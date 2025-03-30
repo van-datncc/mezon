@@ -236,6 +236,7 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 						width: '100%',
 						transform: `translateY(${items[0]?.start ?? 0}px)`
 					}}
+					className="channel-wrap"
 				>
 					{items.map((virtualRow) => {
 						const item = data[virtualRow.index];

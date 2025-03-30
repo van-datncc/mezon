@@ -1,5 +1,5 @@
 import { useCustomNavigate } from '@mezon/core';
-import { appActions, selectBadgeCountByClanId, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
+import { appActions, getStore, selectBadgeCountByClanId, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, createImgproxyUrl } from '@mezon/utils';
 import { memo, useState, useTransition } from 'react';
@@ -19,14 +19,17 @@ const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => 
 	const [_, startTransition] = useTransition();
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const navigate = useCustomNavigate();
-	const isShowDmProfile = useSelector(selectIsUseProfileDM);
 	const dispatch = useAppDispatch();
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-		if (isShowDmProfile) {
-			dispatch(appActions.setIsUseProfileDM(false));
-		}
+		const store = getStore();
+		const isShowDmProfile = selectIsUseProfileDM(store.getState());
 		startTransition(() => {
 			navigate(linkClan);
+			if (isShowDmProfile) {
+				requestIdleCallback(() => {
+					dispatch(appActions.setIsUseProfileDM(false));
+				});
+			}
 		});
 	};
 	const [coords, setCoords] = useState<Coords>({

@@ -27,14 +27,15 @@ import {
 	selectCurrentChannelId,
 	selectCurrentTopicId,
 	selectDataReferences,
-	selectDmGroupCurrentId,
 	selectHasKeyE2ee,
 	selectIdMessageRefEdit,
 	selectIsFocusOnChannelInput,
 	selectIsFocused,
 	selectIsSearchMessage,
 	selectIsShowMemberList,
+	selectIsShowMemberListDM,
 	selectIsShowPopupQuickMess,
+	selectIsUseProfileDM,
 	selectLassSendMessageEntityBySenderId,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
@@ -97,7 +98,14 @@ import { useSelector } from 'react-redux';
 import textFieldEdit from 'text-field-edit';
 import GifStickerEmojiButtons from '../GifsStickerEmojiButtons';
 import CustomModalMentions from './CustomModalMentions';
-import { widthMessageViewChat, widthMessageViewChatThread, widthSearchMessage, widthThumbnailAttachment } from './CustomWidth';
+import {
+	widthDmGroupMemberList,
+	widthDmUserProfile,
+	widthMessageViewChat,
+	widthMessageViewChatThread,
+	widthSearchMessage,
+	widthThumbnailAttachment
+} from './CustomWidth';
 import lightMentionsInputStyle from './LightRmentionInputStyle';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
@@ -1062,41 +1070,31 @@ interface DMReactionInputProps extends MentionReactInputProps {
 }
 
 const DMReactionInput = memo((props: DMReactionInputProps) => {
-	// const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
-	// const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
+	const isShowDMUserProfile = useSelector(selectIsUseProfileDM);
+	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const [mentionWidth, setMentionWidth] = useState('');
 
-	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
-
-	// DM specific state and functionality
 	const { setRequestInput } = useMessageValue(props.currentChannelId || '');
 	const request = useAppSelector((state) => selectRequestByChannelId(state, props.currentChannelId as string));
 
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isGr = props.mode === ChannelStreamMode.STREAM_MODE_GROUP;
 
-	// useEffect(() => {
-	// 	if (isDm) {
-	// 		setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
-	// 	} else if (isGr) {
-	// 		setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
-	// 	}
-	// }, [isDm, isGr, isShowDMUserProfile, isShowMemberListDM]);
-
-	// You could add custom DM-specific search handlers here if needed
-	const handleSearchHashtag = useCallback((search: string, callback: any) => {
-		// DM-specific hashtag search implementation
-		// ...
-	}, []);
+	useEffect(() => {
+		if (isDm) {
+			setMentionWidth(isShowDMUserProfile ? widthDmUserProfile : widthThumbnailAttachment);
+		} else if (isGr) {
+			setMentionWidth(isShowMemberListDM ? widthDmGroupMemberList : widthThumbnailAttachment);
+		}
+	}, [isDm, isGr, isShowDMUserProfile, isShowMemberListDM]);
 
 	return (
 		<MentionReactBase
 			{...props}
 			mentionWidth={mentionWidth}
-			handleSearchHashtag={handleSearchHashtag}
 			request={request}
 			setRequestInput={setRequestInput}
-			currentDmGroupId={currentDmGroupId as string}
+			currentDmGroupId={props.currentChannelId as string}
 		/>
 	);
 });
@@ -1106,7 +1104,6 @@ DMReactionInput.displayName = 'DMReactionInput';
 export const MentionReactInput = memo((props: MentionReactInputProps): ReactElement => {
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
 	const isGr = props.mode === ChannelStreamMode.STREAM_MODE_GROUP;
-
 	if (isDm || isGr) {
 		return <DMReactionInput {...props} isDm={isDm} isGr={isGr} />;
 	}

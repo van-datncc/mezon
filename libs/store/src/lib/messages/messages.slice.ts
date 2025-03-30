@@ -347,8 +347,8 @@ export const fetchMessages = createAsyncThunk(
 
 			// no message id and direction is before timestamp means load latest messages
 			// then the last sent message will be the last message of response
-			if (!fromCache && ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages)) {
-				lastSentMessage = response.messages[response.messages.length - 1];
+			if ((!messageId && direction === Direction_Mode.BEFORE_TIMESTAMP) || isFetchingLatestMessages) {
+				lastSentMessage = response.last_sent_message as ApiChannelMessageHeader;
 			}
 
 			const lastSentState = selectLatestMessageId(state, chlId);
@@ -977,7 +977,6 @@ export const messagesSlice = createSlice({
 						}
 					} else {
 						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
-
 						// update last message
 						state.lastMessageByChannel[channelId] = action.payload;
 

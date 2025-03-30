@@ -679,8 +679,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		// }, [focusingId]);
 
 		const handleScroll = useLastCallback(() => {
-			toggleDisableHover(chatRef.current, scrollTimeoutId2);
-
 			if (isScrollTopJustUpdatedRef.current) {
 				isScrollTopJustUpdatedRef.current = false;
 				return;
@@ -1001,15 +999,14 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					ref={chatRef}
 					className={classNames([
 						'thread-scroll',
-						'absolute top-0 left-0 bottom-0 right-0',
-						'overflow-y-scroll overflow-x-hidden',
+						'w-full',
 						'dark:bg-bgPrimary bg-bgLightPrimary',
 						{
 							customScrollLightMode: appearanceTheme === 'light'
 						}
 					])}
 				>
-					<div className="flex flex-col min-h-full mt-auto justify-end">
+					<div className="messages-wrap flex flex-col min-h-full mt-auto justify-end">
 						{isTopic && convertedFirstMsgOfThisTopic && (
 							<div className="sticky top-0 z-[1] dark:bg-bgPrimary bg-bgLightPrimary">
 								<div
