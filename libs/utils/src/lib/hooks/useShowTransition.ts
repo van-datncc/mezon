@@ -24,6 +24,7 @@ type BaseHookParams<RefType extends HTMLElement> = {
 	prefix?: string;
 	shouldForceOpen?: boolean;
 	onCloseAnimationEnd?: NoneToVoidFunction;
+	isSending?: boolean;
 };
 
 export type HookParams<RefType extends HTMLElement> = BaseHookParams<RefType> & {
@@ -61,7 +62,8 @@ export default function useShowTransition<RefType extends HTMLElement = HTMLDivE
 		className = 'fast',
 		prefix = '',
 		shouldForceOpen,
-		onCloseAnimationEnd
+		onCloseAnimationEnd,
+		isSending
 	} = params;
 
 	const localRef = useRef<RefType>(null);
@@ -86,9 +88,9 @@ export default function useShowTransition<RefType extends HTMLElement = HTMLDivE
 		}
 
 		const state = getState();
-		const shouldRender = state !== 'closed';
-		const hasOpenClass = state === 'open';
-		const isClosing = state === 'closing';
+		const shouldRender = isSending || state !== 'closed';
+		const hasOpenClass = isSending || state === 'open';
+		const isClosing = !isSending && state === 'closing';
 
 		toggleExtraClass(element, `${prefix}shown`, shouldRender);
 		toggleExtraClass(element, `${prefix}not-shown`, !shouldRender);

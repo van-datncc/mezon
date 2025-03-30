@@ -42,8 +42,8 @@ export default function StickerSelector({ onSelected, onScroll }: StickerSelecto
 		setSelectedType(name);
 	}
 
-	const handleClickImage = (imageUrl: string) => {
-		onSelected && onSelected(imageUrl);
+	const handleClickImage = (sticker: any) => {
+		onSelected && onSelected(sticker);
 	};
 
 	return (

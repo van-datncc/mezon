@@ -1,6 +1,6 @@
-import { Colors, size, useAnimatedState } from '@mezon/mobile-ui';
+import {Colors, Metrics, size, useAnimatedState} from '@mezon/mobile-ui';
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import {Platform, View} from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import EmojiSelectorContainer from '../EmojiSelectorContainer';
 
@@ -41,7 +41,13 @@ export default function EmojiSelector({
 					isReactMessage={isReactMessage}
 				/>
 			) : (
-				<View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: size.s_40 }}>
+				<View
+					style={{
+						alignItems: 'center',
+						paddingTop: size.s_40,
+						height: Metrics.screenHeight / (Platform.OS === 'ios' ? 1.4 : 1.3)
+					}}
+				>
 					<Flow color={Colors.bgViolet} />
 				</View>
 			)}

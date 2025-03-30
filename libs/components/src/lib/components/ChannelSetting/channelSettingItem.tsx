@@ -90,7 +90,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 							handleOnClick={handleButtonClick}
 							selectedButton={selectedButton}
 						/>
-						{canEditChannelPermissions && (
+						{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && canEditChannelPermissions && (
 							<ChannelSettingItemButton
 								tabName={EChannelSettingTab.PREMISSIONS}
 								handleOnClick={handleButtonClick}
@@ -104,11 +104,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 						/>
 					</>
 				)}
-				<ChannelSettingItemButton
-					tabName={EChannelSettingTab.INTEGRATIONS}
-					handleOnClick={handleButtonClick}
-					selectedButton={selectedButton}
-				/>
+				{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+					<ChannelSettingItemButton
+						tabName={EChannelSettingTab.INTEGRATIONS}
+						handleOnClick={handleButtonClick}
+						selectedButton={selectedButton}
+					/>
+				)}
 				<hr className="border-t border-solid dark:border-borderDefault my-4" />
 				<button
 					className={`p-2 dark:text-red-600 text-red-600 text-[16px] font-medium pl-2 ml-[-8px] hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === 'Delete' ? 'dark:bg-[#232E3B] bg-bgLightModeButton  ' : ''} w-[170px] text-left rounded-[5px]`}

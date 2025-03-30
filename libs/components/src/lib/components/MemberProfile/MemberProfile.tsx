@@ -210,10 +210,7 @@ export const BaseMemberProfile = ({
 
 	const isListDm = positionType === MemberProfileType.DM_LIST;
 
-	const isAnonymous = useMemo(
-		() => (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID,
-		[isFooter, user?.user?.id, userProfile?.user?.id]
-	);
+	const isAnonymous = (isFooter ? userProfile?.user?.id : user?.user?.id) === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID;
 
 	const username = isFooter ? userProfile?.user?.username || '' : name || '';
 

@@ -62,6 +62,7 @@ export const style = (colors: Attributes) =>
 			padding: size.s_4
 		},
 		input: {
+			height: size.s_40,
 			color: colors.text
 		}
 	});

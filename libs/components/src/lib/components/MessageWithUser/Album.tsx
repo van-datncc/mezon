@@ -12,6 +12,7 @@ type OwnProps = {
 	onClick?: (url?: string) => void;
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	isInSearchMessage?: boolean;
+	isSending?: boolean;
 };
 
 const Album: FC<OwnProps> = ({
@@ -23,7 +24,8 @@ const Album: FC<OwnProps> = ({
 	albumLayout,
 	onClick,
 	onContextMenu,
-	isInSearchMessage
+	isInSearchMessage,
+	isSending
 }) => {
 	const mediaCount = (album as any)?.length;
 
@@ -62,6 +64,7 @@ const Album: FC<OwnProps> = ({
 					isProtected={isProtected}
 					onClick={onClick}
 					onContextMenu={onContextMenu}
+					isSending={isSending}
 				/>
 			);
 		} else if (video) {

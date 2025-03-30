@@ -299,6 +299,7 @@ const ImageAlbum = ({
 					onClick={handleClick}
 					onContextMenu={onContextMenu}
 					isInSearchMessage={isInSearchMessage}
+					isSending={message.isSending}
 				/>
 			</div>
 		);
@@ -330,6 +331,7 @@ const ImageAlbum = ({
 					isDownloading={false}
 					onContextMenu={onContextMenu}
 					isInSearchMessage={isInSearchMessage}
+					isSending={message.isSending}
 				/>
 			</div>
 		);
