@@ -1700,3 +1700,6 @@ export const selectShowScrollDownButton = createSelector(
 	[getChannelsState, (state, channelId) => channelId],
 	(state, channelId) => state.showScrollDownButton?.[channelId] ?? 0
 );
+export const selectAllAppChannelsListShowOnPopUp = createSelector([getChannelsState], (state) =>
+	Object.values(state.byClans).flatMap((clan) => clan.appChannelsListShowOnPopUp || [])
+);

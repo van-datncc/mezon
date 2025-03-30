@@ -5,7 +5,6 @@ import {
 	channelsActions,
 	getStore,
 	selectAppChannelsList,
-	selectAppChannelsListShowOnPopUp,
 	selectAppFocusedChannel,
 	selectChannelById,
 	selectCheckAppFocused,
@@ -23,9 +22,9 @@ import { Icons } from '@mezon/ui';
 import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChannelApps } from '../ChannelApp';
 
 import React from 'react';
+import { ChannelApps } from '../ChannelApp';
 
 type DraggableModalTabsProps = {
 	appChannelList: ApiChannelAppResponseExtend[];
@@ -331,10 +330,11 @@ interface DraggableModalProps {
 	initialWidth?: number;
 	initialHeight?: number;
 	aspectRatio?: number | null;
+	appChannelList?: ApiChannelAppResponseExtend[];
+	inVisible?: boolean;
 }
 
-const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
-	const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
+const DraggableModal: React.FC<DraggableModalProps> = memo(({ appChannelList, inVisible }) => {
 	const isShowModal = appChannelList && appChannelList.length > 0;
 
 	const [isCollapsed, setIsCollapsed] = useState(false);
@@ -462,10 +462,11 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 			window.removeEventListener('mouseup', handleMouseUp);
 		};
 	}, [handleMouseMove, handleMouseUp]);
+	const modalStyle = inVisible ? { height: 0, visibility: 'hidden' as const } : {};
 
 	return (
 		isShowModal && (
-			<div className="relative">
+			<div className="relative" style={modalStyle}>
 				<div
 					ref={modalElementRef}
 					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict z-50"

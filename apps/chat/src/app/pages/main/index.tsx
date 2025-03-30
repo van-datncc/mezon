@@ -23,6 +23,7 @@ import {
 	getIsShowPopupForward,
 	listChannelsByUserActions,
 	onboardingActions,
+	selectAllAppChannelsListShowOnPopUp,
 	selectAllChannelMemberIds,
 	selectAllClans,
 	selectAllRoleIds,
@@ -276,9 +277,20 @@ function MyApp() {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
 
+	const allChannelApp = useSelector(selectAllAppChannelsListShowOnPopUp);
+	const groupedByClan = allChannelApp.reduce<Record<string, typeof allChannelApp>>((acc, item) => {
+		if (item.clan_id) {
+			(acc[item.clan_id] ||= []).push(item);
+		}
+		return acc;
+	}, {});
+
 	return (
 		<div className="relative overflow-hidden w-full h-full">
-			<DraggableModal />
+			{Object.entries(groupedByClan).map(([clanId, apps]) => (
+				<DraggableModal appChannelList={apps} key={clanId} inVisible={clanId !== currentClanId} />
+			))}
+
 			<MemoizedErrorModals />
 
 			<div
