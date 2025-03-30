@@ -80,3 +80,34 @@ export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => 
 		</div>
 	);
 };
+
+export const DeleteAccountModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => {
+	return (
+		<div className="fixed  inset-0 flex items-center justify-center z-50">
+			<div className="fixed inset-0 bg-black opacity-80"></div>
+			<div className="relative z-10 dark:bg-bgPrimary bg-bgLightModeSecond p-6 rounded-[5px] text-center">
+				<h2 className="text-[30px] font-semibold mb-4 dark:text-white text-black">Delete Account</h2>
+				<p className="dark:text-white-600 dark:text-textDarkTheme text-textLightTheme mb-6 text-[16px]">
+					Are you sure that you want to delete your account? This will immediately log you out of your account and you will not be able to
+					log in again.
+				</p>
+				<div className="flex justify-center mt-10 text-[14px]">
+					<button
+						color="gray"
+						onClick={onClose}
+						className="px-4 py-2 mr-5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
+					>
+						Cancel
+					</button>
+					<button
+						color="blue"
+						onClick={handleLogOut}
+						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+					>
+						Delete
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+};
