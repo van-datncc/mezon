@@ -1,6 +1,6 @@
 import { EDragBorderPosition } from '@mezon/utils';
+import isEqual from 'lodash.isequal';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import isEqual  from "lodash.isequal";
 
 export function useDragAndDropRole<T>(initialList: T[]) {
 	const [rolesList, setRolesList] = useState([...initialList]);
@@ -23,16 +23,23 @@ export function useDragAndDropRole<T>(initialList: T[]) {
 		setDragBorderPosition(null);
 		setHoveredIndex(null);
 
-		if (dragItemIndexRef.current !== null && dragOverItemIndexRef.current !== null) {
-			const copyRolesList = [...rolesList];
-			const [draggedItem] = copyRolesList.splice(dragItemIndexRef.current, 1);
-			copyRolesList.splice(dragOverItemIndexRef.current, 0, draggedItem);
+		setRolesList((currentRolesList) => {
+			const dragIndex = dragItemIndexRef.current;
+			const dropIndex = dragOverItemIndexRef.current;
 
-			setRolesList(copyRolesList);
-		}
+			if (dragIndex === null || dropIndex === null) {
+				return currentRolesList;
+			}
 
-		dragOverItemIndexRef.current = null;
-		dragItemIndexRef.current = null;
+			const updatedRolesList = [...currentRolesList];
+			const [draggedItem] = updatedRolesList.splice(dragIndex, 1);
+			updatedRolesList.splice(dropIndex, 0, draggedItem);
+
+			dragItemIndexRef.current = null;
+			dragOverItemIndexRef.current = null;
+
+			return updatedRolesList;
+		});
 	}, []);
 
 	const handleDragOver = useCallback((e: React.DragEvent<HTMLTableRowElement>) => {
