@@ -1,5 +1,3 @@
-import { throttle } from '../utils';
-
 export function findParentByClass(element: HTMLElement, className: string): HTMLElement | null {
 	let parent = element.parentElement;
 	while (parent) {
@@ -23,6 +21,4 @@ function _toggleDisableHoverImpl(element: HTMLDivElement | null, timeoutId: Reac
 	}, 300);
 }
 
-export const toggleDisableHover = throttle((element: HTMLDivElement | null, timeoutId: React.MutableRefObject<NodeJS.Timeout | null>) => {
-	_toggleDisableHoverImpl(element, timeoutId);
-}, 300);
+export const toggleDisableHover = _toggleDisableHoverImpl;

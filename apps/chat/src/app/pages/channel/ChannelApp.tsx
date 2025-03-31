@@ -6,8 +6,8 @@ import {
 	giveCoffeeActions,
 	handleParticipantVoiceState,
 	selectAllAccount,
-	selectAllChannelMembers,
 	selectAllRolesClan,
+	selectAllUsersByUser,
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectEnableCall,
@@ -76,7 +76,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 	const allRolesInClan = useSelector(selectAllRolesClan);
 	const sendTokenEvent = useSelector(selectSendTokenEvent);
 	const userProfile = useSelector(selectAllAccount);
-	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, appChannel?.channel_id));
+	const userChannels = useAppSelector((state) => selectAllUsersByUser(state));
 	const roomId = useAppSelector((state) => selectGetRoomId(state, appChannel?.channel_id));
 
 	const isJoinVoice = useSelector(selectEnableCall);
