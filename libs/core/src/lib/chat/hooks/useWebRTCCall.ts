@@ -30,6 +30,8 @@ const RTCConfig = {
 interface CallState {
 	localStream: MediaStream | null;
 	remoteStream: MediaStream | null;
+	localScreenStream: MediaStream | null;
+	remoteScreenStream: MediaStream | null;
 	peerConnection: RTCPeerConnection | null;
 	storedIceCandidates?: RTCIceCandidate[] | null;
 }
@@ -63,9 +65,16 @@ const decompress = async (compressedStr: string, encoding = 'gzip' as Compressio
 };
 
 export function useWebRTCCall(dmUserId: string, channelId: string, userId: string, callerName: string, callerAvatar: string) {
+	const getScreen = useCallback(async () => {
+		const screenSources = await window.electron.getScreenSources('screen');
+		return screenSources[0];
+	}, []);
+
 	const [callState, setCallState] = useState<CallState>({
 		localStream: null,
 		remoteStream: null,
+		localScreenStream: null,
+		remoteScreenStream: null,
 		peerConnection: null,
 		storedIceCandidates: null
 	});
@@ -78,8 +87,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	const dispatch = useAppDispatch();
 	const timeStartConnected = useRef<Date | null>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
-	const screenViewVideoRef = useRef<HTMLVideoElement>(null);
+	const localScreenVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
+	const remoteScreenVideoRef = useRef<HTMLVideoElement>(null);
+
 	const callTimeout = useRef<NodeJS.Timeout | null>(null);
 	const [audioInputDevicesList, setAudioInputDevicesList] = useState<MediaDeviceInfo[]>([]);
 	const [audioOutputDevicesList, setAudioOutputDevicesList] = useState<MediaDeviceInfo[]>([]);
@@ -118,15 +129,25 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 		pc.ontrack = (event) => {
 			const remoteStream = event.streams[0];
-			setCallState((prev) => ({
-				...prev,
-				remoteStream
-			}));
-
-			if (remoteVideoRef.current) {
-				remoteVideoRef.current.srcObject = remoteStream;
-			}
-
+			remoteStream.getVideoTracks().forEach((track) => {
+				if (isScreenTrack(track)) {
+					if (remoteScreenVideoRef.current) {
+						remoteScreenVideoRef.current.srcObject = remoteStream;
+						setCallState((prev) => ({
+							...prev,
+							remoteScreenStream: remoteStream
+						}));
+					}
+				} else {
+					if (remoteVideoRef.current) {
+						remoteVideoRef.current.srcObject = remoteStream;
+						setCallState((prev) => ({
+							...prev,
+							remoteStream: remoteStream
+						}));
+					}
+				}
+			});
 			remoteStream.getVideoTracks().forEach((track) => {
 				track.onmute = () => {
 					dispatch(audioCallActions.setIsRemoteVideo(false));
@@ -192,6 +213,12 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		return pc;
 	}, [mezon.socketRef, dmUserId, channelId, userId]);
 
+	const isScreenTrack = (track: MediaStreamTrack | null) => {
+		return track?.kind === 'video' && (track?.label.toLowerCase().includes('screen') || track?.label.toLowerCase().includes('window'));
+	};
+	const isCameraTrack = (track: MediaStreamTrack | null) => {
+		return track?.kind === 'video' && !isScreenTrack(track);
+	};
 	// Start a call
 	const startCall = async (isVideoCall: boolean, isAnswer: boolean) => {
 		try {
@@ -288,6 +315,8 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			setCallState({
 				localStream: stream,
 				remoteStream: null,
+				localScreenStream: null,
+				remoteScreenStream: null,
 				peerConnection: pc
 			});
 		} catch (error) {
@@ -439,7 +468,9 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			if (callState.localStream) {
 				callState.localStream.getTracks().forEach((track) => track.stop());
 			}
-
+			if (callState.localScreenStream) {
+				callState.localScreenStream.getTracks().forEach((track) => track.stop());
+			}
 			if (callState.peerConnection) {
 				callState.peerConnection.close();
 			}
@@ -447,8 +478,15 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			if (localVideoRef.current) {
 				localVideoRef.current.srcObject = null;
 			}
+			if (localScreenVideoRef.current) {
+				localScreenVideoRef.current.srcObject = null;
+			}
 			if (remoteVideoRef.current) {
 				remoteVideoRef.current.srcObject = null;
+			}
+
+			if (remoteScreenVideoRef.current) {
+				remoteScreenVideoRef.current.srcObject = null;
 			}
 
 			await mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, 4, '', channelId, userId);
@@ -460,13 +498,16 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			dispatch(audioCallActions.setIsRemoteAudio(false));
 			dispatch(audioCallActions.setIsRemoteVideo(false));
 			dispatch(DMCallActions.setIsShowMeetDM(false));
+			dispatch(DMCallActions.setIsShowShareScreen(false));
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setUserCallId(''));
 			dispatch(DMCallActions.removeAll());
 			setCallState({
 				localStream: null,
 				remoteStream: null,
-				peerConnection: null
+				peerConnection: null,
+				localScreenStream: null,
+				remoteScreenStream: null
 			});
 		} catch (error) {
 			console.error('Error ending call:', error);
@@ -482,10 +523,6 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			audioSender.track.enabled = !audioSender.track.enabled;
 		}
 	};
-	const getListScreen = useCallback(async () => {
-		const screenSources = await window.electron.getScreenSources('screen');
-		return screenSources[0];
-	}, []);
 
 	const toggleVideo = async () => {
 		if (!callState.localStream) return;
@@ -506,10 +543,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			try {
 				const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
 				const videoTrack = videoStream.getVideoTracks()[0];
-
 				callState.localStream.addTrack(videoTrack);
 				const senders = callState.peerConnection?.getSenders() || [];
-				const videoSender = senders.find((sender) => sender.track?.kind === 'video');
+				const videoSender = senders.find((sender) => isCameraTrack(sender.track));
+
 				if (videoSender) {
 					await videoSender.replaceTrack(videoTrack);
 				} else {
@@ -531,7 +568,8 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 					}
 
 					const senders = callState.peerConnection?.getSenders() || [];
-					const videoSender = senders.find((sender) => sender.track === track);
+					const videoSender = senders.find((sender) => isCameraTrack(sender.track));
+
 					if (videoSender) {
 						callState.peerConnection?.removeTrack(videoSender);
 					}
@@ -545,19 +583,51 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	};
 
 	const toggleScreenShare = async () => {
-		if (!callState.localStream) return;
+		if (!callState.localScreenStream) {
+			let videoStream = undefined;
+			if (isElectron()) {
+				const screen = await getScreen();
+				videoStream = await navigator.mediaDevices.getUserMedia({
+					video: {
+						mandatory: {
+							chromeMediaSource: 'desktop',
+							chromeMediaSourceId: screen.id
+						}
+					},
+					audio: false
+				} as MediaStreamConstraints);
+			} else {
+				videoStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+			}
+			if (!videoStream) {
+				return;
+			}
+			callState.localScreenStream = videoStream;
+			const videoTrack = videoStream?.getVideoTracks()[0];
+			const senders = callState.peerConnection?.getSenders() || [];
 
-		if (!isShowScreen) {
-			dispatch(toastActions.addToast({ message: 'Screen is not available', type: 'warning', autoClose: 1000 }));
+			const screenSender = senders.find((sender) => isScreenTrack(sender.track));
+
+			if (screenSender) {
+				await screenSender.replaceTrack(videoTrack);
+			} else {
+				callState.peerConnection?.addTrack(videoTrack, callState.localScreenStream);
+			}
+
+			if (localScreenVideoRef.current) {
+				localScreenVideoRef.current.srcObject = callState.localScreenStream;
+			}
+			dispatch(DMCallActions.setIsShowShareScreen(!isShowScreen));
+
 			return;
 		}
 
-		const videoTracks = callState.localStream.getVideoTracks();
+		const videoTracks = callState.localScreenStream.getVideoTracks();
 		if (videoTracks.length === 0) {
 			try {
 				let videoStream = undefined;
 				if (isElectron()) {
-					const screen = await getListScreen();
+					const screen = await getScreen();
 					videoStream = await navigator.mediaDevices.getUserMedia({
 						video: {
 							mandatory: {
@@ -572,17 +642,19 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 				}
 				const videoTrack = videoStream?.getVideoTracks()[0];
 
-				callState.localStream.addTrack(videoTrack);
+				callState.localScreenStream.addTrack(videoTrack);
 				const senders = callState.peerConnection?.getSenders() || [];
-				const videoSender = senders.find((sender) => sender.track?.kind === 'video');
-				if (videoSender) {
-					await videoSender.replaceTrack(videoTrack);
+
+				const screenSender = senders.find((sender) => isScreenTrack(sender.track));
+
+				if (screenSender) {
+					await screenSender.replaceTrack(videoTrack);
 				} else {
-					callState.peerConnection?.addTrack(videoTrack, callState.localStream);
+					callState.peerConnection?.addTrack(videoTrack, callState.localScreenStream);
 				}
 
-				if (screenViewVideoRef.current) {
-					screenViewVideoRef.current.srcObject = callState.localStream;
+				if (localScreenVideoRef.current) {
+					localScreenVideoRef.current.srcObject = callState.localScreenStream;
 				}
 			} catch (error) {
 				console.error('Error adding video track:', error);
@@ -591,14 +663,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			videoTracks.forEach((track) => {
 				if (track.enabled) {
 					track.stop();
-					if (callState.localStream) {
-						callState.localStream.removeTrack(track);
+					if (callState.localScreenStream) {
+						callState.localScreenStream.removeTrack(track);
 					}
 
 					const senders = callState.peerConnection?.getSenders() || [];
-					const videoSender = senders.find((sender) => sender.track === track);
-					if (videoSender) {
-						callState.peerConnection?.removeTrack(videoSender);
+					const screenSender = senders.find((sender) => isScreenTrack(sender.track));
+					if (screenSender) {
+						callState.peerConnection?.removeTrack(screenSender);
 					}
 				} else {
 					track.enabled = true;
@@ -606,7 +678,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			});
 		}
 
-		dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
+		dispatch(DMCallActions.setIsShowShareScreen(!isShowScreen));
 	};
 
 	const changeAudioInputDevice = async (deviceId: string) => {
@@ -670,6 +742,8 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		handleSignalingMessage,
 		handleOtherCall,
 		localVideoRef,
+		localScreenVideoRef,
+		remoteScreenVideoRef,
 		remoteVideoRef,
 		changeAudioInputDevice,
 		changeAudioOutputDevice,

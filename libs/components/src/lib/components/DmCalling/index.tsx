@@ -76,6 +76,8 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		handleOtherCall,
 		localVideoRef,
 		remoteVideoRef,
+		localScreenVideoRef,
+		remoteScreenVideoRef,
 		changeAudioInputDevice,
 		changeAudioOutputDevice,
 		currentInputDevice,
