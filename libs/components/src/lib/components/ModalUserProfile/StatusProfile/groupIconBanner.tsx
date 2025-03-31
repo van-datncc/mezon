@@ -117,7 +117,6 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 	};
 
 	const handleOpenTransferModal = () => {
-		const amount = 10000;
 		const note = 'Transfer funds';
 
 		dispatch(
@@ -125,7 +124,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				sender_id: userProfile?.user?.id,
 				sender_name: userProfile?.user?.username,
 				receiver_id: user?.id,
-				amount: amount,
+				amount: 0,
 				note: note,
 				extra_attribute: transferDetail?.extra_attribute ?? ''
 			})
