@@ -283,7 +283,6 @@ function MessageWithUser({
 								isInSearchMessage={isSearchMessage}
 							/>
 						)}
-						{!isTopic && message?.code === TypeMessage.Topic && <TopicViewButton message={message} />}
 
 						{Array.isArray(message?.content?.embed) && (
 							<div className="w-full">
@@ -292,6 +291,7 @@ function MessageWithUser({
 								))}
 							</div>
 						)}
+						{!isTopic && message?.code === TypeMessage.Topic && <TopicViewButton message={message} />}
 
 						{!!message?.content?.callLog?.callLogType && (
 							<CallLogMessage
