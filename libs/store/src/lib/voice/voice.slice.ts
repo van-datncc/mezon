@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, IVoice, IvoiceInfo, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
+import { ApiGenerateMeetTokenResponse } from 'mezon-js/api.gen';
 import { ensureClientAsync, ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
@@ -165,6 +166,9 @@ export const voiceSlice = createSlice({
 			state.isJoined = false;
 			state.token = '';
 			state.stream = null;
+		},
+		resetExternalToken: (state) => {
+			state.externalToken = undefined;
 		}
 		// ...
 	},
@@ -179,6 +183,18 @@ export const voiceSlice = createSlice({
 			})
 			.addCase(fetchVoiceChannelMembers.rejected, (state: VoiceState, action) => {
 				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+		builder
+			.addCase(generateMeetTokenExternal.pending, (state: VoiceState) => {
+				state.joinCallExtStatus = 'loading';
+			})
+			.addCase(generateMeetTokenExternal.fulfilled, (state: VoiceState, action: PayloadAction<ApiGenerateMeetTokenResponse>) => {
+				state.externalToken = action.payload.token;
+				state.joinCallExtStatus = 'loaded';
+			})
+			.addCase(generateMeetTokenExternal.rejected, (state: VoiceState, action) => {
+				state.joinCallExtStatus = 'error';
 				state.error = action.error.message;
 			});
 	}
@@ -260,3 +276,7 @@ export const selectShowSelectScreenModal = createSelector(getVoiceState, (state)
 export const selectNumberMemberVoiceChannel = createSelector([selectVoiceChannelMembersByChannelId], (members) => members.length);
 
 export const selectVoiceConnectionState = createSelector(getVoiceState, (state) => state.voiceConnectionState);
+
+///
+export const selectJoinCallExtStatus = createSelector(getVoiceState, (state) => state.joinCallExtStatus);
+export const selectExternalToken = createSelector(getVoiceState, (state) => state.externalToken);
