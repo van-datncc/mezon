@@ -1,5 +1,6 @@
 import { useAccount, useAuth } from '@mezon/core';
 import {
+	accountActions,
 	channelMembersActions,
 	clansActions,
 	selectCurrentChannelId,
@@ -10,7 +11,7 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { Icons, InputField } from '@mezon/ui';
+import { DeleteAccountModal, Icons, InputField } from '@mezon/ui';
 import { ImageSourceObject, MAX_FILE_SIZE_1MB, createImgproxyUrl, fileTypeImage, resizeFileImage } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -238,6 +239,18 @@ const SettingRightUser = ({
 		setCoords({ mouseX, mouseY, distanceToBottom });
 		openRightClickModal();
 	};
+	const [openModalDeleteAcc, setOpenModalDeleteAcc] = useState<boolean>(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+	const handleOpenModalDeleteAcc = () => {
+		setOpenModalDeleteAcc(true);
+	};
+	const handleDeleteAccount = async () => {
+		setIsDeleting(true);
+		await dispatch(accountActions.deleteAccount());
+	};
+	const handleCloseModal = () => {
+		setOpenModalDeleteAcc(false);
+	};
 
 	return (
 		<>
@@ -323,6 +336,16 @@ const SettingRightUser = ({
 							</label>
 						</div>
 					</div>
+					<div className="mt-8">
+						<div className="flex mt-[10px] gap-x-5">
+							<button
+								className="dark:text-white text-black dark:bg-[#ee4545] bg-gray-300 font-medium rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
+								onClick={handleOpenModalDeleteAcc}
+							>
+								Delete account
+							</button>
+						</div>
+					</div>
 				</div>
 				<div className="flex-1  text-white">
 					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
@@ -359,6 +382,7 @@ const SettingRightUser = ({
 					</div>
 				</div>
 			) : null}
+			{openModalDeleteAcc && <DeleteAccountModal handleLogOut={handleDeleteAccount} onClose={handleCloseModal} isDeleting={isDeleting} />}
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />

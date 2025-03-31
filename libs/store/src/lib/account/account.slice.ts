@@ -1,8 +1,10 @@
 import { IUserAccount, LoadingStatus } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { safeJSONParse } from 'mezon-js';
+import { toast } from 'react-toastify';
+import { authActions } from '../auth/auth.slice';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
+import { clearAllMemoizedFunctions, memoizeAndTrack } from '../memoize';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
 export interface IAccount {
@@ -45,6 +47,22 @@ export const getUserProfile = createAsyncThunk<IUserAccount, { noCache: boolean 
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
 	return response;
+});
+
+export const deleteAccount = createAsyncThunk('account/deleteaccount', async (_, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		const response = await mezon.client.deleteAccount(mezon.session);
+		thunkAPI.dispatch(authActions.setLogout());
+		clearAllMemoizedFunctions();
+		return response;
+	} catch (error) {
+		//Todo: check clan owner before deleting account
+		toast.error('Error: You are the owner of the clan');
+		// captureSentryError(error, 'account/deleteaccount');
+		// return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const accountSlice = createSlice({
@@ -133,7 +151,7 @@ export const accountSlice = createSlice({
  */
 export const accountReducer = accountSlice.reducer;
 
-export const accountActions = { ...accountSlice.actions, getUserProfile };
+export const accountActions = { ...accountSlice.actions, getUserProfile, deleteAccount };
 
 export const getAccountState = (rootState: { [ACCOUNT_FEATURE_KEY]: AccountState }): AccountState => rootState[ACCOUNT_FEATURE_KEY];
 
