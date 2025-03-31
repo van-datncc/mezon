@@ -1,4 +1,4 @@
-import { ChannelList, ClanHeader, FooterProfile, StreamInfo, UpdateButton, VoiceInfo } from '@mezon/components';
+import { ChannelList, ClanHeader, StreamInfo, UpdateButton, VoiceInfo } from '@mezon/components';
 import { useApp, useGifsStickersEmoji } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -125,20 +125,11 @@ const ClanLayout = () => {
 			>
 				<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 				<ChannelList />
-				<div id="clan-footer">
+				<div>
 					{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 					{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 					{isVoiceJoined && <VoiceInfo />}
 					{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
-					<div style={{ height: 56, width: '100%' }}>
-						<FooterProfile
-							name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
-							status={userProfile?.user?.online}
-							avatar={userProfile?.user?.avatar_url || ''}
-							userId={userProfile?.user?.id || ''}
-							isDM={false}
-						/>
-					</div>
 				</div>
 			</div>
 			<div

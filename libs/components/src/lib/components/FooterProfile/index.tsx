@@ -222,7 +222,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const rootRef = useRef<HTMLDivElement>(null);
 
 	return (
-		<>
+		<div className="fixed bottom-0 left-[72px] h-14 w-widthChannelList" id="clan-footer">
 			<div
 				ref={rootRef}
 				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
@@ -293,7 +293,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					sendTokenInputsState={sendTokenInputsState}
 				/>
 			)}
-		</>
+		</div>
 	);
 }
 
