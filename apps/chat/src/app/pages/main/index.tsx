@@ -313,7 +313,7 @@ function MyApp() {
 					status={userProfile?.user?.online}
 					avatar={userProfile?.user?.avatar_url || ''}
 					userId={userProfile?.user?.id || ''}
-					isDM={false}
+					isDM={currentClanId !== '0'}
 				/>
 
 				<div

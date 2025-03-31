@@ -8,23 +8,30 @@ import {
 	selectAccountCustomStatus,
 	selectCurrentClanId,
 	selectInfoSendToken,
+	selectIsElectronDownloading,
+	selectIsElectronUpdateAvailable,
+	selectIsInCall,
+	selectIsJoin,
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectShowModalSendToken,
 	selectTheme,
 	selectUpdateToken,
+	selectVoiceJoined,
 	useAppDispatch,
 	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType, TypeMessage, formatMoney } from '@mezon/utils';
+import { ESummaryInfo, TypeMessage, formatMoney } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { MemberProfile } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
+import StreamInfo from '../StreamInfo';
+import UpdateButton from '../UpdateButton/UpdateButton';
+import { VoiceInfo } from '../VoiceChannel';
 import ModalFooterProfile from './ModalFooterProfile';
 
 export type FooterProfileProps = {
@@ -221,18 +228,38 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	const rootRef = useRef<HTMLDivElement>(null);
 
+	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
+	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
+	const isInCall = useSelector(selectIsInCall);
+	const isJoin = useSelector(selectIsJoin);
+	const isVoiceJoined = useSelector(selectVoiceJoined);
+
 	return (
-		<div className="fixed bottom-0 left-[72px] h-14 w-widthChannelList" id="clan-footer">
+		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList" id="clan-footer">
+			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
+			{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
+			{isVoiceJoined && <VoiceInfo />}
+			{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 			<div
 				ref={rootRef}
-				className={`flex items-center justify-between px-4 py-2 font-title text-[15px]
+				className={`flex items-center gap-2 px-4 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
-				<div className={`footer-profile min-w-[142px] ${appearanceTheme === 'light' && 'lightMode'}`} onClick={handleClickFooterProfile}>
-					<div className="cursor-pointer">
-						<MemberProfile
+				<div
+					className={`footer-profile h-10 flex-1 flex items-center ${appearanceTheme === 'light' && 'lightMode'}`}
+					onClick={handleClickFooterProfile}
+				>
+					<div className="cursor-pointer flex items-center gap-2">
+						<img src={avatar} className="h-8 w-8 rounded-full object-cover" alt="user_avatar" />
+						<div className="flex flex-col ">
+							<p className="text-base font-medium">{name}</p>
+							<p className="text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[14px]">
+								{customStatus}
+							</p>
+						</div>
+						{/* <MemberProfile
 							name={name}
 							status={{ status: isMe ? true : status, isMobile: false }}
 							avatar={avatar}
@@ -240,7 +267,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 							classParent="memberProfile"
 							positionType={MemberProfileType.FOOTER_PROFILE}
 							customStatus={userStatusProfile}
-						/>
+						/> */}
 					</div>
 					{showModalFooterProfile && (
 						<ModalFooterProfile
