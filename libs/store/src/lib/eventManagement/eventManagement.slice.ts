@@ -36,7 +36,8 @@ export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?
 		...eventRes,
 		id: eventRes.id || '',
 		channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id,
-		channel_voice_id: eventRes.channel_voice_id === '0' || eventRes.channel_voice_id === '' ? '' : eventRes.channel_voice_id
+		channel_voice_id: eventRes.channel_voice_id === '0' || eventRes.channel_voice_id === '' ? '' : eventRes.channel_voice_id,
+		isPrivate: eventRes.is_private
 	};
 };
 
@@ -119,7 +120,7 @@ export const fetchCreateEventManagement = createAsyncThunk(
 			logo,
 			channel_id,
 			repeat_type,
-			isPrivate = false
+			is_private = false
 		}: ApiCreateEventRequest,
 		thunkAPI
 	) => {
@@ -136,7 +137,7 @@ export const fetchCreateEventManagement = createAsyncThunk(
 				logo: logo || '',
 				channel_id: channel_id,
 				repeat_type: repeat_type || ERepeatType.DOES_NOT_REPEAT,
-				isPrivate: isPrivate
+				is_private: is_private
 			};
 			const response = await mezon.client.createEvent(mezon.session, body);
 

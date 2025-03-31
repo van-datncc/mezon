@@ -42,6 +42,7 @@ export type ItemEventManagementProps = {
 	onEventUpdateId?: (id: string) => void;
 	textChannelId?: string;
 	onClose: () => void;
+	isPrivate?: boolean;
 };
 
 const ItemEventManagement = (props: ItemEventManagementProps) => {
@@ -59,10 +60,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		openModelUpdate,
 		onEventUpdateId,
 		textChannelId,
-		onClose
+		onClose,
+		isPrivate
 	} = props;
 	const isNonPublicEvent = textChannelId && textChannelId !== '0';
-	const isPrivateEvent = event?.isPrivate && isNonPublicEvent;
+	const isPrivateEvent = (event?.isPrivate && !isNonPublicEvent) || (event?.is_private && !isNonPublicEvent) || (isPrivate && !isNonPublicEvent);
 	const dispatch = useAppDispatch();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};

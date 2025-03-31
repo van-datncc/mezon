@@ -24,7 +24,7 @@ export function useEventManagement() {
 			logo: string,
 			channel_id: string,
 			repeat_type: ERepeatType,
-			isPrivate: boolean
+			is_private: boolean
 		) => {
 			await dispatch(
 				eventManagementActions.fetchCreateEventManagement({
@@ -38,7 +38,7 @@ export function useEventManagement() {
 					logo,
 					channel_id,
 					repeat_type,
-					isPrivate
+					is_private
 				})
 			);
 		},

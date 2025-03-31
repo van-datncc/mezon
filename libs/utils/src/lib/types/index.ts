@@ -791,7 +791,7 @@ export enum Tabs_Option {
 export enum OptionEvent {
 	OPTION_SPEAKER = 'Speaker',
 	OPTION_LOCATION = 'Location',
-	PRIVATE_ROOM = 'Private Room'
+	PRIVATE_EVENT = 'Private event'
 }
 
 export enum MentionTypeEnum {
