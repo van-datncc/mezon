@@ -18,7 +18,7 @@ export default function PreJoinCalling() {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
-	const { meetingId } = useParams<{ meetingId: string }>();
+	const { token } = useParams<{ token: string }>();
 
 	useEffect(() => {
 		return () => {
@@ -105,6 +105,7 @@ export default function PreJoinCalling() {
 				micStreamRef.current = stream;
 
 				// Create audio context and analyzer
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
 				audioContextRef.current = audioContext;
 
@@ -148,7 +149,7 @@ export default function PreJoinCalling() {
 
 	// Handle Join Meeting
 	const joinMeeting = async () => {
-		await dispatch(generateMeetTokenExternal({ token: meetingId as string, displayName: username || 'Guest' }));
+		await dispatch(generateMeetTokenExternal({ token: token as string, displayName: username || 'Guest' }));
 	};
 
 	return (

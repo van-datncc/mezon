@@ -99,7 +99,7 @@ export const Routes = memo(() => {
 								element: <LogoutCallback />
 							},
 							{
-								path: 'meeting/code/:meetingId',
+								path: 'meeting/:token',
 								element: <PreJoinCalling />
 							},
 							isElectron()
