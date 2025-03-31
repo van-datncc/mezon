@@ -29,6 +29,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	token: string;
 	stream: MediaStream | null | undefined;
 	showSelectScreenModal: boolean;
+	isPiPMode?: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -147,6 +148,9 @@ export const voiceSlice = createSlice({
 			state.isJoined = false;
 			state.token = '';
 			state.stream = null;
+		},
+		setPiPModeMobile: (state, action) => {
+			state.isPiPMode = action.payload;
 		}
 		// ...
 	},
@@ -242,3 +246,5 @@ export const selectShowSelectScreenModal = createSelector(getVoiceState, (state)
 export const selectNumberMemberVoiceChannel = createSelector([selectVoiceChannelMembersByChannelId], (members) => members.length);
 
 export const selectVoiceConnectionState = createSelector(getVoiceState, (state) => state.voiceConnectionState);
+
+export const selectIsPiPMode = createSelector(getVoiceState, (state) => state.isPiPMode);
