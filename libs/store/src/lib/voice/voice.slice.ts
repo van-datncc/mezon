@@ -2,7 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { IChannelMember, IVoice, IvoiceInfo, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { ensureClientAsync, ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const VOICE_FEATURE_KEY = 'voice';
@@ -29,6 +29,8 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	token: string;
 	stream: MediaStream | null | undefined;
 	showSelectScreenModal: boolean;
+	externalToken: string | undefined;
+	joinCallExtStatus: LoadingStatus;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -73,6 +75,20 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 	}
 );
 
+export const generateMeetTokenExternal = createAsyncThunk(
+	'meet/generateMeetTokenExternal',
+	async ({ token, displayName }: { token: string; displayName?: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureClientAsync(getMezonCtx(thunkAPI));
+			const response = await mezon.client.generateMeetTokenExternal(token, displayName);
+			return response;
+		} catch (error) {
+			captureSentryError(error, 'meet/generateMeetTokenExternal');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
 export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
@@ -87,7 +103,9 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	isJoined: false,
 	token: '',
 	stream: null,
-	showSelectScreenModal: false
+	showSelectScreenModal: false,
+	externalToken: undefined,
+	joinCallExtStatus: 'not loaded'
 });
 
 export const voiceSlice = createSlice({
