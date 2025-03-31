@@ -546,14 +546,8 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 	const toggleScreenShare = async () => {
 		if (!callState.localStream) return;
-		let permissionCameraGranted = false;
 
-		const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
-		if (cameraPermission.state === 'granted') {
-			permissionCameraGranted = true;
-		}
-
-		if (!isShowScreen && !permissionCameraGranted) {
+		if (!isShowScreen) {
 			dispatch(toastActions.addToast({ message: 'Screen is not available', type: 'warning', autoClose: 1000 }));
 			return;
 		}
