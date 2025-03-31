@@ -2,6 +2,7 @@ import { isSameDay, timeFormat } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity } from '@mezon/store-mobile';
 import { EEventStatus } from '@mezon/utils';
+import moment from 'moment';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -33,10 +34,12 @@ export function EventTime({ event, eventStatus }: IEventTimeProps) {
 				color = baseColor.green;
 				text = t('eventDetail.eventIsTaking');
 				break;
-			default:
+			default: {
 				color = themeValue.textStrong;
-				text = timeFormat(event.start_time);
+				const localOffset = moment().utcOffset();
+				text = timeFormat(moment.utc(event?.start_time).add(localOffset, 'minutes').toISOString());
 				break;
+			}
 		}
 
 		return { colorStatusEvent: color, textStatusEvent: text };
