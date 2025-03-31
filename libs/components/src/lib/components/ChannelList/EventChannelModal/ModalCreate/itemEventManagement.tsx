@@ -61,7 +61,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		textChannelId,
 		onClose
 	} = props;
-	const isPrivateEvent = textChannelId && textChannelId !== '0';
+	const isNonPublicEvent = textChannelId && textChannelId !== '0';
+	const isPrivateEvent = event?.isPrivate && isNonPublicEvent;
 	const dispatch = useAppDispatch();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
@@ -162,6 +163,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
+						{isNonPublicEvent && <p className="bg-orange-500 text-white rounded-sm px-1 text-center">Non-Public Event</p>}{' '}
 						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
 					</div>
 					{event?.creator_id && (
@@ -279,13 +281,19 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				)}
 			</div>
 			<div className="flex gap-x-2 mx-4 mb-2">
-				{textChannelId && textChannelId !== '0' && (
+				{isPrivateEvent ? (
 					<span className="flex flex-row">
-						<p className="text-slate-400">
-							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
-							<strong className="text-slate-100">{textChannel.channel_label}</strong>
-						</p>
+						<p className="text-slate-400">Only invited members can join.</p>
 					</span>
+				) : (
+					isNonPublicEvent && (
+						<span className="flex flex-row">
+							<p className="text-slate-400">
+								{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
+								<strong className="text-slate-100">{textChannel.channel_label}</strong>
+							</p>
+						</span>
+					)
 				)}
 			</div>
 			{openPanel && (

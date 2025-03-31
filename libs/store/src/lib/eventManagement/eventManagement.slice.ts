@@ -108,7 +108,19 @@ export type EventManagementOnGogoing = {
 export const fetchCreateEventManagement = createAsyncThunk(
 	'CreatEventManagement/fetchCreateEventManagement',
 	async (
-		{ clan_id, channel_voice_id, address, title, start_time, end_time, description, logo, channel_id, repeat_type }: ApiCreateEventRequest,
+		{
+			clan_id,
+			channel_voice_id,
+			address,
+			title,
+			start_time,
+			end_time,
+			description,
+			logo,
+			channel_id,
+			repeat_type,
+			isPrivate = false
+		}: ApiCreateEventRequest,
 		thunkAPI
 	) => {
 		try {
@@ -123,7 +135,8 @@ export const fetchCreateEventManagement = createAsyncThunk(
 				description: description || '',
 				logo: logo || '',
 				channel_id: channel_id,
-				repeat_type: repeat_type || ERepeatType.DOES_NOT_REPEAT
+				repeat_type: repeat_type || ERepeatType.DOES_NOT_REPEAT,
+				isPrivate: isPrivate
 			};
 			const response = await mezon.client.createEvent(mezon.session, body);
 

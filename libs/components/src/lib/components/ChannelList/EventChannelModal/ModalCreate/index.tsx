@@ -152,7 +152,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 			contentSubmit.description,
 			contentSubmit.logo,
 			contentSubmit.textChannelId as string,
-			contentSubmit.repeatType as ERepeatType
+			contentSubmit.repeatType as ERepeatType,
+			contentSubmit.isPrivate as boolean
 		);
 
 		hanldeCloseModal();
