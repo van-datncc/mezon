@@ -1,6 +1,15 @@
-import { audioCallActions, DMCallActions, selectAudioBusyTone, selectIsShowMeetDM, toastActions, useAppDispatch } from '@mezon/store';
+import {
+	audioCallActions,
+	DMCallActions,
+	selectAudioBusyTone,
+	selectIsShowMeetDM,
+	selectIsShowShareScreen,
+	toastActions,
+	useAppDispatch
+} from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { IMessageTypeCallLog, requestMediaPermission } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { safeJSONParse, WebrtcSignalingType } from 'mezon-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -62,11 +71,14 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 	});
 	const [isAnswerCall, setIsAnswerCall] = useState<boolean>(false);
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
+	const isShowScreen = useSelector(selectIsShowShareScreen);
+
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
 	const timeStartConnected = useRef<Date | null>(null);
 	const localVideoRef = useRef<HTMLVideoElement>(null);
+	const screenViewVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const callTimeout = useRef<NodeJS.Timeout | null>(null);
 	const [audioInputDevicesList, setAudioInputDevicesList] = useState<MediaDeviceInfo[]>([]);
@@ -470,6 +482,10 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 			audioSender.track.enabled = !audioSender.track.enabled;
 		}
 	};
+	const getListScreen = useCallback(async () => {
+		const screenSources = await window.electron.getScreenSources('screen');
+		return screenSources[0];
+	}, []);
 
 	const toggleVideo = async () => {
 		if (!callState.localStream) return;
@@ -502,6 +518,77 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 
 				if (localVideoRef.current) {
 					localVideoRef.current.srcObject = callState.localStream;
+				}
+			} catch (error) {
+				console.error('Error adding video track:', error);
+			}
+		} else {
+			videoTracks.forEach((track) => {
+				if (track.enabled) {
+					track.stop();
+					if (callState.localStream) {
+						callState.localStream.removeTrack(track);
+					}
+
+					const senders = callState.peerConnection?.getSenders() || [];
+					const videoSender = senders.find((sender) => sender.track === track);
+					if (videoSender) {
+						callState.peerConnection?.removeTrack(videoSender);
+					}
+				} else {
+					track.enabled = true;
+				}
+			});
+		}
+
+		dispatch(DMCallActions.setIsShowMeetDM(!isShowMeetDM));
+	};
+
+	const toggleScreenShare = async () => {
+		if (!callState.localStream) return;
+		let permissionCameraGranted = false;
+
+		const cameraPermission = await navigator.permissions.query({ name: 'camera' as PermissionName });
+		if (cameraPermission.state === 'granted') {
+			permissionCameraGranted = true;
+		}
+
+		if (!isShowScreen && !permissionCameraGranted) {
+			dispatch(toastActions.addToast({ message: 'Screen is not available', type: 'warning', autoClose: 1000 }));
+			return;
+		}
+
+		const videoTracks = callState.localStream.getVideoTracks();
+		if (videoTracks.length === 0) {
+			try {
+				let videoStream = undefined;
+				if (isElectron()) {
+					const screen = await getListScreen();
+					videoStream = await navigator.mediaDevices.getUserMedia({
+						video: {
+							mandatory: {
+								chromeMediaSource: 'desktop',
+								chromeMediaSourceId: screen.id
+							}
+						},
+						audio: false
+					} as MediaStreamConstraints);
+				} else {
+					videoStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+				}
+				const videoTrack = videoStream?.getVideoTracks()[0];
+
+				callState.localStream.addTrack(videoTrack);
+				const senders = callState.peerConnection?.getSenders() || [];
+				const videoSender = senders.find((sender) => sender.track?.kind === 'video');
+				if (videoSender) {
+					await videoSender.replaceTrack(videoTrack);
+				} else {
+					callState.peerConnection?.addTrack(videoTrack, callState.localStream);
+				}
+
+				if (screenViewVideoRef.current) {
+					screenViewVideoRef.current.srcObject = callState.localStream;
 				}
 			} catch (error) {
 				console.error('Error adding video track:', error);
@@ -585,6 +672,7 @@ export function useWebRTCCall(dmUserId: string, channelId: string, userId: strin
 		handleEndCall,
 		toggleAudio,
 		toggleVideo,
+		toggleScreenShare,
 		handleSignalingMessage,
 		handleOtherCall,
 		localVideoRef,
