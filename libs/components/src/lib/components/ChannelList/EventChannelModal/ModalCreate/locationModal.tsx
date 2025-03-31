@@ -15,6 +15,7 @@ export type LocationModalProps = {
 	textChannels: ChannelsEntity[];
 	choiceLocation: boolean;
 	choiceSpeaker: boolean;
+	choicePrivateRoom?: boolean;
 	handleOption: (optionEvent: string) => void;
 	setContentSubmit: React.Dispatch<React.SetStateAction<ContenSubmitEventProps>>;
 	onClose: () => void;
@@ -28,7 +29,8 @@ type OptionType = {
 type FilterOptionType = (option: FilterOptionOption<OptionType>, inputValue: string) => boolean;
 
 const LocationModal = (props: LocationModalProps) => {
-	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels, onClose } = props;
+	const { handleOption, voicesChannel, contentSubmit, setContentSubmit, choiceLocation, choiceSpeaker, textChannels, onClose, choicePrivateRoom } =
+		props;
 	const [errorVoice, setErrorVoice] = useState(false);
 
 	const handleChangeVoice = (selectedOption: any) => {
@@ -123,6 +125,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 	const memoizedFilterOption = useMemo<FilterOptionType>(() => (option, inputValue) => filterOptionReactSelect(option, inputValue), []);
+
 	return (
 		<div ref={modalRef}>
 			<div className="flex flex-col mb-4">
@@ -171,21 +174,23 @@ const LocationModal = (props: LocationModalProps) => {
 						id="Hashtag"
 					/>
 				</label>
-				<label className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2" htmlFor="Hashtag">
+				<label className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2" htmlFor="Private">
 					<div className="flex items-center gap-x-2">
 						<Icons.Location />
 						<div>
-							<h4 className={`font-semibold ${choiceLocation ? 'dark:text-white text-black' : 'text-slate-400'}`}>Private Meet Room</h4>
-							<p className={choiceLocation ? 'dark:text-white text-black' : 'text-slate-400'}>Invite-only voice & video room!</p>
+							<h4 className={`font-semibold ${choicePrivateRoom ? 'dark:text-white text-black' : 'text-slate-400'}`}>
+								Create Private Room
+							</h4>
+							<p className={choicePrivateRoom ? 'dark:text-white text-black' : 'text-slate-400'}>Invite-only voice & video room!</p>
 						</div>
 					</div>
 					<input
-						checked={choiceLocation}
-						onChange={() => handleOption(OptionEvent.PRIVATE_MEET_ROOM)}
+						checked={choicePrivateRoom}
+						onChange={() => handleOption(OptionEvent.PRIVATE_ROOM)}
 						type="radio"
 						className="relative disabled:bg-slate-500  float-left -ml-[1.5rem] mr-1 mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:border-neutral-600 dark:checked:border-primary dark:checked:after:border-primary dark:checked:after:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:border-primary dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
-						value="Hashtag"
-						id="Hashtag"
+						value="Private"
+						id="Private"
 					/>
 				</label>
 			</div>
@@ -212,25 +217,30 @@ const LocationModal = (props: LocationModalProps) => {
 					/>
 				</div>
 			)}
-			<div className="flex flex-col mb-2 mt-3">
-				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Who are audiences?</h3>
-				<p className="text-slate-400 text-center">Choose members in the specified channel.</p>
-			</div>
-			<Select
-				options={optionsTextChannel}
-				value={isClear ? null : selectedOption}
-				onChange={handleSelectChannelAudience}
-				styles={customStyles}
-				placeholder="Search channels..."
-				filterOption={memoizedFilterOption}
-			/>
+			{choicePrivateRoom ? null : (
+				<>
+					<div className="flex flex-col mb-2 mt-3">
+						<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Who are audiences?</h3>
+						<p className="text-slate-400 text-center">Choose members in the specified channel.</p>
+					</div>
 
-			{showClearButton && (
-				<div className="flex justify-end mt-1">
-					<button onClick={handleClearAudience} className="text-blue-500 hover:underline">
-						Clear audiences
-					</button>
-				</div>
+					<Select
+						options={optionsTextChannel}
+						value={isClear ? null : selectedOption}
+						onChange={handleSelectChannelAudience}
+						styles={customStyles}
+						placeholder="Search channels..."
+						filterOption={memoizedFilterOption}
+					/>
+
+					{showClearButton && (
+						<div className="flex justify-end mt-1">
+							<button onClick={handleClearAudience} className="text-blue-500 hover:underline">
+								Clear audiences
+							</button>
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);

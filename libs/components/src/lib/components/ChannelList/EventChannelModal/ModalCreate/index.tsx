@@ -64,7 +64,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 		logo: currentEvent ? currentEvent.logo || '' : '',
 		description: currentEvent ? currentEvent.description || '' : '',
 		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
-		repeatType: currentEvent ? currentEvent.repeat_type || ERepeatType.DOES_NOT_REPEAT : ERepeatType.DOES_NOT_REPEAT
+		repeatType: currentEvent ? currentEvent.repeat_type || ERepeatType.DOES_NOT_REPEAT : ERepeatType.DOES_NOT_REPEAT,
+		isPrivate: Boolean(currentEvent?.isPrivate)
 	});
 
 	const [buttonWork, setButtonWork] = useState(true);
@@ -77,6 +78,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const isExistChannelVoice = Boolean(currentEvent?.channel_voice_id);
 	const isExistAddress = Boolean(currentEvent?.address);
+	const isExistPrivateRoom = currentEvent?.isPrivate;
 
 	useEffect(() => {
 		if (currentEvent && eventChannel) {
@@ -89,12 +91,16 @@ const ModalCreate = (props: ModalCreateProps) => {
 	}, [currentEvent, eventChannel]);
 
 	const choiceSpeaker = useMemo(() => {
-		return (isExistChannelVoice || option === OptionEvent.OPTION_SPEAKER) && option !== OptionEvent.OPTION_LOCATION;
-	}, [isExistChannelVoice, option]);
+		return option === OptionEvent.OPTION_SPEAKER || (!option && isExistChannelVoice && !isExistAddress && !isExistPrivateRoom);
+	}, [isExistChannelVoice, isExistAddress, isExistPrivateRoom, option]);
 
 	const choiceLocation = useMemo(() => {
-		return (isExistAddress || option === OptionEvent.OPTION_LOCATION) && option !== OptionEvent.OPTION_SPEAKER;
-	}, [isExistAddress, option]);
+		return option === OptionEvent.OPTION_LOCATION || (!option && isExistAddress && !isExistChannelVoice && !isExistPrivateRoom);
+	}, [isExistChannelVoice, isExistAddress, isExistPrivateRoom, option]);
+
+	const choicePrivateRoom = useMemo(() => {
+		return option === OptionEvent.PRIVATE_ROOM || (!option && isExistPrivateRoom && !isExistChannelVoice && !isExistAddress);
+	}, [isExistChannelVoice, isExistAddress, isExistPrivateRoom, option]);
 
 	const handleNext = (currentModal: number) => {
 		if (buttonWork && currentModal < tabs.length - 1 && !errorTime && !errorOption) {
@@ -131,6 +137,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const handleSubmit = useCallback(async () => {
 		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
 		const address = choiceLocation ? contentSubmit.address : '';
+		const privateRoom = choicePrivateRoom ? contentSubmit.isPrivate : '';
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
@@ -273,6 +280,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						handleOption={handleOption}
 						setContentSubmit={setContentSubmit}
 						textChannels={textChannels}
+						choicePrivateRoom={choicePrivateRoom}
 					/>
 				)}
 				{currentModal === Tabs_Option.EVENT_INFO && (
