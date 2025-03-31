@@ -805,6 +805,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 						requestMeasure(() => {
 							const shouldScrollToBottom = !isBackgroundModeActive();
+							if (!shouldScrollToBottom) return;
 
 							animateScroll({
 								container,

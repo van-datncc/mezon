@@ -379,34 +379,57 @@ const SidebarMenu = memo(
 		const statusMenu = useSelector(selectStatusMenu);
 		const { setCloseMenu, setStatusMenu } = useMenu();
 
-		const handleMenu = useCallback(
-			(event: React.MouseEvent<HTMLDivElement>) => {
-				const elementClick = event.target as HTMLDivElement;
-				const wrapElement = document.querySelector('#menu');
-				if (!closeMenu) {
-					return;
+		useEffect(() => {
+			const handleSizeWidth = () => {
+				if (window.innerWidth < 480) {
+					setCloseMenu(true);
+				} else {
+					setCloseMenu(false);
 				}
-				if (elementClick.classList.contains('clan')) {
-					if (elementClick.classList.contains('choose')) {
-						setStatusMenu(false);
-						elementClick.classList.remove('choose');
-					} else {
-						setStatusMenu(true);
-						const elementOld = wrapElement?.querySelector('.choose');
-						if (elementOld) {
-							elementOld.classList.remove('choose');
-						}
-						elementClick.classList.add('choose');
+			};
+
+			handleSizeWidth();
+
+			if (closeMenu) {
+				setStatusMenu(false);
+			}
+
+			const handleResize = () => {
+				handleSizeWidth();
+			};
+
+			window.addEventListener('resize', handleResize);
+
+			return () => {
+				window.removeEventListener('resize', handleResize);
+			};
+		}, []);
+
+		const handleMenu = (event: MouseEvent) => {
+			const elementClick = event.target as HTMLDivElement;
+			const wrapElement = document.querySelector('#menu');
+			if (!closeMenu) {
+				return;
+			}
+			if (elementClick.classList.contains('clan')) {
+				if (elementClick.classList.contains('choose')) {
+					setStatusMenu(false);
+					elementClick.classList.remove('choose');
+				} else {
+					setStatusMenu(true);
+					const elementOld = wrapElement?.querySelector('.choose');
+					if (elementOld) {
+						elementOld.classList.remove('choose');
 					}
+					elementClick.classList.add('choose');
 				}
-			},
-			[closeMenu, setStatusMenu]
-		);
+			}
+		};
 
 		return (
 			<div
 				className={`contain-strict h-dvh fixed z-10 left-0 top-0 w-[72px] dark:bg-bgSecondary500 bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'max-sm:hidden') : ''}`}
-				onClick={handleMenu}
+				onClick={() => handleMenu}
 				id="menu"
 			>
 				<div

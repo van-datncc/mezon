@@ -68,7 +68,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 				clan_id: currentClanId || '',
 				roles: currentRoles.map((role, index) => ({
 					role_id: role.id,
-					order: index
+					order: index + 1
 				}))
 			};
 			
