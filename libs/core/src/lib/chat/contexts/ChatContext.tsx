@@ -153,7 +153,7 @@ import {
 	ApiUpdateCategoryDescRequest,
 	ApiWebhook
 } from 'mezon-js/dist/api.gen';
-import { ChannelCanvas, RemoveFriend, SdTopicEvent } from 'mezon-js/socket';
+import { ChannelCanvas, DeleteAccountEvent, RemoveFriend, SdTopicEvent } from 'mezon-js/socket';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
@@ -665,12 +665,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const userIds = users.map((u) => u.user_id);
 			const user = users?.find((user) => user.user_id === userId);
 			if (user) {
-				if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD) {
+				if (
+					channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
+					channel_desc.type === ChannelType.CHANNEL_TYPE_THREAD ||
+					channel_desc.type === ChannelType.CHANNEL_TYPE_APP ||
+					channel_desc.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
+				) {
 					const channel = { ...channel_desc, id: channel_desc.channel_id as string };
 					dispatch(channelsActions.add({ clanId: channel_desc.clan_id as string, channel: { ...channel, active: 1 } }));
 					dispatch(listChannelsByUserActions.add(channel));
 
-					if (channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+					if (
+						channel_desc.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
+						channel_desc.type === ChannelType.CHANNEL_TYPE_APP ||
+						channel_desc.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
+					) {
 						dispatch(listChannelRenderAction.addChannelToListRender({ type: channel_desc.type, ...channel }));
 					}
 
@@ -1247,6 +1256,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[dispatch, userId]
 	);
 
+	//TODO: delete account
+	const ondeleteaccount = useCallback(
+		(deleteAccountEvent: DeleteAccountEvent) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		},
+		[dispatch, userId]
+	);
+
 	const onchannelupdated = useCallback(
 		async (channelUpdated: ChannelUpdatedEvent) => {
 			channelUpdated.channel_private = channelUpdated.channel_private ? 1 : 0;
@@ -1792,6 +1809,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onuserprofileupdate = onuserprofileupdate;
 
+			socket.ondeleteaccount = ondeleteaccount;
+
 			socket.onpermissionset = onpermissionset;
 
 			socket.onpermissionchanged = onpermissionchanged;
@@ -1833,6 +1852,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onchannelpresence,
 			onchannelupdated,
 			onuserprofileupdate,
+			ondeleteaccount,
 			onpermissionset,
 			onpermissionchanged,
 			onunmuteevent,
@@ -2020,6 +2040,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		onchanneldeleted,
 		onchannelupdated,
 		onuserprofileupdate,
+		ondeleteaccount,
 		onpermissionset,
 		onpermissionchanged,
 		onunmuteevent,
