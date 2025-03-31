@@ -51,6 +51,7 @@ export function LogOutButton() {
 interface ModalProps {
 	onClose: () => void;
 	handleLogOut: () => void;
+	isDeleting?: boolean;
 }
 
 export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => {
@@ -81,7 +82,7 @@ export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => 
 	);
 };
 
-export const DeleteAccountModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => {
+export const DeleteAccountModal: React.FC<ModalProps> = ({ handleLogOut, onClose, isDeleting }) => {
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
@@ -102,7 +103,10 @@ export const DeleteAccountModal: React.FC<ModalProps> = ({ handleLogOut, onClose
 					<button
 						color="blue"
 						onClick={handleLogOut}
-						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+						disabled={isDeleting}
+						className={`px-4 py-2 rounded text-white focus:outline-none focus:ring focus:border-blue-300 ${
+							isDeleting ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-700 hover:bg-blue-500'
+						}`}
 					>
 						Delete
 					</button>

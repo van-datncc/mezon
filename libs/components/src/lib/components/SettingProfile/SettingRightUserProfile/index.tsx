@@ -240,10 +240,12 @@ const SettingRightUser = ({
 		openRightClickModal();
 	};
 	const [openModalDeleteAcc, setOpenModalDeleteAcc] = useState<boolean>(false);
+	const [isDeleting, setIsDeleting] = useState(false);
 	const handleOpenModalDeleteAcc = () => {
 		setOpenModalDeleteAcc(true);
 	};
 	const handleDeleteAccount = async () => {
+		setIsDeleting(true);
 		await dispatch(accountActions.deleteAccount());
 	};
 	const handleCloseModal = () => {
@@ -380,7 +382,7 @@ const SettingRightUser = ({
 					</div>
 				</div>
 			) : null}
-			{openModalDeleteAcc && <DeleteAccountModal handleLogOut={handleDeleteAccount} onClose={handleCloseModal} />}
+			{openModalDeleteAcc && <DeleteAccountModal handleLogOut={handleDeleteAccount} onClose={handleCloseModal} isDeleting={isDeleting} />}
 
 			<ModalOverData openModal={openModal} handleClose={() => setOpenModal(false)} />
 			<ModalErrorTypeUpload openModal={openModalType} handleClose={() => setOpenModalType(false)} />
