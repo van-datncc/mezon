@@ -153,8 +153,15 @@ export default function PreJoinCalling() {
 
 	// Handle Join Meeting
 	const joinMeeting = useCallback(async () => {
-		const result = await dispatch(generateMeetTokenExternal({ token: code as string, displayName: username as string }));
-	}, [dispatch, username]);
+		if (!username.trim()) {
+			setError('Please enter your name before joining the meeting.');
+			return;
+		}
+
+		setError(null);
+		await dispatch(generateMeetTokenExternal({ token: code as string, displayName: username }));
+	}, [dispatch, username, code]);
+
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleFullScreen = useCallback(() => {
