@@ -4,6 +4,7 @@
 import { LiveKitRoom } from '@livekit/components-react';
 import { generateMeetTokenExternal, selectExternalToken, selectShowCamera, selectShowMicrophone, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { useMediaPermissions } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -177,6 +178,8 @@ export default function PreJoinCalling() {
 		dispatch(voiceActions.resetExternalToken());
 		dispatch(voiceActions.resetLoadingStatusExternalJoin());
 	}, [dispatch]);
+	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
+
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<div className="h-screen w-screen">
@@ -217,21 +220,25 @@ export default function PreJoinCalling() {
 								{/* Controls */}
 								<div className="w-full flex items-center justify-center gap-8">
 									{/* Camera Toggle */}
-									<ControlButton
-										onClick={toggleCamera}
-										isActive={cameraOn}
-										label={cameraOn ? 'Camera on' : 'Camera off'}
-										icon={cameraOn ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
-									/>
+									{hasCameraAccess && (
+										<ControlButton
+											onClick={toggleCamera}
+											isActive={cameraOn}
+											label={cameraOn ? 'Camera on' : 'Camera off'}
+											icon={cameraOn ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
+										/>
+									)}
 
 									{/* Microphone Toggle */}
-									<ControlButton
-										onClick={toggleMic}
-										isActive={micOn}
-										label={micOn ? 'Mic on' : 'Mic off'}
-										audioLevel={micOn ? audioLevel : undefined}
-										icon={micOn ? <Icons.VoiceMicIcon scale={1.3} /> : <Icons.VoiceMicDisabledIcon scale={1.3} />}
-									/>
+									{hasMicrophoneAccess && (
+										<ControlButton
+											onClick={toggleMic}
+											isActive={micOn}
+											label={micOn ? 'Mic on' : 'Mic off'}
+											audioLevel={micOn ? audioLevel : undefined}
+											icon={micOn ? <Icons.VoiceMicIcon scale={1.3} /> : <Icons.VoiceMicDisabledIcon scale={1.3} />}
+										/>
+									)}
 								</div>
 							</div>
 						</div>
