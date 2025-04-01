@@ -22,11 +22,12 @@ import {
 	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ESummaryInfo, TypeMessage, formatMoney } from '@mezon/utils';
+import { ESummaryInfo, EUserStatus, TypeMessage, formatMoney } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { UserStatusIcon } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
 import StreamInfo from '../StreamInfo';
@@ -55,10 +56,10 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const myProfile = useAuth();
 	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
 
-	const userCustomStatus = useMemo(() => {
+	const userCustomStatus: { status: string; user_status: EUserStatus } = useMemo(() => {
 		const metadata = myProfile.userProfile?.user?.metadata;
 		try {
-			return safeJSONParse(metadata || '{}')?.status || '';
+			return safeJSONParse(metadata || '{}') || '';
 		} catch (e) {
 			const unescapedJSON = metadata?.replace(/\\./g, (match) => {
 				switch (match) {
@@ -71,7 +72,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			return safeJSONParse(unescapedJSON || '{}')?.status;
 		}
 	}, [myProfile]);
-	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus ?? '');
+	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus.status ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
 	const [note, setNote] = useState<string>('Transfer funds');
@@ -242,32 +243,26 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 			<div
 				ref={rootRef}
-				className={`flex items-center gap-2 px-4 py-2 font-title text-[15px]
+				className={`flex items-center gap-2 pr-4 pl-2 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div
-					className={`footer-profile h-10 flex-1 flex items-center ${appearanceTheme === 'light' && 'lightMode'}`}
+					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-lg ${appearanceTheme === 'light' && 'lightMode'}`}
 					onClick={handleClickFooterProfile}
 				>
-					<div className="cursor-pointer flex items-center gap-2">
+					<div className="cursor-pointer flex items-center gap-3 relative ">
 						<img src={avatar} className="h-8 w-8 rounded-full object-cover" alt="user_avatar" />
+						<div className="absolute bottom-1 left-6">
+							<UserStatusIcon status={userCustomStatus?.user_status} />
+						</div>
 						<div className="flex flex-col ">
 							<p className="text-base font-medium">{name}</p>
 							<p className="text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[14px]">
 								{customStatus}
 							</p>
 						</div>
-						{/* <MemberProfile
-							name={name}
-							status={{ status: isMe ? true : status, isMobile: false }}
-							avatar={avatar}
-							isHideStatus={false}
-							classParent="memberProfile"
-							positionType={MemberProfileType.FOOTER_PROFILE}
-							customStatus={userStatusProfile}
-						/> */}
 					</div>
 					{showModalFooterProfile && (
 						<ModalFooterProfile
@@ -294,7 +289,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{showModalCustomStatus && (
 				<ModalCustomStatus
 					setCustomStatus={setCustomStatus}
-					customStatus={userCustomStatus || ''}
+					customStatus={userCustomStatus.status || ''}
 					handleSaveCustomStatus={handleSaveCustomStatus}
 					name={name}
 					openModal={showModalCustomStatus}
