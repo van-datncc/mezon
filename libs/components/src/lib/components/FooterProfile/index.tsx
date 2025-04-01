@@ -253,7 +253,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					onClick={handleClickFooterProfile}
 				>
 					<div className="cursor-pointer flex items-center gap-3 relative ">
-						<img src={avatar} className="h-8 w-8 rounded-full object-cover" alt="user_avatar" />
+						<img src={avatar} className="h-8 w-8 rounded-full object-cover" alt="" />
 						<div className="absolute bottom-1 left-6">
 							<UserStatusIcon status={userCustomStatus?.user_status} />
 						</div>
