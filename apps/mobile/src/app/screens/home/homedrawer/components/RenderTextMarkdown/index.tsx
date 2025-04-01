@@ -88,7 +88,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		fence: {
 			color: colors.text,
-			width: codeBlockMaxWidth,
+			maxWidth: codeBlockMaxWidth,
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
