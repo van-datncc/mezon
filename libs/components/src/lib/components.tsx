@@ -119,6 +119,6 @@ export { default as PreJoinCalling } from './components/PreJoinCalling';
 export * from './components/VoiceChannel';
 export * from './components/virtual-core/useVirtualizer';
 
-export * from './components/PreJoinCalling/Control';
+export * from './components/PreJoinCalling/ControlButton';
 export * from './components/PreJoinCalling/JoinForm';
 export * from './components/PreJoinCalling/VideoPreview';

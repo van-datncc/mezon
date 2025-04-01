@@ -1,12 +1,12 @@
 import { Icons } from '@mezon/ui';
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
 interface VideoPreviewProps {
 	cameraOn: boolean;
 	stream: MediaStream | null;
 }
 
-export function VideoPreview({ cameraOn, stream }: VideoPreviewProps) {
+const VideoPreview = memo(({ cameraOn, stream }: VideoPreviewProps) => {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 
 	useEffect(() => {
@@ -27,4 +27,6 @@ export function VideoPreview({ cameraOn, stream }: VideoPreviewProps) {
 			)}
 		</div>
 	);
-}
+});
+
+export { VideoPreview };
