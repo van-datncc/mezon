@@ -5,7 +5,6 @@ import {
 	channelsActions,
 	getStore,
 	selectAppChannelsList,
-	selectAppChannelsListShowOnPopUp,
 	selectAppFocusedChannel,
 	selectChannelById,
 	selectCheckAppFocused,
@@ -23,9 +22,9 @@ import { Icons } from '@mezon/ui';
 import { ASPECT_RATIO, ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChannelApps } from '../ChannelApp';
 
 import React from 'react';
+import { ChannelApps } from '../ChannelApp';
 
 type DraggableModalTabsProps = {
 	appChannelList: ApiChannelAppResponseExtend[];
@@ -293,16 +292,21 @@ const BlankChannelComponent: React.FC = () => {
 					const channel = selectChannelById(store.getState(), app.channel_id as string);
 
 					return (
-						<div key={app.channel_id} className="flex flex-col items-center">
-							<button
-								onClick={() => onClickAppItem(app as ApiChannelAppResponseExtend)}
-								className="w-16 h-16 flex items-center justify-center bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-all duration-200"
-								title={app.url || 'Unnamed App'}
-							>
-								🌐
-							</button>
-							<span>{channel?.channel_label || 'Unknown'}</span>
-						</div>
+						// eslint-disable-next-line react/jsx-no-useless-fragment
+						<>
+							{channel && (
+								<div key={app.channel_id} className="flex flex-col items-center w-[100px]">
+									<button
+										onClick={() => onClickAppItem(app as ApiChannelAppResponseExtend)}
+										className="w-16 h-16 flex items-center justify-center bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-all duration-200"
+										title={channel?.channel_label}
+									>
+										🌐
+									</button>
+									<span className="max-w-[100px] truncate overflow-hidden whitespace-nowrap">{channel?.channel_label}</span>
+								</div>
+							)}
+						</>
 					);
 				})}
 			</div>
@@ -331,10 +335,11 @@ interface DraggableModalProps {
 	initialWidth?: number;
 	initialHeight?: number;
 	aspectRatio?: number | null;
+	appChannelList?: ApiChannelAppResponseExtend[];
+	inVisible?: boolean;
 }
 
-const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
-	const appChannelList = useSelector(selectAppChannelsListShowOnPopUp);
+const DraggableModal: React.FC<DraggableModalProps> = memo(({ appChannelList, inVisible }) => {
 	const isShowModal = appChannelList && appChannelList.length > 0;
 
 	const [isCollapsed, setIsCollapsed] = useState(false);
@@ -462,10 +467,11 @@ const DraggableModal: React.FC<DraggableModalProps> = memo(() => {
 			window.removeEventListener('mouseup', handleMouseUp);
 		};
 	}, [handleMouseMove, handleMouseUp]);
+	const modalStyle = inVisible ? { height: 0, visibility: 'hidden' as const } : {};
 
 	return (
 		isShowModal && (
-			<div className="relative">
+			<div className="relative" style={modalStyle}>
 				<div
 					ref={modalElementRef}
 					className="absolute bg-[#212121] shadow-lg rounded-xl contain-strict z-50"

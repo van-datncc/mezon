@@ -32,6 +32,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	showSelectScreenModal: boolean;
 	externalToken: string | undefined;
 	joinCallExtStatus: LoadingStatus;
+	isPiPMode?: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -172,6 +173,9 @@ export const voiceSlice = createSlice({
 		},
 		resetLoadingStatusExternalJoin: (state) => {
 			state.joinCallExtStatus = 'not loaded';
+		},
+		setPiPModeMobile: (state, action) => {
+			state.isPiPMode = action.payload;
 		}
 		// ...
 	},
@@ -283,3 +287,4 @@ export const selectVoiceConnectionState = createSelector(getVoiceState, (state) 
 ///
 export const selectJoinCallExtStatus = createSelector(getVoiceState, (state) => state.joinCallExtStatus);
 export const selectExternalToken = createSelector(getVoiceState, (state) => state.externalToken);
+export const selectIsPiPMode = createSelector(getVoiceState, (state) => state.isPiPMode);

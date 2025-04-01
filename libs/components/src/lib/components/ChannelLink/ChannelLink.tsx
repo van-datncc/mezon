@@ -10,7 +10,6 @@ import {
 	onboardingActions,
 	selectAppChannelById,
 	selectBuzzStateByChannelId,
-	selectCloseMenu,
 	selectCurrentMission,
 	selectEventsByChannelId,
 	selectTheme,
@@ -138,7 +137,6 @@ const ChannelLinkComponent = ({
 	};
 
 	const { setStatusMenu } = useMenu();
-	const closeMenu = useSelector(selectCloseMenu);
 
 	const setTurnOffThreadMessage = () => {
 		dispatch(threadsActions.setOpenThreadMessageState(false));
@@ -155,9 +153,7 @@ const ChannelLinkComponent = ({
 		}
 
 		setTurnOffThreadMessage();
-		if (closeMenu) {
-			setStatusMenu(false);
-		}
+		setStatusMenu(false);
 		if (channel.type !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			dispatch(
 				channelsActions.setCurrentChannelId({

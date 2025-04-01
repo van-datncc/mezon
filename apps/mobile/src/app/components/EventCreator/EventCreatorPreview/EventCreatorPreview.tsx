@@ -38,10 +38,6 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 			</TouchableOpacity>
 		)
 	});
-	const convertToLocalTime = (utcDate) => {
-		const timezoneOffset = utcDate.getTimezoneOffset();
-		return new Date(utcDate.getTime() - timezoneOffset * 60000).toISOString();
-	};
 
 	function handleClose() {
 		onGoBack?.();
@@ -49,8 +45,8 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 	}
 
 	async function handleCreate() {
-		const timeValueStart = convertToLocalTime(startTime);
-		const timeValueEnd = convertToLocalTime(endTime);
+		const timeValueStart = startTime.toISOString();
+		const timeValueEnd = endTime.toISOString();
 		if (type === OptionEvent.OPTION_SPEAKER) {
 			await createEventManagement(
 				currentClanId || '',
@@ -88,7 +84,7 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 				<EventItem
 					event={{
 						id: '',
-						start_time: convertToLocalTime(startTime),
+						start_time: startTime.toISOString(),
 						channel_voice_id: channelId,
 						address: location,
 						user_ids: [],
@@ -98,7 +94,7 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 						channel_id: eventChannelId
 					}}
 					showActions={false}
-					start={convertToLocalTime(startTime)}
+					start={startTime.toISOString()}
 				/>
 
 				<View style={styles.headerSection}>

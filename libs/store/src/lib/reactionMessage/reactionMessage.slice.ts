@@ -226,7 +226,7 @@ export const reactionSlice = createSlice({
 				const reaction = reactionEntities.find(
 					(reaction) =>
 						reaction.message_id === reactionDataSocket.message_id &&
-						reaction.emoji === reactionDataSocket.emoji &&
+						reaction.emoji_id === reactionDataSocket.emoji_id &&
 						reaction.sender_id === reactionDataSocket.sender_id &&
 						reaction?.channel_id === reactionDataSocket?.channel_id
 				);
@@ -264,13 +264,13 @@ export const reactionSlice = createSlice({
 			const { messages } = action.payload;
 			for (const message of messages) {
 				const reactionsRaw = message.reactions;
+				if (!reactionsRaw?.length) continue;
 				const reactions = (reactionsRaw || []).map((reaction) => {
 					const id = reaction.id || '';
 					const message_id = message.id;
 					return mapReactionToEntity({ ...reaction, id, message_id, channel_id: message.channel_id });
 				});
 				reactionAdapter.upsertMany(state, reactions);
-				if (!reactions?.length) continue;
 
 				const combinedId = `${message.channel_id}_${message.id}`;
 				state.computedMessageReactions[combinedId] = combineMessageReactions(state, combinedId);
@@ -323,8 +323,8 @@ function combineMessageReactions(state: ReactionState, combinedId: string): Emoj
 			continue;
 		}
 
-		if (!dataCombined[emoji]) {
-			dataCombined[emoji] = {
+		if (!dataCombined[emojiId]) {
+			dataCombined[emojiId] = {
 				emojiId,
 				emoji,
 				senders: [],
@@ -341,7 +341,7 @@ function combineMessageReactions(state: ReactionState, combinedId: string): Emoj
 			count: reaction.count
 		};
 
-		const reactionData = dataCombined[emoji];
+		const reactionData = dataCombined[emojiId];
 		const senderIndex = reactionData.senders.findIndex((sender) => sender.sender_id === newSender.sender_id);
 
 		if (senderIndex === -1) {
