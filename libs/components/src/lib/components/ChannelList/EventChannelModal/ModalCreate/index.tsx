@@ -270,33 +270,32 @@ const ModalCreate = (props: ModalCreateProps) => {
 			<div className="flex gap-x-4 mb-4">
 				<HeaderEventCreate tabs={tabs} currentModal={currentModal} onHandleTab={(num: number) => handleCurrentModal(num)} />
 			</div>
-			<div>
-				{currentModal === Tabs_Option.LOCATION && (
-					<LocationModal
-						onClose={onClose}
-						contentSubmit={contentSubmit}
-						choiceSpeaker={choiceSpeaker}
-						choiceLocation={choiceLocation}
-						voicesChannel={voicesChannel}
-						handleOption={handleOption}
-						setContentSubmit={setContentSubmit}
-						textChannels={textChannels}
-						choicePrivateEvent={choicePrivateEvent}
-					/>
-				)}
-				{currentModal === Tabs_Option.EVENT_INFO && (
-					<EventInfoModal
-						onClose={onClose}
-						contentSubmit={contentSubmit}
-						choiceLocation={choiceLocation}
-						timeStartDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.start_time || '') : defaultTimeStart}
-						timeEndDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.end_time || '') : defaultTimeEnd}
-						setContentSubmit={setContentSubmit}
-						setErrorTime={(status: boolean) => setErrorTime(status)}
-					/>
-				)}
-				{currentModal === Tabs_Option.REVIEW && <ReviewModal onClose={onClose} contentSubmit={contentSubmit} option={option} />}
-			</div>
+
+			{currentModal === Tabs_Option.LOCATION && (
+				<LocationModal
+					onClose={onClose}
+					contentSubmit={contentSubmit}
+					choiceSpeaker={choiceSpeaker}
+					choiceLocation={choiceLocation}
+					voicesChannel={voicesChannel}
+					handleOption={handleOption}
+					setContentSubmit={setContentSubmit}
+					textChannels={textChannels}
+					choicePrivateEvent={choicePrivateEvent}
+				/>
+			)}
+			{currentModal === Tabs_Option.EVENT_INFO && (
+				<EventInfoModal
+					onClose={onClose}
+					contentSubmit={contentSubmit}
+					choiceLocation={choiceLocation}
+					timeStartDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.start_time || '') : defaultTimeStart}
+					timeEndDefault={currentEvent ? formatTimeStringToHourFormat(currentEvent.end_time || '') : defaultTimeEnd}
+					setContentSubmit={setContentSubmit}
+					setErrorTime={(status: boolean) => setErrorTime(status)}
+				/>
+			)}
+			{currentModal === Tabs_Option.REVIEW && <ReviewModal onClose={onClose} contentSubmit={contentSubmit} option={option} />}
 			<div className="flex justify-between mt-4 w-full text-white">
 				<button
 					className={`py-2 text-[#84ADFF] font-bold ${(currentModal === Tabs_Option.LOCATION || errorTime) && 'hidden'}`}
