@@ -169,6 +169,9 @@ export const voiceSlice = createSlice({
 		},
 		resetExternalToken: (state) => {
 			state.externalToken = undefined;
+		},
+		resetLoadingStatusExternalJoin: (state) => {
+			state.joinCallExtStatus = 'not loaded';
 		}
 		// ...
 	},

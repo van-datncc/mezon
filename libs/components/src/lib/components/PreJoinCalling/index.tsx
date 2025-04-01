@@ -33,7 +33,9 @@ export default function PreJoinCalling() {
 	const { code } = useParams<{ code: string }>();
 
 	const getExternalToken = useSelector(selectExternalToken);
-	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
+	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus); // "error" | "not loaded" | "loading" | "loaded"
+	const isLoading = getJoinCallExtStatus === 'loading';
+	const isDisabled = getJoinCallExtStatus === 'loaded' || isLoading;
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
@@ -153,7 +155,6 @@ export default function PreJoinCalling() {
 	const joinMeeting = useCallback(async () => {
 		const result = await dispatch(generateMeetTokenExternal({ token: code as string, displayName: username as string }));
 	}, [dispatch, username]);
-
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleFullScreen = useCallback(() => {
@@ -173,6 +174,7 @@ export default function PreJoinCalling() {
 	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetVoiceSettings());
 		dispatch(voiceActions.resetExternalToken());
+		dispatch(voiceActions.resetLoadingStatusExternalJoin());
 	}, [dispatch]);
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
@@ -234,9 +236,12 @@ export default function PreJoinCalling() {
 									/>
 									<button
 										onClick={joinMeeting}
-										className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-medium"
+										disabled={isDisabled}
+										className={`px-6 py-2 rounded text-white font-medium transition ${
+											isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+										}`}
 									>
-										Join now
+										{isLoading ? 'Joining...' : 'Join now'}
 									</button>
 								</div>
 
