@@ -6908,9 +6908,9 @@ export function VoiceEmojiControlIcon(props: React.HTMLAttributes<SVGElement>) {
 		>
 			<path
 				fill="currentColor"
-				fill-rule="evenodd"
+				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22ZM6.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm-9.8 1.17a1 1 0 0 1 1.39.27 3.5 3.5 0 0 0 5.82 0 1 1 0 0 1 1.66 1.12 5.5 5.5 0 0 1-9.14 0 1 1 0 0 1 .27-1.4Z"
-				clip-rule="evenodd"
+				clipRule="evenodd"
 				className=""
 			></path>
 		</svg>
@@ -6937,9 +6937,9 @@ export function VoiceSoundControlIcon(props: React.HTMLAttributes<SVGElement>) {
 			></path>
 			<path
 				fill="currentColor"
-				fill-rule="evenodd"
+				fillRule="evenodd"
 				d="M15.14 20.14c1.78-1.78.7-5.75-2.42-8.86-3.11-3.12-7.08-4.2-8.86-2.42A3.13 3.13 0 0 0 3 11V11l-1.16 8.92a2 2 0 0 0 2.24 2.24L13 21c.86-.04 1.6-.32 2.14-.86Zm-1.3-3.4a9.61 9.61 0 0 0-2.53-4.05 9.61 9.61 0 0 0-4.05-2.53c-1.27-.35-1.82-.05-1.99.11-.16.17-.46.72-.11 2a9.61 9.61 0 0 0 2.53 4.04 9.61 9.61 0 0 0 4.05 2.53c1.27.35 1.82.05 1.99-.11.16-.17.46-.72.11-2Z"
-				clip-rule="evenodd"
+				clipRule="evenodd"
 				className=""
 			></path>
 			<path

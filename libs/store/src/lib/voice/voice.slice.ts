@@ -168,12 +168,19 @@ export const voiceSlice = createSlice({
 			state.token = '';
 			state.stream = null;
 		},
-		resetExternalToken: (state) => {
+		resetExternalCall: (state) => {
+			state.showMicrophone = false;
+			state.showCamera = false;
+			state.showScreen = false;
+			state.voiceConnectionState = false;
+			state.voiceInfo = null;
+			state.fullScreen = false;
+			state.isJoined = false;
 			state.externalToken = undefined;
-		},
-		resetLoadingStatusExternalJoin: (state) => {
+			state.stream = null;
 			state.joinCallExtStatus = 'not loaded';
 		},
+
 		setPiPModeMobile: (state, action) => {
 			state.isPiPMode = action.payload;
 		}
