@@ -168,8 +168,16 @@ export const voiceSlice = createSlice({
 			state.token = '';
 			state.stream = null;
 		},
-		resetExternalToken: (state) => {
+		resetExternalCall: (state) => {
+			state.showMicrophone = false;
+			state.showCamera = false;
+			state.showScreen = false;
+			state.voiceConnectionState = false;
+			state.voiceInfo = null;
+			state.fullScreen = false;
+			state.isJoined = false;
 			state.externalToken = undefined;
+			state.stream = null;
 		},
 		resetLoadingStatusExternalJoin: (state) => {
 			state.joinCallExtStatus = 'not loaded';
