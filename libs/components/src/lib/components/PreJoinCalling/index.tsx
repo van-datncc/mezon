@@ -11,15 +11,19 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
+import { Icons } from '@mezon/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { MyVideoConference } from '../VoiceChannel';
+import { ControlButton } from './Control';
+import { JoinForm } from './JoinForm';
+import { VideoPreview } from './VideoPreview';
 
 export default function PreJoinCalling() {
 	const [cameraOn, setCameraOn] = useState(false);
 	const [micOn, setMicOn] = useState(false);
-	const [username, setusername] = useState('');
+	const [username, setUsername] = useState('');
 	const [audioLevel, setAudioLevel] = useState(0);
 	const [error, setError] = useState<string | null>(null);
 
@@ -212,45 +216,14 @@ export default function PreJoinCalling() {
 						{/* Video Preview */}
 						<div className="w-full max-w-xl bg-zinc-800 rounded-lg overflow-hidden">
 							<div className="p-6 flex flex-col items-center">
-								<div className="w-full aspect-video bg-zinc-900 rounded-lg mb-6 relative overflow-hidden">
-									<video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-									{!cameraOn && (
-										<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-											<div className="w-24 h-24 bg-zinc-700 rounded-full flex items-center justify-center">
-												<svg
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-													className="w-12 h-12 text-white"
-												>
-													<circle cx="12" cy="8" r="5" />
-													<path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" />
-												</svg>
-											</div>
-										</div>
-									)}
-								</div>
-
-								{/* Name Input and Join Button */}
-								<div className="w-full flex gap-2 mb-6">
-									<input
-										type="text"
-										placeholder="Enter name"
-										value={username}
-										onChange={(e) => setusername(e.target.value)}
-										className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-700 rounded text-white"
-									/>
-									<button
-										onClick={joinMeeting}
-										disabled={isDisabled}
-										className={`px-6 py-2 rounded text-white font-medium transition ${
-											isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-										}`}
-									>
-										{isLoading ? 'Joining...' : 'Join now'}
-									</button>
-								</div>
+								<VideoPreview cameraOn={cameraOn} stream={streamRef.current} />
+								<JoinForm
+									username={username}
+									setUsername={setUsername}
+									isLoading={isLoading}
+									isDisabled={isDisabled}
+									onJoin={joinMeeting}
+								/>
 
 								{/* Error message */}
 								{error && (
@@ -260,77 +233,21 @@ export default function PreJoinCalling() {
 								{/* Controls */}
 								<div className="w-full flex items-center justify-center gap-8">
 									{/* Camera Toggle */}
-									<button onClick={toggleCamera} className="flex flex-col items-center gap-2">
-										<div
-											className={`w-12 h-12 rounded-full flex items-center justify-center ${cameraOn ? 'bg-indigo-600' : 'bg-zinc-700'}`}
-										>
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												className={`w-6 h-6 ${cameraOn ? 'text-white' : 'text-gray-300'}`}
-											>
-												<path
-													d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-												/>
-												<rect x="3" y="6" width="12" height="12" rx="2" ry="2" />
-												{!cameraOn && <line x1="2" y1="2" x2="22" y2="22" strokeLinecap="round" strokeLinejoin="round" />}
-											</svg>
-										</div>
-										<span className="text-sm text-gray-300">{cameraOn ? 'Camera on' : 'Camera off'}</span>
-									</button>
+									<ControlButton
+										onClick={toggleCamera}
+										isActive={cameraOn}
+										label={cameraOn ? 'Camera on' : 'Camera off'}
+										icon={cameraOn ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
+									/>
 
 									{/* Microphone Toggle */}
-									<button onClick={toggleMic} className="flex flex-col items-center gap-2 relative">
-										{/* Audio level indicator - positioned behind the button */}
-										{micOn && (
-											<div className="absolute inset-0 flex items-center justify-center -top-5">
-												<div className="w-[56px] h-[56px]">
-													<svg viewBox="0 0 100 100" className="w-full h-full">
-														<circle
-															cx="50"
-															cy="50"
-															r="46"
-															fill="none"
-															stroke="rgba(79, 70, 229, 0.5)"
-															strokeWidth="10"
-															strokeDasharray={`${audioLevel * 290} 290`}
-															strokeDashoffset="0"
-															transform="rotate(-90 50 50)"
-														/>
-													</svg>
-												</div>
-											</div>
-										)}
-
-										{/* Mic button */}
-										<div
-											className={`w-12 h-12 rounded-full flex items-center justify-center z-10 ${micOn ? 'bg-indigo-600' : 'bg-zinc-700'}`}
-										>
-											<svg
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-												className={`w-6 h-6 ${micOn ? 'text-white' : 'text-gray-300'}`}
-											>
-												<path
-													d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-												/>
-												<path d="M19 10v2a7 7 0 01-14 0v-2" strokeLinecap="round" strokeLinejoin="round" />
-												<line x1="12" y1="19" x2="12" y2="23" strokeLinecap="round" strokeLinejoin="round" />
-												<line x1="8" y1="23" x2="16" y2="23" strokeLinecap="round" strokeLinejoin="round" />
-												{!micOn && <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round" />}
-											</svg>
-										</div>
-
-										<span className="text-sm text-gray-300">{micOn ? 'Mic on' : 'Mic off'}</span>
-									</button>
+									<ControlButton
+										onClick={toggleMic}
+										isActive={micOn}
+										label={micOn ? 'Mic on' : 'Mic off'}
+										audioLevel={micOn ? audioLevel : undefined}
+										icon={micOn ? <Icons.VoiceMicIcon scale={1.3} /> : <Icons.VoiceMicDisabledIcon scale={1.3} />}
+									/>
 								</div>
 							</div>
 						</div>

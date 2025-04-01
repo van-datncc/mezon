@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 export * from './attachmentThumb';
 export * from './iconInEmojiPanel';
 export * from './iconRightClick';
@@ -7141,5 +7142,41 @@ export function SvgQualityUnknownIcon() {
 				<path d="M0 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4Zm6-5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-9Zm6-6a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V.5Z" />
 			</g>
 		</svg>
+	);
+}
+
+export function UserAvatarIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg aria-hidden="true" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24" {...props}>
+			<circle cx="12" cy="8" r="5" />
+			<path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" />
+		</svg>
+	);
+}
+interface AudioLevelCircleProps {
+	audioLevel: number;
+	children: React.ReactNode;
+	isActive: boolean;
+}
+
+export function AudioLevelCircle({ audioLevel, children, isActive }: AudioLevelCircleProps) {
+	return (
+		<div className="relative flex items-center justify-center">
+			<svg aria-hidden="true" role="img" viewBox="0 0 100 100" className="absolute w-[56px] h-[56px]">
+				<circle
+					cx="50"
+					cy="50"
+					r="46"
+					fill="none"
+					stroke={isActive ? 'rgba(99, 102, 241, 0.6)' : 'transparent'}
+					strokeWidth="8"
+					strokeDasharray={`${audioLevel * 290} 290`}
+					strokeDashoffset="0"
+					transform="rotate(-90 50 50)"
+				/>
+			</svg>
+
+			<div className="z-10">{children}</div>
+		</div>
 	);
 }

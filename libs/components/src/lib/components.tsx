@@ -118,3 +118,7 @@ export { default as ModalInputMessageBuzz } from './components/ModalInputMessage
 export { default as PreJoinCalling } from './components/PreJoinCalling';
 export * from './components/VoiceChannel';
 export * from './components/virtual-core/useVirtualizer';
+
+export * from './components/PreJoinCalling/Control';
+export * from './components/PreJoinCalling/JoinForm';
+export * from './components/PreJoinCalling/VideoPreview';
