@@ -1,6 +1,7 @@
 import {
 	DmCalling,
 	FirstJoinPopup,
+	FooterProfile,
 	ForwardMessageModal,
 	MessageContextMenuProvider,
 	MessageModalImage,
@@ -306,6 +307,15 @@ function MyApp() {
 				<SidebarMenu openCreateClanModal={openCreateClanModal} />
 				<Topbar />
 				<MainContent />
+
+				<FooterProfile
+					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
+					status={userProfile?.user?.online}
+					avatar={userProfile?.user?.avatar_url || ''}
+					userId={userProfile?.user?.id || ''}
+					isDM={currentClanId !== '0'}
+				/>
+
 				<div
 					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
 					style={streamStyle}
