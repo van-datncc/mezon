@@ -250,6 +250,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							<p className="hover:underline text-slate-400">{channelFirst.channel_label}</p>
 						</>
 					)}
+					{isPrivateEvent && (
+						<a
+							href={privateRoomLink}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="flex gap-x-2 cursor-pointer text-blue-500 underline"
+						>
+							{event?.meet_room?.room_name}
+						</a>
+					)}
 				</div>
 
 				{event && (

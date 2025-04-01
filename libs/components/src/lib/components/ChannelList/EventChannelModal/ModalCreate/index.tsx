@@ -137,7 +137,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const handleSubmit = useCallback(async () => {
 		const voice = choiceSpeaker ? contentSubmit.voiceChannel : '';
 		const address = choiceLocation ? contentSubmit.address : '';
-		const privateEvent = choicePrivateEvent ? contentSubmit.isPrivate : '';
+		const privateEvent = choicePrivateEvent ? contentSubmit.isPrivate : false;
 
 		const timeValueStart = handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart);
 		const timeValueEnd = handleTimeISO(contentSubmit.selectedDateEnd, contentSubmit.timeEnd);
