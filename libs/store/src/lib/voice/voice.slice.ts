@@ -178,10 +178,9 @@ export const voiceSlice = createSlice({
 			state.isJoined = false;
 			state.externalToken = undefined;
 			state.stream = null;
-		},
-		resetLoadingStatusExternalJoin: (state) => {
 			state.joinCallExtStatus = 'not loaded';
 		},
+
 		setPiPModeMobile: (state, action) => {
 			state.isPiPMode = action.payload;
 		}

@@ -175,7 +175,6 @@ export default function PreJoinCalling() {
 	}, [dispatch]);
 	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetExternalCall());
-		dispatch(voiceActions.resetLoadingStatusExternalJoin());
 	}, [dispatch]);
 	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
 
