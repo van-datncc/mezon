@@ -84,8 +84,21 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
+	const [copied, setCopied] = useState(false);
 	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
 	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
+	const externalLink = event?.meet_room?.external_link;
+	const privateRoomLink = `https://${process.env.NX_CHAT_APP_API_HOST}${externalLink}`;
+
+	const handleCopyLink = useCallback(() => {
+		navigator.clipboard.writeText(privateRoomLink);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
+	}, [privateRoomLink]);
+
+	const handleOpenLink = useCallback(() => {
+		window.open(privateRoomLink, '_blank', 'noopener,noreferrer');
+	}, [privateRoomLink]);
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
@@ -284,8 +297,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			</div>
 			<div className="flex gap-x-2 mx-4 mb-2">
 				{isPrivateEvent ? (
-					<span className="flex flex-row">
+					<span className="flex flex-row items-center gap-2">
 						<p className="text-slate-400">Only invited members can join.</p>
+						<button onClick={handleOpenLink} className="text-blue-500 hover:underline">
+							Open Link
+						</button>
+						<button onClick={handleCopyLink} className="text-blue-500 hover:underline">
+							{copied ? 'Copied!' : 'Copy Link'}
+						</button>
 					</span>
 				) : (
 					isNonPublicEvent && (
