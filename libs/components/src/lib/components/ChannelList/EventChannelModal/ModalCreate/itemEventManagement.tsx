@@ -7,6 +7,7 @@ import {
 	selectChannelById,
 	selectChannelFirst,
 	selectMemberClanByUserId,
+	toastActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -89,11 +90,17 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 	const externalLink = event?.meet_room?.external_link;
 	const privateRoomLink = `https://${process.env.NX_CHAT_APP_API_HOST}${externalLink}`;
-
+	const hasLink = Boolean(externalLink);
 	const handleCopyLink = useCallback(() => {
-		navigator.clipboard.writeText(privateRoomLink);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+		navigator.clipboard
+			.writeText(privateRoomLink)
+			.then(() => {
+				setCopied(true);
+				setTimeout(() => setCopied(false), 2000);
+			})
+			.catch((err) => {
+				dispatch(toastActions.addToastError({ message: err?.message || 'Failed to copy link.' }));
+			});
 	}, [privateRoomLink]);
 
 	const handleOpenLink = useCallback(() => {
@@ -309,12 +316,16 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				{isPrivateEvent ? (
 					<span className="flex flex-row items-center gap-2">
 						<p className="text-slate-400">Only invited members can join.</p>
-						<button onClick={handleOpenLink} className="text-blue-500 hover:underline">
-							Open Link
-						</button>
-						<button onClick={handleCopyLink} className="text-blue-500 hover:underline">
-							{copied ? 'Copied!' : 'Copy Link'}
-						</button>
+						{hasLink && (
+							<>
+								<button onClick={handleOpenLink} className="text-blue-500 hover:underline">
+									Open Link
+								</button>
+								<button onClick={handleCopyLink} className="text-blue-500 hover:underline">
+									{copied ? 'Copied!' : 'Copy Link'}
+								</button>
+							</>
+						)}
 					</span>
 				) : (
 					isNonPublicEvent && (
