@@ -1,4 +1,4 @@
-import { useGifsStickersEmoji, usePathMatch } from '@mezon/core';
+import { useGifsStickersEmoji } from '@mezon/core';
 import {
 	RootState,
 	appActions,
@@ -31,7 +31,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IChannel, SubPanelName, isMacDesktop } from '@mezon/utils';
+import { SubPanelName, isMacDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -46,7 +46,6 @@ import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
 export type ChannelTopbarProps = {
-	readonly channel?: Readonly<IChannel> | null;
 	isChannelVoice?: boolean;
 	mode?: ChannelStreamMode;
 	isMemberPath?: boolean;
@@ -54,14 +53,14 @@ export type ChannelTopbarProps = {
 };
 
 const ChannelTopbar = memo(({ mode }: ChannelTopbarProps) => {
-	const channel = useSelector(selectCurrentChannel);
-	const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
+	// const channel = useSelector(selectCurrentChannel);
+	// const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 	const channelPath = `/chat/clans/${currentClanId}/channel-setting`;
-	const { isMemberPath, isChannelPath } = usePathMatch({ isMemberPath: memberPath, isChannelPath: channelPath });
+	// const { isMemberPath, isChannelPath } = usePathMatch({ isMemberPath: memberPath, isChannelPath: channelPath });
 
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
@@ -74,18 +73,21 @@ const ChannelTopbar = memo(({ mode }: ChannelTopbarProps) => {
 	return (
 		<div
 			onMouseDown={onMouseDownTopbar}
-			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink ${isChannelVoice ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink ${false ? 'bg-black' : 'dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary'} ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			{isChannelVoice ? (
+			{/* {isChannelVoice ? (
 				<TopBarChannelVoice channel={channel} />
-			) : (
-				<TopBarChannelText channel={channel} mode={mode} isMemberPath={isMemberPath} isChannelPath={isChannelPath} />
-			)}
+			) : ( */}
+			<TopBarChannelText mode={mode} isMemberPath={false} isChannelPath={false} />
+			{/* )} */}
 		</div>
 	);
 });
 
-const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
+// eslint-disable-next-line no-empty-pattern
+const TopBarChannelVoice = memo(({}: ChannelTopbarProps) => {
+	const channel = useSelector(selectCurrentChannel);
+
 	const [openInviteChannelModal, closeInviteChannelModal] = useModal(
 		() => <ModalInvite onClose={closeInviteChannelModal} open={true} channelID={channel?.id || ''} />,
 		[channel?.channel_id]
@@ -111,7 +113,8 @@ const TopBarChannelVoice = memo(({ channel }: ChannelTopbarProps) => {
 	);
 });
 
-const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, isChannelPath }: ChannelTopbarProps) => {
+const TopBarChannelText = memo(({ isChannelVoice, mode, isMemberPath, isChannelPath }: ChannelTopbarProps) => {
+	const channel = useSelector(selectCurrentChannel);
 	const dispatch = useAppDispatch();
 	const store = useStore();
 
@@ -131,7 +134,8 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, i
 	const appearanceTheme = useSelector(selectTheme);
 	const isShowChatStream = useSelector(selectIsShowChatStream);
 
-	const channelParent = useAppSelector((state) => selectChannelById(state, (channel?.parent_id ? (channel.parent_id as string) : '') ?? '')) || {};
+	const channelParent =
+		useAppSelector((state) => selectChannelById(state, (channel?.parent_id ? (channel.parent_id as string) : '') ?? '')) || null;
 
 	return (
 		<>
@@ -139,7 +143,23 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, i
 				{isMemberPath || isChannelPath ? (
 					<p className="text-base font-semibold">{isChannelPath ? 'Channels' : 'Members'}</p>
 				) : (
-					<ChannelLabel channel={channel} />
+					<>
+						{channelParent && (
+							<>
+								<ChannelTopbarLabel
+									isPrivate={!!channelParent?.channel_private}
+									label={channelParent?.channel_label || ''}
+									type={channelParent?.type || ChannelType.CHANNEL_TYPE_CHANNEL}
+								/>
+								<Icons.ArrowRight />
+							</>
+						)}
+						<ChannelTopbarLabel
+							isPrivate={!!channel?.channel_private}
+							label={channel?.channel_label || ''}
+							type={channel?.type || ChannelType.CHANNEL_TYPE_CHANNEL}
+						/>
+					</>
 				)}
 			</div>
 			{isMemberPath || isChannelPath ? null : (
@@ -177,6 +197,52 @@ const TopBarChannelText = memo(({ channel, isChannelVoice, mode, isMemberPath, i
 				</div>
 			)}
 		</>
+	);
+});
+
+const ChannelTopbarLabel = memo(({ type, label, isPrivate }: { type: ChannelType; label: string; isPrivate: boolean }) => {
+	const renderIcon = () => {
+		if (!isPrivate) {
+			switch (type) {
+				case ChannelType.CHANNEL_TYPE_CHANNEL:
+					return <Icons.Hashtag />;
+				case ChannelType.CHANNEL_TYPE_THREAD:
+					return <Icons.ThreadIcon />;
+				case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
+					return <Icons.Speaker />;
+				case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
+					return <Icons.Speaker />;
+				case ChannelType.CHANNEL_TYPE_STREAMING:
+					return <Icons.Stream />;
+				case ChannelType.CHANNEL_TYPE_APP:
+					return <Icons.AppChannelIcon />;
+				default:
+					return <Icons.Hashtag />;
+			}
+		}
+		switch (type) {
+			case ChannelType.CHANNEL_TYPE_CHANNEL:
+				return <Icons.HashtagLocked />;
+			case ChannelType.CHANNEL_TYPE_THREAD:
+				return <Icons.ThreadIconLocker />;
+			case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
+				return <Icons.SpeakerLocked />;
+			case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
+				return <Icons.SpeakerLocked />;
+			case ChannelType.CHANNEL_TYPE_STREAMING:
+				return <Icons.Stream />;
+			case ChannelType.CHANNEL_TYPE_APP:
+				return <Icons.AppChannelIcon />;
+			default:
+				return <Icons.HashtagLocked />;
+		}
+	};
+
+	return (
+		<div className="flex items-center text-lg gap-1">
+			{renderIcon()}
+			<p className="text-base font-semibold leading-5">{label}</p>
+		</div>
 	);
 });
 
