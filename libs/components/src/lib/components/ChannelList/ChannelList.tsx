@@ -109,6 +109,20 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		return listChannelRender?.find((item) => (item as IChannel)?.count_mess_unread && ((item as IChannel)?.count_mess_unread || 0) > 0) || null;
 	}, [listChannelRender]);
 
+	const calculateHeight = useCallback(() => {
+		//TODO: check get height after join clan
+		const clanFooterEle = document.getElementById('clan-footer');
+		const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
+		const outsideHeight = totalHeight;
+		const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
+		return window.innerHeight - outsideHeight - titleBarHeight;
+	}, []);
+	const [height, setHeight] = useState(calculateHeight());
+
+	useWindowSize(() => {
+		setHeight(calculateHeight());
+	});
+
 	const data = useMemo(() => {
 		const filteredChannels = listChannelRender
 			? isShowEmptyCategory
@@ -120,9 +134,16 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 					)
 			: [];
 
-		const limitedChannels = !showFullList && filteredChannels.length > 20 ? filteredChannels.slice(0, 20) : filteredChannels;
+		const countItems = Math.round(height / 36);
+
+		const limitedChannels =
+			!showFullList && filteredChannels.length > 20 ? filteredChannels.slice(0, countItems > 20 ? countItems : 20) : filteredChannels;
 		return [{ type: 'bannerAndEvents' }, ...limitedChannels];
 	}, [listChannelRender, isShowEmptyCategory, showFullList]) as ICategoryChannel[];
+
+	useEffect(() => {
+		setHeight(calculateHeight());
+	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable, isVoiceJoined]);
 
 	useEffect(() => {
 		const idleCallback = window.requestIdleCallback(
@@ -144,28 +165,10 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 	const virtualizer = useVirtualizer({
 		count,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 45
+		estimateSize: () => 36
 	});
 
 	const items = virtualizer.getVirtualItems();
-
-	const calculateHeight = useCallback(() => {
-		//TODO: check get height after join clan
-		const clanFooterEle = document.getElementById('clan-footer');
-		const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
-		const outsideHeight = totalHeight;
-		const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
-		return window.innerHeight - outsideHeight - titleBarHeight;
-	}, []);
-	const [height, setHeight] = useState(calculateHeight());
-
-	useWindowSize(() => {
-		setHeight(calculateHeight());
-	});
-
-	useEffect(() => {
-		setHeight(calculateHeight());
-	}, [data, streamPlay, IsElectronDownloading, isElectronUpdateAvailable, isVoiceJoined]);
 
 	const findScrollIndex = () => {
 		const channelId = firstChannelWithBadgeCount?.id;

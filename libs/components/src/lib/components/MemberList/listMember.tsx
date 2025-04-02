@@ -92,6 +92,8 @@ const ListMember = () => {
 	const userChannels = useAppSelector((state) => selectAllChannelMembers2(state, currentChannelId as string));
 	const members = useSelector(selectClanMemberWithStatusIds);
 
+	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
+
 	const lisMembers = useMemo(() => {
 		if (!userChannels || !members) {
 			return {
@@ -123,7 +125,9 @@ const ListMember = () => {
 
 		let userList;
 		if (!showFullList) {
-			const maxItems = 20;
+			const countItems = Math.round(height / 48);
+			const maxItems = countItems > 20 ? countItems : 20;
+
 			const onlinesToShow = Math.min(onlineCount, maxItems);
 			const offlinesToShow = onlineCount >= maxItems ? 0 : Math.min(offlineCount, maxItems - onlinesToShow);
 
@@ -144,8 +148,6 @@ const ListMember = () => {
 			fullCount: onlineCount + offlineCount
 		};
 	}, [members, userChannels, showFullList]);
-
-	const [height, setHeight] = useState(window.innerHeight - heightTopBar - titleBarHeight);
 
 	const appearanceTheme = useSelector(selectTheme);
 
