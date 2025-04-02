@@ -7,7 +7,7 @@ import {
 	ModalUserProfile,
 	SearchMessageChannelRender
 } from '@mezon/components';
-import { useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
+import { EmojiSuggestionProvider, useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
@@ -36,9 +36,10 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, RequestInput, SubPanelName, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -345,8 +346,6 @@ type KeyPressListenerProps = {
 
 const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 	const isListenerAttached = useRef(false);
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [inputRequest, setInputRequest] = useState<RequestInput>({ content: '', mentionRaw: [], valueTextInput: '' });
 
 	useEffect(() => {
 		if (isListenerAttached.current) return;
@@ -355,7 +354,7 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		const handleKeyPress = (event: KeyboardEvent) => {
 			if (event.ctrlKey && (event.key === 'g' || event.key === 'G')) {
 				event.preventDefault();
-				setModalIsOpen(true);
+				openModalBuzz();
 			}
 		};
 
@@ -365,21 +364,17 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 			window.removeEventListener('keydown', handleKeyPress);
 			isListenerAttached.current = false;
 		};
-	}, [modalIsOpen]);
+	}, []);
 
-	return (
-		<div>
-			{modalIsOpen && (
-				<ModalInputMessageBuzz
-					inputRequest={inputRequest}
-					setInputRequest={setInputRequest}
-					currentChannel={currentChannel}
-					mode={mode}
-					setModalIsOpen={setModalIsOpen}
-				/>
-			)}
-		</div>
+	const [openModalBuzz, closeModalBuzz] = useModal(
+		() => (
+			<EmojiSuggestionProvider>
+				<ModalInputMessageBuzz currentChannel={currentChannel} mode={mode} closeBuzzModal={closeModalBuzz} />
+			</EmojiSuggestionProvider>
+		),
+		[currentChannel]
 	);
-};
 
+	return null;
+};
 export default memo(DirectMessage);
