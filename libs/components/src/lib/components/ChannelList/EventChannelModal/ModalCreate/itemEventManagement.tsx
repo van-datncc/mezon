@@ -89,7 +89,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
 	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 	const externalLink = event?.meet_room?.external_link;
-	const privateRoomLink = `https://${process.env.NX_CHAT_APP_API_HOST}${externalLink}`;
+	const privateRoomLink = `${process.env.NX_CHAT_APP_REDIRECT_URI}${externalLink}`;
 	const hasLink = Boolean(externalLink);
 	const handleCopyLink = useCallback(() => {
 		navigator.clipboard
