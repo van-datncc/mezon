@@ -50,13 +50,9 @@ export type ChannelTopbarProps = {
 	isChannelPath?: boolean;
 };
 
-const ChannelTopbar = memo(({ mode }: ChannelTopbarProps) => {
-	// const channel = useSelector(selectCurrentChannel);
-	// const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
+const ChannelTopbar = memo(() => {
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-	const currentClanId = useSelector(selectCurrentClanId);
-
 	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	const dispatch = useDispatch();
@@ -70,12 +66,12 @@ const ChannelTopbar = memo(({ mode }: ChannelTopbarProps) => {
 			onMouseDown={onMouseDownTopbar}
 			className={`${isMacDesktop ? 'draggable-area' : ''} max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
-			<TopBarChannelText mode={mode} isMemberPath={false} isChannelPath={false} />
+			<TopBarChannelText />
 		</div>
 	);
 });
 
-const TopBarChannelText = memo(({ isChannelVoice, mode }: ChannelTopbarProps) => {
+const TopBarChannelText = memo(() => {
 	const channel = useSelector(selectCurrentChannel);
 	const memberPath = `/chat/clans/${channel?.clan_id}/member-safety`;
 	const channelPath = `/chat/clans/${channel?.clan_id}/channel-setting`;

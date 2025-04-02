@@ -237,7 +237,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isVoiceJoined = useSelector(selectVoiceJoined);
 
 	return (
-		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList" id="clan-footer">
+		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 hidden sbm:block" id="clan-footer">
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 			{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 			{isVoiceJoined && <VoiceInfo />}
@@ -250,7 +250,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div
-					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-lg ${appearanceTheme === 'light' && 'lightMode'}`}
+					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
 					onClick={handleClickFooterProfile}
 				>
 					<div className="cursor-pointer flex items-center gap-3 relative ">
