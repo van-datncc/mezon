@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender, TooManyUpload } from '@mezon/components';
+import { AgeRestricted, Canvas, FileUploadByDnD, MemberList, SearchMessageChannelRender } from '@mezon/components';
 import { useAppNavigation, useAuth, useDragAndDrop, usePermissionChecker, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	ChannelsEntity,
@@ -53,7 +53,6 @@ import {
 	ParticipantMeetState,
 	SubPanelName,
 	TIME_OFFSET,
-	UploadLimitReason,
 	isBackgroundModeActive,
 	isLinuxDesktop,
 	isWindowsDesktop,
@@ -312,7 +311,7 @@ type ChannelMainContentProps = {
 const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const dispatch = useAppDispatch();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId)) || {};
-	const { draggingState, setDraggingState, isOverUploading, setOverUploadingState, overLimitReason } = useDragAndDrop();
+	const { draggingState, setDraggingState } = useDragAndDrop();
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, channelId));
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -407,9 +406,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 
 	return (
 		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
-			{isOverUploading && (
-				<TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />
-			)}
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 				id="mainChat"
