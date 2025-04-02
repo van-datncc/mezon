@@ -4,6 +4,7 @@ import {
 	ChannelsEntity,
 	ClansEntity,
 	appActions,
+	clansActions,
 	selectAllAccount,
 	selectCloseMenu,
 	selectCurrentChannel,
@@ -23,7 +24,7 @@ import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import ChatStream from '../pages/chatStream';
 import Setting from '../pages/setting';
 import ThreadsMain from '../pages/thread';
@@ -40,6 +41,12 @@ const ClanEffects: React.FC<{
 	username?: string;
 }> = ({ currentClan, currentChannel, chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic, userId, username }) => {
 	// move code thanh.levan
+
+	const { clanId } = useParams();
+	useEffect(() => {
+		dispatch(clansActions.setCurrentClanId(clanId as string));
+	}, [clanId]);
+
 	const dispatch = useAppDispatch();
 	const { setIsShowMemberList } = useApp();
 

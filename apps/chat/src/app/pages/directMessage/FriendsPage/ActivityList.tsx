@@ -5,7 +5,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ActivityListItem from './ActivityListItem';
 
-const heightTopBar = 50;
+const heightTopBar = 60;
 const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 
 type ListActivityProps = {
