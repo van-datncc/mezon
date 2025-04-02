@@ -18,7 +18,7 @@ const iconWidth = '160px';
 const titleBarHeight = '21px';
   const heightMessageViewChat = `calc(100dvh - 10px - ${topBarHeight} - ${chatBoxHeight})`;
 const heightMessageViewChatMobile = `calc(100dvh - 10px - ${chatBoxHeight})`;
-const heightMessageViewChatDM = `calc(100dvh - ${topBarHeight})`;
+const heightMessageViewChatDM = `calc(100dvh - 50px - ${topBarHeight})`;
 const heightMessageViewChatThread = `calc(100dvh - 10px - ${topBarHeight} - ${chatBoxHeightThread})`;
 const heightWithoutTopBar = `calc(100dvh - ${topBarHeight})`;
 const heightWithoutTopBarMobile = `calc(100dvh)`;
@@ -105,7 +105,7 @@ module.exports = {
         heightTitleBarMessageViewChatMobile: `calc(${heightMessageViewChatMobile} - ${titleBarHeight})`,
         heightTitleBarMessageViewChatDM: `calc(${heightMessageViewChatDM} - ${titleBarHeight})`,
         heightTitleBarMessageViewChatThread: `calc(${heightMessageViewChatThread} - ${titleBarHeight})`,
-        heightTitleBarWithoutTopBar: `calc(${heightWithoutTopBar} - ${titleBarHeight})`,
+        heightTitleBarWithoutTopBar: `calc(calc(100dvh - 30px) - 21px)`,
         heightTitleBarWithoutTopBarMobile: `calc(${heightWithoutTopBarMobile} - ${titleBarHeight})`,
         heightChannelList : heighChannelList
       },
