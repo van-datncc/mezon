@@ -237,7 +237,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isVoiceJoined = useSelector(selectVoiceJoined);
 
 	return (
-		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList" id="clan-footer">
+		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 hidden sbm:block" id="clan-footer">
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 			{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 			{isVoiceJoined && <VoiceInfo />}
