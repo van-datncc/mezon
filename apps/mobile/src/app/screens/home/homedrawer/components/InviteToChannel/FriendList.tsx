@@ -116,7 +116,7 @@ export const FriendList = React.memo(
 
 		useEffect(() => {
 			fetchSystemMessage();
-		}, []);
+		}, [currentClanId]);
 
 		useEffect(() => {
 			if (currentClanId && currentClanId !== '0') {
