@@ -332,9 +332,9 @@ export const BaseMemberProfile = ({
 			<div
 				ref={panelRef}
 				onMouseDown={handleMouseClick}
-				className={`relative gap-[9px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
+				className={`relative gap-[5px] flex items-center cursor-pointer rounded ${isFooter ? 'h-10 max-w-[142px]' : ''} ${classParent} ${isOffline ? 'opacity-60' : ''} ${listProfile ? '' : 'overflow-hidden'}`}
 			>
-				<div className="relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
+				<div className="mr-[2px] relative inline-flex items-center justify-start w-8 h-8 text-lg text-white rounded-full">
 					<AvatarImage
 						alt={username}
 						username={usernameAva ?? username}
@@ -364,7 +364,7 @@ export const BaseMemberProfile = ({
 						/>
 					)}
 				</div>
-				<div className="flex flex-col items-start h-full w-full">
+				<div className="flex flex-col items-start h-full ml-0.5 w-full">
 					{!isHideStatus && (
 						<div
 							ref={subNameRef}
@@ -444,15 +444,13 @@ export const BaseMemberProfile = ({
 					)}
 				</div>
 			</div>
-			{openModalRemoveMember && (
-				<MemberProfileModal
-					user={user}
-					currentClanId={currentClan?.id}
-					openModalRemoveMember={openModalRemoveMember}
-					setOpenModalRemoveMember={setOpenModalRemoveMember}
-					onCloseModals={handleClickRemoveMember}
-				/>
-			)}
+			<MemberProfileModal
+				user={user}
+				currentClanId={currentClan?.id}
+				openModalRemoveMember={openModalRemoveMember}
+				setOpenModalRemoveMember={setOpenModalRemoveMember}
+				onCloseModals={handleClickRemoveMember}
+			/>
 		</div>
 	);
 };
@@ -576,7 +574,7 @@ const DMUserName = ({
 	);
 };
 
-export function ClanUserName({
+function ClanUserName({
 	name,
 	isHiddenAvatarPanel,
 	hideLongName,

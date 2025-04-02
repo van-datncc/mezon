@@ -22,12 +22,11 @@ import {
 	userClanProfileActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ESummaryInfo, EUserStatus, TypeMessage, createImgproxyUrl, formatMoney } from '@mezon/utils';
+import { ESummaryInfo, EUserStatus, TypeMessage, formatMoney } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { UserStatusIcon } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
@@ -254,19 +253,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					onClick={handleClickFooterProfile}
 				>
 					<div className="cursor-pointer flex items-center gap-3 relative ">
-						<AvatarImage
-							alt={''}
-							username={name}
-							className="min-w-8 min-h-8 max-w-8 max-h-8"
-							classNameText="font-semibold"
-							srcImgProxy={createImgproxyUrl(avatar ?? '')}
-							src={avatar}
-						/>
+						<img src={avatar} className="h-8 w-8 rounded-full object-cover" alt="" />
 						<div className="absolute bottom-1 left-6">
 							<UserStatusIcon status={userCustomStatus?.user_status} />
 						</div>
 						<div className="flex flex-col ">
-							<p className="text-base font-normal">{name}</p>
+							<p className="text-base font-medium">{name}</p>
 							<p className="text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[14px]">
 								{customStatus}
 							</p>
