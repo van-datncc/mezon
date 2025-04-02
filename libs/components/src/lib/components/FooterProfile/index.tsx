@@ -250,7 +250,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div
-					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-lg ${appearanceTheme === 'light' && 'lightMode'}`}
+					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
 					onClick={handleClickFooterProfile}
 				>
 					<div className="cursor-pointer flex items-center gap-3 relative ">
