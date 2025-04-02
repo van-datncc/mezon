@@ -55,6 +55,7 @@ import {
 	selectAllTextChannel,
 	selectAllThreads,
 	selectAllUserClans,
+	selectChannelById,
 	selectChannelsByClanId,
 	selectClanView,
 	selectClickedOnTopicStatus,
@@ -191,6 +192,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onvoicejoined = useCallback(
 		(voice: VoiceJoinedEvent) => {
 			if (voice) {
+				const store = getStore();
+				const state = store.getState();
+				const voiceChannel = selectChannelById(state, voice.voice_channel_id);
+
+				if (voiceChannel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+					const joinSoundElement = document.createElement('audio');
+					joinSoundElement.src = 'assets/audio/joincallsound.mp3';
+					joinSoundElement.preload = 'auto';
+					joinSoundElement.style.display = 'none';
+					document.body.appendChild(joinSoundElement);
+					joinSoundElement.addEventListener('ended', () => {
+						document.body.removeChild(joinSoundElement);
+					});
+					joinSoundElement.play();
+				}
+
 				dispatch(
 					voiceActions.add({
 						...voice
