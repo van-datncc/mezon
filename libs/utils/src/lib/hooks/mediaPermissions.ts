@@ -3,6 +3,13 @@ import { useEffect, useState } from 'react';
 export function useMediaPermissions() {
 	const [hasCameraAccess, setHasCameraAccess] = useState<boolean | null>(null);
 	const [hasMicrophoneAccess, setHasMicrophoneAccess] = useState<boolean | null>(null);
+	const updateCameraAccess = (state: PermissionState) => {
+		setHasCameraAccess(state === 'granted');
+	};
+
+	const updateMicrophoneAccess = (state: PermissionState) => {
+		setHasMicrophoneAccess(state === 'granted');
+	};
 
 	useEffect(() => {
 		const checkPermissions = async () => {
@@ -25,5 +32,5 @@ export function useMediaPermissions() {
 		checkPermissions();
 	}, []);
 
-	return { hasCameraAccess, hasMicrophoneAccess };
+	return { hasCameraAccess, hasMicrophoneAccess, updateCameraAccess, updateMicrophoneAccess };
 }
