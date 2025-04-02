@@ -32,7 +32,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 
 	const channelApp = useAppSelector((state) => selectAppChannelById(state, channel?.id as string));
 
-	const [appUrlInit, setAppUrlInit] = useState(channelApp?.url || '');
+	const [appUrlInit, setAppUrlInit] = useState(channelApp?.app_url || '');
 	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
 	const [channelLabelInit, setChannelLabelInit] = useState(channel.channel_label || '');
