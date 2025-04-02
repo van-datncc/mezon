@@ -1,11 +1,10 @@
 import { AudioSession, LiveKitRoom, TrackReference } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById2 } from '@mezon/store-mobile';
+import { selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import { AppState, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
-import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../../../constants/icon_cdn';
@@ -31,26 +30,54 @@ function ChannelVoice({
 }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const channel = useSelector((state) => selectChannelById2(state, channelId));
+	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(true);
+	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
+	const dispatch = useAppDispatch();
 	useKeepAwake();
 
 	useEffect(() => {
-		const start = async () => {
-			await AudioSession.startAudioSession();
-		};
+		startAudioCall();
 
-		start();
 		return () => {
-			AudioSession.stopAudioSession();
+			stopAudioCall();
 		};
 	}, []);
+
+	const startAudioCall = async () => {
+		InCallManager.start({ media: 'audio' });
+		await AudioSession.startAudioSession();
+	};
+
+	const stopAudioCall = async () => {
+		InCallManager.stop();
+		await AudioSession.stopAudioSession();
+	};
 
 	const onToggleSpeaker = async () => {
 		InCallManager.setSpeakerphoneOn(!isSpeakerOn);
 		setIsSpeakerOn(!isSpeakerOn);
 	};
+
+	useEffect(() => {
+		const subscription = AppState.addEventListener('change', (state) => {
+			if (state === 'background') {
+				if (Platform.OS === 'android') {
+					NativeModules.PipModule.enablePipMode();
+				} else {
+					// 	do something for ios
+				}
+				dispatch(voiceActions.setPiPModeMobile(true));
+			} else {
+				dispatch(voiceActions.setPiPModeMobile(false));
+			}
+		});
+		return () => {
+			dispatch(voiceActions.setPiPModeMobile(false));
+			subscription.remove();
+		};
+	}, [dispatch]);
 
 	return (
 		<View>
@@ -62,7 +89,7 @@ function ChannelVoice({
 					backgroundColor: themeValue?.primary
 				}}
 			>
-				{isAnimationComplete && !focusedScreenShare && (
+				{isAnimationComplete && !focusedScreenShare && !isPiPMode && (
 					<View style={[styles.menuHeader]}>
 						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
 							<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
@@ -78,9 +105,9 @@ function ChannelVoice({
 								style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
 							>
 								<MezonIconCDN
-									icon={IconCDN.channelVoice}
+									icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
 									height={size.s_17}
-									width={size.s_17}
+									width={isSpeakerOn ? size.s_17 : size.s_20}
 									color={isSpeakerOn ? themeValue.border : themeValue.white}
 								/>
 							</TouchableOpacity>

@@ -1,6 +1,5 @@
 import {
 	DirectMessageBox,
-	DmTopbar,
 	FileUploadByDnD,
 	GifStickerEmojiPopup,
 	MemberListGroupChat,
@@ -8,7 +7,7 @@ import {
 	ModalUserProfile,
 	SearchMessageChannelRender
 } from '@mezon/components';
-import { useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
+import { EmojiSuggestionProvider, useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
 	DirectEntity,
 	MessagesEntity,
@@ -37,9 +36,10 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, RequestInput, SubPanelName, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, SubPanelName, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { DragEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
@@ -197,19 +197,14 @@ const DirectMessage = () => {
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
 			<div
-				className={` flex flex-col
-			 flex-1 shrink min-w-0 bg-transparent
-				h-[100%] overflow-visible relative`}
+				className={` flex flex-col flex-1 shrink min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible relative mt-[50px]`}
 				onDragEnter={handleDragEnter}
 			>
-				<div className="h-heightTopBar">
-					<DmTopbar dmGroupId={directId} isHaveCallInChannel={isHaveCallInChannel || isPlayDialTone} />
-				</div>
 				<div
-					className={`cotain-strict flex flex-row flex-1 w-full ${isHaveCallInChannel || isPlayDialTone ? 'h-heightCallDm' : 'h-[calc(100%_-_60px)]'}`}
+					className={`cotain-strict flex flex-row flex-1 w-full ${isHaveCallInChannel || isPlayDialTone ? 'h-heightCallDm' : 'h-heightWithoutTopBar'}`}
 				>
 					<div
-						className={`flex-col flex-1 h-full pb-[10px] ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM || isShowMemberListDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
+						className={`flex-col flex-1 h-full ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isUseProfileDM || isShowMemberListDM ? 'w-widthDmProfile' : 'w-full'} ${checkTypeDm ? 'sbm:flex hidden' : 'flex'}`}
 					>
 						<div
 							className={`relative overflow-y-auto  ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarMessageViewChatDM' : 'h-heightMessageViewChatDM'} flex-shrink`}
@@ -300,7 +295,7 @@ const DirectMessage = () => {
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && isShowMemberListDM && (
 						<div
-							className={`contain-strict dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_60px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+							className={`contain-strict dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_50px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 						>
 							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
 						</div>
@@ -351,8 +346,6 @@ type KeyPressListenerProps = {
 
 const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 	const isListenerAttached = useRef(false);
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [inputRequest, setInputRequest] = useState<RequestInput>({ content: '', mentionRaw: [], valueTextInput: '' });
 
 	useEffect(() => {
 		if (isListenerAttached.current) return;
@@ -361,7 +354,7 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 		const handleKeyPress = (event: KeyboardEvent) => {
 			if (event.ctrlKey && (event.key === 'g' || event.key === 'G')) {
 				event.preventDefault();
-				setModalIsOpen(true);
+				openModalBuzz();
 			}
 		};
 
@@ -371,21 +364,17 @@ const KeyPressListener = ({ currentChannel, mode }: KeyPressListenerProps) => {
 			window.removeEventListener('keydown', handleKeyPress);
 			isListenerAttached.current = false;
 		};
-	}, [modalIsOpen]);
+	}, []);
 
-	return (
-		<div>
-			{modalIsOpen && (
-				<ModalInputMessageBuzz
-					inputRequest={inputRequest}
-					setInputRequest={setInputRequest}
-					currentChannel={currentChannel}
-					mode={mode}
-					setModalIsOpen={setModalIsOpen}
-				/>
-			)}
-		</div>
+	const [openModalBuzz, closeModalBuzz] = useModal(
+		() => (
+			<EmojiSuggestionProvider>
+				<ModalInputMessageBuzz currentChannel={currentChannel} mode={mode} closeBuzzModal={closeModalBuzz} />
+			</EmojiSuggestionProvider>
+		),
+		[currentChannel]
 	);
-};
 
+	return null;
+};
 export default memo(DirectMessage);

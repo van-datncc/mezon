@@ -1,6 +1,7 @@
 import {
 	DmCalling,
 	FirstJoinPopup,
+	FooterProfile,
 	ForwardMessageModal,
 	MessageContextMenuProvider,
 	MessageModalImage,
@@ -11,7 +12,8 @@ import {
 	NavLinkComponent,
 	SearchModal,
 	SidebarClanItem,
-	SidebarLogoItem
+	SidebarLogoItem,
+	Topbar
 } from '@mezon/components';
 import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
 import {
@@ -303,7 +305,17 @@ function MyApp() {
 				{previewMode && <PreviewOnboardingMode />}
 				{openPopupForward && <ForwardMessageModal openModal={openPopupForward} />}
 				<SidebarMenu openCreateClanModal={openCreateClanModal} />
+				<Topbar />
 				<MainContent />
+
+				<FooterProfile
+					name={userProfile?.user?.display_name || userProfile?.user?.username || ''}
+					status={userProfile?.user?.online}
+					avatar={userProfile?.user?.avatar_url || ''}
+					userId={userProfile?.user?.id || ''}
+					isDM={currentClanId !== '0'}
+				/>
+
 				<div
 					className={`fixed ${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'} bottom-0 ${closeMenu ? (statusMenu ? 'hidden' : 'w-full') : isShowChatStream ? 'max-sm:hidden' : 'w-full'} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && currentClanId !== '0' && memberPath !== currentURL ? 'flex flex-1 justify-center items-center' : 'hidden pointer-events-none'}`}
 					style={streamStyle}
@@ -435,7 +447,7 @@ const SidebarMenu = memo(
 				<div
 					className={`top-0 left-0 right-0 flex flex-col items-center py-4 px-3 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
 				>
-					<div className="flex flex-col ">
+					<div className="flex flex-col items-center">
 						<SidebarLogoItem />
 						<DirectUnreadList />
 					</div>
@@ -446,11 +458,11 @@ const SidebarMenu = memo(
 					<div className="mt-3">
 						<NavLinkComponent>
 							<div
-								className="w-full h-full flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
+								className="flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
 								onClick={openCreateClanModal}
 							>
-								<div className="dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center rounded-full cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-									<p className="text-2xl font-bold text-[#155EEF]">+</p>
+								<div className="w-[40px] h-[40px] rounded-lg dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
+									<p className="text-2xl dark:text-contentSecondary text-textLightTheme">+</p>
 								</div>
 							</div>
 						</NavLinkComponent>
