@@ -1,7 +1,6 @@
 import { useDMInvite, useDirect, useInvite, useSendInviteMessage } from '@mezon/core';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, selectCurrentClanId } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
+import { DirectEntity, fetchSystemMessageByClanId, selectClanSystemMessage, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -46,7 +45,8 @@ export const FriendList = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
-		const mezon = useMezon();
+		const welcomeChannel = useSelector(selectClanSystemMessage);
+		const dispatch = useAppDispatch();
 
 		const userInviteList = useMemo(() => {
 			if (listDMInvite?.length) {
@@ -65,28 +65,6 @@ export const FriendList = React.memo(
 				}
 			});
 		}, [currentInviteLink, t]);
-
-		const sendToDM = async (dataSend: { text: string }, channelSelected: DirectEntity) => {
-			await mezon.socketRef.current.writeChatMessage(
-				'0',
-				channelSelected.id,
-				Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
-				false,
-				{
-					t: dataSend.text,
-					lk: [
-						{
-							e: dataSend.text.length,
-							lk: dataSend.text,
-							s: 0
-						}
-					]
-				},
-				[],
-				[],
-				[]
-			);
-		};
 
 		const directMessageWithUser = async (userId: string) => {
 			const response = await createDirectMessageWithUser(userId);
@@ -110,25 +88,41 @@ export const FriendList = React.memo(
 			}
 
 			if (directParamId && dmGroup) {
-				sendToDM({ text: currentInviteLink }, dmGroup);
+				let channelMode = 0;
+				if (type === ChannelType.CHANNEL_TYPE_DM) {
+					channelMode = ChannelStreamMode.STREAM_MODE_DM;
+				}
+				if (type === ChannelType.CHANNEL_TYPE_GROUP) {
+					channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
+				}
+				sendInviteMessage(currentInviteLink, directParamId, channelMode);
 				setSentIdList([...sentIdList, dmGroup?.id]);
 				return;
 			}
 		};
 
 		const fetchInviteLink = async () => {
-			const response = await createLinkInviteUser(currentClanId ?? '', channelId ?? '', 10);
+			const response = await createLinkInviteUser(currentClanId ?? '', channelId ? channelId : welcomeChannel?.channel_id, 10);
 			if (!response) {
 				return;
 			}
 			setCurrentInviteLink(process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/' + response.invite_link);
 		};
 
+		const fetchSystemMessage = async () => {
+			if (!currentClanId) return;
+			await dispatch(fetchSystemMessageByClanId(currentClanId));
+		};
+
+		useEffect(() => {
+			fetchSystemMessage();
+		}, [currentClanId]);
+
 		useEffect(() => {
 			if (currentClanId && currentClanId !== '0') {
 				fetchInviteLink();
 			}
-		}, [currentClanId, channelId]);
+		}, [currentClanId, channelId, welcomeChannel?.channel_id]);
 
 		const showUpdating = () => {
 			Toast.show({
@@ -221,10 +215,10 @@ export const FriendList = React.memo(
 								return <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />;
 							}}
 							style={styles.inviteList}
-							renderItem={({ item }) => {
+							renderItem={({ item, index }) => {
 								return (
 									<FriendListItem
-										key={item?.id}
+										key={`friend_item_${item?.id}_${index}`}
 										dmGroup={item}
 										user={item}
 										onPress={handleSendInVite}
