@@ -123,11 +123,6 @@
 	width: 8px;
 }
 
-::-webkit-scrollbar-thumb {
-	background: pink;
-	border-radius: 5px;
-}
-
 html,
 body {
 	--tw-bg-opacity: 1;
@@ -618,8 +613,14 @@ input:-webkit-autofill:active {
 // editor-scroll
 
 // attachment-scroll-dark
+
+.attachment-scroll::-webkit-scrollbar-thumb {
+	background: #787881;
+	border-radius: 5px;
+}
+
 .attachment-scroll::-webkit-scrollbar {
-	height: 8px;
+	height: 5px;
 }
 
 .attachment-scroll::-webkit-scrollbar-track {
@@ -628,7 +629,7 @@ input:-webkit-autofill:active {
 
 // attachment-scroll-light
 .attachment-scroll-light::-webkit-scrollbar {
-	height: 8px;
+	height: 5px;
 }
 
 .attachment-scroll-light::-webkit-scrollbar-track {
