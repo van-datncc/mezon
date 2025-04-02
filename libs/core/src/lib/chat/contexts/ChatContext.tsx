@@ -64,10 +64,12 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectCurrentTopicId,
+	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
+	selectVoiceChannelMembersByChannelId,
 	stickerSettingActions,
 	threadsActions,
 	toastActions,
@@ -77,9 +79,7 @@ import {
 	usersClanActions,
 	usersStreamActions,
 	voiceActions,
-	webhookActions,
-	selectVoiceChannelMembersByChannelId,
-	selectCurrentUserId
+	webhookActions
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import {
@@ -199,7 +199,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const voiceChannel = selectChannelById(state, voice.voice_channel_id);
 				const memberList = selectVoiceChannelMembersByChannelId(state, voice.voice_channel_id);
 				const currentUserId = selectCurrentUserId(state);
-				const hasJoinSoundEffect = memberList.some(member => member.user_id === currentUserId) || currentUserId === voice.user_id;
+				const hasJoinSoundEffect = memberList.some((member) => member.user_id === currentUserId) || currentUserId === voice.user_id;
 
 				if (voiceChannel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
 					const joinSoundElement = document.createElement('audio');
