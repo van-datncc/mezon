@@ -34,7 +34,7 @@ export default function PreJoinCalling() {
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
-	const { hasCameraAccess, hasMicrophoneAccess, updateCameraAccess, updateMicrophoneAccess } = useMediaPermissions();
+	const { updateCameraAccess, updateMicrophoneAccess } = useMediaPermissions();
 
 	useEffect(() => {
 		return () => {
