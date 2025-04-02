@@ -15,6 +15,7 @@ import {
 	selectShowModalCustomStatus,
 	selectShowModalFooterProfile,
 	selectShowModalSendToken,
+	selectStatusMenu,
 	selectTheme,
 	selectUpdateToken,
 	selectVoiceJoined,
@@ -235,9 +236,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isInCall = useSelector(selectIsInCall);
 	const isJoin = useSelector(selectIsJoin);
 	const isVoiceJoined = useSelector(selectVoiceJoined);
-
+	const statusMenu = useSelector(selectStatusMenu);
 	return (
-		<div className="fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 hidden sbm:block" id="clan-footer">
+		<div
+			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? 'w-[calc(100vw_-_72px)] sbm:w-widthChannelList' : 'hidden'} sbm:block `}
+			id="clan-footer"
+		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 			{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
 			{isVoiceJoined && <VoiceInfo />}
