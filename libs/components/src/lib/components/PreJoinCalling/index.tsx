@@ -4,8 +4,7 @@
 import { LiveKitRoom } from '@livekit/components-react';
 import { generateMeetTokenExternal, selectExternalToken, selectShowCamera, selectShowMicrophone, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useMediaPermissions } from '@mezon/utils';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { MyVideoConference } from '../VoiceChannel';
@@ -13,12 +12,60 @@ import { ControlButton } from './ControlButton';
 import { JoinForm } from './JoinForm';
 import { VideoPreview } from './VideoPreview';
 
+// Permissions popup component
+const PermissionsPopup = React.memo(({ onClose }: { onClose: () => void }) => {
+	return (
+		<div
+			className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+			role="dialog"
+			aria-labelledby="permissions-popup-title"
+			aria-describedby="permissions-popup-description"
+		>
+			<div className="bg-zinc-800 p-6 rounded-lg max-w-md w-full">
+				<h3 id="permissions-popup-title" className="text-xl font-bold mb-3">
+					Camera and Microphone Access Required
+				</h3>
+				<p id="permissions-popup-description" className="text-gray-300 mb-4">
+					Please enable access to your camera and/or microphone to use the meeting features.
+				</p>
+				<ol className="list-decimal list-inside mb-4 text-gray-300 space-y-2">
+					<li>Click the camera/lock icon in your browser's address bar</li>
+					<li>Select "Allow" for camera and microphone permissions</li>
+					<li>Refresh the page after enabling permissions</li>
+				</ol>
+				<div className="flex gap-3">
+					<button
+						onClick={onClose}
+						className="w-1/2 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-md font-medium transition-colors"
+						aria-label="Continue without enabling permissions"
+					>
+						Continue Anyway
+					</button>
+					<button
+						onClick={() => window.location.reload()}
+						className="w-1/2 py-2 bg-blue-600 hover:bg-blue-700 rounded-md font-medium transition-colors"
+						aria-label="Refresh the page"
+					>
+						Refresh Page
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+});
+
 export default function PreJoinCalling() {
 	const [cameraOn, setCameraOn] = useState(false);
 	const [micOn, setMicOn] = useState(false);
 	const [username, setUsername] = useState('');
 	const [audioLevel, setAudioLevel] = useState(0);
 	const [error, setError] = useState<string | null>(null);
+	// State for permissions
+	const [permissionsState, setPermissionsState] = useState({
+		camera: false,
+		microphone: false,
+		showPopup: false
+	});
 
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
@@ -34,7 +81,69 @@ export default function PreJoinCalling() {
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
-	const { updateCameraAccess, updateMicrophoneAccess } = useMediaPermissions();
+
+	// Check permissions on component mount
+	useEffect(() => {
+		const checkPermissions = async () => {
+			try {
+				await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+				setPermissionsState({
+					camera: true,
+					microphone: true,
+					showPopup: false
+				});
+			} catch (err) {
+				if (err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+					setPermissionsState({
+						camera: false,
+						microphone: false,
+						showPopup: true
+					});
+				} else {
+					try {
+						await navigator.mediaDevices.getUserMedia({ audio: true });
+						setPermissionsState((prev) => ({
+							...prev,
+							microphone: true
+						}));
+					} catch (audioErr) {
+						if (audioErr instanceof DOMException && (audioErr.name === 'NotAllowedError' || audioErr.name === 'PermissionDeniedError')) {
+							setPermissionsState((prev) => ({
+								...prev,
+								microphone: false,
+								showPopup: true
+							}));
+						}
+					}
+
+					try {
+						await navigator.mediaDevices.getUserMedia({ video: true });
+						setPermissionsState((prev) => ({
+							...prev,
+							camera: true
+						}));
+					} catch (videoErr) {
+						if (videoErr instanceof DOMException && (videoErr.name === 'NotAllowedError' || videoErr.name === 'PermissionDeniedError')) {
+							setPermissionsState((prev) => ({
+								...prev,
+								camera: false,
+								showPopup: true
+							}));
+						}
+					}
+				}
+			}
+		};
+
+		checkPermissions();
+	}, []);
+
+	const closePermissionsPopup = useCallback(() => {
+		setPermissionsState((prev) => ({
+			...prev,
+			showPopup: false
+		}));
+	}, []);
 
 	useEffect(() => {
 		return () => {
@@ -84,15 +193,19 @@ export default function PreJoinCalling() {
 				setCameraOn(true);
 				dispatch(voiceActions.setShowCamera(true));
 				setError(null);
+				// Update permissions state
+				setPermissionsState((prev) => ({
+					...prev,
+					camera: true
+				}));
 			} catch (err) {
 				console.error('Error accessing camera:', err);
 				setError('Failed to access camera. Please check your permissions and try again.');
 			}
 		}
-	}, [cameraOn]);
+	}, [cameraOn, dispatch]);
 
 	// Toggle Microphone
-
 	const toggleMic = useCallback(async () => {
 		if (micOn) {
 			setMicOn(false);
@@ -138,19 +251,21 @@ export default function PreJoinCalling() {
 				updateAudioLevel();
 				setMicOn(true);
 				dispatch(voiceActions.setShowMicrophone(true));
-
 				setError(null);
+				// Update permissions state
+				setPermissionsState((prev) => ({
+					...prev,
+					microphone: true
+				}));
 			} catch (err) {
 				console.error('Error accessing microphone:', err);
 				setError('Failed to access microphone. Please check your permissions and try again.');
 			}
 		}
-	}, [micOn]);
+	}, [micOn, dispatch]);
 
 	// Handle Join Meeting
 	const joinMeeting = useCallback(async () => {
-		updateMicrophoneAccess('granted');
-		updateCameraAccess('granted');
 		if (!username.trim()) {
 			setError('Please enter your name before joining the meeting.');
 			return;
@@ -176,6 +291,7 @@ export default function PreJoinCalling() {
 			document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
 		}
 	}, [dispatch]);
+
 	const handleLeaveRoom = useCallback(async () => {
 		dispatch(voiceActions.resetExternalCall());
 	}, [dispatch]);
@@ -219,26 +335,30 @@ export default function PreJoinCalling() {
 
 								{/* Controls */}
 								<div className="w-full flex items-center justify-center gap-8">
-									{/* Camera Toggle */}
-									<ControlButton
-										onClick={toggleCamera}
-										isActive={cameraOn}
-										label={cameraOn ? 'Camera on' : 'Camera off'}
-										icon={cameraOn ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
-									/>
+									{permissionsState.camera && (
+										<ControlButton
+											onClick={toggleCamera}
+											isActive={cameraOn}
+											label={cameraOn ? 'Camera on' : 'Camera off'}
+											icon={cameraOn ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
+										/>
+									)}
 
-									{/* Microphone Toggle */}
-									<ControlButton
-										onClick={toggleMic}
-										isActive={micOn}
-										label={micOn ? 'Mic on' : 'Mic off'}
-										audioLevel={micOn ? audioLevel : undefined}
-										icon={micOn ? <Icons.VoiceMicIcon scale={1.3} /> : <Icons.VoiceMicDisabledIcon scale={1.3} />}
-									/>
+									{permissionsState.microphone && (
+										<ControlButton
+											onClick={toggleMic}
+											isActive={micOn}
+											label={micOn ? 'Mic on' : 'Mic off'}
+											audioLevel={micOn ? audioLevel : undefined}
+											icon={micOn ? <Icons.VoiceMicIcon scale={1.3} /> : <Icons.VoiceMicDisabledIcon scale={1.3} />}
+										/>
+									)}
 								</div>
 							</div>
 						</div>
 					</div>
+
+					{permissionsState.showPopup && !getExternalToken && <PermissionsPopup onClose={closePermissionsPopup} />}
 				</div>
 			)}
 		</div>
