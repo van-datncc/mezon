@@ -1,4 +1,4 @@
-import { useGifsStickersEmoji, usePathMatch } from '@mezon/core';
+import { useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
 import {
 	RootState,
 	appActions,
@@ -78,10 +78,16 @@ const TopBarChannelText = memo(() => {
 	const { isMemberPath, isChannelPath } = usePathMatch({ isMemberPath: memberPath, isChannelPath: channelPath });
 	const channelParent =
 		useAppSelector((state) => selectChannelById(state, (channel?.parent_id ? (channel.parent_id as string) : '') ?? '')) || null;
-
+	const { setStatusMenu } = useMenu();
+	const openMenu = useCallback(() => {
+		setStatusMenu(true);
+	}, []);
 	return (
 		<>
-			<div className="justify-start items-center gap-1 flex">
+			<div className="justify-start items-center gap-1 flex ">
+				<div className="flex sbm:hidden pl-3 px-2" onClick={openMenu} role="button">
+					<Icons.OpenMenu />
+				</div>
 				{isMemberPath || isChannelPath ? (
 					<p className="text-base font-semibold">{isChannelPath ? 'Channels' : 'Members'}</p>
 				) : (
@@ -155,8 +161,8 @@ const ChannelTopbarLabel = memo(({ type, label, isPrivate }: { type: ChannelType
 
 	return (
 		<div className="flex items-center text-lg gap-1">
-			{renderIcon()}
-			<p className="text-base font-semibold leading-5">{label}</p>
+			<div className="w-6">{renderIcon()}</div>
+			<p className="text-base font-semibold leading-5 truncate">{label}</p>
 		</div>
 	);
 });
@@ -210,7 +216,7 @@ const ChannelTopbarTools = memo(
 								<div onClick={() => setTurnOffThreadMessage()}>
 									<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 								</div>
-								{isThread && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
+								{!isThread && <CanvasButton isLightMode={appearanceTheme === 'light'} />}
 								{!isApp && <ThreadButton isLightMode={appearanceTheme === 'light'} />}
 							</div>
 							<SearchMessageChannel mode={ChannelStreamMode.STREAM_MODE_CHANNEL} />
