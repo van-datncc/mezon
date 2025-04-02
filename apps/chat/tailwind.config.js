@@ -1,7 +1,7 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
-const topBarHeight = '60px';
+const topBarHeight = '50px';
 const chatBoxHeight = '52px';
 const chatBoxHeightThread = '60px';
 const profileFooterHeight = '56px';
@@ -98,7 +98,7 @@ module.exports = {
         heightCallDm: heightCallDm,
         heightChatBox: chatBoxHeight,
         heightModalSearch: heightModalSearch,
-        heightHeader: "60px",
+        heightHeader: "50px",
         "9/10": "90%",
         heightTitleBar: `calc(100dvh - ${titleBarHeight})`,
         heightTitleBarMessageViewChat: `calc(${heightMessageViewChat} - ${titleBarHeight})`,
@@ -319,4 +319,5 @@ module.exports = {
     require('@tailwindcss/typography'),
   ],
   //   plugins: [require('flowbite/plugin')],
+
 };
