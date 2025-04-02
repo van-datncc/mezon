@@ -26,7 +26,7 @@ export function EmbedDescription({ description }: EmbedDescriptionProps) {
 
 			if (lastindex < s) {
 				formattedContent.push(
-					<p key={`plain-${lastindex}`} style={{ whiteSpace: 'pre-line' }}>
+					<p key={`plain-${lastindex}`} className="whitespace-pre-line">
 						{text?.slice(lastindex, s) ?? ''}
 					</p>
 				);
@@ -53,7 +53,7 @@ export function EmbedDescription({ description }: EmbedDescriptionProps) {
 
 		if (text && lastindex < text?.length) {
 			formattedContent.push(
-				<p key={`plain-${lastindex}-end`} style={{ whiteSpace: 'pre-line' }}>
+				<p key={`plain-${lastindex}-end`} className="whitespace-pre-line">
 					{text.slice(lastindex)}
 				</p>
 			);
