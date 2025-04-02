@@ -1,6 +1,5 @@
-import { EventManagementEntity, selectAllTextChannel } from '@mezon/store';
+import { EventManagementEntity, getStore, selectAllAccount, selectAllTextChannel } from '@mezon/store';
 import { OptionEvent } from '@mezon/utils';
-import { useSelector } from 'react-redux';
 import ItemEventManagement from '../ModalCreate/itemEventManagement';
 
 type ListEventManagementProps = {
@@ -12,11 +11,19 @@ type ListEventManagementProps = {
 
 const ListEventManagement = (props: ListEventManagementProps) => {
 	const { allEventManagement, openModelUpdate, onUpdateEventId, onClose } = props;
-	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
-	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
+	const store = getStore();
+	const allThreadChannelPrivate = selectAllTextChannel(store.getState());
+	const userId = selectAllAccount(store.getState())?.user?.id;
 
+	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 	return allEventManagement
-		.filter((event) => !event.channel_id || event.channel_id === '0' || allThreadChannelPrivateIds.includes(event.channel_id))
+		.filter(
+			(event) =>
+				!event.channel_id ||
+				event.channel_id === '0' ||
+				allThreadChannelPrivateIds.includes(event.channel_id) ||
+				(event.isPrivate && event.creator_id === userId)
+		)
 		.map((event, index) => {
 			return (
 				<div key={index}>
