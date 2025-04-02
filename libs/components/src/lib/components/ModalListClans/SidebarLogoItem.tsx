@@ -72,7 +72,7 @@ const SidebarLogoItem = () => {
 									? createImgproxyUrl(logoCustom, { width: 40, height: 40, resizeType: 'fit' })
 									: `assets/images/${appearanceTheme === 'dark' ? 'mezon-logo-black.svg' : 'mezon-logo-white.svg'}`
 							}
-							className="clan w-[40px] h-[40px] aspect-square object-cover"
+							className="rounded-lg clan w-[40px] h-[40px] aspect-square object-cover"
 							onClick={handleClickToJoinClan}
 							draggable="false"
 						/>
