@@ -86,7 +86,7 @@ export default memo(function MezonDateTimePicker({
 					<DatePicker
 						{...(need24HourFormat && isModeTime ? need24HourFormat : {})}
 						{...(needLocale && isModeTime ? needLocale : {})}
-						date={dateRef.current}
+						date={dateRef.current || new Date()}
 						onDateChange={handleSetDate}
 						mode={mode}
 						theme={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'}
