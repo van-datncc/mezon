@@ -29,9 +29,18 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
+	isExternalCalling?: boolean;
 }
 
-export function ControlBar({ variation, controls, saveUserChoices = true, onDeviceError, onLeaveRoom, onFullScreen }: ControlBarProps) {
+export function ControlBar({
+	variation,
+	controls,
+	saveUserChoices = true,
+	onDeviceError,
+	onLeaveRoom,
+	onFullScreen,
+	isExternalCalling
+}: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 	const audioScreenTrackRef = useRef<LocalTrackPublication | null>(null);
@@ -292,18 +301,21 @@ export function ControlBar({ variation, controls, saveUserChoices = true, onDevi
 				)}
 			</div>
 			<div className="flex justify-end gap-4">
-				<Tooltip
-					showArrow={{ className: '!bottom-1' }}
-					placement="top"
-					overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">Pop Out</span>}
-					overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
-					overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
-					getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
-				>
-					<span>
-						<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
-					</span>
-				</Tooltip>
+				{!isExternalCalling && (
+					<Tooltip
+						showArrow={{ className: '!bottom-1' }}
+						placement="top"
+						overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">Pop Out</span>}
+						overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
+						overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
+					>
+						<span>
+							<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+						</span>
+					</Tooltip>
+				)}
+
 				<div onClick={onFullScreen}>
 					{isFullScreen ? (
 						<Tooltip

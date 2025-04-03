@@ -217,12 +217,12 @@ const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: stri
 		[hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner]
 	);
 
-	const handleScrollChannelIntoView = useCallback(() => {
+	const handleScrollChannelIntoView = () => {
 		const { index, currentScrollIndex, currentScrollPosition, targetScrollPosition } = findScrollIndex();
 		if (currentScrollIndex === -1 || targetScrollPosition !== currentScrollPosition) {
 			virtualizer.scrollToIndex(index, { align: 'center' });
 		}
-	}, [firstChannelWithBadgeCount]);
+	};
 
 	const isChannelRefOutOfViewport = () => {
 		const { currentScrollIndex } = findScrollIndex();
