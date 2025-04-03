@@ -1,4 +1,4 @@
-import { useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
+import { toChannelPage, useCustomNavigate, useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
 import {
 	RootState,
 	appActions,
@@ -82,6 +82,14 @@ const TopBarChannelText = memo(() => {
 	const openMenu = useCallback(() => {
 		setStatusMenu(true);
 	}, []);
+	const navigate = useCustomNavigate();
+
+	const handleNavigateToParent = () => {
+		if (!channelParent?.id || !channelParent?.clan_id) {
+			return;
+		}
+		navigate(toChannelPage(channelParent.id, channelParent.clan_id));
+	};
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex ">
@@ -93,14 +101,14 @@ const TopBarChannelText = memo(() => {
 				) : (
 					<>
 						{channelParent && (
-							<>
+							<div className="flex gap-1 items-center" onClick={handleNavigateToParent}>
 								<ChannelTopbarLabel
 									isPrivate={!!channelParent?.channel_private}
 									label={channelParent?.channel_label || ''}
 									type={channelParent?.type || ChannelType.CHANNEL_TYPE_CHANNEL}
 								/>
 								<Icons.ArrowRight />
-							</>
+							</div>
 						)}
 						<ChannelTopbarLabel
 							isPrivate={!!channel?.channel_private}
