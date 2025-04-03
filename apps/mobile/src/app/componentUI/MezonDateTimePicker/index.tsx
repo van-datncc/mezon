@@ -1,8 +1,8 @@
 import { ActionEmitEvent, getNearTime } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Colors, ThemeModeBase, size, useTheme } from '@mezon/mobile-ui';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, StyleProp, Text, View, ViewStyle } from 'react-native';
-// import DatePicker from 'react-native-date-picker';
+import DatePicker from 'react-native-date-picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MezonFakeInputBox, { IMezonFakeBoxProps } from '../MezonFakeBox';
 import { style } from './styles';
@@ -33,24 +33,31 @@ export default memo(function MezonDateTimePicker({
 }: IMezonDateTimePicker) {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
-	const [date, setDate] = useState(value || getNearTime(120));
 	const isModeTime = useMemo(() => mode === 'time', [mode]);
 	const [currentDate, setCurrentDate] = useState(value || getNearTime(120));
+	const dateRef = useRef(value || getNearTime(120));
 
 	useEffect(() => {
-		setDate(value || getNearTime(120));
+		dateRef.current = value || getNearTime(120);
 		setCurrentDate(value || getNearTime(120));
 	}, [value]);
 	const handleChange = useCallback(() => {
 		if (keepTime && !isModeTime && value) {
-			const new_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), value.getHours(), value.getMinutes(), value.getSeconds());
+			const new_date = new Date(
+				dateRef.current.getFullYear(),
+				dateRef.current.getMonth(),
+				dateRef.current.getDate(),
+				value.getHours(),
+				value.getMinutes(),
+				value.getSeconds()
+			);
 			setCurrentDate(new_date);
 			onChange && onChange(new_date);
 		} else {
-			setCurrentDate(date);
-			onChange && onChange(date);
+			setCurrentDate(dateRef.current);
+			onChange && onChange(dateRef.current);
 		}
-	}, [keepTime, mode, value, date, error]);
+	}, [dateRef.current, keepTime, isModeTime, value, onChange]);
 
 	useEffect(() => {
 		if (!error) {
@@ -62,7 +69,11 @@ export default memo(function MezonDateTimePicker({
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	}
 
-	const contentBottomSheet = () => {
+	const ContentBottomSheet = () => {
+		const handleSetDate = (date: Date) => {
+			dateRef.current = date;
+		};
+
 		return (
 			<View>
 				{error && (
@@ -72,15 +83,15 @@ export default memo(function MezonDateTimePicker({
 					</View>
 				)}
 				<View style={styles.bsContainer}>
-					{/*<DatePicker*/}
-					{/*	{...(need24HourFormat && isModeTime ? need24HourFormat : {})}*/}
-					{/*	{...(needLocale && isModeTime ? needLocale : {})}*/}
-					{/*	date={date}*/}
-					{/*	onDateChange={setDate}*/}
-					{/*	mode={mode}*/}
-					{/*	theme={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'}*/}
-					{/*	{...(maximumDate ? { maximumDate } : {})}*/}
-					{/*/>*/}
+					<DatePicker
+						{...(need24HourFormat && isModeTime ? need24HourFormat : {})}
+						{...(needLocale && isModeTime ? needLocale : {})}
+						date={dateRef?.current || new Date()}
+						onDateChange={handleSetDate}
+						mode={mode}
+						theme={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'}
+						{...(maximumDate ? { maximumDate } : {})}
+					/>
 				</View>
 			</View>
 		);
@@ -95,7 +106,7 @@ export default memo(function MezonDateTimePicker({
 					<Text style={styles.textApply}>Apply</Text>
 				</TouchableOpacity>
 			),
-			children: contentBottomSheet()
+			children: <ContentBottomSheet />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	}
