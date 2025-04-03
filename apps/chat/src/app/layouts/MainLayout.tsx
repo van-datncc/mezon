@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, ColorRoleProvider, useCustomNavigate, useFriends, useIdleRender } from '@mezon/core';
+import { ChatContext, ChatContextProvider, ColorRoleProvider, useCustomNavigate, useDragAndDrop, useFriends, useIdleRender } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -8,9 +8,9 @@ import {
 	selectBadgeCountAllClan,
 	useAppDispatch
 } from '@mezon/store';
-import { MessageCrypt } from '@mezon/utils';
+import { MessageCrypt, UploadLimitReason } from '@mezon/utils';
 
-import { WebRTCStreamProvider } from '@mezon/components';
+import { TooManyUpload, WebRTCStreamProvider } from '@mezon/components';
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
@@ -110,6 +110,17 @@ const GlobalEventListener = () => {
 	return null;
 };
 
+const TooManyUploadWrapper = memo(
+	() => {
+		const { isOverUploading, setOverUploadingState, overLimitReason } = useDragAndDrop();
+
+		if (!isOverUploading) return null;
+
+		return <TooManyUpload togglePopup={() => setOverUploadingState(false, UploadLimitReason.COUNT)} limitReason={overLimitReason} />;
+	},
+	() => true
+);
+
 const MainLayout = memo(
 	() => {
 		const dispatch = useDispatch();
@@ -130,6 +141,8 @@ const MainLayout = memo(
 				{shouldRender && <ChannelVoice />}
 				<Outlet />
 				<GlobalEventListener />
+
+				<TooManyUploadWrapper />
 			</div>
 		);
 	},

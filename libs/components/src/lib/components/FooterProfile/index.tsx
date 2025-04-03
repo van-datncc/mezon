@@ -239,7 +239,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const statusMenu = useSelector(selectStatusMenu);
 	return (
 		<div
-			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? 'w-[calc(100vw_-_72px)] sbm:w-widthChannelList' : 'hidden'} sbm:block `}
+			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}

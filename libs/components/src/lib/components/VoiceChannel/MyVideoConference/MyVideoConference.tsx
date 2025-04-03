@@ -25,9 +25,10 @@ interface MyVideoConferenceProps {
 	channel?: ChannelsEntity;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
+	extUsername?: string;
 }
 
-export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVideoConferenceProps) {
+export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsername }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -140,7 +141,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
-								<ParticipantTile />
+								<ParticipantTile extUsername={extUsername} />
 							</GridLayout>
 						</div>
 					) : (
@@ -149,7 +150,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen }: MyVide
 								{focusTrack && <FocusLayout trackRef={focusTrack} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile />
+										<ParticipantTile extUsername={extUsername} />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>

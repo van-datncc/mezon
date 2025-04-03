@@ -64,10 +64,12 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectCurrentTopicId,
+	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
+	selectVoiceChannelMembersByChannelId,
 	stickerSettingActions,
 	threadsActions,
 	toastActions,
@@ -195,8 +197,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const store = getStore();
 				const state = store.getState();
 				const voiceChannel = selectChannelById(state, voice.voice_channel_id);
+				const memberList = selectVoiceChannelMembersByChannelId(state, voice.voice_channel_id);
+				const currentUserId = selectCurrentUserId(state);
+				const hasJoinSoundEffect = memberList.some((member) => member.user_id === currentUserId) || currentUserId === voice.user_id;
 
-				if (voiceChannel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+				if (voiceChannel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
 					const joinSoundElement = document.createElement('audio');
 					joinSoundElement.src = 'assets/audio/joincallsound.mp3';
 					joinSoundElement.preload = 'auto';

@@ -57,12 +57,16 @@ export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElemen
 	disableSpeakingIndicator?: boolean;
 
 	onParticipantClick?: (event: ParticipantClickEvent) => void;
+	extUsername?: string;
 }
 
 export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes<HTMLDivElement>) => React.ReactNode = forwardRef<
 	HTMLDivElement,
 	ParticipantTileProps
->(function ParticipantTile({ trackRef, children, onParticipantClick, disableSpeakingIndicator, ...htmlProps }: ParticipantTileProps, ref) {
+>(function ParticipantTile(
+	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, extUsername, ...htmlProps }: ParticipantTileProps,
+	ref
+) {
 	const trackReference = useEnsureTrackRef(trackRef);
 
 	const { elementProps } = useParticipantTile<HTMLDivElement>({
@@ -119,13 +123,21 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								)
 							)}
 							<div className="lk-participant-placeholder !bg-bgIconLight">
-								<AvatarImage
-									alt={username || ''}
-									username={username}
-									className="w-20 h-20"
-									srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 320, height: 320, resizeType: 'fit' })}
-									src={avatar}
-								/>
+								{member ? (
+									<AvatarImage
+										alt={username || ''}
+										username={username || ''}
+										className="w-20 h-20"
+										srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 320, height: 320, resizeType: 'fit' })}
+										src={avatar}
+									/>
+								) : (
+									<div
+										className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] w-20 h-20 !text-4xl font-semibold`}
+									>
+										{username?.charAt(0)?.toUpperCase()}
+									</div>
+								)}
 							</div>
 							<div className="lk-participant-metadata overflow-hidden">
 								<div className="lk-participant-metadata-item flex w-full justify-between gap-1 !bg-transparent">
