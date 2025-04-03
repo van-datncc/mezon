@@ -2,7 +2,15 @@
 'use client';
 
 import { LiveKitRoom } from '@livekit/components-react';
-import { generateMeetTokenExternal, selectExternalToken, selectShowCamera, selectShowMicrophone, useAppDispatch, voiceActions } from '@mezon/store';
+import {
+	generateMeetTokenExternal,
+	selectExternalToken,
+	selectJoinCallExtStatus,
+	selectShowCamera,
+	selectShowMicrophone,
+	useAppDispatch,
+	voiceActions
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -77,7 +85,13 @@ export default function PreJoinCalling() {
 	const { code } = useParams<{ code: string }>();
 
 	const getExternalToken = useSelector(selectExternalToken);
+	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus); // "error" | "not loaded" | "loading" | "loaded"
 
+	useEffect(() => {
+		if (getJoinCallExtStatus === 'error') {
+			setError('Your session has expired. Please try again.');
+		}
+	}, [getJoinCallExtStatus]);
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
@@ -326,7 +340,7 @@ export default function PreJoinCalling() {
 						<div className="w-full max-w-xl bg-zinc-800 rounded-lg overflow-hidden">
 							<div className="p-6 flex flex-col items-center">
 								<VideoPreview cameraOn={cameraOn} stream={streamRef.current} />
-								<JoinForm username={username} setUsername={setUsername} onJoin={joinMeeting} />
+								<JoinForm loadingStatus={getJoinCallExtStatus} username={username} setUsername={setUsername} onJoin={joinMeeting} />
 
 								{/* Error message */}
 								{error && (

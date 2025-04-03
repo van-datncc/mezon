@@ -260,7 +260,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					)}
 					{isPrivateEvent && (
 						<a href={privateRoomLink} target="_blank" rel="noopener noreferrer" className="flex gap-x-2 cursor-pointer">
-							<Icons.SpeakerLocked /> <p className="max-w-10">Private Room</p>
+							<Icons.SpeakerLocked /> <p className="whitespace-normal break-words">Private Room</p>
 						</a>
 					)}
 				</div>
