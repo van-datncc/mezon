@@ -1,14 +1,26 @@
 import { useDMInvite } from '@mezon/core';
-import { DirectEntity, selectTheme } from '@mezon/store';
-import { ChangeEvent, useMemo, useState } from 'react';
+import {
+	DirectEntity,
+	FriendsEntity,
+	selectAllDirectMessages,
+	selectAllFriends,
+	selectAllUsesInAllClansEntities,
+	selectTheme,
+	useAppSelector,
+	UsersEntity
+} from '@mezon/store';
+import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { processUserData } from './dataHelper';
 import ListMemberInviteItem from './ListMemberInviteItem';
 export type ModalParam = {
 	url: string;
 	channelID?: string;
+	isInviteExternalCalling?: boolean;
 };
 const ListMemberInvite = (props: ModalParam) => {
 	const appearanceTheme = useSelector(selectTheme);
+	const { isInviteExternalCalling = false } = props;
 	const { listDMInvite, listUserInvite } = useDMInvite(props.channelID);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sendIds, setSendIds] = useState<Record<string, boolean>>({});
@@ -41,6 +53,18 @@ const ListMemberInvite = (props: ModalParam) => {
 		});
 	};
 
+	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
+	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
+	const dmGroupChatList = dmGroupChatListRef.current;
+	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
+	const friends = useSelector(selectAllFriends);
+
+	const data = processUserData(
+		allUsesInAllClansEntities as Record<string, UsersEntity>,
+		friends as FriendsEntity[],
+		dmGroupChatList as DirectEntity[]
+	);
+
 	return (
 		<>
 			<input
@@ -57,7 +81,13 @@ const ListMemberInvite = (props: ModalParam) => {
 			<div
 				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			>
-				{listDMInvite ? (
+				{isInviteExternalCalling ? (
+					<div className="flex flex-col gap-3">
+						{/* {memberListByUserId?.map((user) => (
+							<ListMemberInviteItem user={user} key={user.id} url={props.url} onSend={handleSend} isSent={!!sendIds[user.id]} />
+						))} */}
+					</div>
+				) : listDMInvite ? (
 					<div className="flex flex-col gap-3">
 						{filteredListDMBySearch?.map((dmGroup) => (
 							<ListMemberInviteItem

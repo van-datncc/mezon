@@ -17,9 +17,11 @@ import { ChannelType } from 'mezon-js';
 import { ApiUserEventRequest } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { Coords } from '../../../ChannelLink';
+import ModalInvite from '../../../ListMemberInvite/modalInvite';
 import { timeFomat } from '../timeFomatEvent';
 import ModalDelEvent from './modalDelEvent';
 import ModalShareEvent from './modalShareEvent';
@@ -106,6 +108,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	const handleOpenLink = useCallback(() => {
 		window.open(privateRoomLink, '_blank', 'noopener,noreferrer');
 	}, [privateRoomLink]);
+
+	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
+		<ModalInvite onClose={closeInviteClanModal} open={true} isInviteExternalCalling={true} />
+	));
+
+	const handleInvite = useCallback(() => {
+		openInviteClanModal();
+	}, []);
 
 	const handleStopPropagation = (e: any) => {
 		e.stopPropagation();
@@ -323,6 +333,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								</button>
 								<button onClick={handleCopyLink} className="text-blue-500 hover:underline">
 									{copied ? 'Copied!' : 'Copy Link'}
+								</button>
+								<button onClick={handleInvite} className="text-blue-500 hover:underline">
+									Invite
 								</button>
 							</>
 						)}
