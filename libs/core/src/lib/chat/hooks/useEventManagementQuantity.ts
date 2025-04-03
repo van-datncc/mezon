@@ -1,13 +1,15 @@
-import { getStore, selectAllAccount, selectAllTextChannel, selectCurrentClanId, selectEventsByClanId } from '@mezon/store';
+import { selectAllAccount, selectAllTextChannel, selectCurrentClanId, selectEventsByClanId, useAppSelector } from '@mezon/store';
 import { EEventStatus } from '@mezon/utils';
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 export const useEventManagementQuantity = () => {
-	const store = getStore();
-	const userId = selectAllAccount(store.getState())?.user?.id;
-	const currentClanId = selectCurrentClanId(store.getState());
-	const allEventManagement = selectEventsByClanId(store.getState(), currentClanId as string);
-	const allThreadChannelPrivate = selectAllTextChannel(store.getState());
+	const userId = useSelector(selectAllAccount)?.user?.id;
+
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const allEventManagement = useAppSelector((state) => selectEventsByClanId(state, currentClanId as string));
+	const allThreadChannelPrivate = useSelector(selectAllTextChannel);
 	const allThreadChannelPrivateIds = allThreadChannelPrivate.map((channel) => channel.channel_id);
 
 	const eventsByUser = useMemo(
