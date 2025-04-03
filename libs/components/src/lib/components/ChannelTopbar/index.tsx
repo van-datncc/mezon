@@ -5,6 +5,7 @@ import {
 	appActions,
 	audioCallActions,
 	channelsActions,
+	getStore,
 	getStoreAsync,
 	notificationActions,
 	pinMessageActions,
@@ -304,7 +305,6 @@ const DmTopbarTools = memo(() => {
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
-	const sessionUser = useSelector(selectSession);
 	const isInCall = useSelector(selectIsInCall);
 	const handleSend = useCallback(
 		(
@@ -313,13 +313,17 @@ const DmTopbarTools = memo(() => {
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
+			const store = getStore();
+			const state = store.getState();
+			const sessionUser = selectSession(state);
+
 			if (sessionUser) {
 				sendMessage(content, mentions, attachments, references);
 			} else {
 				console.error('Session is not available');
 			}
 		},
-		[sendMessage, sessionUser]
+		[sendMessage]
 	);
 
 	const setIsUseProfileDM = useCallback(
