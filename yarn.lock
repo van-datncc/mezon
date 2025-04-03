@@ -12286,17 +12286,17 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
-mezon-js-protobuf@1.7.37:
-  version "1.7.37"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.37.tgz#8e11bcc285255e5dd73298f3059fea3d1813f57f"
-  integrity sha512-8/BQWuRksjbpm8994BwSRntpgJpXwVzbVzAi8IYp4VW2CvMjd65bq4OnSpAp/lk0jZx7X3RQPwksjGX3nT8TyQ==
+mezon-js-protobuf@1.7.38:
+  version "1.7.38"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.38.tgz#c2601665f56b31ec60e9cef212740ff42b929140"
+  integrity sha512-Gs14dm5Ga68AXtT/Txsq2jztk7e2ZOM9qyRoCN4ye09besRUokZXXJg4XcWSvYJkUA9++KMNOZQxU7ttg48q7A==
   dependencies:
     "@scarf/scarf" "^1.1.1"
 
-mezon-js@2.11.28:
-  version "2.11.28"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.28.tgz#98bbfee32e29d54b59af7fa0faba6f046b5eb58d"
-  integrity sha512-Ou6l5ANUdIl/JzxRKNNWHB5/sAjjsog65aKFeiVA2OC44s1jvieSmxVVD/gxun9OZyi5BTVWfudI6afPRr03Kg==
+mezon-js@2.11.29:
+  version "2.11.29"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.11.29.tgz#8be588a968086541a725ce98a7b221a11ac754d3"
+  integrity sha512-a+QA4s1Zh7jXFKkH/q/dJrSuDNKJTUMiXMRMpV9N8Ir4IoBQQXoPBVaQLBXUJ0r7VV3jD7M7iN4h1M8kq3179Q==
   dependencies:
     "@scarf/scarf" "^1.1.1"
     base64-arraybuffer "^1.0.2"
