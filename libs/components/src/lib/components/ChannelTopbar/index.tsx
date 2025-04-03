@@ -41,7 +41,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, isMacDesktop } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -75,7 +75,7 @@ const ChannelTopbar = memo(() => {
 	return (
 		<div
 			onMouseDown={onMouseDownTopbar}
-			className={`max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
+			className={`draggable-area max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			<TopBarChannelText />
 		</div>
@@ -249,7 +249,7 @@ const ChannelTopbarTools = memo(
 		};
 
 		return (
-			<div className={`${isMacDesktop ? 'draggable-area' : ''} items-center h-full flex`}>
+			<div className={`items-center h-full flex`}>
 				{!isStream ? (
 					<div className="items-center gap-2 flex">
 						<div className="relative items-center gap-4 hidden sbm:flex sbm:flex-row-reverse">

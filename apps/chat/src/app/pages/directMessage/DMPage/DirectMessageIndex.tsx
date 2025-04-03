@@ -1,4 +1,3 @@
-import { DmTopbar } from '@mezon/components';
 import { useAppNavigation, useAppParams } from '@mezon/core';
 import { isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { useEffect } from 'react';
@@ -16,7 +15,6 @@ export default function DirectMessageIndex() {
 
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 bg-bgSecondary h-[100%]">
-			<DmTopbar.Skeleton />
 			<div className="flex flex-row ">
 				<div className="flex flex-col flex-1">
 					<div
