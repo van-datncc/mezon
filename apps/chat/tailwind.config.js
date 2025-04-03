@@ -23,7 +23,7 @@ const heightMessageViewChatThread = `calc(100dvh - 10px - ${topBarHeight} - ${ch
 const heightWithoutTopBar = `calc(100dvh - ${topBarHeight})`;
 const heightWithoutTopBarMobile = `calc(100dvh)`;
 const heightCallDm = `calc(100% - 240px)`;
-const messageViewChatDM = `calc(100dvh - 60px)`;
+const messageViewChatDM = `calc(100dvh -  ${topBarHeight})`;
 const heighChannelList = `calc(100dvh - ${profileFooterHeight})`
 
 const plugin = require('tailwindcss/plugin');
