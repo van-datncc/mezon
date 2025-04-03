@@ -115,7 +115,7 @@ function MezonPage() {
 					>
 						<div className="flex flex-col items-center justify-center gap-[24px] m-auto text-center w-full max-w-full md:max-w-[662px]">
 							<h1 className="tracking-[-.02em] text-center text-[60px] max-md:text-[36px] font-black leading-[72px] max-md:leading-[48px] font-semibold font-['Poppins'] text-[#F4F7F9] max-md:text-textDarkTheme">
-								The Live, Work, and Play Platform.
+								The Live, Work, and Play Platform – the best Discord alternative.
 							</h1>
 							<div className="text-[20px] text-[#C2D5DF] text-center leading-[30px] font-normal hidden md:block">
 								<div>Mezon is great for playing games and chilling with friends, </div>
