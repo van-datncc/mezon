@@ -6,6 +6,7 @@ import {
 	selectClanById,
 	selectClanSystemMessage,
 	selectCurrentClanId,
+	selectTheme,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -91,7 +92,7 @@ const ModalInvite = (props: ModalParam) => {
 	useEffect(() => {
 		fetchSystemMessage();
 	}, [currentClanId]);
-
+	const appearanceTheme = useSelector(selectTheme);
 	const closeModalEdit = useCallback(() => setModalEdit(false), []);
 	return !modalEdit ? (
 		<Modal
@@ -146,7 +147,7 @@ const ModalInvite = (props: ModalParam) => {
 				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Expire After</h3>
 				<select
 					name="expireAfter"
-					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 					onChange={(e) => {
 						setExpire(e.target.value);
 					}}
@@ -163,7 +164,7 @@ const ModalInvite = (props: ModalParam) => {
 				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Max Number of Uses</h3>
 				<select
 					name="maxNumberofUses"
-					className="block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none"
+					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 					onChange={(e) => {
 						setMax(e.target.value);
 					}}
