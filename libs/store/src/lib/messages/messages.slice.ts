@@ -538,7 +538,6 @@ export const jumpToMessage = createAsyncThunk(
 							messageId: messageId,
 							direction: Direction_Mode.AROUND_TIMESTAMP,
 							isFetchingLatestMessages,
-							isClearMessage: true,
 							viewingOlder: true
 						})
 					)
