@@ -254,7 +254,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div
-					className={`footer-profile h-10 flex-1 flex pl-2 items-center hover:bg-bgHoverMember rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
+					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
 					onClick={handleClickFooterProfile}
 				>
 					<div className="cursor-pointer flex items-center gap-3 relative ">
@@ -269,11 +269,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						<div className="absolute bottom-1 left-6">
 							<UserStatusIcon status={userCustomStatus?.user_status} />
 						</div>
-						<div className="flex flex-col ">
-							<p className="text-base font-normal">{name}</p>
-							<p className="text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 leading-[14px]">
-								{customStatus}
-							</p>
+						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode  ">
+							<p className="text-base font-medium max-w-40 truncate dark:text-contentSecondary text-black">{name}</p>
+							<p className="text-[11px] text-left line-clamp-1 leading-[14px]">{customStatus}</p>
 						</div>
 					</div>
 					{showModalFooterProfile && (
