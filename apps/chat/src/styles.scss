@@ -123,6 +123,11 @@
 	width: 8px;
 }
 
+::-webkit-scrollbar-thumb {
+	background: #1a1b1e;
+	border-radius: 5px;
+}
+
 html,
 body {
 	--tw-bg-opacity: 1;
