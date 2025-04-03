@@ -228,6 +228,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					}}
 				>
 					{checkOptionVoice &&
+						!isPrivateEvent &&
 						(() => {
 							const isGMeet = channelVoice.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE;
 							const linkProps = isGMeet
@@ -258,13 +259,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</>
 					)}
 					{isPrivateEvent && (
-						<a
-							href={privateRoomLink}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="flex gap-x-2 cursor-pointer text-blue-500 underline"
-						>
-							{event?.meet_room?.room_name}
+						<a href={privateRoomLink} target="_blank" rel="noopener noreferrer" className="flex gap-x-2 cursor-pointer">
+							<Icons.SpeakerLocked /> <p className="whitespace-normal break-words">Private Room</p>
 						</a>
 					)}
 				</div>
@@ -304,7 +300,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								className="flex items-center gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
 							>
 								{isInterested ? <Icons.MuteBell defaultSize="size-4 text-white" /> : <Icons.Bell className="size-4 text-white" />}
-								{event.user_ids?.length} {isInterested ? 'UnInterested' : 'Interested'}
+								<span className="whitespace-nowrap">
+									{event.user_ids?.length} {isInterested ? 'UnInterested' : 'Interested'}
+								</span>
 							</button>
 						) : (
 							<></>
