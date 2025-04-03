@@ -1,7 +1,7 @@
 import { DirectEntity, FriendsEntity, UsersEntity } from '@mezon/store';
 
 // Define the return type for clarity
-interface ProcessedUser {
+export interface ProcessedUser {
 	id: string;
 	username: string;
 	display_name: string;

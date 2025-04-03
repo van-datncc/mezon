@@ -29,6 +29,7 @@ export type ModalParam = {
 	clanId?: string;
 	setShowClanListMenuContext?: () => void;
 	isInviteExternalCalling?: boolean;
+	privateRoomLink?: string;
 };
 
 const ModalInvite = (props: ModalParam) => {
@@ -140,7 +141,7 @@ const ModalInvite = (props: ModalParam) => {
 				</>
 			) : (
 				<>
-					<ListMemberInvite isInviteExternalCalling={isInviteExternalCalling} url={urlInvite} channelID={channelID} />
+					<ListMemberInvite isInviteExternalCalling={isInviteExternalCalling} url={props.privateRoomLink as string} channelID={channelID} />
 					<div className="relative ">
 						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">
 							Or, send a clan invite link to a friend
@@ -148,7 +149,7 @@ const ModalInvite = (props: ModalParam) => {
 						<input
 							type="text"
 							className="w-full h-11 border border-solid dark:border-none dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
-							value={urlInvite}
+							value={props.privateRoomLink as string}
 							readOnly
 						/>
 						<button

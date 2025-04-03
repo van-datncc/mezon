@@ -110,7 +110,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	}, [privateRoomLink]);
 
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} open={true} isInviteExternalCalling={true} />
+		<ModalInvite onClose={closeInviteClanModal} open={true} isInviteExternalCalling={true} privateRoomLink={privateRoomLink} />
 	));
 
 	const handleInvite = useCallback(() => {

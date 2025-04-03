@@ -59,12 +59,11 @@ const ListMemberInvite = (props: ModalParam) => {
 	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 	const friends = useSelector(selectAllFriends);
 
-	const data = processUserData(
-		allUsesInAllClansEntities as Record<string, UsersEntity>,
-		friends as FriendsEntity[],
-		dmGroupChatList as DirectEntity[]
+	const data = useMemo(
+		() =>
+			processUserData(allUsesInAllClansEntities as Record<string, UsersEntity>, friends as FriendsEntity[], dmGroupChatList as DirectEntity[]),
+		[allUsesInAllClansEntities, friends, dmGroupChatList]
 	);
-
 	return (
 		<>
 			<input
@@ -83,9 +82,18 @@ const ListMemberInvite = (props: ModalParam) => {
 			>
 				{isInviteExternalCalling ? (
 					<div className="flex flex-col gap-3">
-						{/* {memberListByUserId?.map((user) => (
-							<ListMemberInviteItem user={user} key={user.id} url={props.url} onSend={handleSend} isSent={!!sendIds[user.id]} />
-						))} */}
+						{data?.map((user) => (
+							<ListMemberInviteItem
+								dmGroup={undefined}
+								user={user}
+								key={user.id}
+								url={props.url}
+								onSend={handleSend}
+								isSent={!!sendIds[user.id]}
+								isExternalCalling={true}
+								usersInviteExternal={user}
+							/>
+						))}
 					</div>
 				) : listDMInvite ? (
 					<div className="flex flex-col gap-3">

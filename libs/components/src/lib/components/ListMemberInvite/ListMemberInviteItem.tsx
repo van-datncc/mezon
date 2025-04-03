@@ -4,6 +4,7 @@ import { UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
+import { ProcessedUser } from './dataHelper';
 
 type ItemPorp = {
 	url: string;
@@ -11,9 +12,11 @@ type ItemPorp = {
 	user?: UsersClanEntity;
 	isSent?: boolean;
 	onSend: (dmGroup: DirectEntity) => void;
+	usersInviteExternal?: ProcessedUser;
+	isExternalCalling?: boolean;
 };
 const ListMemberInviteItem = (props: ItemPorp) => {
-	const { dmGroup, isSent, url, onSend, user } = props;
+	const { dmGroup, isSent, url, onSend, user, usersInviteExternal, isExternalCalling } = props;
 	const [isInviteSent, setIsInviteSent] = useState(isSent);
 	const { sendInviteMessage } = useSendInviteMessage();
 	const { createSilentSendMess } = useSilentSendMess();
@@ -44,7 +47,16 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	useEffect(() => {
 		setIsInviteSent(isSent);
 	}, [isSent]);
-	return dmGroup ? (
+	return isExternalCalling ? (
+		<ItemInviteUser
+			userId={usersInviteExternal?.id}
+			avatar={usersInviteExternal?.avatar_url}
+			displayName={usersInviteExternal?.display_name}
+			username={usersInviteExternal?.username}
+			isInviteSent={isInviteSent}
+			onHandle={() => handleButtonClick('', 0, user?.id)}
+		/>
+	) : dmGroup ? (
 		<ItemInviteDM
 			channelID={dmGroup.channel_id}
 			type={Number(dmGroup.type)}
