@@ -194,11 +194,13 @@ export const CreateNewChannelModal = () => {
 							<div className=" dark:text-zinc-400 text-colorTextLightMode text-sm">Kindly set up a channel of your choice.</div>
 						</div>
 						<div
-							className={`flex flex-col gap-3 w-full max-h-[430px] pr-2 overflow-y-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+							className={`flex flex-col gap-3 w-full max-h-[430px] pr-2 overflow-y-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 						>
 							<div className="Frame407 self-stretch flex-col items-center gap-2 flex">
 								<ChannelLableModal labelProp="Choose channel's type:" />
-								<div className="Frame405 self-stretch  flex-col justify-start items-start gap-2 flex sm:max-h-[200px] lg:h-fit lg:max-h-fit overflow-y-scroll max-xl:h-auto app-scroll">
+								<div
+									className={`Frame405 self-stretch  flex-col justify-start items-start gap-2 flex sm:max-h-[200px] lg:h-fit lg:max-h-fit overflow-y-scroll max-xl:h-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+								>
 									<ChannelTypeComponent
 										type={ChannelType.CHANNEL_TYPE_CHANNEL}
 										onChange={onChangeChannelType}
