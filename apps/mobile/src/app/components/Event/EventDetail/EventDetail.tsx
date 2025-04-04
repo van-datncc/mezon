@@ -49,7 +49,7 @@ export function EventDetail({ event }: IEventDetailProps) {
 
 	const handleShareEvent = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-		await sleep(300);
+		await sleep(500);
 		const data = {
 			children: <ShareEventModal event={event} />
 		};
