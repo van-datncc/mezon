@@ -44,10 +44,6 @@ export function useWindowSize(onResize?: (size: { width: number; height: number 
 		};
 	}, [setIsResizingDebounced, onResize]);
 
-	useEffect(() => {
-		onResize?.({ width: initialWidth, height: initialHeight });
-	}, [initialHeight]);
-
 	return useMemo(() => ({ width, height, isResizing }), [height, isResizing, width]);
 }
 
