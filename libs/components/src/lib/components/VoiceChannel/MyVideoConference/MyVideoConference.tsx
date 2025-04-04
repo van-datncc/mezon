@@ -10,6 +10,7 @@ import {
 import { ChannelsEntity, selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import { ApiAccount } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -27,12 +28,21 @@ interface MyVideoConferenceProps {
 	onFullScreen: () => void;
 	extUsername?: string;
 	isExternalCalling?: boolean;
+	accountExisted?: ApiAccount | null | undefined;
+	extAvatar?: string;
 }
 
-export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsername, isExternalCalling = false }: MyVideoConferenceProps) {
+export function MyVideoConference({
+	channel,
+	onLeaveRoom,
+	onFullScreen,
+	extUsername,
+	isExternalCalling = false,
+	accountExisted,
+	extAvatar
+}: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
-
 	const tracks = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },
@@ -134,7 +144,6 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 	}, []);
 
 	const userTracks = tracks.filter((track) => track.source !== 'screen_share' && track.source !== 'screen_share_audio');
-
 	return (
 		<div className="lk-video-conference">
 			<LayoutContextProvider value={layoutContext}>
@@ -142,7 +151,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
-								<ParticipantTile extUsername={extUsername} />
+								<ParticipantTile extAvatar={extAvatar} accountExisted={accountExisted} extUsername={extUsername} />
 							</GridLayout>
 						</div>
 					) : (
@@ -151,7 +160,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 								{focusTrack && <FocusLayout trackRef={focusTrack} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile extUsername={extUsername} />
+										<ParticipantTile extAvatar={extAvatar} accountExisted={accountExisted} extUsername={extUsername} />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>

@@ -13,6 +13,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { ApiAccount } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -67,6 +68,9 @@ export default function PreJoinCalling() {
 	const [cameraOn, setCameraOn] = useState(false);
 	const [micOn, setMicOn] = useState(false);
 	const [username, setUsername] = useState('');
+
+	const [accountExisted, setAccountExisted] = useState<ApiAccount | null | undefined>(null);
+
 	const [audioLevel, setAudioLevel] = useState(0);
 	const [error, setError] = useState<string | null>(null);
 	// State for permissions
@@ -88,17 +92,22 @@ export default function PreJoinCalling() {
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
 
-	useEffect(() => {
-		if (getJoinCallExtStatus === 'error') {
-			setError('Your session has expired. Please try again.');
-		}
-	}, [getJoinCallExtStatus]);
+	// useEffect(() => {
+	// 	if (getJoinCallExtStatus === 'error') {
+	// 		setError('Your session has expired. Please try again.');
+	// 	}
+	// }, [getJoinCallExtStatus]);
 
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 
 	const account = useSelector(selectAllAccount);
+	useEffect(() => {
+		if (account) {
+			setAccountExisted(account);
+		}
+	}, [account]);
 	const getDisplayName = account?.user?.display_name;
 	const getAvatar = account?.user?.avatar_url;
 
@@ -332,7 +341,9 @@ export default function PreJoinCalling() {
 					className="h-full"
 				>
 					<MyVideoConference
+						accountExisted={accountExisted}
 						extUsername={username}
+						extAvatar={getAvatar}
 						isExternalCalling={true}
 						channel={undefined}
 						onLeaveRoom={handleLeaveRoom}

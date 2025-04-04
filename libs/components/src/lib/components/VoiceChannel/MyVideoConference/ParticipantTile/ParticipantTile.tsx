@@ -17,13 +17,13 @@ import {
 	useMaybeTrackRefContext,
 	useParticipantTile
 } from '@livekit/components-react';
-import { selectAllAccount, selectMemberClanByUserName, useAppSelector } from '@mezon/store';
+import { selectMemberClanByUserName, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import type { Participant } from 'livekit-client';
 import { ConnectionQuality, Track } from 'livekit-client';
+import { ApiAccount } from 'mezon-js/api.gen';
 import React, { PropsWithChildren, forwardRef, useCallback, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { FocusToggle } from './FocusToggle';
 
@@ -59,16 +59,16 @@ export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElemen
 
 	onParticipantClick?: (event: ParticipantClickEvent) => void;
 	extUsername?: string;
+	accountExisted?: ApiAccount | null | undefined;
+	extAvatar?: string;
 }
 export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes<HTMLDivElement>) => React.ReactNode = forwardRef<
 	HTMLDivElement,
 	ParticipantTileProps
 >(function ParticipantTile(
-	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, extUsername, ...htmlProps }: ParticipantTileProps,
+	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, extUsername, accountExisted, extAvatar, ...htmlProps }: ParticipantTileProps,
 	ref
 ) {
-	const accountExisted = useSelector(selectAllAccount);
-
 	const trackReference = useEnsureTrackRef(trackRef);
 
 	const { elementProps } = useParticipantTile<HTMLDivElement>({
@@ -126,17 +126,17 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								)
 							)}
 							<div className="lk-participant-placeholder !bg-bgIconLight">
-								{accountExisted ? (
+								{/* {extAvatar ? (
 									<AvatarImage
-										alt={accountExisted.user?.display_name || ''}
-										username={accountExisted.user?.display_name || ''}
+										alt={username || ''}
+										username={username || ''}
 										className="w-20 h-20"
-										srcImgProxy={createImgproxyUrl(accountExisted.user?.avatar_url ?? '', {
+										srcImgProxy={createImgproxyUrl(extAvatar ?? '', {
 											width: 320,
 											height: 320,
 											resizeType: 'fit'
 										})}
-										src={accountExisted.user?.avatar_url}
+										src={extAvatar}
 									/>
 								) : member ? (
 									<AvatarImage
@@ -152,7 +152,18 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 									>
 										{username?.charAt(0)?.toUpperCase()}
 									</div>
-								)}
+								)} */}
+								<AvatarImage
+									alt={username || ''}
+									username={username || ''}
+									className="w-20 h-20"
+									srcImgProxy={createImgproxyUrl(extAvatar ?? '', {
+										width: 320,
+										height: 320,
+										resizeType: 'fit'
+									})}
+									src={extAvatar}
+								/>
 							</div>
 							<div className="lk-participant-metadata overflow-hidden">
 								<div className="lk-participant-metadata-item flex w-full justify-between gap-1 !bg-transparent">
