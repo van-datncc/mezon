@@ -1,17 +1,16 @@
-import { selectJoinCallExtStatus } from '@mezon/store';
+import { LoadingStatus } from '@mezon/utils';
 import { memo } from 'react';
-import { useSelector } from 'react-redux';
 
 interface JoinFormProps {
 	username: string;
 	setUsername: (value: string) => void;
 	onJoin: () => void;
+	loadingStatus: LoadingStatus;
 }
 
-const JoinForm = memo(({ username, setUsername, onJoin }: JoinFormProps) => {
-	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus); // "error" | "not loaded" | "loading" | "loaded"
-	const isLoading = getJoinCallExtStatus === 'loading';
-	const isDisabled = getJoinCallExtStatus === 'loaded' || isLoading;
+const JoinForm = memo(({ username, setUsername, onJoin, loadingStatus }: JoinFormProps) => {
+	const isLoading = loadingStatus === 'loading';
+	const isDisabled = loadingStatus === 'loaded' || isLoading;
 
 	return (
 		<div className="w-full flex gap-2 mb-6">
