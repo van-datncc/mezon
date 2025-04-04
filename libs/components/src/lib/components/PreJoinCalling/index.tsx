@@ -4,6 +4,7 @@
 import { LiveKitRoom } from '@livekit/components-react';
 import {
 	generateMeetTokenExternal,
+	selectAllAccount,
 	selectExternalToken,
 	selectJoinCallExtStatus,
 	selectShowCamera,
@@ -85,16 +86,21 @@ export default function PreJoinCalling() {
 	const { code } = useParams<{ code: string }>();
 
 	const getExternalToken = useSelector(selectExternalToken);
-	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus); // "error" | "not loaded" | "loading" | "loaded"
+	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
 
 	useEffect(() => {
 		if (getJoinCallExtStatus === 'error') {
 			setError('Your session has expired. Please try again.');
 		}
 	}, [getJoinCallExtStatus]);
+
 	const showMicrophone = useSelector(selectShowMicrophone);
 	const showCamera = useSelector(selectShowCamera);
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
+
+	const account = useSelector(selectAllAccount);
+	const getDisplayName = account?.user?.display_name;
+	const getAvatar = account?.user?.avatar_url;
 
 	// Check permissions on component mount
 	useEffect(() => {
@@ -280,14 +286,14 @@ export default function PreJoinCalling() {
 
 	// Handle Join Meeting
 	const joinMeeting = useCallback(async () => {
-		if (!username.trim()) {
+		if (!username.trim() && !getDisplayName) {
 			setError('Please enter your name before joining the meeting.');
 			return;
 		}
 
 		setError(null);
-		await dispatch(generateMeetTokenExternal({ token: code as string, displayName: username }));
-	}, [dispatch, username, code]);
+		await dispatch(generateMeetTokenExternal({ token: code as string, displayName: getDisplayName ? getDisplayName : username }));
+	}, [dispatch, username, getDisplayName, code]);
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -345,8 +351,14 @@ export default function PreJoinCalling() {
 						{/* Video Preview */}
 						<div className="w-full max-w-xl bg-zinc-800 rounded-lg overflow-hidden">
 							<div className="p-6 flex flex-col items-center">
-								<VideoPreview cameraOn={cameraOn} stream={streamRef.current} />
-								<JoinForm loadingStatus={getJoinCallExtStatus} username={username} setUsername={setUsername} onJoin={joinMeeting} />
+								<VideoPreview avatarExist={getAvatar} cameraOn={cameraOn} stream={streamRef.current} />
+								<JoinForm
+									displayNameExisted={getDisplayName}
+									loadingStatus={getJoinCallExtStatus}
+									username={username}
+									setUsername={setUsername}
+									onJoin={joinMeeting}
+								/>
 
 								{/* Error message */}
 								{error && (

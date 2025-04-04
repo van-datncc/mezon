@@ -17,12 +17,13 @@ import {
 	useMaybeTrackRefContext,
 	useParticipantTile
 } from '@livekit/components-react';
-import { selectMemberClanByUserName, useAppSelector } from '@mezon/store';
+import { selectAllAccount, selectMemberClanByUserName, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import type { Participant } from 'livekit-client';
 import { ConnectionQuality, Track } from 'livekit-client';
 import React, { PropsWithChildren, forwardRef, useCallback, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { FocusToggle } from './FocusToggle';
 
@@ -59,7 +60,6 @@ export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElemen
 	onParticipantClick?: (event: ParticipantClickEvent) => void;
 	extUsername?: string;
 }
-
 export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes<HTMLDivElement>) => React.ReactNode = forwardRef<
 	HTMLDivElement,
 	ParticipantTileProps
@@ -67,6 +67,8 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, extUsername, ...htmlProps }: ParticipantTileProps,
 	ref
 ) {
+	const accountExisted = useSelector(selectAllAccount);
+
 	const trackReference = useEnsureTrackRef(trackRef);
 
 	const { elementProps } = useParticipantTile<HTMLDivElement>({
@@ -97,6 +99,7 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 
 	const username = trackReference.participant.identity;
 	const member = useAppSelector((state) => selectMemberClanByUserName(state, username));
+
 	const voiceUsername = member?.clan_nick || username;
 	const avatar = useMemo(() => {
 		return member?.clan_avatar || member?.user?.avatar_url || 'assets/images/mezon-logo-white.svg';
@@ -123,7 +126,19 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								)
 							)}
 							<div className="lk-participant-placeholder !bg-bgIconLight">
-								{member ? (
+								{accountExisted ? (
+									<AvatarImage
+										alt={accountExisted.user?.display_name || ''}
+										username={accountExisted.user?.display_name || ''}
+										className="w-20 h-20"
+										srcImgProxy={createImgproxyUrl(accountExisted.user?.avatar_url ?? '', {
+											width: 320,
+											height: 320,
+											resizeType: 'fit'
+										})}
+										src={accountExisted.user?.avatar_url}
+									/>
+								) : member ? (
 									<AvatarImage
 										alt={username || ''}
 										username={username || ''}

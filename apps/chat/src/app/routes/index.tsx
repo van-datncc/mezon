@@ -100,6 +100,7 @@ export const Routes = memo(() => {
 							},
 							{
 								path: 'meeting/:code',
+								loader: loaderWithStore(authLoader),
 								element: <PreJoinCalling />
 							},
 							isElectron()
