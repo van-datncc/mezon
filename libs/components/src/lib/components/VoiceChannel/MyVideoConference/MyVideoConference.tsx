@@ -26,9 +26,10 @@ interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
 	extUsername?: string;
+	isExternalCalling?: boolean;
 }
 
-export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsername }: MyVideoConferenceProps) {
+export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsername, isExternalCalling = false }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -192,27 +193,36 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 						<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5">
 							<div className="flex justify-start gap-2">
 								<span>
-									<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+									{!isExternalCalling ? (
+										<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+									) : (
+										<Icons.SpeakerLocked defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+									)}
 								</span>
-								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>{channel?.channel_label}</p>
+								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>
+									{channel?.channel_label ?? 'Private Room'}
+								</p>
 							</div>
 							<div className="flex justify-start gap-4">
-								<div className="relative leading-5 h-5" ref={inboxRef}>
-									<button
-										title="Inbox"
-										className="focus-visible:outline-none"
-										onClick={handleShowInbox}
-										onContextMenu={(e) => e.preventDefault()}
-									>
-										<Icons.Inbox
-											isWhite={isShowInbox}
-											defaultFill="text-contentTertiary"
-											className="hover:text-white text-[#B5BAC1]"
-										/>
-										{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
-									</button>
-									{isShowInbox && <NotificationList rootRef={inboxRef} />}
-								</div>
+								{!isExternalCalling && (
+									<div className="relative leading-5 h-5" ref={inboxRef}>
+										<button
+											title="Inbox"
+											className="focus-visible:outline-none"
+											onClick={handleShowInbox}
+											onContextMenu={(e) => e.preventDefault()}
+										>
+											<Icons.Inbox
+												isWhite={isShowInbox}
+												defaultFill="text-contentTertiary"
+												className="hover:text-white text-[#B5BAC1]"
+											/>
+											{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
+										</button>
+										{isShowInbox && <NotificationList rootRef={inboxRef} />}
+									</div>
+								)}
+
 								<Tooltip
 									showArrow={{ className: '!top-[6px]' }}
 									key={+focusTrack}
@@ -241,7 +251,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 							isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
 						}`}
 					>
-						<ControlBar onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} />
+						<ControlBar isExternalCalling={isExternalCalling} onLeaveRoom={onLeaveRoom} onFullScreen={onFullScreen} />
 					</div>
 				</div>
 			</LayoutContextProvider>

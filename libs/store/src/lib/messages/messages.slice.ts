@@ -334,13 +334,6 @@ export const fetchMessages = createAsyncThunk(
 				};
 			}
 
-			const firstMessage = response.messages[response.messages.length - 1];
-			if (firstMessage?.code === EMessageCode.FIRST_MESSAGE) {
-				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: firstMessage.id }));
-			} else {
-				thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: null }));
-			}
-
 			let lastSentMessage = (state.messages.lastMessageByChannel[chlId] as ApiChannelMessageHeader) || response.last_sent_message;
 
 			if (!fromCache) {
@@ -361,6 +354,8 @@ export const fetchMessages = createAsyncThunk(
 
 			const lastLoadMessage = !fromCache ? response.messages.at(-1) : oldMessages[0];
 			const hasMore = lastLoadMessage?.code !== EMessageCode.FIRST_MESSAGE;
+
+			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: !hasMore ? lastLoadMessage?.id : null }));
 
 			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage?.id, hasMore } }));
 
