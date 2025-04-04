@@ -323,6 +323,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					userId={myProfile.userId as string}
 					note={note}
 					sendTokenInputsState={sendTokenInputsState}
+					infoSendToken={infoSendToken}
 				/>
 			)}
 		</div>
