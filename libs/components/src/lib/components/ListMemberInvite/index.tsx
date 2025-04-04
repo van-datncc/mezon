@@ -9,8 +9,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { UsersClanEntity } from '@mezon/utils';
-import { ChangeEvent, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useThrottledCallback } from 'use-debounce';
 import ListMemberInviteItem from './ListMemberInviteItem';
 import { processUserData } from './dataHelper';
 export type ModalParam = {
@@ -24,10 +25,14 @@ const ListMemberInvite = (props: ModalParam) => {
 	const { listDMInvite, listUserInvite } = useDMInvite(props.channelID);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sendIds, setSendIds] = useState<Record<string, boolean>>({});
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setSearchTerm(e.target.value);
-	};
 
+	const throttledSetSearchTerm = useThrottledCallback(setSearchTerm, 300);
+	const handleInputChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			throttledSetSearchTerm(e.target.value);
+		},
+		[throttledSetSearchTerm]
+	);
 	const filteredListDMBySearch = useMemo(() => {
 		return listDMInvite?.filter((dmGroup) => {
 			if (dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())) {
