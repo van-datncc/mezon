@@ -1,4 +1,4 @@
-import { useAuth } from '@mezon/core';
+import { useAuth, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -7,12 +7,13 @@ import {
 	deleteUserEvent,
 	selectClanById,
 	selectMemberClanByUserId2,
+	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { EEventStatus, sleep } from '@mezon/utils';
+import { EEventStatus, EPermission, sleep } from '@mezon/utils';
 import { ApiUserEventRequest } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
@@ -35,8 +36,26 @@ export function EventDetail({ event }: IEventDetailProps) {
 	const styles = style(themeValue);
 	const userCreate = useAppSelector((state) => selectMemberClanByUserId2(state, event?.creator_id || ''));
 	const clans = useSelector(selectClanById(event?.clan_id || ''));
-	const { userId } = useAuth();
+	const { userId, userProfile } = useAuth();
 	const [isInterested, setIsInterested] = useState<boolean>(false);
+	const [isClanOwner, hasClanPermission, hasAdminPermission] = usePermissionChecker([
+		EPermission.clanOwner,
+		EPermission.manageClan,
+		EPermission.administrator
+	]);
+	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+
+	const canModifyEvent = useMemo(() => {
+		if (isClanOwner || hasClanPermission || hasAdminPermission) {
+			return true;
+		}
+		const isEventICreated = event?.creator_id === userProfile?.user?.id;
+		if (isEventICreated) {
+			return true;
+		}
+
+		return Number(userMaxPermissionLevel) > Number(event?.max_permission);
+	}, [event?.creator_id, event?.max_permission, hasAdminPermission, hasClanPermission, isClanOwner, userMaxPermissionLevel, userProfile?.user?.id]);
 	const dispatch = useAppDispatch();
 
 	function handlePress() {
@@ -136,10 +155,12 @@ export function EventDetail({ event }: IEventDetailProps) {
 					onPress={handleShareEvent}
 					icon={<MezonIconCDN icon={IconCDN.shareIcon} height={20} width={20} color={themeValue.text} />}
 				/>
-				<MezonButton
-					icon={<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={20} width={20} color={themeValue.text} />}
-					onPress={handlePress}
-				/>
+				{canModifyEvent && (
+					<MezonButton
+						icon={<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={20} width={20} color={themeValue.text} />}
+						onPress={handlePress}
+					/>
+				)}
 			</View>
 
 			{!!event?.channel_id && event.channel_id !== '0' && <EventChannelDetail event={event} />}
