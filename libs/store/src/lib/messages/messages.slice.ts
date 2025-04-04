@@ -533,8 +533,8 @@ export const jumpToMessage = createAsyncThunk(
 							messageId: messageId,
 							direction: Direction_Mode.AROUND_TIMESTAMP,
 							isFetchingLatestMessages,
-							isClearMessage: true,
-							viewingOlder: true
+							viewingOlder: true,
+							isClearMessage: true
 						})
 					)
 					.unwrap();
@@ -1457,6 +1457,13 @@ export const selectMessageByMessageId = createSelector(
 	[selectMessagesByChannel, (_, __, messageId: string) => messageId],
 	(channelMessages, messageId) => {
 		return channelMessages?.entities?.[messageId];
+	}
+);
+
+export const selectLastSeenMessageStateByChannelId = createSelector(
+	[getMessagesState, (state, channelId: string) => channelId],
+	(state, channelId) => {
+		return state?.lastMessageByChannel?.[channelId] ?? null;
 	}
 );
 
