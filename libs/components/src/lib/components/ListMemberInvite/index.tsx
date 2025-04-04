@@ -4,15 +4,15 @@ import {
 	FriendsEntity,
 	selectAllDirectMessages,
 	selectAllFriends,
-	selectAllUsesInAllClansEntities,
+	selectAllMembersInClan,
 	selectTheme,
-	useAppSelector,
-	UsersEntity
+	useAppSelector
 } from '@mezon/store';
+import { UsersClanEntity } from '@mezon/utils';
 import { ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { processUserData } from './dataHelper';
 import ListMemberInviteItem from './ListMemberInviteItem';
+import { processUserData } from './dataHelper';
 export type ModalParam = {
 	url: string;
 	channelID?: string;
@@ -54,16 +54,28 @@ const ListMemberInvite = (props: ModalParam) => {
 	};
 
 	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
-	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
+	///
+	const membersClan = useSelector(selectAllMembersInClan);
 	const dmGroupChatList = dmGroupChatListRef.current;
-	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 	const friends = useSelector(selectAllFriends);
 
-	const data = useMemo(
-		() =>
-			processUserData(allUsesInAllClansEntities as Record<string, UsersEntity>, friends as FriendsEntity[], dmGroupChatList as DirectEntity[]),
-		[allUsesInAllClansEntities, friends, dmGroupChatList]
+	const dataUserToInvite = useMemo(
+		() => processUserData(membersClan as UsersClanEntity[], dmGroupChatList as DirectEntity[], friends as FriendsEntity[]),
+		[membersClan, dmGroupChatList, friends]
 	);
+
+	const filteredDataToInvite = useMemo(() => {
+		if (!searchTerm) {
+			return dataUserToInvite;
+		}
+
+		return dataUserToInvite.filter(
+			(item) =>
+				item?.username?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+				item?.clan_nick?.toLowerCase().includes(searchTerm?.toLowerCase())
+		);
+	}, [searchTerm, dataUserToInvite]);
+
 	return (
 		<>
 			<input
@@ -71,29 +83,34 @@ const ListMemberInvite = (props: ModalParam) => {
 				value={searchTerm}
 				onChange={handleInputChange}
 				placeholder="Search for friends"
-				className="w-full h-10 dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
+				className="w-full h-10 mb-1 dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
 			/>
 			<p className="ml-[0px] mt-1 mb-4 dark:text-[#AEAEAE] text-black text-[15px] cursor-default">
 				This channel is private, only select members and roles can view this channel.
 			</p>
+
 			<hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
 			<div
 				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 			>
 				{isInviteExternalCalling ? (
 					<div className="flex flex-col gap-3">
-						{data?.map((user) => (
-							<ListMemberInviteItem
-								dmGroup={undefined}
-								user={user}
-								key={user.id}
-								url={props.url}
-								onSend={handleSend}
-								isSent={!!sendIds[user.id]}
-								isExternalCalling={true}
-								usersInviteExternal={user}
-							/>
-						))}
+						{filteredDataToInvite?.length > 0 ? (
+							filteredDataToInvite.map((user, index) => (
+								<ListMemberInviteItem
+									dmGroup={undefined}
+									user={user as UsersClanEntity}
+									key={`${index}${user.id}`}
+									url={props.url}
+									onSend={handleSend}
+									isSent={!!sendIds[user.id as string]}
+									isExternalCalling={true}
+									usersInviteExternal={user}
+								/>
+							))
+						) : (
+							<span>No result</span>
+						)}
 					</div>
 				) : listDMInvite ? (
 					<div className="flex flex-col gap-3">

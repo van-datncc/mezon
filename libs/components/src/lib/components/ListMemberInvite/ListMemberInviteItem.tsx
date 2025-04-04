@@ -1,5 +1,5 @@
 import { useSendInviteMessage, useSilentSendMess } from '@mezon/core';
-import { DirectEntity } from '@mezon/store';
+import { DirectEntity, getStore, selectDirectById } from '@mezon/store';
 import { UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useState } from 'react';
@@ -32,7 +32,9 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 		if (userId) {
 			directMessageWithUser(userId);
 		}
-		if (directParamId && dmGroup) {
+		if (directParamId) {
+			const store = getStore();
+			const getDirect = selectDirectById(store.getState(), directParamId);
 			let channelMode = 0;
 			if (type === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM;
@@ -41,20 +43,27 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 				channelMode = ChannelStreamMode.STREAM_MODE_GROUP;
 			}
 			sendInviteMessage(url, directParamId, channelMode);
-			onSend(dmGroup);
+			onSend(getDirect);
 		}
 	};
+
 	useEffect(() => {
 		setIsInviteSent(isSent);
 	}, [isSent]);
 	return isExternalCalling ? (
 		<ItemInviteUser
 			userId={usersInviteExternal?.id}
-			avatar={usersInviteExternal?.avatar_url}
-			displayName={usersInviteExternal?.display_name}
+			avatar={usersInviteExternal?.clan_avatar}
+			displayName={usersInviteExternal?.clan_nick}
 			username={usersInviteExternal?.username}
 			isInviteSent={isInviteSent}
-			onHandle={() => handleButtonClick('', 0, user?.id)}
+			onHandle={() =>
+				handleButtonClick(
+					usersInviteExternal?.id,
+					usersInviteExternal?.type,
+					usersInviteExternal?.type === ChannelType.CHANNEL_TYPE_GROUP ? '' : usersInviteExternal?.id
+				)
+			}
 		/>
 	) : dmGroup ? (
 		<ItemInviteDM
@@ -138,9 +147,10 @@ const ItemInviteUser = (props: ItemInviteUserProps) => {
 				srcImgProxy={createImgproxyUrl(avatar ?? '')}
 				src={avatar}
 			/>
-			<p style={{ marginRight: 'auto' }} className="pl-[10px]">
-				{displayName}
+			<p style={{ marginRight: 'auto' }} className="pl-[10px] max-w-[300px] truncate">
+				{displayName} <span className="text-xs text-gray-500">{username}</span>
 			</p>
+
 			<button
 				onClick={onHandle}
 				disabled={isInviteSent}

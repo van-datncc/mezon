@@ -144,7 +144,7 @@ const ModalInvite = (props: ModalParam) => {
 					<ListMemberInvite isInviteExternalCalling={isInviteExternalCalling} url={props.privateRoomLink as string} channelID={channelID} />
 					<div className="relative ">
 						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">
-							Or, send a clan invite link to a friend
+							Or, send a private room link to a friend
 						</p>
 						<input
 							type="text"
@@ -157,7 +157,7 @@ const ModalInvite = (props: ModalParam) => {
 								shadow outline-none focus:outline-none ease-linear transition-all duration-150
 								bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
 							onClick={() => {
-								handleCopyToClipboard(urlInvite);
+								handleCopyToClipboard(!isInviteExternalCalling ? urlInvite : (props.privateRoomLink as string));
 								onClose();
 								setShowClanListMenuContext?.();
 							}}
