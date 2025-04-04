@@ -28,7 +28,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectLastMessageByChannelId,
-	selectLastMessageStateByChannelId,
+	selectLastSeenMessageStateByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
@@ -48,7 +48,7 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const lastMessageState = useSelector((state) => selectLastMessageStateByChannelId(state, channelId as string));
+	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
 	const mounted = useRef('');
 
 	const isFocus = !isBackgroundModeActive();
