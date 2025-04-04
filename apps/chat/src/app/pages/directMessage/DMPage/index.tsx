@@ -28,6 +28,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectLastMessageByChannelId,
+	selectLastMessageStateByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
@@ -47,6 +48,7 @@ import { ChannelTyping } from '../../channel/ChannelTyping';
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const lastMessageState = useSelector((state) => selectLastMessageStateByChannelId(state, channelId as string));
 	const mounted = useRef('');
 
 	const isFocus = !isBackgroundModeActive();
@@ -63,10 +65,10 @@ function useChannelSeen(channelId: string) {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	useEffect(() => {
 		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (lastMessage) {
+		if (lastMessage && lastMessageState && lastMessage?.create_time_seconds === lastMessageState?.timestamp_seconds) {
 			markAsReadSeen(lastMessage, mode, 0);
 		}
-	}, [lastMessage, channelId]);
+	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;

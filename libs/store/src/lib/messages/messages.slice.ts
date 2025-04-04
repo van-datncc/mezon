@@ -1464,6 +1464,10 @@ export const selectMessageByMessageId = createSelector(
 	}
 );
 
+export const selectLastMessageStateByChannelId = createSelector([getMessagesState, (state, channelId: string) => channelId], (state, channelId) => {
+	return state?.lastMessageByChannel?.[channelId] ?? null;
+});
+
 export const selectLastMessageByChannelId = createSelector([selectMessagesByChannel], (channelMessages) => {
 	if (!channelMessages?.ids?.length) return null;
 	const { ids, entities } = channelMessages;
