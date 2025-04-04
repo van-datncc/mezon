@@ -28,13 +28,13 @@ const ListMemberInviteItem = (props: ItemPorp) => {
 	};
 
 	const handleButtonClick = async (directParamId?: string, type?: number, userId?: string) => {
+		const store = getStore();
+		const getDirect = selectDirectById(store.getState(), directParamId);
 		setIsInviteSent(true);
 		if (userId) {
 			directMessageWithUser(userId);
 		}
-		if (directParamId) {
-			const store = getStore();
-			const getDirect = selectDirectById(store.getState(), directParamId);
+		if (directParamId && getDirect) {
 			let channelMode = 0;
 			if (type === ChannelType.CHANNEL_TYPE_DM) {
 				channelMode = ChannelStreamMode.STREAM_MODE_DM;
