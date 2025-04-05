@@ -125,13 +125,16 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 			})}
 			src={resolvedAvatar}
 		/>
-	) : isAvatarResolved ? (
-		<div
-			className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] w-20 h-20 !text-4xl font-semibold`}
-		>
-			{usernameString?.charAt(0)?.toUpperCase()}
-		</div>
-	) : null;
+	) : (
+		isAvatarResolved &&
+		usernameString && (
+			<div
+				className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] w-20 h-20 !text-4xl font-semibold`}
+			>
+				{usernameString?.charAt(0)?.toUpperCase()}
+			</div>
+		)
+	);
 
 	return (
 		<div ref={ref} style={{ position: 'relative' }} {...elementProps}>
