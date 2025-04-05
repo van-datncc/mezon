@@ -89,9 +89,15 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 const RowVirtualizerDynamic = memo(({ appearanceTheme }: { appearanceTheme: string }) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const [showFullList, setShowFullList] = useState(false);
+	const prevClanIdRef = useRef<string | null>(null);
+
 	useSyncEffect(() => {
-		if (showFullList) {
-			setShowFullList(false);
+		const currentClanId = currentClan?.clan_id ?? null;
+		if (prevClanIdRef.current !== currentClanId) {
+			prevClanIdRef.current = currentClanId;
+			if (showFullList) {
+				setShowFullList(false);
+			}
 		}
 	}, [currentClan]);
 
