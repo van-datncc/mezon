@@ -10,7 +10,6 @@ import {
 import { ChannelsEntity, selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
-import { ApiAccount } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,21 +25,10 @@ interface MyVideoConferenceProps {
 	channel?: ChannelsEntity;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
-	extUsername?: string;
 	isExternalCalling?: boolean;
-	accountExisted?: ApiAccount | null | undefined;
-	extAvatar?: string;
 }
 
-export function MyVideoConference({
-	channel,
-	onLeaveRoom,
-	onFullScreen,
-	extUsername,
-	isExternalCalling = false,
-	accountExisted,
-	extAvatar
-}: MyVideoConferenceProps) {
+export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, isExternalCalling = false }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 	const tracks = useTracks(
@@ -151,16 +139,16 @@ export function MyVideoConference({
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
-								<ParticipantTile extAvatar={extAvatar} accountExisted={accountExisted} extUsername={extUsername} />
+								<ParticipantTile isExtCalling={isExternalCalling} />
 							</GridLayout>
 						</div>
 					) : (
 						<div className={`lk-focus-layout-wrapper !h-full  ${isShowMember ? '!py-[68px]' : ''}`}>
 							<FocusLayoutContainer isShowMember={isShowMember}>
-								{focusTrack && <FocusLayout trackRef={focusTrack} />}
+								{focusTrack && <FocusLayout trackRef={focusTrack} isExtCalling={isExternalCalling} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile extAvatar={extAvatar} accountExisted={accountExisted} extUsername={extUsername} />
+										<ParticipantTile isExtCalling={isExternalCalling} />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>

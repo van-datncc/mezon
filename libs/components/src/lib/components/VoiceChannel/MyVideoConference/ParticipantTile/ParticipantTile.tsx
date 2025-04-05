@@ -22,7 +22,7 @@ import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import type { Participant } from 'livekit-client';
 import { ConnectionQuality, Track } from 'livekit-client';
-import { ApiAccount } from 'mezon-js/api.gen';
+import { safeJSONParse } from 'mezon-js';
 import React, { PropsWithChildren, forwardRef, useCallback, useMemo, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { FocusToggle } from './FocusToggle';
@@ -56,17 +56,15 @@ export function TrackRefContextIfNeeded(
 export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElement> {
 	trackRef?: TrackReferenceOrPlaceholder;
 	disableSpeakingIndicator?: boolean;
-
 	onParticipantClick?: (event: ParticipantClickEvent) => void;
-	extUsername?: string;
-	accountExisted?: ApiAccount | null | undefined;
-	extAvatar?: string;
+	isExtCalling?: boolean;
+	isConnectingScreen?: boolean;
 }
 export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes<HTMLDivElement>) => React.ReactNode = forwardRef<
 	HTMLDivElement,
 	ParticipantTileProps
 >(function ParticipantTile(
-	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, extUsername, accountExisted, extAvatar, ...htmlProps }: ParticipantTileProps,
+	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, isExtCalling, ...htmlProps }: ParticipantTileProps,
 	ref
 ) {
 	const trackReference = useEnsureTrackRef(trackRef);
@@ -96,14 +94,44 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 		},
 		[trackReference, layoutContext]
 	);
+	const usernameRaw = trackReference.participant.identity;
 
-	const username = trackReference.participant.identity;
-	const member = useAppSelector((state) => selectMemberClanByUserName(state, username));
+	const parsedUsername = isExtCalling ? safeJSONParse(usernameRaw as string) : undefined;
 
-	const voiceUsername = member?.clan_nick || username;
+	const usernameString = parsedUsername?.extName ? parsedUsername?.extName : usernameRaw;
+
+	const extAvatar = parsedUsername?.extAvatar ? parsedUsername?.extAvatar : undefined;
+
+	const member = useAppSelector((state) => selectMemberClanByUserName(state, usernameString));
+
+	const voiceUsername = member?.clan_nick || usernameString;
+
 	const avatar = useMemo(() => {
-		return member?.clan_avatar || member?.user?.avatar_url || 'assets/images/mezon-logo-white.svg';
+		return member?.clan_avatar || member?.user?.avatar_url || null;
 	}, [member]);
+
+	const resolvedAvatar = extAvatar ?? avatar;
+	const isAvatarResolved = parsedUsername !== undefined || member !== undefined;
+
+	const avatarToRender = resolvedAvatar ? (
+		<AvatarImage
+			alt={usernameString || ''}
+			username={usernameString || ''}
+			className="w-20 h-20"
+			srcImgProxy={createImgproxyUrl(resolvedAvatar, {
+				width: 320,
+				height: 320,
+				resizeType: 'fit'
+			})}
+			src={resolvedAvatar}
+		/>
+	) : isAvatarResolved ? (
+		<div
+			className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] w-20 h-20 !text-4xl font-semibold`}
+		>
+			{usernameString?.charAt(0)?.toUpperCase()}
+		</div>
+	) : null;
 
 	return (
 		<div ref={ref} style={{ position: 'relative' }} {...elementProps}>
@@ -125,46 +153,7 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 									<AudioTrack trackRef={trackReference} onSubscriptionStatusChanged={handleSubscribe} />
 								)
 							)}
-							<div className="lk-participant-placeholder !bg-bgIconLight">
-								{/* {extAvatar ? (
-									<AvatarImage
-										alt={username || ''}
-										username={username || ''}
-										className="w-20 h-20"
-										srcImgProxy={createImgproxyUrl(extAvatar ?? '', {
-											width: 320,
-											height: 320,
-											resizeType: 'fit'
-										})}
-										src={extAvatar}
-									/>
-								) : member ? (
-									<AvatarImage
-										alt={username || ''}
-										username={username || ''}
-										className="w-20 h-20"
-										srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 320, height: 320, resizeType: 'fit' })}
-										src={avatar}
-									/>
-								) : (
-									<div
-										className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] w-20 h-20 !text-4xl font-semibold`}
-									>
-										{username?.charAt(0)?.toUpperCase()}
-									</div>
-								)} */}
-								<AvatarImage
-									alt={username || ''}
-									username={username || ''}
-									className="w-20 h-20"
-									srcImgProxy={createImgproxyUrl(extAvatar ?? '', {
-										width: 320,
-										height: 320,
-										resizeType: 'fit'
-									})}
-									src={extAvatar}
-								/>
-							</div>
+							<div className="lk-participant-placeholder !bg-bgIconLight">{avatarToRender}</div>
 							<div className="lk-participant-metadata overflow-hidden">
 								<div className="lk-participant-metadata-item flex w-full justify-between gap-1 !bg-transparent">
 									{trackReference.source === Track.Source.Camera ? (
