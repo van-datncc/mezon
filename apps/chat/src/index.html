@@ -58,7 +58,6 @@
 
   <script>
     const appData = JSON.parse(localStorage.getItem('persist:apps'));
-    console.log(appData?.theme, 'appData');
     if (appData?.theme === 'dark') {
       document.documentElement.classList.add('dark');
     }
