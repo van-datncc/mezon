@@ -11,7 +11,7 @@ import {
 import { MessageCrypt, UploadLimitReason } from '@mezon/utils';
 
 import { TooManyUpload, WebRTCStreamProvider } from '@mezon/components';
-import { selectTotalUnreadDM, useAppSelector } from '@mezon/store-mobile';
+import { selectTotalUnreadDM, useAppSelector } from '@mezon/store';
 import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
