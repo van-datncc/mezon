@@ -11,7 +11,6 @@ export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
 
 export interface EventManagementEntity extends IEventManagement {
 	id: string;
-	isPrivate?: boolean;
 }
 
 export const eventManagementAdapter = createEntityAdapter<EventManagementEntity>();

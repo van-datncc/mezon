@@ -66,8 +66,10 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		onClose,
 		isPrivate
 	} = props;
-	const isNonPublicEvent = textChannelId && textChannelId !== '0';
-	const isPrivateEvent = (event?.isPrivate && !isNonPublicEvent) || (event?.is_private && !isNonPublicEvent) || (isPrivate && !isNonPublicEvent);
+	const isChannelEvent = textChannelId && textChannelId !== '0';
+	const isPrivateEvent = !isChannelEvent && ((!isReviewEvent && event?.is_private) || (isReviewEvent && isPrivate));
+	const isClanEvent = !isChannelEvent && ((!isReviewEvent && !event?.is_private) || (isReviewEvent && !isPrivate));
+
 	const dispatch = useAppDispatch();
 	const channelFirst = useSelector(selectChannelFirst);
 	const channelVoice = useAppSelector((state) => selectChannelById(state, voiceChannel ?? '')) || {};
@@ -195,8 +197,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 									? 'Event is taking place!'
 									: timeFomat(event?.start_time || start)}
 						</p>
-						{isNonPublicEvent && <p className="bg-orange-500 text-white rounded-sm px-1 text-center">Non-Public Event</p>}{' '}
-						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}{' '}
+						{isClanEvent && <p className="bg-blue-500 text-white rounded-sm px-1 text-center">Clan Event</p>}
+						{isChannelEvent && <p className="bg-orange-500 text-white rounded-sm px-1 text-center">Channel Event</p>}
+						{isPrivateEvent && <p className="bg-red-500 text-white rounded-sm px-1 text-center">Private Event</p>}
 					</div>
 					{event?.creator_id && (
 						<Tooltip overlay={<p style={{ width: 'max-content' }}>{`Created by ${userCreate?.user?.username}`}</p>}>
@@ -269,9 +272,21 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						</>
 					)}
 					{isPrivateEvent && (
-						<a href={privateRoomLink} target="_blank" rel="noopener noreferrer" className="flex gap-x-2 cursor-pointer">
-							<Icons.SpeakerLocked /> <p className="whitespace-normal break-words">Private Room</p>
-						</a>
+						<div className="flex gap-x-2 items-center">
+							<Icons.SpeakerLocked />
+							{!isReviewEvent ? (
+								<a
+									href={privateRoomLink}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="cursor-pointer whitespace-normal break-words"
+								>
+									Private Room
+								</a>
+							) : (
+								<span className="text-gray-400 whitespace-normal break-words cursor-not-allowed">Private Room</span>
+							)}
+						</div>
 					)}
 				</div>
 
@@ -338,17 +353,20 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							</>
 						)}
 					</span>
-				) : (
-					isNonPublicEvent && (
-						<span className="flex flex-row">
-							<p className="text-slate-400">
-								{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
-								<strong className="text-slate-100">{textChannel.channel_label}</strong>
-							</p>
-						</span>
-					)
-				)}
+				) : isChannelEvent ? (
+					<span className="flex flex-row">
+						<p className="text-slate-400">
+							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
+							<strong className="text-slate-100">{textChannel.channel_label}</strong>
+						</p>
+					</span>
+				) : isClanEvent ? (
+					<span className="flex flex-row">
+						<p className="text-slate-400">This event is open to everyone in the clan.</p>
+					</span>
+				) : null}
 			</div>
+
 			{openPanel && (
 				<PanelEventItem
 					event={event}

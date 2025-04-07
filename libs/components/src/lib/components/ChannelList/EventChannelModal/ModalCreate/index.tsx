@@ -7,7 +7,6 @@ import {
 	selectCurrentClanId,
 	selectEventById,
 	selectVoiceChannelAll,
-	toastActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -48,6 +47,11 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const tabs = ['Location', 'Event Info', 'Review'];
 	const [currentModal, setCurrentModal] = useState(0);
 	const currentEvent = useAppSelector((state) => selectEventById(state, currentClanId ?? '', eventId ?? ''));
+	// detach event type
+	const isEditEventAction = Boolean(currentEvent);
+	const isClanEvent = currentEvent?.channel_id === undefined;
+	const isChannelEvent = Boolean(currentEvent?.channel_id && currentEvent?.channel_id !== '0');
+	const isPrivateEvent = currentEvent?.is_private;
 	const eventChannel = useAppSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : '')) || {};
 
 	const createStatus = useSelector(selectCreatingLoaded);
@@ -65,9 +69,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 		description: currentEvent ? currentEvent.description || '' : '',
 		textChannelId: currentEvent ? currentEvent.channel_id || '' : '',
 		repeatType: currentEvent ? currentEvent.repeat_type || ERepeatType.DOES_NOT_REPEAT : ERepeatType.DOES_NOT_REPEAT,
-		isPrivate: Boolean(currentEvent?.isPrivate)
+		isPrivate: Boolean(currentEvent?.is_private)
 	});
-
 	const [buttonWork, setButtonWork] = useState(true);
 	const [errorOption, setErrorOption] = useState(false);
 	const [errorTime, setErrorTime] = useState(false);
@@ -78,7 +81,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 
 	const isExistChannelVoice = Boolean(currentEvent?.channel_voice_id);
 	const isExistAddress = Boolean(currentEvent?.address);
-	const isExistPrivateEvent = currentEvent?.isPrivate;
+	const isExistPrivateEvent = currentEvent?.is_private;
 
 	useEffect(() => {
 		if (currentEvent && eventChannel) {
@@ -86,6 +89,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 				setOption(OptionEvent.OPTION_SPEAKER);
 			} else if (isExistAddress) {
 				setOption(OptionEvent.OPTION_LOCATION);
+			} else if (isExistPrivateEvent) {
+				setOption(OptionEvent.PRIVATE_EVENT);
 			}
 		}
 	}, [currentEvent, eventChannel]);
@@ -157,7 +162,29 @@ const ModalCreate = (props: ModalCreateProps) => {
 		);
 
 		hanldeCloseModal();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [choiceSpeaker, contentSubmit, choiceLocation, currentClanId, createEventManagement]);
+
+	const isEventChanged = useMemo(() => {
+		if (!currentEvent || !contentSubmit) return false;
+
+		const startTimeFormatted = formatTimeStringToHourFormat(currentEvent?.start_time || '');
+		const endTimeFormatted = formatTimeStringToHourFormat(currentEvent?.end_time || '');
+
+		const diffs = {
+			topic: contentSubmit.topic !== currentEvent.title,
+			address: contentSubmit.address !== (currentEvent.address ?? ''),
+			voiceChannel: contentSubmit.voiceChannel !== (currentEvent.channel_voice_id ?? ''),
+			logo: contentSubmit.logo !== (currentEvent.logo ?? ''),
+			description: contentSubmit.description !== (currentEvent.description ?? ''),
+			textChannelId: contentSubmit.textChannelId !== (currentEvent.channel_id ?? ''),
+			repeatType: contentSubmit.repeatType !== currentEvent.repeat_type,
+			timeStart: contentSubmit.timeStart !== startTimeFormatted,
+			timeEnd: contentSubmit.timeEnd !== endTimeFormatted
+		};
+
+		return Object.values(diffs).some(Boolean);
+	}, [contentSubmit, currentEvent]);
 
 	const handleUpdate = useCallback(async () => {
 		try {
@@ -167,11 +194,12 @@ const ModalCreate = (props: ModalCreateProps) => {
 			const voiceChannel = (eventChannel || eventId) && choiceSpeaker ? contentSubmit.voiceChannel : '';
 			const creatorId = currentEvent?.creator_id;
 
-			const baseEventFields: Partial<Record<string, string | number>> = {
+			const baseEventFields: Partial<Record<string, string | number | boolean>> = {
 				event_id: eventId,
 				clan_id: currentClanId as string,
 				creator_id: creatorId as string,
-				channel_id_old: currentEvent?.channel_id
+				channel_id_old: currentEvent?.channel_id,
+				is_private: Boolean(currentEvent?.is_private)
 			};
 
 			const updatedEventFields: Partial<Record<string, string | number | undefined>> = {
@@ -189,36 +217,28 @@ const ModalCreate = (props: ModalCreateProps) => {
 				channel_id: contentSubmit.textChannelId
 			};
 
-			const areUpdatedFieldsEmpty = Object.values(updatedEventFields).every((value) => value === undefined || value === '');
-
-			const combinedUpdatedFields: Partial<Record<string, string | number>> = {
+			const combinedUpdatedFields: Partial<Record<string, string | number | boolean>> = {
 				...baseEventFields,
 				...updatedEventFields
 			};
 
-			const validatedFieldsToUpdate = Object.entries(combinedUpdatedFields).reduce<Record<string, string | number>>((acc, [key, value]) => {
-				if (value) {
-					acc[key] = value;
-				}
-				return acc;
-			}, {});
+			const validatedFieldsToUpdate = Object.entries(combinedUpdatedFields).reduce<Record<string, string | number | boolean>>(
+				(acc, [key, value]) => {
+					if (value) {
+						acc[key] = value;
+					}
+					return acc;
+				},
+				{}
+			);
 
-			const finalFieldsToSubmit: Partial<Record<string, string | number>> = {
+			const finalFieldsToSubmit: Partial<Record<string, string | number | boolean>> = {
 				...validatedFieldsToUpdate,
 				...additionalFields
 			};
 
-			if (!areUpdatedFieldsEmpty) {
+			if (isEventChanged) {
 				await dispatch(eventManagementActions.updateEventManagement(finalFieldsToSubmit));
-				hanldeCloseModal();
-			} else {
-				dispatch(
-					toastActions.addToast({
-						message: 'Nothing has changed',
-						type: 'warning',
-						autoClose: 3000
-					})
-				);
 				hanldeCloseModal();
 			}
 		} catch (error) {
@@ -265,6 +285,8 @@ const ModalCreate = (props: ModalCreateProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const isDisabled = option === '' || errorOption || !isEventChanged;
+
 	return (
 		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg text-sm p-4">
 			<div className="flex gap-x-4 mb-4">
@@ -282,6 +304,10 @@ const ModalCreate = (props: ModalCreateProps) => {
 					setContentSubmit={setContentSubmit}
 					textChannels={textChannels}
 					choicePrivateEvent={choicePrivateEvent}
+					isEditEventAction={isEditEventAction}
+					isChannelEvent={isChannelEvent}
+					isClanEvent={isClanEvent}
+					isPrivateEvent={isPrivateEvent}
 				/>
 			)}
 			{currentModal === Tabs_Option.EVENT_INFO && (
@@ -316,9 +342,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 					{currentModal === Tabs_Option.REVIEW ? (
 						eventId !== '' ? (
 							<button
-								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								className={`px-4 py-2 rounded font-semibold bg-primary ${isDisabled && 'dark:text-slate-400 text-slate-500 bg-opacity-50 cursor-not-allowed'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
-								onClick={option === '' || errorOption ? () => {} : () => handleUpdate()}
+								onClick={handleUpdate}
 							>
 								Update Event
 							</button>
