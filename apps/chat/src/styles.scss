@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @import 'styles/tooltip.scss';
-@import 'quill/dist/quill.snow.css';
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&family=Poppins&family=Inter&display=swap&font-display=swap');
 
 @font-face {
 	font-family: 'gg sans';
@@ -42,30 +42,6 @@
 	src: url('./assets/fonts/ggsans-ExtraBold.woff2') format('woff2');
 	font-weight: bold;
 	font-style: normal;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: 'Noto Sans';
-	src: url('./assets/fonts/NotoSans-Medium.woff2') format('woff2');
-	font-weight: 500;
-	font-style: normal;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: 'Poppins';
-	font-style: normal;
-	font-weight: normal;
-	src: url('./assets//fonts/Poppins-Regular.woff2') format('woff2');
-	font-display: swap;
-}
-
-@font-face {
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: normal;
-	src: url('./assets//fonts/Inter-Regular.woff2') format('woff2');
 	font-display: swap;
 }
 
@@ -625,6 +601,11 @@ input:-webkit-autofill:active {
 
 .thread-scroll::-webkit-scrollbar-thumb {
 	background: transparent;
+	border-radius: 5px;
+}
+
+.thread-scroll.show-scroll::-webkit-scrollbar-thumb {
+	background: #787881;
 }
 
 .thread-scroll:hover::-webkit-scrollbar-thumb {

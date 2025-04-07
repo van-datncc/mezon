@@ -1,6 +1,6 @@
 import { ModalInputMessageBuzz } from '@mezon/components';
 import { EmojiSuggestionProvider } from '@mezon/core';
-import { ChannelsEntity } from '@mezon/store-mobile';
+import { ChannelsEntity } from '@mezon/store';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
