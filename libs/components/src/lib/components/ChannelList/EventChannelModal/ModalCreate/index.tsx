@@ -321,7 +321,9 @@ const ModalCreate = (props: ModalCreateProps) => {
 					setErrorTime={(status: boolean) => setErrorTime(status)}
 				/>
 			)}
-			{currentModal === Tabs_Option.REVIEW && <ReviewModal onClose={onClose} contentSubmit={contentSubmit} option={option} />}
+			{currentModal === Tabs_Option.REVIEW && (
+				<ReviewModal onClose={onClose} event={currentEvent} contentSubmit={contentSubmit} option={option} />
+			)}
 			<div className="flex justify-between mt-4 w-full text-white">
 				<button
 					className={`py-2 text-[#84ADFF] font-bold ${(currentModal === Tabs_Option.LOCATION || errorTime) && 'hidden'}`}

@@ -6,6 +6,7 @@ import {
 	eventManagementActions,
 	selectChannelById,
 	selectChannelFirst,
+	selectMeetRoomByEventId,
 	selectMemberClanByUserId,
 	toastActions,
 	useAppDispatch,
@@ -89,10 +90,11 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		distanceToBottom: 0
 	});
 
+	const getPrivateMeetingRoom = useAppSelector((state) => selectMeetRoomByEventId(state, event?.id as string));
 	const [copied, setCopied] = useState(false);
 	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
 	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
-	const externalLink = event?.meet_room?.external_link;
+	const externalLink = event?.meet_room?.external_link || getPrivateMeetingRoom?.external_link;
 	const privateRoomLink = `${process.env.NX_CHAT_APP_REDIRECT_URI}${externalLink}`;
 	const hasLink = Boolean(externalLink);
 	const handleCopyLink = useCallback(() => {
@@ -274,7 +276,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					{isPrivateEvent && (
 						<div className="flex gap-x-2 items-center">
 							<Icons.SpeakerLocked />
-							{!isReviewEvent ? (
+							{privateRoomLink ? (
 								<a
 									href={privateRoomLink}
 									target="_blank"
