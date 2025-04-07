@@ -16,6 +16,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 	const { option, contentSubmit, onClose, event } = props;
 	const time = useMemo(() => handleTimeISO(contentSubmit.selectedDateStart, contentSubmit.timeStart), []);
 	const modalRef = useRef<HTMLDivElement>(null);
+
 	useEscapeKeyClose(modalRef, onClose);
 	return (
 		<div ref={modalRef} className="dark:text-white text-black">

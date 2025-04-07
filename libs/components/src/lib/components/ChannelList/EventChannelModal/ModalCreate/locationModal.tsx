@@ -94,6 +94,7 @@ const LocationModal = (props: LocationModalProps) => {
 
 	const handleSelectChannelAudience = useCallback(
 		(selectedOption: any) => {
+			setIsClear(false);
 			setContentSubmit((prevContentSubmit) => ({
 				...prevContentSubmit,
 				textChannelId: selectedOption.value
@@ -101,7 +102,14 @@ const LocationModal = (props: LocationModalProps) => {
 		},
 		[setContentSubmit]
 	);
-
+	const [isClear, setIsClear] = useState<boolean>(false);
+	const handleClearAudience = () => {
+		setIsClear(true);
+		setContentSubmit((prevContentSubmit) => ({
+			...prevContentSubmit,
+			textChannelId: ''
+		}));
+	};
 	const optionsTextChannel = useMemo(
 		() =>
 			textChannels.map((channel) => {
@@ -137,9 +145,10 @@ const LocationModal = (props: LocationModalProps) => {
 	);
 
 	const selectedOption = useMemo(
-		() => optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId),
-		[optionsTextChannel, contentSubmit.textChannelId]
+		() => (isClear ? undefined : optionsTextChannel.find((option) => option.value === contentSubmit.textChannelId)),
+		[isClear, optionsTextChannel, contentSubmit.textChannelId]
 	);
+	const showClearButton = selectedOption && !isEditEventAction ? true : false;
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
@@ -257,12 +266,19 @@ const LocationModal = (props: LocationModalProps) => {
 
 					<Select
 						options={optionsTextChannel}
-						value={selectedOption}
+						value={isClear ? null : selectedOption}
 						onChange={handleSelectChannelAudience}
 						styles={customStyles}
 						placeholder="Search channels..."
 						filterOption={memoizedFilterOption}
 					/>
+					{showClearButton && (
+						<div className="flex justify-end mt-1">
+							<button onClick={handleClearAudience} className="text-blue-500 hover:underline">
+								Clear audiences
+							</button>
+						</div>
+					)}
 				</>
 			)}
 		</div>
