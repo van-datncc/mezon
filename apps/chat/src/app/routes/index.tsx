@@ -188,24 +188,6 @@ export const Routes = memo(() => {
 							</Suspense>
 						),
 						children: [
-							// initial route to redirect to /chat
-							{
-								path: '/mezon',
-								element: <InitialRoutes />
-							},
-							{
-								path: 'login/callback',
-								element: <LoginCallback />
-							},
-							{
-								path: 'logout/callback',
-								element: <LogoutCallback />
-							},
-							{
-								path: 'meeting/:code',
-								loader: loaderWithStore(authLoader),
-								element: <PreJoinCalling />
-							},
 							isElectron()
 								? {
 										path: 'login',
