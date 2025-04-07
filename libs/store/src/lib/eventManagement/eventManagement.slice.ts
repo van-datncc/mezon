@@ -36,7 +36,6 @@ export const mapEventManagementToEntity = (eventRes: ApiEventManagement, clanId?
 		id: eventRes.id || '',
 		channel_id: eventRes.channel_id === '0' || eventRes.channel_id === '' ? '' : eventRes.channel_id,
 		channel_voice_id: eventRes.channel_voice_id === '0' || eventRes.channel_voice_id === '' ? '' : eventRes.channel_voice_id
-		// isPrivate: eventRes.is_private
 	};
 };
 
