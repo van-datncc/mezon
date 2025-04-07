@@ -152,7 +152,8 @@ export const Routes = memo(() => {
 							<Suspense fallback={<SuspenseFallback />}>
 								<PreJoinCalling />
 							</Suspense>
-						)
+						),
+						loader: loaderWithStore(authLoader)
 					},
 					isElectron()
 						? {
