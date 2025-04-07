@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEventManagement } from '@mezon/core';
 import {
 	eventManagementActions,
@@ -11,6 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { ContenSubmitEventProps, ERepeatType, OptionEvent, Tabs_Option } from '@mezon/utils';
+import isEqual from 'lodash.isequal';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -168,23 +170,52 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const isEventChanged = useMemo(() => {
 		if (!currentEvent || !contentSubmit) return false;
 
-		const startTimeFormatted = formatTimeStringToHourFormat(currentEvent?.start_time || '');
-		const endTimeFormatted = formatTimeStringToHourFormat(currentEvent?.end_time || '');
-
-		const diffs = {
-			topic: contentSubmit.topic !== currentEvent.title,
-			address: contentSubmit.address !== (currentEvent.address ?? ''),
-			voiceChannel: contentSubmit.voiceChannel !== (currentEvent.channel_voice_id ?? ''),
-			logo: contentSubmit.logo !== (currentEvent.logo ?? ''),
-			description: contentSubmit.description !== (currentEvent.description ?? ''),
-			textChannelId: contentSubmit.textChannelId !== (currentEvent.channel_id ?? ''),
-			repeatType: contentSubmit.repeatType !== currentEvent.repeat_type,
-			timeStart: contentSubmit.timeStart !== startTimeFormatted,
-			timeEnd: contentSubmit.timeEnd !== endTimeFormatted
+		const formattedCurrentEvent = {
+			topic: currentEvent.title,
+			address: currentEvent.address ?? '',
+			voiceChannel: currentEvent.channel_voice_id ?? '',
+			logo: currentEvent.logo ?? '',
+			description: currentEvent.description ?? '',
+			textChannelId: currentEvent.channel_id ?? '',
+			repeatType: currentEvent.repeat_type,
+			timeStart: formatToLocalDateString(currentEvent.start_time || ''),
+			timeEnd: formatToLocalDateString(currentEvent.end_time || '')
 		};
 
-		return Object.values(diffs).some(Boolean);
-	}, [contentSubmit, currentEvent]);
+		const submittedContent = {
+			topic: contentSubmit.topic,
+			address: contentSubmit.address,
+			voiceChannel: contentSubmit.voiceChannel,
+			logo: contentSubmit.logo,
+			description: contentSubmit.description,
+			textChannelId: contentSubmit.textChannelId,
+			repeatType: contentSubmit.repeatType,
+			timeStart: formatToLocalDateString(contentSubmit.selectedDateStart || ''),
+			timeEnd: formatToLocalDateString(contentSubmit.selectedDateEnd || '')
+		};
+
+		return !isEqual(submittedContent, formattedCurrentEvent);
+	}, [
+		currentEvent?.title,
+		currentEvent?.address,
+		currentEvent?.channel_voice_id,
+		currentEvent?.logo,
+		currentEvent?.description,
+		currentEvent?.channel_id,
+		currentEvent?.repeat_type,
+		currentEvent?.start_time,
+		currentEvent?.end_time,
+
+		contentSubmit?.topic,
+		contentSubmit?.address,
+		contentSubmit?.voiceChannel,
+		contentSubmit?.logo,
+		contentSubmit?.description,
+		contentSubmit?.textChannelId,
+		contentSubmit?.repeatType,
+		contentSubmit?.selectedDateStart,
+		contentSubmit?.selectedDateEnd
+	]);
 
 	const handleUpdate = useCallback(async () => {
 		try {

@@ -419,12 +419,12 @@ export const eventManagementSlice = createSlice({
 				state.error = null;
 				const event = action.payload;
 
-				if (event.is_private && event.meet_room) {
+				if (event?.is_private && event?.meet_room) {
 					if (!state.privateMeetingRooms) {
 						state.privateMeetingRooms = [];
 					}
-					const alreadyExists = state.privateMeetingRooms.some((record) => record[event.id as string]);
-					if (!alreadyExists) {
+					const hasEvents = state.privateMeetingRooms.some((record) => record[event.id as string]);
+					if (!hasEvents) {
 						state.privateMeetingRooms.push({ [event?.id as string]: event?.meet_room });
 					}
 				}
@@ -507,9 +507,9 @@ export const selectEventById = createSelector(
 
 export const selectMeetRoomByEventId = createSelector(
 	[(state: RootState) => state.eventmanagement, (state: RootState, eventId: string) => eventId],
-	(events, eventId) => {
-		if (!events.privateMeetingRooms) return null;
-		const record = events.privateMeetingRooms.find((record) => record[eventId]);
+	(event, eventId) => {
+		if (!event.privateMeetingRooms) return null;
+		const record = event.privateMeetingRooms.find((record) => record[eventId]);
 		return record ? record[eventId] : null;
 	}
 );
