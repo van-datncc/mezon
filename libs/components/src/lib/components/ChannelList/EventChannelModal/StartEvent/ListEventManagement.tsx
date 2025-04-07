@@ -19,7 +19,7 @@ const ListEventManagement = (props: ListEventManagementProps) => {
 	return allEventManagement
 		.filter(
 			(event) =>
-				(!event.isPrivate || event.creator_id === userId) &&
+				(!event?.is_private || event.creator_id === userId) &&
 				(!event.channel_id || event.channel_id === '0' || allThreadChannelPrivateIds.includes(event.channel_id))
 		)
 		.map((event, index) => {
