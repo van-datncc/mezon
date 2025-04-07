@@ -25,14 +25,12 @@ interface MyVideoConferenceProps {
 	channel?: ChannelsEntity;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
-	extUsername?: string;
 	isExternalCalling?: boolean;
 }
 
-export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsername, isExternalCalling = false }: MyVideoConferenceProps) {
+export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, isExternalCalling = false }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
-
 	const tracks = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },
@@ -134,7 +132,6 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 	}, []);
 
 	const userTracks = tracks.filter((track) => track.source !== 'screen_share' && track.source !== 'screen_share_audio');
-
 	return (
 		<div className="lk-video-conference">
 			<LayoutContextProvider value={layoutContext}>
@@ -142,16 +139,16 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, extUsern
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
-								<ParticipantTile extUsername={extUsername} />
+								<ParticipantTile isExtCalling={isExternalCalling} />
 							</GridLayout>
 						</div>
 					) : (
 						<div className={`lk-focus-layout-wrapper !h-full  ${isShowMember ? '!py-[68px]' : ''}`}>
 							<FocusLayoutContainer isShowMember={isShowMember}>
-								{focusTrack && <FocusLayout trackRef={focusTrack} />}
+								{focusTrack && <FocusLayout trackRef={focusTrack} isExtCalling={isExternalCalling} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile extUsername={extUsername} />
+										<ParticipantTile isExtCalling={isExternalCalling} />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>

@@ -6,9 +6,10 @@ interface JoinFormProps {
 	setUsername: (value: string) => void;
 	onJoin: () => void;
 	loadingStatus: LoadingStatus;
+	displayNameExisted?: string;
 }
 
-const JoinForm = memo(({ username, setUsername, onJoin, loadingStatus }: JoinFormProps) => {
+const JoinForm = memo(({ username, setUsername, onJoin, loadingStatus, displayNameExisted }: JoinFormProps) => {
 	const isLoading = loadingStatus === 'loading';
 	const isDisabled = loadingStatus === 'loaded' || isLoading;
 
@@ -17,10 +18,12 @@ const JoinForm = memo(({ username, setUsername, onJoin, loadingStatus }: JoinFor
 			<input
 				type="text"
 				placeholder="Enter name"
-				value={username}
+				value={displayNameExisted ? displayNameExisted : username}
 				onChange={(e) => setUsername(e.target.value)}
 				className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-700 rounded text-white"
 				aria-label="Enter your username"
+				readOnly={Boolean(displayNameExisted)}
+				disabled={Boolean(displayNameExisted)}
 			/>
 			<button
 				onClick={onJoin}
