@@ -94,7 +94,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							isSearchMessage={true} // to correct size youtube emmbed
 						/>
 					</div>
-					{pinMessageAttachments.length && (
+					{!!pinMessageAttachments.length && (
 						<MessageAttachment
 							mode={mode as ChannelStreamMode}
 							message={{ ...pinMessage, attachments: pinMessageAttachments } as IMessageWithUser}
