@@ -45,7 +45,7 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 	};
 
 	const buttonColor = useMemo(() => {
-		switch (button.style) {
+		switch (button?.style) {
 			case EButtonMessageStyle.PRIMARY:
 				return baseColor.bgButtonPrimary;
 			case EButtonMessageStyle.SECONDARY:
@@ -59,11 +59,11 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 			default:
 				return baseColor.bgButtonPrimary;
 		}
-	}, [button.style]);
+	}, [button?.style]);
 
 	return (
 		<TouchableOpacity style={[styles.button, { backgroundColor: buttonColor }]} onPress={handleClickOptions}>
-			<Text style={[styles.buttonLabel, !!button?.url && { textDecorationLine: 'underline' }]}>{button.label}</Text>
+			<Text style={[styles.buttonLabel, !!button?.url && { textDecorationLine: 'underline' }]}>{button?.label}</Text>
 		</TouchableOpacity>
 	);
 });
