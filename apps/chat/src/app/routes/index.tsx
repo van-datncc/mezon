@@ -35,6 +35,7 @@ const ClanLayout = lazy(() => import(/* webpackChunkName: "layouts" */ '../layou
 const ClanIndex = lazy(() => import(/* webpackChunkName: "clan-index" */ '../pages/clan/ClanIndex'));
 const ChannelIndex = lazy(() => import(/* webpackChunkName: "channel-index" */ '../pages/channel/ChannelIndex'));
 const DirectMessageIndex = lazy(() => import(/* webpackChunkName: "dm-index" */ '../pages/directMessage/DirectMessageIndex'));
+const ChannelAppLayoutMobile = lazy(() => import(/* webpackChunkName: "layouts" */ '../layouts/ChannelAppLayoutMobile'));
 
 const Canvas = lazy(() => import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.Canvas })));
 const PreJoinCalling = lazy(() =>
@@ -426,6 +427,30 @@ export const Routes = memo(() => {
 																		)
 																	}
 																]
+															}
+														]
+													}
+												]
+											},
+											{
+												path: 'apps-mobile',
+												element: <Outlet />,
+												children: [
+													{
+														path: ':clanId',
+														loader: loaderWithStore(clanLoader),
+														shouldRevalidate: shouldRevalidateServer,
+														element: <Outlet />,
+														children: [
+															{
+																path: ':channelId',
+																loader: loaderWithStore(channelLoader),
+																shouldRevalidate: shouldRevalidateChannel,
+																element: (
+																	<Suspense fallback={<SuspenseFallback />}>
+																		<ChannelAppLayoutMobile />
+																	</Suspense>
+																)
 															}
 														]
 													}
