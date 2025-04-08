@@ -24,7 +24,7 @@ export const EmbedComponentItem = memo(({ messageId, button, senderId, buttonId,
 	const handleClickOptions = async () => {
 		if (button?.url) {
 			try {
-				await Linking.openURL(button.url);
+				await Linking.openURL(button?.url);
 			} catch (err) {
 				throw new Error(err);
 			}
