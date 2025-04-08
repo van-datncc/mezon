@@ -884,7 +884,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 120px 9px 9px',
 							border: 'none',
 							maxHeight: '350px',
-							overflow: 'auto'
+							overflow: 'auto',
+							scrollbarWidth: 'none'
 						},
 						input: {
 							padding: props.isThread && !threadCurrentChannel ? '10px' : '9px 120px 9px 9px',
