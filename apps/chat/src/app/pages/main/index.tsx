@@ -63,7 +63,7 @@ import {
 import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { IClan, PLATFORM_ENV, Platform, TIME_OF_SHOWING_FIRST_POPUP, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
-import { ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
+import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -486,7 +486,6 @@ const ClansList = memo(() => {
 	const clans = useSelector(selectAllClans);
 	const isClanView = useSelector(selectClanView);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
 
 	const sortedClans = useMemo(() => {
 		return [...clans].sort((a, b) => {
@@ -506,12 +505,7 @@ const ClansList = memo(() => {
 	return (
 		<div className="flex flex-col gap-3">
 			{sortedClans.map((clan: IClan) => (
-				<SidebarClanItem
-					key={clan.id}
-					linkClan={`/chat/clans/${clan.id}${idsSelectedChannel[clan.id] ? `/channels/${idsSelectedChannel[clan.id]}` : ''}`}
-					option={clan}
-					active={isClanView && currentClanId === clan.clan_id}
-				/>
+				<SidebarClanItem key={clan.id} option={clan} active={isClanView && currentClanId === clan.clan_id} />
 			))}
 		</div>
 	);

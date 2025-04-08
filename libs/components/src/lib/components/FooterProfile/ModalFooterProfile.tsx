@@ -1,5 +1,3 @@
-import { useAppDispatch } from '@mezon/store';
-import { userClanProfileActions } from '@mezon/store-mobile';
 import { RefObject, useCallback } from 'react';
 import ModalUserProfile from '../ModalUserProfile';
 
@@ -10,13 +8,13 @@ type ModalFooterProfileProps = {
 	isDM: boolean;
 	userStatusProfile: string;
 	rootRef?: RefObject<HTMLElement>;
+	onCloseModal?: () => void;
 };
 
-const ModalFooterProfile = ({ userId, avatar, name, isDM, userStatusProfile, rootRef }: ModalFooterProfileProps) => {
-	const dispatch = useAppDispatch();
+const ModalFooterProfile = ({ userId, avatar, name, isDM, userStatusProfile, rootRef, onCloseModal }: ModalFooterProfileProps) => {
 	const handleCloseModalFooterProfile = useCallback(() => {
-		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
-	}, []);
+		onCloseModal?.();
+	}, [onCloseModal]);
 
 	return (
 		<div
