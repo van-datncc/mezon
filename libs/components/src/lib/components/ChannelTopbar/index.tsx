@@ -41,7 +41,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -54,6 +54,7 @@ import FileModal from './TopBarComponents/FilesModal';
 import NotificationSetting from './TopBarComponents/NotificationSetting';
 import PinnedMessages from './TopBarComponents/PinnedMessages';
 import ThreadModal from './TopBarComponents/Threads/ThreadModal';
+
 export type ChannelTopbarProps = {
 	isChannelVoice?: boolean;
 	mode?: ChannelStreamMode;
@@ -280,14 +281,18 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 	if (isGroup) {
 		return (
 			<div className="flex items-center justify-center">
-				<img className="w-8 h-8 rounded-full" src="assets/images/avatar-group.png" />
+				<img className="w-8 h-8 rounded-full object-cover" src="assets/images/avatar-group.png" alt="" />
 			</div>
 		);
 	}
 	return (
 		<div className="flex items-center justify-center ">
 			{avatar ? (
-				<img className="w-8 h-8 rounded-full" src={avatar} />
+				<img
+					className="w-8 h-8 rounded-full object-cover"
+					src={createImgproxyUrl(avatar, { width: 32, height: 32, resizeType: 'fit' })}
+					alt=""
+				/>
 			) : (
 				<div className="w-8 h-8 rounded-full uppercase flex items-center justify-center font-semibold dark:bg-bgAvatarDark bg-bgAvatarLight dark:text-bgAvatarLight text-bgAvatarDark">
 					{avatarName}
