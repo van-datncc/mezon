@@ -29,7 +29,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 	const dispatch = useAppDispatch();
 
 	const buttonColor = useMemo(() => {
-		switch (button.style) {
+		switch (button?.style) {
 			case EButtonMessageStyle.PRIMARY:
 				return 'bg-buttonPrimary';
 			case EButtonMessageStyle.SECONDARY:
@@ -43,10 +43,10 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 			default:
 				return 'bg-buttonPrimary';
 		}
-	}, [button.style]);
+	}, [button?.style]);
 
 	const handleClickButton = useCallback(() => {
-		if (!button.url) {
+		if (!button?.url) {
 			const data = JSON.stringify(embedData);
 			dispatch(
 				messagesActions.clickButtonMessage({
@@ -65,15 +65,15 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 
 	return (
 		<button className={commonClass} onClick={handleClickButton}>
-			{button.url ? (
-				<a href={button.url} target="_blank" rel="noopener noreferrer" className={commonClass + ' flex items-center hover:underline'}>
-					{button.label}
+			{button?.url ? (
+				<a href={button?.url} target="_blank" rel="noopener noreferrer" className={commonClass + ' flex items-center hover:underline'}>
+					{button?.label}
 					<Icons.ForwardRightClick defaultSize="w-4 h-4 ml-2" defaultFill={'#ffffff'} />
 				</a>
 			) : (
 				<>
-					{button.icon && IconEmbedMessage[button.icon]}
-					{button.label && button.label}
+					{button?.icon && IconEmbedMessage[button.icon]}
+					{button?.label && button.label}
 				</>
 			)}
 		</button>
