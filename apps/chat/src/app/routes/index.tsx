@@ -41,6 +41,9 @@ const Canvas = lazy(() => import(/* webpackChunkName: "ui-components" */ '@mezon
 const PreJoinCalling = lazy(() =>
 	import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.PreJoinCalling }))
 );
+const VoicePopout = lazy(() =>
+	import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.VoicePopout }))
+);
 
 const AppDirectory = lazy(() => import(/* webpackChunkName: "app-pages" */ '../pages/AppDirectory'));
 const ChannelMain = lazy(() => import(/* webpackChunkName: "channel-pages" */ '../pages/channel'));
@@ -152,6 +155,15 @@ export const Routes = memo(() => {
 						element: (
 							<Suspense fallback={<SuspenseFallback />}>
 								<PreJoinCalling />
+							</Suspense>
+						),
+						loader: loaderWithStore(authLoader)
+					},
+					{
+						path: 'popout',
+						element: (
+							<Suspense fallback={<SuspenseFallback />}>
+								<VoicePopout />
 							</Suspense>
 						),
 						loader: loaderWithStore(authLoader)
