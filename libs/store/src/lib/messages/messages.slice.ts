@@ -341,7 +341,11 @@ export const fetchMessages = createAsyncThunk(
 			}
 
 			const lastSentState = selectLatestMessageId(state, chlId);
-			if (!lastSentState || (lastSentMessage && lastSentMessage.id && noCache)) {
+			const lastSeenState = selectLastSeenMessageStateByChannelId(state, chlId);
+			if (
+				!lastSentState ||
+				(lastSentMessage && lastSentMessage.id && (lastSentMessage?.timestamp_seconds || 0) >= (lastSeenState?.timestamp_seconds || 0))
+			) {
 				thunkAPI.dispatch(
 					messagesActions.setLastMessage({
 						...lastSentMessage,
