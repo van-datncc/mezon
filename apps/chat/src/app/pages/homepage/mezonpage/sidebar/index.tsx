@@ -50,7 +50,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 			<div ref={headerSideBarRef} className="flex items-center justify-between pt-[14px] pr-[16px] pb-[14px] pl-[16px] h-[72px] relative">
 				<Link to={'/mezon'} className="flex gap-[4.92px] items-center">
 					<Image src={`assets/images/mezon-logo-black.svg`} width={32} height={32} className="aspect-square object-cover" />
-					<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em] font-['Poppins']">mezon</div>
+					<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em]">mezon</div>
 				</Link>
 				<Icons.MenuClose className="w-[20px] max-lg:block" onClick={toggleSideBar} />
 

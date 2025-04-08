@@ -61,7 +61,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 					<div className="flex items-center gap-[40px]">
 						<Link to={'/mezon'} className="flex items-center gap-[4.92px]">
 							<Image src={`assets/images/mezon-logo-black.svg`} width={32} height={32} className="aspect-square object-cover" />
-							<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em] font-['Poppins']">mezon</div>
+							<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em]">mezon</div>
 						</Link>
 						<div className="hidden md:flex items-center gap-[32px]">
 							<NavLink href="#home" section="home" label="Home" />

@@ -2,6 +2,7 @@ import { useCustomNavigate } from '@mezon/core';
 import { appActions, getStore, selectBadgeCountByClanId, selectIsUseProfileDM, useAppDispatch } from '@mezon/store';
 import { Image } from '@mezon/ui';
 import { IClan, createImgproxyUrl } from '@mezon/utils';
+import { safeJSONParse } from 'mezon-js';
 import { memo, useState, useTransition } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -11,20 +12,21 @@ import PanelClan from '../PanelClan';
 
 export type SidebarClanItemProps = {
 	option: IClan;
-	linkClan: string;
 	active?: boolean;
 };
 
-const SidebarClanItem = ({ option, linkClan, active }: SidebarClanItemProps) => {
+const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 	const [_, startTransition] = useTransition();
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const store = getStore();
+		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
+		const link = `/chat/clans/${option.id}${idsSelectedChannel[option.id] ? `/channels/${idsSelectedChannel[option.id]}` : ''}`;
 		const isShowDmProfile = selectIsUseProfileDM(store.getState());
 		startTransition(() => {
-			navigate(linkClan);
+			navigate(link);
 			if (isShowDmProfile) {
 				requestIdleCallback(() => {
 					dispatch(appActions.setIsUseProfileDM(false));
