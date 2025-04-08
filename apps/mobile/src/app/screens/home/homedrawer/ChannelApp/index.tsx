@@ -5,8 +5,8 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState, selectAllAccount } from '@mezon/store-mobile';
 import { MiniAppEventType, sleep } from '@mezon/utils';
 import { useCallback, useRef, useState } from 'react';
-import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
-import { Chase } from 'react-native-animated-spinkit';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { Wave } from 'react-native-animated-spinkit';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
@@ -92,7 +92,7 @@ const ChannelAppScreen = ({ channelId }) => {
 				} else {
       window.ReactNativeWebView.postMessage(JSON.stringify({ error: "Không tìm thấy #mainChat" }));
 				}
-			}, 1000);
+			}, 5000);
 	})();
 	true;
   `;
@@ -128,7 +128,8 @@ const ChannelAppScreen = ({ channelId }) => {
 						flex: 1
 					}}
 				>
-					<Chase color={'#cdcdcd'} />
+					<Wave color={themeValue.text} />
+					<Text style={styles.textLoading}>Loading data, please wait a moment!</Text>
 				</View>
 			)}
 			<View style={styles.topBar}>
@@ -155,7 +156,7 @@ const ChannelAppScreen = ({ channelId }) => {
 				nestedScrollEnabled={true}
 				onLoadEnd={async () => {
 					handlePing();
-					await sleep(4000);
+					await sleep(5000);
 					setLoading(false);
 				}}
 			/>

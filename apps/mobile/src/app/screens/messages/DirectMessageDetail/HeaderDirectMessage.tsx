@@ -8,6 +8,7 @@ import {
 	directMetaActions,
 	selectDmGroupCurrent,
 	selectLastMessageByChannelId,
+	selectLastSeenMessageStateByChannelId,
 	selectMemberClanByUserId2,
 	selectPreviousChannels,
 	useAppDispatch,
@@ -36,6 +37,7 @@ interface HeaderProps {
 function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
 	const mounted = useRef('');
 
 	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
@@ -45,11 +47,21 @@ function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const previousChannels = useSelector(selectPreviousChannels);
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
+		if (!lastMessage) return;
 		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (lastMessage) {
+		if (!lastMessageState) {
+			markAsReadSeen(lastMessage, mode, 0);
+			return;
+		}
+
+		if (
+			lastMessage?.create_time_seconds &&
+			lastMessageState?.timestamp_seconds &&
+			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
+		) {
 			markAsReadSeen(lastMessage, mode, 0);
 		}
-	}, [lastMessage, channelId]);
+	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
 	useEffect(() => {
 		if (previousChannels.at(1)) {
 			const timestamp = Date.now() / 1000;
@@ -61,6 +73,7 @@ function useChannelSeen(channelId: string, currentDmGroup: any) {
 					isReset: true
 				})
 			);
+			dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
 			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
 		}
 	}, [previousChannels]);

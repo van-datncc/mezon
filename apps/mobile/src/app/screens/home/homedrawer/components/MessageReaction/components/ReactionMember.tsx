@@ -3,7 +3,7 @@ import { selectAllChannelMembers, selectMemberClanByUserId2, useAppSelector } fr
 import { createImgproxyUrl } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import ImageNative from '../../../../../../components/ImageNative';
 import { style } from '../styles';
 
 interface IReactionMemberProps {
@@ -33,18 +33,15 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 		<TouchableOpacity style={styles.memberWrapper} onPress={showUserInformation}>
 			<View style={styles.imageWrapper}>
 				{reactionMember?.user?.avatar_url ? (
-					<View>
-						<FastImage
-							source={{
-								uri: createImgproxyUrl(reactionMember?.clan_avatar ?? reactionMember?.user?.avatar_url ?? '', {
-									width: 300,
-									height: 300,
-									resizeType: 'fit'
-								})
-							}}
-							style={styles.image}
-						/>
-					</View>
+					<ImageNative
+						url={createImgproxyUrl(reactionMember?.clan_avatar ?? reactionMember?.user?.avatar_url ?? '', {
+							width: 50,
+							height: 50,
+							resizeType: 'fit'
+						})}
+						style={[styles.image]}
+						resizeMode={'cover'}
+					/>
 				) : (
 					<View style={styles.avatarBoxDefault}>
 						<Text style={styles.textAvatarBoxDefault}>{reactionMember?.user?.username?.charAt(0)?.toUpperCase()}</Text>
