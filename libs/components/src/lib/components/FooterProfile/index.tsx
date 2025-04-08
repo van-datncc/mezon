@@ -89,6 +89,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		isSendTokenInputDisabled: false,
 		isUserSelectionDisabled: false
 	});
+	const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -122,6 +123,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const handleCloseModalSendToken = () => {
+		setIsButtonDisabled(false);
 		setToken(0);
 		setSelectedUserId('');
 		setNote('transfer funds');
@@ -172,6 +174,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			extra_attribute: infoSendToken?.extra_attribute ?? extraAttribute
 		};
 
+		setIsButtonDisabled(true);
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
@@ -325,6 +328,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					note={note}
 					sendTokenInputsState={sendTokenInputsState}
 					infoSendToken={infoSendToken}
+					isButtonDisabled={isButtonDisabled}
 				/>
 			)}
 		</div>

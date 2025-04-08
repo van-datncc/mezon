@@ -25,6 +25,7 @@ type ModalSendTokenProps = {
 		isUserSelectionDisabled: boolean;
 	};
 	infoSendToken?: ISendTokenDetailType | null;
+	isButtonDisabled: boolean;
 };
 
 const ModalSendToken = ({
@@ -41,7 +42,8 @@ const ModalSendToken = ({
 	selectedUserId,
 	note,
 	sendTokenInputsState,
-	infoSendToken
+	infoSendToken,
+	isButtonDisabled
 }: ModalSendTokenProps) => {
 	const usersClan = useSelector(selectAllUserClans);
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -266,6 +268,7 @@ const ModalSendToken = ({
 							className="h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
 							type="button"
 							onClick={() => handleSaveSendToken(filteredUsers.find((user) => user.username === searchTerm)?.id ?? '')}
+							disabled={isButtonDisabled}
 						>
 							Send
 						</Button>
