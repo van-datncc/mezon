@@ -23,7 +23,7 @@ const ImageNative = ({ url, style, resizeMode }: CustomImageProps) => {
 		if (Platform.OS === 'android') {
 			return <CustomImageView url={url?.toString()} resizeMode={resizeMode} style={style} />;
 		} else {
-			return <CachedImageWithRetryIOS source={{ uri: url?.toString() }} style={style} retryCount={3} />;
+			return <CachedImageWithRetryIOS source={{ uri: url?.toString() }} style={style} retryCount={3} resizeMode={resizeMode} />;
 		}
 	} catch (error) {
 		Sentry.captureException(error);

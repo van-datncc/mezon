@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import React, { useEffect, useState } from 'react';
 import FastImage from 'react-native-fast-image';
 
@@ -12,12 +13,18 @@ const CachedImageWithRetryIOS = ({ source, retryCount = 3, ...props }) => {
 		setKey(Date.now());
 	}, [source]);
 
-	const handleError = () => {
-		if (retriesLeft > 0) {
-			setTimeout(() => {
-				setRetriesLeft(retriesLeft - 1);
-				setKey(Date.now()); // Force re-render to retry
-			}, 500); // Wait 500ms before retry
+	const handleError = (err) => {
+		console.error('log  => err', err);
+		try {
+			if (retriesLeft > 0) {
+				setTimeout(() => {
+					setRetriesLeft(retriesLeft - 1);
+					setKey(Date.now()); // Force re-render to retry
+				}, 500); // Wait 500ms before retry
+			}
+			Sentry.captureException(err);
+		} catch (error) {
+			console.error('log  => error', error);
 		}
 	};
 
