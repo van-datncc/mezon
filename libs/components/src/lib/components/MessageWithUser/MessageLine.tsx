@@ -91,7 +91,7 @@ export const MessageLine = ({
 	onClickToMessage
 }: RenderContentProps) => {
 	mode = mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL;
-	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], lky = [] } = content;
+	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], lky = [] } = content || {};
 	const hgm = Array.isArray(hg) ? hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })) : [];
 	const ejm = Array.isArray(ej) ? ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })) : [];
 	const mkm = Array.isArray(mk) ? mk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) : [];
