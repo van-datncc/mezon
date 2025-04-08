@@ -27,7 +27,6 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	const { sessionRef, clientRef } = useMezon();
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(clanId ?? '', userProfile?.user?.id ?? ''));
 	const [draftProfile, setDraftProfile] = useState(userClansProfile);
-	console.log('draftProfile :', draftProfile);
 	const [openModal, setOpenModal] = useState(false);
 	const [openModalType, setOpenModalType] = useState(false);
 	const [checkValidate, setCheckValidate] = useState(false);
@@ -62,7 +61,6 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		}
 		return profileVaile;
 	}, [draftProfile, userProfile]);
-	console.log('editProfile', editProfile);
 	const { displayName, urlImage } = editProfile;
 
 	// Editor Avatar //
@@ -116,8 +114,6 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 			if (!file.name.endsWith('.gif')) {
 				imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
 			}
-			// const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
-			console.log('imageAvatarResize :', imageAvatarResize);
 			const attachment = await handleUploadFile(
 				clientRef.current,
 				sessionRef.current,
@@ -126,7 +122,6 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				imageAvatarResize.name,
 				imageAvatarResize
 			);
-			console.log('attachment :', attachment);
 			setUrlImage(attachment.url || '');
 			setFlagOption(attachment.url !== userProfile?.user?.avatar_url);
 			setIsLoading(false);
