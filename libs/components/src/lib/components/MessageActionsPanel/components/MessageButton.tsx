@@ -73,7 +73,7 @@ export const MessageButton: React.FC<MessageButtonProps> = ({ messageId, button,
 			) : (
 				<>
 					{button?.icon && IconEmbedMessage[button.icon]}
-					{button?.label && button.label}
+					{button?.label}
 				</>
 			)}
 		</button>
