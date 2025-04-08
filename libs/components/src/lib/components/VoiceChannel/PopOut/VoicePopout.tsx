@@ -2,22 +2,18 @@
 import { LiveKitRoom } from '@livekit/components-react';
 import { useAuth } from '@mezon/core';
 import {
-	generateMeetToken,
-	getStoreAsync,
 	handleParticipantVoiceState,
 	selectCurrentChannel,
-	selectCurrentClan,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectTokenJoinVoice,
 	selectVoiceFullScreen,
 	selectVoiceInfo,
 	useAppDispatch,
-	usersClanActions,
 	voiceActions
 } from '@mezon/store';
 import { ParticipantMeetState } from '@mezon/utils';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { MyVideoConference } from '../MyVideoConference/MyVideoConference';
 
@@ -49,8 +45,14 @@ const VoicePopout: React.FC = () => {
 
 	const handleLeaveRoom = useCallback(async () => {
 		if (!voiceInfo?.clanId || !voiceInfo?.channelId) return;
+
 		dispatch(voiceActions.resetVoiceSettings());
 		await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo.clanId, voiceInfo.channelId);
+		if (window.location.pathname === '/popout') {
+			dispatch(voiceActions.setOpenPopOut(false));
+			window.close();
+			return;
+		}
 	}, [dispatch, voiceInfo]);
 
 	const handleFullScreen = useCallback(() => {
@@ -67,43 +69,6 @@ const VoicePopout: React.FC = () => {
 			document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
 		}
 	}, [dispatch]);
-	const handleJoinRoom = async () => {
-		try {
-			const store = await getStoreAsync();
-			const currentClan = selectCurrentClan(store.getState());
-			dispatch(usersClanActions.fetchUsersClan({ clanId: currentClan?.clan_id as string }));
-
-			if (!currentClan || !currentChannel?.meeting_code) return;
-			const result = await dispatch(
-				generateMeetToken({
-					channelId: currentChannel?.channel_id as string,
-					roomName: currentChannel?.meeting_code
-				})
-			).unwrap();
-
-			if (result) {
-				await participantMeetState(ParticipantMeetState.JOIN, currentChannel?.clan_id as string, currentChannel?.channel_id as string);
-				dispatch(voiceActions.setJoined(true));
-				dispatch(voiceActions.setToken(result));
-				dispatch(
-					voiceActions.setVoiceInfo({
-						clanId: currentClan?.clan_id as string,
-						clanName: currentClan?.clan_name as string,
-						channelId: currentChannel?.channel_id as string,
-						channelLabel: currentChannel?.channel_label as string
-					})
-				);
-			} else {
-				dispatch(voiceActions.setToken(''));
-			}
-		} catch (err) {
-			console.error('Failed to generate token room:', err);
-		}
-	};
-
-	useEffect(() => {
-		handleJoinRoom();
-	}, []);
 
 	return (
 		<div className="h-screen w-screen">

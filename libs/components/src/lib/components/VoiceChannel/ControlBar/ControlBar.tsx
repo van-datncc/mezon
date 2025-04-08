@@ -184,19 +184,30 @@ export function ControlBar({
 	let popoutWindow: Window | null = null;
 
 	const togglePopout = () => {
-		if (popoutWindow && !popoutWindow.closed) {
-			popoutWindow.close();
-			popoutWindow = null;
+		if (window.location.pathname === '/popout') {
 			dispatch(voiceActions.setOpenPopOut(false));
-		} else {
-			popoutWindow = window.open('/popout', 'LiveKitPopout', 'width=800,height=600,left=100,top=100');
-			if (!popoutWindow) {
-				console.error('Pop-up window blocked!');
-			} else {
-				dispatch(voiceActions.setOpenPopOut(true));
-			}
+			window.close();
+			return;
 		}
+
+		popoutWindow = window.open('/popout', 'LiveKitPopout', 'width=800,height=600,left=100,top=100');
+
+		if (!popoutWindow) {
+			console.error('Pop-up window blocked!');
+			return;
+		}
+
+		dispatch(voiceActions.setOpenPopOut(true));
+
+		const checkIfClosed = setInterval(() => {
+			if (popoutWindow?.closed) {
+				clearInterval(checkIfClosed);
+				popoutWindow = null;
+				dispatch(voiceActions.setOpenPopOut(false));
+			}
+		}, 500);
 	};
+
 	const livekitRoomId = isOpenPopOut ? 'livekitRoomPopOut' : 'livekitRoom';
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent">
@@ -331,7 +342,7 @@ export function ControlBar({
 								getTooltipContainer={() => document.getElementById(livekitRoomId) || document.body}
 							>
 								<span>
-									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] rotate-180" />
 								</span>
 							</Tooltip>
 						) : (
@@ -344,7 +355,7 @@ export function ControlBar({
 								getTooltipContainer={() => document.getElementById(livekitRoomId) || document.body}
 							>
 								<span>
-									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] " />
 								</span>
 							</Tooltip>
 						)}

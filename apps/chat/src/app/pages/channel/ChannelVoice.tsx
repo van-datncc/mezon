@@ -57,6 +57,7 @@ const ChannelVoice = memo(
 		};
 
 		const handleJoinRoom = async () => {
+			dispatch(voiceActions.setOpenPopOut(false));
 			const store = await getStoreAsync();
 			const currentClan = selectCurrentClan(store.getState());
 			if (!currentClan || !currentChannel?.meeting_code) return;
@@ -155,7 +156,7 @@ const ChannelVoice = memo(
 							handleJoinRoom={handleJoinRoom}
 							isCurrentChannel={isShow}
 						/>
-						{!isOpenPopOut && (
+						{!isOpenPopOut ? (
 							<LiveKitRoom
 								ref={containerRef}
 								id="livekitRoom"
@@ -173,6 +174,10 @@ const ChannelVoice = memo(
 									onFullScreen={handleFullScreen}
 								/>
 							</LiveKitRoom>
+						) : (
+							<div className="flex items-center justify-center h-full w-full text-center text-lg font-semibold text-gray-500">
+								You are currently in the popout window
+							</div>
 						)}
 					</>
 				)}
