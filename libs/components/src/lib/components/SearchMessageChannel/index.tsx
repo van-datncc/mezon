@@ -230,7 +230,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	);
 
 	const debouncedFetchSearchMessages = useDebouncedCallback(async () => {
-		if (search) {
+		if (search && channelId) {
 			const requestFilter = [
 				...(search.filters || []),
 				{ field_name: 'channel_id', field_value: channelId },
