@@ -78,8 +78,8 @@ const DraggableModalList = memo(({ currentClanId }: { currentClanId: string }) =
 	const groupedByClan = useMemo(() => {
 		if (!allChannelApp) return {};
 		return allChannelApp?.reduce<Record<string, typeof allChannelApp>>((acc, item) => {
-			if (item.clan_id) {
-				(acc[item.clan_id] ||= []).push(item);
+			if (item?.clan_id) {
+				(acc[item?.clan_id] ||= []).push(item);
 			}
 			return acc;
 		}, {});
