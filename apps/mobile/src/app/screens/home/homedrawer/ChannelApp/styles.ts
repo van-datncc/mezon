@@ -43,5 +43,10 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_20,
 			fontWeight: '500',
 			color: colors.textStrong
+		},
+		textLoading: {
+			marginTop: size.s_6,
+			fontSize: size.s_14,
+			color: colors.text
 		}
 	});

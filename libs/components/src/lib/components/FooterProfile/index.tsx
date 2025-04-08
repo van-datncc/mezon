@@ -13,7 +13,6 @@ import {
 	selectIsInCall,
 	selectIsJoin,
 	selectShowModalCustomStatus,
-	selectShowModalFooterProfile,
 	selectShowModalSendToken,
 	selectStatusMenu,
 	selectTheme,
@@ -27,6 +26,7 @@ import { ESummaryInfo, EUserStatus, TypeMessage, createImgproxyUrl, formatMoney 
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { UserStatusIcon } from '../MemberProfile';
@@ -49,7 +49,6 @@ export type FooterProfileProps = {
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
-	const showModalFooterProfile = useSelector(selectShowModalFooterProfile);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
 	const infoSendToken = useSelector(selectInfoSendToken);
@@ -100,12 +99,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
 	}, [myProfile?.userProfile?.wallet]);
 
-	const handleClickFooterProfile = () => {
-		dispatch(userClanProfileActions.setShowModalFooterProfile(!showModalFooterProfile));
-	};
-
 	const handleCloseModalCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
+		setCustomStatus(userCustomStatus.status ?? '');
 	};
 
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
@@ -122,7 +118,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				noClear: noClearStatus
 			})
 		);
-		handleCloseModalCustomStatus();
+		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
 	};
 
 	const handleCloseModalSendToken = () => {
@@ -237,6 +233,23 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isJoin = useSelector(selectIsJoin);
 	const isVoiceJoined = useSelector(selectVoiceJoined);
 	const statusMenu = useSelector(selectStatusMenu);
+
+	const [openProfileModal, closeProfileModal] = useModal(() => {
+		return (
+			<div ref={rootRef}>
+				<ModalFooterProfile
+					userId={userId ?? ''}
+					avatar={avatar}
+					name={name}
+					isDM={isDM}
+					userStatusProfile={userStatusProfile}
+					rootRef={rootRef}
+					onCloseModal={closeProfileModal}
+				/>
+			</div>
+		);
+	}, [userStatusProfile, rootRef.current]);
+
 	return (
 		<div
 			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
@@ -247,7 +260,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{isVoiceJoined && <VoiceInfo />}
 			{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 			<div
-				ref={rootRef}
 				className={`flex items-center gap-2 pr-4 pl-2 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
@@ -255,9 +267,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			>
 				<div
 					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
-					onClick={handleClickFooterProfile}
 				>
-					<div className="cursor-pointer flex items-center gap-3 relative ">
+					<div className="cursor-pointer flex items-center gap-3 relative " onClick={openProfileModal}>
 						<AvatarImage
 							alt={''}
 							username={name}
@@ -271,19 +282,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						</div>
 						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode  ">
 							<p className="text-base font-medium max-w-40 truncate dark:text-contentSecondary text-black">{name}</p>
-							<p className="text-[11px] text-left line-clamp-1 leading-[14px]">{customStatus}</p>
+							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-40">{customStatus}</p>
 						</div>
 					</div>
-					{showModalFooterProfile && (
-						<ModalFooterProfile
-							userId={userId ?? ''}
-							avatar={avatar}
-							name={name}
-							isDM={isDM}
-							userStatusProfile={userStatusProfile}
-							rootRef={rootRef}
-						/>
-					)}
 				</div>
 				<div className="flex items-center gap-2">
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
