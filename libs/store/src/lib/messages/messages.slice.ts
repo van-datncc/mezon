@@ -1055,8 +1055,6 @@ export const messagesSlice = createSlice({
 		},
 		setLastMessage: (state, action: PayloadAction<ApiChannelMessageHeaderWithChannel>) => {
 			// update last message
-			console.log('Set Last');
-			console.log('action.payload: ', action.payload);
 			state.lastMessageByChannel[action.payload.channel_id] = action.payload;
 
 			// update is viewing older messages
