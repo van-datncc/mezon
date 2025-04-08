@@ -30,12 +30,14 @@ const CachedImageWithRetryIOS = ({ source, retryCount = 3, ...props }) => {
 
 	return (
 		<FastImage
-			key={`${key}_`} // Unique key to force re-render
+			key={`${key}_${retriesLeft}_${source?.url}`} // Unique key to force re-render
 			source={{
 				...currentSource,
 				priority: FastImage.priority.high,
 				cache: FastImage.cacheControl.immutable
 			}}
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
 			onError={handleError}
 			{...props}
 		/>
