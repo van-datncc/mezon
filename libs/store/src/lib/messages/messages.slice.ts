@@ -974,7 +974,12 @@ export const messagesSlice = createSlice({
 					} else {
 						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 						// update last message
-						state.lastMessageByChannel[channelId] = action.payload;
+						const lastMessage: ApiChannelMessageHeaderWithChannel = {
+							...action.payload,
+							timestamp_seconds: action.payload.create_time_seconds
+						};
+
+						state.lastMessageByChannel[channelId] = lastMessage;
 
 						// update is viewing older messages
 						// state.isViewingOlderMessagesByChannelId[channelId] = computeIsViewingOlderMessagesByChannelId(state, channelId);
@@ -1055,6 +1060,7 @@ export const messagesSlice = createSlice({
 		},
 		setLastMessage: (state, action: PayloadAction<ApiChannelMessageHeaderWithChannel>) => {
 			// update last message
+			console.log(' action.payload: ', action.payload);
 			state.lastMessageByChannel[action.payload.channel_id] = action.payload;
 
 			// update is viewing older messages
