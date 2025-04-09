@@ -71,8 +71,8 @@ function ChannelVoice({
 					}
 				});
 				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
+				InCallManager.setSpeakerphoneOn(newSpeakerState);
 			} else {
-				// Standard method for Android
 				InCallManager.setSpeakerphoneOn(newSpeakerState);
 			}
 
