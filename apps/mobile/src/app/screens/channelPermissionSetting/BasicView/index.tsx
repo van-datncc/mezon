@@ -4,6 +4,8 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import {
 	channelsActions,
+	fetchUserChannels,
+	rolesClanActions,
 	selectAllUserChannel,
 	selectAllUserClans,
 	selectEveryoneRole,
@@ -14,7 +16,7 @@ import {
 import { isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -41,7 +43,12 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const allClanMembers = useSelector(selectAllUserClans);
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useAppSelector(selectAllUserChannel(channel.channel_id));
+	const listOfChannelMember = useAppSelector(selectAllUserChannel(channel?.channel_id));
+
+	useEffect(() => {
+		dispatch(rolesClanActions.fetchRolesClan({ clanId: channel?.clan_id }));
+		dispatch(fetchUserChannels({ channelId: channel?.channel_id }));
+	}, [channel?.channel_id]);
 
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));
@@ -136,6 +143,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			}
 			switch (type) {
 				case EOverridePermissionType.Member:
+					if (!item?.user?.id || !item?.user?.username) return <View />;
 					return <MemberItem member={item} channel={channel} />;
 				case EOverridePermissionType.Role:
 					return <RoleItem role={item} channel={channel} />;

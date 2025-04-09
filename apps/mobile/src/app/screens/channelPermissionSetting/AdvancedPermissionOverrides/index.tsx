@@ -17,7 +17,7 @@ import { IPermissionSetting } from '../types/channelPermission.type';
 
 type AdvancedPermissionOverrides = typeof APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES;
 export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelScreenProps<AdvancedPermissionOverrides>) => {
-	const { channelId, id, type } = route.params;
+	const { channelId, clanId, id, type } = route.params;
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['channelSetting']);
@@ -53,7 +53,8 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 			maxPermissionId,
 			permission: permissionValueList,
 			roleId: isOverrideRole ? id : '',
-			userId: isOverrideRole ? '' : id
+			userId: isOverrideRole ? '' : id,
+			clanId: clanId
 		};
 		const response = await dispatch(permissionRoleChannelActions.setPermissionRoleChannel(updatePermissionPayload));
 
@@ -133,12 +134,12 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 	);
 
 	const setInitialPermissionValues = () => {
-		const nonDefaultValues = changedChannelPermissionList.reduce((acc, permission) => {
+		const nonDefaultValues = changedChannelPermissionList?.permission_role_channel?.reduce((acc, permission) => {
 			return { ...acc, [permission.permission_id]: permission?.active ? EPermissionStatus.Allow : EPermissionStatus.Deny };
 		}, {});
 		const initialPermissionValue = channelPermissionList?.reduce((acc, permission) => {
-			if (nonDefaultValues[permission?.id]) {
-				return { ...acc, [permission?.id]: nonDefaultValues[permission?.id] };
+			if (nonDefaultValues?.[permission?.id]) {
+				return { ...acc, [permission?.id]: nonDefaultValues?.[permission?.id] };
 			}
 			return { ...acc, [permission?.id]: EPermissionStatus.None };
 		}, {});

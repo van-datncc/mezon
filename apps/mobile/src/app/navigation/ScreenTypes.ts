@@ -177,6 +177,7 @@ export type MenuChannelStackParamList = {
 	};
 	[APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES]: {
 		channelId: string;
+		clanId: string;
 		id: string;
 		type?: number;
 	};
