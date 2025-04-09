@@ -39,6 +39,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 							showAction={showAction}
 							showRole={showRole}
 							currentChannel={currentChannel}
+							directId={currentChannel?.channel_id}
 						/>
 					</View>
 				)

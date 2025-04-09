@@ -111,18 +111,26 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 					</View>
 				</View>
 
-				{!!event?.channel_id && event.channel_id !== '0' && !event?.isPrivate && (
+				{!!event?.channel_id && event.channel_id !== '0' && !event?.is_private && (
 					<View style={styles.privateArea}>
 						<View style={[styles.privatePanel, { backgroundColor: baseColor.orange }]}>
-							<Text style={styles.privateText}>Non Public Event</Text>
+							<Text style={styles.privateText}>Channel Event</Text>
 						</View>
 					</View>
 				)}
 
-				{event?.isPrivate && (
+				{event?.is_private && (
 					<View style={styles.privateArea}>
 						<View style={styles.privatePanel}>
 							<Text style={styles.privateText}>Private Event</Text>
+						</View>
+					</View>
+				)}
+
+				{!event?.is_private && !event?.channel_id && (
+					<View style={styles.privateArea}>
+						<View style={[styles.privatePanel, { backgroundColor: baseColor.blurple }]}>
+							<Text style={styles.privateText}>Clan Event</Text>
 						</View>
 					</View>
 				)}

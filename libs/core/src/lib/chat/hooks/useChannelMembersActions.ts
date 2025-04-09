@@ -15,8 +15,9 @@ export function useChannelMembersActions() {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const removeMemberChannel = useCallback(
 		async ({ channelId, userIds }: RemoveChannelUsers) => {
-			await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
+			const response = await dispatch(channelMembersActions.removeMemberChannel({ channelId, userIds }));
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			return response;
 		},
 		[dispatch]
 	);
