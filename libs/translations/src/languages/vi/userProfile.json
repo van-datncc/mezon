@@ -30,7 +30,9 @@
   },
   "userInfoDM": {
     "menu": {
-      "removeFromGroup": "Xóa Khỏi Nhóm"
+      "removeFromGroup": "Xóa Khỏi Nhóm",
+      "removeSuccess": "Đã xóa thành viên khỏi nhóm",
+      "removeFailed": "Xóa thanh viên khỏi nhóm không thành công"
     },
     "mezonMemberSince": "THÀNH VIÊN MEZON TỪ"
   },

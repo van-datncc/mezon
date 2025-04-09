@@ -1,6 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
+import { getStore, selectCurrentDM } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useEffect } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -20,6 +21,10 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 
 	useEffect(() => {
 		if (userId || user) {
+			const state = getStore()?.getState();
+			const currentDirect = selectCurrentDM(state);
+			const directId = currentDirect?.id;
+
 			const data = {
 				snapPoints: ['60%'],
 				heightFitContent: true,
@@ -39,6 +44,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 							showAction={showAction}
 							showRole={showRole}
 							currentChannel={currentChannel}
+							directId={directId}
 						/>
 					</View>
 				)
