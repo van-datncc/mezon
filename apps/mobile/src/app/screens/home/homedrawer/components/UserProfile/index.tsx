@@ -41,6 +41,7 @@ interface userProfileProps {
 	showAction?: boolean;
 	showRole?: boolean;
 	currentChannel?: ChannelsEntity;
+	directId?: string;
 }
 
 export enum EFriendState {
@@ -56,7 +57,7 @@ export const formatDate = (dateString: string) => {
 };
 
 const UserProfile = React.memo(
-	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel }: userProfileProps) => {
+	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel, directId }: userProfileProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 		const { userProfile } = useAuth();
@@ -74,9 +75,12 @@ const UserProfile = React.memo(
 		const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 		const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
-		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type), [currentChannel?.type]);
 		const { dismiss } = useBottomSheetModal();
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
+		const dmChannel = useMemo(() => {
+			return listDM?.find((dm) => dm?.id === directId);
+		}, [directId, listDM]);
+		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(dmChannel?.type), [dmChannel?.type]);
 
 		const isDM = useMemo(() => {
 			return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
@@ -209,8 +213,11 @@ const UserProfile = React.memo(
 			deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
 		};
 		const isChannelOwner = useMemo(() => {
+			if (dmChannel?.creator_id) {
+				return dmChannel?.creator_id === userProfile?.user?.id;
+			}
 			return currentChannel?.creator_id === userProfile?.user?.id;
-		}, [currentChannel?.creator_id, userProfile?.user?.id]);
+		}, [currentChannel?.creator_id, dmChannel?.creator_id, userProfile?.user?.id]);
 
 		const isShowUserContent = useMemo(() => {
 			return !!userById?.user?.about_me || (showRole && userRolesClan?.length) || showAction || (isDMGroup && isChannelOwner && !isCheckOwner);
@@ -388,7 +395,7 @@ const UserProfile = React.memo(
 								</View>
 							) : null}
 							{isDMGroup && !isCheckOwner && isChannelOwner && (
-								<UserInfoDm currentChannel={currentChannel} user={userById || (user as any)} />
+								<UserInfoDm currentChannel={dmChannel || currentChannel} user={userById || (user as any)} />
 							)}
 							{showAction && !isKicked && <UserSettingProfile user={userById || (user as any)} />}
 						</View>
