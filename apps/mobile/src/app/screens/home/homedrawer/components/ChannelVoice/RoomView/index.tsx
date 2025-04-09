@@ -1,4 +1,5 @@
 import { TrackReference, VideoTrack, useLocalParticipant, useParticipants, useRoomContext, useTracks } from '@livekit/react-native';
+import { ScreenCapturePickerView } from '@livekit/react-native-webrtc';
 import {
 	ActionEmitEvent,
 	Icons,
@@ -14,7 +15,7 @@ import { clansActions, selectIsPiPMode, selectVoiceInfo, useAppDispatch, useAppS
 import { useNavigation } from '@react-navigation/native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Platform, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
 import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -51,6 +52,7 @@ const RoomView = ({
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
+	const screenCaptureRef = React.useRef(null);
 
 	useEffect(() => {
 		if (localParticipant) {
@@ -120,9 +122,19 @@ const RoomView = ({
 		}
 	}, [isMicrophoneEnabled, localParticipant]);
 
+	const startBroadcastIOS = async () => {
+		const reactTag = findNodeHandle(screenCaptureRef.current);
+		await NativeModules.ScreenCapturePickerViewManager.show(reactTag);
+		await localParticipant.setScreenShareEnabled(true);
+	};
+
 	const handleToggleScreenShare = useCallback(async () => {
 		try {
-			await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+			if (Platform.OS === 'ios') {
+				await startBroadcastIOS();
+			} else {
+				await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+			}
 		} catch (error) {
 			console.error('Error toggling screen share:', error);
 		}
@@ -231,6 +243,7 @@ const RoomView = ({
 			</View>
 		);
 	}
+	const screenCapturePickerView = Platform.OS === 'ios' && <ScreenCapturePickerView ref={screenCaptureRef} />;
 
 	return (
 		<View style={[styles.roomViewContainer, isPiPMode && styles.roomViewContainerPiP]}>
@@ -245,6 +258,7 @@ const RoomView = ({
 				/>
 			)}
 			{isAnimationComplete && <RenderControlBar />}
+			{screenCapturePickerView}
 		</View>
 	);
 };

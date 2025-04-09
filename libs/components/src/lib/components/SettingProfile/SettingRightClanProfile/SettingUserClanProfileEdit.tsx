@@ -61,7 +61,6 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		}
 		return profileVaile;
 	}, [draftProfile, userProfile]);
-
 	const { displayName, urlImage } = editProfile;
 
 	// Editor Avatar //
@@ -111,11 +110,14 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 				return;
 			}
 			setIsLoading(true);
-			const imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
+			let imageAvatarResize = file;
+			if (!file.name.endsWith('.gif')) {
+				imageAvatarResize = (await resizeFileImage(file, 120, 120, 'file', 80, 80)) as File;
+			}
 			const attachment = await handleUploadFile(
 				clientRef.current,
 				sessionRef.current,
-				clanId,
+				clanId || '0',
 				userProfile?.user?.id || '0',
 				imageAvatarResize.name,
 				imageAvatarResize

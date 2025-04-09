@@ -33,6 +33,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	externalToken: string | undefined;
 	joinCallExtStatus: LoadingStatus;
 	isPiPMode?: boolean;
+	openPopOut?: boolean;
 }
 
 export const voiceAdapter = createEntityAdapter<VoiceEntity>();
@@ -107,7 +108,8 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	stream: null,
 	showSelectScreenModal: false,
 	externalToken: undefined,
-	joinCallExtStatus: 'not loaded'
+	joinCallExtStatus: 'not loaded',
+	openPopOut: false
 });
 
 export const voiceSlice = createSlice({
@@ -167,6 +169,7 @@ export const voiceSlice = createSlice({
 			state.isJoined = false;
 			state.token = '';
 			state.stream = null;
+			state.openPopOut = false;
 		},
 		resetExternalCall: (state) => {
 			state.showMicrophone = false;
@@ -183,6 +186,9 @@ export const voiceSlice = createSlice({
 
 		setPiPModeMobile: (state, action) => {
 			state.isPiPMode = action.payload;
+		},
+		setOpenPopOut: (state, action: PayloadAction<boolean>) => {
+			state.openPopOut = action.payload;
 		}
 		// ...
 	},
@@ -295,3 +301,4 @@ export const selectVoiceConnectionState = createSelector(getVoiceState, (state) 
 export const selectJoinCallExtStatus = createSelector(getVoiceState, (state) => state.joinCallExtStatus);
 export const selectExternalToken = createSelector(getVoiceState, (state) => state.externalToken);
 export const selectIsPiPMode = createSelector(getVoiceState, (state) => state.isPiPMode);
+export const selectVoiceOpenPopOut = createSelector(getVoiceState, (state) => state.openPopOut);

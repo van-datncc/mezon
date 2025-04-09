@@ -11,6 +11,7 @@ import { channelsReducer } from './channels/channels.slice';
 import { usersClanReducer } from './clanMembers/clan.members';
 import { userClanProfileReducer } from './clanProfile/clanProfile.slice';
 import { clansReducer } from './clans/clans.slice';
+import { COMPOSE_FEATURE_KEY, composeReducer } from './compose/compose.slice';
 import { directReducer } from './direct/direct.slice';
 import { emojiSuggestionReducer } from './emojiSuggestion/emojiSuggestion.slice';
 import { friendsReducer } from './friends/friend.slice';
@@ -302,7 +303,7 @@ const persistedVoiceReducer = persistReducer(
 	{
 		key: VOICE_FEATURE_KEY,
 		storage,
-		whitelist: ['voiceInfo']
+		whitelist: ['voiceInfo', 'openPopOut', 'token', 'showMicrophone', 'showCamera', 'showScreen']
 	},
 	voiceReducer
 );
@@ -314,6 +315,14 @@ const persistedChannelAppReducer = persistReducer(
 		whitelist: ['position', 'size', 'prePosition', 'preSize']
 	},
 	channelAppReducer
+);
+
+const persistedCompose = persistReducer(
+	{
+		key: COMPOSE_FEATURE_KEY,
+		storage
+	},
+	composeReducer
 );
 
 const reducer = {
@@ -391,7 +400,8 @@ const reducer = {
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,
 	walletLedger: walletLedgerReducer,
-	[CHANNEL_LIST_RENDER]: listChannelRenderReducer
+	[CHANNEL_LIST_RENDER]: listChannelRenderReducer,
+	[COMPOSE_FEATURE_KEY]: persistedCompose
 };
 
 let storeInstance = configureStore({

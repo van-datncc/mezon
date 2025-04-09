@@ -15,7 +15,7 @@ import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType, Client, Session, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser } from 'mezon-js/api.gen';
 import { RoleUserListRoleUser } from 'mezon-js/dist/api.gen';
-import React, { RefObject } from 'react';
+import React from 'react';
 import Resizer from 'react-image-file-resizer';
 import { MentionItem } from 'react-mentions';
 import { electronBridge } from '../bridge';
@@ -120,12 +120,6 @@ export const checkSameDay = (startTimeString: string, endTimeString: string) => 
 	const endTime = new Date(endTimeString);
 	const sameDay = isSameDay(startTime, endTime);
 	return sameDay;
-};
-
-export const focusToElement = (ref: RefObject<HTMLInputElement | HTMLDivElement | HTMLUListElement>) => {
-	if (ref?.current) {
-		ref.current.focus();
-	}
 };
 
 export const uniqueUsers = (

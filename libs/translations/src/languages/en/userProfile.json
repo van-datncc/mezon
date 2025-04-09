@@ -30,7 +30,9 @@
   },
   "userInfoDM": {
     "menu": {
-      "removeFromGroup": "Remove From Group"
+      "removeFromGroup": "Remove From Group",
+      "removeSuccess": "Removed from Group",
+      "removeFailed": "Failed to remove from Group"
     },
     "mezonMemberSince": "MEZON MEMBER SINCE"
   },

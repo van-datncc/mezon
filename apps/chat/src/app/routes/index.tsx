@@ -18,6 +18,7 @@ import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
 import { useLoading } from '../app';
+import VoicePopout from '../pages/popOut/VoicePopout';
 import CanvasRoutes from './CanvasRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
@@ -152,6 +153,15 @@ export const Routes = memo(() => {
 						element: (
 							<Suspense fallback={<SuspenseFallback />}>
 								<PreJoinCalling />
+							</Suspense>
+						),
+						loader: loaderWithStore(authLoader)
+					},
+					{
+						path: 'popout',
+						element: (
+							<Suspense fallback={<SuspenseFallback />}>
+								<VoicePopout />
 							</Suspense>
 						),
 						loader: loaderWithStore(authLoader)

@@ -70,8 +70,8 @@ function ChannelVoice({
 						defaultOutput: newSpeakerState ? 'speaker' : 'earpiece'
 					}
 				});
-				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
 				InCallManager.setSpeakerphoneOn(newSpeakerState);
+				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
 			} else {
 				InCallManager.setSpeakerphoneOn(newSpeakerState);
 			}
@@ -87,16 +87,18 @@ function ChannelVoice({
 			if (state === 'background') {
 				if (Platform.OS === 'android') {
 					NativeModules.PipModule.enablePipMode();
-				} else {
-					// 	do something for ios
+					dispatch(voiceActions.setPiPModeMobile(true));
 				}
-				dispatch(voiceActions.setPiPModeMobile(true));
 			} else {
-				dispatch(voiceActions.setPiPModeMobile(false));
+				if (Platform.OS === 'android') {
+					dispatch(voiceActions.setPiPModeMobile(false));
+				}
 			}
 		});
 		return () => {
-			dispatch(voiceActions.setPiPModeMobile(false));
+			if (Platform.OS === 'android') {
+				dispatch(voiceActions.setPiPModeMobile(false));
+			}
 			subscription.remove();
 		};
 	}, [dispatch]);

@@ -11,6 +11,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.mezon.mobile</string>
+		<string>group.mezon.mobile.ScreenBroadcast</string>
 	</array>
 </dict>
 </plist>

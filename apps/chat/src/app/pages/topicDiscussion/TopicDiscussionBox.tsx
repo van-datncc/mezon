@@ -1,5 +1,5 @@
 import { AttachmentPreviewThumbnail, MentionReactInput, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useAuth, useDragAndDrop, useReference, useTopics } from '@mezon/core';
+import { useChatSending, useDragAndDrop, useReference } from '@mezon/core';
 import {
 	fetchMessages,
 	referencesActions,
@@ -11,24 +11,13 @@ import {
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
 	selectSession,
-	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
-import {
-	CREATING_TOPIC,
-	IMessageSendPayload,
-	MAX_FILE_ATTACHMENTS,
-	UploadLimitReason,
-	getWebUploadedAttachments,
-	processFile,
-	sleep
-} from '@mezon/utils';
+import { CREATING_TOPIC, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason, processFile } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/dist/api.gen';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -40,16 +29,28 @@ const TopicDiscussionBox = () => {
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allUserIdsInChannel = useAppSelector((state) => selectAllChannelMemberIds(state, currentChannelId, false));
-	const { currentTopicInitMessage } = useTopics();
 	const sessionUser = useSelector(selectSession);
-	const { clientRef, sessionRef, socketRef } = useMezon();
 	const currentTopicId = useSelector(selectCurrentTopicId);
 	const [isFetchMessageDone, setIsFetchMessageDone] = useState(false);
-	const { userProfile } = useAuth();
 	const dataReferences = useSelector(selectDataReferences(currentTopicId ?? ''));
 	const currentInputChannelId = currentTopicId || CREATING_TOPIC;
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
+
+	const mode =
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
+
+	const { sendMessage } = useChatSending({
+		mode,
+		channelOrDirect: currentChannel
+			? {
+					channel_id: currentChannel.channel_id,
+					clan_id: currentChannel.clan_id,
+					channel_private: currentChannel.channel_private
+				}
+			: undefined,
+		fromTopic: true
+	});
 
 	useEffect(() => {
 		const fetchCurrentTopicMessages = async () => {
@@ -59,67 +60,7 @@ const TopicDiscussionBox = () => {
 		if (currentTopicId !== '') {
 			fetchCurrentTopicMessages();
 		}
-	}, [currentClanId, currentTopicId]);
-
-	const createTopic = useCallback(async () => {
-		const body: ApiSdTopicRequest = {
-			clan_id: currentClanId?.toString(),
-			channel_id: currentChannelId as string,
-			message_id: currentTopicInitMessage?.id
-		};
-
-		const topic = (await dispatch(topicsActions.createTopic(body))).payload as ApiSdTopic;
-		dispatch(topicsActions.setCurrentTopicId(topic.id || ''));
-		return topic;
-	}, [currentChannelId, currentClanId, dispatch, currentTopicInitMessage?.id]);
-
-	const sendMessageTopic = React.useCallback(
-		async (
-			content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>,
-			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>,
-			topicId?: string
-		) => {
-			const session = sessionRef.current;
-			const client = clientRef.current;
-			const socket = socketRef.current;
-
-			if (!client || !session || !socket || !currentClanId) {
-				throw new Error('Client is not initialized');
-			}
-
-			let uploadedFiles: ApiMessageAttachment[] = [];
-
-			if (attachments && attachments.length > 0) {
-				uploadedFiles = await getWebUploadedAttachments({
-					attachments,
-					channelId: topicId || '',
-					clanId: currentClanId || '',
-					client,
-					session
-				});
-			}
-
-			await socket.writeChatMessage(
-				currentClanId,
-				currentChannel?.channel_id as string,
-				mode,
-				currentChannel?.channel_private !== 1,
-				content,
-				mentions,
-				uploadedFiles,
-				references,
-				false,
-				false,
-				'',
-				0,
-				topicId?.toString()
-			);
-		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[sessionRef, clientRef, socketRef, currentClanId, dispatch]
-	);
+	}, [currentClanId, currentChannelId, currentTopicId, dispatch]);
 
 	const handleSend = useCallback(
 		async (
@@ -129,17 +70,9 @@ const TopicDiscussionBox = () => {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (!sessionUser) return;
-			if (currentTopicId !== '') {
-				await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
-			} else {
-				const topic = (await createTopic()) as ApiSdTopic;
-				if (topic) {
-					await sleep(10);
-					await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
-				}
-			}
+			await sendMessage(content, mentions, attachments, references, false, false, false, 0);
 		},
-		[createTopic, currentTopicId, currentTopicId, sendMessageTopic, sessionUser, userProfile]
+		[sendMessage, sessionUser]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -147,8 +80,6 @@ const TopicDiscussionBox = () => {
 	}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
-	const mode =
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
 
 	const firstMessageOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
 
@@ -177,7 +108,7 @@ const TopicDiscussionBox = () => {
 				})
 			);
 		},
-		[currentChannelId, currentClanId, attachmentFilteredByChannelId?.files?.length]
+		[currentInputChannelId, attachmentFilteredByChannelId?.files?.length, dispatch, setOverUploadingState]
 	);
 
 	return (

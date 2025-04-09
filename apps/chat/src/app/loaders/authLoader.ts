@@ -5,8 +5,12 @@ import {
 	clansActions,
 	directActions,
 	friendsActions,
+	getStore,
 	listChannelsByUserActions,
-	listUsersByUserActions
+	listUsersByUserActions,
+	selectCurrentClanId,
+	selectVoiceOpenPopOut,
+	usersClanActions
 } from '@mezon/store';
 import { IWithError, sleep } from '@mezon/utils';
 import { emojiRecentActions } from 'libs/store/src/lib/emojiSuggestion/emojiRecent.slice';
@@ -65,6 +69,13 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 };
 
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
+	const store = getStore();
+	const isOpenVoicePopout = selectVoiceOpenPopOut(store.getState());
+
+	if (isOpenVoicePopout) {
+		const currentClanId = selectCurrentClanId(store.getState());
+		dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId as string }));
+	}
 	dispatch(clansActions.joinClan({ clanId: '0' }));
 	dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 	dispatch(listUsersByUserActions.fetchListUsersByUser({}));

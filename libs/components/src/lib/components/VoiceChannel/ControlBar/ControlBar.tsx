@@ -6,6 +6,7 @@ import {
 	selectShowSelectScreenModal,
 	selectStreamScreen,
 	selectVoiceFullScreen,
+	selectVoiceOpenPopOut,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
@@ -60,6 +61,7 @@ export function ControlBar({
 	const isShowSelectScreenModal = useSelector(selectShowSelectScreenModal);
 	const localPermissions = useLocalParticipantPermissions();
 	const localParticipant = useLocalParticipant();
+	const isOpenPopOut = useSelector(selectVoiceOpenPopOut);
 
 	if (!localPermissions) {
 		visibleControls.camera = false;
@@ -179,7 +181,34 @@ export function ControlBar({
 	);
 
 	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
+	let popoutWindow: Window | null = null;
 
+	const togglePopout = () => {
+		if (window.location.pathname === '/popout') {
+			dispatch(voiceActions.setOpenPopOut(false));
+			window.close();
+			return;
+		}
+
+		popoutWindow = window.open('/popout', 'LiveKitPopout', 'width=800,height=600,left=100,top=100');
+
+		if (!popoutWindow) {
+			console.error('Pop-up window blocked!');
+			return;
+		}
+
+		dispatch(voiceActions.setOpenPopOut(true));
+
+		const checkIfClosed = setInterval(() => {
+			if (popoutWindow?.closed) {
+				clearInterval(checkIfClosed);
+				popoutWindow = null;
+				dispatch(voiceActions.setOpenPopOut(false));
+			}
+		}, 500);
+	};
+
+	const livekitRoomId = isOpenPopOut ? 'livekitRoomPopOut' : 'livekitRoom';
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent">
 			<div className="flex justify-start gap-4">
@@ -302,18 +331,35 @@ export function ControlBar({
 			</div>
 			<div className="flex justify-end gap-4">
 				{!isExternalCalling && (
-					<Tooltip
-						showArrow={{ className: '!bottom-1' }}
-						placement="top"
-						overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">Pop Out</span>}
-						overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
-						overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
-						getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
-					>
-						<span>
-							<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
-						</span>
-					</Tooltip>
+					<div onClick={togglePopout}>
+						{isOpenPopOut ? (
+							<Tooltip
+								showArrow={{ className: '!bottom-1' }}
+								placement="top"
+								overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">Return To App</span>}
+								overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
+								overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+								getTooltipContainer={() => document.getElementById(livekitRoomId) || document.body}
+							>
+								<span>
+									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] rotate-180" />
+								</span>
+							</Tooltip>
+						) : (
+							<Tooltip
+								showArrow={{ className: '!bottom-1' }}
+								placement="top"
+								overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">Pop Out</span>}
+								overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
+								overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
+								getTooltipContainer={() => document.getElementById(livekitRoomId) || document.body}
+							>
+								<span>
+									<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] " />
+								</span>
+							</Tooltip>
+						)}
+					</div>
 				)}
 
 				<div onClick={onFullScreen}>

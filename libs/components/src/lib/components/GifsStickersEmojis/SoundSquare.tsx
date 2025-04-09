@@ -12,6 +12,7 @@ type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
 	mode: number;
 	onClose: () => void;
+	isTopic?: boolean;
 };
 
 type SoundPanel = {
@@ -225,9 +226,13 @@ const sounds = [
 	}
 ];
 
-function SoundSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
+function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const dispatch = useDispatch();
-	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
+	const { sendMessage } = useChatSending({
+		channelOrDirect: channel,
+		mode,
+		fromTopic: isTopic
+	});
 	const currentId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentId ?? ''));
 	const isReplyAction = dataReferences.message_ref_id && dataReferences.message_ref_id !== '';

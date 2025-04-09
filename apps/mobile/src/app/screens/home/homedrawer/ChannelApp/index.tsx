@@ -2,9 +2,9 @@
 import { useClans } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { getAuthState, selectAllAccount } from '@mezon/store-mobile';
-import { MiniAppEventType, sleep } from '@mezon/utils';
-import { useCallback, useRef, useState } from 'react';
+import { getAuthState } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
+import { useRef, useState } from 'react';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
 import WebView from 'react-native-webview';
@@ -20,11 +20,9 @@ const ChannelAppScreen = ({ channelId }) => {
 	const session = JSON.stringify(authState.session);
 	const [loading, setLoading] = useState(true);
 	const { currentClanId } = useClans();
-	const userProfile = useSelector(selectAllAccount);
 	const webviewRef = useRef<WebView>(null);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${currentClanId}/channels/${channelId}`;
-
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${currentClanId}/${channelId}`;
 	const injectedJS = `
     (function() {
 	const authData = {
@@ -65,43 +63,7 @@ const ChannelAppScreen = ({ channelId }) => {
       document.head.appendChild(style);
     })();
 	true;
-	(function() {
-				setTimeout(() => {
-				let element = document.querySelector("#mainChat > div > div > div.flex-shrink > div.flex.gap-2 > div:nth-child(1)");
-				if (element) {
-      element.click();
-				window.ReactNativeWebView.postMessage(JSON.stringify({
-					id: element.id,
-					innerText: element.innerText,
-					classList: Array.from(element.classList)
-				}));
-				} else {
-      window.ReactNativeWebView.postMessage(JSON.stringify({ error: "Không tìm thấy #mainChat" }));
-				}
-			}, 3000);
-			setTimeout(() => {
-				const element = document.querySelector("#main-layout > div.relative > div.relative > div > div.flex > div > button:nth-child(2)");
-
-				if (element && element.title === "Enter Full Screen") {
-				element.click();
-				window.ReactNativeWebView.postMessage(JSON.stringify({
-					id: element.id,
-					innerText: element.innerText,
-					classList: Array.from(element.classList)
-				}));
-				} else {
-      window.ReactNativeWebView.postMessage(JSON.stringify({ error: "Không tìm thấy #mainChat" }));
-				}
-			}, 5000);
-	})();
-	true;
   `;
-
-	const handlePing = useCallback(() => {
-		const message = JSON.stringify({ eventType: MiniAppEventType.CURRENT_USER_INFO, eventData: userProfile });
-		webviewRef?.current?.postMessage(message);
-		webviewRef?.current?.postMessage('onHandleLoadend');
-	}, [userProfile, webviewRef?.current]);
 
 	const closeChannelApp = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -155,8 +117,7 @@ const ChannelAppScreen = ({ channelId }) => {
 				onMessage={onMessage}
 				nestedScrollEnabled={true}
 				onLoadEnd={async () => {
-					handlePing();
-					await sleep(5000);
+					await sleep(500);
 					setLoading(false);
 				}}
 			/>
