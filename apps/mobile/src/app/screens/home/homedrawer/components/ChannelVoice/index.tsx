@@ -61,8 +61,24 @@ function ChannelVoice({
 	};
 
 	const onToggleSpeaker = async () => {
-		InCallManager.setSpeakerphoneOn(!isSpeakerOn);
-		setIsSpeakerOn(!isSpeakerOn);
+		try {
+			const newSpeakerState = !isSpeakerOn;
+			if (Platform.OS === 'ios') {
+				await AudioSession.configureAudio({
+					ios: {
+						defaultOutput: newSpeakerState ? 'speaker' : 'earpiece'
+					}
+				});
+				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
+			} else {
+				// Standard method for Android
+				InCallManager.setSpeakerphoneOn(newSpeakerState);
+			}
+
+			setIsSpeakerOn(newSpeakerState);
+		} catch (error) {
+			console.error('Failed to toggle speaker:', error);
+		}
 	};
 
 	useEffect(() => {
