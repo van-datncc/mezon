@@ -1,6 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { ChannelsEntity } from '@mezon/store';
+import { getStore, selectCurrentDM } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useEffect } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
@@ -17,6 +18,9 @@ interface IUserInformationBottomSheetProps {
 
 export const UserInformationBottomSheet = React.memo((props: IUserInformationBottomSheetProps) => {
 	const { onClose, userId, user, showAction = true, showRole = true, currentChannel } = props;
+	const state = getStore()?.getState();
+	const currentDirect = selectCurrentDM(state);
+	const directId = currentDirect?.id;
 
 	useEffect(() => {
 		if (userId || user) {
@@ -39,7 +43,7 @@ export const UserInformationBottomSheet = React.memo((props: IUserInformationBot
 							showAction={showAction}
 							showRole={showRole}
 							currentChannel={currentChannel}
-							directId={currentChannel?.channel_id}
+							directId={directId}
 						/>
 					</View>
 				)

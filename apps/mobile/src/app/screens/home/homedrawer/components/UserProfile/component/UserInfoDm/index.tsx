@@ -1,7 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useChannelMembersActions } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, ChannelsEntity } from '@mezon/store-mobile';
+import { channelMembersActions, ChannelMembersEntity, ChannelsEntity, directActions, useAppDispatch } from '@mezon/store-mobile';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -13,8 +12,8 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['userProfile']);
 	const styles = style(themeValue);
-	const { removeMemberChannel } = useChannelMembersActions();
 	const { dismiss } = useBottomSheetModal();
+	const dispatch = useAppDispatch();
 	// const formatDate = (dateString: string) => {
 	// 	const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 	// 	const date = new Date(dateString);
@@ -36,7 +35,7 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 			dismiss();
 			const userIds = [user?.id ?? ''];
 			try {
-				const response = await removeMemberChannel({ channelId: currentChannel?.channel_id || '', userIds });
+				const response = await dispatch(channelMembersActions.removeMemberChannel({ channelId: currentChannel?.channel_id, userIds }));
 				if (response?.meta?.requestStatus === 'rejected') {
 					throw new Error('removeMemberChannel failed');
 				} else {
@@ -44,6 +43,7 @@ export default function UserInfoDm({ user, currentChannel }: { user: ChannelMemb
 						type: 'info',
 						text1: t('userInfoDM.menu.removeSuccess')
 					});
+					dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				}
 			} catch (error) {
 				console.error('Error removing member from channel:', error);
