@@ -1876,21 +1876,15 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite 
 };
 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`dark:hover:text-white hover:text-black ${defaultSize} ${'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
 			viewBox="0 0 24 24"
-			onClick={handleClick}
 		>
 			<path
 				fill="currentColor"

@@ -1,5 +1,5 @@
 import { useMessageValue } from '@mezon/core';
-import { selectCurrentChannelId, selectRequestByChannelId, threadsActions, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectComposeInputByChannelId, selectCurrentChannelId, threadsActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { useCallback } from 'react';
@@ -33,7 +33,7 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	}, [dispatch]);
 
 	const { setRequestInput } = useMessageValue();
-	const request = useAppSelector((state) => selectRequestByChannelId(state, currentChannelId as string));
+	const request = useAppSelector((state) => selectComposeInputByChannelId(state, currentChannelId as string));
 
 	const handleCloseModal = () => {
 		setTurnOffThreadMessage();

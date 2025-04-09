@@ -1,11 +1,10 @@
-import { useChatSending, useEscapeKey, useGifsStickersEmoji } from '@mezon/core';
+import { useChatSending, useEscapeKey } from '@mezon/core';
 import { referencesActions, selectDataReferences, selectSession, useAppDispatch } from '@mezon/store';
-import { EmojiPlaces, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { IMessageSendPayload, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
-import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
 import { MessageBox } from '../../MessageBox';
 import { ReplyMessageBox } from '../../ReplyMessageBox';
 import { UserMentionList } from '../../UserMentionList';
@@ -23,8 +22,6 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: direct, mode: mode });
 	// TODO: move selector to store
 	const sessionUser = useSelector(selectSession);
-	const { subPanelActive } = useGifsStickersEmoji();
-	const [isEmojiOnChat, setIsEmojiOnChat] = useState<boolean>(false);
 	const dataReferences = useSelector(selectDataReferences(directParamId ?? ''));
 	const dispatch = useAppDispatch();
 
@@ -52,18 +49,6 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
-	useEffect(() => {
-		const isEmojiReactionPanel = subPanelActive === SubPanelName.EMOJI_REACTION_RIGHT || subPanelActive === SubPanelName.EMOJI_REACTION_BOTTOM;
-
-		const isOtherActivePanel = subPanelActive !== SubPanelName.NONE && !isEmojiReactionPanel;
-
-		const isSmallScreen = window.innerWidth < 640;
-
-		const isActive = isOtherActivePanel || (isEmojiReactionPanel && isSmallScreen);
-
-		setIsEmojiOnChat(isActive);
-	}, [subPanelActive]);
-
 	const handleCloseReplyMessageBox = useCallback(() => {
 		dispatch(
 			referencesActions.setDataReferences({
@@ -76,21 +61,7 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
 
 	return (
-		<div className="mx-3 relative" role="button" ref={chatboxRef}>
-			{isEmojiOnChat && (
-				<div
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-					className={`right-[2px] absolute z-10`}
-					style={{
-						bottom: chatboxRef.current ? `${chatboxRef.current.offsetHeight}px` : ''
-					}}
-				>
-					<GifStickerEmojiPopup channelOrDirect={direct} emojiAction={EmojiPlaces.EMOJI_EDITOR} mode={mode} />
-				</div>
-			)}
-
+		<div className="mx-3 relative" ref={chatboxRef}>
 			{dataReferences.message_ref_id && <ReplyMessageBox channelId={directParamId ?? ''} dataReferences={dataReferences} />}
 			<MessageBox
 				onSend={handleSend}

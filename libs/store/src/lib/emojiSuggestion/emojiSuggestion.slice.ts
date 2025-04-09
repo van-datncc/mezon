@@ -25,6 +25,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	textToSearchEmojiSuggestion: string;
 	addEmojiAction: boolean;
 	shiftPressed: boolean;
+	fromTopic?: boolean;
 }
 
 type UpdateEmojiRequest = {
@@ -40,6 +41,7 @@ type EmojiObjPickedArgs = {
 	shortName: string;
 	id: string;
 	isReset?: boolean;
+	fromTopic?: boolean;
 };
 
 export const fetchEmojiCached = memoizeAndTrack(
@@ -144,7 +146,8 @@ export const initialEmojiSuggestionState: EmojiSuggestionState = emojiSuggestion
 	keyCodeFromKeyBoardState: 1000,
 	textToSearchEmojiSuggestion: '',
 	addEmojiAction: false,
-	shiftPressed: false
+	shiftPressed: false,
+	fromTopic: false
 });
 
 export const emojiSuggestionSlice = createSlice({
@@ -175,12 +178,14 @@ export const emojiSuggestionSlice = createSlice({
 		},
 
 		setSuggestionEmojiObjPicked: (state, action: PayloadAction<EmojiObjPickedArgs>) => {
-			const { shortName, id, isReset } = action.payload;
+			const { shortName, id, isReset, fromTopic } = action.payload;
 
 			if (isReset || !state.emojiObjPicked) {
 				state.emojiObjPicked = {};
+				state.fromTopic = false;
 			} else if (shortName !== '' && id !== '') {
 				state.emojiObjPicked[shortName] = id;
+				state.fromTopic = fromTopic;
 			}
 		}
 	},
@@ -244,6 +249,8 @@ export const selectAddEmojiState = createSelector(getEmojiSuggestionState, (emoj
 export const selectShiftPressedStatus = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.shiftPressed);
 
 export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.emojiObjPicked);
+
+export const selectEmojiFromTopic = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.fromTopic);
 
 export const selectEmojiByClanId = (clanId: string) =>
 	createSelector(selectAllEmojiSuggestion, (emojis) => {

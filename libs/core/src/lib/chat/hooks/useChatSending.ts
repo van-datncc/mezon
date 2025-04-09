@@ -4,8 +4,6 @@ import {
 	selectAnonymousMode,
 	selectCurrentTopicId,
 	selectCurrentTopicInitMessage,
-	selectIsFocusOnChannelInput,
-	selectIsShowCreateTopic,
 	selectMemberClanByUserId2,
 	topicsActions,
 	useAppDispatch,
@@ -21,17 +19,17 @@ import { useSelector } from 'react-redux';
 export type UseChatSendingOptions = {
 	mode: number;
 	channelOrDirect: ApiChannelDescription | undefined;
+	fromTopic?: boolean;
 };
 
 // TODO: separate this hook into 2 hooks for send and edit message
-export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions) {
+export function useChatSending({ mode, channelOrDirect, fromTopic = false }: UseChatSendingOptions) {
 	const dispatch = useAppDispatch();
 	const getClanId = channelOrDirect?.clan_id;
 	const isPublic = !channelOrDirect?.channel_private;
 	const channelIdOrDirectId = channelOrDirect?.channel_id;
 	const currentTopicId = useSelector(selectCurrentTopicId);
-	const isShowCreateTopic = useSelector(selectIsShowCreateTopic);
-	const isFocusOnChannelInput = useSelector(selectIsFocusOnChannelInput);
+
 	const userProfile = useSelector(selectAllAccount);
 
 	const profileInTheClan = useAppSelector((state) => selectMemberClanByUserId2(state, userProfile?.user?.id ?? ''));
@@ -78,7 +76,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			isMobile?: boolean,
 			code?: number
 		) => {
-			if (!isFocusOnChannelInput && isShowCreateTopic) {
+			if (fromTopic) {
 				if (!currentTopicId) {
 					const topic = (await createTopic()) as ApiSdTopic;
 					if (topic) {
@@ -143,8 +141,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			);
 		},
 		[
-			isFocusOnChannelInput,
-			isShowCreateTopic,
+			fromTopic,
 			dispatch,
 			channelIdOrDirectId,
 			getClanId,
@@ -154,9 +151,7 @@ export function useChatSending({ mode, channelOrDirect }: UseChatSendingOptions)
 			priorityAvatar,
 			priorityNameToShow,
 			currentTopicId,
-			createTopic,
-			initMessageOfTopic?.id,
-			userProfile?.user?.id
+			createTopic
 		]
 	);
 

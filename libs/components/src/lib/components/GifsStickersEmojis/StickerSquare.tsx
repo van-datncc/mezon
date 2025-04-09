@@ -1,23 +1,17 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import {
-	referencesActions,
-	selectAllStickerSuggestion,
-	selectCurrentClan,
-	selectCurrentTopicId,
-	selectDataReferences,
-	useAppSelector
-} from '@mezon/store';
+import { referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
-import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ApiChannelDescription, ApiMessageRef } from 'mezon-js/api.gen';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
 	mode: number;
 	onClose: () => void;
+	isTopic?: boolean;
 };
 
 interface ICategorizedStickerProps {
@@ -44,10 +38,13 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 	return stickers.filter((item) => item?.shortname?.toLowerCase().includes(lowerCaseSearchTerm));
 };
 
-function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
+function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const clanStickers = useAppSelector(selectAllStickerSuggestion);
-	const { sendMessage } = useChatSending({ channelOrDirect: channel, mode });
-	const currentTopicId = useSelector(selectCurrentTopicId);
+	const { sendMessage } = useChatSending({
+		channelOrDirect: channel,
+		mode,
+		fromTopic: isTopic
+	});
 	const { valueInputToCheckHandleSearch, subPanelActive } = useGifsStickersEmoji();
 	const [searchedStickers, setSearchStickers] = useState<ClanSticker[]>([]);
 	const currentId = useCurrentInbox()?.channel_id;
@@ -59,18 +56,6 @@ function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 		const result = searchStickers(clanStickers, valueInputToCheckHandleSearch ?? '');
 		setSearchStickers(result);
 	}, [valueInputToCheckHandleSearch, subPanelActive, clanStickers]);
-
-	const handleSend = useCallback(
-		(
-			content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>,
-			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>
-		) => {
-			sendMessage(content, mentions, attachments, references);
-		},
-		[sendMessage]
-	);
 
 	const categoryLogo = clanStickers
 		.map((sticker) => ({
@@ -97,7 +82,7 @@ function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 
 	const handleClickImage = (image: StickerPanel) => {
 		if (isReplyAction) {
-			handleSend({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences]);
+			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences]);
 
 			dispatch(
 				referencesActions.setDataReferences({
@@ -106,7 +91,7 @@ function StickerSquare({ channel, mode, onClose }: ChannelMessageBoxProps) {
 				})
 			);
 		} else {
-			handleSend({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], []);
+			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], []);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};

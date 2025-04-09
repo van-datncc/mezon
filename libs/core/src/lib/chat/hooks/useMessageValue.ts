@@ -1,4 +1,4 @@
-import { channelsActions, getStore, selectCurrentChannel, selectDmGroupCurrentId, selectModeResponsive, useAppDispatch } from '@mezon/store';
+import { composeActions, getStore, selectCurrentChannel, selectDmGroupCurrentId, selectModeResponsive, useAppDispatch } from '@mezon/store';
 import { ModeResponsive, RequestInput } from '@mezon/utils';
 import { useCallback, useMemo } from 'react';
 
@@ -12,16 +12,14 @@ export function useMessageValue() {
 
 		if (mode === ModeResponsive.MODE_CLAN) {
 			dispatch(
-				channelsActions.setRequestInput({
-					clanId: mode === ModeResponsive.MODE_CLAN ? (currentChannel?.clan_id as string) : '0',
+				composeActions.setComposeInput({
 					channelId: isThread ? currentChannel?.id + String(isThread) : (currentChannel?.id as string),
 					request
 				})
 			);
 		} else {
 			dispatch(
-				channelsActions.setRequestInput({
-					clanId: '0',
+				composeActions.setComposeInput({
 					channelId: currentDmGroupId || '',
 					request
 				})

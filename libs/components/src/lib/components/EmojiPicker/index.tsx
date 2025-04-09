@@ -2,8 +2,8 @@ import { useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsS
 import {
 	emojiSuggestionActions,
 	referencesActions,
+	selectAddEmojiState,
 	selectCurrentChannel,
-	selectCurrentThread,
 	selectMessageByMessageId,
 	selectModeResponsive,
 	selectTheme,
@@ -41,6 +41,7 @@ export type EmojiCustomPanelOptions = {
 	buzzInputRequest?: RequestInput;
 	setBuzzInputRequest?: (value: RequestInput) => void;
 	toggleEmojiPanel?: () => void;
+	isFromTopicView?: boolean;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -52,18 +53,10 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const { buzzInputRequest, setBuzzInputRequest, toggleEmojiPanel } = props;
 	const dispatch = useDispatch();
 	const currentChannel = useSelector(selectCurrentChannel);
-	const currentThread = useSelector(selectCurrentThread);
+	const addEmojiState = useSelector(selectAddEmojiState);
 
-	const {
-		categoryEmoji,
-		categoriesEmoji,
-		emojis,
-		setAddEmojiActionChatbox,
-		addEmojiState,
-		shiftPressedState,
-		setSuggestionEmojiObjPicked,
-		setShiftPressed
-	} = useEmojiSuggestionContext();
+	const { categoryEmoji, categoriesEmoji, emojis, setAddEmojiActionChatbox, shiftPressedState, setSuggestionEmojiObjPicked, setShiftPressed } =
+		useEmojiSuggestionContext();
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -137,7 +130,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			} else if (subPanelActive === SubPanelName.EMOJI) {
 				dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ shortName: '', id: '', isReset: true }));
 				setAddEmojiActionChatbox(!addEmojiState);
-				setSuggestionEmojiObjPicked(emojiId, emojiPicked);
+				setSuggestionEmojiObjPicked(emojiId, emojiPicked, props.isFromTopicView);
 				if (!shiftPressedState) {
 					setSubPanelActive(SubPanelName.NONE);
 				}
@@ -171,6 +164,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			props.emojiAction,
 			props.messageEmojiId,
 			props.isFocusTopicBox,
+			props.isFromTopicView,
 			reactionMessageDispatch,
 			messageEmoji?.sender_id,
 			messageEmoji?.channel_id,

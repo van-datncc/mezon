@@ -22,13 +22,13 @@ import {
 	e2eeActions,
 	notificationSettingActions,
 	removeChannelUsersPayload,
+	selectComposeInputByChannelId,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectDmGroupCurrent,
 	selectFriendStatus,
 	selectHasKeyE2ee,
 	selectNotifiSettingsEntitiesById,
-	selectRequestByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -97,6 +97,7 @@ const PanelMember = ({
 	const [mutedUntil, setmutedUntil] = useState('');
 	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
 	const isCreator = userProfile?.user?.id === currentChannel?.creator_id;
+	const request = useAppSelector((state) => selectComposeInputByChannelId(state, currentChannel?.channel_id as string));
 
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
@@ -136,7 +137,6 @@ const PanelMember = ({
 	const navigate = useNavigate();
 	const { createDirectMessageWithUser } = useDirect();
 	const { setRequestInput } = useMessageValue();
-	const request = useAppSelector((state) => selectRequestByChannelId(state, currentChannel?.channel_id as string));
 
 	const displayMentionName = useMemo(() => {
 		if (member?.clan_nick) return member.clan_nick;

@@ -16,12 +16,12 @@ import {
 	referencesActions,
 	selectAllChannelMembers,
 	selectAllRolesClan,
+	selectComposeInputByChannelId,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectMemberClanByUserId2,
 	selectOpenThreadMessageState,
-	selectRequestByChannelId,
 	selectSession,
 	selectTheme,
 	selectThreadCurrentChannel,
@@ -74,7 +74,7 @@ const ThreadBox = () => {
 	const [redoHistory, setRedoHistory] = useState<HistoryItem[]>([]);
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const { setRequestInput } = useMessageValue();
-	const request = useAppSelector((state) => selectRequestByChannelId(state, currentChannelId + 'true'));
+	const request = useAppSelector((state) => selectComposeInputByChannelId(state, currentChannelId + 'true'));
 	const rolesClan = useSelector(selectAllRolesClan);
 	const { membersOfChild } = useChannelMembers({ channelId: currentChannelId, mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0 });
 	const membersOfParent = useAppSelector((state) =>

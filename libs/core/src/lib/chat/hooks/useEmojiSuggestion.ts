@@ -1,6 +1,5 @@
 import {
 	emojiSuggestionActions,
-	selectAddEmojiState,
 	selectAllEmojiRecent,
 	selectAllEmojiSuggestion,
 	selectEmojiListStatus,
@@ -36,14 +35,13 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
 
 	const textToSearchEmojiSuggestion = useSelector(selectTextToSearchEmojiSuggestion);
-	const addEmojiState = useSelector(selectAddEmojiState);
 	const shiftPressedState = useSelector(selectShiftPressedStatus);
 
 	const dispatch = useAppDispatch();
 
 	const setSuggestionEmojiObjPicked = useCallback(
-		(emojId: string, emojiShortname: string) => {
-			dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ id: emojId, shortName: emojiShortname }));
+		(emojId: string, emojiShortname: string, fromTopic?: boolean) => {
+			dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ id: emojId, shortName: emojiShortname, fromTopic }));
 		},
 		[dispatch]
 	);
@@ -106,7 +104,6 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 			categoriesEmoji,
 			categoryEmoji,
 			setAddEmojiActionChatbox,
-			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
 			emojis,
@@ -120,7 +117,6 @@ export function useEmojiSuggestion({ isMobile = false }: EmojiSuggestionProps = 
 			textToSearchEmojiSuggestion,
 			setTextToSearchEmojiSuggesion,
 			setAddEmojiActionChatbox,
-			addEmojiState,
 			setShiftPressed,
 			shiftPressedState,
 			emojis,
