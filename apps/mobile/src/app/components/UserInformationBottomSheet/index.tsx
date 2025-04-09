@@ -18,12 +18,13 @@ interface IUserInformationBottomSheetProps {
 
 export const UserInformationBottomSheet = React.memo((props: IUserInformationBottomSheetProps) => {
 	const { onClose, userId, user, showAction = true, showRole = true, currentChannel } = props;
-	const state = getStore()?.getState();
-	const currentDirect = selectCurrentDM(state);
-	const directId = currentDirect?.id;
 
 	useEffect(() => {
 		if (userId || user) {
+			const state = getStore()?.getState();
+			const currentDirect = selectCurrentDM(state);
+			const directId = currentDirect?.id;
+
 			const data = {
 				snapPoints: ['60%'],
 				heightFitContent: true,
