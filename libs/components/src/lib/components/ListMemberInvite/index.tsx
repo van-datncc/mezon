@@ -25,23 +25,26 @@ const ListMemberInvite = (props: ModalParam) => {
 	const { listDMInvite, listUserInvite } = useDMInvite(props.channelID);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sendIds, setSendIds] = useState<Record<string, boolean>>({});
+	const [filteredListDMBySearch, setFilterListSearch] = useState<DirectEntity[] | undefined>(listDMInvite);
 
-	const throttledSetSearchTerm = useThrottledCallback(setSearchTerm, 300);
-	const handleInputChange = useCallback(
-		(e: ChangeEvent<HTMLInputElement>) => {
-			throttledSetSearchTerm(e.target.value);
-		},
-		[throttledSetSearchTerm]
-	);
-	const filteredListDMBySearch = useMemo(() => {
-		return listDMInvite?.filter((dmGroup) => {
+	const handleFilterListSearch = () => {
+		const listSearch = listDMInvite?.filter((dmGroup) => {
 			if (dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())) {
 				return dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase());
 			}
-
 			return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
-	}, [listDMInvite, searchTerm]);
+		setFilterListSearch(listSearch);
+	};
+
+	const throttledSetSearchTerm = useThrottledCallback(handleFilterListSearch, 500);
+	const handleInputChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			setSearchTerm(e.target.value);
+			throttledSetSearchTerm();
+		},
+		[throttledSetSearchTerm]
+	);
 
 	const filteredListUserBySearch = useMemo(() => {
 		return listUserInvite?.filter((dmGroup) => {
@@ -96,7 +99,7 @@ const ListMemberInvite = (props: ModalParam) => {
 
 			<hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
 			<div
-				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
 			>
 				{isInviteExternalCalling ? (
 					<div className="flex flex-col gap-3">
