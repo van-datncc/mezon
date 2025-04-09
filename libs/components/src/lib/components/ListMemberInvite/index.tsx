@@ -37,7 +37,7 @@ const ListMemberInvite = (props: ModalParam) => {
 		setFilterListSearch(listSearch);
 	};
 
-	const throttledSetSearchTerm = useThrottledCallback(handleFilterListSearch, 500);
+	const throttledSetSearchTerm = useThrottledCallback(handleFilterListSearch, 300);
 	const handleInputChange = useCallback(
 		(e: ChangeEvent<HTMLInputElement>) => {
 			setSearchTerm(e.target.value);
