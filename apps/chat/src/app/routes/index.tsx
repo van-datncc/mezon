@@ -18,6 +18,7 @@ import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
 import { useLoading } from '../app';
+import VoicePopout from '../pages/popOut/VoicePopout';
 import CanvasRoutes from './CanvasRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
@@ -40,9 +41,6 @@ const ChannelAppLayoutMobile = lazy(() => import(/* webpackChunkName: "layouts" 
 const Canvas = lazy(() => import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.Canvas })));
 const PreJoinCalling = lazy(() =>
 	import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.PreJoinCalling }))
-);
-const VoicePopout = lazy(() =>
-	import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.VoicePopout }))
 );
 
 const AppDirectory = lazy(() => import(/* webpackChunkName: "app-pages" */ '../pages/AppDirectory'));

@@ -1,11 +1,10 @@
-import { Canvas, PreJoinCalling, VoicePopout } from './lib/components';
+import { Canvas, PreJoinCalling } from './lib/components';
 
 export * from './lib/components';
 
 const ComponentsModule = {
 	Canvas,
-	PreJoinCalling,
-	VoicePopout
+	PreJoinCalling
 };
 
 export default ComponentsModule;

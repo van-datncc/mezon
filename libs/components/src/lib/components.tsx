@@ -109,7 +109,6 @@ export * from './components/HtmlCanvas';
 export { MentionFloatButton } from './components/MentionFloatButton';
 export { AudioAttachment } from './components/ThumbnailAttachmentRender/ThumbnailAttachmentRender';
 
-export { default as VoicePopout } from '../../../../apps/chat/src/app/pages/popOut/VoicePopout';
 export { default as PrivateThread } from './components/ChannelTopbar/TopBarComponents/Threads/CreateThread/PrivateThread';
 export { default as Topbar } from './components/ChannelTopbar/topbar';
 export { default as ChannelMessageThread } from './components/MessageBox/ReactionMentionInput/ChannelMessageThread';
