@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { ChannelApps } from '../pages/channel/ChannelApp';
 
-const CanvasLayout = () => {
+const ChannelAppLayoutMobile = () => {
 	const { channelId } = useParams();
 	const channelApp = useAppSelector((state) => selectAppChannelById(state, channelId || ''));
 	const appearanceTheme = useSelector(selectTheme);
@@ -16,4 +16,4 @@ const CanvasLayout = () => {
 	);
 };
 
-export default CanvasLayout;
+export default ChannelAppLayoutMobile;

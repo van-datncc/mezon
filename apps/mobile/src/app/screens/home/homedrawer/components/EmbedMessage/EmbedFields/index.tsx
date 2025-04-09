@@ -14,10 +14,15 @@ interface EmbedFieldsProps {
 	fields: IFieldEmbed[];
 }
 
+type radioChecked = {
+	id: string;
+	index: number;
+};
+
 export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [checked, setChecked] = useState<number[]>([]);
+	const [checked, setChecked] = useState<radioChecked[]>([]);
 	const dispatch = useAppDispatch();
 	const groupedFields = useMemo(() => {
 		return fields.reduce<IFieldEmbed[][]>((acc, field) => {
@@ -37,15 +42,15 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 
 	const handleCheckRadioButton = (index: number, option: IMessageRatioOption, radioId: string) => {
 		if (!option?.name) {
-			setChecked([index]);
+			setChecked([{ id: option?.value, index: index }]);
 			handleRadioValue(option?.value, radioId);
 			return;
 		}
-		if (checked.includes(index)) {
-			setChecked(checked.filter((check) => check !== index));
+		if (checked.some((check) => check?.index === index && check?.id === option?.value)) {
+			setChecked(checked.filter((check) => check?.index !== index && check?.id !== option?.value));
 			return;
 		}
-		setChecked([...checked, index]);
+		setChecked([...checked, { id: option?.value, index: index }]);
 		handleRadioValue(option?.value, radioId);
 	};
 
@@ -111,7 +116,9 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 													<EmbedRadioButton
 														key={`Embed_field_option_${optionItem}_${optionIndex}`}
 														option={optionItem}
-														checked={checked?.includes(optionIndex)}
+														checked={checked?.some(
+															(check) => check?.index === optionIndex && check?.id === optionItem?.value
+														)}
 														onCheck={() => handleCheckRadioButton(optionIndex, optionItem, fieldItem?.inputs?.id)}
 													/>
 												))}
