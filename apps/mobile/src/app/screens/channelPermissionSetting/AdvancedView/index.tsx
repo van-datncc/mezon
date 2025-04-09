@@ -1,9 +1,9 @@
 import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { selectAllUserChannel } from '@mezon/store';
-import { selectRolesByChannelId } from '@mezon/store-mobile';
+import { fetchUserChannels, rolesClanActions, selectRolesByChannelId, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -19,9 +19,15 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const { t } = useTranslation('channelSetting');
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
 	const allUserInChannel = useSelector(selectAllUserChannel(channel.channel_id));
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(rolesClanActions.fetchRolesClan({ clanId: channel?.clan_id }));
+		dispatch(fetchUserChannels({ channelId: channel?.channel_id }));
+	}, [channel?.channel_id]);
 
 	const listOfRoleAndMemberInChannel = useMemo(() => {
-		if ((!listOfChannelRole?.length && !allUserInChannel?.length) || !!channel?.channel_private) {
+		if ((!listOfChannelRole?.length && !allUserInChannel?.length) || !channel?.channel_private) {
 			return [];
 		}
 		return [
@@ -46,6 +52,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 				screen: APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES,
 				params: {
 					channelId: channel?.id,
+					clanId: channel?.clan_id,
 					id,
 					type
 				}
@@ -59,21 +66,28 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 			const { type, headerTitle, isShowHeader, role, member } = item;
 			if (!type && headerTitle && isShowHeader) {
 				return (
-					<View style={{ paddingTop: size.s_12, paddingLeft: size.s_12 }}>
+					<View style={{ paddingTop: size.s_12, paddingLeft: size.s_8, marginBottom: size.s_10 }}>
 						<Text color={themeValue.white} h4>
 							{headerTitle}:
 						</Text>
 					</View>
 				);
 			}
-			switch (type) {
-				case EOverridePermissionType.Member:
-					return <MemberItem member={member} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />;
-				case EOverridePermissionType.Role:
-					return <RoleItem role={role} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />;
-				default:
-					return <View />;
-			}
+			return (
+				<View style={{ backgroundColor: themeValue.primary, borderRadius: size.s_8, marginBottom: size.s_8 }}>
+					{type === EOverridePermissionType.Member ? (
+						!member?.user?.id || !member?.user?.username ? (
+							<View />
+						) : (
+							<MemberItem member={member} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />
+						)
+					) : type === EOverridePermissionType.Role ? (
+						<RoleItem role={role} channel={channel} isAdvancedSetting={true} onPress={navigateToPermissionOverridesDetail} />
+					) : (
+						<View />
+					)}
+				</View>
+			);
 		},
 		[channel, themeValue, navigateToPermissionOverridesDetail]
 	);
