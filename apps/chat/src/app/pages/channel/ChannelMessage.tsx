@@ -166,7 +166,7 @@ export const MemorizedChannelMessage = memo(
 		// prev.message.content === curr.message.content &&
 		prev.previousMessage?.id === curr.previousMessage?.id &&
 		prev.message?.code === curr.message?.code &&
-		prev.message?.references?.[0]?.message_ref_id === curr.message?.references?.[0]?.message_ref_id &&
+		prev.message?.references?.[0]?.content === curr.message?.references?.[0]?.content &&
 		prev.avatarDM === curr.avatarDM &&
 		prev.channelLabel === curr.channelLabel
 );

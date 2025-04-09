@@ -338,13 +338,13 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				</ItemPanel>
 			</GroupPanels>
 			<GroupPanels>
-				<ItemPanel
+				{/* <ItemPanel
 					children="Invite People"
 					onClick={() => {
 						dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
 						handClosePannel();
 					}}
-				/>
+				/> */}
 				<ItemPanel
 					children="Copy link"
 					onClick={() => {
