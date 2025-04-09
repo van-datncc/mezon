@@ -51,7 +51,7 @@ const ChannelMessageListener = React.memo(() => {
 				const data = {
 					snapPoints: ['50%', '80%'],
 					hiddenHeaderIndicator: true,
-					children: <UserProfile userId={clanUser?.user?.id} user={clanUser?.user} />
+					children: <UserProfile userId={clanUser?.user?.id} user={clanUser?.user} directId={currentDirectId} />
 				};
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 			} catch (error) {

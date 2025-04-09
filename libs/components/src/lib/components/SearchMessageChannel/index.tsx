@@ -283,7 +283,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	}, [handleSearchFocus]);
 
 	return (
-		<div className="relative" ref={inputRef}>
+		<div className="relative hidden sbm:block " ref={inputRef}>
 			<div
 				className={`transition-all duration-300 ${
 					expanded ? 'w-80' : 'w-40'

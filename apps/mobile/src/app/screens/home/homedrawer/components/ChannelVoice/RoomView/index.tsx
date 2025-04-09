@@ -120,8 +120,12 @@ const RoomView = ({
 		}
 	}, [isMicrophoneEnabled, localParticipant]);
 
-	const handleToggleScreenShare = useCallback(() => {
-		localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+	const handleToggleScreenShare = useCallback(async () => {
+		try {
+			await localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+		} catch (error) {
+			console.error('Error toggling screen share:', error);
+		}
 	}, [isScreenShareEnabled, localParticipant]);
 
 	const handleEndCall = useCallback(() => {

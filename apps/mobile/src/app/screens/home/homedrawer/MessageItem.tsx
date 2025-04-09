@@ -177,6 +177,7 @@ const MessageItem = React.memo(
 							showAction={!isDM}
 							currentChannel={currentChannel}
 							showRole={!isDM}
+							directId={channelId}
 						/>
 					)
 				};

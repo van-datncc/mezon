@@ -288,11 +288,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 	return (
 		<div className="flex items-center justify-center ">
 			{avatar ? (
-				<img
-					className="w-8 h-8 rounded-full object-cover"
-					src={createImgproxyUrl(avatar, { width: 32, height: 32, resizeType: 'fit' })}
-					alt=""
-				/>
+				<img className="w-8 h-8 rounded-full object-cover" src={createImgproxyUrl(avatar)} alt="" />
 			) : (
 				<div className="w-8 h-8 rounded-full uppercase flex items-center justify-center font-semibold dark:bg-bgAvatarDark bg-bgAvatarLight dark:text-bgAvatarLight text-bgAvatarDark">
 					{avatarName}
