@@ -25,6 +25,7 @@ export type GifStickerEmojiPopupOptions = {
 	buzzInputRequest?: RequestInput;
 	setBuzzInputRequest?: (value: RequestInput) => void;
 	toggleEmojiPanel?: () => void;
+	isTopic?: boolean;
 };
 
 export const GifStickerEmojiPopup = ({
@@ -33,7 +34,8 @@ export const GifStickerEmojiPopup = ({
 	channelOrDirect,
 	buzzInputRequest,
 	setBuzzInputRequest,
-	toggleEmojiPanel
+	toggleEmojiPanel,
+	isTopic = false
 }: GifStickerEmojiPopupOptions) => {
 	const { subPanelActive, setSubPanelActive, setValueInputSearch } = useGifsStickersEmoji();
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
@@ -123,6 +125,7 @@ export const GifStickerEmojiPopup = ({
 					buzzInputRequest={buzzInputRequest}
 					setBuzzInputRequest={setBuzzInputRequest}
 					toggleEmojiPanel={toggleEmojiPanel}
+					isTopic={isTopic}
 				/>
 			</div>
 		</div>
@@ -169,7 +172,8 @@ const ContentPanel = React.memo(
 		emojiAction,
 		buzzInputRequest,
 		setBuzzInputRequest,
-		toggleEmojiPanel
+		toggleEmojiPanel,
+		isTopic
 	}: {
 		subPanelActive: SubPanelName;
 		channelOrDirect?: ApiChannelDescription;
@@ -183,6 +187,7 @@ const ContentPanel = React.memo(
 		buzzInputRequest?: RequestInput;
 		setBuzzInputRequest?: (value: RequestInput) => void;
 		toggleEmojiPanel?: () => void;
+		isTopic: boolean;
 	}) => {
 		const isFocusTopicBox = useSelector(selectClickedOnTopicStatus);
 		const isFocusThreadBox = useSelector(selectClickedOnThreadBoxStatus);
@@ -198,6 +203,7 @@ const ContentPanel = React.memo(
 						channelOrDirect={channelOrDirect}
 						mode={channelMode as number}
 						onClose={onClose}
+						isTopic={isTopic}
 					/>
 				</div>
 			);
@@ -206,7 +212,7 @@ const ContentPanel = React.memo(
 		if (subPanelActive === SubPanelName.STICKERS) {
 			return (
 				<div className={`flex h-full pr-2 w-full ${contentWidthClass}`}>
-					<StickerSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
+					<StickerSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} isTopic={isTopic} />
 				</div>
 			);
 		}
@@ -227,14 +233,15 @@ const ContentPanel = React.memo(
 						buzzInputRequest={buzzInputRequest}
 						setBuzzInputRequest={setBuzzInputRequest}
 						toggleEmojiPanel={toggleEmojiPanel}
+						isFromTopicView={!!isTopic}
 					/>
 				</div>
 			);
 		}
 		if (subPanelActive === SubPanelName.SOUNDS) {
 			return (
-				<div className={`flex h-full pr-2 w-full sbm:w-[312px] ${contentWidthClass}`}>
-					<SoundSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} />
+				<div className={`flex h-full pr-2 w-full ${contentWidthClass}`}>
+					<SoundSquare channel={channelOrDirect} mode={channelMode as number} onClose={onClose} isTopic={isTopic} />
 				</div>
 			);
 		}

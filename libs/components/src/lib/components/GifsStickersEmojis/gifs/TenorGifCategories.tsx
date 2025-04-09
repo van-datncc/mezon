@@ -1,23 +1,27 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectDataReferences } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { IGifCategory, IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
-import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { IGifCategory, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { ApiChannelDescription, ApiMessageRef } from 'mezon-js/api.gen';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import FeaturedGifs from './FeaturedGifs';
 import GifCategory from './GifCategory';
 
 type ChannelMessageBoxProps = {
-	// activeTab use TenorGifCategories
-	activeTab: SubPanelName;
-	channelOrDirect: ApiChannelDescription | undefined;
+	activeTab?: SubPanelName;
+	channelOrDirect?: ApiChannelDescription;
 	mode: number;
 	onClose: () => void;
+	isTopic?: boolean;
 };
 
-function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBoxProps) {
-	const { sendMessage } = useChatSending({ channelOrDirect: channelOrDirect ?? undefined, mode });
+function TenorGifCategories({ channelOrDirect, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
+	const { sendMessage } = useChatSending({
+		channelOrDirect: channelOrDirect ?? undefined,
+		mode,
+		fromTopic: isTopic
+	});
 	const {
 		dataGifCategories,
 		dataGifsSearch,
@@ -29,18 +33,22 @@ function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBo
 		setShowCategories,
 		setButtonArrowBack
 	} = useGifs();
+
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const [dataToRenderGifs, setDataToRenderGifs] = useState<any>();
 	const { setSubPanelActive } = useGifsStickersEmoji();
+
 	const ontrendingClickingStatus = () => {
 		setClickedTrendingGif(true);
 		setShowCategories(false);
 		setButtonArrowBack(true);
 	};
+
 	const currentId = useCurrentInbox()?.channel_id;
 	const dataReferences = useSelector(selectDataReferences(currentId ?? ''));
 	const isReplyAction = dataReferences.message_ref_id && dataReferences.message_ref_id !== '';
 	const dispatch = useDispatch();
+
 	useEffect(() => {
 		if (dataGifsSearch.length > 0 && valueInputToCheckHandleSearch !== '') {
 			setDataToRenderGifs(dataGifsSearch);
@@ -53,21 +61,9 @@ function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBo
 		}
 	}, [dataGifsSearch, trendingClickingStatus, valueInputToCheckHandleSearch]);
 
-	const handleSend = useCallback(
-		(
-			content: IMessageSendPayload,
-			mentions?: Array<ApiMessageMention>,
-			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>
-		) => {
-			sendMessage(content, mentions, attachments, references);
-		},
-		[sendMessage]
-	);
-
 	const handleClickGif = (giftUrl: string) => {
 		if (isReplyAction) {
-			handleSend({ t: '' }, [], [{ url: giftUrl }], [dataReferences]);
+			sendMessage({ t: '' }, [], [{ url: giftUrl }], [dataReferences]);
 			dispatch(
 				referencesActions.setDataReferences({
 					channelId: currentId as string,
@@ -75,7 +71,7 @@ function TenorGifCategories({ channelOrDirect, mode, onClose }: ChannelMessageBo
 				})
 			);
 		} else {
-			handleSend({ t: '' }, [], [{ url: giftUrl, filetype: 'gif' }], []);
+			sendMessage({ t: '' }, [], [{ url: giftUrl, filetype: 'gif' }], []);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};

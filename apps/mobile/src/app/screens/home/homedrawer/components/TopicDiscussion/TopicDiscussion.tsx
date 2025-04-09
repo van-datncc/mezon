@@ -1,15 +1,7 @@
 import { ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import {
-	appActions,
-	messagesActions,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectCurrentTopicId,
-	topicsActions,
-	useAppDispatch
-} from '@mezon/store-mobile';
+import { messagesActions, selectCurrentChannel, selectCurrentClanId, selectCurrentTopicId, topicsActions, useAppDispatch } from '@mezon/store-mobile';
 import { checkIsThread, isPublicChannel } from '@mezon/utils';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { KeyboardAvoidingView, Platform, StatusBar, View } from 'react-native';
@@ -88,16 +80,6 @@ export default function TopicDiscussion() {
 			}
 		},
 		[navigation]
-	);
-
-	useFocusEffect(
-		useCallback(() => {
-			dispatch(appActions.setIsFocusOnChannelInput(false));
-
-			return () => {
-				dispatch(appActions.setIsFocusOnChannelInput(true));
-			};
-		}, [dispatch])
 	);
 
 	const onGoBack = useCallback(() => {

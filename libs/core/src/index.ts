@@ -38,6 +38,7 @@ export * from './lib/chat/hooks/useCurrentChat';
 export * from './lib/chat/hooks/useDeleteMessage';
 export * from './lib/chat/hooks/useDirect';
 export * from './lib/chat/hooks/useDirectMembers';
+export * from './lib/chat/hooks/useDraftCompose';
 export * from './lib/chat/hooks/useDragAndDrop';
 export * from './lib/chat/hooks/useDragAndDropRole';
 export * from './lib/chat/hooks/useEditMessage';

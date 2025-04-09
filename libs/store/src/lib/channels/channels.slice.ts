@@ -8,7 +8,6 @@ import {
 	IChannel,
 	LoadingStatus,
 	ModeResponsive,
-	RequestInput,
 	TypeCheck,
 	checkIsThread,
 	mapChannelToAppEntity
@@ -97,7 +96,6 @@ export interface ChannelsState {
 			currentChannelId?: string | null;
 			selectedChannelId?: string | null;
 			currentVoiceChannelId: string;
-			request: Record<string, RequestInput>;
 			idChannelSelected: Record<string, string>;
 			modeResponsive: ModeResponsive.MODE_CLAN | ModeResponsive.MODE_DM;
 			previousChannels: Array<{ clanId: string; channelId: string }>;
@@ -126,7 +124,6 @@ const getInitialClanState = () => {
 		currentChannelId: null,
 		selectedChannelId: null,
 		currentVoiceChannelId: '',
-		request: {},
 		idChannelSelected: {},
 		modeResponsive: ModeResponsive.MODE_DM,
 		previousChannels: [],
@@ -1051,14 +1048,6 @@ export const channelsSlice = createSlice({
 			}
 		},
 
-		setRequestInput: (state, action: PayloadAction<{ clanId: string; channelId: string; request: RequestInput }>) => {
-			const { clanId, channelId, request } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
-			state.byClans[clanId].request[channelId] = request;
-		},
-
 		setIdChannelSelected: (state, action: PayloadAction<{ clanId: string; channelId: string }>) => {
 			const { clanId, channelId } = action.payload;
 			if (clanId && channelId) {
@@ -1176,8 +1165,6 @@ export const channelsSlice = createSlice({
 			state,
 			action: PayloadAction<{ clanId: string; channelId: string; appChannel: ApiChannelAppResponseExtend }>
 		) => {
-			console.log('setAppChannelsListShowOnPopUp');
-
 			const { clanId, channelId, appChannel } = action.payload;
 
 			state.byClans[clanId] = state.byClans[clanId] ?? getInitialClanState();
@@ -1552,11 +1539,6 @@ export const selectDefaultChannelIdByClanId = createSelector(
 		const defaultChannel = channels.find((channel) => channel.parent_id === '0' && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL);
 		return defaultChannel ? defaultChannel.id : null;
 	}
-);
-
-export const selectRequestByChannelId = createSelector(
-	[getChannelsState, (state: RootState) => state.clans.currentClanId as string, (state, channelId: string) => channelId],
-	(state, clanId, channelId) => state.byClans[clanId]?.request[channelId] ?? null
 );
 
 export const selectAllIdChannelSelected = createSelector(
