@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useRef } from 'react';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native';
 import ChannelMessagesWrapper from '../../home/homedrawer/ChannelMessagesWrapper';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
 import PanelKeyboard from '../../home/homedrawer/PanelKeyboard';
@@ -25,7 +25,7 @@ export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClan
 	}, []);
 
 	return (
-		<KeyboardAvoidingView style={styles.content} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
+		<KeyboardAvoidingView style={styles.content} behavior={'padding'} keyboardVerticalOffset={0}>
 			<ChannelMessagesWrapper
 				channelId={directMessageId}
 				clanId={'0'}

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, KeyboardAvoidingView, Platform, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ChannelAppHotbar from './ChannelAppHotbar';
@@ -68,32 +68,30 @@ const HomeDefault = React.memo(
 		}, []);
 
 		return (
-			<View style={[styles.homeDefault]}>
+			<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={0}>
 				{Platform.OS === 'ios' && <LicenseAgreement />}
 				<DrawerListener />
 				<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
-				<KeyboardAvoidingView style={styles.channelView} behavior={'padding'} keyboardVerticalOffset={Platform.OS === 'ios' ? 54 : 0}>
-					<ChannelMessagesWrapper
-						channelId={channelId}
-						clanId={clanId}
-						isPublic={isPublicChannel}
-						mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-					/>
-					{isChannelApp && <ChannelAppHotbar channelId={channelId} />}
-					<ChatBox
-						channelId={channelId}
-						mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-						onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
-						hiddenIcon={{
-							threadIcon: channelType === ChannelType.CHANNEL_TYPE_THREAD
-						}}
-						isPublic={isPublicChannel}
-					/>
-					<PanelKeyboard ref={panelKeyboardRef} currentChannelId={channelId} currentClanId={clanId} />
-				</KeyboardAvoidingView>
+				<ChannelMessagesWrapper
+					channelId={channelId}
+					clanId={clanId}
+					isPublic={isPublicChannel}
+					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+				/>
+				{isChannelApp && <ChannelAppHotbar channelId={channelId} />}
+				<ChatBox
+					channelId={channelId}
+					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+					onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
+					hiddenIcon={{
+						threadIcon: channelType === ChannelType.CHANNEL_TYPE_THREAD
+					}}
+					isPublic={isPublicChannel}
+				/>
+				<PanelKeyboard ref={panelKeyboardRef} currentChannelId={channelId} currentClanId={clanId} />
 
 				<AgeRestrictedModal />
-			</View>
+			</KeyboardAvoidingView>
 		);
 	},
 	(prevProps, nextProps) => {
