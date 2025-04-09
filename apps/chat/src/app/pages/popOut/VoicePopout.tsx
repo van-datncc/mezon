@@ -15,7 +15,7 @@ import {
 import { ParticipantMeetState } from '@mezon/utils';
 import React, { useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { MyVideoConference } from '../MyVideoConference/MyVideoConference';
+import { MyVideoConference } from '../../../../../../libs/components/src/lib/components/VoiceChannel/MyVideoConference/MyVideoConference';
 
 const VoicePopout: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
