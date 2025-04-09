@@ -7,7 +7,7 @@ import {
 	usePinnedTracks,
 	useTracks
 } from '@livekit/components-react';
-import { ChannelsEntity, selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
@@ -22,13 +22,13 @@ import { GridLayout } from './GridLayout/GridLayout';
 import { ParticipantTile } from './ParticipantTile/ParticipantTile';
 
 interface MyVideoConferenceProps {
-	channel?: ChannelsEntity;
+	channelLabel?: string;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
 	isExternalCalling?: boolean;
 }
 
-export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, isExternalCalling = false }: MyVideoConferenceProps) {
+export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isExternalCalling = false }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 	const tracks = useTracks(
@@ -196,9 +196,7 @@ export function MyVideoConference({ channel, onLeaveRoom, onFullScreen, isExtern
 										<Icons.SpeakerLocked defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
 									)}
 								</span>
-								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>
-									{channel?.channel_label ?? 'Private Room'}
-								</p>
+								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>{channelLabel}</p>
 							</div>
 							<div className="flex justify-start gap-4">
 								{!isExternalCalling && (
