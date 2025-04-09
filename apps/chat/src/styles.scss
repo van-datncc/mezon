@@ -105,6 +105,13 @@
 	border-radius: 5px;
 }
 
+@media (max-width: 480px) {
+	#editorReactMentionChannel::placeholder {
+		height: 0;
+		overflow: hidden;
+	}
+}
+
 #editorReactMentionChannel::-webkit-scrollbar {
 	width: 4px;
 }
