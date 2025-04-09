@@ -102,6 +102,7 @@ export default class App {
 			titleBarOverlay: process.platform == 'darwin' ? true : false,
 			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
 			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
+			fullscreenable: false,
 			webPreferences: {
 				nodeIntegration: false,
 				contextIsolation: true,

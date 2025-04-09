@@ -97,11 +97,11 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 								selectedButton={selectedButton}
 							/>
 						)}
-						<ChannelSettingItemButton
+						{/* <ChannelSettingItemButton
 							tabName={EChannelSettingTab.INVITES}
 							handleOnClick={handleButtonClick}
 							selectedButton={selectedButton}
-						/>
+						/> */}
 					</>
 				)}
 				{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
