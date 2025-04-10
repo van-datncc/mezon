@@ -93,7 +93,6 @@ const AppLayout = () => {
 		currentUserId && notificationService.setCurrentUserId(currentUserId);
 	}, [currentUserId]);
 
-	// TODO: move this to a firebase context
 	useEffect(() => {
 		if (!isLogin) {
 			notificationService.isActive && notificationService.close();
@@ -115,6 +114,21 @@ const AppLayout = () => {
 				console.error(error);
 			});
 	}, [isLogin]);
+
+	const navigate = useCustomNavigate();
+	useEffect(() => {
+		const handleCustomNavigation = (event: CustomEvent) => {
+			if (event.detail && event.detail.url) {
+				navigate(event.detail.url);
+			}
+		};
+
+		window.addEventListener('mezon:navigate', handleCustomNavigation as EventListener);
+
+		return () => {
+			window.removeEventListener('mezon:navigate', handleCustomNavigation as EventListener);
+		};
+	}, [navigate]);
 
 	return (
 		<MezonUiProvider themeName={theme}>

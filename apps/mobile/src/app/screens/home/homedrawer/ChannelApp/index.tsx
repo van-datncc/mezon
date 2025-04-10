@@ -1,11 +1,10 @@
 /* eslint-disable no-empty */
 import { useClans } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
-import { useRef, useState } from 'react';
-import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -13,7 +12,7 @@ import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
 import { style } from './styles';
 
-const ChannelAppScreen = ({ channelId }) => {
+const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const authState = useSelector(getAuthState);
@@ -21,6 +20,21 @@ const ChannelAppScreen = ({ channelId }) => {
 	const [loading, setLoading] = useState(true);
 	const { currentClanId } = useClans();
 	const webviewRef = useRef<WebView>(null);
+	const [orientation, setOrientation] = useState<'Portrait' | 'Landscape'>('Portrait');
+
+	useEffect(() => {
+		const handleOrientationChange = () => {
+			const { width, height } = Dimensions.get('window');
+			setOrientation(width > height ? 'Landscape' : 'Portrait');
+		};
+		const subscription = Dimensions.addEventListener('change', handleOrientationChange);
+
+		handleOrientationChange();
+
+		return () => {
+			subscription?.remove();
+		};
+	}, []);
 
 	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${currentClanId}/${channelId}`;
 	const injectedJS = `
@@ -59,15 +73,20 @@ const ChannelAppScreen = ({ channelId }) => {
         .h-heightTopBar {
           display: none !important;
         }
+        .footer-profile {
+          display: none !important;
+        }
+       .contain-strict {
+          display: none !important;
+        }
+        .bg-bgLightModeSecond {
+        	padding-left: 0;
+				}
       \`;
       document.head.appendChild(style);
     })();
 	true;
   `;
-
-	const closeChannelApp = () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-	};
 
 	const reloadChannelApp = () => {
 		webviewRef?.current?.reload();
@@ -94,16 +113,13 @@ const ChannelAppScreen = ({ channelId }) => {
 					<Text style={styles.textLoading}>Loading data, please wait a moment!</Text>
 				</View>
 			)}
-			<View style={styles.topBar}>
-				<TouchableOpacity onPress={closeChannelApp} style={styles.backButton}>
-					<MezonIconCDN icon={IconCDN.closeLargeIcon} height={size.s_20} width={size.s_20} />
-				</TouchableOpacity>
-				<View style={styles.row}>
-					<TouchableOpacity onPress={reloadChannelApp} style={styles.backButton}>
-						<MezonIconCDN icon={IconCDN.reloadIcon} height={size.s_20} width={size.s_20} />
-					</TouchableOpacity>
-				</View>
-			</View>
+			<View style={{ height: orientation === 'Portrait' ? size.s_42 : 0 }} />
+			<TouchableOpacity onPress={closeChannelApp} style={styles.backButton}>
+				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={size.s_16} width={size.s_16} />
+			</TouchableOpacity>
+			<TouchableOpacity onPress={reloadChannelApp} style={styles.reloadButton}>
+				<MezonIconCDN icon={IconCDN.reloadIcon} height={size.s_16} width={size.s_16} />
+			</TouchableOpacity>
 			<WebView
 				ref={webviewRef}
 				source={{

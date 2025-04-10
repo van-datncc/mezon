@@ -6,8 +6,13 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
 			flex: 1,
-			height: height * 0.85,
-			backgroundColor: colors.primary
+			height: '100%',
+			width: '100%',
+			backgroundColor: colors.primary,
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			zIndex: 100000000
 		},
 		containerWebview: {
 			width: '100%',
@@ -21,23 +26,39 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			alignItems: 'center',
 			position: 'absolute',
-			top: -1,
+			top: 0,
 			left: 0,
 			zIndex: 1000,
-			backgroundColor: colors.primary,
-			width: '100%'
+			width: '100%',
+			backgroundColor: 'red'
 		},
 		row: {
 			flexDirection: 'row',
 			gap: size.s_10
 		},
 		backButton: {
-			height: size.s_40,
-			width: size.s_40,
-			borderRadius: size.s_20,
+			height: size.s_30,
+			width: size.s_30,
+			borderRadius: size.s_30,
 			backgroundColor: colors.bgInputPrimary,
 			justifyContent: 'center',
-			alignItems: 'center'
+			alignItems: 'center',
+			position: 'absolute',
+			top: size.s_6,
+			left: size.s_10,
+			zIndex: 1000
+		},
+		reloadButton: {
+			height: size.s_30,
+			width: size.s_30,
+			borderRadius: size.s_30,
+			backgroundColor: colors.bgInputPrimary,
+			justifyContent: 'center',
+			alignItems: 'center',
+			position: 'absolute',
+			top: size.s_6,
+			right: size.s_10,
+			zIndex: 1000
 		},
 		title: {
 			fontSize: size.s_20,

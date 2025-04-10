@@ -16,6 +16,7 @@ type IMezonDateTimePicker = Omit<IMezonFakeBoxProps, 'onPress' | 'postfixIcon' |
 	error?: string;
 	containerStyle?: StyleProp<ViewStyle>;
 	maximumDate?: Date;
+	display?: string;
 };
 
 export default memo(function MezonDateTimePicker({
@@ -28,6 +29,7 @@ export default memo(function MezonDateTimePicker({
 	error,
 	containerStyle,
 	maximumDate,
+	display,
 	...props
 }: IMezonDateTimePicker) {
 	const { themeValue, themeBasic } = useTheme();
@@ -98,13 +100,13 @@ export default memo(function MezonDateTimePicker({
 							{...(need24HourFormat && isModeTime ? need24HourFormat : {})}
 							{...(needLocale && isModeTime ? needLocale : {})}
 							value={dateRef?.current || new Date()}
-							display={isModeTime ? 'spinner' : 'default'}
+							display={isModeTime ? 'spinner' : display ? display : 'default'}
 							is24Hour
 							onChange={onChange}
 							mode={mode}
 							themeVariant={themeBasic === ThemeModeBase.DARK ? 'dark' : 'light'}
 							{...(maximumDate ? { maximumDate } : {})}
-							style={{ backgroundColor: themeValue.primary }}
+							// style={{ backgroundColor: themeValue.primary }}
 							textColor={themeValue.textStrong}
 						/>
 					</View>

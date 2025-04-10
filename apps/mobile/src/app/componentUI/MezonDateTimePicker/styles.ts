@@ -25,7 +25,8 @@ export const style = (colors: Attributes) =>
 		bsContainer: {
 			paddingHorizontal: Metrics.size.xl,
 			flexDirection: 'row',
-			justifyContent: 'center'
+			justifyContent: 'center',
+			marginBottom: size.s_10
 		},
 
 		sectionTitle: {
