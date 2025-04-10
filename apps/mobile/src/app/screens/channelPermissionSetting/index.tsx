@@ -81,7 +81,8 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 				<TouchableOpacity onPress={() => navigation.goBack()}>
 					<View
 						style={{
-							marginTop: size.s_16
+							marginTop: size.s_8,
+							marginLeft: size.s_10
 						}}
 					>
 						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
