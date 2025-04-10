@@ -25,9 +25,8 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingVertical: size.s_30,
-		paddingHorizontal: size.s_10,
-		backgroundColor: Colors.secondary
+		paddingBottom: size.s_30,
+		paddingHorizontal: size.s_10
 	},
 	titleHeader: {
 		fontSize: size.s_20,
