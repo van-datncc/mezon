@@ -1,5 +1,12 @@
 import { ACTIVE_TAB, ETypeSearch, IUerMention } from '@mezon/mobile-components';
-import { DirectEntity, selectAllInfoChannels, selectAllUsersByUser, selectTotalResultSearchMessage } from '@mezon/store-mobile';
+import {
+	DirectEntity,
+	listChannelsByUserActions,
+	selectAllChannelsByUser,
+	selectAllUsersByUser,
+	selectTotalResultSearchMessage,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,9 +29,14 @@ interface ISearchMessagePageProps {
 function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMessagePage, typeSearch }: ISearchMessagePageProps) {
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
-	const listChannels = useSelector(selectAllInfoChannels);
+	const listChannels = useSelector(selectAllChannelsByUser);
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true, isClearChannel: true }));
+	}, [dispatch]);
 
 	const channelsSearch = useMemo(() => {
 		if (!searchText) return listChannels;
