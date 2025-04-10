@@ -64,7 +64,6 @@ const NavigationMain = memo(
 			>
 				<NetInfoComp />
 				<RootListener />
-				{/*<MezonUpdateVersionModal visible={isShowUpdateModal} onClose={() => setIsShowUpdateModal(false)} />*/}
 				<RootStack {...props} />
 			</NavigationContainer>
 		);
