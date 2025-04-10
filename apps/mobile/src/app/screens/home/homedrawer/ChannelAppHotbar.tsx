@@ -1,7 +1,6 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { useCallback } from 'react';
-import { DeviceEventEmitter, Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import ChannelAppScreen from './ChannelApp';
 import { style } from './styles';
 
@@ -12,15 +11,17 @@ type channelAppHotBarProps = {
 const ChannelAppHotbar = ({ channelId }: channelAppHotBarProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const [isShowChannelApp, setIsShowChannelApp] = useState<boolean>(false);
+	const openChannelApp = useCallback(() => {
+		setIsShowChannelApp(true);
+	}, []);
+	const closeChannelApp = useCallback(() => {
+		setIsShowChannelApp(false);
+	}, []);
 
-	const openBottomSheet = useCallback(() => {
-		Keyboard.dismiss();
-		const data = {
-			snapPoint: ['100%'],
-			children: <ChannelAppScreen channelId={channelId} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-	}, [channelId]);
+	if (isShowChannelApp) {
+		return <ChannelAppScreen channelId={channelId} closeChannelApp={closeChannelApp} />;
+	}
 
 	return (
 		<View
@@ -33,7 +34,7 @@ const ChannelAppHotbar = ({ channelId }: channelAppHotBarProps) => {
 				backgroundColor: themeValue.primary
 			}}
 		>
-			<TouchableOpacity style={styles.channelAppButton} onPress={openBottomSheet}>
+			<TouchableOpacity style={styles.channelAppButton} onPress={openChannelApp}>
 				<Text style={styles.messageText}>Launch App</Text>
 			</TouchableOpacity>
 			<TouchableOpacity style={styles.channelAppButton}>
