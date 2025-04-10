@@ -1,6 +1,5 @@
 import { ChatContext } from '@mezon/core';
 import {
-	debounce,
 	getAttachmentUnique,
 	getUpdateOrAddClanChannelCache,
 	PenIcon,
@@ -27,8 +26,8 @@ import {
 } from '@mezon/store-mobile';
 import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
+import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Image as ImageRN, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -37,6 +36,7 @@ import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { useDispatch, useSelector } from 'react-redux';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -73,7 +73,6 @@ export const Sharing = ({ data, onClose }) => {
 	const session = mezon.sessionRef.current;
 	const [attachmentUpload, setAttachmentUpload] = useState<any>([]);
 	const { handleReconnect } = useContext(ChatContext);
-	const navigation = useNavigation<any>();
 	const dataMedia = useMemo(() => {
 		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
@@ -116,14 +115,10 @@ export const Sharing = ({ data, onClose }) => {
 		if (listChannelsText || listDMText) setDataShareTo([...listChannelsText, ...listDMText]);
 	}, [listChannelsText, listDMText]);
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const debouncedSetSearchText = useCallback(
-		debounce((text) => setSearchText(text), 300),
-		[]
-	);
-
+	const debouncedSetSearchText = useMemo(() => debounce((value) => setSearchText(value), 200), []);
 	const generateChannelMatch = (data: any, DMList: any, searchText: string) => {
 		const matchChannels = [...DMList, ...data].filter((channel: { channel_label?: string | number }) =>
-			channel.channel_label?.toString()?.toLowerCase()?.includes(searchText?.toLowerCase())
+			channel.channel_label?.toString()?.trim()?.toLowerCase()?.includes(searchText?.trim()?.toLowerCase())
 		);
 		if (matchChannels.length > 0) {
 			const matchIdList = new Set(matchChannels.map((item) => item.channel_id));
@@ -419,6 +414,7 @@ export const Sharing = ({ data, onClose }) => {
 
 	return (
 		<View style={styles.wrapper}>
+			<StatusBarHeight />
 			<View style={styles.header}>
 				<TouchableOpacity onPress={onClose}>
 					<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_28} height={size.s_28} />

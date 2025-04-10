@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
-			maxWidth: '95%',
+			maxWidth: '90%',
 			borderRadius: size.s_12,
 			overflow: 'hidden',
 			marginTop: size.s_4,
@@ -14,13 +14,12 @@ export const style = (colors: Attributes) =>
 		},
 		info: {
 			flexDirection: 'row',
-			justifyContent: 'center',
-			marginBottom: size.s_4,
-			paddingHorizontal: size.s_8
+			marginBottom: size.s_4
 		},
 		title: {
 			color: colors.text,
 			fontSize: size.s_14,
+			marginBottom: size.s_2,
 			fontWeight: 'bold'
 		},
 		lightTitle: {
@@ -29,7 +28,7 @@ export const style = (colors: Attributes) =>
 		},
 		seperatedItem: {
 			height: 1,
-			backgroundColor: colors.borderDim
+			backgroundColor: colors.primary
 		},
 		transaction: {
 			justifyContent: 'center',

@@ -39,7 +39,7 @@ const CachedImageWithRetryIOS = ({ source, retryCount = 3, style, ...props }) =>
 
 	return (
 		<View style={[styles.container, style]}>
-			{loading && <ActivityIndicator style={styles.loader} size="small" color="#000" />}
+			{loading && <ActivityIndicator style={styles.loader} size="small" color="#333333" />}
 			<FastImage
 				key={`${key}_${retriesLeft}_${source?.url}`} // Unique key to force re-render
 				source={{
