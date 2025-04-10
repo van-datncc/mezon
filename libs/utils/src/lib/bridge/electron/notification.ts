@@ -172,6 +172,7 @@ export class MezonNotificationService {
 				link: link ?? ''
 			}
 		});
+
 		notification.onclick = (event) => {
 			event.preventDefault();
 			if (!link) {
@@ -180,6 +181,14 @@ export class MezonNotificationService {
 			const existingWindow = window.open('', '_self');
 			if (existingWindow) {
 				existingWindow.focus();
+				const notificationUrl = new URL(link);
+				const path = notificationUrl.pathname;
+				window.dispatchEvent(
+					new CustomEvent('mezon:navigate', {
+						detail: { url: path }
+					})
+				);
+			} else {
 				window.location.href = link;
 			}
 		};

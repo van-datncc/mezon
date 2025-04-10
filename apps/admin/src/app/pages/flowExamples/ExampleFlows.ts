@@ -69,7 +69,7 @@ const ExampleFlow: IExampleFlow[] = [
 							nodeId: '1f076ab8-034a-4f3c-b8e3-963c269e9586',
 							parameterKey: 'image',
 							parameterValue:
-								'["https://cdn.mezon.vn/0/0/1831890355411226600/932_undefinedtin_tuc_3.jpg","https://cdn.mezon.vn/0/0/1831890355411226600/634_undefinedtin_tuc_4.jpg","https://cdn.mezon.vn/0/0/1831890355411226600/637_undefinedtin_tuc_8.jpg"]',
+								'["https://cdn.mezon.ai/0/0/1831890355411226600/932_undefinedtin_tuc_3.jpg","https://cdn.mezon.ai/0/0/1831890355411226600/634_undefinedtin_tuc_4.jpg","https://cdn.mezon.ai/0/0/1831890355411226600/637_undefinedtin_tuc_8.jpg"]',
 							id: 'e277134f-a522-439b-96df-996475717be4'
 						}
 					],
@@ -85,9 +85,9 @@ const ExampleFlow: IExampleFlow[] = [
 			output: {
 				message: 'hello, this is an example command flow example',
 				image: [
-					'https://cdn.mezon.vn/0/0/1831890355411226600/932_undefinedtin_tuc_3.jpg',
-					'https://cdn.mezon.vn/0/0/1831890355411226600/634_undefinedtin_tuc_4.jpg',
-					'https://cdn.mezon.vn/0/0/1831890355411226600/637_undefinedtin_tuc_8.jpg'
+					'https://cdn.mezon.ai/0/0/1831890355411226600/932_undefinedtin_tuc_3.jpg',
+					'https://cdn.mezon.ai/0/0/1831890355411226600/634_undefinedtin_tuc_4.jpg',
+					'https://cdn.mezon.ai/0/0/1831890355411226600/637_undefinedtin_tuc_8.jpg'
 				]
 			}
 		}
