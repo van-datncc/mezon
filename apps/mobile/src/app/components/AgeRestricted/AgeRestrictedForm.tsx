@@ -39,7 +39,7 @@ const AgeRestrictedForm = ({ onClose }: { onClose: () => void }) => {
 				<Text style={styles.title}>{t('ageRestrictedForm.title')}</Text>
 				<Text style={styles.description}>{t('ageRestrictedForm.description')}</Text>
 			</View>
-			<MezonDateTimePicker value={date} onChange={handleDatePicked} containerStyle={styles.datePicker} />
+			<MezonDateTimePicker value={date} onChange={handleDatePicked} containerStyle={styles.datePicker} display={'inline'} />
 			<View>
 				<TouchableOpacity style={styles.buttonSubmit} onPress={handleSubmit}>
 					<Text style={styles.btnText}>{t('ageRestrictedForm.submit')}</Text>

@@ -40,7 +40,7 @@ export const style = (colors: Attributes) =>
 			fontWeight: 'bold'
 		},
 		datePicker: {
-			backgroundColor: colors.textLink,
+			backgroundColor: colors.secondaryLight,
 			marginVertical: size.s_20
 		}
 	});

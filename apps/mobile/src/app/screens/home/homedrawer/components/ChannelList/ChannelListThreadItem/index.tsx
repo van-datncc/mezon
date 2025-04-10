@@ -35,7 +35,7 @@ const ChannelListThreadItem = ({ onLongPress, thread, isActive }: IChannelListTh
 	return (
 		<View key={thread.id} style={[styles.channelListLink]}>
 			<View style={[styles.threadItem]}>
-				<View style={{ top: -size.s_20 }}>
+				<View style={{ top: -size.s_20, left: -size.s_2 }}>
 					<MezonIconCDN icon={IconCDN.longCorner} height={size.s_36} width={size.s_12} color={'#535353'} />
 					{/*hardcode virtual view to connect thread lines */}
 					<View
