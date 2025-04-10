@@ -249,7 +249,7 @@ export const convertMarkdown = (markdown: string, type: EBacktickType): string =
 };
 
 export const getSrcEmoji = (id: string) => {
-	return process.env.NX_BASE_IMG_URL + 'emojis/' + id + '.webp';
+	return process.env.NX_BASE_IMG_URL + '/emojis/' + id + '.webp';
 };
 
 export const checkLastChar = (text: string) => {
