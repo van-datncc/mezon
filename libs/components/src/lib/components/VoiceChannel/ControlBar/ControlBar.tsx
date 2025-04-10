@@ -20,9 +20,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModal';
+import { BackgroundEffectsMenu } from './BackgroundEffectsMenu';
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
 import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
+
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 	variation?: 'minimal' | 'verbose' | 'textOnly';
@@ -278,6 +280,7 @@ export function ControlBar({
 							kind="videoinput"
 							onActiveDeviceChange={(_kind, deviceId) => saveVideoInputDeviceId(deviceId ?? 'default')}
 						/>
+						{showCamera && <BackgroundEffectsMenu participant={localParticipant.localParticipant} />}
 					</div>
 				)}
 				{visibleControls.screenShare && browserSupportsScreenSharing && (
