@@ -53,7 +53,17 @@ function ChannelVoice({
 		});
 		await AudioSession.startAudioSession();
 		InCallManager.start({ media: 'audio' });
-		InCallManager.setSpeakerphoneOn(true);
+		if (Platform.OS === 'ios') {
+			await AudioSession.configureAudio({
+				ios: {
+					defaultOutput: 'speaker'
+				}
+			});
+			InCallManager.setSpeakerphoneOn(true);
+			InCallManager.setForceSpeakerphoneOn(true);
+		} else {
+			InCallManager.setSpeakerphoneOn(true);
+		}
 	};
 
 	const stopAudioCall = async () => {
