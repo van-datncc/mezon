@@ -55,8 +55,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		}
 	};
 	return (
-		<div className="outline-none justify-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
-			<div className={`relative w-full mt-[5%] sm:h-auto rounded-lg max-w-[600px] `}>
+		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
+			<div className={`relative w-full sm:h-auto rounded-lg max-w-[600px] `}>
 				<div className="rounded-t-lg text-sm overflow-hidden">
 					<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
 						<div>
