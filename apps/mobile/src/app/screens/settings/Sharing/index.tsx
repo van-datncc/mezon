@@ -24,7 +24,7 @@ import {
 	selectDirectsOpenlist,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { createUploadFilePath, handleUploadFileMobile, useMezon } from '@mezon/transport';
+import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import debounce from 'lodash.debounce';
@@ -103,13 +103,6 @@ export const Sharing = ({ data, onClose }) => {
 			convertFileFormat();
 		}
 	}, [dataMedia]);
-
-	const getFullFileName = useCallback(
-		(fileName: string) => {
-			return createUploadFilePath(session, currentClan?.id, currentChannelId, fileName, true);
-		},
-		[currentChannelId, currentClan?.id, session]
-	);
 
 	useEffect(() => {
 		if (listChannelsText || listDMText) setDataShareTo([...listChannelsText, ...listDMText]);
@@ -294,7 +287,8 @@ export const Sharing = ({ data, onClose }) => {
 		try {
 			const fileFormats = await Promise.all(
 				dataMedia.map(async (media) => {
-					const fileName = getFullFileName(media?.fileName || media?.contentUri || media?.filePath);
+					if (!media?.filePath && !media?.contentUri) return null;
+					const fileName = media?.fileName || media?.contentUri || media?.filePath;
 					setAttachmentUpload((prev) => [
 						...prev,
 						{ url: media?.contentUri || media?.filePath, filename: fileName?.originalFilename || fileName }
@@ -304,13 +298,19 @@ export const Sharing = ({ data, onClose }) => {
 						(media?.filetype && media?.filetype?.startsWith('video')) ||
 						(media?.mimeType && media?.mimeType?.startsWith('video')) ||
 						isVideo(media?.filePath?.toLowerCase());
+					const checkIsImage =
+						(media?.filetype && media?.filetype?.startsWith('image')) ||
+						(media?.mimeType && media?.mimeType?.startsWith('image')) ||
+						isImage(media?.filePath?.toLowerCase());
 					const pathCompressed = checkIsVideo
 						? await compressVideo(media?.filePath || media?.contentUri)
-						: await compressImage(media?.filePath || media?.contentUri);
+						: checkIsImage
+							? await compressImage(media?.filePath || media?.contentUri)
+							: null;
 					const fileData = await RNFS.readFile(pathCompressed || media.filePath || media?.contentUri, 'base64');
 					let width = 600;
 					let height = 900;
-					if (!checkIsVideo) {
+					if (checkIsImage) {
 						await new Promise((resolve, reject) => {
 							ImageRN.getSize(
 								media?.contentUri || media?.filePath,
