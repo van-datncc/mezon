@@ -166,7 +166,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				receiver_id: jsonObject?.receiver_id || selectedUser?.id || '',
 				extra_attribute: jsonObject?.extra_attribute || '',
 				amount: Number(plainTokenCount || 1),
-				note: note || ''
+				note: note?.replace?.(/\s+/g, ' ')?.trim() || ''
 			};
 
 			const res = await store.dispatch(giveCoffeeActions.sendToken(tokenEvent));
@@ -179,7 +179,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 			} else {
 				if (directMessageId) {
 					sendInviteMessage(
-						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
+						`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note?.replace?.(/\s+/g, ' ')?.trim() || ''}`,
 						directMessageId,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
@@ -188,7 +188,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					const response = await createDirectMessageWithUser(jsonObject?.receiver_id || selectedUser?.id);
 					if (response?.channel_id) {
 						sendInviteMessage(
-							`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note || ''}`,
+							`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note?.replace?.(/\s+/g, ' ')?.trim() || ''}`,
 							response?.channel_id,
 							ChannelStreamMode.STREAM_MODE_DM,
 							TypeMessage.SendToken
@@ -220,7 +220,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	};
 
 	const snapPoints = useMemo(() => {
-		return ['90%'];
+		return ['50%', '90%'];
 	}, []);
 
 	const handleSelectUser = (item: Receiver) => {
@@ -396,7 +396,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 
 								<View style={styles.infoRow}>
 									<Text style={styles.label}>{t('note')}</Text>
-									<Text style={styles.value}>{note || ''}</Text>
+									<Text style={styles.value}>{note?.replace?.(/\s+/g, ' ')?.trim() || ''}</Text>
 								</View>
 
 								<View style={styles.infoRow}>

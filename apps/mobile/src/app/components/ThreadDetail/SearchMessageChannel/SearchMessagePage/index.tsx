@@ -33,6 +33,15 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	const totalResult = useSelector(selectTotalResultSearchMessage);
 	const allUsesInAllClans = useSelector(selectAllUsersByUser);
 	const dispatch = useAppDispatch();
+	const [isContentReady, setIsContentReady] = useState(false);
+
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setIsContentReady(true);
+		}, 200);
+
+		return () => clearTimeout(timeout);
+	}, [activeTab, searchText]);
 
 	useEffect(() => {
 		dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true, isClearChannel: true }));
@@ -103,7 +112,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	return (
 		<View style={{ height: '100%', width: '100%' }}>
 			<HeaderTabSearch tabList={TabList} activeTab={activeTab} onPress={handelHeaderTabChange} />
-			<View>{renderContent()}</View>
+			<View>{isContentReady ? renderContent() : null}</View>
 		</View>
 	);
 }

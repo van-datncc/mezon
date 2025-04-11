@@ -74,8 +74,10 @@ const InputSearchMessageChannel = ({
 
 	return (
 		<View style={styles.wrapper}>
-			<TouchableOpacity onPress={onGoBack}>
-				<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
+			<TouchableOpacity onPress={onGoBack} style={{ height: '100%', paddingRight: size.s_10 }}>
+				<View style={{ alignSelf: 'center', justifyContent: 'center', flex: 1 }}>
+					<ArrowLeftIcon width={20} height={20} color={Colors.textGray} />
+				</View>
 			</TouchableOpacity>
 			<View style={styles.searchBox}>
 				<View style={{ marginRight: size.s_6 }}>

@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, getStore, selectClanMemberMetaUserId } from '@mezon/store-mobile';
 import { FlashList } from '@shopify/flash-list';
 import { User } from 'mezon-js';
@@ -56,7 +56,7 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 						keyboardShouldPersistTaps={'handled'}
 						onScrollBeginDrag={Keyboard.dismiss}
 						renderItem={renderItem}
-						estimatedItemSize={100}
+						estimatedItemSize={size.s_60}
 						removeClippedSubviews={true}
 					/>
 				</View>
