@@ -9,9 +9,8 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			paddingHorizontal: size.s_20,
-			gap: size.s_10,
 			marginVertical: size.s_10,
-			marginBottom: -10
+			marginBottom: -size.s_10
 		},
 		searchBox: {
 			flexDirection: 'row',
@@ -21,6 +20,7 @@ export const style = (colors: Attributes) =>
 			flex: 1,
 			height: size.s_40,
 			paddingHorizontal: size.s_10,
+			marginRight: size.s_10,
 			justifyContent: 'space-between'
 		},
 		input: {

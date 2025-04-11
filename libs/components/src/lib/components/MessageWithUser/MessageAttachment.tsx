@@ -20,7 +20,8 @@ import {
 	calculateAlbumLayout,
 	createImgproxyUrl,
 	getAttachmentDataForWindow,
-	isMediaTypeNotSupported
+	isMediaTypeNotSupported,
+	useAppLayout
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
@@ -38,6 +39,8 @@ type MessageAttachmentProps = {
 	mode: ChannelStreamMode;
 	observeIntersectionForLoading?: ObserveFn;
 	isInSearchMessage?: boolean;
+	isTopic?: boolean;
+	defaultMaxWidth?: number;
 };
 
 const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMessageWithUser) => {
@@ -95,7 +98,8 @@ const Attachments: React.FC<{
 	mode: ChannelStreamMode;
 	observeIntersectionForLoading?: ObserveFn;
 	isInSearchMessage?: boolean;
-}> = ({ attachments, message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage }) => {
+	defaultMaxWidth?: number;
+}> = ({ attachments, message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage, defaultMaxWidth }) => {
 	const { videos, images, documents, audio } = classifyAttachments(attachments, message);
 	return (
 		<>
@@ -117,6 +121,7 @@ const Attachments: React.FC<{
 					mode={mode}
 					onContextMenu={onContextMenu}
 					isInSearchMessage={isInSearchMessage}
+					defaultMaxWidth={defaultMaxWidth}
 				/>
 			)}
 
@@ -131,7 +136,14 @@ const Attachments: React.FC<{
 };
 
 // TODO: refactor component for message lines
-const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage }: MessageAttachmentProps) => {
+const MessageAttachment = ({
+	message,
+	onContextMenu,
+	mode,
+	observeIntersectionForLoading,
+	isInSearchMessage,
+	defaultMaxWidth
+}: MessageAttachmentProps) => {
 	const validateAttachment = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
 	if (!validateAttachment) return null;
 	return (
@@ -142,6 +154,7 @@ const MessageAttachment = ({ message, onContextMenu, mode, observeIntersectionFo
 			onContextMenu={onContextMenu}
 			observeIntersectionForLoading={observeIntersectionForLoading}
 			isInSearchMessage={isInSearchMessage}
+			defaultMaxWidth={defaultMaxWidth}
 		/>
 	);
 };
@@ -152,7 +165,8 @@ const ImageAlbum = ({
 	mode,
 	onContextMenu,
 	observeIntersectionForLoading,
-	isInSearchMessage
+	isInSearchMessage,
+	defaultMaxWidth
 }: {
 	images: (ApiMessageAttachment & { create_time?: string })[];
 	message: IMessageWithUser;
@@ -160,8 +174,11 @@ const ImageAlbum = ({
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	observeIntersectionForLoading?: ObserveFn;
 	isInSearchMessage?: boolean;
+	defaultMaxWidth?: number;
 }) => {
 	const dispatch = useAppDispatch();
+
+	const { isMobile } = useAppLayout();
 
 	const handleClick = useCallback((url?: string) => {
 		// move code from old image view component
@@ -289,7 +306,7 @@ const ImageAlbum = ({
 	}, []);
 
 	if (images.length >= 2) {
-		const albumLayout = calculateAlbumLayout(false, true, images, false);
+		const albumLayout = calculateAlbumLayout(false, true, images, isMobile, defaultMaxWidth);
 		return (
 			<div className="w-full">
 				<Album
@@ -300,6 +317,7 @@ const ImageAlbum = ({
 					onContextMenu={onContextMenu}
 					isInSearchMessage={isInSearchMessage}
 					isSending={message.isSending}
+					isMobile={isMobile}
 				/>
 			</div>
 		);
@@ -332,6 +350,7 @@ const ImageAlbum = ({
 					onContextMenu={onContextMenu}
 					isInSearchMessage={isInSearchMessage}
 					isSending={message.isSending}
+					isMobile={isMobile}
 				/>
 			</div>
 		);

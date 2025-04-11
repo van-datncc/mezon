@@ -17,6 +17,8 @@ export const GIF_MIN_WIDTH = 300;
 export const AVATAR_FULL_DIMENSIONS = { width: 640, height: 640 };
 export const VIDEO_AVATAR_FULL_DIMENSIONS = { width: 800, height: 800 };
 export const LIKE_STICKER_ID = '4986041492570112461';
+export const TOPIC_MAX_WIDTH = 24;
+export const TOPBARS_MAX_WIDTH = 20;
 
 const DEFAULT_MEDIA_DIMENSIONS: ApiDimensions = { width: 100, height: 100 };
 const MOBILE_SCREEN_NO_AVATARS_MESSAGE_EXTRA_WIDTH_REM = 4.5;
@@ -50,10 +52,15 @@ function getMaxMessageWidthRem(fromOwnMessage?: boolean, noAvatars?: boolean, is
 	return fromOwnMessage ? cachedMaxWidthOwn : noAvatars ? cachedMaxWidthNoAvatar : cachedMaxWidth;
 }
 
-export function getAvailableWidth(fromOwnMessage?: boolean, isWebPageMedia?: boolean, noAvatars?: boolean, isMobile?: boolean) {
+export function getAvailableWidth(
+	fromOwnMessage?: boolean,
+	isWebPageMedia?: boolean,
+	noAvatars?: boolean,
+	isMobile?: boolean,
+	defaultMaxWidth?: number
+) {
 	const extraPaddingRem = isWebPageMedia ? 1.625 : 0;
-	const availableWidthRem = getMaxMessageWidthRem(fromOwnMessage, noAvatars, isMobile) - extraPaddingRem;
-
+	const availableWidthRem = ((!isMobile && defaultMaxWidth) || getMaxMessageWidthRem(fromOwnMessage, noAvatars, isMobile)) - extraPaddingRem;
 	return availableWidthRem * REM;
 }
 

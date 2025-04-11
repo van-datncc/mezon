@@ -11,7 +11,6 @@ import {
 	MIN_MEDIA_HEIGHT,
 	ObserveFn,
 	SHOW_POSITION,
-	useAppLayout,
 	useBlurredMediaThumbRef,
 	useIsIntersecting,
 	useMediaTransition,
@@ -49,6 +48,7 @@ export type OwnProps<T> = {
 	onCancelUpload?: (arg: T) => void;
 	isInSearchMessage?: boolean;
 	isSending?: boolean;
+	isMobile?: boolean;
 };
 const Photo = <T,>({
 	id,
@@ -75,7 +75,8 @@ const Photo = <T,>({
 	onClick,
 	onContextMenu,
 	isInSearchMessage,
-	isSending
+	isSending,
+	isMobile
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
 	const isPaidPreview = photo.mediaType === 'extendedMediaPreview';
@@ -85,7 +86,6 @@ const Photo = <T,>({
 
 	const { setImageURL, setPositionShow } = useMessageContextMenu();
 
-	const { isMobile } = useAppLayout();
 	const [isLoadAllowed, setIsLoadAllowed] = useState(canAutoLoad);
 	const shouldLoad = isLoadAllowed && isIntersecting;
 
@@ -180,7 +180,7 @@ const Photo = <T,>({
 		<div
 			id={id}
 			ref={ref}
-			className={'relative ' + componentClassName}
+			className={'relative max-w-full ' + componentClassName}
 			style={style}
 			onClick={() => {
 				onClick?.(photo?.url);

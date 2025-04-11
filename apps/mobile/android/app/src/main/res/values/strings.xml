@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Mezon</string>
     <string name="expo_splash_screen_resize_mode">cover</string>
-    <string moduleConfig="true" name="CodePushDeploymentKey">JT3Y22ATCAz3K-IadwV5RGntE6PT5hO0FuaudV</string>
     <string name="accept">Answer</string>
     <string name="decline">Decline</string>
     <string name="call_notification_answer_action">Answer</string>

@@ -156,25 +156,26 @@ const ChannelVoice = memo(
 							handleJoinRoom={handleJoinRoom}
 							isCurrentChannel={isShow}
 						/>
-						{!isOpenPopOut ? (
-							<LiveKitRoom
-								ref={containerRef}
-								id="livekitRoom"
-								key={token}
-								className={`${!isShow ? 'hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
-								audio={showMicrophone}
-								video={showCamera}
-								token={token}
-								serverUrl={serverUrl}
-								data-lk-theme="default"
-							>
-								<MyVideoConference
-									channelLabel={currentChannel?.channel_label as string}
-									onLeaveRoom={handleLeaveRoom}
-									onFullScreen={handleFullScreen}
-								/>
-							</LiveKitRoom>
-						) : (
+
+						<LiveKitRoom
+							ref={containerRef}
+							id="livekitRoom"
+							key={token}
+							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
+							audio={showMicrophone}
+							video={showCamera}
+							token={token}
+							serverUrl={serverUrl}
+							data-lk-theme="default"
+						>
+							<MyVideoConference
+								channelLabel={currentChannel?.channel_label as string}
+								onLeaveRoom={handleLeaveRoom}
+								onFullScreen={handleFullScreen}
+							/>
+						</LiveKitRoom>
+
+						{isOpenPopOut && (
 							<div className="flex items-center justify-center h-full w-full text-center text-lg font-semibold text-gray-500">
 								You are currently in the popout window
 							</div>

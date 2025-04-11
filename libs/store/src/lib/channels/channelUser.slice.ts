@@ -43,9 +43,19 @@ export const fetchListChannelsByUserCached = memoizeAndTrack(
 	}
 );
 
-export const fetchListChannelsByUser = createAsyncThunk(
+type fetchUserChannelsPayload = {
+	noCache?: boolean;
+	isClearChannel?: boolean;
+};
+
+type FetchMessagesPayloadAction = {
+	channels: ChannelUsersEntity[];
+	isClearChannel?: boolean;
+};
+
+export const fetchListChannelsByUser = createAsyncThunk<{ channels: ChannelUsersEntity[]; isClearChannel: boolean }, fetchUserChannelsPayload>(
 	'channelsByUser/fetchListChannelsByUser',
-	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+	async ({ noCache = false, isClearChannel = false }: fetchUserChannelsPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			if (noCache) {
@@ -53,11 +63,12 @@ export const fetchListChannelsByUser = createAsyncThunk(
 			}
 			const response = await fetchListChannelsByUserCached(mezon);
 			if (!response?.channeldesc) {
-				return [];
+				return { channels: [], isClearChannel };
 			}
 
 			const channels = response.channeldesc.map(mapChannelsByUserToEntity);
-			return channels;
+
+			return { channels, isClearChannel };
 		} catch (error) {
 			captureSentryError(error, 'channelsByUser/fetchListChannelsByUser');
 			return thunkAPI.rejectWithValue(error);
@@ -159,8 +170,14 @@ export const listChannelsByUserSlice = createSlice({
 			.addCase(fetchListChannelsByUser.pending, (state: ListChannelsByUserState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchListChannelsByUser.fulfilled, (state: ListChannelsByUserState, action: PayloadAction<ChannelUsersEntity[]>) => {
-				listChannelsByUserAdapter.upsertMany(state, action.payload);
+			.addCase(fetchListChannelsByUser.fulfilled, (state: ListChannelsByUserState, action: PayloadAction<FetchMessagesPayloadAction>) => {
+				const channels = action?.payload?.channels;
+				const isClearChannel = action?.payload?.isClearChannel || false;
+				if (isClearChannel) {
+					listChannelsByUserAdapter.setAll(state, channels);
+				} else {
+					listChannelsByUserAdapter.upsertMany(state, channels);
+				}
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchListChannelsByUser.rejected, (state: ListChannelsByUserState, action) => {

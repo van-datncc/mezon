@@ -93,8 +93,8 @@ android {
         applicationId "com.mezon.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 295
-        versionName "1.1.53"
+        versionCode 299
+        versionName "1.1.56"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -160,6 +160,7 @@ dependencies {
 
 project.ext.react = [
     enableHermes: true,
+    newArchEnabled: true,
     enableFlipper: false
 ]
 
@@ -168,4 +169,3 @@ project.ext.vectoricons = [
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
-apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"

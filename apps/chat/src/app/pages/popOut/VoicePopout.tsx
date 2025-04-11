@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { LiveKitRoom } from '@livekit/components-react';
+import { LiveKitRoom, TrackReference, VideoTrack } from '@livekit/components-react';
 import { useAuth } from '@mezon/core';
 import {
 	handleParticipantVoiceState,
@@ -13,9 +13,8 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { ParticipantMeetState } from '@mezon/utils';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { MyVideoConference } from '../../../../../../libs/components/src/lib/components/VoiceChannel/MyVideoConference/MyVideoConference';
 
 const VoicePopout: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -69,6 +68,17 @@ const VoicePopout: React.FC = () => {
 			document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
 		}
 	}, [dispatch]);
+	const track = (window.opener as any)?.sharedTracks?.screenShare;
+
+	const [trackVideo, setTrackVideo] = useState<TrackReference | null>(null);
+	const renderVideo = () => {
+		if (track) {
+			setTrackVideo(track);
+		}
+	};
+	useEffect(() => {
+		renderVideo();
+	}, []);
 
 	return (
 		<div className="h-screen w-screen">
@@ -83,12 +93,17 @@ const VoicePopout: React.FC = () => {
 				token={token}
 				serverUrl={serverUrl}
 				data-lk-theme="default"
+				connectOptions={{
+					autoSubscribe: false
+				}}
+				connect={false}
 			>
-				<MyVideoConference
+				{/* <MyVideoConference
 					channelLabel={currentChannel?.channel_label as string}
 					onLeaveRoom={handleLeaveRoom}
 					onFullScreen={handleFullScreen}
-				/>
+				/> */}
+				{trackVideo && <VideoTrack trackRef={trackVideo as TrackReference} />}
 			</LiveKitRoom>
 		</div>
 	);
