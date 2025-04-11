@@ -45,7 +45,7 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     LiveKitReactNative.setup(this, AudioType.CommunicationAudioType())
-    SoLoader.init(this, false)
+    SoLoader.init(this, true)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       load()

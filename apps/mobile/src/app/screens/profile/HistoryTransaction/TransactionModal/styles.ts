@@ -69,8 +69,8 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			backgroundColor: 'rgba(0,0,0,0.5)'
 		},
 		noteField: {
-			backgroundColor: colors.bgInputPrimary,
-			paddingHorizontal: size.s_8,
+			backgroundColor: colors.secondary,
+			paddingHorizontal: size.s_10,
 			paddingVertical: size.s_4,
 			marginTop: size.s_12,
 			borderRadius: size.s_4
