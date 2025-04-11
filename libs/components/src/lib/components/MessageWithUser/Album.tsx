@@ -13,6 +13,7 @@ type OwnProps = {
 	onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 	isInSearchMessage?: boolean;
 	isSending?: boolean;
+	isMobile?: boolean;
 };
 
 const Album: FC<OwnProps> = ({
@@ -25,7 +26,8 @@ const Album: FC<OwnProps> = ({
 	onClick,
 	onContextMenu,
 	isInSearchMessage,
-	isSending
+	isSending,
+	isMobile
 }) => {
 	const mediaCount = (album as any)?.length;
 

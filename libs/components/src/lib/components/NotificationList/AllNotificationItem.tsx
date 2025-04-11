@@ -6,6 +6,7 @@ import {
 	IMessageWithUser,
 	INotification,
 	NotificationCategory,
+	TOPBARS_MAX_WIDTH,
 	addMention,
 	convertTimeString,
 	createImgproxyUrl
@@ -192,7 +193,11 @@ function AllTabContent({ message, subject, category, senderId }: IMentionTabCont
 								isJumMessageEnabled={false}
 							/>
 							{Array.isArray(message.attachments) && (
-								<MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />
+								<MessageAttachment
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									message={message}
+									defaultMaxWidth={TOPBARS_MAX_WIDTH}
+								/>
 							)}
 						</div>
 					) : (

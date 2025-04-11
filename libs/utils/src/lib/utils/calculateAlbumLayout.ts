@@ -101,14 +101,15 @@ function calculateContainerSize(layout: IMediaLayout[]) {
 	return styles;
 }
 
-export function calculateAlbumLayout(isOwn: boolean, noAvatars: boolean, album: any, isMobile?: boolean): IAlbumLayout {
+export function calculateAlbumLayout(isOwn: boolean, noAvatars: boolean, album: any, isMobile?: boolean, defaultMaxWidth?: number): IAlbumLayout {
 	const spacing = 2;
 	const ratios = getRatios(album, false, isMobile);
 	const proportions = getProportions(ratios);
 	const averageRatio = getAverageRatio(ratios);
 	const albumCount = ratios.length;
 	const forceCalc = ratios.some((ratio: any) => ratio > 2);
-	const maxWidth = getAvailableWidth(isOwn, false, noAvatars, isMobile);
+
+	const maxWidth = getAvailableWidth(isOwn, false, noAvatars, isMobile, defaultMaxWidth);
 	const maxHeight = maxWidth;
 
 	let layout;

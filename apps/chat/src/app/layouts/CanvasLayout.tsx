@@ -5,9 +5,7 @@ import { useSelector } from 'react-redux';
 const CanvasLayout = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	return (
-		<div
-			className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-		>
+		<div className={`flex flex-1 justify-center thread-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 			<Canvas />
 		</div>
 	);

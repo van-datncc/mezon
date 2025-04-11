@@ -35,7 +35,6 @@ function MezonPage() {
 
 	const universalUrl = `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-mac-x64.dmg`;
 	const portableUrl = `${process.env.NX_BASE_IMG_URL}/release/mezon-${version}-win-x64-portable.exe`;
-	const microsoftStoreUrl = `https://apps.microsoft.com/detail/9pf25lf1fj17?hl=en-US&gl=VN`;
 
 	const updateBackgroundImage = () => {
 		if (window.innerWidth < 768) {
@@ -101,7 +100,7 @@ function MezonPage() {
 			}}
 		>
 			<div
-				className="layout relative flex flex-col items-center text-textDarkTheme overflow-visibile scroll-smooth"
+				className="layout relative flex flex-col items-center text-textDarkTheme overflow-visibile"
 				style={{
 					background: 'linear-gradient(rgba(3, 3, 32, 0) -15.28%, rgb(15, 15, 99) -93.02%, rgba(3, 3, 32, 0) 105.23%)'
 				}}

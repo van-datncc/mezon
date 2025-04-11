@@ -1,5 +1,5 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
-import { IMentionOnMessage, IMessageWithUser, INotification, addMention, createImgproxyUrl } from '@mezon/utils';
+import { IMentionOnMessage, IMessageWithUser, INotification, TOPBARS_MAX_WIDTH, addMention, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import MessageAttachment from '../MessageWithUser/MessageAttachment';
@@ -73,7 +73,9 @@ function MentionTabContent({ message }: IMentionTabContent) {
 							isJumMessageEnabled={false}
 						/>
 					)}
-					{Array.isArray(message.attachments) && <MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} />}
+					{Array.isArray(message.attachments) && (
+						<MessageAttachment mode={ChannelStreamMode.STREAM_MODE_CHANNEL} message={message} defaultMaxWidth={TOPBARS_MAX_WIDTH} />
+					)}
 				</div>
 			</div>
 		</div>
