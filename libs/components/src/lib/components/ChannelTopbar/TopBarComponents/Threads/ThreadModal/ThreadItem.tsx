@@ -55,7 +55,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 	}, [channelThread?.id]);
 
 	const getRandomElements = (array: ChannelMembersEntity[], count: number) => {
-		const result = [];
+		const result: ChannelMembersEntity[] = [];
 		const usedIndices = new Set();
 
 		while (result.length < count && usedIndices.size < array.length) {
@@ -183,9 +183,10 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 						<Avatar.Group className="flex gap-3 justify-end items-center">
 							{previewAvatarList?.map((avatar, index) => (
 								<img
-									key={avatar.clan_avatar || avatar.user?.avatar_url}
+									key={(avatar.clan_avatar || avatar.user?.avatar_url || avatar.id) + index}
 									src={avatar.clan_avatar || avatar.user?.avatar_url}
 									className="object-cover h-6 aspect-square rounded-full"
+									alt=""
 								/>
 							))}
 							{threadMembers && threadMembers.length > 5 && (
