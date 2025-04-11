@@ -1,6 +1,6 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { PinMessageEntity, messagesActions, selectCurrentClanId, selectMessageByMessageId, useAppDispatch, useAppSelector } from '@mezon/store';
-import { IMessageWithUser, convertTimeString } from '@mezon/utils';
+import { IMessageWithUser, TOPBARS_MAX_WIDTH, convertTimeString } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
@@ -98,6 +98,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 						<MessageAttachment
 							mode={mode as ChannelStreamMode}
 							message={{ ...pinMessage, attachments: pinMessageAttachments } as IMessageWithUser}
+							defaultMaxWidth={TOPBARS_MAX_WIDTH}
 						/>
 					)}
 				</div>

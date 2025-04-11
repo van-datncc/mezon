@@ -48,7 +48,6 @@ import {
 	requestForcedReflow,
 	requestMeasure,
 	resetScroll,
-	restartCurrentScrollAnimation,
 	toggleDisableHover,
 	useContainerHeight,
 	useLastCallback,
@@ -598,7 +597,14 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
 		const jumpToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
 		const firstMsgOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
-		const scrollOffset = useAppSelector((state) => selectScrollOffsetByChannelId(state, channelId));
+
+		const scrollOffsetRef = useRef<number>(0);
+
+		useSyncEffect(() => {
+			const store = getStore();
+			const scrollOffset = selectScrollOffsetByChannelId(store.getState(), channelId);
+			scrollOffsetRef.current = scrollOffset;
+		}, [channelId]);
 
 		const [getContainerHeight, prevContainerHeightRef] = useContainerHeight(chatRef, true);
 
@@ -619,8 +625,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		}, [messageIds]);
 
 		const [forceRender, setForceRender] = useState<boolean>(false);
-
-		const scrollOffsetRef = useRef<number>(scrollOffset || 0);
 
 		useEffect(() => {
 			if (chatRef.current && jumpToPresent) {
@@ -708,7 +712,6 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		useSyncEffect(() => {
 			const container = chatRef.current;
 			if (!container) return;
-
 			if (
 				userId === lastMessage?.sender_id &&
 				lastMessage?.create_time &&
@@ -717,9 +720,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				const isAtBottom =
 					chatRef?.current &&
 					Math.abs(chatRef.current.scrollHeight - chatRef.current.clientHeight - chatRef.current.scrollTop) <= BOTTOM_THRESHOLD;
-
 				if (isAtBottom) return;
-
 				skipCalculateScroll.current = true;
 				const { scrollHeight, offsetHeight } = container;
 				const newScrollTop = scrollHeight - offsetHeight;
@@ -812,13 +813,13 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 							const shouldScrollToBottom = !isBackgroundModeActive();
 							if (!shouldScrollToBottom) return;
 
-							animateScroll({
-								container,
-								element: shouldScrollToBottom ? lastItemElement : null!,
-								position: shouldScrollToBottom ? 'end' : 'start',
-								margin: BOTTOM_FOCUS_MARGIN,
-								forceDuration: undefined
-							});
+							// animateScroll({
+							// 	container,
+							// 	element: shouldScrollToBottom ? lastItemElement : null!,
+							// 	position: shouldScrollToBottom ? 'end' : 'start',
+							// 	margin: BOTTOM_FOCUS_MARGIN,
+							// 	forceDuration: undefined
+							// });
 						});
 					}
 
@@ -832,8 +833,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 					// 	!anchor && memoUnreadDividerBeforeIdRef.current && container.querySelector<HTMLDivElement>(`.${UNREAD_DIVIDER_CLASS}`);
 
 					let newScrollTop!: number;
-					if (isAtBottom && isResized) {
-						newScrollTop = scrollHeight - offsetHeight;
+					if (isAtBottom) {
+						newScrollTop = scrollHeight;
 					} else if (anchor) {
 						const newAnchorTop = anchor.getBoundingClientRect().top;
 						newScrollTop = scrollTop + (newAnchorTop - (anchorTopRef.current || 0));
@@ -843,7 +844,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 					return () => {
 						resetScroll(container, Math.ceil(newScrollTop));
-						restartCurrentScrollAnimation();
+						// restartCurrentScrollAnimation();
 						scrollOffsetRef.current = Math.max(Math.ceil(scrollHeight - newScrollTop), offsetHeight);
 						if (!memoFocusingIdRef.current) {
 							isScrollTopJustUpdatedRef.current = true;
@@ -1013,18 +1014,16 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				>
 					<div className="messages-wrap flex flex-col min-h-full mt-auto justify-end">
 						{isTopic && convertedFirstMsgOfThisTopic && (
-							<div className="sticky top-0 z-[1]">
-								<div
-									className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
-								>
-									<MessageWithUser
-										isTopic={isTopic}
-										allowDisplayShortProfile={true}
-										message={convertedFirstMsgOfThisTopic}
-										mode={mode}
-										user={currentClanUser}
-									/>
-								</div>
+							<div
+								className={`fullBoxText relative group ${convertedFirstMsgOfThisTopic?.references?.[0]?.message_ref_id ? 'pt-3' : ''}`}
+							>
+								<MessageWithUser
+									isTopic={isTopic}
+									allowDisplayShortProfile={true}
+									message={convertedFirstMsgOfThisTopic}
+									mode={mode}
+									user={currentClanUser}
+								/>
 							</div>
 						)}
 						{withHistoryTriggers && <div ref={backwardsTriggerRef} key="backwards-trigger" className="backwards-trigger" />}

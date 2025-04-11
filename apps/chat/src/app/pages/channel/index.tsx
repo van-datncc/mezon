@@ -429,16 +429,14 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					)}
 					{isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
 						<div
-							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+							className={`flex flex-1 justify-center thread-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 						>
 							<Canvas />
 						</div>
 					)}
 
 					{!isShowCanvas && isShowAgeRestricted && !isChannelMezonVoice && !isChannelStream && (
-						<div
-							className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-						>
+						<div className={`flex flex-1 justify-center overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 							<AgeRestricted closeAgeRestricted={closeAgeRestricted} />
 						</div>
 					)}

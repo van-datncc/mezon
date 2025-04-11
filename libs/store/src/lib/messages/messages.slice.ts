@@ -272,9 +272,9 @@ const shouldReturnCachedMessages = (
 		return false;
 	}
 
-	if (isFetchingLatestMessages && oldMessages.at(-1)?.id !== lastSentMessage?.id) {
-		return false;
-	}
+	// if (isFetchingLatestMessages && oldMessages.at(-1)?.id !== lastSentMessage?.id) {
+	// 	return false;
+	// }
 
 	if (fromCache) {
 		return true;
@@ -311,7 +311,7 @@ export const fetchMessages = createAsyncThunk(
 
 			if (isFetchingLatestMessages) {
 				thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
-				thunkAPI.dispatch(messagesActions.setIsViewingOlderMessages({ channelId: chlId, isViewing: false }));
+				// thunkAPI.dispatch(messagesActions.setIsViewingOlderMessages({ channelId: chlId, isViewing: false }));
 			}
 
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -525,7 +525,7 @@ export const jumpToMessage = createAsyncThunk(
 		try {
 			thunkAPI.dispatch(messagesActions.setLoadingJumpMessage(true));
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
-			const channelMessages = selectMessageIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
+			const channelMessages = selectViewportIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
 			if (indexMessage < 10) {
 				await thunkAPI
@@ -1285,7 +1285,6 @@ export const messagesReducer = messagesSlice.reducer;
  * import React, { useEffect } from 'react';
  * import { useDispatch } from 'react-redux';
 import { channel } from 'process';
-import { selectAllAccount } from '@mezon/store-mobile';
  *
  * // ...
  *

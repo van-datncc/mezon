@@ -8,9 +8,7 @@ const ChannelAppLayoutMobile = () => {
 	const channelApp = useAppSelector((state) => selectAppChannelById(state, channelId || ''));
 	const appearanceTheme = useSelector(selectTheme);
 	return (
-		<div
-			className={`flex flex-1 justify-center overflow-y-scroll overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
-		>
+		<div className={`flex flex-1 justify-center overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
 			<ChannelApps appChannel={channelApp} />
 		</div>
 	);

@@ -6,6 +6,7 @@ import {
 	HEIGHT_PANEL_PROFILE_DM,
 	ID_MENTION_HERE,
 	ObserveFn,
+	TOPIC_MAX_WIDTH,
 	TypeMessage,
 	UsersClanEntity,
 	WIDTH_CHANNEL_LIST_BOX,
@@ -281,6 +282,7 @@ function MessageWithUser({
 								message={message}
 								onContextMenu={onContextMenu}
 								isInSearchMessage={isSearchMessage}
+								defaultMaxWidth={isTopic ? TOPIC_MAX_WIDTH : undefined}
 							/>
 						)}
 
