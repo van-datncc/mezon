@@ -2,9 +2,9 @@ import { ChannelTypeHeader } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelUsersEntity } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Keyboard, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { ChannelItem } from '../ChannelItem';
 import { EmptySearchPage } from '../EmptySearchPage';
 import style from './ChannelsSearchTab.styles';
@@ -50,12 +50,13 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 		[listTextChannel, listVoiceChannel, listStreamingChannel, t]
 	);
 
-	const renderItem = ({ item }) => {
+	const renderItem = useCallback(({ item }) => {
 		if (item?.type === ChannelTypeHeader) {
 			return <Text style={styles.title}>{item.title}</Text>;
 		}
 		return <ChannelItem channelData={item} key={item?.id} />;
-	};
+	}, []);
+	const keyExtractor = useCallback((item, index) => item?.id?.toString() + `${index}_item_search_channel` + item?.title, []);
 
 	return (
 		<View style={styles.container}>
@@ -68,12 +69,22 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 					<FlatList
 						data={combinedListChannel}
 						renderItem={renderItem}
-						keyExtractor={(item) => (item?.id ? item?.id.toString() : item.title)}
-						onScrollBeginDrag={Keyboard.dismiss}
-						keyboardShouldPersistTaps={'handled'}
-						contentContainerStyle={{ paddingBottom: size.s_50 }}
+						keyExtractor={keyExtractor}
 						showsVerticalScrollIndicator={false}
+						initialNumToRender={10}
+						maxToRenderPerBatch={10}
+						updateCellsBatchingPeriod={50}
+						windowSize={10}
+						scrollEventThrottle={16}
 						removeClippedSubviews={true}
+						keyboardShouldPersistTaps={'handled'}
+						viewabilityConfig={{
+							itemVisiblePercentThreshold: 50,
+							minimumViewTime: 300
+						}}
+						contentOffset={{ x: 0, y: 0 }}
+						disableVirtualization
+						contentContainerStyle={{ paddingBottom: size.s_50 }}
 					/>
 				</View>
 			) : (
