@@ -1,7 +1,7 @@
 import { registerGlobals } from '@livekit/react-native';
 import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { enableFreeze, enableScreens } from 'react-native-screens';
 import App from './src/app/navigation';
 import CustomIncomingCall from './src/app/screens/customIncomingCall';
@@ -15,7 +15,7 @@ if (__DEV__) {
 
 registerGlobals();
 enableScreens(true);
-enableFreeze(true);
+enableFreeze(Platform.OS === 'android');
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const offer = remoteMessage?.data?.offer;
 	if (offer) {

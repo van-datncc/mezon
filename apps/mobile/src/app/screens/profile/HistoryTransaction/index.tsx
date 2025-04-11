@@ -1,3 +1,4 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { fetchListWalletLedger, selectCountWalletLedger, selectWalletLedger, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { formatNumber } from '@mezon/utils';
@@ -5,10 +6,11 @@ import { FlashList } from '@shopify/flash-list';
 import { ApiWalletLedger } from 'mezon-js/api.gen';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
+import { TransactionModal } from './TransactionModal';
 import { style } from './styles';
 
 const limitWallet = 8;
@@ -42,6 +44,13 @@ export const HistoryTransactionScreen = ({ navigation }: SettingScreenProps<Scre
 		}
 	};
 
+	const toggleDetails = (transactionId: string, isMinus: boolean) => {
+		const data = {
+			children: <TransactionModal transactionId={transactionId} isMinus={isMinus} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	};
+
 	const valueText = (value: number) => {
 		if (value > 0) return `+${formatNumber(value, 'vi-VN', 'VND')}`;
 		else return `${formatNumber(value, 'vi-VN', 'VND')}`;
@@ -49,7 +58,7 @@ export const HistoryTransactionScreen = ({ navigation }: SettingScreenProps<Scre
 
 	const renderItem = ({ item }: { item: ApiWalletLedger }) => {
 		return (
-			<Pressable key={`token_receiver_${item.id}`} style={styles.userItem}>
+			<Pressable key={`token_receiver_${item.id}`} style={styles.userItem} onPress={() => toggleDetails(item.transaction_id, item?.value < 0)}>
 				<View>
 					<Text style={styles.title}>{moment(item?.create_time).format('DD/MM/YYYY')}</Text>
 					<Text style={styles.code}>Transaction code: {item?.transaction_id}</Text>
