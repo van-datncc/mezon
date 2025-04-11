@@ -3,13 +3,14 @@ import {
 	isTrackReference,
 	LayoutContextProvider,
 	RoomAudioRenderer,
+	TrackReferenceOrPlaceholder,
 	useCreateLayoutContext,
 	usePinnedTracks,
 	useTracks
 } from '@livekit/components-react';
 import { selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { Participant, RoomEvent, Track, TrackPublication } from 'livekit-client';
+import { RoomEvent, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -166,7 +167,7 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 									destroyTooltipOnHide
 								>
 									<div
-										className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[66px]'} 
+										className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[66px]'}
 											transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px]`}
 										onClick={handleShowMember}
 									>
@@ -255,17 +256,3 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 		</div>
 	);
 }
-
-type TrackReferenceOrPlaceholder = TrackReference | TrackReferencePlaceholder;
-
-type TrackReferencePlaceholder = {
-	participant: Participant;
-	publication?: never;
-	source: Track.Source;
-};
-
-type TrackReference = {
-	participant: Participant;
-	publication: TrackPublication;
-	source: Track.Source;
-};
