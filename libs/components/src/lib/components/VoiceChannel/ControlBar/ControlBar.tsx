@@ -1,4 +1,10 @@
-import { ControlBarControls, useLocalParticipant, useLocalParticipantPermissions, usePersistentUserChoices } from '@livekit/components-react';
+import {
+	ControlBarControls,
+	useLocalParticipant,
+	useLocalParticipantPermissions,
+	usePersistentUserChoices,
+	useTracks
+} from '@livekit/components-react';
 import {
 	selectShowCamera,
 	selectShowMicrophone,
@@ -23,6 +29,7 @@ import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModa
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
 import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
+
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 	variation?: 'minimal' | 'verbose' | 'textOnly';
@@ -182,15 +189,24 @@ export function ControlBar({
 
 	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
 	let popoutWindow: Window | null = null;
-
-	const togglePopout = () => {
+	const screenShareTracks = useTracks([{ source: Track.Source.ScreenShare, withPlaceholder: false }]);
+	const togglePopout = useCallback(() => {
 		if (window.location.pathname === '/popout') {
 			dispatch(voiceActions.setOpenPopOut(false));
 			window.close();
 			return;
 		}
-
+		(window as any).sharedTracks = {
+			screenShare: screenShareTracks[0]
+		};
 		popoutWindow = window.open('/popout', 'LiveKitPopout', 'width=800,height=600,left=100,top=100');
+
+		if (popoutWindow) {
+			popoutWindow.onload = () => {
+				const trackRef = screenShareTracks.find((ref) => ref.publication?.videoTrack);
+				if (!trackRef) return;
+			};
+		}
 
 		if (!popoutWindow) {
 			console.error('Pop-up window blocked!');
@@ -206,7 +222,7 @@ export function ControlBar({
 				dispatch(voiceActions.setOpenPopOut(false));
 			}
 		}, 500);
-	};
+	}, [screenShareTracks, screenShareTracks.length]);
 
 	const livekitRoomId = isOpenPopOut ? 'livekitRoomPopOut' : 'livekitRoom';
 	return (
