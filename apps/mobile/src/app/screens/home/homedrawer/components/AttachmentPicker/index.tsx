@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, appActions, getStoreAsync, referencesActions, selectChannelById, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import { createUploadFilePath, useMezon } from '@mezon/transport';
+import { useMezon } from '@mezon/transport';
 import { checkIsThread } from '@mezon/utils';
 import Geolocation from '@react-native-community/geolocation';
 import { ChannelStreamMode } from 'mezon-js';
@@ -41,14 +41,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		};
 	}, []);
 
-	const getFullFileName = useCallback(
-		(fileName: string) => {
-			const session = sessionRef.current;
-			return createUploadFilePath(session, currentClanId, currentChannelId, fileName, true)?.filePath;
-		},
-		[currentChannelId, currentClanId, sessionRef]
-	);
-
 	const onPickFiles = async () => {
 		try {
 			timeRef.current = setTimeout(() => {
@@ -64,7 +56,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 					channelId: currentChannelId,
 					files: [
 						{
-							filename: getFullFileName(file?.name || file?.uri),
+							filename: file?.name || file?.uri,
 							url: file?.uri || file?.fileCopyUri,
 							filetype: file?.type,
 							size: file.size as number
