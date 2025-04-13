@@ -51,16 +51,16 @@ export const createNewDirectMessage = createAsyncThunk(
 					thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 					thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
 					await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-					if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
-						await thunkAPI.dispatch(
-							channelsActions.joinChat({
-								clanId: '0',
-								channelId: response.channel_id as string,
-								channelType: response.type as number,
-								isPublic: false
-							})
-						);
-					}
+				}
+				if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+					await thunkAPI.dispatch(
+						channelsActions.joinChat({
+							clanId: '0',
+							channelId: response.channel_id as string,
+							channelType: response.type as number,
+							isPublic: false
+						})
+					);
 				}
 				return response;
 			} else {
