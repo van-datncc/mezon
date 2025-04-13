@@ -290,6 +290,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
+			console.log('message :', message);
 			const store = await getStoreAsync();
 			// check mobile
 			const isMobile = false;

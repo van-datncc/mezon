@@ -3,9 +3,12 @@
 
 import { LiveKitRoom } from '@livekit/components-react';
 import {
+	authActions,
 	generateMeetTokenExternal,
 	selectAllAccount,
 	selectExternalToken,
+	selectGuestAccessToken,
+	selectGuestUserId,
 	selectJoinCallExtStatus,
 	selectShowCamera,
 	selectShowMicrophone,
@@ -89,6 +92,44 @@ export default function PreJoinCalling() {
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
+	const getGuestUserId = useSelector(selectGuestUserId);
+	const getGuestAccessToken = useSelector(selectGuestAccessToken);
+
+	function decodeJWT(token: string): any {
+		try {
+			const parts = token.split('.');
+			if (parts.length !== 3) throw new Error('JWT must have 3 parts');
+			const payload = parts[1];
+			const decoded = atob(payload);
+			return JSON.parse(decoded);
+		} catch (error) {
+			console.error('Invalid JWT:', error);
+			return {};
+		}
+	}
+	function createGuestSessionData(token: string) {
+		const payload = decodeJWT(token);
+		const now = Math.floor(Date.now() / 1000);
+		return {
+			created: false,
+			token,
+			created_at: now,
+			expires_at: payload.exp,
+			refresh_expires_at: undefined,
+			username: payload.usn || payload.usr || payload.sub || 'guest',
+			user_id: payload.uid?.toString(),
+			vars: payload.vrs || {},
+			is_remember: false
+		};
+	}
+
+	useEffect(() => {
+		if (getGuestAccessToken && getGuestAccessToken !== '0') {
+			const session = createGuestSessionData(getGuestAccessToken as string);
+			dispatch(authActions.setSession(session));
+			dispatch(authActions.checkSessionWithToken());
+		}
+	}, [getGuestAccessToken, dispatch]);
 
 	useEffect(() => {
 		if (getJoinCallExtStatus === 'error') {
@@ -286,6 +327,9 @@ export default function PreJoinCalling() {
 		}
 	}, [micOn, dispatch]);
 
+	const isUser = getDisplayName && getAvatar;
+	const isGuest = getGuestAccessToken && getGuestUserId && getGuestUserId !== '0';
+
 	// Handle Join Meeting
 	const joinMeeting = useCallback(async () => {
 		if (!username.trim() && !getDisplayName) {
@@ -295,10 +339,11 @@ export default function PreJoinCalling() {
 
 		setError(null);
 		setAvatar(avatar as string);
-		const fullStringNameAndAvatar =
-			getDisplayName && getAvatar ? JSON.stringify({ extName: getDisplayName, extAvatar: getAvatar }) : JSON.stringify({ extName: username });
+		const fullStringNameAndAvatar = isUser
+			? JSON.stringify({ extName: getDisplayName, extAvatar: getAvatar })
+			: JSON.stringify({ extName: username });
 
-		await dispatch(generateMeetTokenExternal({ token: code as string, displayName: fullStringNameAndAvatar }));
+		await dispatch(generateMeetTokenExternal({ token: code as string, displayName: fullStringNameAndAvatar, isGuest: !isUser as boolean }));
 	}, [dispatch, username, getDisplayName, code]);
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -401,3 +446,15 @@ export default function PreJoinCalling() {
 		</div>
 	);
 }
+// const ChatStream = ({ currentChannel }: ChatStreamProps) => {
+// 	const dispatch = useAppDispatch();
+
+// 	useEscapeKey(() => dispatch(appActions.setIsShowChatStream(false)));
+
+// 	return (
+// 		<div className="flex flex-col h-full">
+// 			<ChatHeader currentChannel={currentChannel} />
+// 			<ChannelMain />
+// 		</div>
+// 	);
+// };

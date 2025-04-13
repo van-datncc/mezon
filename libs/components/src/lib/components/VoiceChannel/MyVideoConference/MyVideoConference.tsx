@@ -40,6 +40,8 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 		{ updateOnlyOn: [RoomEvent.ActiveSpeakersChanged], onlySubscribed: false }
 	);
 
+	console.log('tracks', tracks);
+
 	const layoutContext = useCreateLayoutContext();
 
 	const screenShareTracks = useMemo(() => {

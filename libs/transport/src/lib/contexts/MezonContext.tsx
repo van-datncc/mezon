@@ -39,6 +39,8 @@ export type MezonContextValue = {
 
 	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
+	connectWithSession: (session: Sessionlike) => Promise<Session>;
+
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 
@@ -53,7 +55,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
 		}
-		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
+		const socket = clientRef.current.createSocket(clientRef.current.useSSL, true, new WebSocketAdapterPb());
 		socketRef.current = socket;
 		return socket;
 	}, [clientRef, socketRef]);
@@ -224,6 +226,22 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[clientRef, socketRef, isFromMobile]
 	);
 
+	const connectWithSession = useCallback(
+		async (session: any) => {
+			if (!clientRef.current) {
+				throw new Error('Mezon client not initialized');
+			}
+			sessionRef.current = session;
+			if (!socketRef.current) {
+				return session;
+			}
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
+			sessionRef.current = session2;
+			return session;
+		},
+		[clientRef, socketRef, isFromMobile]
+	);
+
 	const abortControllerRef = React.useRef<AbortController | null>(null);
 	const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -333,7 +351,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnectWithTimeout,
 			authenticateMezon,
-			authenticateEmail
+			authenticateEmail,
+			connectWithSession
 		}),
 		[
 			clientRef,
@@ -350,7 +369,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnectWithTimeout,
 			authenticateMezon,
-			authenticateEmail
+			authenticateEmail,
+			connectWithSession
 		]
 	);
 
