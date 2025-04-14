@@ -74,14 +74,6 @@ export function App() {
 }
 
 function AppWrapper() {
-	useEffect(() => {
-		WebFont.load({
-			google: {
-				families: ['gg sans']
-			}
-		});
-	}, []);
-
 	return (
 		<MezonContextProvider mezon={mezon} connect={true}>
 			<App />
