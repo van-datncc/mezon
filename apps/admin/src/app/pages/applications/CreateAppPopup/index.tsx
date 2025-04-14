@@ -23,7 +23,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 
-	// Kiểm tra form đã hợp lệ chưa để enable nút Create
 	const isFormValid = !!formValues.name && (creationType === 'bot' || (formValues.url !== '' && isUrlValid)) && isCheckedForPolicy;
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -39,7 +38,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			return;
 		}
 
-		// 2. If application, validate URL
 		if (creationType === 'application') {
 			if (!formValues.url) {
 				setNotification(
@@ -59,17 +57,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			}
 		}
 
-		// 3. Validate policy checkbox
-		// if (!isCheckedForPolicy) {
-		// 	setNotification(
-		// 		<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
-		// 			The <span className="font-semibold hover:underline">Terms of Service</span> must be accepted.
-		// 		</div>
-		// 	);
-		// 	return;
-		// }
-
-		// 4. All good → submit
 		setNotification(null);
 		const createRequest: ApiAddAppRequest = {
 			appname: formValues.name,
@@ -98,8 +85,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 
 		if (name === 'url') {
 			try {
-				// thử parse URL, nếu lỗi thì invalid
-				// eslint-disable-next-line no-new
 				new URL(value);
 				setIsUrlValid(true);
 			} catch {
@@ -107,10 +92,8 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			}
 		}
 	};
-
 	const handleCreationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setCreationType(e.target.value as CreationType);
-		// reset URL validation khi đổi sang bot
 		if (e.target.value === 'bot') {
 			setFormValues((prev) => ({ ...prev, url: '' }));
 			setIsUrlValid(true);
@@ -125,8 +108,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						Create a {creationType === 'application' ? 'new application' : 'bot'}
 					</div>
 					{notification}
-
-					{/* Chọn loại */}
 					<div className="flex flex-col gap-2">
 						<div className="text-[12px] font-semibold">
 							TYPE <span className="text-red-600">*</span>
@@ -141,7 +122,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						</select>
 					</div>
 
-					{/* Fields */}
 					<div className="flex flex-col gap-2">
 						<div className="text-[12px] font-semibold">
 							NAME <span className="text-red-600">*</span>
@@ -154,7 +134,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							className="bg-bgLightModeThird dark:bg-[#1e1f22] outline-primary p-[10px] rounded-sm"
 						/>
 					</div>
-
 					{creationType === 'application' && (
 						<div className="flex flex-col gap-2">
 							<div className="text-[12px] font-semibold">
@@ -170,8 +149,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							{!isUrlValid && <div className="text-red-500 text-sm">Please enter a valid URL (e.g., https://example.com).</div>}
 						</div>
 					)}
-
-					{/* Terms */}
 					<div className="flex gap-2">
 						<input checked={isCheckedForPolicy} onChange={handleTogglePolicyCheckBox} type="checkbox" className="w-6" />
 						<div className="flex-1">
@@ -181,7 +158,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						</div>
 					</div>
 
-					{/* Shadow Bot */}
 					{creationType === 'application' && (
 						<div className="flex gap-2">
 							<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
@@ -192,8 +168,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						</div>
 					)}
 				</div>
-
-				{/* Footer */}
 				<div className="dark:bg-[#2b2d31] bg-[#f2f3f5] dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
 						Cancel
