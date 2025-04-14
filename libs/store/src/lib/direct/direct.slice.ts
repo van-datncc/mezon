@@ -49,7 +49,6 @@ export const createNewDirectMessage = createAsyncThunk(
 			if (response) {
 				thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 				thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
-				await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
 				if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					await thunkAPI.dispatch(
 						channelsActions.joinChat({
@@ -162,6 +161,7 @@ export const fetchDirectMessage = createAsyncThunk(
 			});
 			const channels = sorted.map(mapDmGroupToEntity);
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
+			console.log('channels: ', channels);
 			thunkAPI.dispatch(directActions.setAll(channels));
 			const users = mapChannelsToUsers(channels);
 			thunkAPI.dispatch(directMembersMetaActions.updateBulkMetadata(users));
@@ -299,6 +299,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 );
 
 const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
+	console.log('message: ', message);
 	return {
 		id: message.channel_id,
 		clan_id: '0',
@@ -340,9 +341,12 @@ export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageW
 	try {
 		const state = thunkAPI.getState() as RootState;
 		const existingDirect = selectDirectById(state, message.channel_id);
+		console.log('existingDirect: ', existingDirect);
 
 		if (!existingDirect) {
 			const directEntity = mapMessageToConversation(message);
+			console.log('directEntity: ', directEntity);
+
 			thunkAPI.dispatch(directActions.upsertOne(directEntity));
 			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
 			return directEntity;
@@ -428,7 +432,9 @@ export const directSlice = createSlice({
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
 			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
+			console.log('existLabel: ', existLabel);
 			const dataUpdate = action.payload;
+			console.log('dataUpdate: ', dataUpdate);
 			if (existLabel && existLabel?.length <= 1) {
 				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
 			}
