@@ -380,10 +380,8 @@ export const ChatBoxBottomBar = memo(
 						const session = sessionRef.current;
 						const client = clientRef.current;
 
-						console.log('>handle to file', fileTxtSaved.name);
-
 						if (!client || !session || !currentChannel.channel_id) {
-							console.log('Client is not initialized');
+							return;
 						}
 
 						await dispatch(
