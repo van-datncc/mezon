@@ -1,9 +1,8 @@
 import { initStore, MezonStoreProvider } from '@mezon/store';
 import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import WebFont from 'webfontloader';
 import './app.module.scss';
 import AppLayout from './layouts/AppLayout';
 import RootLayout from './layouts/RootLayout';

@@ -99,7 +99,6 @@ import {
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
-	electronBridge,
 	isBackgroundModeActive
 } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -388,6 +387,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 
 					if (mess.isMe) {
+						// Mark as read if isMe send token
+						if (mess.code === TypeMessage.SendToken) {
+							dispatch(
+								messagesActions.updateLastSeenMessage({
+									clanId: mess?.clan_id || '',
+									channelId: mess?.channel_id,
+									messageId: mess?.id,
+									mode: mess.mode,
+									badge_count: 0
+								})
+							);
+						}
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
@@ -1570,12 +1581,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const title = 'Funds Transferred:';
 			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
 
-			electronBridge.pushNotification(title, {
-				body: body,
-				icon: prioritizedAvatar,
-				data: {
-					link: ''
-				}
+			return new Notification(title, {
+				body,
+				icon: prioritizedAvatar ?? ''
 			});
 		}
 	}, []);
