@@ -355,7 +355,6 @@ export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageW
 			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
 			return directEntity;
 		} else {
-			console.log('directEntity: ', directEntity);
 			thunkAPI.dispatch(directActions.updateMoreData(directEntity));
 		}
 
