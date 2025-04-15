@@ -42,13 +42,22 @@ export const mapDmGroupToEntity = (channelRes: ApiChannelDescription) => {
 
 export const createNewDirectMessage = createAsyncThunk(
 	'direct/createNewDirectMessage',
-	async ({ body }: { body: ApiCreateChannelDescRequest }, thunkAPI) => {
+	async ({ body, username, avatar }: { body: ApiCreateChannelDescRequest; username?: string; avatar?: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.createChannelDesc(mezon.session, body);
 			if (response) {
 				thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
 				thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
+				thunkAPI.dispatch(
+					directActions.upsertOne({
+						id: response.channel_id || '',
+						...response,
+						usernames: username ? [username] : [],
+						channel_label: username,
+						channel_avatar: avatar ? [avatar] : ['']
+					})
+				);
 				if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 					await thunkAPI.dispatch(
 						channelsActions.joinChat({
@@ -161,7 +170,6 @@ export const fetchDirectMessage = createAsyncThunk(
 			});
 			const channels = sorted.map(mapDmGroupToEntity);
 			thunkAPI.dispatch(directMetaActions.setDirectMetaEntities(channels));
-			console.log('channels: ', channels);
 			thunkAPI.dispatch(directActions.setAll(channels));
 			const users = mapChannelsToUsers(channels);
 			thunkAPI.dispatch(directMembersMetaActions.updateBulkMetadata(users));
@@ -299,7 +307,6 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 );
 
 const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
-	console.log('message: ', message);
 	return {
 		id: message.channel_id,
 		clan_id: '0',
@@ -341,15 +348,15 @@ export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageW
 	try {
 		const state = thunkAPI.getState() as RootState;
 		const existingDirect = selectDirectById(state, message.channel_id);
-		console.log('existingDirect: ', existingDirect);
 
+		const directEntity = mapMessageToConversation(message);
 		if (!existingDirect) {
-			const directEntity = mapMessageToConversation(message);
-			console.log('directEntity: ', directEntity);
-
 			thunkAPI.dispatch(directActions.upsertOne(directEntity));
 			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
 			return directEntity;
+		} else {
+			console.log('directEntity: ', directEntity);
+			thunkAPI.dispatch(directActions.updateMoreData(directEntity));
 		}
 
 		return null;
@@ -432,9 +439,7 @@ export const directSlice = createSlice({
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
 			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
-			console.log('existLabel: ', existLabel);
 			const dataUpdate = action.payload;
-			console.log('dataUpdate: ', dataUpdate);
 			if (existLabel && existLabel?.length <= 1) {
 				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
 			}
@@ -627,6 +632,19 @@ export const directSlice = createSlice({
 					id: action.payload.channelId,
 					changes: {
 						count_mess_unread: 0
+					}
+				});
+			}
+		},
+		updateMoreData: (state, action: PayloadAction<DirectEntity>) => {
+			const data = action.payload;
+			const currentData = state.entities[data.channel_id || ''];
+			if (currentData) {
+				directAdapter.updateOne(state, {
+					id: data.channel_id || '',
+					changes: {
+						...data,
+						...currentData
 					}
 				});
 			}
