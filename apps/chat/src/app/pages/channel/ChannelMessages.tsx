@@ -57,7 +57,6 @@ import {
 	useSyncEffect
 } from '@mezon/utils';
 import classNames from 'classnames';
-import isElectron from 'is-electron';
 import { ChannelMessage as ChannelMessageType, ChannelType } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -1011,7 +1010,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						{
 							customScrollLightMode: appearanceTheme === 'light'
 						},
-						`${isElectron() ? 'scroll-big' : ''}`
+						'scroll-big'
 					])}
 				>
 					<div className="messages-wrap flex flex-col min-h-full mt-auto justify-end">
