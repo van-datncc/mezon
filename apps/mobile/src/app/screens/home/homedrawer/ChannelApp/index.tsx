@@ -3,6 +3,7 @@ import { useClans } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
@@ -12,8 +13,10 @@ import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
 import { style } from './styles';
 
-const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
+const ChannelAppScreen = ({ channelId, closeChannelApp, route }) => {
 	const { themeValue, themeBasic } = useTheme();
+	const navigation = useNavigation<any>();
+	const paramsRoute = route?.params;
 	const styles = style(themeValue);
 	const authState = useSelector(getAuthState);
 	const session = JSON.stringify(authState.session);
@@ -36,7 +39,7 @@ const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
 		};
 	}, []);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${currentClanId}/${channelId}`;
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId ? paramsRoute?.clanId : currentClanId}/${paramsRoute?.channelId ? paramsRoute?.channelId : channelId}`;
 	const injectedJS = `
     (function() {
 	const authData = {
@@ -94,6 +97,14 @@ const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
 	const onMessage = (event) => {
 		console.error('Received message from WebView:', event?.nativeEvent?.data);
 	};
+
+	const onClose = () => {
+		if (!closeChannelApp) navigation.goBack();
+		else {
+			closeChannelApp?.();
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			{loading && (
@@ -114,7 +125,7 @@ const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
 				</View>
 			)}
 			<View style={{ height: orientation === 'Portrait' ? size.s_42 : 0 }} />
-			<TouchableOpacity onPress={closeChannelApp} style={styles.backButton}>
+			<TouchableOpacity onPress={onClose} style={styles.backButton}>
 				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={size.s_16} width={size.s_16} />
 			</TouchableOpacity>
 			<TouchableOpacity onPress={reloadChannelApp} style={styles.reloadButton}>
