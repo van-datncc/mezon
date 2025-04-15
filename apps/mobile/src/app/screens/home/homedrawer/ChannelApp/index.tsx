@@ -12,12 +12,8 @@ import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
-import ChannelAppOptions from './ChannelAppOptions';
+import ChannelAppOptions, { OptionChannelApp } from './ChannelAppOptions';
 import { style } from './styles';
-
-const OptionChannelApp = {
-	Refresh: 'refresh'
-};
 
 const ChannelAppScreen = ({ channelId, closeChannelApp }) => {
 	const { themeValue, themeBasic } = useTheme();

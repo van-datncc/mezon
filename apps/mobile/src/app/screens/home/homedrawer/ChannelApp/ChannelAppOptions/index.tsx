@@ -5,6 +5,10 @@ import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import { style } from './styles';
 
+export const OptionChannelApp = {
+	Refresh: 'refresh'
+};
+
 interface IListOptionProps {
 	onPressOption: (option: IOption) => void;
 }
@@ -13,7 +17,7 @@ export const appsOptions = [
 	{
 		title: 'option',
 		content: 'Refresh App',
-		value: 'refresh',
+		value: OptionChannelApp.Refresh,
 		icon: <MezonIconCDN icon={IconCDN.reloadIcon} color={Colors.textGray} />
 	}
 ];
