@@ -694,13 +694,24 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			}
 
 			runDebouncedForScroll(() => {
-				if (userActiveScroll.current && container.scrollTop < 1000) {
-					const skeletonElement = container.querySelector('#msg-loading-top');
-					if (skeletonElement && !isLoading && messageIds.length > 0) {
+				if (!userActiveScroll.current) return;
+
+				const { scrollHeight, clientHeight, scrollTop } = container;
+				if (container.scrollTop < 1000) {
+					if (messageIds.length > 0) {
 						onChange(LoadMoreDirection.Backwards);
 					}
 				}
+
+				const bottomOffset = Math.abs(scrollHeight - clientHeight - scrollTop);
+				const isAtBottom = bottomOffset <= BOTTOM_THRESHOLD;
+
+				if (isAtBottom) {
+					onChange(LoadMoreDirection.Forwards);
+				}
+
 				scrollOffsetRef.current = container.scrollHeight - container.scrollTop;
+
 				dispatch(
 					channelsActions.setScrollOffset({
 						channelId: channelId,
@@ -1009,7 +1020,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						'w-full',
 						{
 							customScrollLightMode: appearanceTheme === 'light'
-						}
+						},
+						'scroll-big'
 					])}
 				>
 					<div className="messages-wrap flex flex-col min-h-full mt-auto justify-end">
