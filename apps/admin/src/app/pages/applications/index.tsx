@@ -171,8 +171,8 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 		navigate(id);
 	};
 
-	const applications = appListForDisplaying.filter((app) => !app.is_shadow);
-	const bots = appListForDisplaying.filter((app) => app.is_shadow);
+	const applications = appListForDisplaying.filter((app) => app.app_url && app.app_url.trim() !== '');
+	const bots = appListForDisplaying.filter((app) => !app.app_url || app.app_url.trim() === '');
 
 	const renderAppList = (items: ApiApp[], title: string) => (
 		<div className="flex flex-col gap-5">
@@ -210,5 +210,4 @@ const ApplicationsList = ({ isSmallSizeSort, appListForDisplaying }: IApplicatio
 		</div>
 	);
 };
-
 export default ApplicationsPage;

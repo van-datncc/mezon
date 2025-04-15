@@ -328,15 +328,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const attachmentList: AttachmentEntity[] =
 					message.attachments && message.attachments.length > 0
 						? message.attachments.map((attachment) => {
-								const dateTime = new Date();
-								return {
-									...attachment,
-									id: attachment.url as string,
-									message_id: message?.message_id,
-									create_time: dateTime.toISOString(),
-									uploader: message?.sender_id
-								};
-							})
+							const dateTime = new Date();
+							return {
+								...attachment,
+								id: attachment.url as string,
+								message_id: message?.message_id,
+								create_time: dateTime.toISOString(),
+								uploader: message?.sender_id
+							};
+						})
 						: [];
 
 				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
@@ -1067,7 +1067,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					channel_private: channelCreated.channel_private,
 					type: channelCreated.channel_type,
 					status: channelCreated.status,
-					app_url: channelCreated.app_url,
+					app_id: channelCreated.app_id,
 					clan_id: channelCreated.clan_id
 				};
 				dispatch(listChannelRenderAction.addThreadToListRender({ clanId: channelCreated?.clan_id as string, channel: thread }));
@@ -1369,7 +1369,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 				}
-				if (channelUpdated.app_url) {
+				if (channelUpdated.app_id) {
 					dispatch(
 						channelsActions.updateAppChannel({
 							clanId: channelUpdated.clan_id,
@@ -1972,63 +1972,63 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventnotiuserchannel = () => {};
+			socket.oneventnotiuserchannel = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onlastseenupdated = () => {};
+			socket.onlastseenupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncanvasevent = () => {};
+			socket.oncanvasevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => {};
+			socket.onclandeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onremovefriend = () => {};
+			socket.onremovefriend = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => {};
+			socket.onstickercreated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventemoji = () => {};
+			socket.oneventemoji = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerdeleted = () => {};
+			socket.onstickerdeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => {};
+			socket.onstickerupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => {};
+			socket.oncoffeegiven = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => {};
+			socket.onroleevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserstatusevent = () => {};
+			socket.onuserstatusevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventwebhook = () => {};
+			socket.oneventwebhook = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ontokensent = () => {};
+			socket.ontokensent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onJoinChannelAppEvent = () => {};
+			socket.onJoinChannelAppEvent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onsdtopicevent = () => {};
+			socket.onsdtopicevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onUnpinMessageEvent = () => {};
+			socket.onUnpinMessageEvent = () => { };
 		};
 	}, [
 		onchannelmessage,

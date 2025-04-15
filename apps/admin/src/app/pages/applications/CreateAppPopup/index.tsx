@@ -27,8 +27,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		// 1. Validate name
 		if (!formValues.name) {
 			setNotification(
 				<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
@@ -37,7 +35,6 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			);
 			return;
 		}
-
 		if (creationType === 'application') {
 			if (!formValues.url) {
 				setNotification(
@@ -62,7 +59,8 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			appname: formValues.name,
 			creator_id: userProfile?.user?.id ?? '',
 			role: 0,
-			is_shadow: creationType === 'bot' || isShadowBot
+			is_shadow: creationType === 'bot' ? true : isShadowBot,
+			app_url: creationType === 'application' ? formValues.url : ''
 		};
 		await dispatch(createApplication({ request: createRequest }));
 		togglePopup();
@@ -93,8 +91,9 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 		}
 	};
 	const handleCreationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setCreationType(e.target.value as CreationType);
-		if (e.target.value === 'bot') {
+		const selectedType = e.target.value as CreationType;
+		setCreationType(selectedType);
+		if (selectedType === 'bot') {
 			setFormValues((prev) => ({ ...prev, url: '' }));
 			setIsUrlValid(true);
 		}
