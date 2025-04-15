@@ -1,7 +1,7 @@
 import { Colors, Metrics, size } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, NativeModules, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, NativeModules, Platform, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -17,7 +17,7 @@ export const RenderVideoChat = React.memo(
 		};
 
 		useEffect(() => {
-			if (videoURL && !!NativeModules?.VideoThumbnail?.getThumbnail) {
+			if (videoURL && !!NativeModules?.VideoThumbnail?.getThumbnail && Platform.OS === 'android') {
 				setLoading(true);
 				NativeModules.VideoThumbnail.getThumbnail(videoURL)
 					.then((path) => {
