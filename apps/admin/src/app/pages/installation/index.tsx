@@ -1,9 +1,13 @@
 import copy from 'copy-to-clipboard';
-import { useParams } from 'react-router-dom';
+import { ApiApp } from 'mezon-js/api.gen';
 
-const Installation = () => {
-	const { applicationId } = useParams();
-	const linkInstall = window.location.origin + '/developers/app/install/' + applicationId;
+type InstallationProps = {
+	application: ApiApp;
+};
+
+const Installation = ({ application }: InstallationProps) => {
+	const linkInstall = window.location.origin + (application.app_url ? '/developers/app/install/' : '/developers/bot/install/') + application.id;
+
 	const handleCopyToClipboard = () => {
 		copy(linkInstall);
 	};
