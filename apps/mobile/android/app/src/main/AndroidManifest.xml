@@ -125,7 +125,7 @@
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustResize"
         android:requestLegacyExternalStorage="true"
-        android:screenOrientation="unspecified"
+        android:screenOrientation="fullUser"
         android:showWhenLocked="false"
         android:turnScreenOn="true"
         android:theme="@style/AppTheme"

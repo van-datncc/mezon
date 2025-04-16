@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 import { useClans } from '@mezon/core';
+import { IOption } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
@@ -7,10 +8,12 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
+import Tooltip from 'react-native-walkthrough-tooltip';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
+import ChannelAppOptions, { OptionChannelApp } from './ChannelAppOptions';
 import { style } from './styles';
 
 const ChannelAppScreen = ({ channelId, closeChannelApp, route }) => {
@@ -24,6 +27,7 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }) => {
 	const { currentClanId } = useClans();
 	const webviewRef = useRef<WebView>(null);
 	const [orientation, setOrientation] = useState<'Portrait' | 'Landscape'>('Portrait');
+	const [isShowTooltip, setIsShowTooltip] = useState<boolean>(false);
 
 	useEffect(() => {
 		const handleOrientationChange = () => {
@@ -98,6 +102,17 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }) => {
 		console.error('Received message from WebView:', event?.nativeEvent?.data);
 	};
 
+	const onPressOption = (option: IOption) => {
+		if (option?.value === OptionChannelApp.Refresh) {
+			reloadChannelApp();
+		}
+		setIsShowTooltip(false);
+	};
+
+	const toggleTooltip = () => {
+		setIsShowTooltip(!isShowTooltip);
+	};
+
 	const onClose = () => {
 		if (!closeChannelApp) navigation.goBack();
 		else {
@@ -124,13 +139,29 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }) => {
 					<Text style={styles.textLoading}>Loading data, please wait a moment!</Text>
 				</View>
 			)}
-			<View style={{ height: orientation === 'Portrait' ? size.s_42 : 0 }} />
 			<TouchableOpacity onPress={onClose} style={styles.backButton}>
-				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={size.s_16} width={size.s_16} />
+				<MezonIconCDN icon={IconCDN.closeSmallBold} height={size.s_16} width={size.s_16} />
+				<Text style={styles.buttonText}>Close</Text>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={reloadChannelApp} style={styles.reloadButton}>
-				<MezonIconCDN icon={IconCDN.reloadIcon} height={size.s_16} width={size.s_16} />
-			</TouchableOpacity>
+			<View style={styles.toolTipContainer}>
+				<Tooltip
+					isVisible={isShowTooltip}
+					content={<ChannelAppOptions onPressOption={onPressOption} />}
+					contentStyle={styles.toolTip}
+					arrowSize={{ width: 0, height: 0 }}
+					placement="center"
+					onClose={() => setIsShowTooltip(false)}
+					closeOnBackgroundInteraction={true}
+					disableShadow={true}
+					closeOnContentInteraction={true}
+				>
+					<TouchableOpacity onPress={toggleTooltip} style={styles.reloadButton}>
+						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_16} width={size.s_16} />
+						<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={size.s_14} width={size.s_14} />
+					</TouchableOpacity>
+				</Tooltip>
+			</View>
+
 			<WebView
 				ref={webviewRef}
 				source={{
