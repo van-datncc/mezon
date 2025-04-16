@@ -1,6 +1,8 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { useCallback, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { sleep } from '@mezon/utils';
+import { useCallback } from 'react';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import ChannelAppScreen from './ChannelApp';
 import { style } from './styles';
 
@@ -11,17 +13,15 @@ type channelAppHotBarProps = {
 const ChannelAppHotbar = ({ channelId }: channelAppHotBarProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const [isShowChannelApp, setIsShowChannelApp] = useState<boolean>(false);
-	const openChannelApp = useCallback(() => {
-		setIsShowChannelApp(true);
-	}, []);
-	const closeChannelApp = useCallback(() => {
-		setIsShowChannelApp(false);
-	}, []);
 
-	if (isShowChannelApp) {
-		return <ChannelAppScreen channelId={channelId} closeChannelApp={closeChannelApp} />;
-	}
+	const openChannelApp = useCallback(async () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		await sleep(500);
+		const data = {
+			children: <ChannelAppScreen channelId={channelId} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	}, [channelId]);
 
 	return (
 		<View
