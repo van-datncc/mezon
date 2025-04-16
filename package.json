@@ -6,8 +6,8 @@
   "productName": "mezon",
   "repository": "https://github.com/nccasia/mezon-fe",
   "scripts": {
-    "dev:chat": "nx run chat:serve --host=127.0.0.1 --port=4200",
-    "dev:admin": "nx run admin:serve --host=127.0.0.1 --port=4200",
+    "dev:chat": "nx run chat:serve",
+    "dev:admin": "nx run admin:serve",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format": "nx format:check",
