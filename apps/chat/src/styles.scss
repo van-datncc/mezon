@@ -600,7 +600,7 @@ input:-webkit-autofill:active {
 	width: 4px;
 }
 .scroll-big::-webkit-scrollbar {
-	width: 8px;
+	width: 7px;
 }
 
 .thread-scroll::-webkit-scrollbar-track {
@@ -1201,6 +1201,6 @@ input:-webkit-autofill:active {
 	background: oklab(0.9 0 0 / 0.12);
 }
 
-.lk-participant-media-video[data-lk-local-participant='false'] {
+.lk-participant-media-video[data-lk-local-participant='false'][data-lk-source='camera'] {
 	transform: rotateY(180deg) !important;
 }
