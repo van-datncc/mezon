@@ -22,7 +22,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const [creationType, setCreationType] = useState<CreationType>('application');
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
-
+	const typeApplication = creationType === 'application';
 	const isFormValid = !!formValues.name && (creationType === 'bot' || (formValues.url !== '' && isUrlValid)) && isCheckedForPolicy;
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -35,7 +35,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			);
 			return;
 		}
-		if (creationType === 'application') {
+		if (typeApplication) {
 			if (!formValues.url) {
 				setNotification(
 					<div className="p-3 dark:bg-[#6b373b] bg-[#fbc5c6] border border-red-500 rounded-md">
@@ -59,8 +59,8 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			appname: formValues.name,
 			creator_id: userProfile?.user?.id ?? '',
 			role: 0,
-			is_shadow: creationType === 'bot' ? true : isShadowBot,
-			app_url: creationType === 'application' ? formValues.url : ''
+			is_shadow: isShadowBot,
+			app_url: typeApplication ? formValues.url : ''
 		};
 		await dispatch(createApplication({ request: createRequest }));
 		togglePopup();
@@ -104,7 +104,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			<form className="relative z-10 w-[450px]" onSubmit={handleSubmit}>
 				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px] flex flex-col gap-5 pb-5 rounded-t-md">
 					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold">
-						Create a {creationType === 'application' ? 'new application' : 'bot'}
+						Create a {typeApplication ? 'new application' : 'bot'}
 					</div>
 					{notification}
 					<div className="flex flex-col gap-2">
@@ -133,7 +133,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							className="bg-bgLightModeThird dark:bg-[#1e1f22] outline-primary p-[10px] rounded-sm"
 						/>
 					</div>
-					{creationType === 'application' && (
+					{typeApplication && (
 						<div className="flex flex-col gap-2">
 							<div className="text-[12px] font-semibold">
 								URL <span className="text-red-600">*</span>
@@ -156,16 +156,13 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							<span className="text-blue-500 hover:underline">Developer Policy</span>
 						</div>
 					</div>
-
-					{creationType === 'application' && (
-						<div className="flex gap-2">
-							<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
-							<div className="flex-1 flex gap-1">
-								<div>Shadow Bot </div>
-								<Icons.ShadowBotIcon className="w-6" />
-							</div>
+					<div className="flex gap-2">
+						<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
+						<div className="flex-1 flex gap-1">
+							<div>Shadow Bot </div>
+							<Icons.ShadowBotIcon className="w-6" />
 						</div>
-					)}
+					</div>
 				</div>
 				<div className="dark:bg-[#2b2d31] bg-[#f2f3f5] dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
