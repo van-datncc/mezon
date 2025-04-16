@@ -1,12 +1,9 @@
 /* eslint-disable no-empty */
-import { useClans } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -14,21 +11,13 @@ import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
 import { style } from './styles';
 
-type ChannelAppProps = {
-	channelId: string;
-	closeChannelApp?: () => void;
-	route?: any;
-};
-
-const ChannelAppScreen = ({ channelId, closeChannelApp, route }: ChannelAppProps) => {
+const ChannelAppScreen = ({ navigation, route }) => {
 	const { themeValue, themeBasic } = useTheme();
-	const navigation = useNavigation<any>();
 	const paramsRoute = route?.params;
 	const styles = style(themeValue);
 	const authState = useSelector(getAuthState);
 	const session = JSON.stringify(authState.session);
 	const [loading, setLoading] = useState(true);
-	const { currentClanId } = useClans();
 	const webviewRef = useRef<WebView>(null);
 	const [orientation, setOrientation] = useState<'Portrait' | 'Landscape'>('Portrait');
 	const [isShowTooltip, setIsShowTooltip] = useState<boolean>(false);
@@ -47,7 +36,7 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }: ChannelAppProps
 		};
 	}, []);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId ? paramsRoute?.clanId : currentClanId}/${paramsRoute?.channelId ? paramsRoute?.channelId : channelId}`;
+	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
 	const injectedJS = `
     (function() {
 	const authData = {
@@ -118,14 +107,11 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }: ChannelAppProps
 	// };
 
 	const onClose = () => {
-		if (!closeChannelApp) navigation.goBack();
-		else {
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-		}
+		navigation.goBack();
 	};
 
 	return (
-		<View style={styles.container}>
+		<Modal style={styles.container} visible={true}>
 			{loading && (
 				<View
 					style={{
@@ -183,7 +169,7 @@ const ChannelAppScreen = ({ channelId, closeChannelApp, route }: ChannelAppProps
 					setLoading(false);
 				}}
 			/>
-		</View>
+		</Modal>
 	);
 };
 

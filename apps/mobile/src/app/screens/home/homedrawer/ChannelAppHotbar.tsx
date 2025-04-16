@@ -1,27 +1,26 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { sleep } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
-import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
-import ChannelAppScreen from './ChannelApp';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
 
 type channelAppHotBarProps = {
 	channelId: string;
+	clanId: string;
 };
 
-const ChannelAppHotbar = ({ channelId }: channelAppHotBarProps) => {
+const ChannelAppHotbar = ({ channelId, clanId }: channelAppHotBarProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const navigation = useNavigation<any>();
 
 	const openChannelApp = useCallback(async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-		await sleep(500);
-		const data = {
-			children: <ChannelAppScreen channelId={channelId} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, [channelId]);
+		navigation.navigate(APP_SCREEN.CHANNEL_APP, {
+			channelId: channelId,
+			clanId: clanId
+		});
+	}, [channelId, clanId]);
 
 	return (
 		<View
