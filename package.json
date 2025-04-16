@@ -6,8 +6,8 @@
   "productName": "mezon",
   "repository": "https://github.com/nccasia/mezon-fe",
   "scripts": {
-    "dev:chat": "nx run chat:serve",
-    "dev:admin": "nx run admin:serve",
+    "dev:chat": "nx run chat:serve --host=127.0.0.1 --port=4200",
+    "dev:admin": "nx run admin:serve --host=127.0.0.1 --port=4200",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
     "format": "nx format:check",
@@ -68,6 +68,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
     "memoizee": "^0.4.17",
+    "mezon-active-windows": "0.1.38",
     "mezon-js": "2.11.34",
     "mezon-js-protobuf": "1.7.42",
     "minio": "^7.1.3",
