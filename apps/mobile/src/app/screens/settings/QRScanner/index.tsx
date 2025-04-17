@@ -150,7 +150,7 @@ export const QRScanner = () => {
 			} else if (value) {
 				try {
 					const decode = Snowflake.parse(value);
-					if (decode?.timestamp) {
+					if (decode?.timestamp && Number.isInteger(Number(value))) {
 						setValueCode(value);
 					}
 				} catch {
