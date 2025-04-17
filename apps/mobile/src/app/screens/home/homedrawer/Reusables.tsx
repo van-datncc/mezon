@@ -21,7 +21,7 @@ export interface IFriendListItemProps {
 	dmGroup?: Receiver;
 	user?: Receiver;
 	isSent?: boolean;
-	onPress: (directParamId?: string, type?: number, userId?: string, dmGroup?: Receiver) => void;
+	onPress: (directParamId?: string, type?: number, dmGroup?: Receiver) => void;
 }
 
 export interface IListMemberInviteProps {
@@ -55,7 +55,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 				<TouchableOpacity
 					disabled={isSent}
 					onPress={() => {
-						onPress(dmGroup.channel_id || '', dmGroup.type || 0, '', dmGroup);
+						onPress(dmGroup.channel_id || '', dmGroup.type || 0, dmGroup);
 					}}
 					style={[styles.friendItemWrapper, isSent && styles.friendItemWrapperInvited]}
 				>
@@ -74,7 +74,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 							viewContainerStyle={[styles.inviteButton]}
 							disabled={isSent}
 							onPress={() => {
-								onPress(dmGroup.channel_id || '', dmGroup.type || 0, '', dmGroup);
+								onPress(dmGroup.channel_id || '', dmGroup.type || 0, dmGroup);
 							}}
 						>
 							{isSent ? 'Sent' : 'Invite'}
@@ -85,7 +85,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 				<TouchableOpacity
 					disabled={isSent}
 					onPress={() => {
-						onPress('', 0, user?.id, user);
+						onPress('', 0, user);
 					}}
 					style={[styles.friendItemWrapper, isSent && styles.friendItemWrapperInvited]}
 				>
@@ -100,7 +100,7 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 							viewContainerStyle={[styles.inviteButton]}
 							disabled={isSent}
 							onPress={() => {
-								onPress('', 0, user?.id, user);
+								onPress('', 0, user);
 							}}
 						>
 							{isSent ? 'Sent' : 'Invite'}

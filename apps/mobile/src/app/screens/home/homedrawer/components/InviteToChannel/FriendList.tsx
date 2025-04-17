@@ -130,10 +130,10 @@ export const FriendList = React.memo(
 			}
 		};
 
-		const handleSendInVite = async (directParamId?: string, type?: number, userId?: string, dmGroup?: Receiver) => {
-			if (userId) {
+		const handleSendInVite = async (directParamId?: string, type?: number, dmGroup?: Receiver) => {
+			if (dmGroup?.user) {
 				directMessageWithUser(dmGroup);
-				setSentIdList([...sentIdList, userId]);
+				setSentIdList([...sentIdList, dmGroup?.user?.id]);
 				return;
 			}
 
