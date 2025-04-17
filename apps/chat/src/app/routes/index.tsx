@@ -164,8 +164,8 @@ export const Routes = memo(() => {
 							<Suspense fallback={<SuspenseFallback />}>
 								<VoicePopout />
 							</Suspense>
-						),
-						loader: loaderWithStore(authLoader)
+						)
+						// loader: loaderWithStore(authLoader)
 					},
 					isElectron()
 						? {
