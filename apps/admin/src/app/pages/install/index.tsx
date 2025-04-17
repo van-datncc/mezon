@@ -13,7 +13,6 @@ import ModalAddApp from './ModalAddApp';
 const Install: React.FC = () => {
 	const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
 
-	// 🆕 Thêm lấy modalType từ useParams
 	const { applicationId, modalType } = useParams();
 
 	const appSelect = useSelector(selectAppById(applicationId || ''));
@@ -47,14 +46,12 @@ const Install: React.FC = () => {
 				<>
 					{openModalAdd && (
 						<>
-							{/* 🆕 Hiển thị modal theo modalType */}
 							{modalType === 'bot' && (
 								<ModalAddBot nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
 							{modalType === 'app' && (
 								<ModalAddApp nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
-							{/* 🆕 Hiển thị thông báo nếu modalType không hợp lệ */}
 							{modalType !== 'bot' && modalType !== 'app' && (
 								<div className="text-red-500 font-semibold text-lg">Invalid modal type: {modalType}</div>
 							)}

@@ -29,7 +29,6 @@ const ModalAddBot = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 	const [clanValue, setClanValue] = useState('');
 	const [clanError, setClanError] = useState<string>();
 
-	// load categories each time clanValue changes
 	const clanConfig: SelectFieldConfig<any> = {
 		label: 'Add to clan',
 		value: clanValue,

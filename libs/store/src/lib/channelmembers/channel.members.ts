@@ -652,7 +652,7 @@ export const selectChannelMemberByUserIds = createSelector(
 					} as ChannelMembersEntity);
 					return;
 				}
-				const { usernames, channel_label, user_id, is_online, channel_avatar } = userInfo as DirectEntity;
+				const { channel_label, user_id, is_online, usernames, display_names } = userInfo as DirectEntity;
 				const currentUserIndex = Array.isArray(user_id) ? user_id.findIndex((id) => id === userId) : -1;
 				if (currentUserIndex === -1) return;
 				members.push({
@@ -660,7 +660,9 @@ export const selectChannelMemberByUserIds = createSelector(
 					userChannelId: channelId,
 					user: {
 						online: is_online?.[currentUserIndex],
-						...dmMembers?.[userId]?.user
+						...dmMembers?.[userId]?.user,
+						display_name: display_names?.[currentUserIndex],
+						username: usernames?.[currentUserIndex]
 					},
 					id: userId
 				} as ChannelMembersEntity);
