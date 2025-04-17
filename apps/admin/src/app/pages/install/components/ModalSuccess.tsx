@@ -4,7 +4,7 @@ import { Icons } from '@mezon/ui';
 import { ThemeApp } from '@mezon/utils';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { TypeSelectClan } from './ModalAddBot';
+import { TypeSelectClan } from './types';
 
 type ModalSuccessProps = {
 	name?: string;
@@ -17,32 +17,34 @@ const ModalSuccess = (props: ModalSuccessProps) => {
 	const { toClanPage } = useAppNavigation();
 	const navigate = useNavigate();
 	const handleNavigate = () => {
-		window.location.href = `${process.env.NX_CHAT_APP_REDIRECT_URI}${toClanPage(clan?.clanId || '')}`;
+		if (clan?.clanId) {
+			window.location.href = `${process.env.NX_CHAT_APP_REDIRECT_URI}${toClanPage(clan.clanId)}`;
+		}
 	};
 
 	const appearanceTheme = useSelector(selectTheme);
 
 	return (
-		<div className="rounded dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full pt-4 flex flex-col items-center p-6 gap-y-5">
+		<div className="rounded dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full pt-6 pb-4 flex flex-col items-center p-6 gap-y-5">
 			<Icons.PicSuccessModal defaultFill={appearanceTheme === ThemeApp.Light ? '#fff' : '#000'} />
-			<p className="text-base dark:text-colorWhiteSecond text-colorTextLightMode">Success!</p>
-			<p className="text-sm dark:text-colorWhiteSecond text-colorTextLightMode">
-				<strong>{name}</strong>
-				&nbsp;has been authorised and added
+			<p className="text-lg font-bold text-white">Success!</p>
+			<p className="text-sm text-contentTertiary text-center">
+				<strong>{name}</strong>&nbsp;has been authorised and added
 				{isModalTry ? (
 					'.'
 				) : (
 					<>
-						to&nbsp;<strong>{clan?.clanName}</strong>
+						{' '}
+						to <strong>{clan?.clanName}</strong>
 					</>
 				)}
 			</p>
 			{!isModalTry && (
-				<button className="px-4 py-2 rounded bg-primary w-fit text-sm font-medium text-white" onClick={handleNavigate}>
+				<button className="px-4 py-2 rounded bg-primary w-fit text-sm font-medium text-white hover:bg-opacity-80" onClick={handleNavigate}>
 					Go to <strong>{clan?.clanName}</strong>
 				</button>
 			)}
-			<p className="text-xs dark:text-contentTertiary text-black">You may now close this window or tab.</p>
+			<p className="text-xs text-contentTertiary">You may now close this window or tab.</p>
 		</div>
 	);
 };
