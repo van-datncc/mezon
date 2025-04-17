@@ -11,6 +11,7 @@ import {
 	selectShowScreen,
 	selectShowSelectScreenModal,
 	selectStreamScreen,
+	selectTokenJoinVoice,
 	selectVoiceFullScreen,
 	selectVoiceOpenPopOut,
 	useAppDispatch,
@@ -23,6 +24,7 @@ import isElectron from 'is-electron';
 import { LocalTrackPublication, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom/client';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModal';
@@ -30,7 +32,7 @@ import { BackgroundEffectsMenu } from './BackgroundEffectsMenu';
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
 import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
-
+import VoicePopout from './VoicePopout';
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 	variation?: 'minimal' | 'verbose' | 'textOnly';
@@ -60,6 +62,7 @@ export function ControlBar({
 	variation ??= defaultVariation;
 	const stream = useSelector(selectStreamScreen);
 	const visibleControls = { leave: true, ...controls };
+	const token = useSelector(selectTokenJoinVoice);
 
 	const showScreen = useSelector(selectShowScreen);
 	const showCamera = useSelector(selectShowCamera);
@@ -202,11 +205,40 @@ export function ControlBar({
 			return;
 		}
 		(window as any).sharedTracks = {
-			screenShare: screenShareTracks[0]
+			screenShare: screenShareTracks[0],
+			token: token
 		};
-		popoutWindow = window.open('/popout', 'LiveKitPopout', 'width=800,height=600,left=100,top=100');
+		popoutWindow = window.open(
+			'',
+			'LiveKitPopout',
+			'toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=800,height=600'
+		);
 
 		if (popoutWindow) {
+			const div = popoutWindow.document.createElement('div');
+			Object.assign(div.style, {
+				width: 'calc(100vw - 24px)',
+				height: 'calc(100vh - 24px)',
+				padding: '4px',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center'
+			});
+			Object.assign(popoutWindow.document.body.style, {
+				margin: '0px',
+				background: 'black'
+			});
+			popoutWindow.document.body.appendChild(div);
+
+			const root = ReactDOM.createRoot(div);
+			root.render(
+				<VoicePopout
+					trackData={{
+						screenShare: screenShareTracks[0],
+						token: token
+					}}
+				/>
+			);
 			popoutWindow.onload = () => {
 				const trackRef = screenShareTracks.find((ref) => ref.publication?.videoTrack);
 				if (!trackRef) return;
@@ -227,7 +259,7 @@ export function ControlBar({
 				dispatch(voiceActions.setOpenPopOut(false));
 			}
 		}, 500);
-	}, [screenShareTracks, screenShareTracks.length]);
+	}, [screenShareTracks, screenShareTracks.length, token]);
 
 	const livekitRoomId = isOpenPopOut ? 'livekitRoomPopOut' : 'livekitRoom';
 	return (
