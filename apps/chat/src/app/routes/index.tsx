@@ -165,7 +165,6 @@ export const Routes = memo(() => {
 								<VoicePopout />
 							</Suspense>
 						)
-						// loader: loaderWithStore(authLoader)
 					},
 					isElectron()
 						? {
