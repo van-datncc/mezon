@@ -222,7 +222,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			});
 			const timer = setTimeout(() => {
 				handleClosePopup();
-			}, 10000);
+			}, ONE_MINUTE / 2);
 
 			return () => clearTimeout(timer);
 		}
