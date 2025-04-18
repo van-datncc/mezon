@@ -1,7 +1,6 @@
-import { AndroidAudioTypePresets, AudioSession, LiveKitRoom, TrackReference, useConnectionState } from '@livekit/react-native';
+import { AudioSession, LiveKitRoom, TrackReference, useConnectionState } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
-import { sleep } from '@mezon/utils';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useState } from 'react';
 import { AppState, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -11,6 +10,7 @@ import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBar
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import RoomView from './RoomView';
 import { style } from './styles';
+const { CustomAudioModule } = NativeModules;
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,44 +30,37 @@ const ConnectionMonitor = () => {
 	}, [connectionState]);
 
 	const startAudioCall = async () => {
-		await AudioSession.configureAudio({
-			android: {
-				audioTypeOptions: AndroidAudioTypePresets.communication,
-				preferredOutputList: ['speaker', 'headset', 'bluetooth']
-			}
-		});
-		await AudioSession.startAudioSession();
-		await sleep(300);
-		InCallManager.start({ media: 'audio' });
-		if (Platform.OS === 'ios') {
+		if (Platform.OS === 'android') {
+			CustomAudioModule.setSpeaker(true, null);
+		} else {
+			await AudioSession.startAudioSession();
+			InCallManager.start({ media: 'audio' });
 			await AudioSession.configureAudio({
 				ios: {
 					defaultOutput: 'speaker'
 				}
 			});
-			InCallManager.setSpeakerphoneOn(true);
-			InCallManager.setForceSpeakerphoneOn(true);
-		} else {
 			InCallManager.setSpeakerphoneOn(true);
 			InCallManager.setForceSpeakerphoneOn(true);
 		}
 	};
 
 	const stopAudioCall = async () => {
-		if (Platform.OS === 'ios') {
+		if (Platform.OS === 'android') {
+			CustomAudioModule.setSpeaker(true, null);
+		} else {
+			await AudioSession.startAudioSession();
+			InCallManager.start({ media: 'audio' });
 			await AudioSession.configureAudio({
 				ios: {
 					defaultOutput: 'speaker'
 				}
 			});
-			InCallManager.setSpeakerphoneOn(false);
-			InCallManager.setForceSpeakerphoneOn(false);
-		} else {
-			InCallManager.setSpeakerphoneOn(false);
-			InCallManager.setForceSpeakerphoneOn(false);
+			InCallManager.setSpeakerphoneOn(true);
+			InCallManager.setForceSpeakerphoneOn(true);
+			InCallManager.stop();
+			await AudioSession.stopAudioSession();
 		}
-		InCallManager.stop();
-		await AudioSession.stopAudioSession();
 	};
 
 	return <View />;
@@ -109,7 +102,7 @@ function ChannelVoice({
 				InCallManager.setSpeakerphoneOn(newSpeakerState);
 				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
 			} else {
-				InCallManager.setSpeakerphoneOn(newSpeakerState);
+				CustomAudioModule.setSpeaker(newSpeakerState, null);
 			}
 
 			setIsSpeakerOn(newSpeakerState);
