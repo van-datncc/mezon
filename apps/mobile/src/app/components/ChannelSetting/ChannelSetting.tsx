@@ -22,6 +22,7 @@ import MezonConfirm from '../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
+import MezonOption from '../../componentUI/MezonOption';
 import { IconCDN } from '../../constants/icon_cdn';
 import useBackHardWare from '../../hooks/useBackHardWare';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
@@ -147,6 +148,24 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		[]
 	);
 
+	const webhookMenu = useMemo(
+		() =>
+			[
+				{
+					title: t('fields.channelWebhooks.webhook'),
+					expandable: true,
+					icon: <MezonIconCDN icon={IconCDN.webhookIcon} color={themeValue.text} />,
+					isShow: isChannel && channel?.type === ChannelType.CHANNEL_TYPE_APP,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
+							screen: APP_SCREEN.MENU_CLAN.INTEGRATIONS
+						});
+					}
+				}
+			] satisfies IMezonMenuItemProps[],
+		[]
+	);
+
 	const deleteMenu = useMemo(
 		() =>
 			[
@@ -173,7 +192,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				// { items: categoryMenu },
 				{
 					items: permissionMenu,
-					bottomDescription: t('fields.channelPermission.description')
+					bottomDescription: channel?.type === ChannelType.CHANNEL_TYPE_APP ? t('fields.channelPermission.description') : ''
 				}
 				// {
 				// 	items: notificationMenu,
@@ -183,7 +202,30 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		[currentCategoryName]
 	);
 
-	const bottomMenu = useMemo(() => [{ items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
+	const bottomMenu = useMemo(() => [{ items: webhookMenu }, { items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
+
+	const hideInactiveOptions = useMemo(
+		() =>
+			[
+				{
+					title: t('fields.channelHideInactivity._1hour'),
+					value: 0
+				},
+				{
+					title: t('fields.channelHideInactivity._24hours'),
+					value: 1
+				},
+				{
+					title: t('fields.channelHideInactivity._3days'),
+					value: 2
+				},
+				{
+					title: t('fields.channelHideInactivity._1Week'),
+					value: 3
+				}
+			] satisfies IMezonOptionData,
+		[]
+	);
 
 	const handleDeleteChannel = useCallback(async () => {
 		await dispatch(
@@ -280,11 +322,28 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					placeHolder={t('fields.channelName.placeholder')}
 					isValid={!isCheckDuplicateNameChannel && isCheckValid}
 				/>
+
+				{isChannel && channel?.type === ChannelType.CHANNEL_TYPE_APP && (
+					<MezonInput
+						label={t('fields.channelDescription.title')}
+						value={currentSettingValue.channelTopic}
+						onTextChange={(text) => handleUpdateValue({ channelTopic: text })}
+						textarea
+					/>
+				)}
 			</View>
 
-			{channel?.type === ChannelType.CHANNEL_TYPE_APP && <MezonMenu menu={topMenu} />}
+			<MezonMenu menu={topMenu} />
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
+
+			{isChannel && channel?.type === ChannelType.CHANNEL_TYPE_APP && (
+				<MezonOption
+					title={t('fields.channelHideInactivity.title')}
+					data={hideInactiveOptions}
+					bottomDescription={t('fields.channelHideInactivity.description')}
+				/>
+			)}
 
 			<MezonMenu menu={bottomMenu} />
 			<AddMemberOrRoleBS bottomSheetRef={bottomSheetRef} channel={channel} />
