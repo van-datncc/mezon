@@ -790,13 +790,14 @@ export type SendMessageArgs = {
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	username: string;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, mode, isPublic, username }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic, username);
 		return ack;
 	}
 );

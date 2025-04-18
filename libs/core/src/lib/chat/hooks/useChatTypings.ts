@@ -18,7 +18,7 @@ interface UseChatTypingsOptions {
 }
 
 export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypingsOptions) {
-	const { userId } = useAuth();
+	const { userId, userProfile } = useAuth();
 	const typingUsersIds = useAppSelector((state) => selectTypingUserIdsByChannelId(state, channelId));
 	const typingUsers = useAppSelector((state) =>
 		selectChannelMemberByUserIds(
@@ -44,7 +44,8 @@ export function useChatTypings({ channelId, mode, isPublic, isDM }: UseChatTypin
 				clanId: currentClanId || '',
 				channelId,
 				mode,
-				isPublic: isPublic
+				isPublic: isPublic,
+				username: userProfile?.user?.display_name || userProfile?.user?.username || ''
 			})
 		);
 	}, [channelId, currentClanId, dispatch, isPublic, mode]);
