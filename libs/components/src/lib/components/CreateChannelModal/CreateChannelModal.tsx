@@ -25,6 +25,7 @@ import { CreateChannelButton } from './CreateChannelButton';
 
 import { Dropdown } from 'flowbite-react';
 import React from 'react';
+import { ChannelStatusModal } from './ChannelStatus';
 
 export const CreateNewChannelModal = () => {
 	const dispatch = useAppDispatch();
@@ -83,7 +84,7 @@ export const CreateNewChannelModal = () => {
 			clan_id: currentClan?.clan_id,
 			type: channelType,
 			channel_label: channelName,
-			channel_private: 0,
+			channel_private: isPrivate,
 			category_id: currentCategory?.category_id || channelWelcome?.category_id,
 			...(isAppChannel && selectedApp && { app_id: selectedApp.id }),
 			parent_id: '0'
@@ -283,9 +284,11 @@ export const CreateNewChannelModal = () => {
 									/>
 								</div>
 							)}
-							{/* {channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
-								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-							)} */}
+							{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
+								channelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
+								channelType !== ChannelType.CHANNEL_TYPE_APP && (
+									<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
+								)}
 						</div>
 					</div>
 				</div>
