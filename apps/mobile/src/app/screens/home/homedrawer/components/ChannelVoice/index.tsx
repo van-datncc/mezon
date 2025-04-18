@@ -1,4 +1,4 @@
-import { AndroidAudioTypePresets, AudioSession, LiveKitRoom, TrackReference } from '@livekit/react-native';
+import { AndroidAudioTypePresets, AudioSession, LiveKitRoom, TrackReference, useConnectionState } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
@@ -12,6 +12,60 @@ import RoomView from './RoomView';
 import { style } from './styles';
 
 const { width, height } = Dimensions.get('window');
+
+const ConnectionMonitor = () => {
+	const connectionState = useConnectionState();
+
+	useEffect(() => {
+		if (connectionState === 'connected') {
+			startAudioCall();
+		}
+
+		return () => {
+			stopAudioCall();
+		};
+	}, [connectionState]);
+
+	const startAudioCall = async () => {
+		await AudioSession.configureAudio({
+			android: {
+				audioTypeOptions: AndroidAudioTypePresets.communication
+			}
+		});
+		await AudioSession.startAudioSession();
+		InCallManager.start({ media: 'audio' });
+		if (Platform.OS === 'ios') {
+			await AudioSession.configureAudio({
+				ios: {
+					defaultOutput: 'speaker'
+				}
+			});
+			InCallManager.setSpeakerphoneOn(true);
+			InCallManager.setForceSpeakerphoneOn(true);
+		} else {
+			InCallManager.setSpeakerphoneOn(true);
+			InCallManager.setForceSpeakerphoneOn(true);
+		}
+	};
+
+	const stopAudioCall = async () => {
+		if (Platform.OS === 'ios') {
+			await AudioSession.configureAudio({
+				ios: {
+					defaultOutput: 'speaker'
+				}
+			});
+			InCallManager.setSpeakerphoneOn(false);
+			InCallManager.setForceSpeakerphoneOn(false);
+		} else {
+			InCallManager.setSpeakerphoneOn(false);
+		}
+		InCallManager.stop();
+		await AudioSession.stopAudioSession();
+	};
+
+	return <View />;
+};
 
 function ChannelVoice({
 	channelId,
@@ -36,40 +90,6 @@ function ChannelVoice({
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
 	useKeepAwake();
-
-	useEffect(() => {
-		startAudioCall();
-
-		return () => {
-			stopAudioCall();
-		};
-	}, []);
-
-	const startAudioCall = async () => {
-		await AudioSession.configureAudio({
-			android: {
-				audioTypeOptions: AndroidAudioTypePresets.communication
-			}
-		});
-		await AudioSession.startAudioSession();
-		InCallManager.start({ media: 'audio' });
-		if (Platform.OS === 'ios') {
-			await AudioSession.configureAudio({
-				ios: {
-					defaultOutput: 'speaker'
-				}
-			});
-			InCallManager.setSpeakerphoneOn(true);
-			InCallManager.setForceSpeakerphoneOn(true);
-		} else {
-			InCallManager.setSpeakerphoneOn(true);
-		}
-	};
-
-	const stopAudioCall = async () => {
-		InCallManager.stop();
-		await AudioSession.stopAudioSession();
-	};
 
 	const onToggleSpeaker = async () => {
 		try {
@@ -149,6 +169,7 @@ function ChannelVoice({
 					</View>
 				)}
 				<LiveKitRoom serverUrl={serverUrl} token={token} connect={true}>
+					<ConnectionMonitor />
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}
