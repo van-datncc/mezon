@@ -6,7 +6,7 @@
   "productName": "mezon",
   "repository": "https://github.com/nccasia/mezon-fe",
   "scripts": {
-   "dev:chat": "nx run chat:serve",
+    "dev:chat": "nx run chat:serve",
     "dev:admin": "nx run admin:serve",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all --fix",
