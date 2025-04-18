@@ -1,4 +1,4 @@
-import { TrackReference, VideoTrack, useLocalParticipant, useParticipants, useRoomContext, useTracks } from '@livekit/react-native';
+import { AudioSession, TrackReference, VideoTrack, useLocalParticipant, useParticipants, useRoomContext, useTracks } from '@livekit/react-native';
 import { ScreenCapturePickerView } from '@livekit/react-native-webrtc';
 import {
 	ActionEmitEvent,
@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
+import InCallManager from 'react-native-incall-manager';
 import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -40,7 +41,7 @@ const RoomView = ({
 	onFocusedScreenChange: (track: TrackReference | null) => void;
 }) => {
 	const marginWidth = Dimensions.get('screen').width;
-	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
+	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare, Track.Source.ScreenShareAudio]);
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -61,6 +62,17 @@ const RoomView = ({
 	}, [localParticipant]);
 
 	const loadLocalDefaults = async () => {
+		if (Platform.OS === 'ios') {
+			await AudioSession.configureAudio({
+				ios: {
+					defaultOutput: 'speaker'
+				}
+			});
+			InCallManager.setSpeakerphoneOn(true);
+			InCallManager.setForceSpeakerphoneOn(true);
+		} else {
+			InCallManager.setSpeakerphoneOn(true);
+		}
 		await localParticipant.setCameraEnabled(false);
 		await localParticipant.setMicrophoneEnabled(false);
 	};
