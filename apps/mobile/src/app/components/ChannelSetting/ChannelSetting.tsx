@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import { ApiUpdateChannelDescRequest } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-native';
@@ -61,6 +61,9 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		return isEqual(originSettingValue, currentSettingValue);
 	}, [originSettingValue, currentSettingValue]);
 
+	const currentCategoryName = useMemo(() => {
+		return channel?.category_name;
+	}, [channel?.category_name]);
 	useBackHardWare();
 	const currentUserId = useSelector(selectCurrentUserId);
 
@@ -114,6 +117,36 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		});
 	};
 
+	const permissionMenu = useMemo(
+		() =>
+			[
+				{
+					title: t('fields.channelPermission.permission'),
+					expandable: true,
+					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
+					isShow: isChannel && channel?.type === ChannelType.CHANNEL_TYPE_APP,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION,
+							params: {
+								channelId
+							}
+						});
+					}
+				},
+				{
+					title: t('fields.privateChannelInvite.addMember'),
+					expandable: true,
+					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
+					isShow: isChannel && !!channel.channel_private,
+					onPress: () => {
+						bottomSheetRef?.current?.present();
+					}
+				}
+			] satisfies IMezonMenuItemProps[],
+		[]
+	);
+
 	const deleteMenu = useMemo(
 		() =>
 			[
@@ -132,6 +165,22 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				}
 			] satisfies IMezonMenuItemProps[],
 		[channel?.creator_id, currentUserId, isChannel, t]
+	);
+
+	const topMenu = useMemo(
+		() =>
+			[
+				// { items: categoryMenu },
+				{
+					items: permissionMenu,
+					bottomDescription: t('fields.channelPermission.description')
+				}
+				// {
+				// 	items: notificationMenu,
+				// 	bottomDescription: ''
+				// }
+			] satisfies IMezonMenuSectionProps[],
+		[currentCategoryName]
 	);
 
 	const bottomMenu = useMemo(() => [{ items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
@@ -232,6 +281,8 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					isValid={!isCheckDuplicateNameChannel && isCheckValid}
 				/>
 			</View>
+
+			{channel?.type === ChannelType.CHANNEL_TYPE_APP && <MezonMenu menu={topMenu} />}
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
 
