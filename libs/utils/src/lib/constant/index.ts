@@ -8,7 +8,7 @@ export const SIZE_PAGE_SEARCH = 25;
 export const LIMIT_SIZE_UPLOAD_IMG = 1000000;
 export const MAX_FILE_NAME_EMOJI = 62;
 export const MAX_FILE_ATTACHMENTS = 50; // 50 items
-export const MAX_FILE_SIZE = 150 * 1024 * 1024; // 150MB
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 export const DEBOUNCE_TYPING_TIME = 700;
 export const TIME_OF_SHOWING_FIRST_POPUP = 1000 * 60 * 5;
 export const KEY_KEYBOARD = { BACKSPACE: 8, TAB: 9, ENTER: 13, ESC: 27, UP: 38, DOWN: 40, RIGHT: 39, LEFT: 27 };
@@ -24,6 +24,7 @@ export const FOR_3_HOURS = 3 * 60 * 60 * 1000;
 export const FOR_8_HOURS = 8 * 60 * 60 * 1000;
 export const FOR_24_HOURS = 24 * 60 * 60 * 1000;
 export const MAX_LENGTH_MESSAGE_BUZZ = 160;
+export const ONE_MINUTE = 60000;
 
 export const MUTE = 0;
 export const ACTIVE = 1;
@@ -132,7 +133,9 @@ export enum MiniAppEventType {
 	GET_CHANNELS = 'GET_CHANNELS',
 	CHANNELS_RESPONSE = 'CHANNELS_RESPONSE',
 	GET_CLAN = 'GET_CLAN',
-	GET_CHANNEL = 'GET_CHANNEL'
+	CLAN_RESPONSE = 'CLAN_RESPONSE',
+	GET_CHANNEL = 'GET_CHANNEL',
+	CHANNEL_RESPONSE = 'CHANNEL_RESPONSE'
 }
 
 export const CREATING_THREAD = 'CREATING_THREAD';

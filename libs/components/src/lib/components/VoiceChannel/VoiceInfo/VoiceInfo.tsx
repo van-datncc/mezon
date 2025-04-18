@@ -105,6 +105,7 @@ const VoiceInfo = React.memo(() => {
 						icon={showMicrophone ? <Icons.VoiceMicIcon className="w-4 h-4" /> : <Icons.VoiceMicDisabledIcon className="w-4 h-4" />}
 					/>
 				)}
+
 				{hasCameraAccess && (
 					<ButtonControlVoice
 						overlay={
