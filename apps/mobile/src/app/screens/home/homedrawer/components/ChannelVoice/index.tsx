@@ -1,6 +1,7 @@
 import { AndroidAudioTypePresets, AudioSession, LiveKitRoom, TrackReference, useConnectionState } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useState } from 'react';
 import { AppState, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -22,17 +23,21 @@ const ConnectionMonitor = () => {
 		}
 
 		return () => {
-			stopAudioCall();
+			if (connectionState === 'connected') {
+				stopAudioCall();
+			}
 		};
 	}, [connectionState]);
 
 	const startAudioCall = async () => {
 		await AudioSession.configureAudio({
 			android: {
-				audioTypeOptions: AndroidAudioTypePresets.communication
+				audioTypeOptions: AndroidAudioTypePresets.communication,
+				preferredOutputList: ['speaker', 'headset', 'bluetooth']
 			}
 		});
 		await AudioSession.startAudioSession();
+		await sleep(300);
 		InCallManager.start({ media: 'audio' });
 		if (Platform.OS === 'ios') {
 			await AudioSession.configureAudio({
@@ -59,6 +64,7 @@ const ConnectionMonitor = () => {
 			InCallManager.setForceSpeakerphoneOn(false);
 		} else {
 			InCallManager.setSpeakerphoneOn(false);
+			InCallManager.setForceSpeakerphoneOn(false);
 		}
 		InCallManager.stop();
 		await AudioSession.stopAudioSession();
