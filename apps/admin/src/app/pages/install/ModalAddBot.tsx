@@ -66,7 +66,7 @@ const ModalAddBot = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			<HeaderModal name={nameApp} username={account?.user?.username} />
 			<SelectField {...clanConfig} />
 			<FooterModal name={nameApp} />
-			<ModalAsk handelBack={handleOpenModal} handleAddBot={handleAdd} />
+			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
 		</div>
 	);
 });

@@ -98,9 +98,11 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			channel_private: 0,
 			parent_id: '0'
 		};
-		const resp = await dispatch(createNewChannel(data));
-		if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
+		try {
+			const resp = await dispatch(createNewChannel(data)).unwrap();
 			toggleSuccess();
+		} catch (error) {
+			console.error('Create channel failed:', error);
 		}
 	}, [applicationId, clanValue, categoryValue, dispatch]);
 
@@ -114,7 +116,7 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			<SelectField {...clanConfig} />
 			{clanValue && <SelectField {...categoryConfig} />}
 			<FooterModal name={nameApp} />
-			<ModalAsk handelBack={handleOpenModal} handleAddBot={handleAdd} />
+			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
 		</div>
 	);
 });

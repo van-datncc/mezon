@@ -387,13 +387,6 @@ const { selectAll: selectAllCategoriesEntities } = categoriesAdapter.getSelector
 
 export const selectClanCategories = (clanId: string) =>
 	createSelector(getCategoriesState, (state) => state.byClans[clanId]?.entities ?? categoriesAdapter.getInitialState());
-export const selectCategoriesArrayByClanId = (clanId: string) =>
-	createSelector(getCategoriesState, (state) => {
-		const entities = state.byClans[clanId]?.entities;
-		if (!entities) return [];
-		return Object.values(entities);
-	});
-
 export const selectCategoryIdSortChannel = createSelector(
 	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => {

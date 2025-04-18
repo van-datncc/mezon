@@ -14,6 +14,10 @@ const Install: React.FC = () => {
 	const { isLogin, redirect } = useLoaderData() as IAuthLoaderData;
 
 	const { applicationId, modalType } = useParams();
+	const MODAL_TYPE = {
+		BOT: 'bot',
+		APP: 'app'
+	} as const;
 
 	const appSelect = useSelector(selectAppById(applicationId || ''));
 
@@ -46,13 +50,13 @@ const Install: React.FC = () => {
 				<>
 					{openModalAdd && (
 						<>
-							{modalType === 'bot' && (
+							{modalType === MODAL_TYPE.BOT && (
 								<ModalAddBot nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
-							{modalType === 'app' && (
+							{modalType === MODAL_TYPE.APP && (
 								<ModalAddApp nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
-							{modalType !== 'bot' && modalType !== 'app' && (
+							{modalType !== MODAL_TYPE.BOT && modalType !== MODAL_TYPE.APP && (
 								<div className="text-red-500 font-semibold text-lg">Invalid modal type: {modalType}</div>
 							)}
 						</>

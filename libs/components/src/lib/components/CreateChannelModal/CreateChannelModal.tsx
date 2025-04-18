@@ -20,7 +20,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChannelLableModal } from './ChannelLabel';
 import { ChannelNameModalRef, ChannelNameTextField } from './ChannelNameTextField';
-import { ChannelStatusModal } from './ChannelStatus';
 import { ChannelTypeComponent } from './ChannelType';
 import { CreateChannelButton } from './CreateChannelButton';
 
@@ -84,7 +83,7 @@ export const CreateNewChannelModal = () => {
 			clan_id: currentClan?.clan_id,
 			type: channelType,
 			channel_label: channelName,
-			channel_private: isPrivate,
+			channel_private: 0,
 			category_id: currentCategory?.category_id || channelWelcome?.category_id,
 			...(isAppChannel && selectedApp && { app_id: selectedApp.id }),
 			parent_id: '0'
@@ -284,9 +283,9 @@ export const CreateNewChannelModal = () => {
 									/>
 								</div>
 							)}
-							{channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
+							{/* {channelType !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channelType !== ChannelType.CHANNEL_TYPE_STREAMING && (
 								<ChannelStatusModal onChangeValue={onChangeToggle} channelNameProps="Is private channel?" />
-							)}
+							)} */}
 						</div>
 					</div>
 				</div>

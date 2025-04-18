@@ -24,7 +24,7 @@ const ModalTry = (props: ModalTryProps) => {
 		<div className="rounded bg-bgProfileBody max-w-[440px] w-full pt-4 flex flex-col text-center gap-y-2">
 			<HeaderModal name={nameApp} username={account?.user?.username} isModalTry />
 			<FooterModal name={nameApp} />
-			<ModalAsk handelBack={handleOpenModal} handleAddBot={handleModalSuccess} />
+			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleModalSuccess} />
 		</div>
 	) : (
 		<ModalSuccess name={nameApp} isModalTry />
