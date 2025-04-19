@@ -12,6 +12,7 @@ const HeaderModal = memo(({ name, username }: HeaderModalProps) => {
 	return (
 		<div className={`p-4 pb-0 ${isDarkMode ? 'bg-[#1e1f22] text-[#d1d5db]' : 'bg-[#f9fafb] text-[#111827]'}`}>
 			<p className="text-sm font-medium">An external application</p>
+
 			<h3 className="font-bold text-2xl text-[#facc15] mt-1 truncate max-w-full">{name}</h3>
 
 			<p className="text-sm mt-2">wants to access your Mezon account</p>
