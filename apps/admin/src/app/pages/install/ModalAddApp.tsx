@@ -7,17 +7,17 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { memo, useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import FooterModal from './components/FooterModal';
 import HeaderModal from './components/HeaderModal';
 import ModalAsk from './components/ModalAsk';
 import ModalSuccess from './components/ModalSuccess';
 import SelectField, { SelectFieldConfig } from './components/SelectField';
-
+import TextField from './components/TextField';
 enum RequestStatusSuccess {
 	Fulfill = 'fulfilled'
 }
@@ -31,15 +31,14 @@ type ModalAddAppProps = {
 const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: ModalAddAppProps) => {
 	const dispatch = useAppDispatch();
 	const account = useSelector(selectAllAccount);
-
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const toggleSuccess = () => setOpenSuccess((s) => !s);
-
 	const [clanValue, setClanValue] = useState('');
+	const [labelValue, setLabelValue] = useState('');
 	const [clanError, setClanError] = useState<string>();
 	const [categoryValue, setCategoryValue] = useState('');
 	const [categoryError, setCategoryError] = useState<string>();
-
+	console.log('labelValue', labelValue);
 	useEffect(() => {
 		if (clanValue) {
 			dispatch(categoriesActions.fetchCategories({ clanId: clanValue }));
@@ -90,7 +89,7 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 		if (hasError) return;
 		const sanitizeLabel = (label: string) => label.replace(/[^a-zA-Z0-9-_]/g, '').slice(0, 32);
 		const data: ApiCreateChannelDescRequest = {
-			channel_label: sanitizeLabel(nameApp),
+			channel_label: sanitizeLabel(labelValue) || sanitizeLabel(nameApp),
 			app_id: applicationId,
 			clan_id: clanValue,
 			category_id: categoryValue,
@@ -101,10 +100,11 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 		try {
 			const resp = await dispatch(createNewChannel(data)).unwrap();
 			toggleSuccess();
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Create channel failed:', error);
+			toast.error(error?.message || 'Channel name already exists, please choose another name');
 		}
-	}, [applicationId, clanValue, categoryValue, dispatch]);
+	}, [applicationId, clanValue, categoryValue, labelValue, dispatch]);
 
 	if (openSuccess) {
 		return <ModalSuccess name={nameApp} clan={{ clanId: clanValue, clanName: '', isEmpty: false }} />;
@@ -115,6 +115,7 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			<HeaderModal name={nameApp} username={account?.user?.username} />
 			<SelectField {...clanConfig} />
 			{clanValue && <SelectField {...categoryConfig} />}
+			<TextField label="Channel Name" value={labelValue} onChange={(v) => setLabelValue(v)} placeholder={nameApp} />
 			<FooterModal name={nameApp} />
 			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
 		</div>
