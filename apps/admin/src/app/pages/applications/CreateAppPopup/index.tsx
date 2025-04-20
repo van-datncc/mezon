@@ -148,19 +148,21 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							{!isUrlValid && <div className="text-red-500 text-sm">Please enter a valid URL (e.g., https://example.com).</div>}
 						</div>
 					)}
+					{creationType === 'bot' && (
+						<div className="flex gap-2">
+							<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
+							<div className="flex-1 flex gap-1">
+								<div>Shadow Bot </div>
+								<Icons.ShadowBotIcon className="w-6" />
+							</div>
+						</div>
+					)}
 					<div className="flex gap-2">
 						<input checked={isCheckedForPolicy} onChange={handleTogglePolicyCheckBox} type="checkbox" className="w-6" />
 						<div className="flex-1">
 							By clicking Create, you agree to the Mezon{' '}
 							<span className="text-blue-500 hover:underline">Developer Terms of Service</span> and{' '}
 							<span className="text-blue-500 hover:underline">Developer Policy</span>
-						</div>
-					</div>
-					<div className="flex gap-2">
-						<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
-						<div className="flex-1 flex gap-1">
-							<div>Shadow Bot </div>
-							<Icons.ShadowBotIcon className="w-6" />
 						</div>
 					</div>
 				</div>
