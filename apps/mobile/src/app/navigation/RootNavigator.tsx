@@ -44,7 +44,6 @@ const NavigationMain = memo(
 		// 		}
 		// 	}
 		// };
-
 		const theme = {
 			dark: themeBasic === ThemeModeBase.DARK,
 			colors: {
@@ -86,7 +85,6 @@ const NavigationMain = memo(
 		return (
 			<NavigationContainer
 				theme={theme}
-				independent
 				onReady={async () => {
 					await BootSplash.hide({ fade: true });
 				}}

@@ -135,7 +135,6 @@ export const Authentication = memo(() => {
 					initialRouteName={APP_SCREEN.BOTTOM_BAR}
 					screenOptions={{
 						headerShown: false,
-						animationEnabled: false,
 						gestureEnabled: Platform.OS === 'ios',
 						gestureDirection: 'horizontal'
 					}}
@@ -183,7 +182,6 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.VIDEO_DETAIL}
 						component={RenderVideoDetail}
 						options={{
-							animationEnabled: true,
 							headerShown: false,
 							headerShadowVisible: false
 						}}
