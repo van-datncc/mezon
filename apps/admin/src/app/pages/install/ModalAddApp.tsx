@@ -38,7 +38,6 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 	const [clanError, setClanError] = useState<string>();
 	const [categoryValue, setCategoryValue] = useState('');
 	const [categoryError, setCategoryError] = useState<string>();
-	console.log('labelValue', labelValue);
 	useEffect(() => {
 		if (clanValue) {
 			dispatch(categoriesActions.fetchCategories({ clanId: clanValue }));
@@ -87,7 +86,14 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			hasError = true;
 		}
 		if (hasError) return;
-		const sanitizeLabel = (label: string) => label.replace(/[^a-zA-Z0-9-_]/g, '').slice(0, 32);
+		const sanitizeLabel = (label: string) =>
+			label
+				.replace(/[^\p{L}\p{M}\p{N} \-_]/gu, '')
+				.normalize('NFC')
+				.replace(/\s+/g, ' ')
+				.trim()
+				.slice(0, 32);
+
 		const data: ApiCreateChannelDescRequest = {
 			channel_label: sanitizeLabel(labelValue) || sanitizeLabel(nameApp),
 			app_id: applicationId,
@@ -97,12 +103,18 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			channel_private: 0,
 			parent_id: '0'
 		};
+
 		try {
 			const resp = await dispatch(createNewChannel(data)).unwrap();
 			toggleSuccess();
-		} catch (error: any) {
-			console.error('Create channel failed:', error);
-			toast.error(error?.message || 'Channel name already exists, please choose another name');
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				console.error('Create channel failed:', error);
+				toast.error(error.message || 'Channel name already exists, please choose another name');
+			} else {
+				console.error('Create channel failed:', error);
+				toast.error('An unknown error occurred');
+			}
 		}
 	}, [applicationId, clanValue, categoryValue, labelValue, dispatch]);
 

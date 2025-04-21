@@ -23,6 +23,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const typeApplication = creationType === 'application';
+	const typeBot = creationType === 'bot';
 	const isFormValid = !!formValues.name && (creationType === 'bot' || (formValues.url !== '' && isUrlValid)) && isCheckedForPolicy;
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -55,12 +56,15 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 		}
 
 		setNotification(null);
+		const cleanedName = formValues.name.trim().replace(/\s+/g, ' ');
+		const cleanedUrl = formValues.url.trim();
+
 		const createRequest: ApiAddAppRequest = {
-			appname: formValues.name,
+			appname: cleanedName,
 			creator_id: userProfile?.user?.id ?? '',
 			role: 0,
 			is_shadow: isShadowBot,
-			app_url: typeApplication ? formValues.url : ''
+			app_url: typeApplication ? cleanedUrl : ''
 		};
 		await dispatch(createApplication({ request: createRequest }));
 		togglePopup();
@@ -148,11 +152,11 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 							{!isUrlValid && <div className="text-red-500 text-sm">Please enter a valid URL (e.g., https://example.com).</div>}
 						</div>
 					)}
-					{creationType === 'bot' && (
+					{typeBot && (
 						<div className="flex gap-2">
 							<input checked={isShadowBot} onChange={handleCheckForShadow} type="checkbox" className="w-6" />
 							<div className="flex-1 flex gap-1">
-								<div>Shadow Bot </div>
+								<span>Shadow Bot </span>
 								<Icons.ShadowBotIcon className="w-6" />
 							</div>
 						</div>

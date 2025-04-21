@@ -44,7 +44,15 @@ const Install: React.FC = () => {
 					}`}
 				>
 					<div className="rounded-full dark:text-bgAvatarLight text-bgAvatarDark dark:bg-bgAvatarDark bg-bgAvatarLight text-2xl font-bold size-[80px] min-w-[80px] uppercase flex justify-center items-center">
-						{appSelect?.appname?.at(0)}
+						{appSelect?.applogo ? (
+							<img
+								src={appSelect.applogo}
+								alt={`imageApp: ${appSelect?.appname}`}
+								className="w-full h-full object-cover rounded-full"
+							/>
+						) : (
+							<span>{appSelect?.appname?.at(0)}</span>
+						)}
 					</div>
 					<p className="text-2xl font-semibold mt-2 truncate max-w-full">{appSelect?.appname}</p>
 

@@ -4,8 +4,6 @@ import type { TypeSelectClan } from "./types";
 import { Button, Card } from "flowbite-react";
 import { Check } from "libs/ui/src/lib/Icons";
 
-import { useAppearance } from "../../../context/AppearanceContext";
-
 type ModalSuccessProps = {
   name?: string;
   isModalTry?: boolean;
@@ -15,7 +13,6 @@ type ModalSuccessProps = {
 const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
   const { toClanPage } = useAppNavigation();
   const navigate = useNavigate();
-  const { isDarkMode } = useAppearance();
 
   const handleNavigate = () => {
     if (clan?.clanId) {
@@ -25,11 +22,7 @@ const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
 
   return (
     <Card
-      className={`max-w-[440px] w-full rounded-lg overflow-hidden border-0 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-[#2b2d31] to-[#313338] text-white"
-          : "bg-white text-black"
-      } shadow-2xl transition-all duration-500 hover:shadow-[0_0_25px_rgba(88,101,242,0.3)]`}
+      className="max-w-[440px] w-full rounded-lg overflow-hidden border-0 bg-white text-black dark:bg-gradient-to-br dark:from-[#2b2d31] dark:to-[#313338] dark:text-white shadow-2xl transition-all duration-500 hover:shadow-[0_0_25px_rgba(88,101,242,0.3)]"
     >
       <div className="p-8 flex flex-col items-center text-center space-y-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+')]"></div>
@@ -46,24 +39,21 @@ const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
         <h2 className="text-2xl font-bold animate-fadeIn z-10">Success!</h2>
 
         <p className="animate-fadeIn z-10">
-          <span className="font-semibold">{name}</span> has been authorised and added
+          <span className="font-semibold">{name}</span> has been authorised and added 
           {clan?.clanName ? (
-            <>
-              {" "}to <span className="font-semibold">{clan.clanName}</span>
-            </>
+            <> to <span className="font-semibold">{clan.clanName}</span></>
           ) : (
             "."
           )}
         </p>
 
-
-          <Button
-            onClick={handleNavigate}
-            className="bg-[#5865f2] hover:bg-[#4752c4] text-white w-full mt-4 animate-fadeIn relative z-10 transition-all hover:scale-105 hover:shadow-lg group overflow-hidden"
-          >
-            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5865f2] to-[#4752c4] group-hover:animate-shimmer"></span>
-            <span className="relative font-bold">Go to {clan?.clanName}</span>
-          </Button>
+        <Button
+          onClick={handleNavigate}
+          className="bg-[#5865f2] hover:bg-[#4752c4] text-white w-full mt-4 animate-fadeIn relative z-10 transition-all hover:scale-105 hover:shadow-lg group overflow-hidden"
+        >
+          <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5865f2] to-[#4752c4] group-hover:animate-shimmer"></span>
+          <span className="relative font-bold">Go to {clan?.clanName}</span>
+        </Button>
 
         <p className="text-xs animate-fadeIn z-10">You may now close this window or tab.</p>
 

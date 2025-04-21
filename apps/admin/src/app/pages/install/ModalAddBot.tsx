@@ -50,7 +50,16 @@ const ModalAddBot = memo(({ nameBot = '', applicationId, handleOpenModal }: Moda
 		}
 		if (hasError) return;
 
-		const resp = await dispatch(addBotChat({ appId: applicationId, clanId: clanValue }));
+		const cleanAppId = applicationId.replace(/\s+/g, ' ').trim();
+		const cleanClanId = clanValue.replace(/\s+/g, ' ').trim();
+
+		const resp = await dispatch(
+			addBotChat({
+				appId: cleanAppId,
+				clanId: cleanClanId
+			})
+		);
+
 		if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
 			toggleSuccess();
 		}
