@@ -9,8 +9,6 @@ import {
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
 import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
-import MezonIconCDN from 'apps/mobile/src/app/componentUI/MezonIconCDN';
-import { IconCDN } from 'apps/mobile/src/app/constants/icon_cdn';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
@@ -44,7 +42,8 @@ export const TYPE_MENTION = {
 	voiceChannel: '##voice',
 	userRoleMention: '@role',
 	thread: '#thread',
-	stream: '#stream'
+	stream: '#stream',
+	app: '#app'
 };
 /**
  * custom style for markdown
@@ -361,7 +360,7 @@ export const RenderTextMarkdownContent = ({
 
 					const { text, link } = parseMarkdownLink(mention);
 
-					const urlFormat = link.replace(/##voice|#thread|#stream|#%22|%22|"|#/g, '');
+					const urlFormat = link.replace(/##voice|#thread|#stream|#app|#%22|%22|"|#/g, '');
 					const dataChannel = urlFormat.split('_');
 					const payloadChannel = {
 						type: Number(dataChannel?.[0] || 1),
@@ -390,31 +389,17 @@ export const RenderTextMarkdownContent = ({
 						>
 							{payloadChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
 							payloadChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
-								<CustomIcon name="volume-up" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+								<CustomIcon name="voice" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
-								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+								<CustomIcon name="thread" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
-								<View
-									style={{
-										backgroundColor: Colors.midnightBlue,
-										flexDirection: 'row',
-										alignItems: 'center',
-										height: '99%',
-										transform: [{ translateY: 3.6 }]
-									}}
-								>
-									<MezonIconCDN icon={IconCDN.channelApp} width={size.s_14} height={size.s_14} color={Colors.textLink} />
-								</View>
+								<CustomIcon name="app" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
 							) : payloadChannel?.channel_id === 'undefined' ? (
 								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />
 							) : null}
-							{payloadChannel?.channel_id === 'undefined'
-								? 'private-channel'
-								: payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP
-									? text.replace('#', '')
-									: text}
+							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
 				} else {
