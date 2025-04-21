@@ -9,6 +9,8 @@ import {
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
 import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
+import MezonIconCDN from 'apps/mobile/src/app/componentUI/MezonIconCDN';
+import { IconCDN } from 'apps/mobile/src/app/constants/icon_cdn';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
@@ -393,10 +395,26 @@ export const RenderTextMarkdownContent = ({
 								<CustomIcon name="thread-icon" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
 							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
 								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
+								<View
+									style={{
+										backgroundColor: Colors.midnightBlue,
+										flexDirection: 'row',
+										alignItems: 'center',
+										height: '99%',
+										transform: [{ translateY: 3.6 }]
+									}}
+								>
+									<MezonIconCDN icon={IconCDN.channelApp} width={size.s_14} height={size.s_14} color={Colors.textLink} />
+								</View>
 							) : payloadChannel?.channel_id === 'undefined' ? (
 								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />
 							) : null}
-							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
+							{payloadChannel?.channel_id === 'undefined'
+								? 'private-channel'
+								: payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP
+									? text.replace('#', '')
+									: text}
 						</Text>
 					);
 				} else {
