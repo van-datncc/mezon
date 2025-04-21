@@ -1641,7 +1641,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							dispatch(
 								policiesActions.updateOne({
 									id: role.id as string,
-									changes: { title: role.title }
+									changes: { title: role.title, id: role.id || '', max_level_permission: role.max_level_permission }
 								})
 							);
 						} else {
