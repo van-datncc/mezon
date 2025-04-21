@@ -137,7 +137,6 @@ export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: P
 export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
 
 export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsUser, (userPermissions) => {
-	console.log('userPermissions: ', userPermissions);
 	let maxPermissionLevel: number | null = null;
 	for (const permission of userPermissions) {
 		if (Number.isInteger(permission?.max_level_permission)) {
