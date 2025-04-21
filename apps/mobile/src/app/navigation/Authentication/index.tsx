@@ -79,7 +79,7 @@ export const Authentication = memo(() => {
 	};
 
 	const extractChannelParams = (url: string) => {
-		const pattern = /www\.mezon\.ai\/channel-app\/([^/]+)\/([^/]+)\?([^#]+)/i;
+		const pattern = /mezon\.ai\/channel-app\/([^/]+)\/([^/]+)\?([^#]+)/i;
 		const match = url.match(pattern);
 
 		if (match) {

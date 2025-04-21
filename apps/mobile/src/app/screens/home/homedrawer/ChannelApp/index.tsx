@@ -28,9 +28,9 @@ const ChannelAppScreen = ({ navigation, route }) => {
 
 		const queryString = params.toString();
 
-		return queryString
-			? `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}?${queryString}`
-			: `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
+		const baseUrl = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
+
+		return queryString ? `${baseUrl}?${queryString}` : baseUrl;
 	}, [paramsRoute?.channelId, paramsRoute?.clanId, paramsRoute?.code, paramsRoute?.subpath]);
 
 	const injectedJS = `
