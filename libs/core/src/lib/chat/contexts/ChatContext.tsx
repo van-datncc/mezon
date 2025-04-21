@@ -1001,7 +1001,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				messagesActions.updateTypingUsers({
 					channelId: e.channel_id,
 					userId: e.sender_id,
-					isTyping: true
+					isTyping: true,
+					typingName: e.sender_display_name || e.sender_username
 				})
 			);
 		},
