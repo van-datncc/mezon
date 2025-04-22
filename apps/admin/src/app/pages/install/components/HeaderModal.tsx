@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { useAppearance } from '../../../context/AppearanceContext';
 
 type HeaderModalProps = {
 	name?: string;
@@ -7,10 +6,8 @@ type HeaderModalProps = {
 };
 
 const HeaderModal = memo(({ name, username }: HeaderModalProps) => {
-	const { isDarkMode } = useAppearance();
-
 	return (
-		<div className={`p-4 pb-0 ${isDarkMode ? 'bg-[#1e1f22] text-[#d1d5db]' : 'bg-[#f9fafb] text-[#111827]'}`}>
+		<div className="p-4 pb-0 bg-[#f9fafb] text-[#111827] dark:bg-[#1e1f22] dark:text-[#d1d5db]">
 			<p className="text-sm font-medium">An external application</p>
 
 			<h3 className="font-bold text-2xl text-[#facc15] mt-1 truncate max-w-full">{name}</h3>
@@ -22,7 +19,7 @@ const HeaderModal = memo(({ name, username }: HeaderModalProps) => {
 					Not you?
 				</a>
 			</p>
-			<hr className={`${isDarkMode ? 'border-[#374151]' : 'border-[#d1d5db]'} my-4`} />
+			<hr className="my-4 border-[#d1d5db] dark:border-[#374151]" />
 		</div>
 	);
 });
