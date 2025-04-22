@@ -1364,18 +1364,25 @@ export const selectUnreadMessageIdByChannelId = createSelector(
 export const selectTypingUsers = createSelector(getMessagesState, (state) => state.typingUsers);
 
 export const selectTypingUsersById = createSelector(
-	[selectTypingUsers, (_, channelId: string) => channelId, (_, __, userId: string) => userId],
-	(typingUsers, channelId, userId) => {
-		const channelTypingUsers = typingUsers?.[channelId]?.users || [];
-
-		return channelTypingUsers.filter((user) => user.id !== userId);
+	[
+		getMessagesState,
+		(_state, { channelId, userId }: { channelId: string; userId: string }) => {
+			return { channelId, userId };
+		}
+	],
+	(state, props) => {
+		const { channelId, userId } = props;
+		return state?.typingUsers?.[channelId]?.users.filter((user) => user.id !== userId) || [];
 	}
 );
 
+export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersById], (typingUsers) => {
+	return typingUsers;
+});
+
 export const selectIsUserTypingInChannel = createSelector(
-	[getMessagesState, (_, channelId) => channelId, (_, __, userId) => userId],
-	(state, channelId, userId) => {
-		const typingUsers = state.typingUsers?.[channelId]?.users;
+	[selectTypingUserIdsByChannelId, (_, channelId) => channelId, (_, __, userId) => userId],
+	(typingUsers, channelId, userId) => {
 		if (!typingUsers || !channelId || !userId) return false;
 		if (Array.isArray(userId)) {
 			return typingUsers.some((user) => userId.includes(user.id));
