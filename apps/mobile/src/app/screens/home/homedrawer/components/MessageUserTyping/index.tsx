@@ -1,5 +1,6 @@
+import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { Text, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { selectAllAccount, selectTypingUsersById } from '@mezon/store-mobile';
+import { selectTypingUsersById } from '@mezon/store-mobile';
 import LottieView from 'lottie-react-native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useMemo } from 'react';
@@ -18,8 +19,10 @@ interface IProps {
 export const MessageUserTyping = React.memo(({ channelId, isDM, mode, isPublic }: IProps) => {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
-	const userProfile = useSelector(selectAllAccount);
-	const typingUsers = useSelector((state) => selectTypingUsersById(state, channelId, userProfile?.user?.id as string));
+	const userId = useMemo(() => {
+		return load(STORAGE_MY_USER_ID);
+	}, []);
+	const typingUsers = useSelector((state) => selectTypingUsersById(state, channelId, userId));
 	const typingLabel = useMemo(() => {
 		if (typingUsers?.length === 1) {
 			return `${typingUsers[0].typingName} is typing...`;
