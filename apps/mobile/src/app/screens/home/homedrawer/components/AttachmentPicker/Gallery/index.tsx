@@ -11,13 +11,13 @@ import {
 	Alert,
 	DeviceEventEmitter,
 	Dimensions,
-	Image,
 	Linking,
 	PermissionsAndroid,
 	Platform,
 	TouchableOpacity,
 	View
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
@@ -39,7 +39,8 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [currentAlbums, setCurrentAlbums] = useState<string>('All');
 	const [pageInfo, setPageInfo] = useState(null);
-	const [loading, setLoading] = useState(false);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const [loadingImages, setLoadingImages] = useState<Record<string, boolean>>({});
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>();
 	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
@@ -181,9 +182,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	};
 
 	const loadPhotos = async (album, after = null) => {
-		if (loading) return;
+		if (isLoadingMore) return;
 
-		setLoading(true);
+		setIsLoadingMore(true);
 		try {
 			const res = await CameraRoll.getPhotos({
 				first: 30,
@@ -193,12 +194,21 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				groupTypes: album === 'All' ? 'All' : 'Album',
 				groupName: album === 'All' || album === 'All Videos' ? null : album
 			});
+
+			setLoadingImages((prevState) => {
+				const newState = { ...prevState };
+				res.edges.forEach((photo) => {
+					newState[photo.node.id] = true;
+				});
+				return newState;
+			});
+
 			setPhotos(after ? [...photos, ...res.edges] : res.edges);
 			setPageInfo(res.page_info);
 		} catch (error) {
 			console.error('Error loading photos', error);
 		} finally {
-			setLoading(false);
+			setIsLoadingMore(false);
 		}
 	};
 
@@ -221,9 +231,12 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			);
 		}
 		const fileName = item?.node?.image?.filename;
+		const imageId = item?.node?.id;
 		const isVideo = item?.node?.type?.startsWith?.('video');
 		const isSelected = attachmentFilteredByChannelId?.files.some((file) => file.filename === fileName);
 		const disabled = isDisableSelectAttachment && !isSelected;
+		const isLoadingImage = loadingImages[imageId];
+
 		return (
 			<TouchableOpacity
 				style={[styles.itemGallery, disabled && styles.disable]}
@@ -236,7 +249,18 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				}}
 				disabled={disabled}
 			>
-				<Image source={{ uri: item.node.image.uri + '?thumbnail=true&quality=low' }} style={styles.imageGallery} />
+				<FastImage
+					source={{ uri: item.node.image.uri + '?thumbnail=true&quality=low', cache: FastImage.cacheControl.immutable }}
+					style={styles.imageGallery}
+					onLoadEnd={() => {
+						setLoadingImages((prev) => ({ ...prev, [imageId]: false }));
+					}}
+				/>
+				{isLoadingImage && (
+					<View style={styles.loadingContainer}>
+						<ActivityIndicator size="small" color={themeValue.text} />
+					</View>
+				)}
 				{isVideo && (
 					<View style={styles.videoOverlay}>
 						<PlayIcon width={size.s_20} height={size.s_20} />
@@ -373,7 +397,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				}}
 				onEndReached={handleLoadMore}
 				onEndReachedThreshold={0.5}
-				ListFooterComponent={() => loading && <ActivityIndicator size="small" color={themeValue.text} />}
+				ListFooterComponent={() => isLoadingMore && <ActivityIndicator size="small" color={themeValue.text} />}
 			/>
 		</View>
 	);
