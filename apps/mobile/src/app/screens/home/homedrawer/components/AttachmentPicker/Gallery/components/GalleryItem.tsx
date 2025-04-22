@@ -2,7 +2,7 @@ import { CameraIcon, CheckIcon, PlayIcon } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import { PreSendAttachment } from '@mezon/utils';
 import { PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
-import { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { style } from './styles';
@@ -27,6 +27,11 @@ const GalleryItem = ({
 	handleRemove
 }: GalleryItemProps) => {
 	const styles = style(themeValue);
+	const fileName = item?.node?.image?.filename;
+	const isVideo = item?.node?.type?.startsWith?.('video');
+	const isSelected = attachmentFilteredByChannelId?.files.some((file) => file.filename === fileName);
+	const disabled = isDisableSelectAttachment && !isSelected;
+	const [isLoadingImage, setIsLoadingImage] = useState(true);
 
 	if (item?.isUseCamera) {
 		return (
@@ -35,12 +40,6 @@ const GalleryItem = ({
 			</TouchableOpacity>
 		);
 	}
-
-	const fileName = item?.node?.image?.filename;
-	const isVideo = item?.node?.type?.startsWith?.('video');
-	const isSelected = attachmentFilteredByChannelId?.files.some((file) => file.filename === fileName);
-	const disabled = isDisableSelectAttachment && !isSelected;
-	const [isLoadingImage, setIsLoadingImage] = useState(true);
 
 	return (
 		<TouchableOpacity
@@ -79,4 +78,4 @@ const GalleryItem = ({
 	);
 };
 
-export default GalleryItem;
+export default memo(GalleryItem);

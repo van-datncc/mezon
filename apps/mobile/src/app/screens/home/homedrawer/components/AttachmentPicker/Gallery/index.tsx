@@ -5,7 +5,7 @@ import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { MAX_FILE_SIZE } from '@mezon/utils';
 import { CameraRoll, PhotoIdentifier, iosRefreshGallerySelection, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
 import { iosReadGalleryPermission } from '@react-native-camera-roll/camera-roll/src/CameraRollIOSPermission';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, DeviceEventEmitter, Dimensions, Linking, PermissionsAndroid, Platform, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
@@ -215,50 +215,53 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		);
 	};
 
-	const handleGalleryPress = async (file: PhotoIdentifier) => {
-		try {
-			const image = file?.node?.image;
-			const type = file?.node?.type;
-			const name = file?.node?.image?.filename || file?.node?.image?.uri;
-			const size = file?.node?.image?.fileSize;
+	const handleGalleryPress = useCallback(
+		async (file: PhotoIdentifier) => {
+			try {
+				const image = file?.node?.image;
+				const type = file?.node?.type;
+				const name = file?.node?.image?.filename || file?.node?.image?.uri;
+				const size = file?.node?.image?.fileSize;
 
-			if (size && size >= MAX_FILE_SIZE) {
-				Toast.show({
-					type: 'error',
-					text1: 'File size cannot exceed 50MB!'
-				});
-				return;
-			}
-
-			let filePath = image?.uri;
-
-			if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
-				const ms = new Date().getTime();
-				const ext = image.extension;
-				const destPath = `${RNFS.CachesDirectoryPath}/${ms}.${ext}`;
-
-				if (type && type.startsWith('video')) {
-					filePath = await RNFS.copyAssetsVideoIOS(filePath, destPath);
-				} else {
-					filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
+				if (size && size >= MAX_FILE_SIZE) {
+					Toast.show({
+						type: 'error',
+						text1: 'File size cannot exceed 50MB!'
+					});
+					return;
 				}
+
+				let filePath = image?.uri;
+
+				if (Platform.OS === 'ios' && filePath.startsWith('ph://')) {
+					const ms = new Date().getTime();
+					const ext = image.extension;
+					const destPath = `${RNFS.CachesDirectoryPath}/${ms}.${ext}`;
+
+					if (type && type.startsWith('video')) {
+						filePath = await RNFS.copyAssetsVideoIOS(filePath, destPath);
+					} else {
+						filePath = await RNFS.copyAssetsFileIOS(filePath, destPath, image.width, image.height);
+					}
+				}
+
+				const fileFormat: IFile = {
+					uri: filePath,
+					type: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
+					size: size,
+					name,
+					fileData: filePath,
+					width: image?.width,
+					height: image?.height
+				};
+
+				onPickGallery(fileFormat);
+			} catch (err) {
+				console.error('Error: ', err);
 			}
-
-			const fileFormat: IFile = {
-				uri: filePath,
-				type: Platform.OS === 'ios' ? `${file?.node?.type}/${image?.extension}` : file?.node?.type,
-				size: size,
-				name,
-				fileData: filePath,
-				width: image?.width,
-				height: image?.height
-			};
-
-			onPickGallery(fileFormat);
-		} catch (err) {
-			console.error('Error: ', err);
-		}
-	};
+		},
+		[onPickGallery]
+	);
 
 	const checkPermissionCamera = async () => {
 		const permission = await Camera.requestCameraPermission();
@@ -268,7 +271,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		return permission === PermissionsAndroid.RESULTS.GRANTED;
 	};
 
-	const onOpenCamera = async () => {
+	const onOpenCamera = useCallback(async () => {
 		const isHavePermission = await checkPermissionCamera();
 
 		if (!isHavePermission) return;
@@ -299,7 +302,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				onPickGallery(fileFormat);
 			}
 		});
-	};
+	}, [checkPermissionCamera, onPickGallery]);
 
 	const handleLoadMore = async () => {
 		if (pageInfo?.has_next_page) {
@@ -307,10 +310,13 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	const handleRemove = (filename: string) => {
-		const index = attachmentFilteredByChannelId?.files?.findIndex((file) => file.filename === filename);
-		removeAttachmentByIndex(currentChannelId, index);
-	};
+	const handleRemove = useCallback(
+		(filename: string) => {
+			const index = attachmentFilteredByChannelId?.files?.findIndex((file) => file.filename === filename);
+			removeAttachmentByIndex(currentChannelId, index);
+		},
+		[attachmentFilteredByChannelId, currentChannelId, removeAttachmentByIndex]
+	);
 
 	return (
 		<View style={{ flex: 1 }}>
