@@ -1372,17 +1372,15 @@ export const selectTypingUsersById = createSelector(
 	],
 	(state, props) => {
 		const { channelId, userId } = props;
-		return state?.typingUsers?.[channelId]?.users.filter((user) => user.id !== userId) || [];
+		const typingList = state?.typingUsers?.[channelId]?.users.filter((user) => user.id !== userId) || [];
+		return typingList;
 	}
 );
 
-export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersById], (typingUsers) => {
-	return typingUsers;
-});
-
 export const selectIsUserTypingInChannel = createSelector(
-	[selectTypingUserIdsByChannelId, (_, channelId) => channelId, (_, __, userId) => userId],
-	(typingUsers, channelId, userId) => {
+	[getMessagesState, (_, channelId) => channelId, (_, __, userId) => userId],
+	(state, channelId, userId) => {
+		const typingUsers = state.typingUsers?.[channelId]?.users;
 		if (!typingUsers || !channelId || !userId) return false;
 		if (Array.isArray(userId)) {
 			return typingUsers.some((user) => userId.includes(user.id));
