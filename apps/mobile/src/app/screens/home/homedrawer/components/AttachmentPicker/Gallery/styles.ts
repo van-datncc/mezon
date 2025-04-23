@@ -47,7 +47,7 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.secondary,
 			borderRadius: size.s_20,
 			padding: size.s_4,
-			zIndex: size.s_2
+			zIndex: 2
 		},
 		selectedOverlay: {
 			position: 'absolute',
