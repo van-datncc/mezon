@@ -121,19 +121,26 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
 	};
+	const [changeName, setChangeName] = useState(appDetail.appname);
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState(false);
 	const toggleDeletePopup = () => {
 		setIsShowDeletePopup(!isShowDeletePopup);
+	};
+	const handleConfirmNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setChangeName(e.target.value);
+		if (e.target.value !== appDetail.appname) {
+			setChangeName(e.target.value);
+		}
 	};
 	return (
 		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
 				<div className="text-[12px] uppercase font-semibold">Name</div>
 				<input
-					value={appDetail.appname}
-					className="cursor-not-allowed w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
+					value={changeName}
+					className=" w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] p-[10px] outline-primary dark:bg-[#1e1f22]"
 					type="text"
-					readOnly={true}
+					onChange={handleConfirmNameChange}
 				/>
 			</div>
 			<div className="flex flex-col gap-2">

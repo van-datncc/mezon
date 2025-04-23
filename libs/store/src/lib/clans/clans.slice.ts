@@ -327,7 +327,6 @@ export const clansSlice = createSlice({
 		},
 		updateClansOrder: (state, action: PayloadAction<string[]>) => {
 			state.clansOrder = action.payload;
-			localStorage.setItem('clanOrder', JSON.stringify(action.payload));
 		},
 
 		toggleInvitePeople: (state, action: PayloadAction<{ status: boolean; clanId?: string; channelId?: string }>) => {
