@@ -15,12 +15,11 @@ import {
 	SidebarLogoItem,
 	Topbar
 } from '@mezon/components';
-import { useAppParams, useAuth, useDragAndDrop, useMenu, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useClanDragAndDrop, useMenu, useReference } from '@mezon/core';
 import {
 	DMCallActions,
 	accountActions,
 	audioCallActions,
-	clansActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
@@ -485,20 +484,13 @@ const SidebarMenu = memo(
 
 const ClansList = memo(() => {
 	const dispatch = useDispatch();
-
 	const clans = useSelector(selectOrderedClans);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isClanView = useSelector(selectClanView);
 
-	const { draggingState: isDragging, setDraggingState } = useDragAndDrop();
-
 	const [items, setItems] = useState<string[]>([]);
-	const [potentialDrag, setPotentialDrag] = useState<string | null>(null);
-	const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
-	const [draggedItem, setDraggedItem] = useState<string | null>(null);
-	const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
-	const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-	const [overItem, setOverItem] = useState<string | null>(null);
+
+	const { draggingState, handleMouseDown, handleMouseEnter } = useClanDragAndDrop(items, setItems);
 
 	useEffect(() => {
 		const savedOrder = localStorage.getItem('clanOrder');
@@ -515,71 +507,20 @@ const ClansList = memo(() => {
 		setItems(clans.map((c) => c.id));
 	}, [clans]);
 
-	useEffect(() => {
-		const onMove = (e: MouseEvent) => {
-			if (!startPoint || !potentialDrag) return;
-			const dx = Math.abs(e.clientX - startPoint.x);
-			const dy = Math.abs(e.clientY - startPoint.y);
-			if (!isDragging && (dx > 5 || dy > 5)) {
-				setDraggingState(true);
-				setDraggedItem(potentialDrag);
-			}
-			if (isDragging) {
-				setDragPosition({ x: e.clientX, y: e.clientY });
-			}
-		};
-
-		const onUp = () => {
-			if (isDragging && draggedItem && overItem && draggedItem !== overItem) {
-				const oldIndex = items.indexOf(draggedItem);
-				const newIndex = items.indexOf(overItem);
-				const newItems = [...items];
-				newItems.splice(oldIndex, 1);
-				newItems.splice(newIndex, 0, draggedItem);
-				setItems(newItems);
-				dispatch(clansActions.updateClansOrder(newItems));
-			}
-			setPotentialDrag(null);
-			setStartPoint(null);
-			setDraggedItem(null);
-			setDraggingState(false);
-			setDragPosition(null);
-			setOverItem(null);
-		};
-
-		window.addEventListener('mousemove', onMove);
-		window.addEventListener('mouseup', onUp);
-		return () => {
-			window.removeEventListener('mousemove', onMove);
-			window.removeEventListener('mouseup', onUp);
-		};
-	}, [startPoint, potentialDrag, isDragging, draggedItem, overItem, items, dispatch, setDraggingState]);
-
-	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
-		setStartPoint({ x: e.clientX, y: e.clientY });
-		setPotentialDrag(id);
-		setDragOffset({
-			x: e.clientX - e.currentTarget.getBoundingClientRect().left,
-			y: e.clientY - e.currentTarget.getBoundingClientRect().top
-		});
-	};
+	const { isDragging, draggedItem, dragPosition, dragOffset } = draggingState;
+	const isActive = isClanView && currentClanId === clans.find((c) => c.id === draggedItem)?.clan_id;
 
 	return (
 		<div className="flex flex-col gap-2 relative">
 			{items.map((id) => {
 				const clan = clans.find((c) => c.id === id)!;
-				const isActive = isClanView && currentClanId === clan.clan_id;
 				const draggingThis = isDragging && draggedItem === clan.id;
 
 				return (
 					<div
 						key={clan.id}
-						className={`relative transition-all duration-200 ${
-							draggingThis ? 'opacity-0 h-0 overflow-hidden my-0' : isDragging && overItem === clan.id ? 'my-8' : 'my-0'
-						}`}
-						onMouseEnter={() => {
-							if (isDragging && draggedItem !== clan.id) setOverItem(clan.id);
-						}}
+						className={`relative transition-all duration-200 ${draggingThis ? 'opacity-0 h-0 overflow-hidden my-0' : isDragging && draggingState.overItem === clan.id ? 'my-8' : 'my-0'}`}
+						onMouseEnter={() => handleMouseEnter(clan.id)}
 						onMouseDown={(e) => handleMouseDown(e, clan.id)}
 					>
 						<SidebarClanItem option={clan} active={isActive} className={draggingThis ? 'opacity-0' : ''} />
