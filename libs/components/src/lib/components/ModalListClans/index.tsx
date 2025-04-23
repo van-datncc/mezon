@@ -3,7 +3,7 @@ import { appActions, getStore, selectBadgeCountByClanId, selectIsUseProfileDM, u
 import { Image } from '@mezon/ui';
 import { IClan, createImgproxyUrl } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { memo, useEffect, useState, useTransition } from 'react';
+import { memo, useState, useTransition } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
@@ -22,7 +22,6 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
-
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const store = getStore();
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
@@ -47,7 +46,6 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
 		return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} clan={option} />;
 	}, [coords, option]);
-
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
@@ -56,19 +54,6 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 		setCoords({ mouseX, mouseY, distanceToBottom });
 		openRightClickModal();
 	};
-
-	const [items, setItems] = useState<IClan[]>([]);
-
-	useEffect(() => {
-		const savedOrder = localStorage.getItem('clanOrder');
-		if (savedOrder) {
-			setItems(JSON.parse(savedOrder));
-		}
-	}, []);
-
-	useEffect(() => {
-		localStorage.setItem('clanOrder', JSON.stringify(items));
-	}, [items]);
 
 	return (
 		<div
@@ -96,7 +81,6 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 					)}
 				</NavLinkComponent>
 			</button>
-
 			{badgeCountClan > 0 ? (
 				<div
 					className={`flex items-center text-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-5px] right-[2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${

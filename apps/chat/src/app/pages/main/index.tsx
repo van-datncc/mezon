@@ -15,7 +15,7 @@ import {
 	SidebarLogoItem,
 	Topbar
 } from '@mezon/components';
-import { useAppParams, useAuth, useMenu, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useDragAndDrop, useMenu, useReference } from '@mezon/core';
 import {
 	DMCallActions,
 	accountActions,
@@ -490,11 +490,12 @@ const ClansList = memo(() => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isClanView = useSelector(selectClanView);
 
+	const { draggingState: isDragging, setDraggingState } = useDragAndDrop();
+
 	const [items, setItems] = useState<string[]>([]);
 	const [potentialDrag, setPotentialDrag] = useState<string | null>(null);
 	const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
 	const [draggedItem, setDraggedItem] = useState<string | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
 	const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
 	const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 	const [overItem, setOverItem] = useState<string | null>(null);
@@ -520,7 +521,7 @@ const ClansList = memo(() => {
 			const dx = Math.abs(e.clientX - startPoint.x);
 			const dy = Math.abs(e.clientY - startPoint.y);
 			if (!isDragging && (dx > 5 || dy > 5)) {
-				setIsDragging(true);
+				setDraggingState(true);
 				setDraggedItem(potentialDrag);
 			}
 			if (isDragging) {
@@ -541,7 +542,7 @@ const ClansList = memo(() => {
 			setPotentialDrag(null);
 			setStartPoint(null);
 			setDraggedItem(null);
-			setIsDragging(false);
+			setDraggingState(false);
 			setDragPosition(null);
 			setOverItem(null);
 		};
@@ -552,7 +553,7 @@ const ClansList = memo(() => {
 			window.removeEventListener('mousemove', onMove);
 			window.removeEventListener('mouseup', onUp);
 		};
-	}, [startPoint, potentialDrag, isDragging, draggedItem, overItem, items, dispatch]);
+	}, [startPoint, potentialDrag, isDragging, draggedItem, overItem, items, dispatch, setDraggingState]);
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
 		setStartPoint({ x: e.clientX, y: e.clientY });
