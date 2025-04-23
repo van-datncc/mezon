@@ -262,7 +262,7 @@ export function MyVideoConference({
 				</div>
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
-			<ConnectionStateToast />
+			{!propTracks && <ConnectionStateToast />}
 		</div>
 	);
 }
