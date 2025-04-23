@@ -3,7 +3,7 @@ import { appActions, getStore, selectBadgeCountByClanId, selectIsUseProfileDM, u
 import { Image } from '@mezon/ui';
 import { IClan, createImgproxyUrl } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { memo, useState, useTransition } from 'react';
+import { memo, useEffect, useState, useTransition } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Coords } from '../ChannelLink';
@@ -13,13 +13,16 @@ import PanelClan from '../PanelClan';
 export type SidebarClanItemProps = {
 	option: IClan;
 	active?: boolean;
+	onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
+	className?: string;
 };
 
-const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
+const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: SidebarClanItemProps) => {
 	const [_, startTransition] = useTransition();
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
+
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const store = getStore();
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
@@ -34,6 +37,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 			}
 		});
 	};
+
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -43,6 +47,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
 		return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} clan={option} />;
 	}, [coords, option]);
+
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
@@ -52,8 +57,26 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 		openRightClickModal();
 	};
 
+	const [items, setItems] = useState<IClan[]>([]);
+
+	useEffect(() => {
+		const savedOrder = localStorage.getItem('clanOrder');
+		if (savedOrder) {
+			setItems(JSON.parse(savedOrder));
+		}
+	}, []);
+
+	useEffect(() => {
+		localStorage.setItem('clanOrder', JSON.stringify(items));
+	}, [items]);
+
 	return (
-		<div onContextMenu={handleMouseClick} className="relative h-[40px]">
+		<div
+			onMouseDown={onMouseDown}
+			onContextMenu={handleMouseClick}
+			data-id={option.id}
+			className={`relative h-[48px] w-[48px] overflow-hidden cursor-move rounded-lg bg-gray-800 flex items-center justify-center transition-all duration-200 hover:bg-gray-700 ${className}`}
+		>
 			<button onClick={handleClick} draggable="false">
 				<NavLinkComponent active={active}>
 					{option.logo ? (
@@ -73,6 +96,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 					)}
 				</NavLinkComponent>
 			</button>
+
 			{badgeCountClan > 0 ? (
 				<div
 					className={`flex items-center text-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-5px] right-[2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${

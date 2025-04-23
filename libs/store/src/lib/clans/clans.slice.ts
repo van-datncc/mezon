@@ -13,6 +13,7 @@ import { defaultNotificationCategoryActions } from '../notificationSetting/notif
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
+import { RootState } from '../store';
 import { usersStreamActions } from '../stream/usersStream.slice';
 import { voiceActions } from '../voice/voice.slice';
 
@@ -52,6 +53,7 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	invitePeople: boolean;
 	inviteChannelId?: string;
 	inviteClanId?: string;
+	clansOrder?: string[];
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -301,7 +303,8 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	clanMetadata: clanMetaAdapter.getInitialState(),
 	invitePeople: false,
 	inviteChannelId: undefined,
-	inviteClanId: undefined
+	inviteClanId: undefined,
+	clansOrder: []
 });
 
 type UpdateClanBadgeCountPayload = {
@@ -322,6 +325,11 @@ export const clansSlice = createSlice({
 		setCurrentClanId: (state, action: PayloadAction<string>) => {
 			state.currentClanId = action.payload;
 		},
+		updateClansOrder: (state, action: PayloadAction<string[]>) => {
+			state.clansOrder = action.payload;
+			localStorage.setItem('clanOrder', JSON.stringify(action.payload));
+		},
+
 		toggleInvitePeople: (state, action: PayloadAction<{ status: boolean; clanId?: string; channelId?: string }>) => {
 			state.invitePeople = action.payload.status;
 			if (action.payload.status) {
@@ -519,7 +527,12 @@ export const selectCurrentClan = createSelector(selectClansEntities, selectCurre
 );
 
 export const selectDefaultClanId = createSelector(selectAllClans, (clans) => (clans.length > 0 ? clans[0].id : null));
+export const selectOrderedClans = createSelector([selectAllClans, (state: RootState) => state.clans.clansOrder], (clans, order) => {
+	if (!order || order.length === 0) return clans;
 
+	const clanMap = Object.fromEntries(clans.map((clan) => [clan.id, clan]));
+	return order.map((id) => clanMap[id]).filter(Boolean);
+});
 export const selectShowNumEvent = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.clanMetadata.entities[clanId];
