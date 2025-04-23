@@ -491,18 +491,6 @@ const ClansList = memo(() => {
 	const [items, setItems] = useState<string[]>([]);
 
 	const { draggingState, handleMouseDown, handleMouseEnter } = useClanDragAndDrop(items, setItems);
-
-	useEffect(() => {
-		const savedOrder = localStorage.getItem('clanOrder');
-		if (savedOrder) {
-			setItems(JSON.parse(savedOrder));
-		}
-	}, []);
-
-	useEffect(() => {
-		localStorage.setItem('clanOrder', JSON.stringify(items));
-	}, [items]);
-
 	useEffect(() => {
 		setItems(clans.map((c) => c.id));
 	}, [clans]);

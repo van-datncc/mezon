@@ -530,8 +530,14 @@ export const selectOrderedClans = createSelector([selectAllClans, (state: RootSt
 	if (!order || order.length === 0) return clans;
 
 	const clanMap = Object.fromEntries(clans.map((clan) => [clan.id, clan]));
-	return order.map((id) => clanMap[id]).filter(Boolean);
+
+	const orderedClans = order.map((id) => clanMap[id]).filter(Boolean);
+
+	const remainingClans = clans.filter((clan) => !order.includes(clan.id));
+
+	return [...orderedClans, ...remainingClans];
 });
+
 export const selectShowNumEvent = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.clanMetadata.entities[clanId];
