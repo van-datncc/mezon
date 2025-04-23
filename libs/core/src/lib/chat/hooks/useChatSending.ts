@@ -41,13 +41,12 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			: userProfile?.user?.avatar_url;
 
 	const priorityDisplayName = userProfile?.user?.display_name ? userProfile?.user?.display_name : userProfile?.user?.username;
-	const priorityNameToShow = useMemo(() => {
-		return mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+	const priorityNameToShow =
+		mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
 			? profileInTheClan?.clan_nick
 				? profileInTheClan?.clan_nick
 				: priorityDisplayName
 			: priorityDisplayName;
-	}, [profileInTheClan]);
 
 	const currentUserId = userProfile?.user?.id || '';
 	const anonymousMode = useSelector(selectAnonymousMode);
@@ -168,7 +167,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 				})
 			);
 		}
-	}, [channelIdOrDirectId, getClanId, dispatch, isPublic, mode, anonymousMode]);
+	}, [priorityNameToShow, channelIdOrDirectId, getClanId, dispatch, isPublic, mode, anonymousMode]);
 
 	// Move this function to to a new action of messages slice
 	const editSendMessage = React.useCallback(
