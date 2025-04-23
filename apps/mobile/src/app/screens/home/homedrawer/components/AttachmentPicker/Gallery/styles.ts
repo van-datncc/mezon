@@ -3,34 +3,6 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
-		cameraPicker: {
-			width: '32%',
-			backgroundColor: colors.border,
-			borderRadius: size.s_6,
-			margin: size.s_2,
-			alignItems: 'center',
-			justifyContent: 'center',
-			minHeight: 120
-		},
-		itemGallery: {
-			width: '32%',
-			margin: size.s_2,
-			borderRadius: size.s_6,
-			overflow: 'hidden'
-		},
-		imageGallery: {
-			flex: 1,
-			width: '100%',
-			height: 120,
-			resizeMode: 'cover',
-			borderRadius: size.s_6
-		},
-		videoOverlay: {
-			...StyleSheet.absoluteFillObject,
-			backgroundColor: 'rgba(0, 0, 0, 0.5)',
-			alignItems: 'center',
-			justifyContent: 'center'
-		},
 		wrapperRequesting: {
 			flex: 1,
 			justifyContent: 'center',
