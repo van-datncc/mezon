@@ -18,7 +18,6 @@ import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
 import { useLoading } from '../app';
-import VoicePopout from '../pages/popOut/VoicePopout';
 import CanvasRoutes from './CanvasRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
@@ -158,14 +157,14 @@ export const Routes = memo(() => {
 						),
 						loader: loaderWithStore(authLoader)
 					},
-					{
-						path: 'popout',
-						element: (
-							<Suspense fallback={<SuspenseFallback />}>
-								<VoicePopout />
-							</Suspense>
-						)
-					},
+					// {
+					// 	path: 'popout',
+					// 	element: (
+					// 		<Suspense fallback={<SuspenseFallback />}>
+					// 			<VoicePopout />
+					// 		</Suspense>
+					// 	)
+					// },
 					isElectron()
 						? {
 								path: '/',
@@ -493,22 +492,6 @@ export const Routes = memo(() => {
 								)
 							}
 						]
-					},
-					{
-						path: '/.well-known/assetlinks.json',
-						element: (
-							<Suspense fallback={<SuspenseFallback />}>
-								<AssetLinkLayout />
-							</Suspense>
-						)
-					},
-					{
-						path: '/.well-known/apple-app-site-association',
-						element: (
-							<Suspense fallback={<SuspenseFallback />}>
-								<AppleAppSiteAssociationLayout />
-							</Suspense>
-						)
 					},
 					{
 						path: '*',

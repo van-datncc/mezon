@@ -2,7 +2,7 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getAuthState } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import { Wave } from 'react-native-animated-spinkit';
 import WebView from 'react-native-webview';
@@ -20,7 +20,22 @@ const ChannelAppScreen = ({ navigation, route }) => {
 	const [loading, setLoading] = useState(true);
 	const webviewRef = useRef<WebView>(null);
 
-	const uri = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
+	const uri = useMemo(() => {
+		let queryString: string;
+		if (paramsRoute?.code && paramsRoute?.subpath) {
+			queryString = `?code=${paramsRoute?.code}&subpath=${paramsRoute?.subpath}`;
+		} else if (paramsRoute?.code) {
+			queryString = `?code=${paramsRoute?.code}`;
+		} else if (paramsRoute?.subpath) {
+			queryString = `?subpath=${paramsRoute?.subpath}`;
+		} else {
+		}
+
+		const baseUrl = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
+
+		return queryString ? `${baseUrl}${queryString}` : baseUrl;
+	}, [paramsRoute?.channelId, paramsRoute?.clanId, paramsRoute?.code, paramsRoute?.subpath]);
+
 	const injectedJS = `
     (function() {
 	const authData = {

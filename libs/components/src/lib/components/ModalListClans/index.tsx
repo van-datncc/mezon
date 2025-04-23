@@ -13,18 +13,23 @@ import PanelClan from '../PanelClan';
 export type SidebarClanItemProps = {
 	option: IClan;
 	active?: boolean;
+	onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
+	className?: string;
 };
 
-const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
+const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: SidebarClanItemProps) => {
 	const [_, startTransition] = useTransition();
 	const badgeCountClan = useSelector(selectBadgeCountByClanId(option.clan_id ?? '')) || 0;
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
+
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		const store = getStore();
 		const idsSelectedChannel = safeJSONParse(localStorage.getItem('remember_channel') || '{}');
-		const link = `/chat/clans/${option.id}${idsSelectedChannel[option.id] ? `/channels/${idsSelectedChannel[option.id]}` : ''}`;
+		const channelId = idsSelectedChannel[option.id] || option.welcome_channel_id;
+		const link = `/chat/clans/${option.id}${channelId ? `/channels/${channelId}` : ''}`;
 		const isShowDmProfile = selectIsUseProfileDM(store.getState());
+
 		startTransition(() => {
 			navigate(link);
 			if (isShowDmProfile) {
@@ -34,6 +39,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 			}
 		});
 	};
+
 	const [coords, setCoords] = useState<Coords>({
 		mouseX: 0,
 		mouseY: 0,
@@ -43,6 +49,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
 		return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} clan={option} />;
 	}, [coords, option]);
+
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;
@@ -53,7 +60,7 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 	};
 
 	return (
-		<div onContextMenu={handleMouseClick} className="relative h-[40px]">
+		<div onMouseDown={onMouseDown} onContextMenu={handleMouseClick} data-id={option.id} className={`relative h-[40px] ${className}`}>
 			<button onClick={handleClick} draggable="false">
 				<NavLinkComponent active={active}>
 					{option.logo ? (
@@ -73,15 +80,16 @@ const SidebarClanItem = ({ option, active }: SidebarClanItemProps) => {
 					)}
 				</NavLinkComponent>
 			</button>
-			{badgeCountClan > 0 ? (
+
+			{badgeCountClan > 0 && (
 				<div
-					className={`flex items-center text-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-5px] right-[2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${
+					className={`flex items-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-5px] right-[2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${
 						badgeCountClan >= 10 ? 'w-[22px] h-[16px]' : 'w-[16px] h-[16px]'
 					}`}
 				>
 					{badgeCountClan >= 100 ? '99+' : badgeCountClan}
 				</div>
-			) : null}
+			)}
 		</div>
 	);
 };

@@ -78,15 +78,37 @@ export const Authentication = memo(() => {
 		}
 	};
 
+	const extractChannelParams = (url: string) => {
+		const regex = /channel-app\/(\d+)\/(\d+)(?:\?[^#]*)?/;
+		const baseMatch = url.match(regex);
+		if (!baseMatch) return null;
+
+		const [, id1, id2] = baseMatch;
+
+		const codeMatch = url.match(/[?&]code=([^&]+)/);
+		const subpathMatch = url.match(/[?&]subpath=([^&]+)/);
+
+		return {
+			channelId: id1,
+			clanId: id2,
+			code: codeMatch ? codeMatch[1] : null,
+			subpath: subpathMatch ? subpathMatch[1] : null
+		};
+	};
+
 	const onNavigationDeeplink = async (path: string) => {
 		if (path?.includes?.('channel-app/')) {
-			const parts = path.split('/');
-			const channelId = parts[parts.length - 2];
-			const clanId = parts[parts.length - 1];
+			const parts = extractChannelParams(path);
+			const channelId = parts?.channelId;
+			const clanId = parts?.clanId;
+			const code = parts?.code;
+			const subpath = parts?.subpath;
 			if (clanId && channelId) {
 				navigation.navigate(APP_SCREEN.CHANNEL_APP, {
 					channelId: channelId,
-					clanId: clanId
+					clanId: clanId,
+					code: code,
+					subpath: subpath
 				});
 			}
 		}
