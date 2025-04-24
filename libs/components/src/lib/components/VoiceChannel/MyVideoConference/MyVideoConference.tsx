@@ -27,12 +27,20 @@ interface MyVideoConferenceProps {
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
 	isExternalCalling?: boolean;
+	tracks?: TrackReferenceOrPlaceholder[];
 }
 
-export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isExternalCalling = false }: MyVideoConferenceProps) {
+export function MyVideoConference({
+	channelLabel,
+	onLeaveRoom,
+	onFullScreen,
+	isExternalCalling = false,
+	tracks: propTracks
+}: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
-	const tracks = useTracks(
+
+	const tracksFromHook = useTracks(
 		[
 			{ source: Track.Source.Camera, withPlaceholder: true },
 			{ source: Track.Source.ScreenShare, withPlaceholder: false }
@@ -40,7 +48,7 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 		{ updateOnlyOn: [RoomEvent.ActiveSpeakersChanged], onlySubscribed: false }
 	);
 
-	console.log('tracks', tracks);
+	const tracks = propTracks || tracksFromHook;
 
 	const layoutContext = useCreateLayoutContext();
 
@@ -71,7 +79,7 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: updatedFocusTrack });
 			}
 		}
-	}, [screenShareTracks, focusTrack?.publication?.trackSid, tracks]);
+	}, [screenShareTracks, focusTrack?.publication?.trackSid, tracks, layoutContext?.pin]);
 
 	const [isShowMember, setIsShowMember] = useState<boolean>(true);
 
@@ -202,7 +210,7 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>{channelLabel}</p>
 							</div>
 							<div className="flex justify-start gap-4">
-								{!isExternalCalling && (
+								{!isExternalCalling && !propTracks && (
 									<div className="relative leading-5 h-5" ref={inboxRef}>
 										<button
 											title="Inbox"
@@ -254,7 +262,7 @@ export function MyVideoConference({ channelLabel, onLeaveRoom, onFullScreen, isE
 				</div>
 			</LayoutContextProvider>
 			<RoomAudioRenderer />
-			<ConnectionStateToast />
+			{!propTracks && <ConnectionStateToast />}
 		</div>
 	);
 }

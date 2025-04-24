@@ -42,14 +42,15 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 	const direct = useAppSelector((state) => selectDirectById(state, groupCallId)) || {};
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const { disconnect } = useWebRTCStream();
-
-	const { handleEndCall, toggleAudio, toggleVideo } = useWebRTCCall(
+	const { handleEndCall } = useWebRTCCall({
 		dmUserId,
-		groupCallId as string,
-		userProfile?.user?.id as string,
-		userProfile?.user?.username as string,
-		userProfile?.user?.avatar_url as string
-	);
+		channelId: groupCallId as string,
+		userId: userProfile?.user?.id as string,
+		callerName: userProfile?.user?.username as string,
+		callerAvatar: userProfile?.user?.avatar_url as string,
+		isInChannelCalled: false
+	});
+
 	const redirectToCall = async () => {
 		await dispatch(
 			directActions.joinDirectMessage({

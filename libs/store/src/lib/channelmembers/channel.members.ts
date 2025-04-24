@@ -4,7 +4,6 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
-import { ChannelsEntity } from '../channels/channels.slice';
 import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { selectClanView } from '../clans/clans.slice';
 import { selectDirectMembersMetaEntities } from '../direct/direct.members.meta';
@@ -90,14 +89,13 @@ export const fetchChannelMembers = createAsyncThunk(
 
 			const state = thunkAPI.getState() as RootState;
 			const currentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[channelId] || {};
-			const parentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[currentChannel.parent_id || ''] as ChannelsEntity;
 
-			if (parentChannel?.channel_private && !state?.channelMembers?.entities?.[parentChannel.id]) {
-				const response = await fetchChannelMembersCached(mezon, clanId, parentChannel.id, channelType);
+			if (currentChannel?.parent_id && currentChannel.parent_id !== '0' && !state?.channelMembers?.entities?.[currentChannel.parent_id]) {
+				const response = await fetchChannelMembersCached(mezon, clanId, currentChannel.parent_id, channelType);
 
 				if (!(Date.now() - response.time > 100)) {
 					thunkAPI.dispatch(
-						channelMembersActions.setMemberChannels({ channelId: parentChannel.id, members: response.channel_users ?? [] })
+						channelMembersActions.setMemberChannels({ channelId: currentChannel.parent_id, members: response.channel_users ?? [] })
 					);
 				}
 			}
@@ -652,7 +650,7 @@ export const selectChannelMemberByUserIds = createSelector(
 					} as ChannelMembersEntity);
 					return;
 				}
-				const { usernames, channel_label, user_id, is_online, channel_avatar } = userInfo as DirectEntity;
+				const { channel_label, user_id, is_online, usernames, display_names } = userInfo as DirectEntity;
 				const currentUserIndex = Array.isArray(user_id) ? user_id.findIndex((id) => id === userId) : -1;
 				if (currentUserIndex === -1) return;
 				members.push({
@@ -660,7 +658,9 @@ export const selectChannelMemberByUserIds = createSelector(
 					userChannelId: channelId,
 					user: {
 						online: is_online?.[currentUserIndex],
-						...dmMembers?.[userId]?.user
+						...dmMembers?.[userId]?.user,
+						display_name: display_names?.[currentUserIndex],
+						username: usernames?.[currentUserIndex]
 					},
 					id: userId
 				} as ChannelMembersEntity);

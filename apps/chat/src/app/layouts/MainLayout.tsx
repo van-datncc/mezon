@@ -2,7 +2,6 @@ import { ChatContext, ChatContextProvider, ColorRoleProvider, useCustomNavigate,
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
-	handleTopicNotification,
 	selectAllAccount,
 	selectAnyUnreadChannel,
 	selectBadgeCountAllClan,
@@ -35,17 +34,6 @@ const GlobalEventListener = () => {
 	const { quantityPendingRequest } = useFriends();
 
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
-
-	useEffect(() => {
-		const handleNavigateToPath = (_: unknown, notifi: any) => {
-			navigate(notifi.path);
-			dispatch(handleTopicNotification({ msg: notifi.msg }));
-		};
-		window.electron?.on('navigate-to-path', handleNavigateToPath);
-		return () => {
-			window.electron?.removeListener('navigate-to-path', handleNavigateToPath);
-		};
-	}, [navigate]);
 
 	useEffect(() => {
 		const reconnectSocket = debounce(() => {

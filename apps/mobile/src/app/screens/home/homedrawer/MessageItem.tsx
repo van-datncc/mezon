@@ -90,7 +90,7 @@ const MessageItem = React.memo(
 				replyTo: senderDisplayName
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
-		}, []);
+		}, [message]);
 		//check
 
 		const hasIncludeMention = userId
@@ -304,18 +304,12 @@ const MessageItem = React.memo(
 								<View style={message?.content?.fwd ? { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 } : undefined}>
 									{!!message?.content?.fwd && (
 										<Text style={styles.forward}>
-											<Entypo name="forward" size={15} /> Forwarded
+											<Entypo name="forward" size={15} color={themeValue.text} /> Forwarded
 										</Text>
 									)}
 									<View style={{ opacity: message.isError || message?.isErrorRetry ? 0.6 : 1 }}>
 										{isMessageSystem ? (
 											<MessageLineSystem message={message} />
-										) : isInviteLink || isGoogleMapsLink ? (
-											<RenderMessageBlock
-												isGoogleMapsLink={isGoogleMapsLink}
-												isInviteLink={isInviteLink}
-												contentMessage={contentMessage}
-											/>
 										) : isMessageCallLog ? (
 											<MessageCallLog
 												contentMsg={message?.content?.t}
@@ -360,6 +354,13 @@ const MessageItem = React.memo(
 												/>
 											))}
 									</View>
+									{(isInviteLink || isGoogleMapsLink) && (
+										<RenderMessageBlock
+											isGoogleMapsLink={isGoogleMapsLink}
+											isInviteLink={isInviteLink}
+											contentMessage={contentMessage}
+										/>
+									)}
 									{/* check  */}
 									{message?.attachments?.length > 0 && (
 										<MessageAttachment
@@ -380,7 +381,7 @@ const MessageItem = React.memo(
 									preventAction={preventAction}
 									openEmojiPicker={() => {
 										const data = {
-											heightFitContent: true,
+											snapPoints: ['75%'],
 											children: (
 												<ContainerMessageActionModal
 													message={message}

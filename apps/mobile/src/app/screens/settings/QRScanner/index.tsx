@@ -1,12 +1,14 @@
 import { useAuth } from '@mezon/core';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import { Snowflake } from '@theinternetfolks/snowflake';
 import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
@@ -119,6 +121,10 @@ export const QRScanner = () => {
 		const store = await getStoreAsync();
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
+			if (value?.includes('channel-app')) {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, value);
+				return;
+			}
 			const valueObj = safeJSONParse(value || '{}');
 			// case Transfer funds
 			if (valueObj?.receiver_id) {
@@ -130,7 +136,14 @@ export const QRScanner = () => {
 				});
 				// 	case login
 			} else if (value) {
-				setValueCode(value);
+				try {
+					const decode = Snowflake.parse(value);
+					if (decode?.timestamp && Number.isInteger(Number(value))) {
+						setValueCode(value);
+					}
+				} catch {
+					//
+				}
 			} else {
 				// 	empty
 			}

@@ -1,14 +1,13 @@
 import {
 	ACTIVE_WINDOW,
 	DOWNLOAD_PROGRESS,
-	NAVIGATE_TO_URL,
 	SENDER_ID,
 	START_NOTIFICATION_SERVICE,
 	TRIGGER_SHORTCUT,
 	UPDATE_AVAILABLE,
 	UPDATE_ERROR
 } from './constants';
-import { NotificationData } from './notification';
+import { NotificationData, SHOW_NOTIFICATION } from './notification';
 import { ElectronBridgeHandler, IElectronBridge, MezonDownloadFile, MezonElectronAPI, MezonNotificationOptions } from './types';
 
 export class ElectronBridge implements IElectronBridge {
@@ -70,21 +69,9 @@ export class ElectronBridge implements IElectronBridge {
 	}
 
 	public pushNotification(title: string, options: MezonNotificationOptions, msg?: NotificationData) {
-		const notification = new Notification(title, options);
-		notification.onclick = () => {
-			const link = options.data?.link;
-			if (!link) {
-				return;
-			}
-			const notificationUrl = new URL(link);
-			const currentPath = window.location.pathname;
-			const path = notificationUrl.pathname;
-			const isSubPath = currentPath.endsWith(path);
-
-			if (path) {
-				this.bridge?.send(NAVIGATE_TO_URL, { path: path, msg: msg }, isSubPath);
-			}
-		};
+		if (this.bridge.send) {
+			this.bridge.send(SHOW_NOTIFICATION, { title, options, msg });
+		}
 	}
 
 	private setupSenderId() {

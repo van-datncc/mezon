@@ -18,7 +18,6 @@ import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
 import { useLoading } from '../app';
-import VoicePopout from '../pages/popOut/VoicePopout';
 import CanvasRoutes from './CanvasRoutes';
 import ClansRoutes from './ClanRoutes';
 import DMRoutes from './DMRoutes';
@@ -37,7 +36,8 @@ const ClanIndex = lazy(() => import(/* webpackChunkName: "clan-index" */ '../pag
 const ChannelIndex = lazy(() => import(/* webpackChunkName: "channel-index" */ '../pages/channel/ChannelIndex'));
 const DirectMessageIndex = lazy(() => import(/* webpackChunkName: "dm-index" */ '../pages/directMessage/DirectMessageIndex'));
 const ChannelAppLayoutMobile = lazy(() => import(/* webpackChunkName: "layouts" */ '../layouts/ChannelAppLayoutMobile'));
-
+const AssetLinkLayout = lazy(() => import(/* webpackChunkName: "layouts" */ '../layouts/AssetLinkLayout'));
+const AppleAppSiteAssociationLayout = lazy(() => import(/* webpackChunkName: "layouts" */ '../layouts/AppleAppSiteAssociationLayout'));
 const Canvas = lazy(() => import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.Canvas })));
 const PreJoinCalling = lazy(() =>
 	import(/* webpackChunkName: "ui-components" */ '@mezon/components').then((module) => ({ default: module.default.PreJoinCalling }))
@@ -157,15 +157,14 @@ export const Routes = memo(() => {
 						),
 						loader: loaderWithStore(authLoader)
 					},
-					{
-						path: 'popout',
-						element: (
-							<Suspense fallback={<SuspenseFallback />}>
-								<VoicePopout />
-							</Suspense>
-						),
-						loader: loaderWithStore(authLoader)
-					},
+					// {
+					// 	path: 'popout',
+					// 	element: (
+					// 		<Suspense fallback={<SuspenseFallback />}>
+					// 			<VoicePopout />
+					// 		</Suspense>
+					// 	)
+					// },
 					isElectron()
 						? {
 								path: '/',

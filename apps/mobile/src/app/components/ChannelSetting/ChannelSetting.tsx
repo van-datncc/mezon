@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import { ApiUpdateChannelDescRequest } from 'mezon-js';
+import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-native';
@@ -24,7 +24,6 @@ import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
 import MezonOption from '../../componentUI/MezonOption';
 import { IconCDN } from '../../constants/icon_cdn';
-import useBackHardWare from '../../hooks/useBackHardWare';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
 import { validInput } from '../../utils/validate';
@@ -65,7 +64,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	const currentCategoryName = useMemo(() => {
 		return channel?.category_name;
 	}, [channel?.category_name]);
-	useBackHardWare();
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	navigation.setOptions({
@@ -125,7 +123,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: t('fields.channelPermission.permission'),
 					expandable: true,
 					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
-					isShow: isChannel,
+					isShow: isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
 					onPress: () => {
 						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 							screen: APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION,
@@ -139,7 +137,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: t('fields.privateChannelInvite.addMember'),
 					expandable: true,
 					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
-					isShow: isChannel && !!channel.channel_private,
+					isShow: isChannel && !!channel.channel_private && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
 					onPress: () => {
 						bottomSheetRef?.current?.present();
 					}
@@ -155,7 +153,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: t('fields.channelWebhooks.webhook'),
 					expandable: true,
 					icon: <MezonIconCDN icon={IconCDN.webhookIcon} color={themeValue.text} />,
-					isShow: isChannel,
+					isShow: isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
 					onPress: () => {
 						navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 							screen: APP_SCREEN.MENU_CLAN.INTEGRATIONS
@@ -180,7 +178,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					textStyle: { color: 'red' },
 					onPress: () => handlePressLeaveChannel(),
 					icon: <MezonIconCDN icon={IconCDN.leaveGroupIcon} color={Colors.textRed} />,
-					isShow: channel?.creator_id !== currentUserId
+					isShow: channel?.creator_id !== currentUserId && channel?.type !== ChannelType.CHANNEL_TYPE_APP
 				}
 			] satisfies IMezonMenuItemProps[],
 		[channel?.creator_id, currentUserId, isChannel, t]
@@ -192,7 +190,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				// { items: categoryMenu },
 				{
 					items: permissionMenu,
-					bottomDescription: t('fields.channelPermission.description')
+					bottomDescription: channel?.type === ChannelType.CHANNEL_TYPE_APP ? '' : t('fields.channelPermission.description')
 				}
 				// {
 				// 	items: notificationMenu,
@@ -323,7 +321,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					isValid={!isCheckDuplicateNameChannel && isCheckValid}
 				/>
 
-				{isChannel && (
+				{isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP && (
 					<MezonInput
 						label={t('fields.channelDescription.title')}
 						value={currentSettingValue.channelTopic}
@@ -333,15 +331,17 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				)}
 			</View>
 
-			<MezonMenu menu={topMenu} />
+			{isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP && <MezonMenu menu={topMenu} />}
 
 			{/*<MezonSlider data={slowModeOptions} title={t('fields.channelSlowMode.title')} />*/}
 
-			<MezonOption
-				title={t('fields.channelHideInactivity.title')}
-				data={hideInactiveOptions}
-				bottomDescription={t('fields.channelHideInactivity.description')}
-			/>
+			{isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP && (
+				<MezonOption
+					title={t('fields.channelHideInactivity.title')}
+					data={hideInactiveOptions}
+					bottomDescription={t('fields.channelHideInactivity.description')}
+				/>
+			)}
 
 			<MezonMenu menu={bottomMenu} />
 			<AddMemberOrRoleBS bottomSheetRef={bottomSheetRef} channel={channel} />

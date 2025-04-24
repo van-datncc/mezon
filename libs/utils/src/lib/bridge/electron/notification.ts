@@ -3,6 +3,10 @@ import { safeJSONParse } from 'mezon-js';
 import { MessageCrypt } from '../../e2ee';
 import { isBackgroundModeActive } from '../../hooks/useBackgroundMode';
 import { electronBridge } from './electron';
+import { MezonNotificationOptions } from './types';
+
+export const SHOW_NOTIFICATION = 'APP::SHOW_NOTIFICATION';
+
 export interface IMessageExtras {
 	link: string; // link for navigating
 	e2eemess: string;
@@ -45,6 +49,9 @@ export class MezonNotificationService {
 	private pingTimeout: NodeJS.Timeout | null = null;
 	private previousAppId = 0;
 	private currentUserId: string | null = null;
+
+	// Track active notifications by channel ID
+	private activeNotifications: Map<string, Notification> = new Map();
 
 	public static getInstance() {
 		if (!MezonNotificationService.instance) {
@@ -142,36 +149,46 @@ export class MezonNotificationService {
 		}
 	}
 
-	private pushNotification(title: string, message: string, image: string, link: string | undefined, msg?: NotificationData) {
+	public pushNotification(title: string, message: string, image: string, link: string | undefined, msg?: NotificationData) {
 		if (isElectron()) {
-			electronBridge.pushNotification(
-				title,
-				{
-					body: message,
-					icon: image ?? '',
-					data: {
-						link: link ?? ''
-					}
+			const options: MezonNotificationOptions = {
+				body: message,
+				icon: image ?? '',
+				data: {
+					link: link ?? '',
+					channelId: msg?.channel_id
 				},
-				msg
-			);
-		} else {
-			this.pushNotificationForWeb(title, message, image, link);
-		}
-	}
+				tag: msg?.channel_id
+			};
 
-	private pushNotificationForWeb(title: string, message: string, image: string, link: string | undefined) {
+			electronBridge.pushNotification(title, options, msg);
+			return;
+		}
+
+		// Web notification handling
 		if (!('Notification' in window)) {
 			console.warn('This browser does not support desktop notification');
 			return;
 		}
+
+		const channelId = msg?.channel_id;
+		if (channelId && this.activeNotifications.has(channelId)) {
+			const previousNotification = this.activeNotifications.get(channelId);
+			previousNotification?.close();
+		}
+
 		const notification = new Notification(title, {
 			body: message,
 			icon: image ?? '',
 			data: {
 				link: link ?? ''
-			}
+			},
+			tag: channelId
 		});
+
+		if (channelId) {
+			this.activeNotifications.set(channelId, notification);
+		}
 
 		notification.onclick = (event) => {
 			event.preventDefault();
@@ -179,13 +196,15 @@ export class MezonNotificationService {
 				return;
 			}
 			const existingWindow = window.open('', '_self');
+
 			if (existingWindow) {
 				existingWindow.focus();
 				const notificationUrl = new URL(link);
 				const path = notificationUrl.pathname;
+				const fromTopic = msg?.extras?.topicId && msg?.extras?.topicId !== '0';
 				window.dispatchEvent(
 					new CustomEvent('mezon:navigate', {
-						detail: { url: path }
+						detail: { url: path, msg: fromTopic ? msg : null }
 					})
 				);
 			} else {

@@ -33,7 +33,6 @@ import {
 	emojiSuggestionActions,
 	eventManagementActions,
 	friendsActions,
-	getDmEntityByChannelId,
 	getStore,
 	getStoreAsync,
 	giveCoffeeActions,
@@ -66,6 +65,7 @@ import {
 	selectCurrentTopicId,
 	selectCurrentUserId,
 	selectDmGroupCurrentId,
+	selectIsInCall,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
@@ -99,7 +99,6 @@ import {
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
-	electronBridge,
 	isBackgroundModeActive
 } from '@mezon/utils';
 import isElectron from 'is-electron';
@@ -144,7 +143,9 @@ import {
 	VoiceEndedEvent,
 	VoiceJoinedEvent,
 	VoiceLeavedEvent,
-	WebrtcSignalingFwd
+	WebrtcSignalingFwd,
+	WebrtcSignalingType,
+	safeJSONParse
 } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateEventRequest, ApiGiveCoffeeEvent, ApiMessageReaction, ApiNotification } from 'mezon-js/api.gen';
 import {
@@ -160,7 +161,6 @@ import { ChannelCanvas, DeleteAccountEvent, RemoveFriend, SdTopicEvent } from 'm
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
-import { useDirect } from '../hooks/useDirect';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -178,7 +178,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const { socketRef, reconnectWithTimeout } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
-	const { createDirectMessageWithUser } = useDirect();
 
 	const navigate = useCustomNavigate();
 	// update later
@@ -201,7 +200,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const currentUserId = selectCurrentUserId(state);
 				const hasJoinSoundEffect = memberList.some((member) => member.user_id === currentUserId) || currentUserId === voice.user_id;
 
-				if (voiceChannel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
+				if (voiceChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
 					const joinSoundElement = document.createElement('audio');
 					joinSoundElement.src = 'assets/audio/joincallsound.mp3';
 					joinSoundElement.preload = 'auto';
@@ -350,17 +349,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 				dispatch(messagesActions.addNewMessage(mess));
 				if (mess.mode === ChannelStreamMode.STREAM_MODE_DM || mess.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-					const senderIsMe = userId === mess.sender_id;
 					const newDm = await dispatch(directActions.addDirectByMessageWS(mess)).unwrap();
-					const dmItemInChannelState = await dispatch(getDmEntityByChannelId({ channelId: mess.channel_id })).unwrap();
-					if (!dmItemInChannelState.active) {
-						if (senderIsMe) {
-							const partnerId = dmItemInChannelState?.user_id?.[0] || '';
-							await createDirectMessageWithUser(partnerId);
-						} else {
-							await createDirectMessageWithUser(mess.sender_id);
-						}
-					}
 					!newDm && dispatch(directMetaActions.updateDMSocket(message));
 					const isClanView = selectClanView(store.getState());
 
@@ -389,6 +378,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 
 					if (mess.isMe) {
+						// Mark as read if isMe send token
+						if (mess.code === TypeMessage.SendToken) {
+							dispatch(
+								messagesActions.updateLastSeenMessage({
+									clanId: mess?.clan_id || '',
+									channelId: mess?.channel_id,
+									messageId: mess?.id,
+									mode: mess.mode,
+									badge_count: 0
+								})
+							);
+						}
 						dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: message.channel_id, timestamp }));
 					}
 				} else {
@@ -1002,7 +1003,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				messagesActions.updateTypingUsers({
 					channelId: e.channel_id,
 					userId: e.sender_id,
-					isTyping: true
+					isTyping: true,
+					typingName: e.sender_display_name || e.sender_username
 				})
 			);
 		},
@@ -1068,7 +1070,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					channel_private: channelCreated.channel_private,
 					type: channelCreated.channel_type,
 					status: channelCreated.status,
-					app_url: channelCreated.app_url,
+					app_id: channelCreated.app_id,
 					clan_id: channelCreated.clan_id
 				};
 				dispatch(listChannelRenderAction.addThreadToListRender({ clanId: channelCreated?.clan_id as string, channel: thread }));
@@ -1370,7 +1372,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					dispatch(channelsActions.updateChannelSocket(channelUpdated));
 					dispatch(listChannelsByUserActions.upsertOne({ id: channelUpdated.channel_id, ...channelUpdated }));
 				}
-				if (channelUpdated.app_url) {
+				if (channelUpdated.app_id) {
 					dispatch(
 						channelsActions.updateAppChannel({
 							clanId: channelUpdated.clan_id,
@@ -1571,12 +1573,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const title = 'Funds Transferred:';
 			const body = `+${(AMOUNT_TOKEN.TEN_TOKENS * TOKEN_TO_AMOUNT.ONE_THOUNSAND).toLocaleString('vi-VN')}vnđ from ${prioritizedName}`;
 
-			electronBridge.pushNotification(title, {
-				body: body,
-				icon: prioritizedAvatar,
-				data: {
-					link: ''
-				}
+			return new Notification(title, {
+				body,
+				icon: prioritizedAvatar ?? ''
 			});
 		}
 	}, []);
@@ -1645,7 +1644,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							dispatch(
 								policiesActions.updateOne({
 									id: role.id as string,
-									changes: { title: role.title }
+									changes: { title: role.title, id: role.id || '', max_level_permission: role.max_level_permission }
 								})
 							);
 						} else {
@@ -1677,29 +1676,47 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onwebrtcsignalingfwd = useCallback(async (event: WebrtcSignalingFwd) => {
-		// TODO: AND TYPE IN BE
-		// TYPE = 4: USER CANCEL CALL
-		// TYPE = 0: USER JOINED CALL
-		// TYPE = 5: OTHER CALL
 		const store = await getStoreAsync();
 		const userCallId = selectUserCallId(store.getState() as unknown as RootState);
-
-		if (userCallId && userCallId !== event?.caller_id) {
-			socketRef.current?.forwardWebrtcSignaling(event?.caller_id, 5, '', event?.channel_id, userId || '');
+		const isInCall = selectIsInCall(store.getState() as unknown as RootState);
+		const signalingType = event?.data_type;
+		// Skip processing if not in a call and the signaling type is not relevant
+		if (!isInCall && [WebrtcSignalingType.WEBRTC_SDP_ANSWER, WebrtcSignalingType.WEBRTC_ICE_CANDIDATE].includes(signalingType)) {
 			return;
 		}
-		if (event?.data_type === 4) {
+
+		if (userCallId && userCallId !== event?.caller_id) {
+			socketRef.current?.forwardWebrtcSignaling(
+				event?.caller_id,
+				WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL,
+				'',
+				event?.channel_id,
+				userId || ''
+			);
+			return;
+		}
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_QUIT) {
 			dispatch(DMCallActions.cancelCall({}));
 			dispatch(audioCallActions.startDmCall({}));
 			dispatch(audioCallActions.setUserCallId(''));
 			dispatch(audioCallActions.setIsJoinedCall(false));
 			dispatch(DMCallActions.setOtherCall({}));
 		}
-		if (event?.data_type === 0) {
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_INIT) {
 			dispatch(audioCallActions.setIsJoinedCall(true));
 		}
-		if (event?.data_type === 5) {
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL) {
 			dispatch(audioCallActions.setIsBusyTone(true));
+		}
+		if (signalingType === WebrtcSignalingType.WEBRTC_SDP_STATUS_REMOTE_MEDIA) {
+			const dataJSON = safeJSONParse((event?.json_data as string) || '{}');
+			if (dataJSON?.micEnabled !== undefined) {
+				dispatch(audioCallActions.setIsRemoteAudio(dataJSON?.micEnabled));
+			}
+			if (dataJSON?.cameraEnabled !== undefined) {
+				dispatch(audioCallActions.setIsRemoteVideo(dataJSON?.cameraEnabled));
+			}
+			return;
 		}
 		dispatch(
 			DMCallActions.addOrUpdate({

@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 import { MezonStoreProvider, initStore } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { NavigationContainer } from '@react-navigation/native';
+import { LinkingOptions, NavigationContainer, getStateFromPath } from '@react-navigation/native';
 import React, { memo, useMemo } from 'react';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider, EmojiSuggestionProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
-import { StatusBar } from 'react-native';
+import { DeviceEventEmitter, Platform, StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import Toast from 'react-native-toast-message';
 import NetInfoComp from '../components/NetworkInfo';
@@ -16,6 +17,7 @@ import { toastConfig } from '../configs/toastConfig';
 import { DeviceProvider } from '../contexts/device';
 import RootListener from './RootListener';
 import RootStack from './RootStack';
+import { APP_SCREEN } from './ScreenTypes';
 
 const NavigationMain = memo(
 	(props) => {
@@ -42,7 +44,6 @@ const NavigationMain = memo(
 		// 		}
 		// 	}
 		// };
-
 		const theme = {
 			dark: themeBasic === ThemeModeBase.DARK,
 			colors: {
@@ -55,12 +56,39 @@ const NavigationMain = memo(
 			}
 		};
 
+		const linking: LinkingOptions<{ any }> = {
+			prefixes: ['https://mezon.ai', 'mezon.ai://', 'mezon://'],
+			config: {
+				screens: {
+					[`${APP_SCREEN.HOME}`]: {
+						path: 'home'
+					},
+					[`${APP_SCREEN.CHANNEL_APP}`]: {
+						path: 'channel-app/:code',
+						parse: {
+							code: (code) => `${code}`
+						}
+					}
+				}
+			},
+			// Add this debugging to see what's happening
+			getStateFromPath: (path, config) => {
+				if (path && Platform.OS === 'android') {
+					setTimeout(() => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, path);
+					}, 1000);
+				}
+				return getStateFromPath(path, config);
+			}
+		};
+
 		return (
 			<NavigationContainer
 				theme={theme}
 				onReady={async () => {
 					await BootSplash.hide({ fade: true });
 				}}
+				linking={linking}
 			>
 				<NetInfoComp />
 				<RootListener />

@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { ActiveDm, BuzzArgs, IChannel, IUserItemActivity, LoadingStatus } from '@mezon/utils';
+import { ActiveDm, BuzzArgs, IChannel, IMessage, IUserItemActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelMessage, ChannelType, ChannelUpdatedEvent, UserProfileRedis, safeJSONParse } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api.gen';
@@ -40,34 +40,45 @@ export const mapDmGroupToEntity = (channelRes: ApiChannelDescription) => {
 	return { ...channelRes, id: channelRes.channel_id || '' };
 };
 
-export const createNewDirectMessage = createAsyncThunk('direct/createNewDirectMessage', async (body: ApiCreateChannelDescRequest, thunkAPI) => {
-	try {
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.createChannelDesc(mezon.session, body);
-		if (response) {
-			thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
-			thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
-			await thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
-			if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
-				await thunkAPI.dispatch(
-					channelsActions.joinChat({
-						clanId: '0',
-						channelId: response.channel_id as string,
-						channelType: response.type as number,
-						isPublic: false
+export const createNewDirectMessage = createAsyncThunk(
+	'direct/createNewDirectMessage',
+	async ({ body, username, avatar }: { body: ApiCreateChannelDescRequest; username?: string | string[]; avatar?: string | string[] }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.createChannelDesc(mezon.session, body);
+			if (response) {
+				thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
+				thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
+				thunkAPI.dispatch(
+					directActions.upsertOne({
+						id: response.channel_id || '',
+						...response,
+						usernames: Array.isArray(username) ? username : username ? [username] : [],
+						channel_label: Array.isArray(username) ? username.toString() : username,
+						channel_avatar: Array.isArray(avatar) ? avatar : avatar ? [avatar] : []
 					})
 				);
+				if (response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
+					await thunkAPI.dispatch(
+						channelsActions.joinChat({
+							clanId: '0',
+							channelId: response.channel_id as string,
+							channelType: response.type as number,
+							isPublic: false
+						})
+					);
+				}
+				return response;
+			} else {
+				captureSentryError('no response', 'direct/createNewDirectMessage');
+				return thunkAPI.rejectWithValue('no reponse');
 			}
-			return response;
-		} else {
-			captureSentryError('no response', 'direct/createNewDirectMessage');
-			return thunkAPI.rejectWithValue('no reponse');
+		} catch (error) {
+			captureSentryError(error, 'direct/createNewDirectMessage');
+			return thunkAPI.rejectWithValue(error);
 		}
-	} catch (error) {
-		captureSentryError(error, 'direct/createNewDirectMessage');
-		return thunkAPI.rejectWithValue(error);
 	}
-});
+);
 
 export const closeDirectMessage = createAsyncThunk('direct/closeDirectMessage', async (body: ApiDeleteChannelDescRequest, thunkAPI) => {
 	try {
@@ -333,16 +344,21 @@ const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
 	};
 };
 
-export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageWS', async (message: ChannelMessage, thunkAPI) => {
+export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageWS', async (message: IMessage, thunkAPI) => {
 	try {
 		const state = thunkAPI.getState() as RootState;
 		const existingDirect = selectDirectById(state, message.channel_id);
 
+		const directEntity = mapMessageToConversation(message);
 		if (!existingDirect) {
-			const directEntity = mapMessageToConversation(message);
+			if (message.isMe) {
+				return directEntity;
+			}
 			thunkAPI.dispatch(directActions.upsertOne(directEntity));
 			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
 			return directEntity;
+		} else {
+			thunkAPI.dispatch(directActions.updateMoreData(directEntity));
 		}
 
 		return null;
@@ -618,6 +634,19 @@ export const directSlice = createSlice({
 					id: action.payload.channelId,
 					changes: {
 						count_mess_unread: 0
+					}
+				});
+			}
+		},
+		updateMoreData: (state, action: PayloadAction<DirectEntity>) => {
+			const data = action.payload;
+			const currentData = state.entities[data.channel_id || ''];
+			if (currentData) {
+				directAdapter.updateOne(state, {
+					id: data.channel_id || '',
+					changes: {
+						...data,
+						...currentData
 					}
 				});
 			}

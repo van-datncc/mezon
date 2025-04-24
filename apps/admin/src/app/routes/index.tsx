@@ -155,7 +155,7 @@ export const Routes = () => {
 							]
 						},
 						{
-							path: 'bot/install/:applicationId',
+							path: ':modalType/install/:applicationId',
 							loader: loaderWithStore(authLoader),
 							element: <Install />
 						}

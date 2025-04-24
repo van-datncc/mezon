@@ -81,6 +81,7 @@ export interface MessagesEntity extends IMessageWithUser {
 
 export interface UserTypingState {
 	id: string;
+	typingName: string;
 	timeAt: number;
 }
 
@@ -218,21 +219,9 @@ type fetchMessageChannelPayload = {
 
 const MESSAGE_LIST_SLICE = 100;
 
-function findClosestIndex(sourceIds: string[], offsetId: string) {
-	if (offsetId < sourceIds[0]) {
-		return 0;
-	}
-
-	if (offsetId > sourceIds[sourceIds.length - 1]) {
-		return sourceIds.length - 1;
-	}
-
-	return sourceIds.findIndex((id, i) => id === offsetId || (id < offsetId && sourceIds[i + 1] > offsetId));
-}
-
 function getViewportSlice(sourceIds: string[], offsetId: string | undefined, direction: Direction_Mode) {
 	const { length } = sourceIds;
-	const index = offsetId ? findClosestIndex(sourceIds, offsetId) : -1;
+	const index = offsetId ? sourceIds.findIndex((id, i) => id === offsetId) : -1;
 	const isBackwards = direction === Direction_Mode.BEFORE_TIMESTAMP;
 	const isAround = direction === Direction_Mode.AROUND_TIMESTAMP;
 	const indexForDirection = isBackwards ? index : index + 1 || length;
@@ -774,15 +763,16 @@ type UpdateTypingArgs = {
 	channelId: string;
 	userId: string;
 	isTyping: boolean;
+	typingName: string;
 };
 
 const typingTimeouts: { [key: string]: NodeJS.Timeout } = {};
 
 export const updateTypingUsers = createAsyncThunk(
 	'messages/updateTypingUsers',
-	async ({ channelId, userId, isTyping }: UpdateTypingArgs, thunkAPI) => {
+	async ({ channelId, userId, isTyping, typingName }: UpdateTypingArgs, thunkAPI) => {
 		// set user typing to true
-		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping }));
+		thunkAPI.dispatch(messagesActions.setUserTyping({ channelId, userId, isTyping, typingName }));
 
 		const typingKey = channelId + userId;
 
@@ -802,13 +792,14 @@ export type SendMessageArgs = {
 	channelId: string;
 	mode: number;
 	isPublic: boolean;
+	username: string;
 };
 
 export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
-	async ({ clanId, channelId, mode, isPublic }: SendMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, mode, isPublic, username }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic);
+		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic, username);
 		return ack;
 	}
 );
@@ -832,6 +823,7 @@ export type SetChannelLastMessageArgs = {
 
 export type SetUserTypingArgs = {
 	userId: string;
+	typingName: string;
 	channelId: string;
 	isTyping: boolean;
 };
@@ -1126,7 +1118,7 @@ export const messagesSlice = createSlice({
 			};
 		},
 		setUserTyping: (state, action: PayloadAction<SetUserTypingArgs>) => {
-			const { channelId, userId } = action.payload || {};
+			const { channelId, userId, typingName } = action.payload || {};
 			const found = state.typingUsers?.[channelId]?.users?.find((user) => user.id === userId);
 			if (found) {
 				found.timeAt = Date.now();
@@ -1135,7 +1127,8 @@ export const messagesSlice = createSlice({
 
 			const user = {
 				id: userId,
-				timeAt: Date.now()
+				timeAt: Date.now(),
+				typingName: typingName
 			};
 
 			if (!state.typingUsers) {
@@ -1370,17 +1363,19 @@ export const selectUnreadMessageIdByChannelId = createSelector(
 
 export const selectTypingUsers = createSelector(getMessagesState, (state) => state.typingUsers);
 
-export const selectTypingUsersById = createSelector([getMessagesState, (_state, channelId: string) => channelId], (state, channelId) => {
-	return state?.typingUsers?.[channelId];
-});
+export const selectTypingUsersById = createSelector(
+	[selectTypingUsers, (_, channelId: string) => channelId, (_, __, userId: string) => userId],
+	(typingUsers, channelId, userId) => {
+		const channelTypingUsers = typingUsers?.[channelId]?.users || [];
 
-export const selectTypingUserIdsByChannelId = createSelector([selectTypingUsersById], (typingUsers) => {
-	return typingUsers?.users;
-});
+		return channelTypingUsers.filter((user) => user.id !== userId);
+	}
+);
 
 export const selectIsUserTypingInChannel = createSelector(
-	[selectTypingUserIdsByChannelId, (_, channelId) => channelId, (_, __, userId) => userId],
-	(typingUsers, channelId, userId) => {
+	[selectTypingUsers, (_, channelId) => channelId, (_, __, userId) => userId],
+	(listTyping, channelId, userId) => {
+		const typingUsers = listTyping?.[channelId]?.users;
 		if (!typingUsers || !channelId || !userId) return false;
 		if (Array.isArray(userId)) {
 			return typingUsers.some((user) => userId.includes(user.id));
@@ -1388,7 +1383,6 @@ export const selectIsUserTypingInChannel = createSelector(
 		return typingUsers.some((user) => user.id === userId);
 	}
 );
-
 export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
 
 export const selectHasMoreMessageByChannelId2 = createSelector([getMessagesState, getChannelIdAsSecondParam], (state, channelId) => {

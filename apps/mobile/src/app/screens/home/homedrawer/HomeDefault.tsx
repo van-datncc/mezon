@@ -8,7 +8,7 @@ import { DeviceEventEmitter, Keyboard, KeyboardAvoidingView, Platform } from 're
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
 import ChannelAppHotbar from './ChannelAppHotbar';
-import ChannelMessagesWrapper from './ChannelMessagesWrapper';
+import ChannelMessages from './ChannelMessages';
 import { ChatBox } from './ChatBox';
 import DrawerListener from './DrawerListener';
 import HomeDefaultHeader from './HomeDefaultHeader';
@@ -72,13 +72,13 @@ const HomeDefault = React.memo(
 				{Platform.OS === 'ios' && <LicenseAgreement />}
 				<DrawerListener />
 				<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
-				<ChannelMessagesWrapper
+				<ChannelMessages
 					channelId={channelId}
 					clanId={clanId}
 					isPublic={isPublicChannel}
 					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
 				/>
-				{isChannelApp && <ChannelAppHotbar channelId={channelId} />}
+				{isChannelApp && <ChannelAppHotbar channelId={channelId} clanId={clanId} />}
 				<ChatBox
 					channelId={channelId}
 					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}

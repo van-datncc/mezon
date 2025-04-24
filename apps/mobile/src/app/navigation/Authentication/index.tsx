@@ -2,18 +2,20 @@ import React, { memo, useContext, useEffect } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ChatContext } from '@mezon/core';
-import { STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
+import { ActionEmitEvent, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
 import { ColorRoleProvider } from '@mezon/mobile-ui';
 import notifee from '@notifee/react-native';
+import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment';
-import { Dimensions, NativeModules, Platform } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Linking, NativeModules, Platform } from 'react-native';
 import BottomSheetRootListener from '../../components/BottomSheetRootListener';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import ModalRootListener from '../../components/ModalRootListener';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
+import ChannelAppScreen from '../../screens/home/homedrawer/ChannelApp';
 import ChannelMessageListener from '../../screens/home/homedrawer/ChannelMessageListener';
 import ChannelMessageReactionListener from '../../screens/home/homedrawer/ChannelMessageReactionListener';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
@@ -38,6 +40,28 @@ const { SharedPreferences } = NativeModules;
 export const Authentication = memo(() => {
 	const isTabletLandscape = useTabletLandscape();
 	const { onchannelmessage } = useContext(ChatContext);
+	const navigation = useNavigation<any>();
+
+	useEffect(() => {
+		const getUrl = async () => {
+			try {
+				const url = await Linking.getInitialURL();
+				if (url) {
+					await onNavigationDeeplink(url);
+				}
+			} catch (error) {
+				console.error('Error getting initial URL:', error);
+			}
+		};
+		getUrl();
+	}, []);
+
+	useEffect(() => {
+		const eventDeelink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
+		return () => {
+			eventDeelink.remove();
+		};
+	}, []);
 
 	useEffect(() => {
 		initLoader();
@@ -54,6 +78,41 @@ export const Authentication = memo(() => {
 		}
 	};
 
+	const extractChannelParams = (url: string) => {
+		const regex = /channel-app\/(\d+)\/(\d+)(?:\?[^#]*)?/;
+		const baseMatch = url.match(regex);
+		if (!baseMatch) return null;
+
+		const [, id1, id2] = baseMatch;
+
+		const codeMatch = url.match(/[?&]code=([^&]+)/);
+		const subpathMatch = url.match(/[?&]subpath=([^&]+)/);
+
+		return {
+			channelId: id1,
+			clanId: id2,
+			code: codeMatch ? codeMatch[1] : null,
+			subpath: subpathMatch ? subpathMatch[1] : null
+		};
+	};
+
+	const onNavigationDeeplink = async (path: string) => {
+		if (path?.includes?.('channel-app/')) {
+			const parts = extractChannelParams(path);
+			const channelId = parts?.channelId;
+			const clanId = parts?.clanId;
+			const code = parts?.code;
+			const subpath = parts?.subpath;
+			if (clanId && channelId) {
+				navigation.navigate(APP_SCREEN.CHANNEL_APP, {
+					channelId: channelId,
+					clanId: clanId,
+					code: code,
+					subpath: subpath
+				});
+			}
+		}
+	};
 	const onNotificationOpenedApp = async () => {
 		if (Platform.OS === 'android') {
 			try {
@@ -98,7 +157,6 @@ export const Authentication = memo(() => {
 					initialRouteName={APP_SCREEN.BOTTOM_BAR}
 					screenOptions={{
 						headerShown: false,
-						animationEnabled: false,
 						gestureEnabled: Platform.OS === 'ios',
 						gestureDirection: 'horizontal'
 					}}
@@ -146,11 +204,11 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.VIDEO_DETAIL}
 						component={RenderVideoDetail}
 						options={{
-							animationEnabled: true,
 							headerShown: false,
 							headerShadowVisible: false
 						}}
 					/>
+					<RootStack.Screen name={APP_SCREEN.CHANNEL_APP} component={ChannelAppScreen} />
 				</RootStack.Navigator>
 				<CallingModalWrapper />
 				<StreamingWrapper />

@@ -11,7 +11,8 @@ import {
 	selectAllAccount,
 	selectAllDirectMessages,
 	selectAllFriends,
-	selectAllUserClans
+	selectAllUserClans,
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { TypeMessage, formatMoney } from '@mezon/utils';
 import debounce from 'lodash.debounce';
@@ -19,8 +20,7 @@ import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Alert, Modal, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import ViewShot from 'react-native-view-shot';
 import { useSelector } from 'react-redux';
@@ -29,6 +29,7 @@ import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import Backdrop from '../../../components/BottomSheetRootListener/backdrop';
 import { IconCDN } from '../../../constants/icon_cdn';
+import { useImage } from '../../../hooks/useImage';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
 import { Sharing } from '../../settings/Sharing';
 import { style } from './styles';
@@ -69,7 +70,12 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const { sendInviteMessage } = useSendInviteMessage();
 	const [successTime, setSuccessTime] = useState('');
 	const [fileShared, setFileShared] = useState<any>();
-	const viewToSnapshotRef = useRef();
+	const [isShowModalShare, setIsShowModalShare] = useState<boolean>(false);
+	const { saveImageToCameraRoll } = useImage();
+	const dispatch = useAppDispatch();
+
+	const viewToSnapshotRef = useRef<ViewShot>(null);
+	const [disableButton, setDisableButton] = useState<boolean>(false);
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return friends?.filter((user) => user.state === 0) || [];
 	}, [friends]);
@@ -159,6 +165,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 				return;
 			}
 			store.dispatch(appActions.setLoadingMainMobile(true));
+			setDisableButton(true);
 
 			const tokenEvent: ApiTokenSentEvent = {
 				sender_id: userProfile?.user?.id || '',
@@ -176,6 +183,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					type: 'error',
 					text1: t('toast.error.anErrorOccurred')
 				});
+				setDisableButton(false);
 			} else {
 				if (directMessageId) {
 					sendInviteMessage(
@@ -185,7 +193,12 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 						TypeMessage.SendToken
 					);
 				} else {
-					const response = await createDirectMessageWithUser(jsonObject?.receiver_id || selectedUser?.id);
+					const receiver = mergeUser?.find((user) => user?.id === jsonObject?.receiver_id) || selectedUser;
+					const response = await createDirectMessageWithUser(
+						jsonObject?.receiver_id || selectedUser?.id,
+						receiver?.username?.[0],
+						receiver?.avatar_url
+					);
 					if (response?.channel_id) {
 						sendInviteMessage(
 							`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note?.replace?.(/\s+/g, ' ')?.trim() || ''}`,
@@ -203,9 +216,16 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					.toString()
 					.padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 				setSuccessTime(formattedTime);
+				setDisableButton(false);
 				setShowConfirmModal(true);
 			}
 		} catch (err) {
+			Toast.show({
+				type: 'error',
+				text1: t('toast.error.anErrorOccurred')
+			});
+			setDisableButton(false);
+		} finally {
 			store.dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
@@ -265,6 +285,10 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 
 	const handleShare = async () => {
 		try {
+			if (fileShared) {
+				setIsShowModalShare(true);
+				return;
+			}
 			if (viewToSnapshotRef?.current) {
 				const dataUri = await viewToSnapshotRef?.current?.capture?.();
 				if (!dataUri) {
@@ -284,12 +308,29 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					filePath: dataUri
 				};
 				setFileShared([shareData]);
+				setIsShowModalShare(true);
 			}
 		} catch (error) {
 			Toast.show({
 				type: 'error',
 				text1: 'Failed to share transfer funds'
 			});
+		}
+	};
+
+	const handleSaveImage = async () => {
+		try {
+			dispatch(appActions.setLoadingMainMobile(true));
+			const dataUri = await viewToSnapshotRef?.current?.capture?.();
+			if (!dataUri) {
+				Alert.alert('Failed to save image');
+				return;
+			}
+			await saveImageToCameraRoll('file://' + dataUri, 'png');
+			Alert.alert('Save image successfully');
+		} catch (error) {
+			Alert.alert('Failed to save image');
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
@@ -301,10 +342,16 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 		setShowConfirmModal(false);
 	};
 
-	const onCloseFileShare = useCallback(() => {
-		setFileShared(undefined);
-		navigation.goBack();
-	}, [navigation]);
+	const onCloseFileShare = useCallback(
+		(isSent = false) => {
+			if (isSent) {
+				navigation.goBack();
+			} else {
+				setIsShowModalShare(false);
+			}
+		},
+		[navigation]
+	);
 
 	return (
 		<View style={styles.container}>
@@ -354,20 +401,11 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					</View>
 				</View>
 			</ScrollView>
-			<Pressable style={styles.button} onPress={sendToken}>
+			<Pressable style={styles.button} onPress={sendToken} disabled={disableButton}>
 				<Text style={styles.buttonTitle}>{t('sendToken')}</Text>
 			</Pressable>
-			<Modal
-				isVisible={showConfirmModal}
-				animationIn="fadeIn"
-				animationOut="fadeOut"
-				hasBackdrop={true}
-				coverScreen={true}
-				backdropColor="rgba(0,0,0, 0.9)"
-				deviceHeight={Dimensions.get('screen').height}
-				style={{ margin: 0, justifyContent: 'center', alignItems: 'center' }}
-			>
-				{fileShared ? (
+			<Modal visible={showConfirmModal}>
+				{fileShared && isShowModalShare ? (
 					<Sharing data={fileShared} onClose={onCloseFileShare} />
 				) : (
 					<ViewShot
@@ -407,8 +445,12 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 							<View style={styles.action}>
 								<View style={styles.actionMore}>
 									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
-										<MezonIconCDN icon={IconCDN.shareIcon} width={24} height={24} />
+										<MezonIconCDN icon={IconCDN.shareIcon} width={size.s_24} height={size.s_24} />
 										<Text style={styles.textActionMore}>{t('share')}</Text>
+									</TouchableOpacity>
+									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleSaveImage}>
+										<MezonIconCDN icon={IconCDN.downloadIcon} width={size.s_24} height={size.s_24} />
+										<Text style={styles.textActionMore}>{t('saveImage')}</Text>
 									</TouchableOpacity>
 									<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
 										<Icons.ArrowLeftRightIcon />

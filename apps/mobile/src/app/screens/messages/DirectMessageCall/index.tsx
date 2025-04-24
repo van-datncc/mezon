@@ -12,6 +12,7 @@ import {
 } from '@mezon/store-mobile';
 import { IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { WebrtcSignalingType } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
 import { BackHandler, DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -42,7 +43,6 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const userProfile = useSelector(selectAllAccount);
 	const [isShowControl, setIsShowControl] = useState<boolean>(true);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
-	const isInCall = useSelector(selectIsInCall);
 	const isRemoteVideo = useSelector(selectRemoteVideo);
 	const navigation = useNavigation<any>();
 
@@ -68,12 +68,13 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 
 	useEffect(() => {
 		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;
-		if (callState?.peerConnection && lastSignalingData) {
+		if (lastSignalingData) {
 			const dataType = lastSignalingData?.data_type;
 
-			if ([4, 5].includes(dataType)) {
+			if ([WebrtcSignalingType.WEBRTC_SDP_QUIT, WebrtcSignalingType.WEBRTC_SDP_TIMEOUT].includes(dataType)) {
 				if (!timeStartConnected?.current) {
-					const callLogType = dataType === 5 ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
+					const callLogType =
+						dataType === WebrtcSignalingType.WEBRTC_SDP_TIMEOUT ? IMessageTypeCallLog.TIMEOUTCALL : IMessageTypeCallLog.REJECTCALL;
 					dispatch(
 						DMCallActions.updateCallLog({
 							channelId: directMessageId || '',
@@ -84,8 +85,8 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 						})
 					);
 				}
-				handleEndCall({ isCancelGoBack: dataType === 5 });
-				if (dataType === 5) {
+				handleEndCall({ isCancelGoBack: dataType === WebrtcSignalingType.WEBRTC_SDP_TIMEOUT });
+				if (dataType === WebrtcSignalingType.WEBRTC_SDP_JOINED_OTHER_CALL) {
 					Toast.show({
 						type: 'error',
 						text1: 'User is currently on another call',
@@ -101,10 +102,10 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 			}
 		}
 
-		if (lastSignalingData && isInCall) {
+		if (lastSignalingData) {
 			handleSignalingMessage(lastSignalingData);
 		}
-	}, [callState.peerConnection, isInCall, signalingData, timeStartConnected.current]);
+	}, [signalingData, timeStartConnected.current]);
 
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));

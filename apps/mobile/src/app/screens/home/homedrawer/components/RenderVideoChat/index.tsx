@@ -1,36 +1,42 @@
 import { Colors, Metrics, size } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, NativeModules, Platform, TouchableOpacity, View } from 'react-native';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import FastImage from 'react-native-fast-image';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
-
 const widthMedia = Metrics.screenWidth - 150;
-
 export const RenderVideoChat = React.memo(
 	({ videoURL, onLongPress }: { videoURL: string; onLongPress: () => void }) => {
-		const [thumbnail, setThumbnail] = useState<string | null>(null);
 		const [loading, setLoading] = useState(true);
 		const navigation = useNavigation<any>();
-
-		useEffect(() => {
-			setLoading(false);
-			if (videoURL) {
-				createThumbnail({ url: videoURL, timeStamp: 1000 })
-					.then((response) => setThumbnail(response.path))
-					.catch(() => {
-						setThumbnail(null);
-						// Toast.show({ type: 'error', text1: 'Failed to generate thumbnail.' });
-					})
-					.finally(() => setLoading(false));
-			}
-		}, [videoURL]);
+		const [thumbPath, setThumbPath] = useState('');
 
 		const handlePlayVideo = () => {
 			navigation.navigate(APP_SCREEN.VIDEO_DETAIL, { videoURL });
 		};
+
+		useEffect(() => {
+			if (videoURL) {
+				setLoading(true);
+				if (Platform.OS === 'android') {
+					NativeModules.VideoThumbnail.getThumbnail(videoURL)
+						.then((path) => {
+							setThumbPath(path);
+						})
+						.catch((err) => console.error(err))
+						.finally(() => setLoading(false));
+				} else {
+					createThumbnail({ url: videoURL, timeStamp: 1000 })
+						.then((response) => setThumbPath(response.path))
+						.catch(() => {
+							setThumbPath(null);
+						})
+						.finally(() => setLoading(false));
+				}
+			}
+		}, [videoURL]);
 
 		if (!videoURL) return null;
 		const isUploading = !videoURL.startsWith('http');
@@ -56,7 +62,7 @@ export const RenderVideoChat = React.memo(
 						style={{ alignItems: 'center', justifyContent: 'center', width: '80%', overflow: 'hidden', borderRadius: size.s_4 }}
 					>
 						<FastImage
-							source={{ uri: thumbnail || '' }}
+							source={{ uri: thumbPath || '' }}
 							style={{
 								width: '100%',
 								height: Math.max(160, size.s_100 * 2.5),

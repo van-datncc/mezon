@@ -5,13 +5,13 @@ import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	appActions,
+	getStore,
 	giveCoffeeActions,
 	messagesActions,
 	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
-	selectDirectsOpenlist,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
@@ -65,21 +65,19 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const dispatch = useAppDispatch();
 	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', handleBottomSheetExpand } = props;
 	const { socketRef } = useMezon();
+	const store = getStore();
 
 	const { t } = useTranslation(['message']);
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
 
-	const currentClanId = useSelector(selectCurrentClanId);
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
 	const navigation = useNavigation<any>();
-	const listDM = useSelector(selectDirectsOpenlist);
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
-	const userProfile = useSelector(selectAllAccount);
 	const isMessageSystem =
 		message?.code === TypeMessage.Welcome ||
 		message?.code === TypeMessage.CreateThread ||
@@ -89,10 +87,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
 
+	const onCloseModalConfirm = useCallback(() => {
+		setCurrentMessageActionType(null);
+	}, []);
+
 	const onDeleteMessage = useCallback(
 		async (messageId: string) => {
 			const socket = socketRef.current;
 			const isPublic = currentDmId ? false : isPublicChannel(currentChannel);
+			const currentClanId = selectCurrentClanId(store.getState());
 
 			dispatch(
 				messagesActions.remove({
@@ -108,7 +111,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				messageId
 			);
 		},
-		[currentChannel, currentChannelId, currentClanId, currentDmId, dispatch, mode, socketRef]
+		[currentChannel, currentChannelId, currentDmId, dispatch, mode, socketRef]
 	);
 
 	const onConfirmAction = useCallback(
@@ -130,10 +133,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		},
 		[onDeleteMessage, setCurrentMessageActionType]
 	);
-
-	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
-	}, [userProfile?.wallet]);
 
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
@@ -169,11 +168,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		);
 	};
 
-	const directMessageId = useMemo(() => {
-		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === message?.user?.id);
-		return directMessage?.id;
-	}, [listDM, message?.user?.id]);
-
 	const handleActionEditMessage = () => {
 		onClose();
 		const payload: IMessageActionNeedToResolve = {
@@ -187,6 +181,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const handleActionGiveACoffee = async () => {
 		onClose();
 		try {
+			const userProfile = selectAllAccount(store.getState());
+			const tokenInWallet = userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
 			if (TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10 > tokenInWallet) {
 				Toast.show({
 					type: 'error',
@@ -205,23 +201,18 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				};
 				dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
 				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
-				if (directMessageId) {
+				const response = await createDirectMessageWithUser(
+					message?.user?.id,
+					message?.display_name || message?.user?.username,
+					message?.avatar
+				);
+				if (response?.channel_id) {
 					sendInviteMessage(
 						`Funds Transferred: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
-						directMessageId,
+						response?.channel_id,
 						ChannelStreamMode.STREAM_MODE_DM,
 						TypeMessage.SendToken
 					);
-				} else {
-					const response = await createDirectMessageWithUser(message?.user?.id, true);
-					if (response?.channel_id) {
-						sendInviteMessage(
-							`Funds Transferred: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
-							response?.channel_id,
-							ChannelStreamMode.STREAM_MODE_DM,
-							TypeMessage.SendToken
-						);
-					}
 				}
 			}
 		} catch (error) {
@@ -348,9 +339,14 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		setCurrentMessageActionType(EMessageActionType.Report);
 	};
 
-	const handleForwardMessage = () => {
+	const handleForwardMessage = async () => {
 		dispatch(setIsForwardAll(false));
-		setCurrentMessageActionType(EMessageActionType.ForwardMessage);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		await sleep(500);
+		const data = {
+			children: <ForwardMessageModal message={message} isPublic={isPublicChannel(currentChannel)} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const handleForwardAllMessages = () => {
@@ -574,8 +570,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			id: '',
 			mode: mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
 			messageId: messageId ?? '',
-			clanId:
-				mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM ? '' : (message?.clan_id ?? currentClanId),
+			clanId: mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM ? '' : message?.clan_id,
 			channelId: message?.channel_id ?? '',
 			emojiId: emoji_id ?? '',
 			emoji: emoji?.trim() ?? '',
@@ -659,21 +654,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			) : (
 				renderMessageItemActions()
 			)}
-			{currentMessageActionType === EMessageActionType.ForwardMessage && (
-				<ForwardMessageModal
-					show={currentMessageActionType === EMessageActionType.ForwardMessage}
-					onClose={onClose}
-					message={message}
-					isPublic={isPublicChannel(currentChannel)}
-				/>
-			)}
 			{currentMessageActionType === EMessageActionType.Report && (
 				<ReportMessageModal isVisible={currentMessageActionType === EMessageActionType.Report} onClose={onClose} message={message} />
 			)}
 			{[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType) && (
 				<ConfirmPinMessageModal
 					isVisible={[EMessageActionType.PinMessage, EMessageActionType.UnPinMessage].includes(currentMessageActionType)}
-					onClose={onClose}
+					onClose={onCloseModalConfirm}
 					message={message}
 					type={currentMessageActionType}
 				/>
