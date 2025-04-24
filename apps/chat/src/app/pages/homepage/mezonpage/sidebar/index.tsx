@@ -96,7 +96,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 				>
 					Developers
 				</a>
-        <a
+				<a
 					href={'https://top.mezon.ai'}
 					target="_blank"
 					rel="noopener noreferrer"
@@ -104,7 +104,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 				>
 					Bots/Apps
 				</a>
-        <a
+				<a
 					href={'documents'}
 					target="_blank"
 					rel="noopener noreferrer"
