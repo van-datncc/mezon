@@ -9,7 +9,7 @@ import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBar
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import RoomView from './RoomView';
 import { style } from './styles';
-const { CustomAudioModule, KeepAwake } = NativeModules;
+const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
 
 const { width, height } = Dimensions.get('window');
 
@@ -89,26 +89,34 @@ function ChannelVoice({
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		const activateKeepAwake = async () => {
-			if (Platform.OS === 'android') {
-				try {
+		const activateKeepAwake = async (platform: string) => {
+			try {
+				if (platform === 'android') {
 					await KeepAwake.activate();
-				} catch (error) {
-					console.error('Activate KeepAwake Error:', error);
+				} else {
+					await KeepAwakeIOS.activate();
 				}
+			} catch (error) {
+				console.error(`Activate KeepAwake Error on ${platform}:`, error);
 			}
 		};
 
-		activateKeepAwake();
+		const deactivateKeepAwake = async (platform: string) => {
+			try {
+				if (platform === 'android') {
+					KeepAwake.deactivate();
+				} else {
+					KeepAwakeIOS.deactivate();
+				}
+			} catch (error) {
+				console.error(`Deactivate KeepAwake Error on ${platform}:`, error);
+			}
+		};
+
+		activateKeepAwake(Platform.OS);
 
 		return () => {
-			if (Platform.OS === 'android') {
-				try {
-					KeepAwake.deactivate();
-				} catch (error) {
-					console.error('Deactivate KeepAwake Error:', error);
-				}
-			}
+			deactivateKeepAwake(Platform.OS);
 		};
 	}, []);
 
@@ -134,7 +142,7 @@ function ChannelVoice({
 	};
 
 	useEffect(() => {
-		const subscription = AppState.addEventListener('change', (state) => {
+		const subscription = AppState.addEventListener('change', async (state) => {
 			if (state === 'background') {
 				if (Platform.OS === 'android') {
 					NativeModules.PipModule.enablePipMode();
