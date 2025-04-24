@@ -10,6 +10,7 @@ import {
 	selectGuestAccessToken,
 	selectGuestUserId,
 	selectJoinCallExtStatus,
+	selectOpenExternalChatBox,
 	selectShowCamera,
 	selectShowMicrophone,
 	useAppDispatch,
@@ -17,7 +18,6 @@ import {
 } from '@mezon/store';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import { MyVideoConference } from '../VoiceChannel';
 import { JoinForm } from './JoinForm';
 import { VideoPreview } from './VideoPreview';
@@ -66,6 +66,7 @@ const PermissionsPopup = React.memo(({ onClose }: { onClose: () => void }) => {
 
 export default function PreJoinCalling() {
 	const [cameraOn, setCameraOn] = useState(false);
+	console.log('cameraOn: ', cameraOn);
 	const [micOn, setMicOn] = useState(false);
 	const [username, setUsername] = useState('');
 	const [avatar, setAvatar] = useState('');
@@ -86,7 +87,8 @@ export default function PreJoinCalling() {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
-	const { code } = useParams<{ code: string }>();
+	// const { code } = useParams<{ code: string }>();
+	const code = 'MTc0NTQ4MTA2NTg3ODM3ODAxNDoxODQwNjU0NjI1MTI0OTEzMTUy.O2KVwOk-_SIdG4ijVW7vcALxIfroJVDG8y_woFAWoM0';
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
@@ -142,62 +144,6 @@ export default function PreJoinCalling() {
 	const account = useSelector(selectAllAccount);
 	const getDisplayName = account?.user?.display_name;
 	const getAvatar = account?.user?.avatar_url;
-
-	// Check permissions on component mount
-	// useEffect(() => {
-	// 	const checkPermissions = async () => {
-	// 		try {
-	// 			await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-	// 			setPermissionsState({
-	// 				camera: true,
-	// 				microphone: true,
-	// 				showPopup: false
-	// 			});
-	// 		} catch (err) {
-	// 			if (err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
-	// 				setPermissionsState({
-	// 					camera: false,
-	// 					microphone: false,
-	// 					showPopup: true
-	// 				});
-	// 			} else {
-	// 				try {
-	// 					await navigator.mediaDevices.getUserMedia({ audio: true });
-	// 					setPermissionsState((prev) => ({
-	// 						...prev,
-	// 						microphone: true
-	// 					}));
-	// 				} catch (audioErr) {
-	// 					if (audioErr instanceof DOMException && (audioErr.name === 'NotAllowedError' || audioErr.name === 'PermissionDeniedError')) {
-	// 						setPermissionsState((prev) => ({
-	// 							...prev,
-	// 							microphone: false,
-	// 							showPopup: true
-	// 						}));
-	// 					}
-	// 				}
-
-	// 				try {
-	// 					await navigator.mediaDevices.getUserMedia({ video: true });
-	// 					setPermissionsState((prev) => ({
-	// 						...prev,
-	// 						camera: true
-	// 					}));
-	// 				} catch (videoErr) {
-	// 					if (videoErr instanceof DOMException && (videoErr.name === 'NotAllowedError' || videoErr.name === 'PermissionDeniedError')) {
-	// 						setPermissionsState((prev) => ({
-	// 							...prev,
-	// 							camera: false,
-	// 							showPopup: true
-	// 						}));
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	};
-
-	// 	checkPermissions();
-	// }, []);
 
 	const closePermissionsPopup = useCallback(() => {
 		setPermissionsState((prev) => ({
@@ -365,9 +311,16 @@ export default function PreJoinCalling() {
 		dispatch(voiceActions.resetExternalCall());
 	}, [dispatch]);
 
+	const openChatBox = useSelector(selectOpenExternalChatBox);
+	const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (!event.shiftKey && event.key === 'Enter') {
+			console.log('event: ', event.currentTarget.value);
+			event.currentTarget.value = '';
+		}
+	};
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
-		<div className="h-screen w-screen">
+		<div className="h-screen w-screen flex">
 			{getExternalToken ? (
 				<LiveKitRoom
 					ref={containerRef}
@@ -378,7 +331,7 @@ export default function PreJoinCalling() {
 					token={getExternalToken}
 					serverUrl={serverUrl}
 					data-lk-theme="default"
-					className="h-full"
+					className="h-full flex-1"
 				>
 					<MyVideoConference
 						isExternalCalling={true}
@@ -388,7 +341,7 @@ export default function PreJoinCalling() {
 					/>
 				</LiveKitRoom>
 			) : (
-				<div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+				<div className="flex flex-col items-center justify-center min-h-screen bg-black text-white flex-1">
 					<div className="w-full max-w-3xl px-4 py-8 flex flex-col items-center">
 						{/* Header */}
 						<div className="text-center mb-4">
@@ -417,6 +370,18 @@ export default function PreJoinCalling() {
 					</div>
 
 					{permissionsState.showPopup && !getExternalToken && <PermissionsPopup onClose={closePermissionsPopup} />}
+				</div>
+			)}
+			{openChatBox && (
+				<div className="max-w-[480px] bg-[#111] min-w-[300px] w-1/4 h-full flex-col flex p-2 py-4 gap-2">
+					<div className="flex-1 bg-bgPrimary rounded-md"></div>
+					<div id="external_chat" className="w-full h-10">
+						<input
+							placeholder="Write your thought..."
+							className="text-white bg-channelTextarea w-full h-full rounded-full outline-none px-4"
+							onKeyDown={handleSendMessage}
+						/>
+					</div>
 				</div>
 			)}
 		</div>
