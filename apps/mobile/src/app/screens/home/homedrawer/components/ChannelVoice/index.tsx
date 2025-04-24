@@ -1,7 +1,6 @@
 import { AudioSession, LiveKitRoom, TrackReference, useConnectionState } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
-import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useState } from 'react';
 import { AppState, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
@@ -10,7 +9,7 @@ import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBar
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import RoomView from './RoomView';
 import { style } from './styles';
-const { CustomAudioModule } = NativeModules;
+const { CustomAudioModule, KeepAwake } = NativeModules;
 
 const { width, height } = Dimensions.get('window');
 
@@ -88,7 +87,30 @@ function ChannelVoice({
 	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(true);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
-	useKeepAwake();
+
+	useEffect(() => {
+		const activateKeepAwake = async () => {
+			if (Platform.OS === 'android') {
+				try {
+					await KeepAwake.activate();
+				} catch (error) {
+					console.error('Activate KeepAwake Error:', error);
+				}
+			}
+		};
+
+		activateKeepAwake();
+
+		return () => {
+			if (Platform.OS === 'android') {
+				try {
+					KeepAwake.deactivate();
+				} catch (error) {
+					console.error('Deactivate KeepAwake Error:', error);
+				}
+			}
+		};
+	}, []);
 
 	const onToggleSpeaker = async () => {
 		try {
