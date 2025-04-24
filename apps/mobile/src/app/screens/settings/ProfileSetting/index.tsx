@@ -109,13 +109,12 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	}, []);
 
 	useEffect(() => {
-		const { username, about_me } = userProfile?.user || {};
+		const { username } = userProfile?.user || {};
 		const { nick_name } = userClansProfile || {};
 		const initialValue = {
 			username,
 			imgUrl: userClansProfile?.avatar,
-			displayName: nick_name,
-			aboutMe: about_me
+			displayName: nick_name
 		};
 		setOriginClanProfileValue(initialValue);
 		if (!nick_name) {
@@ -123,7 +122,6 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		} else {
 			setCurrentClanProfileValue(initialValue);
 		}
-		setCurrentClanProfileValue(initialValue);
 	}, [userClansProfile, tab, userProfile, selectedClan]);
 
 	const isUserProfileNotChanged = useMemo(() => {
@@ -262,7 +260,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
-			if (isClanProfileNotChanged || isClanProfileNotChanged) return;
+			if (isClanProfileNotChanged || isClanProfileEmptyName) return;
 			updateClanProfile();
 			return;
 		}
