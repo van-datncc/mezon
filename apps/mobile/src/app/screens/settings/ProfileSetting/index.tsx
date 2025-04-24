@@ -122,6 +122,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		} else {
 			setCurrentClanProfileValue(initialValue);
 		}
+		setCurrentClanProfileValue(initialValue);
 	}, [userClansProfile, tab, userProfile, selectedClan]);
 
 	const isUserProfileNotChanged = useMemo(() => {
