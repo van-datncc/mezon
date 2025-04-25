@@ -55,19 +55,19 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 	const clans = useMemo(() => {
 		return selectClansEntities(store.getState() as any);
-	}, []);
+	}, [store]);
 
 	const listChannelsText = useMemo(() => {
 		const listChannels = selectAllChannelsByUser(store.getState() as any);
 		return listChannels.filter(
 			(channel) => channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
 		);
-	}, []);
+	}, [store]);
+	const listDM = selectDirectsOpenlist(store.getState() as any);
 
 	const listDMText = useMemo(() => {
-		const listDM = selectDirectsOpenlist(store.getState() as any);
 		return listDM.filter((channel) => !!channel.channel_label);
-	}, [store]);
+	}, [listDM]);
 
 	const mezon = useMezon();
 	const dispatch = useDispatch();
@@ -102,7 +102,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		} else {
 			setDataShareTo([...listChannelsText, ...listDMText]);
 		}
-	}, [searchText]);
+	}, [listChannelsText, listDMText, searchText]);
 
 	useEffect(() => {
 		if (dataMedia?.length) {
