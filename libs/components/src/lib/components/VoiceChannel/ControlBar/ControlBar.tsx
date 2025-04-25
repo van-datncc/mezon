@@ -275,7 +275,7 @@ export function ControlBar({
 	}, []);
 
 	const hasExternalGroup = false;
-	const listUser = useSelector((state) => selectStreamMembersByChannelId(state));
+	const listUser = useSelector((state) => selectStreamMembersByChannelId(state, ''));
 	const createExteralGroup = useCallback(async () => {
 		dispatch(voiceActions.setToggleChatBox());
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
