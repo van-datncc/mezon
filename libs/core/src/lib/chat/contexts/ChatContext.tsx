@@ -230,6 +230,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onstreamingchanneljoined = useCallback(async (user: StreamingJoinedEvent) => {
+		console.log('user: ', user);
 		const store = await getStoreAsync();
 		const currentStreamInfo = selectCurrentStreamInfo(store.getState());
 		const streamChannelMember = selectStreamMembersByChannelId(store.getState(), currentStreamInfo?.streamId || '');

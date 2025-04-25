@@ -6,10 +6,12 @@ import {
 	useTracks
 } from '@livekit/components-react';
 import {
+	directActions,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
 	selectShowSelectScreenModal,
+	selectStreamMembersByChannelId,
 	selectStreamScreen,
 	selectVoiceFullScreen,
 	selectVoiceOpenPopOut,
@@ -21,6 +23,8 @@ import { requestMediaPermission, useMediaPermissions } from '@mezon/utils';
 
 import isElectron from 'is-electron';
 import { LocalTrackPublication, RoomEvent, Track } from 'livekit-client';
+import { ChannelType } from 'mezon-js';
+import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -270,6 +274,19 @@ export function ControlBar({
 		dispatch(voiceActions.setToggleChatBox());
 	}, []);
 
+	const hasExternalGroup = false;
+	const listUser = useSelector((state) => selectStreamMembersByChannelId(state));
+	const createExteralGroup = useCallback(async () => {
+		dispatch(voiceActions.setToggleChatBox());
+		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
+			type: ChannelType.CHANNEL_TYPE_GROUP,
+			channel_private: 1,
+			user_ids: [],
+			clan_id: '0'
+		};
+		const response = await dispatch(directActions.createNewDirectMessage({ body: bodyCreateDmGroup }));
+	}, []);
+
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-sbm:!hidden max-md:flex-col">
 			<div className="flex justify-start gap-4 max-md:hidden">
@@ -363,9 +380,20 @@ export function ControlBar({
 						)}
 					</div>
 				)}
-				<div onClick={toggleChatBox}>
-					<Icons.BoxChatIcon defaultSize="cursor-pointer w-6 h-6" />
-				</div>
+
+				{isExternalCalling && (
+					<>
+						{!hasExternalGroup ? (
+							<div onClick={createExteralGroup}>
+								<Icons.Plus />
+							</div>
+						) : (
+							<div onClick={toggleChatBox}>
+								<Icons.BoxChatIcon defaultSize="cursor-pointer w-6 h-6" />
+							</div>
+						)}
+					</>
+				)}
 				<div onClick={onFullScreen}>
 					{isFullScreen ? (
 						<span>

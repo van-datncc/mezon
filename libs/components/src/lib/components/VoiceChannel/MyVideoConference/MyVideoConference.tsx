@@ -49,6 +49,7 @@ export function MyVideoConference({
 	);
 
 	const tracks = propTracks || tracksFromHook;
+	console.log('tracks: ', tracks);
 
 	const layoutContext = useCreateLayoutContext();
 

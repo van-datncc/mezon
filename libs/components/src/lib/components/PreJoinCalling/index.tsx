@@ -70,7 +70,6 @@ export default function PreJoinCalling() {
 	const [micOn, setMicOn] = useState(false);
 	const [username, setUsername] = useState('');
 	const [avatar, setAvatar] = useState('');
-
 	const [audioLevel, setAudioLevel] = useState(0);
 	const [error, setError] = useState<string | null>(null);
 	// State for permissions
@@ -88,7 +87,7 @@ export default function PreJoinCalling() {
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
 	// const { code } = useParams<{ code: string }>();
-	const code = 'MTc0NTQ4MTA2NTg3ODM3ODAxNDoxODQwNjU0NjI1MTI0OTEzMTUy.O2KVwOk-_SIdG4ijVW7vcALxIfroJVDG8y_woFAWoM0';
+	const code = 'MTc0NTU0OTY5MzY2Mjk1OTg3NjoxODQwNjU0NjI1MzMwNDM0MDQ4.gfPrkk291nuaMr1i7ylhB_jppMO5J6iq7BV63RRoGYM';
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
@@ -314,8 +313,6 @@ export default function PreJoinCalling() {
 	const openChatBox = useSelector(selectOpenExternalChatBox);
 	const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (!event.shiftKey && event.key === 'Enter') {
-			console.log('event: ', event.currentTarget.value);
-			event.currentTarget.value = '';
 		}
 	};
 	return (
