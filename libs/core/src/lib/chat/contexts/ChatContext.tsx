@@ -229,7 +229,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onstreamingchanneljoined = useCallback(async (user: StreamingJoinedEvent) => {
-		console.log('user: ', user);
 		const store = await getStoreAsync();
 		const currentStreamInfo = selectCurrentStreamInfo(store.getState());
 		const streamChannelMember = selectStreamMembersByChannelId(store.getState(), currentStreamInfo?.streamId || '');
@@ -289,7 +288,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			console.log('message :', message);
 			const store = await getStoreAsync();
 			// check mobile
 			const isMobile = false;
