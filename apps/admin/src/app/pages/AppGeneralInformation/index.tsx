@@ -141,7 +141,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 			const timer = setTimeout(() => {
 				setVisibleToken(null);
 				localStorage.removeItem(`app_token_${appId}`);
-			}, 5000);
+			}, 9000);
 			return () => clearTimeout(timer);
 		}
 	}, [appId]);
@@ -246,7 +246,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 		setChangeUrl(appDetail.app_url);
 		setChangeAboutApp(appDetail.about);
 	}, [appDetail]);
-
+	const setAppOrBot = appDetail.app_url ? 'application' : 'bot';
 	return (
 		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
@@ -276,19 +276,17 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 
 			<div className="flex flex-col gap-2">
 				<div className="text-[12px] uppercase font-semibold">Description (maximum 400 characters)</div>
-				<div className="text-[14px]">
-					Your description will appear in the About Me section of your {appDetail.app_url ? 'application' : 'bot'}
-				</div>
+				<div className="text-[14px]">Your description will appear in the About Me section of your {setAppOrBot}</div>
 				<textarea
 					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] min-h-[120px] max-h-[120px] p-[10px] outline-primary dark:bg-[#1e1f22]"
-					placeholder={`Write a short description of your ${appDetail.app_url ? 'app' : 'bot'} `}
+					placeholder={`Write a short description of your ${setAppOrBot} `}
 					onChange={handleOpenSaveChangeAboutApp}
 					value={changeAboutApp}
 				></textarea>
 			</div>
 
 			<div className="text-[12px] font-semibold flex flex-col gap-2">
-				<div className="uppercase">{appDetail.app_url ? 'Application' : 'Bot'} ID</div>
+				<div className="uppercase">{setAppOrBot} ID</div>
 				<div>{appId}</div>
 				<div
 					onClick={() => handleCopyUrl(appId)}
@@ -299,7 +297,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 			</div>
 
 			<div className="text-[12px] font-semibold flex flex-col gap-2">
-				<div className="uppercase">{appDetail.app_url ? 'Application' : 'Bot'} Token</div>
+				<div className="uppercase">{setAppOrBot} Token</div>
 
 				{visibleToken ? (
 					<div className="text-blue-600  rounded-sm mt-1">
@@ -319,7 +317,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 				{visibleToken && (
 					<div
 						onClick={() => handleCopyUrl(visibleToken)}
-						className="mt-2 py-[7px] px-[16px] bg-blue-600 hover:bg-blue-800 cursor-pointer w-fit text-[15px] text-white rounded-sm"
+						className="mt-2 py-[7px] px-[16px] bg-green-600 hover:bg-green-800 cursor-pointer w-fit text-[15px] text-white rounded-sm"
 					>
 						Copy Token
 					</div>
@@ -337,7 +335,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 					onClick={toggleDeletePopup}
 					className="text-[15px] px-4 py-[10px] text-white bg-red-600 hover:bg-red-800 cursor-pointer rounded-sm w-fit"
 				>
-					Delete {appDetail.app_url ? 'Application' : 'Bot'}
+					Delete {setAppOrBot}
 				</div>
 			</div>
 
