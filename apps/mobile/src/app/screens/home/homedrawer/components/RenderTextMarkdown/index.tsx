@@ -249,6 +249,25 @@ export function extractIds(url: string): { clanId: string | null; channelId: str
 	};
 }
 
+const renderChannelIcon = (channelType: number, channelId: string, themeValue: Attributes) => {
+	if (channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channelType === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
+		return <CustomIcon name="voice" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />;
+	}
+	if (channelType === ChannelType.CHANNEL_TYPE_THREAD) {
+		return <CustomIcon name="thread" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />;
+	}
+	if (channelType === ChannelType.CHANNEL_TYPE_STREAMING) {
+		return <CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />;
+	}
+	if (channelType === ChannelType.CHANNEL_TYPE_APP) {
+		return <CustomIcon name="app" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />;
+	}
+	if (channelId === 'undefined') {
+		return <Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />;
+	}
+	return null;
+};
+
 export const RenderTextMarkdownContent = ({
 	content,
 	isEdited,
@@ -388,18 +407,7 @@ export const RenderTextMarkdownContent = ({
 								onChannelMention?.(payloadChannel);
 							}}
 						>
-							{payloadChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
-							payloadChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
-								<CustomIcon name="voice" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
-								<CustomIcon name="thread" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-								<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-							) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
-								<CustomIcon name="app" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-							) : payloadChannel?.channel_id === 'undefined' ? (
-								<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />
-							) : null}
+							{renderChannelIcon(payloadChannel?.type, payloadChannel?.channel_id, themeValue)}
 							{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 						</Text>
 					);
@@ -503,18 +511,7 @@ export const RenderTextMarkdownContent = ({
 											onChannelMention?.(payloadChannel);
 										}}
 									>
-										{payloadChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
-										payloadChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
-											<CustomIcon name="voice" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
-											<CustomIcon name="thread" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-											<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
-											<CustomIcon name="app" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
-										) : payloadChannel?.channel_id === 'undefined' ? (
-											<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />
-										) : null}
+										{renderChannelIcon(payloadChannel?.type, payloadChannel?.channel_id, themeValue)}
 										{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
 									</Text>
 								);
