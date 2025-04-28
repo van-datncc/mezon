@@ -454,6 +454,74 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.LINK: {
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
+						const basePath = '/chat/clans/';
+						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
+
+						if (contentHasChannelLink) {
+							const pathSegments = contentInElement?.split('/') as string[];
+							const channelIdOnLink = pathSegments?.[pathSegments?.indexOf('channels') + 1];
+
+							const channelsEntities = selectChannelsEntities(store.getState() as any);
+							const hashtagDmEntities = selectHashtagDmEntities(store.getState() as any);
+							const channelFound = channelsEntities[channelIdOnLink];
+
+							if (channelIdOnLink && channelFound?.id) {
+								const mention = ChannelHashtag({
+									channelHashtagId: channelIdOnLink,
+									currentChannelId,
+									mode,
+									hashtagDmEntities,
+									channelsEntities
+								});
+
+								const { text, link } = parseMarkdownLink(mention);
+
+								const urlFormat = link.replace(/##voice|#thread|#stream|#app|#%22|%22|"|#/g, '');
+								const dataChannel = urlFormat.split('_');
+								const payloadChannel = {
+									type: Number(dataChannel?.[0] || 1),
+									id: dataChannel?.[1],
+									channel_id: dataChannel?.[1],
+									clan_id: dataChannel?.[2],
+									status: Number(dataChannel?.[3] || 1),
+									meeting_code: dataChannel?.[4] || '',
+									category_id: dataChannel?.[5]
+								};
+
+								textParts.push(
+									<Text
+										key={`hashtag-${index}`}
+										style={[
+											themeValue && payloadChannel?.channel_id === 'undefined'
+												? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).privateChannel
+												: themeValue && !!payloadChannel?.channel_id
+													? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).hashtag
+													: {}
+										]}
+										onPress={() => {
+											if (!payloadChannel?.channel_id) return;
+											onChannelMention?.(payloadChannel);
+										}}
+									>
+										{payloadChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ||
+										payloadChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
+											<CustomIcon name="voice" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? (
+											<CustomIcon name="thread" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
+											<CustomIcon name="stream" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+										) : payloadChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
+											<CustomIcon name="app" size={size.s_14} color={Colors.textLink} style={{ marginTop: size.s_10 }} />
+										) : payloadChannel?.channel_id === 'undefined' ? (
+											<Feather name="lock" size={size.s_14} color={themeValue.text} style={{ marginTop: size.s_10 }} />
+										) : null}
+										{payloadChannel?.channel_id === 'undefined' ? 'private-channel' : text}
+									</Text>
+								);
+								break;
+							}
+						}
+
 						if (contentInElement.includes('canvas') && canvasId && clanId && channelId) {
 							textParts.push(<RenderCanvasItem key={`canvas-${index}`} clanId={clanId} channelId={channelId} canvasId={canvasId} />);
 						} else if (contentInElement.includes('unknown')) {
