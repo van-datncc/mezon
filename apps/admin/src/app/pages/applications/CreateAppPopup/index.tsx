@@ -3,6 +3,7 @@ import { createApplication, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiAddAppRequest } from 'mezon-js/api.gen';
 import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface ICreateAppPopup {
 	togglePopup: () => void;
@@ -25,6 +26,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	const typeApplication = creationType === 'application';
 	const typeBot = creationType === 'bot';
 	const isFormValid = !!formValues.name && (creationType === 'bot' || (formValues.url !== '' && isUrlValid)) && isCheckedForPolicy;
+	const navigate = useNavigate();
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -66,7 +68,19 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 			is_shadow: isShadowBot,
 			app_url: typeApplication ? cleanedUrl : ''
 		};
-		await dispatch(createApplication({ request: createRequest }));
+		const response = (await dispatch(createApplication({ request: createRequest }))) as { payload?: { id?: string; token?: string } };
+
+		if (response?.payload?.id) {
+			if (response?.payload?.token) {
+				localStorage.setItem(`app_token_${response.payload.id}`, response.payload.token);
+			}
+			setTimeout(() => {
+				navigate(`/developers/applications/${response?.payload?.id}/information`);
+			}, 500);
+		} else {
+			console.error('Failed to create application or missing ID in response:', response);
+		}
+
 		togglePopup();
 	};
 
