@@ -48,7 +48,6 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
-	reactionActions,
 	rolesClanActions,
 	selectAllEmojiSuggestion,
 	selectAllTextChannel,
@@ -1026,7 +1025,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
 			}
 
-			dispatch(reactionActions.setReactionDataSocket(reactionEntity));
 			dispatch(messagesActions.updateMessageReactions(reactionEntity));
 		},
 		[userId]
