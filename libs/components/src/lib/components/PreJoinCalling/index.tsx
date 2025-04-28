@@ -19,6 +19,7 @@ import {
 import { safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { MyVideoConference } from '../VoiceChannel';
 import { JoinForm } from './JoinForm';
 import { VideoPreview } from './VideoPreview';
@@ -86,8 +87,7 @@ export default function PreJoinCalling() {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
-	// const { code } = useParams<{ code: string }>();
-	const code = 'MTc0NTgwODk4OTIzNTc5NzIxMToxODQwNjU0NjI1NTUyNzMyMTYw.hBnxR9oYjvEj-j3GcEjiOJGt-eDAhkT8Nuhou1gSmOo';
+	const { code } = useParams<{ code: string }>();
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
