@@ -5,6 +5,7 @@ import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { ITabs } from '../../common/constants/tabSideBar';
 
 interface ISideBarProps {
@@ -27,13 +28,16 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 		const current = allApps.apps.find((a) => a.id === currentAppId);
 		const isApp = Boolean(current?.app_url);
 
-		const list = allApps.apps.filter((a) => (isApp ? Boolean(a.app_url) : !a.app_url));
-		setFilteredApps(list);
+		const filtered = allApps.apps.filter((a) => (isApp ? Boolean(a.app_url) : !a.app_url));
 
-		if (current && list.find((a) => a.id === currentAppId) && current.appname) {
+		const sorted = filtered.filter((a) => a.id != null).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+
+		setFilteredApps(sorted);
+
+		if (current && sorted.find((a) => a.id === currentAppId) && current.appname) {
 			setDropdownValue(current.appname);
-		} else if (list.length > 0 && list[0].appname) {
-			setDropdownValue(list[0].appname);
+		} else if (sorted.length > 0 && sorted[0].appname) {
+			setDropdownValue(sorted[0].appname);
 		}
 	}, [allApps, currentAppId]);
 
@@ -43,8 +47,18 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 
 		setLoading(true);
 		setDropdownValue(app.appname);
-		await dispatch(getApplicationDetail({ appId: app.id }));
-		setLoading(false);
+
+		try {
+			await dispatch(getApplicationDetail({ appId: app.id }));
+		} catch (error: any) {
+			if (error instanceof Error) {
+				toast.error(`Error fetching application details: ${error.message}`);
+			} else {
+				toast.error('An unknown error occurred');
+			}
+		} finally {
+			setLoading(false);
+		}
 		navigate(`/developers/applications/${app.id}/information`);
 	};
 

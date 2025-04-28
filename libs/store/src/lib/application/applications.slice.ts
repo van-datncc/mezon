@@ -192,7 +192,6 @@ export const adminApplicationSlice = createSlice({
 			state.loadingStatus = 'loaded';
 			state.appsData = action.payload;
 			applicationAdapter.setAll(state, (action.payload.apps as IApplicationEntity[]) || []);
-			console.log('loggggg', action.payload.apps);
 		});
 		builder.addCase(fetchApplications.rejected, (state) => {
 			state.loadingStatus = 'not loaded';

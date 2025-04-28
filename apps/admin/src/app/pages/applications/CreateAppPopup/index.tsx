@@ -84,11 +84,10 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 				navigate(`/developers/applications/${response?.payload?.id}/information`);
 				togglePopup();
 			} else {
-				toast.error('Failed to create application or missing ID in response:');
+				toast.error(`Failed to create application or missing ID in response`);
 			}
-		} catch (error) {
-			console.error(error);
-			toast.error('An unexpected error occurred.');
+		} catch (error: any) {
+			toast.error(`An unexpected error occurred.${error.message}`);
 		} finally {
 			setIsLoading(false);
 		}

@@ -56,7 +56,7 @@ const GeneralInformation = () => {
 			updateRequest.applogo = appLogoUrl;
 		}
 
-		if (Object.keys(updateRequest).length === 0) return; // không có gì thay đổi
+		if (Object.keys(updateRequest).length === 0) return;
 
 		await dispatch(editApplication({ request: updateRequest, appId }));
 		await dispatch(fetchApplications({ noCache: true }));
@@ -178,8 +178,6 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 		if (newAbout !== appDetail.about) {
 			setChangeAboutApp(newAbout);
 			setOpenSaveChange(true);
-			dispatch(editApplication({ request: { about: newAbout }, appId }));
-			localStorage.setItem('about', newAbout);
 		}
 	};
 	const handleResetChange = () => {
@@ -285,6 +283,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 					className="w-full bg-bgLightModeThird rounded-sm border dark:border-[#4d4f52] min-h-[120px] max-h-[120px] p-[10px] outline-primary dark:bg-[#1e1f22]"
 					placeholder={`Write a short description of your ${appDetail.app_url ? 'app' : 'bot'} `}
 					onChange={handleOpenSaveChangeAboutApp}
+					value={changeAboutApp}
 				></textarea>
 			</div>
 
