@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 'use client';
 
-import { LiveKitRoom } from '@livekit/components-react';
+import { ChatProps, LiveKitRoom, ReceivedChatMessage, useChat } from '@livekit/components-react';
 import {
 	authActions,
 	generateMeetTokenExternal,
@@ -16,7 +16,8 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { safeJSONParse } from 'mezon-js';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MyVideoConference } from '../VoiceChannel';
 import { JoinForm } from './JoinForm';
@@ -66,7 +67,6 @@ const PermissionsPopup = React.memo(({ onClose }: { onClose: () => void }) => {
 
 export default function PreJoinCalling() {
 	const [cameraOn, setCameraOn] = useState(false);
-	console.log('cameraOn: ', cameraOn);
 	const [micOn, setMicOn] = useState(false);
 	const [username, setUsername] = useState('');
 	const [avatar, setAvatar] = useState('');
@@ -87,7 +87,7 @@ export default function PreJoinCalling() {
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
 	// const { code } = useParams<{ code: string }>();
-	const code = 'MTc0NTU0OTY5MzY2Mjk1OTg3NjoxODQwNjU0NjI1MzMwNDM0MDQ4.gfPrkk291nuaMr1i7ylhB_jppMO5J6iq7BV63RRoGYM';
+	const code = 'MTc0NTgwODk4OTIzNTc5NzIxMToxODQwNjU0NjI1NTUyNzMyMTYw.hBnxR9oYjvEj-j3GcEjiOJGt-eDAhkT8Nuhou1gSmOo';
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
@@ -310,11 +310,6 @@ export default function PreJoinCalling() {
 		dispatch(voiceActions.resetExternalCall());
 	}, [dispatch]);
 
-	const openChatBox = useSelector(selectOpenExternalChatBox);
-	const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
-		if (!event.shiftKey && event.key === 'Enter') {
-		}
-	};
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<div className="h-screen w-screen flex">
@@ -328,7 +323,7 @@ export default function PreJoinCalling() {
 					token={getExternalToken}
 					serverUrl={serverUrl}
 					data-lk-theme="default"
-					className="h-full flex-1"
+					className="h-full flex-1 flex"
 				>
 					<MyVideoConference
 						isExternalCalling={true}
@@ -336,6 +331,8 @@ export default function PreJoinCalling() {
 						onLeaveRoom={handleLeaveRoom}
 						onFullScreen={handleFullScreen}
 					/>
+					{/* {!!openChatBox && <Chat className="max-w-[480px] bg-[#111] min-w-[300px] w-1/4 h-full flex-col flex p-2 py-4 gap-2" />} */}
+					<ChatStream />
 				</LiveKitRoom>
 			) : (
 				<div className="flex flex-col items-center justify-center min-h-screen bg-black text-white flex-1">
@@ -369,9 +366,32 @@ export default function PreJoinCalling() {
 					{permissionsState.showPopup && !getExternalToken && <PermissionsPopup onClose={closePermissionsPopup} />}
 				</div>
 			)}
+		</div>
+	);
+}
+const ChatStream = () => {
+	const chatOptions: ChatProps = React.useMemo(() => {
+		return { messageDecoder: undefined, messageEncoder: undefined, channelTopic: undefined };
+	}, []);
+
+	const { send, chatMessages } = useChat(chatOptions);
+	const openChatBox = useSelector(selectOpenExternalChatBox);
+	const handleSendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (!event.shiftKey && event.key === 'Enter') {
+			send((event.target as HTMLInputElement).value);
+			(event.target as HTMLInputElement).value = '';
+			// console.log('event: ', (event.target as HTMLInputElement).value);
+		}
+	};
+	return (
+		<>
 			{openChatBox && (
 				<div className="max-w-[480px] bg-[#111] min-w-[300px] w-1/4 h-full flex-col flex p-2 py-4 gap-2">
-					<div className="flex-1 bg-bgPrimary rounded-md"></div>
+					<div className="flex-1 bg-bgPrimary rounded-md flex flex-col gap-2 overflow-y-auto thread-scroll">
+						{chatMessages.map((message) => (
+							<MessageItem message={message} />
+						))}
+					</div>
 					<div id="external_chat" className="w-full h-10">
 						<input
 							placeholder="Write your thought..."
@@ -381,18 +401,28 @@ export default function PreJoinCalling() {
 					</div>
 				</div>
 			)}
+		</>
+	);
+};
+
+const MessageItem = ({ message }: { message: ReceivedChatMessage }) => {
+	const nameSender = safeJSONParse(message.from?.identity || `{ extName: '' }`).extName || '';
+	const time = useMemo(() => {
+		const timestamp = message.timestamp; // Example timestamp in milliseconds
+		const date = new Date(timestamp);
+
+		// Extract hours and minutes
+		const hours = date.getHours().toString().padStart(2, '0'); // Ensures two-digit format
+		const minutes = date.getMinutes().toString().padStart(2, '0');
+		return `${hours}:${minutes}`;
+	}, []);
+	return (
+		<div className={`flex flex-col p-2 ${message.from?.isLocal ? 'text-right' : ''}`}>
+			<p className="text-base font-semibold leading-4">
+				{nameSender}
+				<span className="font-normal text-xs leading-4 ml-4">{time}</span>
+			</p>
+			<p className="text-sm">{message.message}</p>
 		</div>
 	);
-}
-// const ChatStream = ({ currentChannel }: ChatStreamProps) => {
-// 	const dispatch = useAppDispatch();
-
-// 	useEscapeKey(() => dispatch(appActions.setIsShowChatStream(false)));
-
-// 	return (
-// 		<div className="flex flex-col h-full">
-// 			<ChatHeader currentChannel={currentChannel} />
-// 			<ChannelMain />
-// 		</div>
-// 	);
-// };
+};
