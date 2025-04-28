@@ -17,6 +17,7 @@ import { GUEST_NAME } from '@mezon/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ChatStream from '../chatStream';
 
 // Permissions popup component
@@ -84,7 +85,7 @@ export default function PreJoinCalling() {
 	const getGuestUserId = useSelector(selectGuestUserId);
 	const getGuestAccessToken = useSelector(selectGuestAccessToken);
 
-	function decodeJWT(token: string): any {
+	function decodeJWT(token: string) {
 		try {
 			const parts = token.split('.');
 			if (parts.length !== 3) throw new Error('JWT must have 3 parts');
@@ -92,7 +93,7 @@ export default function PreJoinCalling() {
 			const decoded = atob(payload);
 			return JSON.parse(decoded);
 		} catch (error) {
-			console.error('Invalid JWT:', error);
+			toast.error('Invalid JWT');
 			return {};
 		}
 	}
