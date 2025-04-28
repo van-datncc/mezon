@@ -77,14 +77,14 @@ export function combineMessageReactions(reactions: any[], message_id: string): a
 	const dataCombined: Record<string, EmojiDataOptionals> = {};
 
 	for (const reaction of reactions) {
-		const emojiId = reaction.emoji_id || ('' as string);
-		const emoji = reaction.emoji || ('' as string);
+		const emojiId = reaction?.emoji_id || ('' as string);
+		const emoji = reaction?.emoji || ('' as string);
 
-		if (reaction.count < 1) {
+		if (reaction?.count < 1) {
 			continue;
 		}
 
-		if (!dataCombined[emojiId]) {
+		if (!dataCombined?.[emojiId]) {
 			dataCombined[emojiId] = {
 				emojiId,
 				emoji,
@@ -95,19 +95,19 @@ export function combineMessageReactions(reactions: any[], message_id: string): a
 				channel_id: ''
 			};
 		}
-		if (!reaction.sender_name) continue;
+		if (!reaction?.sender_name) continue;
 		const newSender = {
-			sender_id: reaction.sender_id,
-			count: reaction.count
+			sender_id: reaction?.sender_id,
+			count: reaction?.count
 		};
 
-		const reactionData = dataCombined[emojiId];
-		const senderIndex = reactionData.senders.findIndex((sender) => sender.sender_id === newSender.sender_id);
+		const reactionData = dataCombined?.[emojiId];
+		const senderIndex = reactionData?.senders?.findIndex((sender) => sender?.sender_id === newSender?.sender_id);
 
 		if (senderIndex === -1) {
-			reactionData.senders.push(newSender);
-		} else if (reactionData?.senders[senderIndex]) {
-			reactionData.senders[senderIndex].count = newSender.count;
+			reactionData?.senders?.push(newSender);
+		} else if (reactionData?.senders?.[senderIndex]) {
+			reactionData.senders[senderIndex].count = newSender?.count;
 		}
 	}
 

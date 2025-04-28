@@ -549,7 +549,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		message?.topic_id,
 		message?.code,
 		message?.channel_id,
-		message.attachments,
+		message?.attachments,
 		message?.id,
 		listPinMessages,
 		isDM,
