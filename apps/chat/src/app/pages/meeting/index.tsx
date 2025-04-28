@@ -18,6 +18,7 @@ import { GUEST_NAME } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 // Permissions popup component
 const PermissionsPopup = React.memo(({ onClose }: { onClose: () => void }) => {
