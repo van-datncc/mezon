@@ -14,6 +14,7 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
+import { GUEST_NAME } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -76,8 +77,7 @@ export default function PreJoinCalling() {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
-	// const { code } = useParams<{ code: string }>();
-	const code = 'MTc0NTgyOTI2OTU4MDYxMDUzNzoxODQwNjU0NjI1NjMyNDIzOTM2.BRbZsDnNiLTh93EAc7qPoBHtZeYNBEGySTux1ZKsKds';
+	const { code } = useParams<{ code: string }>();
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
@@ -105,7 +105,7 @@ export default function PreJoinCalling() {
 			created_at: now,
 			expires_at: payload.exp,
 			refresh_expires_at: undefined,
-			username: payload.usn || payload.usr || payload.sub || 'guest',
+			username: payload.usn || payload.usr || payload.sub || GUEST_NAME,
 			user_id: payload.uid?.toString(),
 			vars: payload.vrs || {},
 			is_remember: false
