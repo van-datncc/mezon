@@ -94,7 +94,7 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.addApp(mezon.session, data.request);
 		if (response) {
-			thunkAPI.dispatch(fetchApplications({ noCache: true }));
+			await thunkAPI.dispatch(fetchApplications({ noCache: true }));
 			return response;
 		} else {
 			return thunkAPI.rejectWithValue({});
@@ -192,6 +192,7 @@ export const adminApplicationSlice = createSlice({
 			state.loadingStatus = 'loaded';
 			state.appsData = action.payload;
 			applicationAdapter.setAll(state, (action.payload.apps as IApplicationEntity[]) || []);
+			console.log('loggggg', action.payload.apps);
 		});
 		builder.addCase(fetchApplications.rejected, (state) => {
 			state.loadingStatus = 'not loaded';
