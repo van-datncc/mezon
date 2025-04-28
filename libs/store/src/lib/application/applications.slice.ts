@@ -95,8 +95,9 @@ export const createApplication = createAsyncThunk('adminApplication/createApplic
 		const response = await mezon.client.addApp(mezon.session, data.request);
 		if (response) {
 			thunkAPI.dispatch(fetchApplications({ noCache: true }));
+			return response;
 		} else {
-			thunkAPI.rejectWithValue({});
+			return thunkAPI.rejectWithValue({});
 		}
 	} catch (error) {
 		captureSentryError(error, 'adminApplication/createApplication');
