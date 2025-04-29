@@ -16,7 +16,7 @@ export const EmbedAnimation = ({ url_image, url_position }: EmbedAnimationProps)
 			const innerAnimation = makeAnimation(jsonPosition).animate;
 			style.innerHTML = `
 
-      .slot-machine {
+      .box_animation {
         background-image: url(${url_image});
         animation: slot_machine 2s steps(1) fowards;
         }
@@ -28,7 +28,7 @@ export const EmbedAnimation = ({ url_image, url_position }: EmbedAnimationProps)
 
           `;
 
-			const div = document.getElementById('Test_animation');
+			const div = document.getElementById('box_animation');
 			div?.appendChild(style);
 		};
 		fetchAnimationData();
@@ -36,7 +36,7 @@ export const EmbedAnimation = ({ url_image, url_position }: EmbedAnimationProps)
 
 	return (
 		<div className="rounded-md bg-white">
-			<div id="Test_animation" className="w-32 h-32 slot-machine"></div>
+			<div id="box_animation" className="w-32 h-32 box_animation"></div>
 		</div>
 	);
 };
