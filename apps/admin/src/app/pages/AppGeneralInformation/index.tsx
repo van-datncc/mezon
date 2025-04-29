@@ -6,6 +6,7 @@ import { ApiApp, ApiMessageAttachment, MezonUpdateAppBody } from 'mezon-js/api.g
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { APP_TYPES } from '../../constants/constants';
 import DeleteAppPopup from '../applications/DeleteAppPopup';
 
 const GeneralInformation = () => {
@@ -231,7 +232,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 				setVisibleToken(response.token);
 				const timer = setTimeout(() => {
 					setVisibleToken(null);
-				}, 5000);
+				}, 9000);
 				return () => clearTimeout(timer);
 			}
 
@@ -246,7 +247,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 		setChangeUrl(appDetail.app_url);
 		setChangeAboutApp(appDetail.about);
 	}, [appDetail]);
-	const setAppOrBot = appDetail.app_url ? 'application' : 'bot';
+	const setAppOrBot = appDetail.app_url ? APP_TYPES.APPLICATION : APP_TYPES.BOT;
 	return (
 		<div className="flex-1 flex flex-col gap-7">
 			<div className="w-full flex flex-col gap-2">
