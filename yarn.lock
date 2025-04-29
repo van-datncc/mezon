@@ -12279,6 +12279,13 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
+mezon-js-protobuf@1.7.46:
+  version "1.7.46"
+  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.7.46.tgz#472e0ee0732fa669ea086b3cce4c4cc21a545fd2"
+  integrity sha512-FUxRhNZY+299HpnTnIbv3OJB2YRqxklZerEOlB/2Zp9jRDk7VRWParVpi4Ll5hatlsyBgKbd4LqnhuYKZ43URw==
+  dependencies:
+    "@scarf/scarf" "^1.1.1"
+
 
 
 mezon-js@2.11.41:
@@ -12633,7 +12640,7 @@ node-abort-controller@^3.0.1, node-abort-controller@^3.1.1:
   resolved "https://registry.yarnpkg.com/node-abort-controller/-/node-abort-controller-3.1.1.tgz#a94377e964a9a37ac3976d848cb5c765833b8548"
   integrity sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==
 
-node-addon-api@^1.6.3:
+node-addon-api@^1.6.3, node-addon-api@^1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-1.7.2.tgz#3df30b95720b53c24e59948b49532b662444f54d"
   integrity sha512-ibPK3iA+vaY1eEjESkQkM0BbCqFOaZMiXRTtdB0u7b4djtY6JnsjvPdUHVMg6xQt3B8fpTTWHI9A+ADjM9frzg==
