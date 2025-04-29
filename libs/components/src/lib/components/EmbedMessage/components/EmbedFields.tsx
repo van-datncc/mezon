@@ -95,7 +95,7 @@ const InputEmbedByType = ({ messageId, senderId, component }: InputEmbedByType) 
 		case EMessageComponentType.RADIO:
 			return <EmbedOptionRatio key={component.id} idRadio={component.id} options={component.component} message_id={messageId} />;
 		case EMessageComponentType.ANIMATION:
-			return <EmbedAnimation />;
+			return <EmbedAnimation url_image={component.component.url_image} url_position={component.component.url_position} />;
 		default:
 			return;
 	}

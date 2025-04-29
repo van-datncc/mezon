@@ -1,121 +1,37 @@
 import { useEffect } from 'react';
 
-export const EmbedAnimation = () => {
-	const jsonPosition = {
-		frames: {
-			'RunRight01.png': {
-				frame: {
-					x: 1,
-					y: 1,
-					w: 128,
-					h: 128
-				},
-				rotated: false,
-				trimmed: false,
-				spriteSourceSize: {
-					x: 0,
-					y: 0,
-					w: 128,
-					h: 128
-				},
-				sourceSize: {
-					w: 128,
-					h: 128
-				}
-			},
-			'RunRight02.png': {
-				frame: {
-					x: 131,
-					y: 1,
-					w: 128,
-					h: 128
-				},
-				rotated: false,
-				trimmed: false,
-				spriteSourceSize: {
-					x: 0,
-					y: 0,
-					w: 128,
-					h: 128
-				},
-				sourceSize: {
-					w: 128,
-					h: 128
-				}
-			},
-			'RunRight03.png': {
-				frame: {
-					x: 1,
-					y: 131,
-					w: 128,
-					h: 128
-				},
-				rotated: false,
-				trimmed: false,
-				spriteSourceSize: {
-					x: 0,
-					y: 0,
-					w: 128,
-					h: 128
-				},
-				sourceSize: {
-					w: 128,
-					h: 128
-				}
-			},
-			'RunRight04.png': {
-				frame: {
-					x: 131,
-					y: 131,
-					w: 128,
-					h: 128
-				},
-				rotated: false,
-				trimmed: false,
-				spriteSourceSize: {
-					x: 0,
-					y: 0,
-					w: 128,
-					h: 128
-				},
-				sourceSize: {
-					w: 128,
-					h: 128
-				}
-			}
-		},
-		meta: {
-			app: 'http://www.codeandweb.com/texturepacker',
-			version: '1.0',
-			image: 'spritesheet.png',
-			format: 'RGBA8888',
-			size: {
-				w: 260,
-				h: 260
-			},
-			scale: '1'
-		}
-	};
-	const url_image = '';
+type EmbedAnimationProps = {
+	url_image?: string;
+	url_position?: string;
+};
+
+export const EmbedAnimation = ({ url_image, url_position }: EmbedAnimationProps) => {
 	useEffect(() => {
-		const style = document.createElement('style');
-		const innerAnimation = makeAnimation(jsonPosition).animate;
-		style.innerHTML = `
+		const fetchAnimationData = async () => {
+			if (!url_position) {
+				return;
+			}
+			const jsonPosition = await (await fetch(url_position)).json();
+			const style = document.createElement('style');
+			const innerAnimation = makeAnimation(jsonPosition).animate;
+			style.innerHTML = `
 
-    .slot-machine {
-	background-image: url(${url_image});
-	animation: slot_machine 2s steps(1) infinite;
-}
+      .slot-machine {
+        background-image: url(${url_image});
+        animation: slot_machine 2s steps(1) fowards;
+        }
 
-@keyframes slot_machine {
-  ${innerAnimation}
-}
+        @keyframes slot_machine {
+          ${innerAnimation}
+          }
 
 
-`;
+          `;
 
-		const div = document.getElementById('Test_animation');
-		div?.appendChild(style);
+			const div = document.getElementById('Test_animation');
+			div?.appendChild(style);
+		};
+		fetchAnimationData();
 	}, []);
 
 	return (
