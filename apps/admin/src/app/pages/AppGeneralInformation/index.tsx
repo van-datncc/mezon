@@ -231,7 +231,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 				setVisibleToken(response.token);
 				const timer = setTimeout(() => {
 					setVisibleToken(null);
-				}, 5000);
+				}, 9000);
 				return () => clearTimeout(timer);
 			}
 
