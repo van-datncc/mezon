@@ -39,6 +39,8 @@ export type MezonContextValue = {
 
 	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session>;
+	connectWithSession: (session: Sessionlike) => Promise<Session>;
+
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 
@@ -53,6 +55,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
 		}
+
+		if (socketRef.current && socketRef.current.isOpen()) {
+			await socketRef.current.disconnect(false);
+		}
+
 		const socket = clientRef.current.createSocket(clientRef.current.useSSL, false, new WebSocketAdapterPb());
 		socketRef.current = socket;
 		return socket;
@@ -224,6 +231,22 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[clientRef, socketRef, isFromMobile]
 	);
 
+	const connectWithSession = useCallback(
+		async (session: any) => {
+			if (!clientRef.current) {
+				throw new Error('Mezon client not initialized');
+			}
+			sessionRef.current = session;
+			if (!socketRef.current) {
+				return session;
+			}
+			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
+			sessionRef.current = session2;
+			return session;
+		},
+		[clientRef, socketRef, isFromMobile]
+	);
+
 	const abortControllerRef = React.useRef<AbortController | null>(null);
 	const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -267,20 +290,26 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					}
 
 					try {
+						if (socketRef.current && socketRef.current.isOpen()) {
+							return resolve(socketRef.current);
+						}
+
 						const socket = await createSocket();
 						const newSession = await clientRef?.current?.sessionRefresh(
 							new Session(session.token, session.refresh_token, session.created, session.is_remember ?? false)
 						);
-						const recsession = await socket.connect(
+
+						const connectedSession = await socket.connect(
 							newSession || session,
 							true,
 							isFromMobile ? '1' : '0',
 							DefaultSocket.DefaultConnectTimeoutMs,
 							signal
 						);
+
 						await socket.joinClanChat(clanId);
 						socketRef.current = socket;
-						sessionRef.current = recsession;
+						sessionRef.current = connectedSession;
 						return resolve(socket);
 					} catch (error) {
 						failCount++;
@@ -291,11 +320,17 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 							timeoutIdRef.current = setTimeout(res, retryTime);
 						});
 
-						!socketRef.current?.isOpen() && (await retry());
+						if (socketRef.current && socketRef.current.isOpen()) {
+							return resolve(socketRef.current);
+						}
+						await retry();
 					}
 				};
 
-				!socketRef.current?.isOpen() && (await retry());
+				if (socketRef.current && socketRef.current.isOpen()) {
+					return resolve(socketRef.current);
+				}
+				await retry();
 			});
 		},
 		[createSocket, isFromMobile]
@@ -308,13 +343,18 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
 			}
+
+			if (socketRef.current && socketRef.current.isOpen()) {
+				return Promise.resolve(socketRef.current);
+			}
+
 			return new Promise((resolve, reject) => {
 				timeoutRef.current = setTimeout(() => {
 					reconnect(clanId).then(resolve).catch(reject);
 				}, 500);
 			});
 		},
-		[reconnect]
+		[reconnect, socketRef]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
@@ -333,7 +373,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnectWithTimeout,
 			authenticateMezon,
-			authenticateEmail
+			authenticateEmail,
+			connectWithSession
 		}),
 		[
 			clientRef,
@@ -350,7 +391,8 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			logOutMezon,
 			reconnectWithTimeout,
 			authenticateMezon,
-			authenticateEmail
+			authenticateEmail,
+			connectWithSession
 		]
 	);
 
