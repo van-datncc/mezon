@@ -153,10 +153,6 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 		{
 			title: t('fields.channelVoiceType.mezon'),
 			value: ChannelType.CHANNEL_TYPE_MEZON_VOICE
-		},
-		{
-			title: t('fields.channelVoiceType.gMeet'),
-			value: ChannelType.CHANNEL_TYPE_GMEET_VOICE
 		}
 	];
 
