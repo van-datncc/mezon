@@ -5,9 +5,11 @@ type EmbedAnimationProps = {
 	url_position?: string;
 	pool?: Array<string[]>;
 	messageId: string;
+	repeat?: number;
+	duration?: number;
 };
 
-export const EmbedAnimation = ({ url_image, url_position, pool, messageId }: EmbedAnimationProps) => {
+export const EmbedAnimation = ({ url_image, url_position, pool, messageId, repeat = 1, duration = 2 }: EmbedAnimationProps) => {
 	useEffect(() => {
 		const fetchAnimationData = async () => {
 			if (!url_position) {
@@ -22,7 +24,8 @@ export const EmbedAnimation = ({ url_image, url_position, pool, messageId }: Emb
 
         .box_animation_${index} {
           background-image: url(${url_image});
-          animation: animation_embed_${index} 2s steps(1) forwards;
+          animation: animation_embed_${index} ${duration}s steps(1) forwards;
+          animation-iteration-count: ${repeat};
           background-repeat : no-repeat;
           }
 
