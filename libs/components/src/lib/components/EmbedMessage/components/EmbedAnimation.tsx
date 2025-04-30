@@ -9,7 +9,7 @@ type EmbedAnimationProps = {
 	duration?: number;
 };
 
-export const EmbedAnimation = ({ url_image, url_position, pool, messageId, repeat = 1, duration = 2 }: EmbedAnimationProps) => {
+export const EmbedAnimation = ({ url_image, url_position, pool, messageId, repeat, duration = 2 }: EmbedAnimationProps) => {
 	useEffect(() => {
 		const fetchAnimationData = async () => {
 			if (!url_position) {
@@ -25,7 +25,7 @@ export const EmbedAnimation = ({ url_image, url_position, pool, messageId, repea
         .box_animation_${index} {
           background-image: url(${url_image});
           animation: animation_embed_${index} ${duration}s steps(1) forwards;
-          animation-iteration-count: ${repeat};
+          animation-iteration-count: ${repeat ? repeat : 'infinite'};
           background-repeat : no-repeat;
           }
 
