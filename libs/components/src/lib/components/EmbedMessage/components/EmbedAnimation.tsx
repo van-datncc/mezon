@@ -64,14 +64,12 @@ const makeAnimation = (data: TDataAnimation, poolImages: string[]) => {
       ${index * (100 / imageNumber)}%{
         background-position : -${frame.x}px -${frame.y}px;
         }
-        100%{
-        background-position : -${frame.x}px -${frame.y}px;
-        }
+
         `;
 		} else {
 			animate =
 				animate +
-				`${index * (100 / imageNumber)}%{
+				`${100 - (imageNumber - 1 - index) * (100 / imageNumber)}%{
         background-position : -${frame.x}px -${frame.y}px;
     }
         `;
