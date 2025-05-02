@@ -9,7 +9,7 @@ import {
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
-import { AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
+import { AndroidImportance, AndroidVisibility } from '@notifee/react-native/src/types/NotificationAndroid';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform } from 'react-native';
@@ -64,39 +64,94 @@ const openAppSettings = () => {
 		Linking.openSettings();
 	}
 };
+
+const getConfigDisplayNotificationAndroid = async (data: { [key: string]: string | object }) => {
+	const defaultConfig = {
+		visibility: AndroidVisibility.PUBLIC,
+		channelId: 'default',
+		smallIcon: 'ic_notification',
+		color: '#000000',
+		sound: 'default',
+		largeIcon: data?.image,
+		importance: AndroidImportance.HIGH,
+		showTimestamp: true,
+		pressAction: {
+			id: 'default',
+			launchActivity: 'com.mezon.mobile.MainActivity'
+		}
+	};
+
+	if (!data?.channelId) {
+		return defaultConfig;
+	}
+
+	const channelGroupId = await getOrCreateChannelGroup(data.channelId as string);
+	const channelId = await createNotificationChannel(data.channelId as string, channelGroupId);
+
+	return {
+		...defaultConfig,
+		channelId,
+		groupId: channelGroupId,
+		groupSummary: !channelGroupId
+	};
+};
+
+const getOrCreateChannelGroup = async (channelId: string): Promise<string> => {
+	const group = await notifee.getChannelGroup(channelId);
+	if (group) {
+		return group?.id;
+	}
+	return await notifee.createChannelGroup({
+		id: channelId,
+		name: `${channelId} group`
+	});
+};
+
+const createNotificationChannel = async (channelId: string, groupId: string): Promise<string> => {
+	return await notifee.createChannel({
+		id: channelId,
+		name: `${channelId} channel`,
+		groupId,
+		importance: AndroidImportance.HIGH,
+		sound: 'default',
+		visibility: AndroidVisibility.PUBLIC
+	});
+};
+
+const getConfigDisplayNotificationIOS = async (data: { [key: string]: string | object }) => {
+	const defaultConfig = {
+		critical: true,
+		criticalVolume: 1.0,
+		sound: 'default',
+		foregroundPresentationOptions: {
+			badge: true,
+			banner: true,
+			list: true,
+			sound: true
+		}
+	};
+
+	return {
+		...defaultConfig,
+		threadId: (data?.channelId as string) || undefined
+	};
+};
+
 export const createLocalNotification = async (title: string, body: string, data: { [key: string]: string | object }) => {
 	try {
-		const channelId = await notifee.createChannel({
-			id: 'default',
-			name: 'mezon'
-		});
+		const configDisplayNotificationd =
+			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : await getConfigDisplayNotificationIOS(data);
+
 		await notifee.displayNotification({
 			title: title || '',
 			body: body,
+			subtitle: (data?.subtitle as string) || '',
 			data: data,
-			android: {
-				visibility: AndroidVisibility.PUBLIC,
-				channelId: 'mezon-mobile',
-				smallIcon: 'ic_notification',
-				color: '#000000',
-				sound: 'default',
-				pressAction: {
-					id: 'default'
-				}
-			},
-			ios: {
-				critical: true,
-				criticalVolume: 1.0,
-				sound: 'default',
-				foregroundPresentationOptions: {
-					badge: true,
-					banner: true,
-					list: true,
-					sound: true
-				}
-			}
+			android: configDisplayNotificationd,
+			ios: configDisplayNotificationd
 		});
 	} catch (err) {
+		console.error('log  => err', err);
 		/* empty */
 	}
 };
