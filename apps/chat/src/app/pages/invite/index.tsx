@@ -1,7 +1,7 @@
 import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { authActions, channelsActions, inviteActions, selectInviteById, selectIsClickInvite, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { channelsActions, inviteActions, selectInviteById, selectIsClickInvite, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,15 +12,7 @@ export default function InvitePage() {
 	const selectInvite = useSelector(selectInviteById(inviteIdParam || ''));
 	const navigate = useNavigate();
 	const { inviteUser } = useInvite();
-	const isLogin = useSelector(selectIsLogin);
 	const dispatch = useDispatch();
-
-	useEffect(() => {
-		if (!isLogin) {
-			dispatch(authActions.setRedirectUrl(`/invite/${inviteIdParam}`));
-			navigate('/login');
-		}
-	}, [isLogin, inviteIdParam, dispatch, navigate]);
 
 	const clanName = useMemo(() => {
 		return selectInvite?.clan_name || '';
@@ -74,7 +66,7 @@ export default function InvitePage() {
 			navigate(`/chat/clans/${clanId}/channels/${channeId}`);
 			toast.info('You are already a member!');
 		}
-	}, []);
+	}, [userJoined, navigate, clanId, channeId]);
 
 	return (
 		<Modal show={!userJoined} size={'md'}>
