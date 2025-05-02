@@ -85,26 +85,32 @@ const getConfigDisplayNotificationAndroid = async (data: { [key: string]: string
 		return defaultConfig;
 	}
 
-	const channelGroupId = await getOrCreateChannelGroup(data.channelId as string);
-	const channelId = await createNotificationChannel(data.channelId as string, channelGroupId);
+	const channelGroup = await getOrCreateChannelGroup(data.channelId as string);
+	const channelId = await createNotificationChannel(data.channelId as string, channelGroup?.groupId);
 
 	return {
 		...defaultConfig,
 		channelId,
-		groupId: channelGroupId,
-		groupSummary: !channelGroupId
+		groupId: channelGroup?.groupId,
+		groupSummary: channelGroup?.isGroupSummary
 	};
 };
 
-const getOrCreateChannelGroup = async (channelId: string): Promise<string> => {
+const getOrCreateChannelGroup = async (channelId: string): Promise<any> => {
+	let groupId = '';
 	const group = await notifee.getChannelGroup(channelId);
 	if (group) {
-		return group?.id;
+		groupId = group?.id;
 	}
-	return await notifee.createChannelGroup({
+	groupId = await notifee.createChannelGroup({
 		id: channelId,
 		name: `${channelId} group`
 	});
+
+	return {
+		groupId,
+		isGroupSummary: group === null
+	};
 };
 
 const createNotificationChannel = async (channelId: string, groupId: string): Promise<string> => {
@@ -140,6 +146,7 @@ const getConfigDisplayNotificationIOS = async (data: { [key: string]: string | o
 export const createLocalNotification = async (title: string, body: string, data: { [key: string]: string | object }) => {
 	try {
 		const configDisplayNotificationAndroid = Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
+		console.log('log  => configDisplayNotificationAndroid', configDisplayNotificationAndroid);
 		const configDisplayNotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
 
 		await notifee.displayNotification({
