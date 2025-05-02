@@ -1,10 +1,10 @@
 import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { channelsActions, inviteActions, selectInviteById, selectIsClickInvite, useAppDispatch } from '@mezon/store';
+import { authActions, channelsActions, inviteActions, selectInviteById, selectIsClickInvite, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Button, Modal } from 'flowbite-react';
 import { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 export default function InvitePage() {
@@ -12,6 +12,15 @@ export default function InvitePage() {
 	const selectInvite = useSelector(selectInviteById(inviteIdParam || ''));
 	const navigate = useNavigate();
 	const { inviteUser } = useInvite();
+	const isLogin = useSelector(selectIsLogin);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		if (!isLogin) {
+			dispatch(authActions.setRedirectUrl(`/invite/${inviteIdParam}`));
+			navigate('/login');
+		}
+	}, [isLogin, inviteIdParam, dispatch, navigate]);
 
 	const clanName = useMemo(() => {
 		return selectInvite?.clan_name || '';
@@ -55,9 +64,9 @@ export default function InvitePage() {
 		handleBackNavigate();
 	};
 
-	const dispatch = useAppDispatch();
+	const appDispatch = useAppDispatch();
 	const handleBackNavigate = () => {
-		dispatch(inviteActions.setIsClickInvite(false));
+		appDispatch(inviteActions.setIsClickInvite(false));
 	};
 
 	useEffect(() => {
