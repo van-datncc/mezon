@@ -12,7 +12,7 @@ import {
 import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -82,6 +82,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	}, [clanOwnerPermission, hasAdminPermission, hasManageClanPermission]);
 
 	navigation.setOptions({
+		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
 		headerBackTitleVisible: false,
 		headerRight: () => {
 			if (disabled) return <View />;
