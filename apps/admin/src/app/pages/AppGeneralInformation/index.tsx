@@ -339,5 +339,4 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 		</div>
 	);
 };
-
 export default GeneralInformation;
