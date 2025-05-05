@@ -334,7 +334,6 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 					Delete {setAppOrBot}
 				</div>
 			</div>
-
 			{isShowDeletePopup && <DeleteAppPopup appId={appId} appName={appDetail.appname as string} togglePopup={toggleDeletePopup} />}
 		</div>
 	);
