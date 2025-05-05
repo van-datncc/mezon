@@ -191,8 +191,8 @@ export const isShowNotification = (currentChannelId, currentDmId, remoteMessage:
 	}
 
 	const link = remoteMessage?.data?.link as string;
-	const directMessageId = link.match(clanDirectMessageLinkRegex)?.[1] || '';
-	const channelMessageId = link.match(clanAndChannelIdLinkRegex)?.[2] || '';
+	const directMessageId = link?.match?.(clanDirectMessageLinkRegex)?.[1] || '';
+	const channelMessageId = link?.match?.(clanAndChannelIdLinkRegex)?.[2] || '';
 
 	const areOnChannel = currentChannelId === channelMessageId;
 	const areOnDirectMessage = currentDmId === directMessageId;
