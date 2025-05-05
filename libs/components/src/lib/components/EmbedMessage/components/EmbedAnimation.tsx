@@ -55,9 +55,9 @@ export const EmbedAnimation = ({
           .box_animation_${index}_${messageId} {
             background-image: url(${url_image});
             background-repeat : no-repeat;
-            background-position: -${jsonPosition.frames[poolItem[pool.length - 1]].frame.x}px -${jsonPosition.frames[poolItem[pool.length - 1]].frame.y}px;
-            width : ${jsonPosition.frames[poolItem[pool.length - 1]].frame.w}px;
-            height : ${jsonPosition.frames[poolItem[pool.length - 1]].frame.h}px;
+            background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y}px;
+            width : ${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.w}px;
+            height : ${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.h}px;
             }
               `;
 				}
