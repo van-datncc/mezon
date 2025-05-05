@@ -63,7 +63,7 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 
 	const pinMessageAttachments = useMemo(() => {
 		try {
-			return safeJSONParse(pinMessageItem?.attachment || '{}') || {};
+			return safeJSONParse(pinMessageItem?.attachment || '[]') || [];
 		} catch (e) {
 			console.error({ e });
 		}
