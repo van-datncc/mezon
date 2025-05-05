@@ -344,6 +344,7 @@ export interface IMessageAnimation {
 	duration?: number;
 	repeat?: number;
 	vertical?: boolean;
+	isResult?: number;
 }
 
 export interface IMessageCallLog {
