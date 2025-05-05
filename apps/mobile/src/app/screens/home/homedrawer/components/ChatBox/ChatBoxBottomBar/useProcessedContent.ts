@@ -57,7 +57,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			let shortname = '';
 			let j = i + 1;
 
-			while (j < inputString.length && inputString[j] !== ':') {
+			while (j < inputString.length && inputString[j] !== colon) {
 				shortname += inputString[j];
 				j++;
 			}
