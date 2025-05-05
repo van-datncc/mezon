@@ -343,6 +343,7 @@ export interface IMessageAnimation {
 	pool?: Array<string[]>;
 	duration?: number;
 	repeat?: number;
+	vertical?: boolean;
 }
 
 export interface IMessageCallLog {
