@@ -129,11 +129,25 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	}
 
 	function handleLoad(url: string) {
-		setBanner(url);
+		if (hasAdminPermission || clanOwnerPermission) {
+			setBanner(url);
+		} else {
+			Toast.show({
+				type: 'error',
+				text1: t('menu.serverName.permissionDenied')
+			});
+		}
 	}
 
 	const handleClearBanner = () => {
-		setBanner('');
+		if (hasAdminPermission || clanOwnerPermission) {
+			setBanner('');
+		} else {
+			Toast.show({
+				type: 'error',
+				text1: t('menu.serverName.permissionDenied')
+			});
+		}
 	};
 
 	const openBottomSheet = () => {
