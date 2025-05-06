@@ -43,7 +43,6 @@ import {
 	EEventAction,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
-	EPermission,
 	FOR_10_MINUTES,
 	IMessageWithUser,
 	MenuBuilder,
@@ -169,7 +168,6 @@ function MessageContextMenu({
 		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_CHANNEL) ||
 		(canSendMessage && activeMode === ChannelStreamMode.STREAM_MODE_THREAD);
 
-	const [removeReaction] = usePermissionChecker([EPermission.manageChannel]);
 	const { type } = useAppParams();
 
 	const [enableCopyLinkItem, setEnableCopyLinkItem] = useState<boolean>(false);
