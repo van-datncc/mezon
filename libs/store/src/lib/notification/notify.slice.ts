@@ -237,7 +237,8 @@ export const notificationSlice = createSlice({
 							id: noti.id || '',
 							...noti,
 							create_time: safeJSONParse(noti.content || '').create_time,
-							content: safeJSONParse(noti.content || '')
+							content: safeJSONParse(noti.content || ''),
+							category: NotificationCategory.MESSAGES
 						};
 						state.notifications[NotificationCategory.MESSAGES].data = [
 							...state.notifications[NotificationCategory.MESSAGES].data,
