@@ -13,6 +13,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',
-			gap: size.s_10
+			gap: size.s_10,
+			marginTop: -size.s_10
 		}
 	});
