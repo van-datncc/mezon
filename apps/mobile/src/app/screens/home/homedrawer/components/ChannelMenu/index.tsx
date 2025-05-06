@@ -285,7 +285,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 					}
 				});
 			},
-			isShow: isCanManageThread
+			isShow: channel?.creator_id === currentUserId 
 		},
 		{
 			title: t('menu.manageThreadMenu.deleteThread'),
@@ -308,7 +308,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 			textStyle: {
 				color: Colors.textRed
 			},
-			isShow: isCanManageThread
+			isShow: channel?.creator_id === currentUserId
 		}
 		// {
 		// 	title: t('menu.manageThreadMenu.copyLink'),
