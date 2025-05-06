@@ -7,6 +7,7 @@ import {
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
 	messagesActions,
+	notificationActions,
 	pinMessageActions,
 	reactionActions,
 	referencesActions,
@@ -396,6 +397,13 @@ function MessageContextMenu({
 		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
 	}, [dispatch, message, setIsShowCreateTopic, setCurrentTopicInitMessage]);
 
+	const handleMarkMessageNoti = useCallback(async () => {
+		try {
+			dispatch(notificationActions.markMessageNotify(message));
+		} catch (error) {
+			console.error('Failed to copy text', error);
+		}
+	}, [dispatch, message]);
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
 			return true;
@@ -635,9 +643,9 @@ function MessageContextMenu({
 		// 	builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
 		// });
 
-		// builder.when(checkPos, (builder) => {
-		// 	builder.addMenuItem('markUnread', 'Mark Unread', () => console.log('markUnread'), <Icons.UnreadRightClick defaultSize="w-4 h-4" />);
-		// });
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem('markMessage', 'Mark Message', handleMarkMessageNoti, <Icons.StarIcon className="w-4 h-4" />);
+		});
 
 		// builder.when(checkPos, (builder) => {
 		// 	builder.addMenuItem(
