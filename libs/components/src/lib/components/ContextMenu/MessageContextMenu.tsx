@@ -64,6 +64,7 @@ import {
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import DynamicContextMenu from './DynamicContextMenu';
 import { useMessageContextMenu } from './MessageContextMenuContext';
 
@@ -401,7 +402,7 @@ function MessageContextMenu({
 		try {
 			dispatch(notificationActions.markMessageNotify(message));
 		} catch (error) {
-			console.error('Failed to copy text', error);
+			toast.error('Failed to note this message');
 		}
 	}, [dispatch, message]);
 	const checkPos = useMemo(() => {
