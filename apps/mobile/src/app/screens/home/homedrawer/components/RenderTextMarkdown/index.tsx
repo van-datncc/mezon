@@ -565,6 +565,8 @@ export const RenderTextMarkdownContent = ({
 												allowsFullscreenVideo={true}
 												javaScriptEnabled={true}
 												domStorageEnabled={true}
+												mediaPlaybackRequiresUserAction={false}
+												allowsInlineMediaPlayback={true}
 											/>
 										</View>
 									</View>
