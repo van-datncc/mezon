@@ -60,7 +60,7 @@ export const EmbedAnimation = ({
               .box_resize_${index}_${messageId}{
                 width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidth}px;
                 height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidth}px;
-                background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * 80}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * 80 * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+                background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
               }
             }
               `;
