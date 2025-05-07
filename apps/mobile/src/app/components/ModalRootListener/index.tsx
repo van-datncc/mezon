@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import React, { memo, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, StyleSheet, View } from 'react-native';
+import { BackHandler, DeviceEventEmitter, Keyboard, StyleSheet, View } from 'react-native';
 
 const useModalState = () => {
 	const [children, setChildren] = useState<any>(null);
@@ -35,10 +35,20 @@ const ModalRootListener = () => {
 				onTriggerModal(data);
 			}
 		});
+
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+			if (visible) {
+				setVisible(false);
+				return true;
+			}
+			return false;
+		});
+
 		return () => {
 			modalListener.remove();
+			backHandler.remove();
 		};
-	}, []);
+	}, [visible]);
 
 	return (
 		visible && (
