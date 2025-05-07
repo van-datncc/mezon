@@ -10,7 +10,8 @@ type EmbedAnimationProps = {
 	vertical?: boolean;
 	isResult?: number;
 };
-
+const WIDTH_BOX_ANIMATION_SMALL = 80;
+const BREAK_POINT_RESPONSIVE = 1200;
 export const EmbedAnimation = ({
 	url_image,
 	url_position,
@@ -21,8 +22,6 @@ export const EmbedAnimation = ({
 	vertical = false,
 	isResult
 }: EmbedAnimationProps) => {
-	const WIDTH_BOX_ANIMATION_SMALL = 80;
-	const BREAK_POINT_RESPONSIVE = 1200;
 	useEffect(() => {
 		const fetchAnimationData = async () => {
 			if (!url_position) {
@@ -32,10 +31,8 @@ export const EmbedAnimation = ({
 
 			pool?.map((poolItem, index) => {
 				const style = document.createElement('style');
-				const windowWidth = window.innerWidth;
 
-				const ratioWidth =
-					windowWidth > BREAK_POINT_RESPONSIVE ? 1 : WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
+				const ratioWidth = WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
 
 				if (!isResult) {
 					const innerAnimation = makeAnimation(jsonPosition, poolItem, ratioWidth).animate;
@@ -112,7 +109,7 @@ export default EmbedAnimation;
 
 const makeAnimation = (data: TDataAnimation, poolImages: string[], ratio?: number) => {
 	const imageNumber = poolImages.length;
-	const ratioPotion = ratio ? ratio : 1;
+	const ratioPotion = window.innerWidth < BREAK_POINT_RESPONSIVE && ratio ? ratio : 1;
 	let animate = '';
 	poolImages.map((key, index) => {
 		const frame = data.frames[key].frame;
