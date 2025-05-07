@@ -484,7 +484,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 						prefixIcon={<MezonIconCDN icon={IconCDN.magnifyingIcon} color={themeValue.text} height={20} width={20} />}
 					/>
 					<View style={{ flex: 1, backgroundColor: themeValue.secondary, borderRadius: size.s_8 }}>
-						<BottomSheetFlatList data={filteredUsers} renderItem={renderItem} />
+						<BottomSheetFlatList data={filteredUsers} contentContainerStyle={{ flexGrow: 1 }} renderItem={renderItem} />
 					</View>
 				</View>
 			</BottomSheetModal>
