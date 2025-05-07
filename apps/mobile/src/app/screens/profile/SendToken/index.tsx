@@ -10,9 +10,9 @@ import {
 	getStoreAsync,
 	giveCoffeeActions,
 	selectAllAccount,
-	selectAllDirectMessages,
 	selectAllFriends,
 	selectAllUserClans,
+	selectDirectsOpenlist,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { TypeMessage, formatMoney } from '@mezon/utils';
@@ -72,7 +72,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const { saveImageToCameraRoll } = useImage();
 	const dispatch = useAppDispatch();
 	const listDM = useMemo(() => {
-		const dmGroupChatList = selectAllDirectMessages(store.getState());
+		const dmGroupChatList = selectDirectsOpenlist(store.getState() as any);
 		return dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	}, []);
 
@@ -198,11 +198,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 					);
 				} else {
 					const receiver = mergeUser?.find((user) => user?.id === jsonObject?.receiver_id) || selectedUser;
-					const response = await createDirectMessageWithUser(
-						jsonObject?.receiver_id || selectedUser?.id,
-						receiver?.username?.[0],
-						receiver?.avatar_url
-					);
+					const response = await createDirectMessageWithUser(receiver?.id, receiver?.username?.[0], receiver?.avatar_url);
 					if (response?.channel_id) {
 						sendInviteMessage(
 							`${t('tokensSent')} ${formatMoney(Number(plainTokenCount || 1))}₫ | ${note?.replace?.(/\s+/g, ' ')?.trim() || ''}`,
