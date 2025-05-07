@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import React, { memo, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Modal } from 'react-native';
+import { DeviceEventEmitter, Keyboard, StyleSheet, View } from 'react-native';
 
 const useModalState = () => {
 	const [children, setChildren] = useState<any>(null);
@@ -41,10 +41,32 @@ const ModalRootListener = () => {
 	}, []);
 
 	return (
-		<Modal visible={visible} animationType={'fade'} transparent={true} onRequestClose={() => setVisible(false)}>
-			{children && children}
-		</Modal>
+		visible && (
+			<View style={styles.overlay}>
+				<View style={styles.modalContent}>{children && children}</View>
+			</View>
+		)
 	);
 };
+
+const styles = StyleSheet.create({
+	overlay: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	modalContent: {
+		width: '100%',
+		height: '100%',
+		backgroundColor: 'transparent'
+	}
+});
 
 export default memo(ModalRootListener, () => true);
