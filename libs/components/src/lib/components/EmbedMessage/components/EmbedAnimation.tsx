@@ -21,6 +21,8 @@ export const EmbedAnimation = ({
 	vertical = false,
 	isResult
 }: EmbedAnimationProps) => {
+	const WIDTH_BOX_ANIMATION_SMALL = 80;
+	const BREAK_POINT_RESPONSIVE = 1200;
 	useEffect(() => {
 		const fetchAnimationData = async () => {
 			if (!url_position) {
@@ -30,38 +32,64 @@ export const EmbedAnimation = ({
 
 			pool?.map((poolItem, index) => {
 				const style = document.createElement('style');
+				const windowWidth = window.innerWidth;
+
+				const ratioWidth =
+					windowWidth > BREAK_POINT_RESPONSIVE ? 1 : WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
+
 				if (!isResult) {
-					const innerAnimation = makeAnimation(jsonPosition, poolItem).animate;
+					const innerAnimation = makeAnimation(jsonPosition, poolItem, ratioWidth).animate;
 					style.innerHTML = `
+          .box_resize_${index}_${messageId}{
+            width : ${jsonPosition.frames[poolItem[index]].frame.w}px;
+            height : ${jsonPosition.frames[poolItem[index]].frame.h}px;
+          }
 
           .box_animation_${index}_${messageId} {
             background-image: url(${url_image});
             animation: animation_embed_${index}_${messageId} ${duration}s steps(1) forwards;
             animation-iteration-count: ${repeat ? repeat : 'infinite'};
             background-repeat : no-repeat;
-            width : ${jsonPosition.frames[poolItem[index]].frame.w}px;
-            height : ${jsonPosition.frames[poolItem[index]].frame.h}px;
             }
 
             @keyframes animation_embed_${index}_${messageId} {
               ${innerAnimation}
               }
 
-
+            @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
+              .box_resize_${index}_${messageId}{
+                width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidth}px;
+                height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidth}px;
+                background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * 80}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * 80 * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+              }
+            }
               `;
 				} else {
 					style.innerHTML = `
+            .box_resize_${index}_${messageId}{
+              width : ${jsonPosition.frames[poolItem[index]].frame.w}px;
+              height : ${jsonPosition.frames[poolItem[index]].frame.h}px;
+            }
 
           .box_animation_${index}_${messageId} {
             background-image: url(${url_image});
             background-repeat : no-repeat;
             background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y}px;
-            width : ${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.w}px;
-            height : ${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.h}px;
+            }
+
+
+              @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
+              .box_resize_${index}_${messageId}{
+                width : ${WIDTH_BOX_ANIMATION_SMALL}px;
+                height : ${(WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+                 background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+                   background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidth}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidth}px;
+                 }
             }
               `;
 				}
 				const div = document.getElementById(`${messageId}_animation_${index}`);
+
 				div?.appendChild(style);
 			});
 		};
@@ -69,15 +97,22 @@ export const EmbedAnimation = ({
 	}, []);
 
 	return (
-		<div className={`rounded-md flex gap-2 ${vertical ? 'flex-col' : ''}`}>
-			{pool?.map((poolItem, index) => <div id={`${messageId}_animation_${index}`} className={`box_animation_${index}_${messageId}`}></div>)}
+		<div id={`${messageId}_wrap_animation`} className={`rounded-md flex gap-2 ${vertical ? 'flex-col' : ''}`}>
+			{pool?.map((poolItem, index) => (
+				<div
+					key={`${messageId}_animation_${index}`}
+					id={`${messageId}_animation_${index}`}
+					className={`box_animation_${index}_${messageId} box_resize_${index}_${messageId}`}
+				></div>
+			))}
 		</div>
 	);
 };
 export default EmbedAnimation;
 
-const makeAnimation = (data: TDataAnimation, poolImages: string[]) => {
+const makeAnimation = (data: TDataAnimation, poolImages: string[], ratio?: number) => {
 	const imageNumber = poolImages.length;
+	const ratioPotion = ratio ? ratio : 1;
 	let animate = '';
 	poolImages.map((key, index) => {
 		const frame = data.frames[key].frame;
@@ -86,7 +121,7 @@ const makeAnimation = (data: TDataAnimation, poolImages: string[]) => {
 				animate +
 				`
       ${index * (100 / imageNumber)}%{
-        background-position : -${frame.x}px -${frame.y}px;
+        background-position : -${frame.x * ratioPotion}px -${frame.y * ratioPotion}px;
         }
 
         `;
@@ -94,7 +129,7 @@ const makeAnimation = (data: TDataAnimation, poolImages: string[]) => {
 			animate =
 				animate +
 				`${100 - (imageNumber - 1 - index) * (100 / imageNumber)}%{
-        background-position : -${frame.x}px -${frame.y}px;
+        background-position : -${frame.x * ratioPotion}px -${frame.y * ratioPotion}px;
     }
         `;
 		}
