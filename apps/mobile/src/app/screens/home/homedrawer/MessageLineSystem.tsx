@@ -134,7 +134,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 				case ETokenMessage.HASHTAGS: {
 					const hashtag = parseThreadInfo(contentInElement);
 					formattedContent.push(
-						<Text style={styles.textPinMessage} key={`hashtag-${index}_${hashtag?.threadId}`}>
+						<Text key={`hashtag-${index}_${hashtag?.threadId}`}>
 							{'started a thread: '}
 							<Text style={styles.textMention} onPress={() => handleJumpToThread(hashtag)}>
 								{hashtag?.threadLabel}
