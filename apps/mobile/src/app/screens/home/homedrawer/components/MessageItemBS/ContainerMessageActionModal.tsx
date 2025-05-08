@@ -8,6 +8,7 @@ import {
 	getStore,
 	giveCoffeeActions,
 	messagesActions,
+	notificationActions,
 	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentChannelId,
@@ -381,6 +382,18 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
+	const handleActionMarkMessage = useCallback(async () => {
+		dispatch(notificationActions.markMessageNotify(message));
+		Toast.show({
+			type: 'success',
+			props: {
+				text2: t('toast.markMessage'),
+				leadingIcon: <MezonIconCDN icon={IconCDN.starIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
+			}
+		});
+		onClose();
+	}, [dispatch, message, t]);
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -434,6 +447,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.Buzz:
 				handleActionBuzzMessage();
 				break;
+			case EMessageActionType.MarkMessage:
+				handleActionMarkMessage();
+				break;
 			default:
 				break;
 		}
@@ -442,7 +458,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const getActionMessageIcon = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.EditMessage:
-				return <MezonIconCDN icon={IconCDN.pencilIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
+				return <MezonIconCDN icon={IconCDN.pencilIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />;
 			case EMessageActionType.Reply:
 				return <MezonIconCDN icon={IconCDN.arrowAngleLeftUpIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.ForwardMessage:
@@ -477,6 +493,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.discussionIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.Buzz:
 				return <MezonIconCDN icon={IconCDN.buzz} width={size.s_18} height={size.s_18} color={baseColor.red} />;
+			case EMessageActionType.MarkMessage:
+				return <MezonIconCDN icon={IconCDN.starIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />;
 			default:
 				return <View />;
 		}
