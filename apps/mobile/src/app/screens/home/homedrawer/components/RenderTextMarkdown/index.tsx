@@ -470,11 +470,8 @@ export const RenderTextMarkdownContent = ({
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
 						const basePath = '/chat/clans/';
-						const contentHasChannelLink =
-							contentInElement?.includes(basePath) &&
-							contentInElement?.includes('/channels/') &&
-							!contentInElement?.includes('/canvas/');
-						const contentHasCanvasLink = contentInElement.includes('canvas') && canvasId && clanId && channelId;
+						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/') && !contentInElement?.includes('/canvas/');
+						const contentHasCanvasLink = contentInElement.includes('canvas') && canvasId && clanId && channelId
 
 						if (contentHasChannelLink) {
 							const pathSegments = contentInElement?.split('/') as string[];
