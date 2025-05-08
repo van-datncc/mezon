@@ -11,15 +11,14 @@ import {
 import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import YoutubePlayer from 'react-native-youtube-iframe';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import ImageNative from '../../../../../components/ImageNative';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
+import RenderYoutubeVideo from './components/RenderYoutubeVideo';
 
 export default function openUrl(url, customCallback) {
 	if (customCallback) {
@@ -170,21 +169,6 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			fontWeight: 'bold',
 			lineHeight: size.s_20,
 			color: colors.text
-		},
-		loadingVideoSpinner: {
-			position: 'absolute',
-			top: 0,
-			left: 0,
-			right: 0,
-			bottom: 0,
-			backgroundColor: 'rgba(0,0,0,0.1)',
-			justifyContent: 'center',
-			alignItems: 'center'
-		},
-		borderLeftView: {
-			borderLeftWidth: size.s_4,
-			borderColor: baseColor.buzzRed,
-			borderRadius: size.s_4
 		}
 	});
 };
@@ -293,22 +277,6 @@ export const RenderTextMarkdownContent = ({
 	onLongPress
 }: IMarkdownProps) => {
 	const { themeValue } = useTheme();
-
-	const [isPortrait, setIsPortrait] = useState<boolean>(true);
-	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
-
-	useEffect(() => {
-		const checkOrientation = () => {
-			const { width, height } = Dimensions.get('window');
-			setIsPortrait(height < width);
-		};
-
-		checkOrientation();
-
-		const subscription = Dimensions.addEventListener('change', checkOrientation);
-
-		return () => subscription?.remove();
-	}, []);
 
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
@@ -569,47 +537,15 @@ export const RenderTextMarkdownContent = ({
 							const videoId = extractYoutubeVideoId(contentInElement);
 
 							markdownBlackParts.push(
-								<View
+								<RenderYoutubeVideo
 									key={`youtube-${index}`}
-									style={{
-										display: 'flex',
-										gap: size.s_8,
-										marginTop: isPortrait ? -size.s_4 : -size.s_40,
-										marginLeft: isPortrait ? -size.s_4 : 0,
-										paddingBottom: isPortrait ? size.s_6 : size.s_22
-									}}
-								>
-									<Text
-										style={[themeValue ? markdownStyles(themeValue).link : {}]}
-										onPress={() => openUrl(contentInElement, null)}
-										onLongPress={onLongPress}
-									>
-										{contentInElement}
-									</Text>
-
-									<View style={[themeValue ? markdownStyles(themeValue).borderLeftView : {}]}>
-										{!isVideoReady && (
-											<View style={[themeValue ? markdownStyles(themeValue).loadingVideoSpinner : {}]}>
-												<ActivityIndicator size="large" color={baseColor.buzzRed} />
-											</View>
-										)}
-
-										<YoutubePlayer
-											height={size.s_170}
-											width={size.s_300}
-											videoId={videoId}
-											play={false}
-											onReady={() => setIsVideoReady(true)}
-											webViewProps={{
-												androidLayerType: 'hardware',
-												javaScriptEnabled: true,
-												domStorageEnabled: true,
-												allowsInlineMediaPlayback: true,
-												onStartShouldSetResponder: () => true
-											}}
-										/>
-									</View>
-								</View>
+									videoId={videoId}
+									contentInElement={contentInElement}
+									onPress={() => openUrl(contentInElement, null)}
+									onLongPress={onLongPress}
+									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
+									themeValue={themeValue}
+								/>
 							);
 						} else {
 							textParts.push(
