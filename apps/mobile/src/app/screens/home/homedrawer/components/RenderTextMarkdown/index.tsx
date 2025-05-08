@@ -88,7 +88,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		fence: {
 			color: colors.text,
-			maxWidth: codeBlockMaxWidth,
+			width: codeBlockMaxWidth,
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
@@ -422,22 +422,29 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.PRE:
-						markdownBlackParts.push(
-							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
-							</View>
+						textParts.push(
+							<Text>
+								{'\n'}
+								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
+								</View>
+							</Text>
 						);
 						break;
 
 					case EBacktickType.TRIPLE:
-						markdownBlackParts.push(
-							<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-								<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
-									{contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
-										? contentInElement?.slice(3, -3)
-										: contentInElement}
-								</Text>
-							</View>
+						textParts.push(
+							<Text>
+								{'\n'}
+								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
+									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+										{(contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
+											? contentInElement?.slice(3, -3)
+											: contentInElement
+										)?.replace(/^\n+|\n+$/g, '')}
+									</Text>
+								</View>
+							</Text>
 						);
 						break;
 
