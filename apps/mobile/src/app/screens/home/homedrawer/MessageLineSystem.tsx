@@ -28,7 +28,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 		}
 
 		if (threadContent) {
-			const threadStart = threadContent?.threadLabel || '';
+			const threadStart = threadContent?.threadLabel;
 			const startIdx = text?.indexOf(threadStart);
 
 			if (startIdx !== -1) {
