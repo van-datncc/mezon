@@ -8,13 +8,13 @@ import {
 	selectChannelsEntities,
 	selectHashtagDmEntities
 } from '@mezon/store-mobile';
-import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
-import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import WebView from 'react-native-webview';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import ImageNative from '../../../../../components/ImageNative';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
@@ -165,26 +165,26 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 			color: colors.text,
 			backgroundColor: colors.secondaryLight
 		},
-		viewYoutube: {
-			flex: 1,
-			padding: size.s_10,
-			backgroundColor: colors.border,
-			width: '90%',
-			maxWidth: size.s_400,
-			borderRadius: size.s_4,
-			height: size.s_220
-		},
-		borderLeftView: {
-			borderLeftWidth: size.s_4,
-			borderLeftColor: 'red',
-			borderRadius: size.s_4,
-			height: size.s_220
-		},
 		boldText: {
 			fontSize: size.medium,
 			fontWeight: 'bold',
 			lineHeight: size.s_20,
 			color: colors.text
+		},
+		loadingVideoSpinner: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			bottom: 0,
+			backgroundColor: 'rgba(0,0,0,0.1)',
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		borderLeftView: {
+			borderLeftWidth: size.s_4,
+			borderColor: baseColor.buzzRed,
+			borderRadius: size.s_4
 		}
 	});
 };
@@ -237,6 +237,12 @@ function parseMarkdownLink(text: string) {
 	};
 }
 
+export function extractYoutubeVideoId(url: string) {
+	const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+	const match = url.match(regExp);
+	return match && match[2].length === 11 ? match[2] : null;
+}
+
 export function extractIds(url: string): { clanId: string | null; channelId: string | null; canvasId: string | null } {
 	const clanIdMatch = url.match(/\/clans\/(\d+)\//);
 	const channelIdMatch = url.match(/\/channels\/(\d+)\//);
@@ -287,6 +293,22 @@ export const RenderTextMarkdownContent = ({
 	onLongPress
 }: IMarkdownProps) => {
 	const { themeValue } = useTheme();
+
+	const [isPortrait, setIsPortrait] = useState<boolean>(true);
+	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
+
+	useEffect(() => {
+		const checkOrientation = () => {
+			const { width, height } = Dimensions.get('window');
+			setIsPortrait(height < width);
+		};
+
+		checkOrientation();
+
+		const subscription = Dimensions.addEventListener('change', checkOrientation);
+
+		return () => subscription?.remove();
+	}, []);
 
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
@@ -463,8 +485,7 @@ export const RenderTextMarkdownContent = ({
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
 						const basePath = '/chat/clans/';
-						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/') && !contentInElement?.includes('/canvas/');
-						const contentHasCanvasLink = contentInElement.includes('canvas') && canvasId && clanId && channelId
+						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
 
 						if (contentHasChannelLink) {
 							const pathSegments = contentInElement?.split('/') as string[];
@@ -520,7 +541,7 @@ export const RenderTextMarkdownContent = ({
 							}
 						}
 
-						if (contentHasCanvasLink) {
+						if (contentInElement.includes('canvas') && canvasId && clanId && channelId) {
 							textParts.push(<RenderCanvasItem key={`canvas-${index}`} clanId={clanId} channelId={channelId} canvasId={canvasId} />);
 						} else if (contentInElement.includes('unknown')) {
 							textParts.push(
@@ -545,10 +566,19 @@ export const RenderTextMarkdownContent = ({
 
 					case EBacktickType.LINKYOUTUBE:
 						if (isYouTubeLink(contentInElement)) {
-							const videoUrl = getYouTubeEmbedUrl(contentInElement);
-							const widthScreen = Dimensions.get('screen').width;
+							const videoId = extractYoutubeVideoId(contentInElement);
+
 							markdownBlackParts.push(
-								<View key={`youtube-${index}`} style={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}>
+								<View
+									key={`youtube-${index}`}
+									style={{
+										display: 'flex',
+										gap: size.s_8,
+										marginTop: isPortrait ? -size.s_4 : -size.s_40,
+										marginLeft: isPortrait ? -size.s_4 : 0,
+										paddingBottom: isPortrait ? size.s_6 : size.s_22
+									}}
+								>
 									<Text
 										style={[themeValue ? markdownStyles(themeValue).link : {}]}
 										onPress={() => openUrl(contentInElement, null)}
@@ -556,19 +586,28 @@ export const RenderTextMarkdownContent = ({
 									>
 										{contentInElement}
 									</Text>
-									<View style={{ display: 'flex', flexDirection: 'row' }}>
-										<View style={themeValue ? markdownStyles(themeValue).borderLeftView : {}} />
-										<View style={themeValue ? markdownStyles(themeValue).viewYoutube : {}}>
-											<WebView
-												originWhitelist={['*']}
-												source={{ uri: videoUrl }}
-												allowsFullscreenVideo={true}
-												javaScriptEnabled={true}
-												domStorageEnabled={true}
-												mediaPlaybackRequiresUserAction={false}
-												allowsInlineMediaPlayback={true}
-											/>
-										</View>
+
+									<View style={[themeValue ? markdownStyles(themeValue).borderLeftView : {}]}>
+										{!isVideoReady && (
+											<View style={[themeValue ? markdownStyles(themeValue).loadingVideoSpinner : {}]}>
+												<ActivityIndicator size="large" color={baseColor.buzzRed} />
+											</View>
+										)}
+
+										<YoutubePlayer
+											height={size.s_170}
+											width={size.s_300}
+											videoId={videoId}
+											play={false}
+											onReady={() => setIsVideoReady(true)}
+											webViewProps={{
+												androidLayerType: 'hardware',
+												javaScriptEnabled: true,
+												domStorageEnabled: true,
+												allowsInlineMediaPlayback: true,
+												onStartShouldSetResponder: () => true
+											}}
+										/>
 									</View>
 								</View>
 							);
