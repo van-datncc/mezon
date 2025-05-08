@@ -31,7 +31,7 @@
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment",
         "pinMessage": "Message has been pinned",
-        "markMessage": "Marked Message Text"
+        "markMessage": "Message has been marked"
     },
     "directMessage": {
         "you": "You"

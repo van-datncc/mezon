@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { useChannelMembers, useChatSending, useDirect, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
+import { ActionEmitEvent, CheckIcon, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
@@ -388,7 +388,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			type: 'success',
 			props: {
 				text2: t('toast.markMessage'),
-				leadingIcon: <MezonIconCDN icon={IconCDN.starIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
+				leadingIcon: <CheckIcon color={Colors.green} />
 			}
 		});
 		onClose();
