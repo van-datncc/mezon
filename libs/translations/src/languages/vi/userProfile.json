@@ -32,7 +32,7 @@
     "menu": {
       "removeFromGroup": "Xóa khỏi nhóm",
       "removeSuccess": "Đã xóa thành viên khỏi nhóm",
-      "removeFailed": "Xóa thanh viên khỏi nhóm không thành công"
+      "removeFailed": "Xóa thành viên khỏi nhóm không thành công"
     },
     "mezonMemberSince": "THÀNH VIÊN MEZON TỪ"
   },

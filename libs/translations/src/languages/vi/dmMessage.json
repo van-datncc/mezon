@@ -7,13 +7,13 @@
         "deleteGroup": "Xóa nhóm",
         "profile": "Hồ sơ",
         "closeDm": "Đóng tin nhắn",
-        "markAsRead": "Đánh dấu đã đọc",
+        "markAsRead": "Đánh dấu là đã đọc",
         "favorite": "Yêu thích",
         "muteConversation": "Tắt thông báo",
         "unMuteConversation": "Bật thông báo",
         "notificationSettings": "Cài đặt thông báo",
-        "disableE2EE": "Disable E2EE",
-        "enableE2EE": "Enable E2EE"
+        "disableE2EE": "Tắt mã hóa E2EE",
+        "enableE2EE": "Bật mã hóa E2EE"
     },
     "confirm": {
         "title": "Rời khỏi '{{groupName}}'",
