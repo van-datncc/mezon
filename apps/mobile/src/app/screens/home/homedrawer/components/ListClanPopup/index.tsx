@@ -107,7 +107,7 @@ export const ListClanPopup = React.memo(() => {
 						</TouchableOpacity>
 					);
 				}}
-				activationDistance={30}
+				activationDistance={40}
 			/>
 		</View>
 	);
