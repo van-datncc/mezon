@@ -82,6 +82,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		message?.code === TypeMessage.CreateThread ||
 		message?.code === TypeMessage.CreatePin ||
 		message?.code === TypeMessage.AuditLog;
+	const isAnonymous = message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const onClose = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
@@ -507,7 +508,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
-			(isMyMessage || isMessageSystem) && EMessageActionType.GiveACoffee,
+			(isMyMessage || isMessageSystem || isAnonymous) && EMessageActionType.GiveACoffee,
 			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
 		];
 
