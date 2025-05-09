@@ -33,6 +33,20 @@ export const style = (colors: Attributes) =>
 			height: size.s_30,
 			width: size.s_20 + size.s_2
 		},
+		memberReactContainer: {
+			flexDirection: 'column',
+			gap: size.s_6
+		},
+		memberInfoContainer: {
+			flexDirection: 'row',
+			gap: size.s_10
+		},
+		memberReactCount: {
+			marginLeft: size.s_12,
+			color: Colors.bgGrayDark,
+			fontSize: size.small,
+			fontWeight: 'bold'
+		},
 		reactCount: {
 			color: colors.text,
 			fontSize: size.small
