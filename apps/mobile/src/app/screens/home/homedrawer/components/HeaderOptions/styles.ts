@@ -27,7 +27,7 @@ export const style = (colors: Attributes) =>
 		},
 		textOption: {
 			color: colors.text,
-			fontSize: size.label,
+			fontSize: size.s_13,
 			fontWeight: '500',
 			maxWidth: 200
 		},

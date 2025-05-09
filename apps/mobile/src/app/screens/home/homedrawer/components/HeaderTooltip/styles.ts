@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		toolTip: {
-			minWidth: 240,
 			height: '100%',
 			padding: 0,
 			borderRadius: size.s_10,

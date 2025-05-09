@@ -34,13 +34,13 @@ const HomeDefaultHeader = React.memo(
 				title: 'anonymous',
 				content: anonymousMode ? 'Turn off Anonymous' : 'Turn on Anonymous',
 				value: OptionChannelHeader.Anonymous,
-				icon: <MezonIconCDN icon={IconCDN.anonymous} color={Colors.textGray} />
+				icon: <MezonIconCDN icon={IconCDN.anonymous} color={Colors.textGray} height={size.s_18} width={size.s_18} />
 			},
 			{
 				title: 'buzz',
 				content: 'Buzz',
 				value: OptionChannelHeader.Buzz,
-				icon: <MezonIconCDN icon={IconCDN.buzz} color={Colors.textGray} />
+				icon: <MezonIconCDN icon={IconCDN.buzz} color={Colors.textGray} height={size.s_18} width={size.s_18} />
 			}
 		];
 
