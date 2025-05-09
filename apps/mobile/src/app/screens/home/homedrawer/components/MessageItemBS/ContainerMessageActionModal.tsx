@@ -50,7 +50,6 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType } from '../../enums';
 import { IConfirmActionPayload, IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
-import { ConfirmBuzzMessageModal } from '../ConfirmBuzzMessage';
 import { ConfirmPinMessageModal } from '../ConfirmPinMessageModal';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import { IReactionMessageProps } from '../MessageReaction';
@@ -367,20 +366,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 	};
 
-	const handleBuzzMessage = useCallback((text: string) => {
-		onClose();
-		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-	}, []);
-
-	const handleActionBuzzMessage = async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-		await sleep(500);
-		const data = {
-			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	};
-
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -431,9 +416,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
-			case EMessageActionType.Buzz:
-				handleActionBuzzMessage();
-				break;
 			default:
 				break;
 		}
@@ -475,8 +457,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.markUnreadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.TopicDiscussion:
 				return <MezonIconCDN icon={IconCDN.discussionIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
-			case EMessageActionType.Buzz:
-				return <MezonIconCDN icon={IconCDN.buzz} width={size.s_18} height={size.s_18} color={baseColor.red} />;
 			default:
 				return <View />;
 		}
@@ -534,14 +514,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
-		const attractActionList = [EMessageActionType.Buzz];
-
 		return {
-			attract: availableMessageActions.filter((action) => attractActionList.includes(action.type)),
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter(
-				(action) => ![...frequentActionList, ...warningActionList, ...mediaList, ...attractActionList].includes(action.type)
-			),
+			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
 	}, [
@@ -621,16 +596,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
 								<View style={styles.icon}>{getActionMessageIcon(action.type)}</View>
 								<Text style={styles.actionText}>{action.title}</Text>
-							</Pressable>
-						);
-					})}
-				</View>
-				<View style={styles.messageActionGroup}>
-					{messageActionList.attract.map((action) => {
-						return (
-							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
-								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
-								<Text style={styles.warningActionText}>{action.title}</Text>
 							</Pressable>
 						);
 					})}

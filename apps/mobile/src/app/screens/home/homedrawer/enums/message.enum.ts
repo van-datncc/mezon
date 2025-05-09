@@ -21,6 +21,5 @@ export enum EMessageActionType {
 	SaveImage,
 	CopyMediaLink,
 	ResendMessage,
-	TopicDiscussion,
-	Buzz
+	TopicDiscussion
 }
