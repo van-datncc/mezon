@@ -50,11 +50,9 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 				)}
 			</View>
 			<View style={styles.memberReactContainer}>
-				<View style={styles.memberInfoContainer}>
-					<Text style={styles.memberName}>
-						{reactionMember?.clan_nick || reactionMember?.user?.display_name || reactionMember?.user?.username}
-					</Text>
-				</View>
+				<Text style={styles.memberName}>
+					{reactionMember?.clan_nick || reactionMember?.user?.display_name || reactionMember?.user?.username}
+				</Text>
 				{count && <Text style={styles.memberReactCount}>x{count}</Text>}
 			</View>
 		</TouchableOpacity>

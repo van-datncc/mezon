@@ -37,10 +37,6 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'column',
 			gap: size.s_6
 		},
-		memberInfoContainer: {
-			flexDirection: 'row',
-			gap: size.s_10
-		},
 		memberReactCount: {
 			marginLeft: size.s_12,
 			color: Colors.bgGrayDark,
