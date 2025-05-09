@@ -16,7 +16,7 @@
         "enableE2EE": "Bật mã hóa E2EE"
     },
     "confirm": {
-        "title": "Rời khỏi '{{groupName}}'",
+        "title": "Rời khỏi {{groupName}}",
         "content": "Bạn có chắc chắn muốn rời khỏi {{groupName}} không? Bạn sẽ không thể tham gia lại nhóm này trừ khi được mời lại.",
         "confirmText": "Vâng"
     }
