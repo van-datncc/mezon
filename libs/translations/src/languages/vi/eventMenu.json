@@ -22,6 +22,15 @@
     "item": {
       "interested": "Quan tâm",
       "uninterested": "Không quan tâm"
+    },
+    "detail": {
+        "eventInfo": "Thông tin sự kiện",
+        "interested": "Quan tâm"
+    },
+    "share": {
+        "title": "Chia sẻ sự kiện cho bạn bè",
+        "search": "Tìm kiếm",
+        "share": "Chia sẻ"
     }
   }
   

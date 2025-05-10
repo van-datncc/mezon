@@ -60,7 +60,7 @@ export function EventViewer({ handlePressEventCreate }: { handlePressEventCreate
 			children: (
 				<MezonTab
 					views={[<EventDetail event={event} />, <EventMember event={event} />]}
-					titles={['Event Info', 'Interested']}
+					titles={[t('detail.eventInfo'), t('item.interested')]}
 					isBottomSheet={isTabletLandscape}
 				/>
 			)

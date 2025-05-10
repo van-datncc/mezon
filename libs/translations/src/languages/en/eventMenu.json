@@ -22,5 +22,14 @@
     "item": {
         "interested": "Interested",
         "uninterested": "Uninterested"
+    },
+    "detail": {
+        "eventInfo": "Event Info",
+        "interested": "Interested"
+    },
+    "share": {
+        "title": "Share Event to friends",
+        "search": "Search",
+        "share": "Share"
     }
 }
