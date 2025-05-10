@@ -66,7 +66,7 @@ export const MyQRCode = () => {
 				<View>
 					<Text style={styles.nameProfile}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
 					<Text style={styles.tokenProfile}>
-						{t('token')} {formatMoney(Number(tokenInWallet || 0) + Number(getTokenSocket || 0))}₫
+						{t('token')} {formatMoney(Number(tokenInWallet || 0))}₫
 					</Text>
 				</View>
 			</View>
