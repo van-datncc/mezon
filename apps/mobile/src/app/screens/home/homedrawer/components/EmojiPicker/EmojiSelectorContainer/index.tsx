@@ -59,7 +59,7 @@ export default function EmojiSelectorContainer({
 	}, [store]);
 
 	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
-		if (emojis.length === 0 || !categoryParam) {
+		if (emojis?.length === 0 || !categoryParam) {
 			return [];
 		}
 
