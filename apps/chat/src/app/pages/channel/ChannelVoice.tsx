@@ -218,7 +218,7 @@ const ChannelVoice = memo(
 									/>
 									<EmojiSuggestionProvider>
 										{isShowChatStream && (
-											<div className=" h-100vh w-[400px] border-l border-border dark:border-bgTertiary z-40 bg-bgPrimary dark:bg-bgTertiary flex-shrink-0">
+											<div className=" h-100vh w-[400px] border-l border-border dark:border-bgTertiary z-40 bg-bgPrimary flex-shrink-0">
 												<ChatStream currentChannel={currentChannel} />
 											</div>
 										)}</EmojiSuggestionProvider>
