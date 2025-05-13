@@ -6,6 +6,7 @@ import ChannelMain from '../channel';
 
 type ChatStreamProps = {
 	readonly currentChannel?: Readonly<IChannel> | null;
+	topicChannelId?: string;
 };
 
 const ChatHeader = ({ currentChannel }: ChatStreamProps) => {

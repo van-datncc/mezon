@@ -178,7 +178,8 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 		channelType !== ChannelType.CHANNEL_TYPE_CHANNEL &&
 		channelType !== ChannelType.CHANNEL_TYPE_DM &&
 		channelType !== ChannelType.CHANNEL_TYPE_GROUP &&
-		channelType !== ChannelType.CHANNEL_TYPE_THREAD
+		channelType !== ChannelType.CHANNEL_TYPE_THREAD &&
+		channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
 	) {
 		return null;
 	}
@@ -191,7 +192,9 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 		return channel;
 	} catch (error) {
 		captureSentryError(error, 'channels/joinChat');
+		console.error('Error joining chat:', error);
 		return thunkAPI.rejectWithValue(error);
+
 	}
 });
 
@@ -233,7 +236,7 @@ export const joinChannel = createAsyncThunk(
 
 			const isPublic = channel ? (checkIsThread(channel as ChannelsEntity) ? false : !channel.channel_private) : false;
 			if (channel) {
-				thunkAPI.dispatch(
+				await thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: channel.clan_id ?? '',
 						channelId: channel.channel_id ?? '',
@@ -261,7 +264,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			);
 
 			if (
-				response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+				// response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
 				response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 				response.type !== ChannelType.CHANNEL_TYPE_STREAMING
 			) {

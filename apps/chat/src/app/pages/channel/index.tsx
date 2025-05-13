@@ -68,7 +68,6 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
-import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -216,8 +215,9 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const isShowMemberList = useSelector(selectIsShowMemberList);
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_APP
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ||
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
 			? ChannelStreamMode.STREAM_MODE_CHANNEL
 			: ChannelStreamMode.STREAM_MODE_THREAD;
 
@@ -314,9 +314,9 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 					</div>
 				</div>
 			)}
-			{currentChannel && (
+			{/* {currentChannel && (
 				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel?.channel_private : false} />
-			)}
+			)} */}
 		</div>
 	);
 };
@@ -376,7 +376,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	}, [isShowMemberList, setIsShowCreateThread]);
 
 	useEffect(() => {
-		if (!isShowCanvas && !isShowAgeRestricted && draggingState && !isChannelMezonVoice) {
+		if (!isShowCanvas && !isShowAgeRestricted && draggingState) {
 			openUploadFileModal();
 		}
 
@@ -422,17 +422,17 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 	return (
-		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
+		<div className={`w-full `}>
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 				id="mainChat"
 				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				onDragEnter={canSendMessage ? handleDragEnter : () => {}}
+				onDragEnter={canSendMessage ? handleDragEnter : () => { }}
 			>
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
 				>
-					{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
+					{!isShowCanvas && !isShowAgeRestricted && (
 						<div
 							className={`flex flex-col flex-1 min-w-60 ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
 						>
@@ -503,7 +503,6 @@ export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	if (!currentChannel) {
 		return null;
 	}
-
 	return (
 		<>
 			<ChannelMainContent channelId={chlId} />
