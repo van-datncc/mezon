@@ -34,15 +34,13 @@ import androidx.core.graphics.drawable.IconCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactInstanceManager;
-import androidx.core.app.NotificationCompat;
+
 
 public class IncomingCallService extends Service {
   private static Runnable handleTimeout;
@@ -163,57 +161,56 @@ public class IncomingCallService extends Service {
     emptyScreenIntent.setAction(action);
     emptyScreenIntent.putExtras(bundleData);
     emptyScreenIntent.putExtra("eventName", eventName);
-//     ReactApplication reactApplication = (ReactApplication) getApplicationContext();
-//     ReactInstanceManager reactInstanceManager = reactApplication.getReactNativeHost().getReactInstanceManager();
-//     ReactApplicationContext reactApplicationContext = (ReactApplicationContext) reactInstanceManager.getCurrentReactContext();
-//     FullScreenNotificationIncomingCallModule module = new FullScreenNotificationIncomingCallModule(reactApplicationContext);
-//     module.backToApp();
     return PendingIntent.getActivity(this, 0, emptyScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
   }
 
   private Notification buildNotification(Context context, Intent intent, Bitmap avatarBitmap) throws MalformedURLException {
-      Bundle bundle = intent.getExtras();
-      if (bundle == null) {
-          throw new IllegalArgumentException("Intent extras cannot be null");
-      }
-      bundleData = bundle;
+    Bundle bundle = intent.getExtras();
+    if (bundle == null) {
+      throw new IllegalArgumentException("Intent extras cannot be null");
+    }
+    bundleData = bundle;
 
-      PendingIntent emptyPendingIntent = createEmptyPendingIntent(context, bundle);
-      Uri soundUri = getCustomSoundUri(context, bundle);
-      String channelId = bundle.getString("channelId");
-      createNotificationChannel(context, channelId, bundle.getString("channelName"), soundUri);
+    PendingIntent emptyPendingIntent = createEmptyPendingIntent(context, bundle);
+    // Get the custom sound URI
+    Uri soundUri = getCustomSoundUri(context, bundle);
 
-      NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channelId);
-      buildNotificationBase(notificationBuilder, bundle, emptyPendingIntent, soundUri);
+    // Create the notification channel if necessary
+    String channelId = bundle.getString("channelId");
+    createNotificationChannel(context, channelId, bundle.getString("channelName"), soundUri);
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-          boolean isVideo = bundle.getBoolean("isVideo");
-          Person caller = buildCaller(bundle, avatarBitmap);
-          notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText("Call from " + bundle.getString("name")))
-              .addPerson(caller);
-      } else {
-          addActionButtons(context, notificationBuilder, bundle);
-      }
+    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, channelId);
+    buildNotificationBase(notificationBuilder, bundle, emptyPendingIntent, soundUri);
 
-      applyOptionalSettings(context, notificationBuilder, bundle);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      boolean isVideo=bundle.getBoolean("isVideo");
+      Person caller = buildCaller(bundle, avatarBitmap);
+      notificationBuilder.setStyle(NotificationCompat.CallStyle.forIncomingCall(caller,
+          onButtonNotificationClick(0, Constants.ACTION_PRESS_DECLINE_CALL, Constants.RNNotificationEndCallAction),
+          onButtonNotificationClick(1, Constants.ACTION_PRESS_ANSWER_CALL, Constants.RNNotificationAnswerAction)
+        ).setIsVideo(isVideo))
+        .addPerson(caller);
+    } else {
+      addActionButtons(context, notificationBuilder, bundle);
+    }
 
-      Notification notification = notificationBuilder.build();
-      notification.flags |= Notification.FLAG_INSISTENT;
-      return notification;
+    applyOptionalSettings(context, notificationBuilder, bundle);
+
+    Notification notification = notificationBuilder.build();
+    notification.flags |= Notification.FLAG_INSISTENT;
+    return notification;
   }
 
   private void buildNotificationBase(NotificationCompat.Builder notificationBuilder, Bundle bundle, PendingIntent emptyPendingIntent, Uri soundUri) {
-    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationManager.cancelAll();
     notificationBuilder.setContentTitle(bundle.getString("name"))
       .setContentText(bundle.getString("info"))
-      .setPriority(NotificationCompat.PRIORITY_HIGH)
+      .setPriority(NotificationCompat.PRIORITY_MAX)
       .setCategory(NotificationCompat.CATEGORY_CALL)
       .setContentIntent(emptyPendingIntent)
       .setAutoCancel(true)
       .setOngoing(true)
       .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-      .setVibrate(new long[] { 0, 500, 1000, 500 })
+      .setVibrate(new long[]{0, 1000, 800})
       .setSound(soundUri)
       .setFullScreenIntent(emptyPendingIntent, true);
   }
@@ -228,8 +225,6 @@ public class IncomingCallService extends Service {
     if (iconName != null) {
       notificationBuilder.setSmallIcon(getResourceIdForResourceName(context, iconName));
     }
-
-    notificationBuilder.setVibrate(new long[] { 0, 500, 1000, 500 });
 
     if (timeoutNumber > 0) {
       setTimeOutEndCall(uuid);
@@ -248,19 +243,17 @@ public class IncomingCallService extends Service {
   private void createNotificationChannel(Context context, String channelId, String channelName, Uri soundUri) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-      notificationManager.cancelAll();
       NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-      notificationChannel.enableVibration(true);
-      notificationChannel.setVibrationPattern(new long[] { 0, 500, 1000, 500 });
       notificationChannel.setSound(soundUri,
         new AudioAttributes.Builder()
           .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
           .setUsage(AudioAttributes.USAGE_NOTIFICATION)
           .build());
-      notificationChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
       notificationChannel.enableLights(true);
+      notificationChannel.enableVibration(true);
       notificationChannel.setLightColor(Color.WHITE);
       notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+      notificationChannel.setVibrationPattern(new long[]{0, 1000, 800});
       notificationManager.createNotificationChannel(notificationChannel);
     }
   }
@@ -302,20 +295,12 @@ public class IncomingCallService extends Service {
 
   @Override
   public void onCreate() {
-      super.onCreate();
-      IntentFilter filter = new IntentFilter();
-      filter.addAction(Constants.ACTION_PRESS_ANSWER_CALL);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        registerReceiver(notificationReceiver, filter, Context.RECEIVER_EXPORTED);
-      } else {
-        registerReceiver(notificationReceiver, filter);
-      }
+    super.onCreate();
   }
 
   @Override
   public void onDestroy() {
     super.onDestroy();
-    unregisterReceiver(notificationReceiver);
     Log.d(TAG, "onDestroy service");
     cancelTimer();
     stopForeground(true);
@@ -385,19 +370,6 @@ public class IncomingCallService extends Service {
 
     return desiredColor;
   }
-
-  private final BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-          String action = intent.getAction();
-          String eventName = intent.getStringExtra("eventName");
-          if (Constants.ACTION_PRESS_ANSWER_CALL.equals(action)) {
-             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-             notificationManager.cancelAll();
-             stopForeground(true);
-          }
-      }
-  };
 
   private BroadcastReceiver mReceiver = new BroadcastReceiver() {
     @Override

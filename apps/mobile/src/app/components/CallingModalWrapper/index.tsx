@@ -59,20 +59,19 @@ const CallingModalWrapper = () => {
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
 			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
 				dispatch(appActions.setLoadingMainMobile(true));
-				dispatch(DMCallActions.setIsInCall(true));
-				const payload = safeJSONParse(notificationDataParse?.offer || '{}');
 				const signalingData = {
-					channel_id: payload?.channelId,
-					json_data: payload?.offer,
+					channel_id: data?.channelId,
+					receiver_id: userId,
+					json_data: data?.offer,
 					data_type: WebrtcSignalingType.WEBRTC_SDP_OFFER,
-					caller_id: payload?.callerId
+					caller_id: data?.callerId
 				};
 				dispatch(
 					DMCallActions.addOrUpdate({
 						calleeId: userId,
 						signalingData: signalingData as WebrtcSignalingFwd,
-						id: payload?.callerId,
-						callerId: payload?.callerId
+						id: data?.callerId,
+						callerId: data?.callerId
 					})
 				);
 				await sleep(500);
@@ -80,13 +79,16 @@ const CallingModalWrapper = () => {
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 					params: {
-						receiverId: payload?.callerId,
-						receiverAvatar: payload?.callerAvatar,
-						directMessageId: payload?.channelId,
+						receiverId: data?.callerId,
+						receiverAvatar: data?.callerAvatar,
+						directMessageId: data?.channelId,
 						isAnswerCall: true
 					}
 				});
+			} else if (notificationData) {
 				await SharedPreferences.removeItem('notificationDataCalling');
+			} else {
+				/* empty */
 			}
 		} catch (error) {
 			console.error('Failed to retrieve data', error);

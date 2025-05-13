@@ -25,7 +25,6 @@ public class CustomFirebaseMessagingReceiver extends ReactNativeFirebaseMessagin
         if (reactContext != null && data != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(reactContext);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            Log.d(TAG, "-------START sendEvent 111111 ------");
 
             // Retrieve existing data
             String existingData = sharedPreferences.getString("notificationDataPushed", "[]");
@@ -49,6 +48,10 @@ public class CustomFirebaseMessagingReceiver extends ReactNativeFirebaseMessagin
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent.getExtras() == null) {
+            Log.e(TAG, "Intent extras are null, cannot process the message");
+            return;
+        }
         RemoteMessage remoteMessage = new RemoteMessage(intent.getExtras());
         ReactInstanceManager reactInstanceManager = ((ReactApplication) context.getApplicationContext()).getReactNativeHost().getReactInstanceManager();
         ReactContext reactContext = reactInstanceManager.getCurrentReactContext();

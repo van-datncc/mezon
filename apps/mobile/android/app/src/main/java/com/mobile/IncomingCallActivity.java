@@ -20,15 +20,11 @@ import com.facebook.react.ReactFragment;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
-import com.facebook.react.modules.core.PermissionAwareActivity;
-import com.facebook.react.modules.core.PermissionListener;
-import com.squareup.picasso.Picasso;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactInstanceManager;
-import android.provider.Settings;
 
-public class IncomingCallActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity {
+import com.squareup.picasso.Picasso;
+
+public class IncomingCallActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler {
+
   private static final String TAG = "MessagingService";
   private static final String TAG_KEYGUARD = "Incoming:unLock";
   private TextView tvName;
@@ -44,7 +40,6 @@ public class IncomingCallActivity extends AppCompatActivity implements DefaultHa
   private String uuid = "";
   static boolean active = false;
   static IncomingCallActivity instance;
-  private PermissionListener permissionListener;
 
   public static IncomingCallActivity getInstance() {
     return instance;
@@ -94,7 +89,23 @@ public class IncomingCallActivity extends AppCompatActivity implements DefaultHa
     if (bundle.containsKey("uuid")) {
       uuid = bundle.getString("uuid");
     }
-    setContentView(R.layout.activity_call_incoming);
+    if (bundle.containsKey("mainComponent") && bundle.getString("mainComponent") != null) {
+      String mainComponent = bundle.getString("mainComponent");
+      setContentView(R.layout.custom_ingcoming_call_rn);
+      Fragment reactNativeFragment = new ReactFragment.Builder()
+        .setComponentName(mainComponent)
+        .setLaunchOptions(bundle)
+        .build();
+
+      getSupportFragmentManager()
+        .beginTransaction()
+        .add(R.id.reactNativeFragment, reactNativeFragment)
+        .commit();
+      return;
+    } else {
+      setContentView(R.layout.activity_call_incoming);
+    }
+
     tvName = findViewById(R.id.tvName);
     tvInfo = findViewById(R.id.tvInfo);
     ivAvatar = findViewById(R.id.ivAvatar);
@@ -154,6 +165,7 @@ public class IncomingCallActivity extends AppCompatActivity implements DefaultHa
 
   private void acceptDialing() {
     active = false;
+    Log.d(TAG, "acceptDialing function executed");
     WritableMap params = Arguments.createMap();
     Bundle bundle = getIntent().getExtras();
     if (bundle.containsKey("payload")) {
@@ -168,11 +180,6 @@ public class IncomingCallActivity extends AppCompatActivity implements DefaultHa
     } else {
       finish();
     }
-    ReactApplication reactApplication = (ReactApplication) getApplicationContext();
-    ReactInstanceManager reactInstanceManager = reactApplication.getReactNativeHost().getReactInstanceManager();
-    ReactApplicationContext reactApplicationContext = (ReactApplicationContext) reactInstanceManager.getCurrentReactContext();
-    FullScreenNotificationIncomingCallModule module = new FullScreenNotificationIncomingCallModule(reactApplicationContext);
-    module.backToApp();
   }
 
   private void dismissDialing(String action) {
@@ -197,17 +204,4 @@ public class IncomingCallActivity extends AppCompatActivity implements DefaultHa
   public void invokeDefaultOnBackPressed() {
     super.onBackPressed();
   }
-
-  @Override
-    public void requestPermissions(String[] permissions, int requestCode, PermissionListener listener) {
-      this.permissionListener = listener;
-      requestPermissions(permissions, requestCode);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-      if (permissionListener != null && permissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-        permissionListener = null;
-      }
-    }
 }

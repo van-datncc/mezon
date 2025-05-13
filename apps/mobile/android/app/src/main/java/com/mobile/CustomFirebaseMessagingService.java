@@ -45,6 +45,8 @@ public class CustomFirebaseMessagingService extends ReactNativeFirebaseMessaging
         if (reactContext != null) {
            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(reactContext);
            SharedPreferences.Editor editor = sharedPreferences.edit();
+           Log.d(TAG, "log  => -------START to save notificationDataCalling CALL ------");
+
            editor.putString("notificationDataCalling", new JSONObject(data).toString());
            editor.apply();
         } else {
@@ -56,83 +58,89 @@ public class CustomFirebaseMessagingService extends ReactNativeFirebaseMessaging
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Context context = getApplicationContext();
         Map<String, String> data = remoteMessage.getData();
-        Log.d(TAG, "-------START onMessageReceived ------");
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-         boolean isAppInBackground = true;
-            if (appProcesses != null) {
-                String packageName = context.getPackageName();
-                for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-                    if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals(packageName)) {
-                        isAppInBackground = false;
-                        break;
-                    }
-                }
-            }
-        if (data.containsKey("offer") && isAppInBackground) {
-        try {
-              Boolean isCancel = "CANCEL_CALL".equals(new JSONObject(data.get("offer")).getString("offer"));
-              ReactInstanceManager reactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
-              ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
-              Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.ringing);
-              MediaPlayer mediaPlayer = MediaPlayer.create(context, soundUri);
-              Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean isAppInForeground = isAppInForeground();
+        if (data.containsKey("offer") && !isAppInForeground) {
+            try {
+                  Boolean isCancel = "CANCEL_CALL".equals(new JSONObject(data.get("offer")).getString("offer"));
+                  ReactInstanceManager reactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                  ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
+                  Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.ringing);
+                  MediaPlayer mediaPlayer = MediaPlayer.create(context, soundUri);
+                  Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-                if (!isCancel) {
-                  mediaPlayer.setLooping(true);
-                  mediaPlayer.start();
+                    if (!isCancel) {
+                      mediaPlayer.setLooping(true);
+                      mediaPlayer.start();
 
-                  if (vibrator != null && vibrator.hasVibrator()) {
-                      VibrationEffect vibrationEffect = VibrationEffect.createOneShot(30000, VibrationEffect.DEFAULT_AMPLITUDE);
-                      vibrator.vibrate(vibrationEffect);
-                  }
-
-                  WritableMap params = Arguments.createMap();
-                  params.putString("offer", data.get("offer"));
-
-                  new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                      mediaPlayer.stop();
-                      mediaPlayer.release();
-                      if (vibrator != null) {
-                          vibrator.cancel();
+                      if (vibrator != null && vibrator.hasVibrator()) {
+                          VibrationEffect vibrationEffect = VibrationEffect.createOneShot(30000, VibrationEffect.DEFAULT_AMPLITUDE);
+                          vibrator.vibrate(vibrationEffect);
                       }
-                  }, NotificationManagerCompat.from(context).areNotificationsEnabled() ? 5000 : 10000);
 
-                    PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-                    WakeLock wakeLock = powerManager.newWakeLock(
-                        PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE,
-                        "MyApp::MyWakelockTag"
-                    );
-                    wakeLock.acquire(10000);
-                }
+                      WritableMap params = Arguments.createMap();
+                      params.putString("offer", data.get("offer"));
 
-                try {
-                    if (reactContext != null) {
-                        sendEvent(reactContext, data);
-                        handleIncomingCall(reactContext, data, isCancel);
-                    } else {
-                        reactInstanceManager.addReactInstanceEventListener(new ReactInstanceEventListener() {
-                            @Override
-                            public void onReactContextInitialized(ReactContext context) {
-                                sendEvent(context, data);
-                                handleIncomingCall(context, data, isCancel);
-                                reactInstanceManager.removeReactInstanceEventListener(this);
-                            }
-                        });
+                      new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                          mediaPlayer.stop();
+                          mediaPlayer.release();
+                          if (vibrator != null) {
+                              vibrator.cancel();
+                          }
+                      }, NotificationManagerCompat.from(context).areNotificationsEnabled() ? 5000 : 10000);
 
-                        if (!reactInstanceManager.hasStartedCreatingInitialContext()) {
-                            reactInstanceManager.createReactContextInBackground();
-                        }
+                        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                        WakeLock wakeLock = powerManager.newWakeLock(
+                            PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE,
+                            "MyApp::MyWakelockTag"
+                        );
+                        wakeLock.acquire(10000);
                     }
-                } catch (Exception e) {
-                    Log.d(TAG, "log onMessageReceived => error: " + e);
+
+                    try {
+                        if (reactContext != null) {
+                            sendEvent(reactContext, data);
+                            handleIncomingCall(reactContext, data, isCancel);
+                        } else {
+                            reactInstanceManager.addReactInstanceEventListener(new ReactInstanceEventListener() {
+                                @Override
+                                public void onReactContextInitialized(ReactContext context) {
+                                    sendEvent(context, data);
+                                    handleIncomingCall(context, data, isCancel);
+                                    reactInstanceManager.removeReactInstanceEventListener(this);
+                                }
+                            });
+
+                            if (!reactInstanceManager.hasStartedCreatingInitialContext()) {
+                                reactInstanceManager.createReactContextInBackground();
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.d(TAG, "log onMessageReceived => error: " + e);
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, "JSONException: " + e.getMessage());
                 }
-            } catch (JSONException e) {
-                Log.e(TAG, "JSONException: " + e.getMessage());
             }
-        }
 
         super.onMessageReceived(remoteMessage);
+    }
+
+    private boolean isAppInForeground() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return false;
+        }
+
+        final String packageName = getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+                    && appProcess.processName.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleIncomingCall(ReactContext reactContext, Map<String, String> data, Boolean isCancel) {
