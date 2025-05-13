@@ -28,7 +28,7 @@ interface MyVideoConferenceProps {
 	onFullScreen: () => void;
 	isExternalCalling?: boolean;
 	tracks?: TrackReferenceOrPlaceholder[];
-	isShowChatStream?: boolean;
+	isShowChatVoice?: boolean;
 	onToggleChat?: () => void;
 	currentChannel?: any;
 }
@@ -39,7 +39,7 @@ export function MyVideoConference({
 	onFullScreen,
 	isExternalCalling = false,
 	tracks: propTracks,
-	isShowChatStream,
+	isShowChatVoice,
 	onToggleChat,
 	currentChannel
 }: MyVideoConferenceProps) {
@@ -260,7 +260,7 @@ export function MyVideoConference({
 									onClick={onToggleChat}
 									style={{ marginLeft: 8 }}
 								>
-									<Icons.Chat className={isShowChatStream ? 'text-white' : 'text-[#B5BAC1]'} />
+									<Icons.Chat className={isShowChatVoice ? 'text-white' : 'text-[#B5BAC1]'} />
 								</button>
 							</div>
 						</div>

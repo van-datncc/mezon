@@ -236,7 +236,7 @@ export const joinChannel = createAsyncThunk(
 
 			const isPublic = channel ? (checkIsThread(channel as ChannelsEntity) ? false : !channel.channel_private) : false;
 			if (channel) {
-				await thunkAPI.dispatch(
+				thunkAPI.dispatch(
 					channelsActions.joinChat({
 						clanId: channel.clan_id ?? '',
 						channelId: channel.channel_id ?? '',

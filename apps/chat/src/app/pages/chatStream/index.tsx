@@ -13,7 +13,8 @@ const ChatHeader = ({ currentChannel }: ChatStreamProps) => {
 	const dispatch = useAppDispatch();
 
 	const handleCloseModal = () => {
-		dispatch(appActions.setIsShowChatStream(false));
+		dispatch(appActions.setIsShowChatStream(false))
+		dispatch(appActions.setIsShowChatVoice(false));
 	};
 
 	return (
