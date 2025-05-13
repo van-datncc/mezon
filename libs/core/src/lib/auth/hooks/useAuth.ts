@@ -26,16 +26,6 @@ export function useAuth() {
 		[dispatch]
 	);
 
-	const loginByApple = useCallback(
-		async (token: string) => {
-			const action = await dispatch(authActions.authenticateApple(token));
-			const session = action.payload;
-			dispatch(accountActions.setAccount(session));
-			return session;
-		},
-		[dispatch]
-	);
-
 	const qRCode = useCallback(async () => {
 		const action = await dispatch(authActions.createQRLogin());
 		const loginQR = action.payload as ApiLoginIDResponse;
@@ -72,11 +62,10 @@ export function useAuth() {
 			loginByEmail,
 			qRCode,
 			checkLoginRequest,
-			loginByApple,
 			fetchUserProfile,
 			confirmLoginRequest,
 			session
 		}),
-		[userProfile, userId, qRCode, loginByApple, fetchUserProfile, loginByEmail]
+		[userProfile, userId, qRCode, fetchUserProfile, loginByEmail]
 	);
 }
