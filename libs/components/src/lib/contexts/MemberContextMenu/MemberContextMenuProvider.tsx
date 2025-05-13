@@ -194,6 +194,10 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 				);
 			}
 
+			if (user) {
+				setCurrentUser(user);
+			}
+
 			const handlers = createDefaultHandlers(user);
 			setCurrentHandlers(handlers);
 			showMenu(event);
