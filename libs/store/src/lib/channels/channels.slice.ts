@@ -264,7 +264,7 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 			);
 
 			if (
-				// response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
+				response.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE &&
 				response.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 				response.type !== ChannelType.CHANNEL_TYPE_STREAMING
 			) {
