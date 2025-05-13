@@ -29,8 +29,8 @@ export const EmbedAnimation = ({
 	channelId,
 	observeIntersectionForLoading
 }: EmbedAnimationProps) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const isIntersecting = useIsIntersecting(containerRef, observeIntersectionForLoading);
+	const ref = useRef<HTMLDivElement>(null);
+	const isIntersecting = useIsIntersecting(ref, observeIntersectionForLoading);
 
 	useEffect(() => {
 		const fetchAnimationData = async () => {
@@ -90,13 +90,13 @@ export const EmbedAnimation = ({
 				div?.appendChild(style);
 			});
 		};
-		if (isIntersecting && !containerRef.current?.firstChild?.hasChildNodes()) {
+		if (isIntersecting && !ref.current?.firstChild?.hasChildNodes()) {
 			fetchAnimationData();
 		}
 	}, [isIntersecting]);
 
 	return (
-		<div ref={containerRef} id={`${messageId}_wrap_animation`} className={`rounded-md flex gap-2 ${vertical ? 'flex-col' : ''}`}>
+		<div ref={ref} id={`${messageId}_wrap_animation`} className={`rounded-md flex gap-2 ${vertical ? 'flex-col' : ''}`}>
 			{pool?.map((poolItem, index) => (
 				<div
 					key={`${messageId}_animation_${index}`}
