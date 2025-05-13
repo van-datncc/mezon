@@ -27,7 +27,7 @@ const CategoryList: FC<CategoryListProps> = ({ categoriesWithIcons, selectedCate
 			{categoriesWithIcons.map((item) => (
 				<TouchableOpacity
 					key={item.name}
-					onPress={() => onSelectCategory(item.name)}
+					// onPress={() => onSelectCategory(item.name)}
 					style={{
 						...styles.cateItem,
 						backgroundColor: item.name === selectedCategory ? baseColor.blurple : 'transparent'
