@@ -68,6 +68,7 @@ import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
 import { ChannelMessageBox } from './ChannelMessageBox';
+import { ChannelTyping } from './ChannelTyping';
 
 function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
@@ -314,9 +315,13 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 					</div>
 				</div>
 			)}
-			{/* {currentChannel && (
-				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel?.channel_private : false} />
-			)} */}
+			{currentChannel && currentChannel?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
+				<ChannelTyping
+					channelId={currentChannel?.id}
+					mode={mode}
+					isPublic={currentChannel ? !currentChannel?.channel_private : false}
+				/>
+			)}
 		</div>
 	);
 };
