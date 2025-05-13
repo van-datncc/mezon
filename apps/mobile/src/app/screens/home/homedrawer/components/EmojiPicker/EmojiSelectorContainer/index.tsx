@@ -59,6 +59,10 @@ export default function EmojiSelectorContainer({
 	}, [store]);
 
 	const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
+		if (emojis.length === 0 || !categoryParam) {
+			return [];
+		}
+
 		return emojis
 			.filter((emoji) => !!emoji.id && emoji?.category?.includes(categoryParam))
 			.map((emoji) => ({
@@ -225,9 +229,9 @@ export default function EmojiSelectorContainer({
 			windowSize={10}
 			removeClippedSubviews={true}
 			disableVirtualization
-			style={{ 
-                minHeight: Metrics.screenHeight * (Platform.OS === 'ios' ? 1.4 : 1.03)
-            }}
+			style={{
+				minHeight: Metrics.screenHeight * (Platform.OS === 'ios' ? 1.4 : 1.03)
+			}}
 		/>
 	);
 }

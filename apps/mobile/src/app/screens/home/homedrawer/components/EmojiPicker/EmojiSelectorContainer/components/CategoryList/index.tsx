@@ -24,9 +24,9 @@ const CategoryList: FC<CategoryListProps> = ({ categoriesWithIcons, selectedCate
 			style={styles.wrapperCateContainer}
 			contentContainerStyle={styles.cateContainer}
 		>
-			{categoriesWithIcons.map((item) => (
+			{categoriesWithIcons?.length > 0 && categoriesWithIcons.map((item, index) => (
 				<TouchableOpacity
-					key={item.name}
+					key={`${item.name}_cate_emoji${index}`}
 					// onPress={() => onSelectCategory(item.name)}
 					style={{
 						...styles.cateItem,

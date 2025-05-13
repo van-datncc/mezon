@@ -24,7 +24,7 @@ const EmojisPanel: FC<EmojisPanelProps> = ({ emojisData, onEmojiSelect }) => {
 
 	return (
 		<View style={styles.emojisPanel}>
-			{emojisData.map((item) => (
+			{emojisData?.length > 0 && emojisData.map((item) => (
 				renderEmoji({ item })
 			))}
 		</View>
