@@ -10,7 +10,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ParticipantMeetState, handleCopyLink, useMediaPermissions } from '@mezon/utils';
+import { DOMAIN_URL, ParticipantMeetState, handleCopyLink, useMediaPermissions } from '@mezon/utils';
 import isElectron from 'is-electron';
 import Tooltip from 'rc-tooltip';
 import React, { ReactNode, memo, useCallback } from 'react';
@@ -74,8 +74,7 @@ const VoiceInfo = React.memo(() => {
 	}, [showMicrophone]);
 
 	const handleCopyVoiceLink = useCallback(() => {
-		const urlHost = window.location.host;
-		const linkVoice = `${urlHost}/chat/clans/${currentVoiceInfo?.clanId}/channels/${currentVoiceInfo?.channelId}`;
+		const linkVoice = `${DOMAIN_URL}/chat/clans/${currentVoiceInfo?.clanId}/channels/${currentVoiceInfo?.channelId}`;
 		handleCopyLink(linkVoice);
 	}, []);
 	return (
