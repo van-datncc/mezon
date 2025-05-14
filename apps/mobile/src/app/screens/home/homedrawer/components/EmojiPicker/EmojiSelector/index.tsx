@@ -6,15 +6,13 @@ type EmojiSelectorProps = {
 	isReactMessage?: boolean;
 	handleBottomSheetExpand?: () => void;
 	handleBottomSheetCollapse?: () => void;
-	onScroll?: (e: any) => void;
 };
 
 export default function EmojiSelector({
 	onSelected,
 	isReactMessage = false,
 	handleBottomSheetExpand,
-	handleBottomSheetCollapse,
-	onScroll
+	handleBottomSheetCollapse
 }: EmojiSelectorProps) {
 	return (
 		<EmojiSelectorContainer
@@ -22,7 +20,6 @@ export default function EmojiSelector({
 			handleBottomSheetCollapse={handleBottomSheetCollapse}
 			onSelected={onSelected}
 			isReactMessage={isReactMessage}
-			onScroll={onScroll}
 		/>
 	);
 }

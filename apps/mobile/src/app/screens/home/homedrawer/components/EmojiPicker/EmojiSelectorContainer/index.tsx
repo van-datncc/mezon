@@ -32,15 +32,13 @@ type EmojiSelectorContainerProps = {
 	isReactMessage?: boolean;
 	handleBottomSheetExpand?: () => void;
 	handleBottomSheetCollapse?: () => void;
-	onScroll?: (e: any) => void;
 };
 
 export default function EmojiSelectorContainer({
 	onSelected,
 	isReactMessage = false,
 	handleBottomSheetExpand,
-	handleBottomSheetCollapse,
-	onScroll
+	handleBottomSheetCollapse
 }: EmojiSelectorContainerProps) {
 	const store = getStore();
 	const { categoryEmoji, categoriesEmoji, emojis } = useEmojiSuggestionContext();

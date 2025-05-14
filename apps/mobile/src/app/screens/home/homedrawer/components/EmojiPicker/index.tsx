@@ -219,7 +219,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 						handleBottomSheetCollapse={handleBottomSheetCollapse}
 						onSelected={onSelectEmoji}
 						searchText={searchText}
-						onScroll={onScroll}
 					/>
 				) : mode === 'gif' ? (
 					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
