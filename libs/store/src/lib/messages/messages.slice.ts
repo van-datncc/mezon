@@ -424,11 +424,11 @@ export const loadMoreMessage = createAsyncThunk(
 
 			if (direction === Direction_Mode.BEFORE_TIMESTAMP) {
 				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(chlId)(getMessagesRootState(thunkAPI));
-				const firstChannelMessageId = selectFirstMessageIdByChannelId(chlId)(getMessagesRootState(thunkAPI));
+				// const firstChannelMessageId = selectFirstMessageIdByChannelId(chlId)(getMessagesRootState(thunkAPI));
 
-				if (!lastScrollMessageId || lastScrollMessageId === firstChannelMessageId) {
-					return;
-				}
+				// if (!lastScrollMessageId || lastScrollMessageId === firstChannelMessageId) {
+				// 	return;
+				// }
 
 				if (topicId) {
 					return await thunkAPI.dispatch(
