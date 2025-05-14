@@ -27,7 +27,6 @@ export const FOR_24_HOURS = 24 * 60 * 60 * 1000;
 export const MAX_LENGTH_MESSAGE_BUZZ = 160;
 export const ONE_MINUTE = 60000;
 export const GUEST_NAME = 'guest';
-export const DOMAIN_URL = 'https://mezon.ai/';
 
 export const MUTE = 0;
 export const ACTIVE = 1;
