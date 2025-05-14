@@ -174,9 +174,9 @@ const HomeDefaultHeader = React.memo(
 				) : (
 					<View />
 				)}
-				<TouchableOpacity>
+				<View style={{position: 'relative', zIndex: 0}}>
 					<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
-				</TouchableOpacity>
+				</View>
 			</View>
 		);
 	}
