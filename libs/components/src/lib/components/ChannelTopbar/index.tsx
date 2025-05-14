@@ -83,7 +83,7 @@ const ChannelTopbar = memo(() => {
 	);
 });
 
-const TopBarChannelText = () => {
+const TopBarChannelText = memo(() => {
 	const channel = useSelector(selectCurrentChannel);
 	const memberPath = `/chat/clans/${channel?.clan_id}/member-safety`;
 	const channelPath = `/chat/clans/${channel?.clan_id}/channel-setting`;
@@ -169,7 +169,7 @@ const TopBarChannelText = () => {
 							avatarName={currentDmGroup?.channel_label?.at(0)}
 						/>
 						<textarea
-							key={`${channelDmGroupLabel}_${currentDmGroup.channel_id}`}
+							key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}`}
 							rows={1}
 							className={`${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent flex-1 outline-none resize-none w-full leading-10 truncate one-line text-colorTextLightMode dark:text-contentPrimary`}
 							defaultValue={channelDmGroupLabel}
@@ -195,7 +195,7 @@ const TopBarChannelText = () => {
 			</div>
 		</>
 	);
-};
+});
 
 const ChannelTopbarLabel = memo(({ type, label, isPrivate }: { type: ChannelType; label: string; isPrivate: boolean }) => {
 	const renderIcon = () => {
