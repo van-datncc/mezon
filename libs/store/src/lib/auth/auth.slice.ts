@@ -27,6 +27,7 @@ export interface ISession {
 	user_id?: string;
 	vars?: object;
 	is_remember?: boolean;
+	api_url: string;
 }
 
 export const initialAuthState: AuthState = {
@@ -44,7 +45,7 @@ function normalizeSession(session: Session): ISession {
 
 export const authenticateApple = createAsyncThunk('auth/authenticateApple', async (token: string, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon.authenticateApple(token);
+	const session = await mezon.authenticateMezon(token);
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
