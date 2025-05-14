@@ -95,7 +95,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 					<div className="flex flex-row items-center gap-4">
 						<button
 							onClick={handleCreateCanvas}
-							className="px-3 py-2 h-6 rounded focus:ring-transparent bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover items-center"
+							className="px-3 h-6 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover"
 						>
 							Create
 						</button>
