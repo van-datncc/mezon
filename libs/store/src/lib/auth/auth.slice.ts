@@ -27,7 +27,6 @@ export interface ISession {
 	user_id?: string;
 	vars?: object;
 	is_remember?: boolean;
-	api_url: string;
 }
 
 export const initialAuthState: AuthState = {
@@ -43,6 +42,14 @@ function normalizeSession(session: Session): ISession {
 	return session;
 }
 
+export const authenticateApple = createAsyncThunk('auth/authenticateApple', async (token: string, thunkAPI) => {
+	const mezon = getMezonCtx(thunkAPI);
+	const session = await mezon.authenticateApple(token);
+	if (!session) {
+		return thunkAPI.rejectWithValue('Invalid session');
+	}
+	return normalizeSession(session);
+});
 export type AuthenticateEmailPayload = {
 	email: string;
 	password: string;
@@ -214,6 +221,20 @@ export const authSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
+			.addCase(authenticateApple.pending, (state: AuthState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(authenticateApple.fulfilled, (state: AuthState, action) => {
+				state.loadingStatus = 'loaded';
+				state.session = action.payload;
+				state.isLogin = true;
+			})
+			.addCase(authenticateApple.rejected, (state: AuthState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+
+		builder
 			.addCase(refreshSession.pending, (state: AuthState) => {
 				state.loadingStatus = 'loading';
 			})
@@ -308,6 +329,7 @@ export const authReducer = authSlice.reducer;
 
 export const authActions = {
 	...authSlice.actions,
+	authenticateApple,
 	authenticateMezon,
 	refreshSession,
 	createQRLogin,

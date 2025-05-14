@@ -110,22 +110,19 @@ const TopBarChannelText = memo(() => {
 		return currentDmGroup?.channel_label;
 	}, [currentDmGroup?.channel_label, currentDmGroup?.type, currentDmGroup?.usernames]);
 
-	const handleChangeGroupName = useCallback(
-		async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				dispatch(
-					channelsActions.updateChannel({
-						channel_id: currentDmGroup.channel_id as string,
-						category_id: '',
-						app_id: '',
-						channel_label: (e.target as HTMLTextAreaElement).value
-					})
-				);
-			}
-		},
-		[currentDmGroup]
-	);
+	const handleChangeGroupName = useCallback(async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			dispatch(
+				channelsActions.updateChannel({
+					channel_id: currentDmGroup.channel_id as string,
+					category_id: '',
+					app_id: '',
+					channel_label: (e.target as HTMLTextAreaElement).value
+				})
+			);
+		}
+	}, []);
 
 	const handleRestoreName = useCallback(
 		(e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
@@ -169,13 +166,14 @@ const TopBarChannelText = memo(() => {
 							avatarName={currentDmGroup?.channel_label?.at(0)}
 						/>
 						<textarea
-							key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}`}
 							rows={1}
 							className={`${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent flex-1 outline-none resize-none w-full leading-10 truncate one-line text-colorTextLightMode dark:text-contentPrimary`}
 							defaultValue={channelDmGroupLabel}
 							onKeyDown={handleChangeGroupName}
 							onBlur={handleRestoreName}
-						></textarea>
+						>
+							{/* {channelDmGroupLabel} */}
+						</textarea>
 					</div>
 				)}
 			</div>

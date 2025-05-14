@@ -74,6 +74,9 @@ type ItemMemberPermissionProps = {
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', onDelete } = props;
+	console.log('displayName: ', displayName);
+	console.log('username: ', username);
+	console.log('id: ', id);
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const isClanOwner = checkClanOwner(id);
 	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
