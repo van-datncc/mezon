@@ -126,6 +126,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			throw new Error('Mezon client not initialized');
 		}
 		const session = await clientRef.current.checkLoginRequest(LoginRequest);
+		const config = extractAndSaveConfig(session, isFromMobile);
+		if (config) {
+			clientRef.current.setBasePath(config.host, config.port, config.useSSL);
+		}
+
 		const socket = await createSocket();
 		socketRef.current = socket;
 		return session;
