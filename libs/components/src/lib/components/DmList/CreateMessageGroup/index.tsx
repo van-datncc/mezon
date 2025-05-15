@@ -80,9 +80,12 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 
 	const handleCreateDM = async () => {
 		const listGroupDM = selectedFriends;
-
+		const userNameGroup: string[] = [];
+		const avatarGroup: string[] = [];
 		if (currentDM?.type === ChannelType.CHANNEL_TYPE_DM) {
 			listGroupDM.push(currentDM.user_id?.at(0) as string);
+			userNameGroup.push(currentDM.usernames?.at(0) as string);
+			avatarGroup.push(currentDM.channel_avatar?.at(0) as string);
 		}
 		const bodyCreateDmGroup: ApiCreateChannelDescRequest = {
 			type: selectedFriends.length > 1 ? ChannelType.CHANNEL_TYPE_GROUP : ChannelType.CHANNEL_TYPE_DM,
@@ -95,14 +98,13 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 			return;
 		}
 
-		const userNameGroup: string[] = [];
-		const avatarGroup: string[] = [];
-
 		dataSelectFriends.current?.map((friend) => {
 			userNameGroup.push(friend.user?.display_name || friend.user?.username || '');
 			avatarGroup.push(friend.user?.avatar_url || '');
 		});
 
+		console.log('userNameGroup: ', userNameGroup);
+		console.log('avatarGroup: ', avatarGroup);
 		const response = await dispatch(
 			directActions.createNewDirectMessage({ body: bodyCreateDmGroup, username: userNameGroup, avatar: avatarGroup })
 		);
@@ -301,7 +303,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 							? 'Add to Group Chat'
 							: selectedFriends.length === 0
 								? 'Create DM or Group Chat'
-								: selectedFriends.length === 1
+								: selectedFriends.length === 1 && currentDM?.type !== ChannelType.CHANNEL_TYPE_DM
 									? 'Create DM'
 									: 'Create Group Chat'}
 					</button>
