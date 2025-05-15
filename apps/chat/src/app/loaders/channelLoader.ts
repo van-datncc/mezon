@@ -1,4 +1,4 @@
-import { channelsActions, threadsActions, topicsActions } from '@mezon/store';
+import { canvasAPIActions, channelsActions, threadsActions, topicsActions } from '@mezon/store';
 import { notificationService } from '@mezon/utils';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
