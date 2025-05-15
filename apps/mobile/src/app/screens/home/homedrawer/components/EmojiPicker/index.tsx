@@ -224,7 +224,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 
 				{mode === 'emoji' ? (
 					<EmojiSelector
-						onScroll={onScroll}
 						handleBottomSheetExpand={handleBottomSheetExpand}
 						handleBottomSheetCollapse={handleBottomSheetCollapse}
 						onSelected={onSelectEmoji}
