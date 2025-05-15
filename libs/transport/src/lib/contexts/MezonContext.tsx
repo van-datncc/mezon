@@ -224,10 +224,15 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					device_id || '',
 					platform || ''
 				);
-			}
 
-			sessionRef.current = null;
-			clearSessionFromStorage();
+				sessionRef.current = null;
+				clearSessionFromStorage();
+				clientRef.current.setBasePath(
+					process.env.NX_CHAT_APP_API_GW_HOST as string,
+					process.env.NX_CHAT_APP_API_GW_PORT as string,
+					process.env.NX_CHAT_APP_API_SECURE === 'true'
+				);
+			}
 		},
 		[socketRef]
 	);
