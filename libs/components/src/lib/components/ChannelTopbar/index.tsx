@@ -133,6 +133,9 @@ const TopBarChannelText = memo(() => {
 		},
 		[channelDmGroupLabel]
 	);
+	const handleCloseCanvas = () => {
+		dispatch(appActions.setIsShowCanvas(false));
+	};
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex flex-1">
@@ -158,6 +161,7 @@ const TopBarChannelText = memo(() => {
 								isPrivate={!!channel?.channel_private}
 								label={channel?.channel_label || ''}
 								type={channel?.type || ChannelType.CHANNEL_TYPE_CHANNEL}
+								onClick={handleCloseCanvas}
 							/>
 						</>
 					)
@@ -197,51 +201,53 @@ const TopBarChannelText = memo(() => {
 	);
 });
 
-const ChannelTopbarLabel = memo(({ type, label, isPrivate }: { type: ChannelType; label: string; isPrivate: boolean }) => {
-	const renderIcon = () => {
-		if (!isPrivate) {
+const ChannelTopbarLabel = memo(
+	({ type, label, isPrivate, onClick }: { type: ChannelType; label: string; isPrivate: boolean; onClick?: () => void }) => {
+		const renderIcon = () => {
+			if (!isPrivate) {
+				switch (type) {
+					case ChannelType.CHANNEL_TYPE_CHANNEL:
+						return <Icons.Hashtag />;
+					case ChannelType.CHANNEL_TYPE_THREAD:
+						return <Icons.ThreadIcon />;
+					case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
+						return <Icons.Speaker />;
+					case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
+						return <Icons.Speaker />;
+					case ChannelType.CHANNEL_TYPE_STREAMING:
+						return <Icons.Stream />;
+					case ChannelType.CHANNEL_TYPE_APP:
+						return <Icons.AppChannelIcon />;
+					default:
+						return <Icons.Hashtag />;
+				}
+			}
 			switch (type) {
 				case ChannelType.CHANNEL_TYPE_CHANNEL:
-					return <Icons.Hashtag />;
+					return <Icons.HashtagLocked />;
 				case ChannelType.CHANNEL_TYPE_THREAD:
-					return <Icons.ThreadIcon />;
+					return <Icons.ThreadIconLocker />;
 				case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
-					return <Icons.Speaker />;
+					return <Icons.SpeakerLocked />;
 				case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
-					return <Icons.Speaker />;
+					return <Icons.SpeakerLocked />;
 				case ChannelType.CHANNEL_TYPE_STREAMING:
 					return <Icons.Stream />;
 				case ChannelType.CHANNEL_TYPE_APP:
 					return <Icons.AppChannelIcon />;
 				default:
-					return <Icons.Hashtag />;
+					return <Icons.HashtagLocked />;
 			}
-		}
-		switch (type) {
-			case ChannelType.CHANNEL_TYPE_CHANNEL:
-				return <Icons.HashtagLocked />;
-			case ChannelType.CHANNEL_TYPE_THREAD:
-				return <Icons.ThreadIconLocker />;
-			case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
-				return <Icons.SpeakerLocked />;
-			case ChannelType.CHANNEL_TYPE_GMEET_VOICE:
-				return <Icons.SpeakerLocked />;
-			case ChannelType.CHANNEL_TYPE_STREAMING:
-				return <Icons.Stream />;
-			case ChannelType.CHANNEL_TYPE_APP:
-				return <Icons.AppChannelIcon />;
-			default:
-				return <Icons.HashtagLocked />;
-		}
-	};
+		};
 
-	return (
-		<div className="flex items-center text-lg gap-1 dark:text-white text-black">
-			<div className="w-6">{renderIcon()}</div>
-			<p className="text-base font-semibold leading-5 truncate">{label}</p>
-		</div>
-	);
-});
+		return (
+			<div className="flex items-center text-lg gap-1 dark:text-white text-black" onClick={onClick}>
+				<div className="w-6">{renderIcon()}</div>
+				<p className="text-base font-semibold leading-5 truncate">{label}</p>
+			</div>
+		);
+	}
+);
 
 const ChannelTopbarTools = memo(
 	({
