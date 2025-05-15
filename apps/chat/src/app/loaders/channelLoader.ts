@@ -13,6 +13,7 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	dispatch(channelsActions.joinChannel({ clanId, channelId, noFetchMembers: false, messageId: messageId || '' }));
 	dispatch(channelsActions.setPreviousChannels({ clanId, channelId }));
 	notificationService.setCurrentChannelId(channelId);
+	dispatch(canvasAPIActions.getChannelCanvasList({ channel_id: channelId, clan_id: clanId }));
 	dispatch(topicsActions.setIsShowCreateTopic(false));
 	dispatch(topicsActions.setCurrentTopicId(''));
 	dispatch(topicsActions.setFocusTopicBox(false));
