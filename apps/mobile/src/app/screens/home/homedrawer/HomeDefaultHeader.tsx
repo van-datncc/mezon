@@ -174,7 +174,9 @@ const HomeDefaultHeader = React.memo(
 				) : (
 					<View />
 				)}
-				<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+				<View style={{position: 'relative', zIndex: 0}}>
+					<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+				</View>
 			</View>
 		);
 	}
