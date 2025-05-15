@@ -13,7 +13,6 @@ import {
 	selectIsLoadingJumpMessage,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectLastMessageByChannelId,
 	selectMessageIsLoading,
 	selectMessagesByChannel,
 	useAppDispatch,
@@ -60,7 +59,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean | string>(false);
@@ -74,23 +72,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const timeOutRef = useRef(null);
 	const timeOutRef2 = useRef(null);
 	const [showScrollButton, setShowScrollButton] = useState(false);
-
-	const onViewableItemsChanged = useRef(({ viewableItems }) => {
-		const firstItemVisible = messages?.length ? viewableItems?.some((item) => item?.item?.id === lastMessage?.id) : true;
-		setShowScrollButton(!firstItemVisible);
-	}).current;
-
-	const viewabilityConfig = {
-		itemVisiblePercentThreshold: 50,
-		minimumViewTime: 2000
-	};
-
-	const viewabilityConfigCallbackPairs = useRef([
-		{
-			viewabilityConfig,
-			onViewableItemsChanged
-		}
-	]).current;
 
 	const userId = useSelector(selectAllAccount)?.user?.id;
 
@@ -163,10 +144,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		async (direction: ELoadMoreDirection) => {
 			const store = getStore();
 			const isFetching = selectMessageIsLoading(store.getState());
-			if (showScrollButton) {
-				dispatch(messagesActions.setIdMessageToJump(null));
-				return;
-			}
 			if (isLoadMore?.current?.[direction] || isFetching) return;
 			if (direction === ELoadMoreDirection.bottom) {
 				const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState(), channelId);
@@ -254,13 +231,25 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		}, 800);
 	}, [clanId, channelId, dispatch, topicChannelId]);
 
+	const handleSetShowJumpLast = useCallback(
+		(nativeEvent) => {
+			const { contentOffset } = nativeEvent;
+			const isLastMessageVisible = contentOffset.y >= size.s_100;
+			if (isLastMessageVisible !== showScrollButton) {
+				setShowScrollButton(isLastMessageVisible);
+			}
+		},
+		[showScrollButton]
+	);
+
 	const handleScroll = useCallback(
 		async ({ nativeEvent }) => {
+			handleSetShowJumpLast(nativeEvent);
 			if (nativeEvent.contentOffset.y <= 0) {
 				await onLoadMore(ELoadMoreDirection.bottom);
 			}
 		},
-		[onLoadMore]
+		[handleSetShowJumpLast, onLoadMore]
 	);
 
 	return (
@@ -276,7 +265,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					onLoadMore={onLoadMore}
 					isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
 					isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
-					viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
 				/>
 			) : (
 				<View />
