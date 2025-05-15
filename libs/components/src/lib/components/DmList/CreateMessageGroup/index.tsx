@@ -103,8 +103,6 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 			avatarGroup.push(friend.user?.avatar_url || '');
 		});
 
-		console.log('userNameGroup: ', userNameGroup);
-		console.log('avatarGroup: ', avatarGroup);
 		const response = await dispatch(
 			directActions.createNewDirectMessage({ body: bodyCreateDmGroup, username: userNameGroup, avatar: avatarGroup })
 		);
