@@ -13,7 +13,6 @@ import {
 	selectIsLoadingJumpMessage,
 	selectIsMessageIdExist,
 	selectIsViewingOlderMessagesByChannelId,
-	selectLastMessageByChannelId,
 	selectMessageIsLoading,
 	selectMessagesByChannel,
 	useAppDispatch,
@@ -60,7 +59,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
 	const [, setTriggerRender] = useState<boolean | string>(false);
