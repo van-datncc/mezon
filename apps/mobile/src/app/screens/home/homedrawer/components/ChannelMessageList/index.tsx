@@ -11,7 +11,6 @@ interface IChannelListMessageProps {
 	flatListRef: React.RefObject<FlatList<MessagesEntity>>;
 	messages: MessagesEntity[];
 	handleScroll: (event) => void;
-	handleOnScroll?: (event) => void;
 	renderItem: ({ item }: { item: MessagesEntity }) => React.ReactElement;
 	onLoadMore: (direction: ELoadMoreDirection) => void;
 	isLoadMoreTop: boolean;
@@ -24,7 +23,6 @@ const ChannelListMessage = React.memo(
 		flatListRef,
 		messages,
 		handleScroll,
-		handleOnScroll,
 		renderItem,
 		onLoadMore,
 		isLoadMoreTop,
@@ -74,7 +72,6 @@ const ChannelListMessage = React.memo(
 				ref={flatListRef}
 				// overrideProps={{ isInvertedVirtualizedList: true }}
 				onMomentumScrollEnd={handleScroll}
-				onScroll={handleOnScroll}
 				viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
 				keyboardShouldPersistTaps={'handled'}
 				// removeClippedSubviews={false}
