@@ -2,7 +2,7 @@ import { ELoadMoreDirection } from '@mezon/chat-scroll';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { MessagesEntity } from '@mezon/store-mobile';
 import React, { useCallback, useMemo } from 'react';
-import { View } from 'react-native';
+import { View, ViewabilityConfigCallbackPairs } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { FlatList } from 'react-native-gesture-handler';
 import { style } from './styles';
@@ -16,10 +16,21 @@ interface IChannelListMessageProps {
 	onLoadMore: (direction: ELoadMoreDirection) => void;
 	isLoadMoreTop: boolean;
 	isLoadMoreBottom: boolean;
+	viewabilityConfigCallbackPairs: ViewabilityConfigCallbackPairs;
 }
 
 const ChannelListMessage = React.memo(
-	({ flatListRef, messages, handleScroll, handleOnScroll, renderItem, onLoadMore, isLoadMoreTop, isLoadMoreBottom }: IChannelListMessageProps) => {
+	({
+		flatListRef,
+		messages,
+		handleScroll,
+		handleOnScroll,
+		renderItem,
+		onLoadMore,
+		isLoadMoreTop,
+		isLoadMoreBottom,
+		viewabilityConfigCallbackPairs
+	}: IChannelListMessageProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 
@@ -64,6 +75,7 @@ const ChannelListMessage = React.memo(
 				// overrideProps={{ isInvertedVirtualizedList: true }}
 				onMomentumScrollEnd={handleScroll}
 				onScroll={handleOnScroll}
+				viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs}
 				keyboardShouldPersistTaps={'handled'}
 				// removeClippedSubviews={false}
 				// decelerationRate={'fast'}
