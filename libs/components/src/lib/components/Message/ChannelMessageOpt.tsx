@@ -105,7 +105,7 @@ const ChannelMessageOpt = ({
 		<div
 			className={`chooseForText z-[1] absolute h-8 p-0.5 rounded block ${!isCombine ? (message?.references ? '-top-5' : 'top-0') : '-top-5'} ${isDifferentDay ? 'top-4' : ''} right-6 w-fit`}
 		>
-			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded">
+			<div className="flex justify-between dark:bg-bgDarkPopover bg-bgLightMode border border-bgSecondary rounded select-none">
 				<div className="w-fit h-full flex items-center justify-between" ref={refOpt}>
 					<RecentEmoji message={message} isTopic={isTopic} />
 					{items
