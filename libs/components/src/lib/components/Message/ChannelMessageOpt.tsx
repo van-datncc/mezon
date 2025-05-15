@@ -240,7 +240,7 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser, isTopic: boolean) 
 		const store = getStore();
 		const currentChannel = selectCurrentChannel(store.getState());
 		try {
-			await dispatch(
+			const checkSendCoffee = await dispatch(
 				giveCoffeeActions.updateGiveCoffee({
 					channel_id: message.channel_id,
 					clan_id: message.clan_id ?? '',
@@ -250,23 +250,24 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser, isTopic: boolean) 
 					token_count: AMOUNT_TOKEN.TEN_TOKENS
 				})
 			).unwrap();
-			// fix
-			await reactionMessageDispatch({
-				id: EMOJI_GIVE_COFFEE.emoji_id,
-				messageId: message.id ?? '',
-				emoji_id: EMOJI_GIVE_COFFEE.emoji_id,
-				emoji: EMOJI_GIVE_COFFEE.emoji,
-				count: 1,
-				message_sender_id: message?.sender_id ?? '',
-				action_delete: false,
-				is_public: isPublicChannel(channel),
-				clanId: message.clan_id ?? '',
-				channelId: isTopic ? currentChannel?.id || '' : (message?.channel_id ?? ''),
-				isFocusTopicBox,
-				channelIdOnMessage: message?.channel_id
-			});
+			if (checkSendCoffee === true) {
+				await reactionMessageDispatch({
+					id: EMOJI_GIVE_COFFEE.emoji_id,
+					messageId: message.id ?? '',
+					emoji_id: EMOJI_GIVE_COFFEE.emoji_id,
+					emoji: EMOJI_GIVE_COFFEE.emoji,
+					count: 1,
+					message_sender_id: message?.sender_id ?? '',
+					action_delete: false,
+					is_public: isPublicChannel(channel),
+					clanId: message.clan_id ?? '',
+					channelId: isTopic ? currentChannel?.id || '' : (message?.channel_id ?? ''),
+					isFocusTopicBox,
+					channelIdOnMessage: message?.channel_id
+				});
 
-			await sendNotificationMessage(message.sender_id || '', message.user?.name || message.user?.username, message.avatar);
+				await sendNotificationMessage(message.sender_id || '', message.user?.name || message.user?.username, message.avatar);
+			}
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
 		}
