@@ -71,7 +71,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const timeOutRef2 = useRef(null);
-	const [isShowScrollButton, setIsShowScrollButton] = useState(false);
+	const [isShowJumpToPresent, setIsShowJumpToPresent] = useState(false);
 
 	const userId = useSelector(selectAllAccount)?.user?.id;
 
@@ -235,11 +235,11 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		(nativeEvent) => {
 			const { contentOffset } = nativeEvent;
 			const isLastMessageVisible = contentOffset.y >= 100;
-			if (isLastMessageVisible !== isShowScrollButton) {
-				setIsShowScrollButton(isLastMessageVisible);
+			if (isLastMessageVisible !== isShowJumpToPresent) {
+				setIsShowJumpToPresent(isLastMessageVisible);
 			}
 		},
-		[isShowScrollButton]
+		[isShowJumpToPresent]
 	);
 
 	const handleScroll = useCallback(
@@ -274,7 +274,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					height: size.s_8
 				}}
 			/>
-			{isShowScrollButton && (
+			{isShowJumpToPresent && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={handleJumpToPresent} activeOpacity={0.8}>
 					{isLoadingScrollBottom ? (
 						<ActivityIndicator size="small" color={themeValue.textStrong} />
