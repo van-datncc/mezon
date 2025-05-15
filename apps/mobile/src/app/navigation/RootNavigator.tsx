@@ -156,7 +156,7 @@ const RootNavigation = (props) => {
 		}
 		if (mezon?.sessionRef) {
 			const config = extractAndSaveConfig(mezon?.sessionRef as unknown as Session, true);
-			saveMezonConfigToStorage(config.host, config.port, config.useSSL);
+			if (config) saveMezonConfigToStorage(config.host, config.port, config.useSSL);
 		}
 		return initStore(mezon, undefined);
 	}, [mezon]);
