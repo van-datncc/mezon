@@ -6,7 +6,7 @@ const style = (colors: Attributes) =>
 		container: {
 			backgroundColor: colors.primary,
 			paddingHorizontal: size.s_20,
-			width: Dimensions.get('screen').width,
+			width: '100%',
 			height: Dimensions.get('screen').height
 		},
 		boxMembers: {
