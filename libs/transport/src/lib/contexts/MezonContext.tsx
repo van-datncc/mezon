@@ -23,6 +23,11 @@ type Sessionlike = {
 	created: boolean;
 	is_remember: boolean;
 	api_url: string;
+	expires_at?: number;
+	refresh_expires_at?: number;
+	created_at?: number;
+	username?: string;
+	user_id?: string;
 };
 
 const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) => {
@@ -80,10 +85,15 @@ export type MezonContextValue = {
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 
 	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
-	refreshSession: (session: Sessionlike) => Promise<Session>;
+	refreshSession: (session: Sessionlike) => Promise<Session | undefined>;
 	connectWithSession: (session: Sessionlike) => Promise<Session>;
 
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
+};
+
+const isSessionExpired = (expiresAt: number): boolean => {
+	const now = Math.floor(Date.now() / 1000) + 5;
+	return now >= expiresAt;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -242,6 +252,17 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
+
+			if (session.expires_at && isSessionExpired(session.expires_at)) {
+				await logOutMezon();
+				throw new Error('Mezon client not initialized');
+			}
+
+			if (!clientRef.current.host || clientRef.current.host === process.env.NX_CHAT_APP_API_GW_HOST) {
+				await logOutMezon();
+				throw new Error('Mezon client not initialized');
+			}
+
 			const newSession = await clientRef.current.sessionRefresh(
 				new Session(session.token, session.refresh_token, session.created, session.api_url, session.is_remember)
 			);
@@ -256,7 +277,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef.current = session2;
 			return newSession;
 		},
-		[clientRef, socketRef, isFromMobile]
+		[clientRef, socketRef, isFromMobile, logOutMezon]
 	);
 
 	const connectWithSession = useCallback(
