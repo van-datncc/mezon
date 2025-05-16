@@ -32,7 +32,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [keywordSearch, setKeywordSearch] = useState('');
 	const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, currentChannel?.channel_id ?? ''));
-	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
+	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? '', currentChannel?.parent_id));
 	const filteredCanvases = useMemo(() => {
 		if (!keywordSearch) return canvases;
 		const lowerCaseQuery = keywordSearch.toLowerCase().trim();
