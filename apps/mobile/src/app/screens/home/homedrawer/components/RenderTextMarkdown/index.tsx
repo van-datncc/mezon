@@ -174,7 +174,6 @@ export const markdownStyles = (
 		boldText: {
 			fontSize: size.medium,
 			fontWeight: 'bold',
-			lineHeight: size.s_20,
 			color: colors.text
 		},
 		blockSpacing: {
