@@ -1,7 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, appActions, getStoreAsync, referencesActions, selectChannelById, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
 import { MAX_FILE_SIZE, checkIsThread } from '@mezon/utils';
 import Geolocation from '@react-native-community/geolocation';
 import { pick, types } from '@react-native-documents/picker';
@@ -29,7 +28,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['message']);
-	const { sessionRef } = useMezon();
 	const timeRef = useRef<any>(null);
 	const dispatch = useDispatch();
 	const [isShowAlbum, setIsShowAlbum] = useState<boolean>(false);
