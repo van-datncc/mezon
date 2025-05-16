@@ -137,7 +137,11 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 						{event.description && <Text style={styles.description}>{event.description}</Text>}
 						<EventLocation event={event} />
 					</View>
-					{event?.logo && <ImageNative url={event?.logo} style={styles.eventLogo} />}
+					{event?.logo && (
+						<View style={styles.eventLogo}>
+							<ImageNative url={event?.logo} style={styles.eventLogoImage} />
+						</View>
+					)}
 				</View>
 
 				{showActions && (
