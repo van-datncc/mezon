@@ -69,9 +69,6 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		return notificationType ? notificationType.label : null;
 	}, [defaultNotificationClan?.notification_setting_type]);
 
-	const handleInvitePeople = () => {
-		dispatch(clansActions.toggleInvitePeople({ status: true, clanId: clan?.clan_id }));
-	};
 	const { setIsShowSettingFooterStatus, setIsShowSettingFooterInitTab, setIsUserProfile, setIsShowSettingProfileInitTab, setClanIdSettingProfile } =
 		useSettingFooter();
 	const handleOpenClanProfileSetting = () => {
@@ -134,10 +131,6 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 						>
 							{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
 						</ItemPanel>
-					</GroupPanels>
-
-					<GroupPanels>
-						<ItemPanel children="Invite People" info onClick={handleInvitePeople} />
 					</GroupPanels>
 					<GroupPanels>
 						<Dropdown
