@@ -62,8 +62,7 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 
 	const shouldShowKickOption = !isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
 
-	const shouldShowRemoveFromThreadOption =
-		!isSelf && isPrivateThread && (isCreator || hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
+	const shouldShowRemoveFromThreadOption = !isSelf && (isCreator || hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
 
 	const friendStatus = useAppSelector(selectFriendStatus(currentUser?.user?.id || ''));
 
@@ -112,7 +111,7 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 
 	const handleRemoveMemberFromThread = useCallback(
 		async (userId?: string) => {
-			if (!userId || !currentChannelId || !isPrivateThread) return;
+			if (!userId || !currentChannelId) return;
 
 			try {
 				await dispatch(
@@ -248,9 +247,9 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 							<MemberMenuItem label="Remove Friend" onClick={currentHandlers.handleRemoveFriend} isWarning={true} />
 						)}
 
-						{shouldShow('kick') && <MemberMenuItem label="Kick" onClick={currentHandlers.handleKick} isWarning={true} />}
+						{!!shouldShow('kick') && <MemberMenuItem label="Kick" onClick={currentHandlers.handleKick} isWarning={true} />}
 
-						{shouldShow('removeFromThread') && (
+						{!!shouldShow('removeFromThread') && (
 							<MemberMenuItem
 								label={`Remove ${currentUser?.user?.username || 'User'} from thread`}
 								onClick={currentHandlers.handleRemoveFromThread}
