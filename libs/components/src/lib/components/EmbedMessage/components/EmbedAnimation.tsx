@@ -42,10 +42,12 @@ export const EmbedAnimation = ({
 			pool?.map((poolItem, index) => {
 				const style = document.createElement('style');
 
-				const ratioWidth = WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
+				const ratioWidthBig = DEFAULT_WIDTH / jsonPosition.frames[poolItem[index]].frame.w;
+				const ratioWidthSmall = WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
 
 				if (!isResult) {
-					const innerAnimation = makeAnimation(jsonPosition, poolItem, ratioWidth).animate;
+					const innerAnimationBig = makeAnimation(jsonPosition, poolItem, ratioWidthBig).animate;
+					const innerAnimationSmall = makeAnimation(jsonPosition, poolItem, ratioWidthSmall).animate;
 					style.innerHTML = `
 
           .box_animation_${index}_${messageId} {
@@ -56,15 +58,23 @@ export const EmbedAnimation = ({
             }
 
             @keyframes animation_embed_${index}_${messageId} {
-              ${innerAnimation}
-              }
+              ${innerAnimationBig}
+            }
+
+            @keyframes animation_embed_${index}_${messageId}_small {
+              ${innerAnimationSmall}
+            }
 
             @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
               .box_resize_${index}_${messageId}{
-                width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidth}px !important;
-                height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidth}px !important;
+                width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidthSmall}px !important;
+                height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidthSmall}px !important;
                 background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
-              }
+                }
+                .box_animation_${index}_${messageId}{
+                animation: animation_embed_${index}_${messageId}_small ${duration}s steps(1) forwards;
+
+                }
             }
               `;
 				} else {
@@ -80,7 +90,7 @@ export const EmbedAnimation = ({
                 width : ${WIDTH_BOX_ANIMATION_SMALL}px !important;
                 height : ${(WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px !important;
                  background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
-                   background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidth}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidth}px;
+                   background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidthSmall}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidthSmall}px;
                  }
             }
               `;
@@ -115,7 +125,7 @@ export default EmbedAnimation;
 
 const makeAnimation = (data: TDataAnimation, poolImages: string[], ratio?: number) => {
 	const imageNumber = poolImages.length;
-	const ratioPotion = window.innerWidth < BREAK_POINT_RESPONSIVE && ratio ? ratio : 1;
+	const ratioPotion = ratio ? ratio : 1;
 	let animate = '';
 	poolImages.map((key, index) => {
 		const frame = data.frames[key].frame;
