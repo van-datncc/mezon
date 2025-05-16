@@ -13,6 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
+  var orientationLock: UIInterfaceOrientationMask = .all
   
   func application(
     _ application: UIApplication,
@@ -20,10 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   ) -> Bool {
   
     FirebaseApp.configure()
-
     
     // Configure audio session for playback
     try? AVAudioSession.sharedInstance().setCategory(.playback)
+    
+    // Set default orientation based on device type
+    setDefaultOrientationForDevice()
     
     // Setup React Native with our custom delegate
     let delegate = ReactNativeDelegate()
@@ -65,6 +68,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let handledByLinking = RCTLinkingManager.application(application, continue: userActivity, restorationHandler: restorationHandler)
     
     return handledByLinking
+  }
+  
+  // Add support for orientation handling
+  func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+    // Check if this is a React Native modal view controller
+    let windowController = window?.rootViewController
+    if windowController != nil {
+      // Special handling for React Native modal controllers to avoid crashes
+      if let controller = windowController,
+         NSStringFromClass(type(of: controller)).contains("RCTFabric") ||
+         NSStringFromClass(type(of: controller)).contains("RCTModal") {
+        // Allow all orientations for React Native modal controllers
+        return .all
+      }
+    }
+    
+    // For regular views, enforce our orientation preferences
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      // Lock iPads to landscape orientations
+      return .landscape
+    } else {
+      // For iPhones, use the stored orientation setting
+      return self.orientationLock
+    }
+  }
+  
+  // Set default orientation based on device type
+  private func setDefaultOrientationForDevice() {
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      // For iPad (tablet), set and lock to landscape orientation
+      if #available(iOS 16.0, *) {
+        // iOS 16+ approach
+        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+        windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+      } else {
+        // Older iOS approach
+        UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+      }
+      
+      // Lock to landscape for iPads (but the special cases will be handled in supportedInterfaceOrientationsFor)
+      self.orientationLock = .landscape
+    } else {
+      // For iPhone or other devices, allow all orientations
+      self.orientationLock = .all
+    }
   }
 }
 
