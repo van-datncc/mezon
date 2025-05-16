@@ -3,7 +3,7 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { ChannelsEntity, appActions, getStoreAsync, referencesActions, selectChannelById, selectDmGroupCurrentId } from '@mezon/store-mobile';
 import { MAX_FILE_SIZE, checkIsThread } from '@mezon/utils';
 import Geolocation from '@react-native-community/geolocation';
-import { pick, types } from '@react-native-documents/picker';
+import { errorCodes, pick, types } from '@react-native-documents/picker';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +77,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 			timeRef.current = setTimeout(() => {
 				dispatch(appActions.setIsFromFCMMobile(false));
 			}, 2000);
-			if (DocumentPicker.isCancel(err)) {
+			if (err?.code === errorCodes.OPERATION_CANCELED) {
 				onCancel?.();
 				// User cancelled the picker
 			} else {

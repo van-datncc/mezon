@@ -61,7 +61,7 @@ const ChannelListHeader = () => {
 
 	const onOpenEvent = () => {
 		const data = {
-			heightFitContent: true,
+			snapPoints: ['50%', '80%'],
 			children: <EventViewer handlePressEventCreate={handlePressEventCreate} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });

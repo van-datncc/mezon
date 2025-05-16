@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
+			flex: 1,
 			paddingHorizontal: Metrics.size.xl,
 			paddingVertical: Metrics.size.xl,
 			borderWidth: 1,
@@ -56,6 +57,7 @@ export const style = (colors: Attributes) =>
 
 		mainSec: {
 			gap: 5,
+			width: '67%',
 			marginBottom: Metrics.size.m
 		},
 
@@ -67,10 +69,15 @@ export const style = (colors: Attributes) =>
 		},
 
 		eventLogo: {
-			height: '100%',
+			height: size.s_80,
+			borderRadius: size.s_6,
+			overflow: 'hidden',
 			width: '30%'
 		},
-
+		eventLogoImage: {
+			height: '100%',
+			width: '100%'
+		},
 		privatePanel: {
 			backgroundColor: baseColor.redStrong,
 			justifyContent: 'center',

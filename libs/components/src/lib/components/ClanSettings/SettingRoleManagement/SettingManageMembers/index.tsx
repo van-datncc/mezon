@@ -90,23 +90,21 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 				</button>
 			</div>
 			<br />
-			<div>
-				<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto">
-					{searchResults.map((member: UsersClanEntity) => (
-						<ItemMember
-							key={member?.user?.id}
-							id={member?.user?.id}
-							username={member?.user?.username}
-							displayName={member?.user?.display_name}
-							clanName={member?.clan_nick}
-							clanAvatar={member.clan_avatar}
-							avatar={member?.user?.avatar_url}
-							isNewRole={isNewRole}
-							onRemove={() => handleRemoveMember(member?.user?.id || '')}
-						/>
-					))}
-				</ul>
-			</div>
+			<ul className="flex flex-col gap-y-4 max-h-listMemberRole overflow-y-auto thread-scroll">
+				{searchResults.map((member: UsersClanEntity) => (
+					<ItemMember
+						key={member?.user?.id}
+						id={member?.user?.id}
+						username={member?.user?.username}
+						displayName={member?.user?.display_name}
+						clanName={member?.clan_nick}
+						clanAvatar={member.clan_avatar}
+						avatar={member?.user?.avatar_url}
+						isNewRole={isNewRole}
+						onRemove={() => handleRemoveMember(member?.user?.id || '')}
+					/>
+				))}
+			</ul>
 			<AddMembersModal isOpen={openModal} onClose={handleCloseModal} RolesClan={RolesClan} />
 		</div>
 	);
