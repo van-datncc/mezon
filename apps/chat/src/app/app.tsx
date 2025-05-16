@@ -1,5 +1,5 @@
 import { MezonStoreProvider, initStore, selectIsLogin, setIsElectronDownloading, setIsElectronUpdateAvailable } from '@mezon/store';
-import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { CreateMezonClientOptions, MezonContextProvider, clearSessionFromStorage, useMezon } from '@mezon/transport';
 
 import { PermissionProvider, useActivities, useSettingFooter } from '@mezon/core';
 import { captureSentryError } from '@mezon/logger';
@@ -13,9 +13,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
 
-const getMezonConfig = (): CreateMezonClientOptions => {
+export const getMezonConfig = (): CreateMezonClientOptions => {
 	try {
 		const storedConfig = localStorage.getItem('mezon_session');
+
 		if (storedConfig) {
 			const parsedConfig = JSON.parse(storedConfig);
 			if (parsedConfig.host) {
@@ -67,6 +68,23 @@ const AppInitializer = () => {
 	const dispatch = useDispatch();
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const { setUserActivity } = useActivities();
+
+	const { clientRef } = useMezon();
+	if (clientRef?.current?.setBasePath) {
+		if (!isLogin) {
+			clearSessionFromStorage();
+			clientRef.current.setBasePath(
+				process.env.NX_CHAT_APP_API_GW_HOST as string,
+				process.env.NX_CHAT_APP_API_GW_PORT as string,
+				process.env.NX_CHAT_APP_API_SECURE === 'true'
+			);
+		} else {
+			const config = getMezonConfig();
+			if (config) {
+				clientRef.current.setBasePath(config.host, config.port, config.ssl);
+			}
+		}
+	}
 
 	useEffect(() => {
 		if (isElectron() && isLogin) {
