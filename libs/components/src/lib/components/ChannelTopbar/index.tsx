@@ -4,6 +4,7 @@ import {
 	RootState,
 	appActions,
 	audioCallActions,
+	canvasAPIActions,
 	channelsActions,
 	getStore,
 	getStoreAsync,
@@ -286,6 +287,16 @@ const ChannelTopbarTools = memo(
 			}
 		};
 
+		const fetchCanvasChannel = async () => {
+			const store = await getStoreAsync();
+			const currentChannel = selectCurrentChannel(store.getState());
+			dispatch(canvasAPIActions.getChannelCanvasList({ channel_id: currentChannel?.channel_id || '', clan_id: currentChannel?.clan_id || '' }));
+			if (currentChannel?.parent_id && currentChannel?.parent_id !== '0') {
+				dispatch(
+					canvasAPIActions.getChannelCanvasList({ channel_id: currentChannel?.parent_id || '', clan_id: currentChannel?.clan_id || '' })
+				);
+			}
+		};
 		return (
 			<div className={`items-center h-full flex`}>
 				{!isStream ? (
@@ -295,11 +306,11 @@ const ChannelTopbarTools = memo(
 							<MuteButton isLightMode={appearanceTheme === 'light'} />
 							<InboxButton isLightMode={appearanceTheme === 'light'} />
 							<PinButton mode={ChannelStreamMode.STREAM_MODE_CHANNEL} isLightMode={appearanceTheme === 'light'} />
-							<div onClick={() => setTurnOffThreadMessage()}>
+							<div onClick={setTurnOffThreadMessage}>
 								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 							</div>
 							{!isApp && <ThreadButton isLightMode={appearanceTheme === 'light'} />}
-							<CanvasButton isLightMode={appearanceTheme === 'light'} />
+							<CanvasButton onClick={fetchCanvasChannel} />
 						</div>
 						<div className="sbm:hidden mr-5">
 							<ChannelListButton />
@@ -459,12 +470,13 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-function CanvasButton({ isLightMode }: { isLightMode: boolean }) {
+function CanvasButton({ onClick }: { onClick?: () => void }) {
 	const [isShowCanvas, setIsShowCanvas] = useState<boolean>(false);
 	const canvasRef = useRef<HTMLDivElement | null>(null);
 
-	const handleShowCanvas = () => {
+	const handleShowCanvas = async () => {
 		setIsShowCanvas(!isShowCanvas);
+		onClick?.();
 	};
 
 	const handleClose = useCallback(() => {
