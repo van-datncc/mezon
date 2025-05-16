@@ -45,7 +45,7 @@ const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) =
 	}
 };
 
-const clearSessionFromStorage = () => {
+export const clearSessionFromStorage = () => {
 	try {
 		localStorage.removeItem(SESSION_STORAGE_KEY);
 	} catch (error) {
@@ -89,11 +89,6 @@ export type MezonContextValue = {
 	connectWithSession: (session: Sessionlike) => Promise<Session>;
 
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
-};
-
-const isSessionExpired = (expiresAt: number): boolean => {
-	const now = Math.floor(Date.now() / 1000) + 5;
-	return now >= expiresAt;
 };
 
 const MezonContext = React.createContext<MezonContextValue>({} as MezonContextValue);
@@ -253,14 +248,23 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				throw new Error('Mezon client not initialized');
 			}
 
-			if (session.expires_at && isSessionExpired(session.expires_at)) {
-				await logOutMezon();
-				throw new Error('Mezon client not initialized');
+			const sessionObj = new Session(session.token, session.refresh_token, session.created, session.api_url, session.is_remember);
+
+			if (session.expires_at) {
+				sessionObj.expires_at = session.expires_at;
 			}
 
-			if (!clientRef.current.host || clientRef.current.host === process.env.NX_CHAT_APP_API_GW_HOST) {
+			if (sessionObj.isexpired(Date.now() / 1000)) {
 				await logOutMezon();
-				throw new Error('Mezon client not initialized');
+				return;
+			}
+
+			if (
+				!clientRef.current.host ||
+				(clientRef.current.host === process.env.NX_CHAT_APP_API_GW_HOST && clientRef.current.port === process.env.NX_CHAT_APP_API_GW_PORT)
+			) {
+				await logOutMezon();
+				return;
 			}
 
 			const newSession = await clientRef.current.sessionRefresh(
