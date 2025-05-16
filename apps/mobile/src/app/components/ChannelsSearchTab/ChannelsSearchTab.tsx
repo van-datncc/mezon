@@ -61,11 +61,7 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<View
-					style={{
-						paddingBottom: size.s_100
-					}}
-				>
+				<View style={styles.listBox}>
 					<FlatList
 						data={combinedListChannel}
 						renderItem={renderItem}

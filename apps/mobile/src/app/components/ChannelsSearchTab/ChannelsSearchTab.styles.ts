@@ -6,12 +6,16 @@ const style = (colors: Attributes) =>
 		container: {
 			marginTop: size.s_10,
 			paddingHorizontal: size.s_20,
-			width: '100%'
+			flex: 1
 		},
 		title: {
 			fontSize: size.medium,
 			color: colors.white,
 			fontWeight: '600',
+			marginBottom: size.s_20
+		},
+		listBox: {
+			flex: 1,
 			marginBottom: size.s_20
 		}
 	});

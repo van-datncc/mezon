@@ -1,20 +1,19 @@
 import { Attributes, size } from '@mezon/mobile-ui';
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
 			backgroundColor: colors.primary,
 			paddingHorizontal: size.s_20,
-			width: '100%',
-			height: Dimensions.get('screen').height
+			flex: 1
 		},
 		boxMembers: {
 			marginTop: size.s_10,
 			borderRadius: size.s_14,
 			backgroundColor: colors.secondary,
 			flex: 1,
-			marginBottom: 200
+			marginBottom: size.s_20
 		}
 	});
 
