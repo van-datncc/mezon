@@ -20,13 +20,13 @@ import {
 	selectLatestMessageId,
 	selectMemberClanByUserId2,
 	selectMessageEntitiesByChannelId,
-	selectMessageIdsByChannelId2,
 	selectMessageIsLoading,
 	selectMessageNotified,
 	selectScrollOffsetByChannelId,
 	selectShowScrollDownButton,
 	selectTheme,
 	selectUnreadMessageIdByChannelId,
+	selectViewportIdsByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -125,7 +125,7 @@ function ChannelMessages({
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId2(state, channelId));
+	const messageIds = useAppSelector((state) => selectViewportIdsByChannelId(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
@@ -142,6 +142,8 @@ function ChannelMessages({
 	const setAnchor = useRef<number | null>(null);
 	const previousChannelId = useRef<string | null>(null);
 	const preventScrollbottom = useRef<boolean>(false);
+
+	console.log(messageIds.length, 'messageIds.length');
 
 	useSyncEffect(() => {
 		userActiveScroll.current = false;
@@ -426,7 +428,14 @@ const ScrollDownButton = memo(
 			const state = getStore().getState();
 
 			const lastSentMessageId = selectLatestMessageId(state, channelId);
+
+			console.log(messageIds, 'messageIds');
+
+			console.log(lastSentMessageId, 'lastSentMessageId');
+
 			const jumpPresent = !!lastSentMessageId && !messageIds.includes(lastSentMessageId as string) && messageIds.length >= 20;
+
+			console.log(jumpPresent, 'jumpPresent');
 
 			dispatch(
 				channelsActions.setScrollOffset({

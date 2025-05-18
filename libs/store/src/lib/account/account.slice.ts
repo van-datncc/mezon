@@ -44,7 +44,7 @@ export const getUserProfile = createAsyncThunk<IUserAccount, { noCache: boolean 
 	}
 	const response = await fetchUserProfileCached(mezon);
 	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid getUserProfile');
 	}
 	return response;
 });

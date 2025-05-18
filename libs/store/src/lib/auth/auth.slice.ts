@@ -84,12 +84,13 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 	const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 
 	if (!sessionState) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid refreshSession');
 	}
 
 	if (mezon.sessionRef.current?.token === sessionState?.token) {
 		return sessionState;
 	}
+
 	let session;
 	try {
 		session = await mezon?.refreshSession({
@@ -97,11 +98,11 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 			is_remember: sessionState.is_remember ?? false
 		});
 	} catch (error: any) {
-		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	return normalizeSession(session);
@@ -112,7 +113,7 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 	const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 
 	if (!sessionState) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid checkSessionWithToken');
 	}
 
 	if (mezon.sessionRef.current?.token === sessionState?.token) {
@@ -125,11 +126,11 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 			is_remember: sessionState.is_remember ?? false
 		});
 	} catch (error: any) {
-		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid checkSessionWithToken');
 	}
 
 	return normalizeSession(session);
@@ -140,7 +141,7 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	await mezon?.logOutMezon(device_id, platform);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
-	restoreLocalStorage(['persist:auth', 'mezon_session', 'persist:apps', 'persist:categories', 'persist:clans']);
+	restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories', 'persist:clans']);
 });
 
 export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {
@@ -148,7 +149,7 @@ export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkA
 	const QRlogin = await mezon?.createQRLogin();
 
 	if (!QRlogin) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid getQRCode');
 	}
 	return QRlogin;
 });
