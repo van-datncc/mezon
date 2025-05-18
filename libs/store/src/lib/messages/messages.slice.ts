@@ -1478,6 +1478,13 @@ export const selectViewportIdsByChannelId = createCachedSelector([getMessagesSta
 	return messagesState?.channelViewPortMessageIds[channelId] || emptyArray;
 });
 
+export const selectMessageIdsByChannelId2 = createSelector([selectMessageIdsByChannelId, selectViewportIdsByChannelId], (messageIds, viewportIds) => {
+	if (!viewportIds?.length) {
+		return messageIds;
+	}
+	return messageIds.filter((id) => viewportIds.includes(id));
+});
+
 export const selectMessagesByChannel = createSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState?.channelMessages?.[channelId];
 });

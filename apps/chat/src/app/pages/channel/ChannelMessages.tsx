@@ -20,13 +20,13 @@ import {
 	selectLatestMessageId,
 	selectMemberClanByUserId2,
 	selectMessageEntitiesByChannelId,
+	selectMessageIdsByChannelId2,
 	selectMessageIsLoading,
 	selectMessageNotified,
 	selectScrollOffsetByChannelId,
 	selectShowScrollDownButton,
 	selectTheme,
 	selectUnreadMessageIdByChannelId,
-	selectViewportIdsByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -125,7 +125,7 @@ function ChannelMessages({
 }: ChannelMessagesProps) {
 	const appearanceTheme = useSelector(selectTheme);
 	const currentChannelId = useSelector(selectCurrentChannelId);
-	const messageIds = useAppSelector((state) => selectViewportIdsByChannelId(state, channelId));
+	const messageIds = useAppSelector((state) => selectMessageIdsByChannelId2(state, channelId));
 	const idMessageNotified = useSelector(selectMessageNotified);
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
