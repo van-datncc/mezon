@@ -49,7 +49,7 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 			const response = await fetchDefaultNotificationCategoryCached(mezon, categoryId);
 
 			if (!response) {
-				return thunkAPI.rejectWithValue('Invalid session');
+				return thunkAPI.rejectWithValue('Invalid getDefaultNotificationCategory');
 			}
 
 			const apiNotificationSetting = response

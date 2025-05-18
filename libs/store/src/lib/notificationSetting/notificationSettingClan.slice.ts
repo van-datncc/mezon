@@ -47,7 +47,7 @@ export const getDefaultNotificationClan = createAsyncThunk(
 			}
 			const response = await fetchDefaultNotificationClanCached(mezon, clanId);
 			if (!response) {
-				return thunkAPI.rejectWithValue('Invalid session');
+				return thunkAPI.rejectWithValue('Invalid getDefaultNotificationClan');
 			}
 			const clanNotificationConfig: ApiNotificationSetting = {
 				id: response.id,
