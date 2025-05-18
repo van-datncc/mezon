@@ -7,6 +7,7 @@ import * as React from 'react';
 import { memo, useEffect, useMemo } from 'react';
 import { BackHandler, Image, ImageBackground, NativeModules, Text, TouchableOpacity, View } from 'react-native';
 import { Bounce } from 'react-native-animated-spinkit';
+import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
 
 import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
@@ -19,7 +20,7 @@ import { style } from './styles';
 import BG_CALLING from './bgCalling.png';
 
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
-const { FullScreenNotificationIncomingCall, SharedPreferences } = NativeModules;
+const { FullScreenNotificationIncomingCall } = NativeModules;
 const IncomingHomeScreen = memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -33,7 +34,7 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	const getDataCall = async () => {
 		try {
-			await SharedPreferences.removeItem('notificationDataCalling');
+			await NotificationPreferences.clearValue('notificationDataCalling');
 			const payload = safeJSONParse(props?.payload || '{}');
 			if (payload?.offer !== 'CANCEL_CALL' && !!payload?.offer) {
 				const signalingData = {

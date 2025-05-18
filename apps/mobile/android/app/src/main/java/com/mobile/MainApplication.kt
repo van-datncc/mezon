@@ -23,6 +23,8 @@ import com.mezon.mobile.KeepAwakePackage;
 import com.mezon.mobile.DeviceUtilsPackage;
 import com.mezon.mobile.BluetoothPackage;
 import com.mezon.mobile.NavigationBarPackage;
+import com.mezon.mobile.NotificationPreferencesPackage;
+
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 
 class MainApplication : Application(), ReactApplication {
@@ -42,6 +44,7 @@ class MainApplication : Application(), ReactApplication {
               add(DeviceUtilsPackage())
               add(BluetoothPackage())
               add(NavigationBarPackage())
+              add(NotificationPreferencesPackage())
             }
 
         override fun getJSMainModuleName(): String = "src/main"

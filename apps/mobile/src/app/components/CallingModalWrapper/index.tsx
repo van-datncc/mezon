@@ -1,18 +1,16 @@
-import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
-import { appActions, DMCallActions, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { appActions, DMCallActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
-import { AppState, NativeModules, Platform, View } from 'react-native';
+import React, { memo, useCallback, useEffect, useRef } from 'react';
+import { AppState, Platform, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import NotificationPreferences from '../../utils/NotificationPreferences';
 import CallingModal from '../CallingModal';
-const { SharedPreferences } = NativeModules;
 
 const CallingModalWrapper = () => {
-	const userId = useMemo(() => {
-		return load(STORAGE_MY_USER_ID);
-	}, []);
+	const userId = useSelector(selectCurrentUserId);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
@@ -52,11 +50,12 @@ const CallingModalWrapper = () => {
 
 	const getDataCall = async () => {
 		try {
-			const notificationData = await SharedPreferences.getItem('notificationDataCalling');
+			const notificationData = await NotificationPreferences.getValue('notificationDataCalling');
 			if (!notificationData) return;
 
 			const notificationDataParse = safeJSONParse(notificationData || '{}');
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
+			console.log('log  => data getDataCall', data);
 			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
 				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {
@@ -74,8 +73,9 @@ const CallingModalWrapper = () => {
 						callerId: data?.callerId
 					})
 				);
-				await sleep(500);
+				await sleep(2000);
 				dispatch(appActions.setLoadingMainMobile(false));
+				await NotificationPreferences.clearValue('notificationDataCalling');
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 					params: {
@@ -86,7 +86,7 @@ const CallingModalWrapper = () => {
 					}
 				});
 			} else if (notificationData) {
-				await SharedPreferences.removeItem('notificationDataCalling');
+				await NotificationPreferences.clearValue('notificationDataCalling');
 			} else {
 				/* empty */
 			}
