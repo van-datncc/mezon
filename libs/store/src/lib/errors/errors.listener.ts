@@ -124,6 +124,10 @@ errorListenerMiddleware.startListening({
 			return;
 		}
 		if (toast.type === 'error') {
+			if (toast.message === 'Redirect Login') {
+				return;
+			}
+
 			listenerApi.dispatch(
 				toastActions.addToastError({
 					message: toast.message as string

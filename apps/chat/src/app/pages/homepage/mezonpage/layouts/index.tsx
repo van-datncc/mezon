@@ -11,8 +11,8 @@ const Layout = memo((props: LayoutProps) => {
 	return (
 		<div>
 			<section id="overview" className="flex flex-col items-center relative">
-				<div className="max-lg:hidden absolute top-0 left-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
-				<div className="max-lg:hidden absolute right-0 transform translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
+				<div className="max-lg:hidden absolute top-0 left-0 translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
+				<div className="max-lg:hidden absolute right-0 translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
 				<div
 					className={`w-10/12 pt-96 pb-96 flex flex-col gap-[64px] max-md:gap-[32px] max-lg:w-full max-lg:pt-[48px] max-lg:pb-[48px] max-md:px-[16px] ${sideBarIsOpen ? 'unset' : 'relative'}`}
 				>
@@ -32,13 +32,11 @@ const Layout = memo((props: LayoutProps) => {
 							<Image src={`assets/blockchain-intergration.svg`} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
-									className="text-[20px] leading-[30px] font-semibold"
+									className="text-[20px] leading-[30px] font-semibold text-transparent"
 									style={{
 										background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
 										WebkitBackgroundClip: 'text',
-										backgroundClip: 'text',
-										color: 'transparent',
-										fontFamily: 'Poppins'
+										backgroundClip: 'text'
 									}}
 								>
 									Workstation
@@ -59,13 +57,11 @@ const Layout = memo((props: LayoutProps) => {
 							<Image src={`assets/developer-empowerment.svg`} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
-									className="text-[20px] leading-[30px] font-semibold"
+									className="text-[20px] leading-[30px] font-semibold text-transparent"
 									style={{
-										background: ' linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%',
+										background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
 										WebkitBackgroundClip: 'text',
-										backgroundClip: 'text',
-										color: 'transparent',
-										fontFamily: 'Poppins'
+										backgroundClip: 'text'
 									}}
 								>
 									Ecosystem
@@ -85,13 +81,11 @@ const Layout = memo((props: LayoutProps) => {
 							<Image src={`assets/vision-for-the-future.svg`} />
 							<div className="flex flex-col items-center gap-[20px] text-center">
 								<div
-									className="text-[20px] leading-[30px] font-semibold"
+									className="text-[20px] leading-[30px] font-semibold text-transparent"
 									style={{
 										background: 'linear-gradient(349.47deg, #1D5AFA -9.25%, #F8E4F0 90.24%)',
 										WebkitBackgroundClip: 'text',
-										backgroundClip: 'text',
-										color: 'transparent',
-										fontFamily: 'Poppins'
+										backgroundClip: 'text'
 									}}
 								>
 									AI Agent
@@ -103,14 +97,14 @@ const Layout = memo((props: LayoutProps) => {
 							</div>
 						</AnimatedSection>
 					</div>
-					<div className="hidden max-lg:block absolute right-0 bottom-0 w-[300px] h-[300px] bg-[#8D72C5] filter blur-[100px] mix-blend-color-dodge"></div>
+					<div className="hidden max-lg:block absolute right-0 bottom-0 w-[300px] h-[300px] bg-[#8D72C5] filter blur-[100px] mix-blend-color-dodge will-change-transform"></div>
 				</div>
 			</section>
 			<section id="feature" className="flex flex-col items-center">
 				<div
 					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
-					<h2 className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px] font-['Poppins']">
+					<h2 className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px]">
 						Our features
 					</h2>
 
@@ -198,7 +192,7 @@ const Layout = memo((props: LayoutProps) => {
 
 								<AnimatedSection
 									delay={300}
-									className="w-[50%] flex flex-col items-center max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] max-md:shadow-[0px_4px_90px_16px_#22119280_inset] max-md:bg-[#0B0E2D]"
+									className="w-[50%] flex flex-col items-center max-md:w-full rounded-[20px] border border-[#4465FF4D] p-[64px] gap-[40px] max-md:py-[32px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] max-md:bg-[#0B0E2D] max-md:shadow-[0px_4px_90px_16px_#22119280_inset]"
 									style={{
 										background:
 											window.innerWidth > 768 ? 'linear-gradient(315.97deg, #0A052C 52.65%, #221192 113.54%)' : '#0B0E2D'
@@ -223,7 +217,7 @@ const Layout = memo((props: LayoutProps) => {
 										</div>
 										<div className="flex flex-col gap-[4.95px]">
 											<span className="font-normal text-[9.9px] leading-[11.88px] text-[#FFFFFF]">
-												By creating a clan, you agree to Mezon’s
+												By creating a clan, you agree to Mezon's
 											</span>
 											<span className="font-normal text-[9.9px] leading-[11.88px] text-[#5865F2]">Community Guidelines.</span>
 										</div>
@@ -235,17 +229,17 @@ const Layout = memo((props: LayoutProps) => {
 							</div>
 
 							{!sideBarIsOpen && (
-								<div className="hidden md:block absolute top-2/4 left-2/4 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[190px] mix-blend-color-dodge"></div>
+								<div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[190px] mix-blend-color-dodge will-change-transform"></div>
 							)}
 						</div>
 					</div>
 
 					{!sideBarIsOpen && (
 						<div>
-							<div className="hidden md:block absolute top-[8%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[140px] mix-blend-color-dodge"></div>
-							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
-							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-[50%] filter blur-[130px] mix-blend-color-dodge"></div>
-							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-[50%] filter blur-[100px] mix-blend-color-dodge"></div>
+							<div className="hidden md:block absolute top-[8%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[140px] mix-blend-color-dodge will-change-transform"></div>
+							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
+							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
+							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[100px] mix-blend-color-dodge will-change-transform"></div>
 						</div>
 					)}
 				</div>
@@ -264,7 +258,7 @@ interface HeaderFeatureProps {
 export const HeaderFeature: React.FC<HeaderFeatureProps> = ({ content, className }) => {
 	return (
 		<h3
-			className={`text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] text-transparent font-['Poppins'] bg-[linear-gradient(349.47deg,_#1D5AFA_-9.25%,_#F8E4F0_90.24%)] ${className}`}
+			className={`text-[30px] font-semibold leading-[38px] text-center max-md:text-[20px] max-md:leading-[30px] text-transparent bg-[linear-gradient(349.47deg,_#1D5AFA_-9.25%,_#F8E4F0_90.24%)] ${className}`}
 			style={{
 				WebkitBackgroundClip: 'text',
 				backgroundClip: 'text'
@@ -360,7 +354,7 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children, dela
 	return (
 		<div
 			ref={sectionRef}
-			className={`${className} transition-transform duration-700 ease-in-out ${
+			className={`${className} transition-transform duration-700 ease-in-out will-change-transform will-change-opacity ${
 				isVisible ? `translate-y-0 opacity-100` : 'translate-y-[20%] opacity-0'
 			}`}
 			style={{ transitionDelay: `${delay}ms`, ...style }}

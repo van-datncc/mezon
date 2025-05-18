@@ -46,7 +46,7 @@ export const getNotifiReactMessage = createAsyncThunk(
 			}
 			const response = await fetchNotifiReactMessageCached(mezon, channelId);
 			if (!response) {
-				return thunkAPI.rejectWithValue('Invalid session');
+				return thunkAPI.rejectWithValue('Invalid getNotifiReactMessage');
 			}
 			return response;
 		} catch (error) {
