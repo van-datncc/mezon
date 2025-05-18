@@ -1,7 +1,6 @@
 import { useColorsRoleById } from '@mezon/core';
-import { selectAllAccount, selectClanMemberMetaUserId, selectMemberClanByUserId2, selectMemberCustomStatusById2, useAppSelector } from '@mezon/store';
+import { selectClanMemberMetaUserId, selectMemberClanByUserId2, selectMemberCustomStatusById2, useAppSelector } from '@mezon/store';
 import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 import { AvatarImage } from '../../components';
 import { useMemberContextMenu } from '../../contexts/MemberContextMenu';
@@ -14,7 +13,6 @@ type BaseMemberProfileProps = {
 export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
 	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
-	const userProfile = useAppSelector(selectAllAccount);
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
@@ -42,15 +40,7 @@ export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 		showContextMenu(event, userTemplate);
 	};
 
-	const statusOnline = useMemo(() => {
-		if (userProfile?.user?.metadata && user.user?.id === userProfile.user.id) {
-			const metadata = safeJSONParse(userProfile?.user?.metadata);
-			return metadata?.user_status;
-		}
-		if (userMeta) {
-			return userMeta?.status;
-		}
-	}, [user.user?.id, userMeta, userProfile?.user?.id, userProfile?.user?.metadata]);
+	const statusOnline = userMeta?.status;
 
 	const userStatus: EUserStatus = useMemo(() => {
 		if (statusOnline) {
@@ -61,13 +51,11 @@ export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 		}
 	}, [statusOnline, user?.user?.metadata]);
 
-	const isMe = user?.user?.id === userProfile?.user?.id;
-
-	const isOffline = !user.user?.online;
+	const isOffline = !userMeta?.online || !user.user?.online;
 	const isMobile = user.user?.is_mobile;
 
 	return (
-		<div className="relative group w-full">
+		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
 			<div onContextMenu={handleContextMenu} onClick={handleClick} className="cursor-pointer flex items-center gap-[9px] relative">
 				<div className="relative">
 					<AvatarImage
@@ -82,7 +70,7 @@ export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 						{/* <UserStatusIcon status={userMeta?.status} /> */}
 						<StatusUser
 							isMemberChannel={true}
-							status={{ status: isMe ? true : !isOffline, isMobile }}
+							status={{ status: !isOffline, isMobile }}
 							userId={user?.user?.id}
 							customStatus={userStatus}
 						/>
