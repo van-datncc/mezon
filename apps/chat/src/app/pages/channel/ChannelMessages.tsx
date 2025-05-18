@@ -143,8 +143,6 @@ function ChannelMessages({
 	const previousChannelId = useRef<string | null>(null);
 	const preventScrollbottom = useRef<boolean>(false);
 
-	console.log(messageIds.length, 'messageIds.length');
-
 	useSyncEffect(() => {
 		userActiveScroll.current = false;
 		skipCalculateScroll.current = false;
@@ -429,13 +427,7 @@ const ScrollDownButton = memo(
 
 			const lastSentMessageId = selectLatestMessageId(state, channelId);
 
-			console.log(messageIds, 'messageIds');
-
-			console.log(lastSentMessageId, 'lastSentMessageId');
-
 			const jumpPresent = !!lastSentMessageId && !messageIds.includes(lastSentMessageId as string) && messageIds.length >= 20;
-
-			console.log(jumpPresent, 'jumpPresent');
 
 			dispatch(
 				channelsActions.setScrollOffset({
