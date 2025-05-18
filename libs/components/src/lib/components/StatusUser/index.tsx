@@ -1,4 +1,4 @@
-import { selectCurrentChannelId, selectDmGroupCurrentId, selectIsUserTypingInChannel, useAppSelector } from '@mezon/store';
+import { selectDmGroupCurrentId, selectIsUserTypingInChannel, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -18,23 +18,15 @@ type StatusUserProps = {
 	sizeStatusIcon?: string;
 	customStatus?: EUserStatus;
 	isDM?: boolean;
+	currentChannelID?: string;
 };
 
 const ClanStatusUser = (props: StatusUserProps) => {
-	const { customStatus, status, isMemberChannel, userId = '', isTyping = true, sizeStatusIcon } = props;
-
-	const currentChannelID = useSelector(selectCurrentChannelId);
-	const isTypingInChannel = useAppSelector((state) => selectIsUserTypingInChannel(state, currentChannelID || '', userId));
-
-	const checkTypingUser = isMemberChannel ? isTypingInChannel : false;
+	const { customStatus, status, isTyping = true, sizeStatusIcon } = props;
 
 	return (
-		<span
-			className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${
-				checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'
-			}`}
-		>
-			{renderStatusIcon({ isTyping, checkTypingUser, status, customStatus, sizeStatusIcon })}
+		<span className="absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode rounded-full right-[-4px]">
+			{renderStatusIcon({ isTyping, checkTypingUser: false, status, customStatus, sizeStatusIcon })}
 		</span>
 	);
 };
