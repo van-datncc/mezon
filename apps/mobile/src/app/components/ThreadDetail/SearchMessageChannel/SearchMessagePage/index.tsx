@@ -112,9 +112,9 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	};
 
 	return (
-		<View style={{ height: '100%', width: '100%' }}>
+		<View style={{ flex: 1 }}>
 			<HeaderTabSearch tabList={TabList} activeTab={activeTab} onPress={handelHeaderTabChange} />
-			<View>{isContentReady ? renderContent() : null}</View>
+			<View style={{ flex: 1 }}>{isContentReady ? renderContent() : null}</View>
 		</View>
 	);
 }

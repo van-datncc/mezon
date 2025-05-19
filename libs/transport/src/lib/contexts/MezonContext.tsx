@@ -53,6 +53,30 @@ export const clearSessionFromStorage = () => {
 	}
 };
 
+export const getMezonConfig = (): CreateMezonClientOptions => {
+	try {
+		const storedConfig = localStorage.getItem('mezon_session');
+
+		if (storedConfig) {
+			const parsedConfig = JSON.parse(storedConfig);
+			if (parsedConfig.host) {
+				parsedConfig.port = parsedConfig.port || (process.env.NX_CHAT_APP_API_PORT as string);
+				parsedConfig.key = process.env.NX_CHAT_APP_API_KEY as string;
+				return parsedConfig;
+			}
+		}
+	} catch (error) {
+		console.error('Failed to get Mezon config from localStorage:', error);
+	}
+
+	return {
+		host: process.env.NX_CHAT_APP_API_GW_HOST as string,
+		port: process.env.NX_CHAT_APP_API_GW_PORT as string,
+		key: process.env.NX_CHAT_APP_API_KEY as string,
+		ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
+	};
+};
+
 export const extractAndSaveConfig = (session: Session | null, isFromMobile?: boolean) => {
 	if (!session || !session.api_url) return null;
 	try {
@@ -254,10 +278,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				sessionObj.expires_at = session.expires_at;
 			}
 
-			if (sessionObj.isexpired(Date.now() / 1000)) {
-				await logOutMezon();
-				return;
-			}
+			// if (sessionObj.isexpired(Date.now() / 1000)) {
+			// 	await logOutMezon();
+			// 	return;
+			// }
 
 			if (
 				!clientRef.current.host ||
