@@ -11,7 +11,6 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
-import com.mezon.mobile.SharedPreferencesPackage
 import com.livekit.reactnative.LiveKitReactNative
 import com.livekit.reactnative.audio.AudioType
 import com.mezon.mobile.CustomImageViewPackage
@@ -34,7 +33,6 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               add(CustomImageViewPackage())
-              add(SharedPreferencesPackage())
               add(PiPPackage())
               add(VideoThumbnailPackage())
               add(CustomAudioPackage())

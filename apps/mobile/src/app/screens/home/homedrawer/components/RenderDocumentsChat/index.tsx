@@ -4,17 +4,17 @@ import { EMimeTypes, notImplementForGifOrStickerSendFromPanel } from '@mezon/uti
 import React from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { openUrl } from 'react-native-markdown-display';
-import { isAudio, isImage, isVideo } from '../../../../../utils/helpers';
+import { checkFileTypeImage, isAudio, isVideo } from '../../../../../utils/helpers';
 import RenderAudioChat from '../RenderAudioChat/RenderAudioChat';
 import { RenderImageChat } from '../RenderImageChat';
 import { RenderVideoChat } from '../RenderVideoChat';
-import { style } from './styles';
+import { style } from './styles'; 
 
 export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressImage }: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
-	const isShowImage = isImage(document?.url?.toLowerCase());
+	const isShowImage = checkFileTypeImage(document?.filetype);
 	if (isShowImage) {
 		const checkImage = notImplementForGifOrStickerSendFromPanel(document);
 

@@ -103,8 +103,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setCustomStatus(userCustomStatus.status ?? '');
 	};
 
-	const { setIsShowSettingFooterStatus } = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsUserProfile } = useSettingFooter();
 	const openSetting = () => {
+		setIsUserProfile(true);
 		setIsShowSettingFooterStatus(true);
 	};
 

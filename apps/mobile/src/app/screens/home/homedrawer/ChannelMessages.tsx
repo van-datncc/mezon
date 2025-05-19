@@ -155,6 +155,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 			}
 			isLoadMore.current[direction] = true;
 			if (direction === ELoadMoreDirection.bottom) {
+				scrollChannelMessageToIndex(LIMIT_MESSAGE + Math.floor(LIMIT_MESSAGE / 1.2));
 				await dispatch(
 					messagesActions.loadMoreMessage({
 						clanId,
@@ -166,7 +167,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				);
 				isLoadMore.current[direction] = false;
 				setTriggerRender(uuid.v4());
-				scrollChannelMessageToIndex(LIMIT_MESSAGE + Math.floor(LIMIT_MESSAGE / 1.2));
 				return;
 			}
 			await dispatch(
@@ -245,11 +245,11 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const handleScroll = useCallback(
 		async ({ nativeEvent }) => {
 			handleSetShowJumpLast(nativeEvent);
-			if (nativeEvent.contentOffset.y <= 0) {
+			if (nativeEvent.contentOffset.y <= 0 && isShowJumpToPresent) {
 				await onLoadMore(ELoadMoreDirection.bottom);
 			}
 		},
-		[handleSetShowJumpLast, onLoadMore]
+		[handleSetShowJumpLast, isShowJumpToPresent, onLoadMore]
 	);
 
 	return (
@@ -279,7 +279,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					{isLoadingScrollBottom ? (
 						<ActivityIndicator size="small" color={themeValue.textStrong} />
 					) : (
-						<MezonIconCDN icon={IconCDN.arrowLargeDownIcon} color={themeValue.textStrong} height={size.s_20} width={size.s_20} />
+						<MezonIconCDN icon={IconCDN.arrowLargeDownIcon} color={themeValue.textStrong} height={size.s_18} width={size.s_18} />
 					)}
 				</TouchableOpacity>
 			)}

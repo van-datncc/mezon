@@ -26,6 +26,8 @@ export const isImage = (url?: string) => {
 	return /\.(jpg|jpeg|png|webp|avif|gif|svg|heic|PNG)/.test(url);
 };
 
+export const checkFileTypeImage = (type: string) => type?.startsWith('image/');
+
 export const isVideo = (url?: string) => {
 	return /\.(mp4|webm|mov|mkv)/.test(url);
 };
