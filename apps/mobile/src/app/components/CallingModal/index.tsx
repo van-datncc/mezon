@@ -1,4 +1,4 @@
-import { ActionEmitEvent, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
+import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, selectAllUserClans, selectIsInCall, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import { WebrtcSignalingType } from 'mezon-js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
 import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
@@ -50,21 +50,6 @@ const CallingModal = () => {
 	};
 
 	useEffect(() => {
-		let timer: string | number | NodeJS.Timeout;
-		const statusInCallListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SET_STATUS_IN_CALL, ({ status = false }) => {
-			timer = setTimeout(() => {
-				if (!status) dispatch(DMCallActions.removeAll());
-				dispatch(DMCallActions.setIsInCall(status));
-			}, 4000);
-		});
-
-		return () => {
-			timer && clearTimeout(timer);
-			statusInCallListener.remove();
-		};
-	}, [dispatch]);
-
-	useEffect(() => {
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 		const dataType = latestSignalingEntry?.signalingData?.data_type;
 		if (!isInCall && dataType === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
@@ -102,7 +87,6 @@ const CallingModal = () => {
 	};
 
 	const onJoinCall = () => {
-		dispatch(DMCallActions.setIsInCall(true));
 		stopAndReleaseSound();
 		Vibration.cancel();
 		setIsVisible(false);
