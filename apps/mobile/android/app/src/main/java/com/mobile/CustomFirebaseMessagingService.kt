@@ -183,27 +183,7 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
     private fun startVibration() {
         try {
-            Log.d(TAG, "startVibrationstartVibrationstartVibrationstartVibration")
-
-            // Pattern for vibration (in milliseconds)
-            val pattern = longArrayOf(0, 1000, 1000)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                val vibrator = vibratorManager.defaultVibrator
-                val effect = VibrationEffect.createWaveform(pattern, 0)
-                vibrator.vibrate(effect)
-            } else {
-                @Suppress("DEPRECATION")
-                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val effect = VibrationEffect.createWaveform(pattern, 0)
-                    vibrator.vibrate(effect)
-                } else {
-                    @Suppress("DEPRECATION")
-                    vibrator.vibrate(pattern, 0)
-                }
-            }
+            // Todo add loop vibration
         } catch (e: Exception) {
             Log.e(TAG, "Error starting vibration: ${e.message}")
         }
@@ -211,15 +191,7 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
     private fun stopVibration() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                val vibrator = vibratorManager.defaultVibrator
-                vibrator.cancel()
-            } else {
-                @Suppress("DEPRECATION")
-                val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibrator.cancel()
-            }
+            // Stop vibration
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping vibration: ${e.message}")
         }

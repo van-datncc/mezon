@@ -21,7 +21,7 @@
         <Button
                 android:id="@+id/answer_button"
                 android:layout_width="0dp"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/rounded_button_answer"
@@ -31,7 +31,7 @@
         <Button
                 android:id="@+id/decline_button"
                 android:layout_width="0dp"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:background="@drawable/rounded_button_decline"

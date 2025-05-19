@@ -55,7 +55,6 @@ const CallingModalWrapper = () => {
 
 			const notificationDataParse = safeJSONParse(notificationData || '{}');
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
-			console.log('log  => data getDataCall', data);
 			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
 				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {

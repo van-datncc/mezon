@@ -14,7 +14,6 @@ import com.facebook.soloader.SoLoader
 import com.mezon.mobile.SharedPreferencesPackage
 import com.livekit.reactnative.LiveKitReactNative
 import com.livekit.reactnative.audio.AudioType
-import com.mezon.mobile.FullScreenNotificationIncomingCallPackage
 import com.mezon.mobile.CustomImageViewPackage
 import com.mezon.mobile.PiPPackage
 import com.mezon.mobile.VideoThumbnailPackage;
@@ -34,7 +33,6 @@ class MainApplication : Application(), ReactApplication {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
-              add(FullScreenNotificationIncomingCallPackage())
               add(CustomImageViewPackage())
               add(SharedPreferencesPackage())
               add(PiPPackage())
