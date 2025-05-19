@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment';
-import { DeviceEventEmitter, Dimensions, Linking, NativeModules, Platform } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Linking, Platform } from 'react-native';
 import BottomSheetRootListener from '../../components/BottomSheetRootListener';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import ModalRootListener from '../../components/ModalRootListener';
@@ -23,6 +23,7 @@ import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelV
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
+import NotificationPreferences from '../../utils/NotificationPreferences';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
@@ -35,7 +36,6 @@ import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
 const RootStack = createStackNavigator();
-const { SharedPreferences } = NativeModules;
 
 export const Authentication = memo(() => {
 	const isTabletLandscape = useTabletLandscape();
@@ -130,7 +130,7 @@ export const Authentication = memo(() => {
 	const onNotificationOpenedApp = async () => {
 		if (Platform.OS === 'android') {
 			try {
-				const notificationDataPushed = await SharedPreferences.getItem('notificationDataPushed');
+				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
 				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
 				if (notificationDataPushedParse.length > 0) {
 					for (const data of notificationDataPushedParse) {
@@ -156,8 +156,8 @@ export const Authentication = memo(() => {
 							}
 						}
 					}
-					await SharedPreferences.removeItem('notificationDataPushed');
 				}
+				await NotificationPreferences.clearValue('notificationDataPushed');
 			} catch (error) {
 				console.error('Error processing notifications:', error);
 			}

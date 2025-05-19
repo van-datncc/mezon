@@ -23,6 +23,8 @@ import androidx.core.graphics.drawable.IconCompat
 import android.widget.RemoteViews
 import android.app.Notification
 import android.view.View
+import org.json.JSONArray
+import android.app.ActivityManager
 
 class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
@@ -37,6 +39,11 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         Log.d(TAG, "Received FCM message from: ${remoteMessage.from}")
+        val isAppInForeground = isAppInForeground()
+        if (isAppInForeground) {
+            Log.d(TAG, "App is in foreground")
+            return
+        }
 
         // Extract data from the notification
         val data = remoteMessage.data
@@ -52,16 +59,31 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
                     saveNotificationData(data)
                     showCallNotification(data)
                 }
+            } else {
+                saveMessagesNotificationData(data)
             }
         }
     }
 
     private fun saveNotificationData(data: Map<String, String>) {
         try {
-            Log.d(TAG, "saveNotificationData")
             val sharedPreferences = applicationContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("notificationDataCalling", JSONObject(data).toString())
+            editor.apply()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving notification data: ${e.message}")
+        }
+    }
+
+    private fun saveMessagesNotificationData(data: Map<String, String>) {
+        try {
+            val sharedPreferences = applicationContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val existingData = sharedPreferences.getString("notificationDataPushed", "[]")
+            val dataArray = JSONArray(existingData)
+            dataArray.put(JSONObject(data))
+            editor.putString("notificationDataPushed", dataArray.toString())
             editor.apply()
         } catch (e: Exception) {
             Log.e(TAG, "Error saving notification data: ${e.message}")
@@ -195,5 +217,18 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping vibration: ${e.message}")
         }
+    }
+
+    private fun isAppInForeground(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val appProcesses = activityManager.runningAppProcesses ?: return false
+        val packageName = applicationContext.packageName
+
+        for (appProcess in appProcesses) {
+            if (appProcess.processName == packageName) {
+                return appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+            }
+        }
+        return false
     }
 }
