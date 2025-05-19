@@ -128,23 +128,6 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					{isLogin ? 'Open Mezon' : 'Login'}
 				</Link>
 			</div>
-
-			<div ref={footerSideBarRef} className="container w-full py-[48px] absolute bottom-0">
-				<div className="flex flex-col gap-[24px] max-lg:px-[32px]">
-					<div className="flex items-center gap-[24px]">
-						<a href="https://www.linkedin.com/company/nccplus-vietnam" target="_blank" rel="noreferrer" className="cursor-pointer">
-							<Image src={`assets/instagram.svg`} />
-						</a>
-						<a href="https://www.facebook.com/profile.php?id=61558081847939" target="_blank" rel="noreferrer" className="cursor-pointer">
-							<Image src={`assets/facebook.svg`} />
-						</a>
-						<a href="https://github.com/nccasia/mezon-fe" target="_blank" rel="noreferrer" className="cursor-pointer">
-							<Image src={`assets/twitter.svg`} />
-						</a>
-					</div>
-					<div className="font-normal text-[16px] leading-[24px] text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
-				</div>
-			</div>
 		</div>
 	);
 });
