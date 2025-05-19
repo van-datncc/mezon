@@ -311,7 +311,7 @@ export const RenderTextMarkdownContent = ({
 		if (lastIndex < s) {
 			textParts.push(
 				<Text key={`text-${index}`} style={themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}}>
-					{t?.slice(lastIndex, s)}
+					{t?.slice(lastIndex, s).replace(/^\n|\n$/, '')}
 				</Text>
 			);
 		}
@@ -588,6 +588,7 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.LINKYOUTUBE:
 						if (isYouTubeLink(contentInElement)) {
 							const videoId = extractYoutubeVideoId(contentInElement);
+							const widthScreen = Dimensions.get('screen').width;
 
 							markdownBlackParts.push(
 								<RenderYoutubeVideo
@@ -598,6 +599,7 @@ export const RenderTextMarkdownContent = ({
 									onLongPress={onLongPress}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
 									themeValue={themeValue}
+									containerStyle={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}
 								/>
 							);
 						} else {
@@ -627,7 +629,7 @@ export const RenderTextMarkdownContent = ({
 	if (lastIndex < (t?.length ?? 0)) {
 		textParts.push(
 			<Text key="text-end" style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}>
-				{t?.slice(lastIndex)}
+				{t?.slice(lastIndex).replace(/^\n|\n$/, '')}
 			</Text>
 		);
 	}
@@ -657,9 +659,12 @@ export const RenderTextMarkdownContent = ({
 					}}
 				/>
 			)}
-			<Text>{textParts}</Text>
-			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
-			{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+
+			<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+				{textParts?.length > 0 && <Text>{textParts}</Text>}
+				{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			</View>
 		</View>
 	);
 };

@@ -1,6 +1,6 @@
 import { Attributes, size } from '@mezon/mobile-ui';
 import { memo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextStyle, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextStyle, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
 type RenderYoutubeVideoProps = {
@@ -11,24 +11,23 @@ type RenderYoutubeVideoProps = {
 	onLongPress?: () => void;
 	linkStyle?: TextStyle;
 	themeValue?: Attributes;
+	containerStyle?: TextStyle;
 };
 
-const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPress, linkStyle, themeValue }: RenderYoutubeVideoProps) => {
+const RenderYoutubeVideo = ({
+	key,
+	videoId,
+	contentInElement,
+	onPress,
+	onLongPress,
+	linkStyle,
+	themeValue,
+	containerStyle
+}: RenderYoutubeVideoProps) => {
 	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
-	const { width, height } = useWindowDimensions();
-	const isLandscape = width > height;
 
 	return (
-		<View
-			key={key}
-			style={{
-				display: 'flex',
-				gap: size.s_8,
-				marginTop: isLandscape ? -size.s_4 : -size.s_40,
-				marginLeft: isLandscape ? -size.s_4 : 0,
-				paddingBottom: isLandscape ? size.s_6 : size.s_22
-			}}
-		>
+		<View key={key} style={containerStyle}>
 			<Text style={linkStyle} onPress={onPress} onLongPress={onLongPress}>
 				{contentInElement}
 			</Text>
@@ -41,8 +40,8 @@ const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPre
 				)}
 
 				<YoutubePlayer
-					height={size.s_170}
-					width={size.s_300}
+					height={size.s_180}
+					width={size.s_325}
 					videoId={videoId}
 					play={false}
 					onReady={() => setIsVideoReady(true)}
