@@ -291,6 +291,7 @@ export const RenderTextMarkdownContent = ({
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
+	const markdownBlackParts: React.ReactNode[] = [];
 
 	const elements = [
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
@@ -310,7 +311,7 @@ export const RenderTextMarkdownContent = ({
 		if (lastIndex < s) {
 			textParts.push(
 				<Text key={`text-${index}`} style={themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}}>
-					{t?.slice(lastIndex, s)}
+					{t?.slice(lastIndex, s).replace(/^\n|\n$/, '')}
 				</Text>
 			);
 		}
@@ -585,7 +586,7 @@ export const RenderTextMarkdownContent = ({
 							const videoId = extractYoutubeVideoId(contentInElement);
 							const widthScreen = Dimensions.get('screen').width;
 
-							textParts.push(
+							markdownBlackParts.push(
 								<RenderYoutubeVideo
 									key={`youtube-${index}`}
 									videoId={videoId}
@@ -624,7 +625,7 @@ export const RenderTextMarkdownContent = ({
 	if (lastIndex < (t?.length ?? 0)) {
 		textParts.push(
 			<Text key="text-end" style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}>
-				{t?.slice(lastIndex)}
+				{t?.slice(lastIndex).replace(/^\n|\n$/, '')}
 			</Text>
 		);
 	}
@@ -655,8 +656,11 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 
-			<Text>{textParts}</Text>
-			{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+				{textParts?.length > 0 && <Text>{textParts}</Text>}
+				{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			</View>
 		</View>
 	);
 };
