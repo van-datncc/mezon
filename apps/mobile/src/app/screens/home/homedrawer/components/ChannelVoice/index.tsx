@@ -13,17 +13,23 @@ import RoomView from './RoomView';
 import { style } from './styles';
 const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
 
-const ConnectionMonitor = () => {
+type monitorProps = {
+	onConnectionConnected?: (connected: boolean) => void;
+};
+
+const ConnectionMonitor = memo(({ onConnectionConnected }: monitorProps) => {
 	const connectionState = useConnectionState();
 
 	useEffect(() => {
 		if (connectionState === 'connected') {
+			onConnectionConnected(true);
 			startAudioCall();
 		}
 	}, [connectionState]);
 
 	useEffect(() => {
 		return () => {
+			onConnectionConnected(false);
 			stopAudioCall();
 		};
 	}, []);
@@ -37,7 +43,17 @@ const ConnectionMonitor = () => {
 					}
 				}
 			});
-			CustomAudioModule.setSpeaker(false, null);
+			await CustomAudioModule.getAudioStatus((err, audioRoute) => {
+				if (err) {
+					console.error('error get init audio status:', err);
+				} else {
+					if (audioRoute === 'speaker') {
+						return;
+					} else {
+						CustomAudioModule.setSpeaker(false, null);
+					}
+				}
+			});
 		} else {
 			await AudioSession.startAudioSession();
 			await AudioSession.setAppleAudioConfiguration({
@@ -55,17 +71,20 @@ const ConnectionMonitor = () => {
 	};
 
 	const stopAudioCall = async () => {
+		if (Platform.OS === 'android') {
+			CustomAudioModule.setSpeaker(false, null);
+		}
 		InCallManager.stop();
 		await AudioSession.stopAudioSession();
 	};
 
 	return <View />;
-};
+});
 
 type headerProps = {
 	channel: ChannelsEntity;
 	onPressMinimizeRoom: () => void;
-	onToggleSpeaker: () => void;
+	onToggleSpeaker: (boolean) => void;
 	isSpeakerOn: boolean;
 };
 
@@ -124,7 +143,10 @@ const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, is
 						<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
 					</TouchableOpacity>
 				)}
-				<TouchableOpacity onPress={() => onToggleSpeaker()} style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}>
+				<TouchableOpacity
+					onPress={() => onToggleSpeaker(!isSpeakerOn)}
+					style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
+				>
 					<MezonIconCDN
 						icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
 						height={size.s_17}
@@ -158,6 +180,7 @@ function ChannelVoice({
 	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(false);
+	const [isConnectionConnected, setConnectionConnected] = useState(false);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
 
@@ -299,7 +322,7 @@ function ChannelVoice({
 				}}
 			>
 				<LiveKitRoom serverUrl={serverUrl} token={token} connect={true}>
-					{isAnimationComplete && !focusedScreenShare && !isPiPMode && (
+					{isAnimationComplete && !focusedScreenShare && isConnectionConnected && !isPiPMode && (
 						<HeaderRoomView
 							channel={channel}
 							isSpeakerOn={isSpeakerOn}
@@ -307,7 +330,7 @@ function ChannelVoice({
 							onToggleSpeaker={onToggleSpeaker}
 						/>
 					)}
-					<ConnectionMonitor />
+					<ConnectionMonitor onConnectionConnected={setConnectionConnected} />
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}
