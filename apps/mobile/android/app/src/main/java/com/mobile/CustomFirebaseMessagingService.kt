@@ -25,6 +25,7 @@ import android.app.Notification
 import android.view.View
 import org.json.JSONArray
 import android.app.ActivityManager
+import android.media.MediaPlayer
 
 class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
@@ -33,7 +34,13 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         private const val PREF_NAME = "NotificationPrefs"
         private const val CHANNEL_ID = "calling_channel"
         private const val NOTIFICATION_ID = 1001
+        private const val CALL_TIMEOUT_MS: Long = 60000L // 60 seconds timeout as Long
     }
+
+    private var vibrator: Vibrator? = null
+    private var callTimeoutHandler: android.os.Handler? = null
+    private var callTimeoutRunnable: Runnable? = null
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -53,7 +60,6 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
             Log.d(TAG, "Notification data OFFER onMessageReceived: $offer")
             if (offer != null) {
                 if (offer == "{\"offer\":\"CANCEL_CALL\"}") {
-                    removeNotificationData()
                     cancelCallNotification()
                 } else {
                     saveNotificationData(data)
@@ -172,12 +178,40 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         startVibration()
         // Show the notification
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+
+        // Start call timeout handler
+        startCallTimeout()
+    }
+
+    private fun startCallTimeout() {
+        // Cancel any existing timeout handler
+        cancelCallTimeout()
+
+        // Create new timeout handler
+        callTimeoutHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        callTimeoutRunnable = Runnable {
+            Log.d(TAG, "Call timeout reached - cancelling notification")
+            cancelCallNotification()
+        }
+
+        // Schedule timeout after CALL_TIMEOUT_MS (60 seconds)
+        callTimeoutHandler?.postDelayed(callTimeoutRunnable!!, CALL_TIMEOUT_MS)
+        Log.d(TAG, "Call timeout scheduled for $CALL_TIMEOUT_MS ms")
+    }
+
+    private fun cancelCallTimeout() {
+        callTimeoutRunnable?.let { runnable ->
+            callTimeoutHandler?.removeCallbacks(runnable)
+            Log.d(TAG, "Call timeout cancelled")
+        }
     }
 
     private fun cancelCallNotification() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
         stopVibration()
+        removeNotificationData()
+        cancelCallTimeout()
     }
 
     private fun createCallNotificationChannel(notificationManager: NotificationManager) {
