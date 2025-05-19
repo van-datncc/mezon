@@ -1,11 +1,11 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DMCallActions, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { appActions, DMCallActions, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import LottieView from 'lottie-react-native';
 import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import * as React from 'react';
 import { memo, useEffect, useMemo } from 'react';
-import { BackHandler, Image, ImageBackground, NativeModules, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native';
 import { Bounce } from 'react-native-animated-spinkit';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
@@ -20,7 +20,6 @@ import { style } from './styles';
 import BG_CALLING from './bgCalling.png';
 
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
-const { FullScreenNotificationIncomingCall } = NativeModules;
 const IncomingHomeScreen = memo((props: any) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -34,24 +33,32 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	const getDataCall = async () => {
 		try {
-			await NotificationPreferences.clearValue('notificationDataCalling');
-			const payload = safeJSONParse(props?.payload || '{}');
-			if (payload?.offer !== 'CANCEL_CALL' && !!payload?.offer) {
+			const notificationData = await NotificationPreferences.getValue('notificationDataCalling');
+			if (!notificationData) return;
+
+			const notificationDataParse = safeJSONParse(notificationData || '{}');
+			const data = safeJSONParse(notificationDataParse?.offer || '{}');
+			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
+				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {
-					channel_id: payload?.channelId,
-					json_data: payload?.offer,
+					channel_id: data?.channelId,
+					receiver_id: userId,
+					json_data: data?.offer,
 					data_type: WebrtcSignalingType.WEBRTC_SDP_OFFER,
-					caller_id: payload?.callerId,
-					receiver_id: userId
+					caller_id: data?.callerId
 				};
 				dispatch(
 					DMCallActions.addOrUpdate({
 						calleeId: userId,
 						signalingData: signalingData as WebrtcSignalingFwd,
-						id: payload?.callerId,
-						callerId: payload?.callerId
+						id: data?.callerId,
+						callerId: data?.callerId
 					})
 				);
+			} else if (notificationData) {
+				await NotificationPreferences.clearValue('notificationDataCalling');
+			} else {
+				/* empty */
 			}
 		} catch (error) {
 			console.error('Failed to retrieve data', error);
@@ -106,7 +113,6 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	const onJoinCall = () => {
 		if (!signalingData?.[signalingData?.length - 1]?.callerId) return;
-		FullScreenNotificationIncomingCall.triggerNotificationClick('ACTION_PRESS_ANSWER_CALL', 'RNNotificationAnswerAction');
 		dispatch(DMCallActions.setIsInCall(true));
 		setIsInCall(true);
 	};
