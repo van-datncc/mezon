@@ -291,7 +291,6 @@ export const RenderTextMarkdownContent = ({
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
-	const markdownBlackParts: React.ReactNode[] = [];
 
 	const elements = [
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
@@ -584,8 +583,9 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.LINKYOUTUBE:
 						if (isYouTubeLink(contentInElement)) {
 							const videoId = extractYoutubeVideoId(contentInElement);
+							const widthScreen = Dimensions.get('screen').width;
 
-							markdownBlackParts.push(
+							textParts.push(
 								<RenderYoutubeVideo
 									key={`youtube-${index}`}
 									videoId={videoId}
@@ -594,6 +594,7 @@ export const RenderTextMarkdownContent = ({
 									onLongPress={onLongPress}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
 									themeValue={themeValue}
+									containerStyle={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}
 								/>
 							);
 						} else {
@@ -653,8 +654,8 @@ export const RenderTextMarkdownContent = ({
 					}}
 				/>
 			)}
+
 			<Text>{textParts}</Text>
-			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 			{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
 		</View>
 	);
