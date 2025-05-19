@@ -2,7 +2,6 @@ import { channelsActions, getStore, inviteActions, selectAppChannelById, selectT
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -171,17 +170,50 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 		return () => clearTimeout(timer);
 	}, [copied]);
 
+	// TODO: continue test
+	const handleCopyClick = () => {
+		navigator.clipboard
+			.writeText(contentBacktick)
+			.then(() => setCopied(true))
+			.catch((err) => console.error('Failed to copy text: ', err));
+	};
+
+	const formatContent = () => {
+		if (!contentBacktick) return '';
+
+		const content = contentBacktick.trim();
+		const lines = content.split('\n');
+
+		const formattedLines = lines.map((line: string) => {
+			if (line.match(/^#{1,6}\s+.+$/)) {
+				const headingLevel = line.indexOf(' ');
+				const headingText = line.substring(headingLevel).trim();
+				const fontSize = 24 - (headingLevel - 1) * 2;
+				return `<div style="font-size: ${fontSize}px; font-weight: bold; margin: 8px 0; line-height: 1">${headingText}</div>`;
+			}
+			return line;
+		});
+
+		return formattedLines.join('\n');
+	};
+
+	const formattedContent = formatContent();
+
+	const displayContent = formattedContent.includes('<div') ? (
+		<div dangerouslySetInnerHTML={{ __html: formattedContent }} />
+	) : contentBacktick.trim() === '' ? (
+		contentBacktick
+	) : (
+		contentBacktick.trim()
+	);
+
 	return (
 		<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
 			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
-				<CopyToClipboard text={`${contentBacktick}`} onCopy={() => setCopied(true)}>
-					<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
-						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
-					</button>
-				</CopyToClipboard>
-				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>
-					{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
-				</code>
+				<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `} onClick={handleCopyClick}>
+					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
+				</button>
+				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{displayContent}</code>
 			</pre>
 		</div>
 	);

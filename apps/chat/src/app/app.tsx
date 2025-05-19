@@ -1,5 +1,5 @@
 import { MezonStoreProvider, initStore, selectIsLogin, setIsElectronDownloading, setIsElectronUpdateAvailable } from '@mezon/store';
-import { CreateMezonClientOptions, MezonContextProvider, clearSessionFromStorage, useMezon } from '@mezon/transport';
+import { MezonContextProvider, clearSessionFromStorage, getMezonConfig, useMezon } from '@mezon/transport';
 
 import { PermissionProvider, useActivities, useSettingFooter } from '@mezon/core';
 import { captureSentryError } from '@mezon/logger';
@@ -12,30 +12,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
-
-export const getMezonConfig = (): CreateMezonClientOptions => {
-	try {
-		const storedConfig = localStorage.getItem('mezon_session');
-
-		if (storedConfig) {
-			const parsedConfig = JSON.parse(storedConfig);
-			if (parsedConfig.host) {
-				parsedConfig.port = parsedConfig.port || (process.env.NX_CHAT_APP_API_PORT as string);
-				parsedConfig.key = process.env.NX_CHAT_APP_API_KEY as string;
-				return parsedConfig;
-			}
-		}
-	} catch (error) {
-		console.error('Failed to get Mezon config from localStorage:', error);
-	}
-
-	return {
-		host: process.env.NX_CHAT_APP_API_GW_HOST as string,
-		port: process.env.NX_CHAT_APP_API_GW_PORT as string,
-		key: process.env.NX_CHAT_APP_API_KEY as string,
-		ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
-	};
-};
 
 const mezon = getMezonConfig();
 
