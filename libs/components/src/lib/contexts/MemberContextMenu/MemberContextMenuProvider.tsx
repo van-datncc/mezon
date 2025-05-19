@@ -52,7 +52,7 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 		show({ event });
 	};
 
-	const isPrivateThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel.channel_private;
+	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 
 	const isCreator = userProfile?.user?.id === currentChannel?.creator_id;
 
@@ -62,7 +62,8 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 
 	const shouldShowKickOption = !isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
 
-	const shouldShowRemoveFromThreadOption = !isSelf && (isCreator || hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
+	const shouldShowRemoveFromThreadOption =
+		!isSelf && isThread && (isCreator || hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner));
 
 	const friendStatus = useAppSelector(selectFriendStatus(currentUser?.user?.id || ''));
 
@@ -132,7 +133,7 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 				});
 			}
 		},
-		[dispatch, currentClan?.clan_id, currentChannelId, isPrivateThread]
+		[dispatch, currentClan?.clan_id, currentChannelId, isThread]
 	);
 
 	const createDefaultHandlers = (user?: ChannelMembersEntity): MemberContextMenuHandlers => {
