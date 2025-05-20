@@ -1,6 +1,6 @@
 import { MediaStream, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription, mediaDevices } from '@livekit/react-native-webrtc';
 import { useAuth, useChatSending } from '@mezon/core';
-import { ActionEmitEvent, sessionConstraints } from '@mezon/mobile-components';
+import { sessionConstraints } from '@mezon/mobile-components';
 import { DMCallActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store';
 import { RootState, audioCallActions } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
@@ -9,14 +9,14 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { BackHandler, Platform } from 'react-native';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import NotificationPreferences from '../utils/NotificationPreferences';
 import { usePermission } from './useRequestPermission';
-const { SharedPreferences } = NativeModules;
 
 const RTCConfig = {
 	iceServers: [
@@ -108,7 +108,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 	useEffect(() => {
 		if (Platform.OS === 'android') {
-			SharedPreferences.removeItem('notificationDataCalling');
+			NotificationPreferences.clearValue('notificationDataCalling');
 		}
 		return () => {
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
@@ -365,7 +365,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 
 	// Handle incoming signaling messages
 	const handleSignalingMessage = async (signalingData: any) => {
-		console.log('log  => signalingData.data_type handleSignalingMessage', signalingData.data_type);
 		try {
 			switch (signalingData.data_type) {
 				case WebrtcSignalingType.WEBRTC_SDP_OFFER: {
@@ -410,7 +409,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			}
 			dispatch(DMCallActions.removeAll());
 			dispatch(audioCallActions.setUserCallId(''));
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_SET_STATUS_IN_CALL, { status: false });
+			dispatch(DMCallActions.setIsInCall(false));
 			if (timeStartConnected?.current) {
 				let timeCall = '';
 				const startTime = new Date(timeStartConnected.current);

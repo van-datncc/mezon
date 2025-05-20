@@ -121,7 +121,9 @@ const MessageItem = React.memo(
 			const userIdMention = userId;
 			const includesUser = message?.mentions?.some((mention) => mention?.user_id === userIdMention);
 			const includesRole = message?.mentions?.some((item) => currentClanUser?.role_id?.includes(item?.role_id as string));
-			return includesUser || includesRole;
+			const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
+
+			return includesUser || includesRole || checkReplied;
 		})();
 
 		const isSameUser = message?.user?.id === previousMessage?.user?.id;
