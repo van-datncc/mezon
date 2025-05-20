@@ -428,7 +428,7 @@ function MessageContextMenu({
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
-		return !checkMessageInPinnedList && !isTopic;
+		return !checkMessageInPinnedList;
 	}, [checkMessageInPinnedList, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
@@ -589,10 +589,10 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(pinMessageStatus === true, (builder) => {
+		builder.when(!isTopic && pinMessageStatus === true, (builder) => {
 			builder.addMenuItem('pinMessage', 'Pin Message', openPinMessageModal, <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
-		builder.when(pinMessageStatus === false, (builder) => {
+		builder.when(!isTopic && pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 

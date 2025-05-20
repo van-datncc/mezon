@@ -6,10 +6,12 @@ import {
 	pinMessageActions,
 	RootState,
 	selectClanView,
+	selectClickedOnThreadBoxStatus,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectCurrentTopicId,
 	selectMessageByMessageId,
+	selectThreadCurrentChannel,
 	useAppDispatch
 } from '@mezon/store';
 import { SHOW_POSITION } from '@mezon/utils';
@@ -85,8 +87,17 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 const getMessage = (appState: RootState, isTopic: boolean, messageId: string) => {
 	const isClanView = selectClanView(appState);
 	const { currentChannel, currentDm } = getCurrentChannelAndDm(appState);
+	const isFocusThreadBox = selectClickedOnThreadBoxStatus(appState);
+	const currentThread = selectThreadCurrentChannel(appState);
+
+	const channelId = isFocusThreadBox ? currentThread?.channel_id : currentChannel?.id;
+
 	const currentTopicId = selectCurrentTopicId(appState);
-	const message = selectMessageByMessageId(appState, isTopic ? currentTopicId : isClanView ? currentChannel?.id : currentDm?.id, messageId);
+	const message = selectMessageByMessageId(
+		appState,
+		isTopic ? currentTopicId : isFocusThreadBox ? channelId : isClanView ? currentChannel?.id : currentDm?.id,
+		messageId
+	);
 
 	return message;
 };
