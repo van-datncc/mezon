@@ -47,12 +47,12 @@ const App = (props) => {
 	useEffect(() => {
 		const logAppStarted = async () => {
 			try {
-				analytics().logEvent('app_started', {
-					platform: Platform.OS,
-					timestamp: Date.now()
+				await analytics().setAnalyticsCollectionEnabled(true);
+				await analytics().logEvent('app_started', {
+					platform: Platform.OS
 				});
 			} catch (error) {
-				console.error('Failed to log app started event:', error);
+				console.error('Failed to log app started event:');
 			}
 		};
 		logAppStarted();

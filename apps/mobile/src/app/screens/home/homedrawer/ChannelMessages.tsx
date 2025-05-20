@@ -97,8 +97,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 	useEffect(() => {
 		let timeout;
-		let retryCount = 0;
-		const maxRetries = 3;
 
 		const checkMessageExistence = () => {
 			const store = getStore();
@@ -111,34 +109,21 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 						index: indexToJump,
 						viewPosition: 0.5
 					});
-					clearTimeout(timeout);
-					setTimeout(() => {
+					timeout = setTimeout(() => {
 						dispatch(messagesActions.setIdMessageToJump(null));
 					}, 3000);
 				}
-			} else if (retryCount < maxRetries) {
-				retryCount++;
-				timeout = setTimeout(checkMessageExistence, 1000);
 			}
 		};
 
 		if (idMessageToJump?.id && !isLoadingJumpMessage) {
-			timeout = setTimeout(checkMessageExistence, 0);
+			checkMessageExistence();
 		}
 
 		return () => {
 			timeout && clearTimeout(timeout);
 		};
 	}, [channelId, dispatch, idMessageToJump?.id, isLoadingJumpMessage, messages]);
-
-	const scrollChannelMessageToIndex = useCallback(
-		(index: number) => {
-			if (flatListRef.current && index > 0 && messages?.length - 1 >= index) {
-				flatListRef?.current?.scrollToIndex?.({ animated: true, index: index });
-			}
-		},
-		[messages?.length]
-	);
 
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
@@ -154,8 +139,8 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				if (!hasMoreTop) return;
 			}
 			isLoadMore.current[direction] = true;
+			dispatch(messagesActions.setIdMessageToJump(null));
 			if (direction === ELoadMoreDirection.bottom) {
-				scrollChannelMessageToIndex(LIMIT_MESSAGE + Math.floor(LIMIT_MESSAGE / 1.2));
 				await dispatch(
 					messagesActions.loadMoreMessage({
 						clanId,
@@ -180,13 +165,9 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 			);
 			isLoadMore.current[direction] = false;
 			setTriggerRender(uuid.v4());
-			// if (messages?.length >= LIMIT_MESSAGE * 4) {
-			// 	scrollChannelMessageToIndex(LIMIT_MESSAGE * 3);
-			// }
-
 			return true;
 		},
-		[dispatch, clanId, topicChannelId, channelId, topicId, scrollChannelMessageToIndex]
+		[dispatch, clanId, topicChannelId, channelId, topicId]
 	);
 
 	const renderItem = useCallback(
