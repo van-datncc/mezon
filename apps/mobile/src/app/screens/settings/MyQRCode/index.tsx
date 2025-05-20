@@ -1,7 +1,6 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount } from '@mezon/store-mobile';
 import { createImgproxyUrl, formatMoney } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
@@ -22,7 +21,7 @@ export const MyQRCode = () => {
 	const isTabletLandscape = useTabletLandscape();
 
 	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
+		return userProfile?.wallet || 0;
 	}, [userProfile?.wallet]);
 
 	const genQRCode = useCallback(async () => {

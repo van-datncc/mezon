@@ -1,16 +1,18 @@
-import { useAuth, useFriends, useMemberStatus } from '@mezon/core';
+import { useFriends, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	FriendsEntity,
+	accountActions,
 	channelMembersActions,
 	selectAccountCustomStatus,
+	selectAllAccount,
 	selectCurrentClanId,
 	selectUserStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,19 +38,25 @@ export enum ETypeCustomUserStatus {
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const isTabletLandscape = useTabletLandscape();
-	const user = useAuth();
+	const userProfile = useSelector(selectAllAccount);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue, isTabletLandscape);
 	const { friends: allUser } = useFriends();
-	const { color } = useMixImageColor(user?.userProfile?.user?.avatar_url);
+	const { color } = useMixImageColor(userProfile?.user?.avatar_url);
 	const { t } = useTranslation('profile');
 	const { t: tUser } = useTranslation('customUserStatus');
 	const [isVisibleAddStatusUserModal, setIsVisibleAddStatusUserModal] = useState<boolean>(false);
 	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
-	const memberStatus = useMemberStatus(user?.userId || '');
+	const memberStatus = useMemberStatus(userProfile?.user?.id || '');
 	const userStatus = useSelector(selectUserStatus);
+
+	useFocusEffect(
+		React.useCallback(() => {
+			dispatch(accountActions.getUserProfile({ noCache: true }));
+		}, [dispatch])
+	);
 
 	const userStatusIcon = useMemo(() => {
 		const mobileIconSize = isTabletLandscape ? size.s_20 : size.s_18;
@@ -78,8 +86,8 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	}, [isTabletLandscape, memberStatus, userStatus]);
 
 	const tokenInWallet = useMemo(() => {
-		return user?.userProfile?.wallet ? safeJSONParse(user?.userProfile?.wallet || '{}')?.value : 0;
-	}, [user?.userProfile?.wallet]);
+		return userProfile?.wallet || 0;
+	}, [userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
@@ -108,8 +116,8 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	}, [friendList]);
 
 	const memberSince = useMemo(() => {
-		return moment(user?.userProfile?.user?.create_time).format('MMM DD, YYYY');
-	}, [user]);
+		return moment(userProfile?.user?.create_time).format('MMM DD, YYYY');
+	}, [userProfile?.user?.create_time]);
 
 	const handlePressSetCustomStatus = () => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
@@ -165,18 +173,18 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				</View>
 
 				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
-					{user?.userProfile?.user?.avatar_url ? (
+					{userProfile?.user?.avatar_url ? (
 						isTabletLandscape ? (
 							<Image
 								source={{
-									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
 								}}
 								style={styles.imgWrapper}
 							/>
 						) : (
 							<FastImage
 								source={{
-									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
 								}}
 								style={styles.imgWrapper}
 							/>
@@ -193,7 +201,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 								justifyContent: 'center'
 							}}
 						>
-							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
+							<Text style={styles.textAvatar}>{userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
 						</View>
 					)}
 
@@ -231,10 +239,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 			<ScrollView style={styles.contentWrapper}>
 				<View style={styles.contentContainer}>
 					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
-						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
+						<Text style={styles.textName}>{userProfile?.user?.display_name}</Text>
 						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
-					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
+					<Text style={styles.text}>{userProfile?.user?.username}</Text>
 					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}>
 						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
 						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
@@ -276,10 +284,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<View style={styles.contentContainer}>
 					<View style={{ gap: size.s_20 }}>
-						{user?.userProfile?.user?.about_me ? (
+						{userProfile?.user?.about_me ? (
 							<View>
 								<Text style={styles.textTitle}>{t('aboutMe')}</Text>
-								<Text style={styles.text}>{user?.userProfile?.user?.about_me}</Text>
+								<Text style={styles.text}>{userProfile?.user?.about_me}</Text>
 							</View>
 						) : null}
 
