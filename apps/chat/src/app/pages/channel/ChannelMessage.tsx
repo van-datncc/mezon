@@ -168,7 +168,8 @@ export const MemorizedChannelMessage = memo(
 		prev.message?.code === curr.message?.code &&
 		prev.message?.references?.[0]?.content === curr.message?.references?.[0]?.content &&
 		prev.avatarDM === curr.avatarDM &&
-		prev.channelLabel === curr.channelLabel
+		prev.channelLabel === curr.channelLabel &&
+		prev.isHighlight === curr.isHighlight
 );
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

@@ -1,5 +1,6 @@
 import { ChannelsEntity, selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js/api.gen';
@@ -193,7 +194,12 @@ const SystemMessagesManagement = ({
 				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'}
 			>
 				{channelsList
-					.filter((channel) => channel.clan_id === currentClanId && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL)
+					.filter(
+						(channel) =>
+							channel.clan_id === currentClanId &&
+							channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
+							channel.channel_private !== ChannelStatusEnum.isPrivate
+					)
 					.map((channel) =>
 						channel.channel_id !== selectedChannel?.channel_id ? (
 							<Dropdown.Item

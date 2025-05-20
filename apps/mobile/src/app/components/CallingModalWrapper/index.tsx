@@ -18,7 +18,7 @@ const CallingModalWrapper = () => {
 
 	const handleAppStateChangeListener = useCallback(
 		(nextAppState: typeof AppState.currentState) => {
-			if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+			if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active' && Platform.OS === 'android') {
 				const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 				if (latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
 					getDataCall();
