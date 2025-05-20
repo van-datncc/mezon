@@ -1,4 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
+import { generateBasePath } from '@mezon/transport';
 import { IChannelMember, IVoice, IvoiceInfo, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
@@ -91,7 +92,7 @@ export const generateMeetTokenExternal = createAsyncThunk(
 	async ({ token, displayName, isGuest }: { token: string; displayName?: string; isGuest?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureClientAsync(getMezonCtx(thunkAPI));
-			const response = await mezon.client.generateMeetTokenExternal(token, displayName, isGuest);
+			const response = await mezon.client.generateMeetTokenExternal(generateBasePath(), token, displayName, isGuest);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'meet/generateMeetTokenExternal');
