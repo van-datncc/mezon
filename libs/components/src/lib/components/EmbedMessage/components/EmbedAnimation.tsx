@@ -84,7 +84,8 @@ export const EmbedAnimation = ({
           .box_animation_${index}_${messageId} {
             background-image: url(${url_image});
             background-repeat : no-repeat;
-            background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y}px;
+            background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidthBig}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidthBig}px;
+            background-size: ${jsonPosition.meta.size.w * ratioWidthBig}px ${jsonPosition.meta.size.h * ratioWidthBig}px;
             }
               @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
               .box_resize_${index}_${messageId}{
