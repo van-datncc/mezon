@@ -98,9 +98,20 @@ const ClanSettingOverview = () => {
 
 	const updateSystemMessages = async () => {
 		if (systemMessage && Object.keys(systemMessage).length > 0 && currentClan?.clan_id && updateSystemMessageRequest) {
+			const cachedMessageUpdate: ApiSystemMessage = {
+				boost_message: updateSystemMessageRequest.boost_message || systemMessage.boost_message,
+				channel_id: systemMessage.channel_id,
+				clan_id: systemMessage.clan_id,
+				id: systemMessage.id,
+				hide_audit_log: updateSystemMessageRequest.hide_audit_log || systemMessage.hide_audit_log,
+				setup_tips: updateSystemMessageRequest.setup_tips || systemMessage.setup_tips,
+				welcome_random: updateSystemMessageRequest.welcome_random || systemMessage.welcome_random,
+				welcome_sticker: updateSystemMessageRequest.welcome_sticker || systemMessage.welcome_sticker
+			};
 			const request = {
 				clanId: currentClan.clan_id,
-				newMessage: updateSystemMessageRequest
+				newMessage: updateSystemMessageRequest,
+				cachedMessage: cachedMessageUpdate
 			};
 			await dispatch(updateSystemMessage(request));
 		} else if (createSystemMessageRequest) {

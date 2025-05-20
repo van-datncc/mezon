@@ -73,15 +73,18 @@ export const createSystemMessage = createAsyncThunk('systemMessages/createSystem
 export interface IUpdateSystemMessage {
 	clanId: string;
 	newMessage: MezonUpdateSystemMessageBody;
+	cachedMessage?: ApiSystemMessage;
 }
 export const updateSystemMessage = createAsyncThunk(
 	'systemMessages/updateSystemMessage',
-	async ({ clanId, newMessage }: IUpdateSystemMessage, thunkAPI) => {
+	async ({ clanId, newMessage, cachedMessage }: IUpdateSystemMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, newMessage);
 			if (response) {
-				thunkAPI.dispatch(fetchSystemMessageByClanId({ clanId }));
+				fetchSystemMesssageByClanCached.delete(mezon, clanId);
+				await fetchSystemMesssageByClanCached(mezon, clanId, cachedMessage);
+				return cachedMessage;
 			}
 			return response;
 		} catch (error) {
