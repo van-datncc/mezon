@@ -3,11 +3,13 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		itemDetail: {
+			gap: size.s_10
+		},
 		name: {
 			color: colors.white,
 			fontWeight: 'bold',
-			fontSize: size.medium,
-			marginTop: size.s_10
+			fontSize: size.medium
 		},
 		value: {
 			color: colors.text,
@@ -16,6 +18,7 @@ export const style = (colors: Attributes) =>
 			width: '80%'
 		},
 		option: {
+			marginTop: size.s_10,
 			justifyContent: 'space-between',
 			flexDirection: 'row',
 			alignItems: 'center'

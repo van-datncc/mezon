@@ -16,7 +16,7 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId }));
 	dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
-	dispatch(fetchSystemMessageByClanId(clanId));
+	dispatch(fetchSystemMessageByClanId({ clanId }));
 	dispatch(appActions.setIsShowCanvas(false));
 	dispatch(topicsActions.setIsShowCreateTopic(false));
 	dispatch(topicsActions.setCurrentTopicId(''));

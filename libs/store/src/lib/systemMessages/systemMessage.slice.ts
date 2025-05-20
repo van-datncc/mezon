@@ -1,8 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
-import { IPSystemMessage, LoadingStatus } from '@mezon/utils';
+import { FOR_15_MINUTES, IPSystemMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiSystemMessage, ApiSystemMessageRequest, ApiSystemMessagesList, MezonUpdateSystemMessageBody } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const SYSTEM_MESSAGE_FEATURE_KEY = 'systemMessages';
 
@@ -28,17 +29,40 @@ export const initialSystemMessageState: SystemMessageState = systemMessageAdapte
 	currentClanSystemMessage: {}
 });
 
+export const fetchSystemMesssageByClanCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, clanId: string, defaultResponse?: ApiSystemMessage) => {
+		if (defaultResponse) {
+			return defaultResponse;
+		}
+		const response: ApiSystemMessage = await mezon.client.getSystemMessageByClanId(mezon.session, clanId);
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: FOR_15_MINUTES,
+		normalizer: (args) => {
+			return args[0]?.session?.username || '' + args[1];
+		}
+	}
+);
+
 export const fetchSystemMessages = createAsyncThunk('systemMessages/fetchSystemMessages', async (_, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
 	const response: ApiSystemMessagesList = await mezon.client.getSystemMessagesList(mezon.session);
 	return response.system_messages_list;
 });
 
-export const fetchSystemMessageByClanId = createAsyncThunk('systemMessages/fetchSystemMessageByClanId', async (clanId: string, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response: ApiSystemMessage = await mezon.client.getSystemMessageByClanId(mezon.session, clanId);
-	return response;
-});
+export const fetchSystemMessageByClanId = createAsyncThunk(
+	'systemMessages/fetchSystemMessageByClanId',
+	async ({ clanId, noCache = false }: { clanId: string; noCache?: boolean }, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (noCache) {
+			fetchSystemMesssageByClanCached.delete(mezon, clanId);
+		}
+		const response: ApiSystemMessage = await fetchSystemMesssageByClanCached(mezon, clanId);
+		return response;
+	}
+);
 
 export const createSystemMessage = createAsyncThunk('systemMessages/createSystemMessage', async (newMessage: ApiSystemMessageRequest, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -49,15 +73,18 @@ export const createSystemMessage = createAsyncThunk('systemMessages/createSystem
 export interface IUpdateSystemMessage {
 	clanId: string;
 	newMessage: MezonUpdateSystemMessageBody;
+	cachedMessage?: ApiSystemMessage;
 }
 export const updateSystemMessage = createAsyncThunk(
 	'systemMessages/updateSystemMessage',
-	async ({ clanId, newMessage }: IUpdateSystemMessage, thunkAPI) => {
+	async ({ clanId, newMessage, cachedMessage }: IUpdateSystemMessage, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response: ApiSystemMessage = await mezon.client.updateSystemMessage(mezon.session, clanId, newMessage);
 			if (response) {
-				thunkAPI.dispatch(fetchSystemMessageByClanId(clanId));
+				fetchSystemMesssageByClanCached.delete(mezon, clanId);
+				await fetchSystemMesssageByClanCached(mezon, clanId, cachedMessage);
+				return cachedMessage;
 			}
 			return response;
 		} catch (error) {
