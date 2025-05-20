@@ -99,7 +99,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			<MemberProfile
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
 				name={directMessage?.channel_label ?? ''}
-				usernameAva={directMessage?.channel_label ?? ''}
+				usernameAva={directMessage?.channel_label ?? 'Deleted Account'}
 				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
 				isHideStatus={true}
 				isHideIconStatus={false}

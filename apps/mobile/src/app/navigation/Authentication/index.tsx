@@ -180,7 +180,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.HOME_DEFAULT}
 						component={isTabletLandscape ? HomeScreenTablet : HomeDefaultWrapper}
 						options={{
-							animationEnabled: true,
+							animationEnabled: Platform.OS === 'ios',
 							headerShown: false,
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
@@ -192,7 +192,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
 						component={DirectMessageDetailScreen}
 						options={{
-							animationEnabled: true,
+							animationEnabled: Platform.OS === 'ios',
 							headerShown: false,
 							headerShadowVisible: false,
 							gestureEnabled: true,
@@ -202,7 +202,13 @@ export const Authentication = memo(() => {
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />
-					<RootStack.Screen name={APP_SCREEN.MESSAGES.STACK} children={(props) => <MessagesStacks {...props} />} />
+					<RootStack.Screen
+						name={APP_SCREEN.MESSAGES.STACK}
+						children={(props) => <MessagesStacks {...props} />}
+						options={{
+							animationEnabled: Platform.OS === 'ios'
+						}}
+					/>
 					<RootStack.Screen name={APP_SCREEN.NOTIFICATION.STACK} children={(props) => <NotificationStacks {...props} />} />
 					<RootStack.Screen name={APP_SCREEN.MENU_CHANNEL.STACK} children={(props) => <MenuChannelStacks {...props} />} />
 
@@ -212,7 +218,13 @@ export const Authentication = memo(() => {
 
 					<RootStack.Screen name={APP_SCREEN.SETTINGS.STACK} children={(props) => <SettingStacks {...props} />} />
 
-					<RootStack.Screen name={APP_SCREEN.FRIENDS.STACK} children={(props) => <FriendStacks {...props} />} />
+					<RootStack.Screen
+						name={APP_SCREEN.FRIENDS.STACK}
+						children={(props) => <FriendStacks {...props} />}
+						options={{
+							animationEnabled: Platform.OS === 'ios'
+						}}
+					/>
 
 					<RootStack.Screen
 						name={APP_SCREEN.VIDEO_DETAIL}

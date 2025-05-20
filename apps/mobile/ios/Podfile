@@ -54,6 +54,7 @@ target 'Mobile' do
   config = use_native_modules!
 
   pod 'FirebaseCore', :modular_headers => true
+  pod 'Firebase/Analytics', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
   pod 'SDWebImage', :modular_headers => true
   pod 'RNFS', :path => '../node_modules/react-native-fs'

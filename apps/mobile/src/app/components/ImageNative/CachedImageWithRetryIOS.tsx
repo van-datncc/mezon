@@ -43,7 +43,7 @@ const CachedImageWithRetryIOS = memo(
 			timeoutRef.current = setTimeout(() => {
 				setRetriesLeft((prevRetries) => prevRetries - 1);
 				setKey(Date.now());
-			}, 2000);
+			}, 500);
 		};
 
 		const handleExhaustedRetries = () => {

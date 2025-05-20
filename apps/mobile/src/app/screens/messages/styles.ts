@@ -216,5 +216,5 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			flexWrap: 'nowrap',
 			overflow: 'hidden'
 		},
-		textQuantityPending: { fontSize: size.s_12, color: colors.white }
+		textQuantityPending: { fontSize: size.s_12, color: 'white' }
 	});

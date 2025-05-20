@@ -11,6 +11,8 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.mezon.mobile.CustomClientFactory;
 import com.zoontek.rnbootsplash.RNBootSplash;
+import android.app.NotificationManager
+import android.content.Context
 
 class MainActivity : ReactActivity() {
 
@@ -37,8 +39,12 @@ class MainActivity : ReactActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent);
     setIntent(intent);
+    if (intent?.action == "ANSWER_CALL_ACTION") {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(1001)
+    }
   }
-  
+
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
