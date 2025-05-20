@@ -22,6 +22,7 @@ import com.mezon.mobile.DeviceUtilsPackage;
 import com.mezon.mobile.BluetoothPackage;
 import com.mezon.mobile.NavigationBarPackage;
 import com.mezon.mobile.NotificationPreferencesPackage;
+import io.invertase.firebase.analytics.ReactNativeFirebaseAnalyticsPackage;
 
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 
@@ -41,6 +42,7 @@ class MainApplication : Application(), ReactApplication {
               add(BluetoothPackage())
               add(NavigationBarPackage())
               add(NotificationPreferencesPackage())
+              add(ReactNativeFirebaseAnalyticsPackage())
             }
 
         override fun getJSMainModuleName(): String = "src/main"
