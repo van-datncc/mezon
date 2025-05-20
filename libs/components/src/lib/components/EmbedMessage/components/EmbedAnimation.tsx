@@ -55,6 +55,7 @@ export const EmbedAnimation = ({
             animation: animation_embed_${index}_${messageId} ${duration}s steps(1) forwards;
             animation-iteration-count: ${repeat ? repeat : 'infinite'};
             background-repeat : no-repeat;
+            background-size: ${jsonPosition.meta.size.w * ratioWidthBig}px ${jsonPosition.meta.size.h * ratioWidthBig}px;
             }
 
             @keyframes animation_embed_${index}_${messageId} {
@@ -69,7 +70,7 @@ export const EmbedAnimation = ({
               .box_resize_${index}_${messageId}{
                 width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidthSmall}px !important;
                 height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidthSmall}px !important;
-                background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+                background-size: ${jsonPosition.meta.size.w * ratioWidthSmall}px ${jsonPosition.meta.size.h * ratioWidthSmall}px;
                 }
                 .box_animation_${index}_${messageId}{
                 animation: animation_embed_${index}_${messageId}_small ${duration}s steps(1) forwards;
