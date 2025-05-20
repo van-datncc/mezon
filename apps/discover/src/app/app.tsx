@@ -1,10 +1,17 @@
-import { MezonStoreProvider, initStore } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import HeaderMezon from './components/HeaderMezon';
-import ClanDetailPage from './pages/ClanDetailPage';
-import DiscoverPage from './pages/DiscoverPage';
+import { DiscoverProvider } from './context/DiscoverContext';
+
+const DiscoverPage = lazy(() => import('./pages/DiscoverPage'));
+const ClanDetailPage = lazy(() => import('./pages/ClanDetailPage'));
+
+const LoadingSpinner = () => (
+	<div className="flex items-center justify-center min-h-screen">
+		<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5865f2]"></div>
+	</div>
+);
 
 /**
  */
@@ -20,11 +27,13 @@ function AppWithStore() {
 			<HeaderMezon sideBarIsOpen={sideBarIsOpen} toggleSideBar={toggleSideBar} />
 
 			<div className="pt-[80px]">
-				<Routes>
-					<Route path="/" element={<Navigate to="/clans" replace />} />
-					<Route path="/clans" element={<DiscoverPage />} />
-					<Route path="/clan/:id" element={<ClanDetailPage />} />
-				</Routes>
+				<Suspense fallback={<LoadingSpinner />}>
+					<Routes>
+						<Route path="/" element={<Navigate to="/clans" replace />} />
+						<Route path="/clans" element={<DiscoverPage />} />
+						<Route path="/clan/:id" element={<ClanDetailPage />} />
+					</Routes>
+				</Suspense>
 			</div>
 		</div>
 	);
@@ -37,11 +46,9 @@ export default function App() {
 		return <div className="loading">Loading...</div>;
 	}
 
-	const { store, persistor } = initStore(mezon);
-
 	return (
-		<MezonStoreProvider store={store} persistor={persistor} loading={false}>
+		<DiscoverProvider>
 			<AppWithStore />
-		</MezonStoreProvider>
+		</DiscoverProvider>
 	);
 }

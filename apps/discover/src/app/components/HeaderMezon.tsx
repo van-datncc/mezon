@@ -1,7 +1,5 @@
-import { selectIsLogin } from '@mezon/store';
 import { throttle } from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { BREAKPOINTS, COLORS, NAVIGATION_LINKS, Z_INDEX } from '../constants/constants';
 
@@ -11,7 +9,6 @@ interface HeaderProps {
 }
 
 const HeaderMezon = memo((props: HeaderProps) => {
-	const isLogin = useSelector(selectIsLogin) ?? false;
 	const { sideBarIsOpen, toggleSideBar } = props;
 	const refHeader = useRef<HTMLDivElement>(null);
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -79,7 +76,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								className={`hidden ${BREAKPOINTS.MOBILE}:block px-[16px] py-[10px] bg-[${COLORS.PRIMARY}] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[${COLORS.PRIMARY_HOVER}] focus:bg-[#281FB5] whitespace-nowrap`}
 								to={'/mezon'}
 							>
-								{isLogin ? 'Open Mezon' : 'Login'}
+								Login
 							</Link>
 
 							<button
@@ -115,7 +112,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 									to={'/mezon'}
 									className={`bg-[${COLORS.PRIMARY}] hover:bg-[${COLORS.PRIMARY_HOVER}] text-white px-4 py-2 rounded-full font-medium text-center`}
 								>
-									{isLogin ? 'Open Mezon' : 'Login'}
+									Login
 								</Link>
 							</nav>
 						</div>

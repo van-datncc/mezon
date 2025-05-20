@@ -1,111 +1,30 @@
-import {
-	AppDispatch,
-	clansActions,
-	fetchClansDiscover,
-	selectClansCurrentPage,
-	selectClansTotalPages,
-	selectDiscoverClans,
-	selectDiscoverError,
-	selectDiscoverLoadingStatus
-} from '@mezon/store';
-import { ApiClanDiscover } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import Banner from '../components/Banner';
 import Categories from '../components/Categories';
 import ClanList from '../components/ClanList';
 import Footer from '../components/Footer';
 import { COLORS, PAGINATION } from '../constants/constants';
+import { useDiscover } from '../context/DiscoverContext';
+import { usePagination } from '../hooks/usePagination';
 
 export default function DiscoverPage() {
-	const dispatch = useDispatch<AppDispatch>();
-	const discoverClans = useSelector(selectDiscoverClans) || [];
-	const loadingStatus = useSelector(selectDiscoverLoadingStatus);
-	const error = useSelector(selectDiscoverError);
-	const currentPage = useSelector(selectClansCurrentPage) || 1;
-	const totalPages = useSelector(selectClansTotalPages) || 1;
+	const { clans, loading, error, currentPage, totalPages, searchTerm, selectedCategory, handleSearch, handleCategorySelect, handlePageChange } =
+		useDiscover();
 
-	const [searchTerm, setSearchTerm] = useState('');
-	const [selectedCategory, setSelectedCategory] = useState('all');
-	const itemsPerPage = PAGINATION.ITEMS_PER_PAGE;
+	const { pageNumbers, isFirstPage, isLastPage } = usePagination({
+		currentPage,
+		totalPages,
+		maxPageNumbers: PAGINATION.MAX_PAGE_NUMBERS
+	});
 
-	useEffect(() => {
-		dispatch(
-			fetchClansDiscover({
-				page: currentPage,
-				itemPerPage: itemsPerPage
-			})
-		)
-			.unwrap()
-			.catch(() => {
-				toast.error('can not fetch clans, please try again later');
-			});
-	}, [dispatch, itemsPerPage, currentPage]);
-
-	const filteredClans = discoverClans.filter((clan: ApiClanDiscover) => {
+	const filteredClans = clans.filter((clan) => {
 		if (!clan) return false;
-
 		const clanName = clan.clan_name || '';
 		return clanName.toLowerCase().includes(searchTerm.toLowerCase());
 	});
 
-	const currentClans = filteredClans;
-
-	const handleSearch = (term: string) => {
-		setSearchTerm(term);
-	};
-
-	const handleCategorySelect = (categoryId: string) => {
-		setSelectedCategory(categoryId);
-
-		toast.info('Category filtering will be implemented soon!');
-	};
-
-	const getPageNumbers = () => {
-		const pageNumbers = [];
-		const maxPageNumbers = PAGINATION.MAX_PAGE_NUMBERS;
-
-		if (totalPages <= maxPageNumbers) {
-			for (let i = 1; i <= totalPages; i++) {
-				pageNumbers.push(i);
-			}
-		} else {
-			if (currentPage <= 3) {
-				for (let i = 1; i <= 4; i++) {
-					pageNumbers.push(i);
-				}
-				pageNumbers.push('ellipsis');
-				pageNumbers.push(totalPages);
-			} else if (currentPage >= totalPages - 2) {
-				pageNumbers.push(1);
-				pageNumbers.push('ellipsis');
-				for (let i = totalPages - 3; i <= totalPages; i++) {
-					pageNumbers.push(i);
-				}
-			} else {
-				pageNumbers.push(1);
-				pageNumbers.push('ellipsis');
-				pageNumbers.push(currentPage - 1);
-				pageNumbers.push(currentPage);
-				pageNumbers.push(currentPage + 1);
-				pageNumbers.push('ellipsis');
-				pageNumbers.push(totalPages);
-			}
-		}
-
-		return pageNumbers;
-	};
-
 	const formatNumber = (num: number) => {
 		return num.toLocaleString('en-US');
-	};
-
-	const handlePageChange = (pageNumber: number) => {
-		if (pageNumber !== currentPage && pageNumber >= 1 && pageNumber <= totalPages) {
-			dispatch(clansActions.setCurrentPage(pageNumber));
-			window.scrollTo({ top: 0, behavior: 'smooth' });
-		}
 	};
 
 	return (
@@ -127,14 +46,14 @@ export default function DiscoverPage() {
 								</h2>
 							</div>
 
-							{loadingStatus === 'loading' ? (
+							{loading ? (
 								<>
 									<div className="text-center mb-6">
 										<p className="text-gray-600">Loading clan list...</p>
 									</div>
 									<ClanList loading={true} clans={[]} />
 								</>
-							) : loadingStatus === 'error' ? (
+							) : error ? (
 								<div className="text-center py-12">
 									<div className="mb-4 text-gray-400">
 										<svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -146,23 +65,16 @@ export default function DiscoverPage() {
 										</svg>
 									</div>
 									<h3 className="text-xl font-semibold mb-2">Error loading clan list</h3>
-									<p className="text-gray-600">{error || 'Đã xảy ra lỗi khi tải danh sách clan. Vui lòng thử lại sau.'}</p>
+									<p className="text-gray-600">{error}</p>
 									<button
 										className={`mt-4 bg-[${COLORS.PRIMARY}] text-white px-4 py-2 rounded-md`}
-										onClick={() => {
-											dispatch(
-												fetchClansDiscover({
-													page: 1,
-													itemPerPage: itemsPerPage
-												})
-											);
-										}}
+										onClick={() => handlePageChange(1)}
 									>
 										Refresh
 									</button>
 								</div>
 							) : filteredClans.length > 0 ? (
-								<ClanList clans={currentClans} />
+								<ClanList clans={filteredClans} />
 							) : (
 								<div className="text-center py-12">
 									<div className="mb-4 text-gray-400">
@@ -174,7 +86,7 @@ export default function DiscoverPage() {
 											></path>
 										</svg>
 									</div>
-									<h3 className="text-xl font-semibold mb-2"> No matching results</h3>
+									<h3 className="text-xl font-semibold mb-2">No matching results</h3>
 									<p className="text-gray-600">Please try searching with different keywords</p>
 								</div>
 							)}
@@ -184,28 +96,28 @@ export default function DiscoverPage() {
 									<div className="flex flex-wrap items-center justify-center gap-2">
 										<button
 											className={`px-2 sm:px-3 py-1 rounded text-sm ${
-												currentPage === 1
+												isFirstPage
 													? 'bg-gray-100 text-gray-400 cursor-not-allowed'
 													: 'bg-gray-200 hover:bg-gray-300 text-gray-700'
 											}`}
 											onClick={() => handlePageChange(1)}
-											disabled={currentPage === 1}
+											disabled={isFirstPage}
 										>
 											First
 										</button>
 										<button
 											className={`px-2 sm:px-3 py-1 rounded text-sm ${
-												currentPage === 1
+												isFirstPage
 													? 'bg-gray-100 text-gray-400 cursor-not-allowed'
 													: 'bg-gray-200 hover:bg-gray-300 text-gray-700'
 											}`}
 											onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-											disabled={currentPage === 1}
+											disabled={isFirstPage}
 										>
 											Prev
 										</button>
 
-										{getPageNumbers().map((pageNumber, index) =>
+										{pageNumbers.map((pageNumber, index) =>
 											pageNumber === 'ellipsis' ? (
 												<span key={`ellipsis-${index}`} className="px-2 sm:px-3 py-1 text-sm">
 													...
@@ -227,23 +139,23 @@ export default function DiscoverPage() {
 
 										<button
 											className={`px-2 sm:px-3 py-1 rounded text-sm ${
-												currentPage === totalPages
+												isLastPage
 													? 'bg-gray-100 text-gray-400 cursor-not-allowed'
 													: 'bg-gray-200 hover:bg-gray-300 text-gray-700'
 											}`}
 											onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-											disabled={currentPage === totalPages}
+											disabled={isLastPage}
 										>
 											Next
 										</button>
 										<button
 											className={`px-2 sm:px-3 py-1 rounded text-sm ${
-												currentPage === totalPages
+												isLastPage
 													? 'bg-gray-100 text-gray-400 cursor-not-allowed'
 													: 'bg-gray-200 hover:bg-gray-300 text-gray-700'
 											}`}
 											onClick={() => handlePageChange(totalPages)}
-											disabled={currentPage === totalPages}
+											disabled={isLastPage}
 										>
 											Last
 										</button>
@@ -258,7 +170,7 @@ export default function DiscoverPage() {
 								</p>
 								<button
 									className={`bg-[${COLORS.PRIMARY}] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:bg-[${COLORS.PRIMARY_HOVER}] transition-colors`}
-									onClick={() => toast.warning('Chức năng này sẽ sớm được triển khai!')}
+									onClick={() => toast.warning('This feature will be implemented soon!')}
 								>
 									Make Your Community Public
 								</button>

@@ -1,0 +1,104 @@
+import { Client } from 'mezon-js';
+import { ApiClanDiscover, ApiClanDiscoverRequest } from 'mezon-js/api.gen';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { PAGINATION } from '../constants/constants';
+
+interface DiscoverContextType {
+	clans: ApiClanDiscover[];
+	loading: boolean;
+	error: string | null;
+	currentPage: number;
+	totalPages: number;
+	searchTerm: string;
+	selectedCategory: string;
+	setSearchTerm: (term: string) => void;
+	setSelectedCategory: (category: string) => void;
+	handlePageChange: (page: number) => void;
+	handleSearch: (term: string) => void;
+	handleCategorySelect: (category: string) => void;
+}
+
+const DiscoverContext = createContext<DiscoverContextType | undefined>(undefined);
+
+export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const [clans, setClans] = useState<ApiClanDiscover[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState('all');
+
+	const fetchClans = async (page: number) => {
+		try {
+			setLoading(true);
+			setError(null);
+
+			const mezon = new Client('HTTP3m3zonPr0dkey', 'gw.mezon.ai', '443', true);
+			const request: ApiClanDiscoverRequest = {
+				page_number: page,
+				item_per_page: PAGINATION.ITEMS_PER_PAGE
+			};
+
+			const response = await mezon.listClanDiscover('https://dev-mezon.nccsoft.vn:8088', request);
+
+			if (!response) {
+				throw new Error('No response from API');
+			}
+
+			setClans(response.clan_discover || []);
+			setTotalPages(response.page_count || 1);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'An error occurred');
+			toast.error('Cannot fetch clans, please try again later');
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchClans(currentPage);
+	}, [currentPage]);
+
+	const handlePageChange = (page: number) => {
+		if (page !== currentPage && page >= 1 && page <= totalPages) {
+			setCurrentPage(page);
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	};
+
+	const handleSearch = (term: string) => {
+		setSearchTerm(term);
+	};
+
+	const handleCategorySelect = (category: string) => {
+		setSelectedCategory(category);
+		toast.info('Category filtering will be implemented soon!');
+	};
+
+	const value = {
+		clans,
+		loading,
+		error,
+		currentPage,
+		totalPages,
+		searchTerm,
+		selectedCategory,
+		setSearchTerm,
+		setSelectedCategory,
+		handlePageChange,
+		handleSearch,
+		handleCategorySelect
+	};
+
+	return <DiscoverContext.Provider value={value}>{children}</DiscoverContext.Provider>;
+};
+
+export const useDiscover = () => {
+	const context = useContext(DiscoverContext);
+	if (context === undefined) {
+		throw new Error('useDiscover must be used within a DiscoverProvider');
+	}
+	return context;
+};

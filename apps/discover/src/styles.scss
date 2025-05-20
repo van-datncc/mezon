@@ -1,4 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,7 +95,6 @@ body {
 	color: var(--text-normal);
 }
 
-//button voice control pannel
 .button {
 	line-height: 0;
 	width: 32px;
@@ -109,7 +107,6 @@ body {
 	color: #e1e1e1;
 }
 
-// btn icon voice control pannel
 .button-icon {
 	position: relative;
 	display: flex;
@@ -237,7 +234,6 @@ input:-webkit-autofill:active {
 	font-family: 'gg sans', 'Noto Sans', sans-serif;
 }
 
-// text more one line then hidden
 .one-line {
 	display: -webkit-box;
 	-webkit-line-clamp: 1;
@@ -246,7 +242,6 @@ input:-webkit-autofill:active {
 	max-width: 100%;
 }
 
-// css inBox dropdrow nocation
 #inBox [data-testid='flowbite-dropdown'] {
 	min-width: 480px !important;
 	left: -30px !important;
@@ -256,7 +251,6 @@ input:-webkit-autofill:active {
 	}
 }
 
-// css hover svg change color
 .iconHover {
 	svg:hover {
 		path {
@@ -277,7 +271,6 @@ input:-webkit-autofill:active {
 	}
 }
 
-// css memberProfile
 .memberProfile:hover {
 	background-color: #3b3b3b;
 
@@ -306,14 +299,12 @@ input:-webkit-autofill:active {
 	}
 }
 
-// css friendList
 .friendList {
 	.nameMemberProfile {
 		background-color: transparent;
 	}
 }
 
-// css replyMessage
 .replyMessage {
 	svg {
 		min-width: 32px;
@@ -325,7 +316,6 @@ input:-webkit-autofill:active {
 	margin-right: 0;
 }
 
-// css mainChat
 #mainChat:has(#memberList) {
 	[class='editorStyles_mentionSuggestions__-tu0h'] {
 		left: -50px !important;
@@ -345,7 +335,6 @@ input:-webkit-autofill:active {
 		}
 	}
 
-	// start style markdown
 	.prose {
 		max-width: unset;
 		padding-right: 0;
@@ -468,10 +457,8 @@ input:-webkit-autofill:active {
 		}
 	}
 
-	// end style markdown
 }
 
-// css video
 #meet {
 	video {
 		border-radius: 10px;
@@ -496,7 +483,6 @@ input:-webkit-autofill:active {
 	}
 }
 
-// thread-scroll
 .thread-scroll::-webkit-scrollbar {
 	width: 4px;
 }
@@ -513,7 +499,6 @@ input:-webkit-autofill:active {
 	background: #151515;
 }
 
-// attachment-scroll
 .attachment-scroll::-webkit-scrollbar {
 	height: 8px;
 }
@@ -526,7 +511,6 @@ input:-webkit-autofill:active {
 	background: #2b2d31;
 }
 
-// css tagLink of markdown
 .tagLink {
 	text-decoration: none;
 
@@ -535,7 +519,6 @@ input:-webkit-autofill:active {
 	}
 }
 
-// css modal img show
 .modalImage {
 	[role='dialog'] {
 		padding: 0;
@@ -550,12 +533,10 @@ input:-webkit-autofill:active {
 	}
 }
 
-// css editorReactMention text box chat
 #editorReactMention {
 	max-width: calc(100% - 100px);
 }
 
-// emojiPicker
 .emojiPicker {
 	h2 {
 		background-color: #2b2d31;
@@ -566,10 +547,7 @@ input:-webkit-autofill:active {
 	}
 }
 
-// custom dark - light mode
 .customScrollLightMode {
-	// scrollbar-width: thin;
-	// scrollbar-color: white #E1E1E1;
 }
 
 .customScrollLightMode::-webkit-scrollbar {
@@ -586,7 +564,6 @@ input:-webkit-autofill:active {
 	border-radius: 4px;
 }
 
-// custom dark - small light mode
 .customSmallScrollLightMode::-webkit-scrollbar {
 	width: 4px;
 }
@@ -603,7 +580,6 @@ input:-webkit-autofill:active {
 	background: rgb(205, 205, 205);
 }
 
-//input autofill
 .lightInputAutoFill:-webkit-autofill,
 .lightInputAutoFill:-webkit-autofill:hover,
 .lightInputAutoFill:-webkit-autofill:focus,
@@ -628,12 +604,10 @@ input:-webkit-autofill:active {
 	box-shadow: inset 0 0 20px 20px rgb(223 225 229);
 }
 
-//0.3 opacity background
 .bg-opacity-30 {
 	--tw-bg-opacity: 0.3;
 }
 
-// Scrollbar mention
 
 .lightModeScrollBarMention {
 	::-webkit-scrollbar-track {
@@ -652,7 +626,6 @@ input:-webkit-autofill:active {
 	user-select: none; /* Standard syntax */
 }
 
-// css icon
 .iconWhiteImportant * {
 	color: white !important;
 }
