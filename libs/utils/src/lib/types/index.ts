@@ -271,6 +271,7 @@ export interface IFieldEmbed {
 	value: string;
 	inline?: boolean;
 	inputs?: SelectComponent | InputComponent | DatePickerComponent | RadioComponent | AnimationComponent;
+	shape?: GridComponent;
 	button?: ButtonComponent[];
 }
 
@@ -288,7 +289,8 @@ export enum EMessageComponentType {
 	INPUT = 3,
 	DATEPICKER = 4,
 	RADIO = 5,
-	ANIMATION = 6
+	ANIMATION = 6,
+	GRID = 7
 }
 
 export enum EIconEmbedButtonMessage {
@@ -347,6 +349,19 @@ export interface IMessageAnimation {
 	isResult?: number;
 }
 
+export interface IMessageGrid {
+	items: IMessageGridItem[];
+	url_image?: string;
+	url_position?: string;
+}
+
+export interface IMessageGridItem {
+	width?: number;
+	height?: number;
+	start_col?: number;
+	start_row?: number;
+}
+
 export interface IMessageCallLog {
 	isVideo: boolean;
 	callLogType: IMessageTypeCallLog;
@@ -379,6 +394,13 @@ export interface IMessageComponent<T> {
 	component: T;
 	max_options?: number;
 }
+export interface IEmbedShapeComponent<T> {
+	type: EMessageComponentType;
+	id: string;
+	component: T;
+	columns: number;
+	rows: number;
+}
 
 export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
 export type SelectComponent = IMessageComponent<IMessageSelect> & { type: EMessageComponentType.SELECT };
@@ -386,6 +408,7 @@ export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessage
 export type DatePickerComponent = IMessageComponent<IMessageDatePicker> & { type: EMessageComponentType.DATEPICKER };
 export type RadioComponent = IMessageComponent<IMessageRatioOption[]> & { type: EMessageComponentType.RADIO };
 export type AnimationComponent = IMessageComponent<IMessageAnimation> & { type: EMessageComponentType.ANIMATION };
+export type GridComponent = IEmbedShapeComponent<IMessageGrid> & { type: EMessageComponentType.GRID };
 
 export interface IMessageActionRow {
 	components: Array<ButtonComponent | SelectComponent | InputComponent>;

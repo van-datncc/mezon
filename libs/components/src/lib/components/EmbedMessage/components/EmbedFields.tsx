@@ -2,6 +2,7 @@ import {
 	AnimationComponent,
 	DatePickerComponent,
 	EMessageComponentType,
+	GridComponent,
 	IFieldEmbed,
 	InputComponent,
 	ObserveFn,
@@ -14,6 +15,7 @@ import { MessageDatePicker } from '../../MessageActionsPanel/components/MessageD
 import { MessageInput } from '../../MessageActionsPanel/components/MessageInput';
 import { MessageSelect } from '../../MessageActionsPanel/components/MessageSelect';
 import { EmbedAnimation } from './EmbedAnimation';
+import { EmbedGrid } from './EmbedGrid';
 import { EmbedOptionRatio } from './EmbedOptionRatio';
 interface EmbedFieldsProps {
 	fields: IFieldEmbed[];
@@ -65,6 +67,18 @@ export function EmbedFields({ fields, message_id, senderId, channelId, observeIn
 									/>
 								</div>
 							)}
+							{field.shape && (
+								<div className="flex flex-col gap-1 w-max-[500px]">
+									<ShapeEmbedMessage
+										shape={field.shape}
+										messageId={message_id}
+										senderId={senderId}
+										channelId={channelId}
+										observeIntersectionForLoading={observeIntersectionForLoading}
+									/>
+								</div>
+							)}
+
 							<div className="flex gap-1">
 								{field.button &&
 									field.button.map((button) => (
@@ -128,7 +142,29 @@ const InputEmbedByType = ({ messageId, senderId, component, max_options, channel
 					observeIntersectionForLoading={observeIntersectionForLoading}
 				/>
 			);
+
 		default:
 			return;
 	}
+};
+
+type ShapeEmbedMessage = {
+	messageId: string;
+	senderId: string;
+	shape: GridComponent;
+	channelId: string;
+	observeIntersectionForLoading?: ObserveFn;
+};
+
+const ShapeEmbedMessage = ({ messageId, senderId, shape, channelId, observeIntersectionForLoading }: ShapeEmbedMessage) => {
+	return (
+		<EmbedGrid
+			pool={shape.component.items}
+			columns={shape.columns}
+			senderId={senderId}
+			messageId={messageId}
+			channelId={channelId}
+			rows={shape.rows}
+		/>
+	);
 };
