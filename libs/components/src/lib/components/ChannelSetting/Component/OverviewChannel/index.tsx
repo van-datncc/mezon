@@ -410,7 +410,7 @@ const BottomBlock = ({
 				</div>
 			</div>
 
-			{!thisIsSystemMessageChannel && (
+			{/* {!thisIsSystemMessageChannel && (
 				<>
 					<hr className="border-t border-solid dark:border-borderDivider" />
 					<div className="flex flex-col gap-3">
@@ -435,7 +435,7 @@ const BottomBlock = ({
 						</div>
 					</div>
 				</>
-			)}
+			)} */}
 
 			<hr className="border-t border-solid dark:border-borderDivider" />
 			<div className="flex flex-col gap-2">
