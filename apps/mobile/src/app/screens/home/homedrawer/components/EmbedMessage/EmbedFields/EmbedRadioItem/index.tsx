@@ -16,12 +16,12 @@ export const EmbedRadioButton = memo(({ option, checked, onCheck }: EmbedRadioPr
 	const styles = style(themeValue);
 
 	return (
-		<View>
-			<Text style={styles.name}>{option?.label}</Text>
-			<View style={styles.option}>
-				<Text style={styles.value}>{option?.description}</Text>
-				<MezonRadioButton checked={checked} onChange={onCheck} />
+		<View style={styles.option}>
+			<View style={styles.itemDetail}>
+				{option?.label && <Text style={styles.name}>{option?.label}</Text>}
+				{option?.description && <Text style={styles.value}>{option?.description}</Text>}
 			</View>
+			<MezonRadioButton checked={checked} onChange={onCheck} />
 		</View>
 	);
 });

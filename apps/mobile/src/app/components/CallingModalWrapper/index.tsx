@@ -72,7 +72,7 @@ const CallingModalWrapper = () => {
 						callerId: data?.callerId
 					})
 				);
-				await sleep(2000);
+				await sleep(4000);
 				dispatch(appActions.setLoadingMainMobile(false));
 				await NotificationPreferences.clearValue('notificationDataCalling');
 				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {

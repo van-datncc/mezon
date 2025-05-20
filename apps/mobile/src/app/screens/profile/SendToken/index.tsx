@@ -85,7 +85,7 @@ export const SendTokenScreen = ({ navigation, route }: SettingScreenProps<Screen
 	const canEdit = jsonObject?.canEdit;
 
 	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
+		return userProfile?.wallet || 0;
 	}, [userProfile?.wallet]);
 
 	const mergeUser = useMemo(() => {

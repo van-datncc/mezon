@@ -283,25 +283,31 @@ const DirectMessage = () => {
 						)}
 
 						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
-							<DirectMessageBox
-								direct={currentDmGroup}
-								mode={
-									currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
-										? ChannelStreamMode.STREAM_MODE_DM
-										: ChannelStreamMode.STREAM_MODE_GROUP
-								}
-							/>
-							{directId && (
-								<ChannelTyping
-									channelId={directId}
-									mode={
-										currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
-											? ChannelStreamMode.STREAM_MODE_DM
-											: ChannelStreamMode.STREAM_MODE_GROUP
-									}
-									isPublic={false}
-									isDM={true}
-								/>
+							{currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM && currentDmGroup.user_id?.length === 0 ? (
+								<div className="text-textSecondary800"> You do not have permission to send message</div>
+							) : (
+								<>
+									<DirectMessageBox
+										direct={currentDmGroup}
+										mode={
+											currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+												? ChannelStreamMode.STREAM_MODE_DM
+												: ChannelStreamMode.STREAM_MODE_GROUP
+										}
+									/>
+									{directId && (
+										<ChannelTyping
+											channelId={directId}
+											mode={
+												currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM
+													? ChannelStreamMode.STREAM_MODE_DM
+													: ChannelStreamMode.STREAM_MODE_GROUP
+											}
+											isPublic={false}
+											isDM={true}
+										/>
+									)}
+								</>
 							)}
 						</div>
 					</div>
