@@ -5,7 +5,7 @@ import LottieView from 'lottie-react-native';
 import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import * as React from 'react';
 import { memo, useEffect, useMemo } from 'react';
-import { BackHandler, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Image, ImageBackground, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { Bounce } from 'react-native-animated-spinkit';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
@@ -81,7 +81,7 @@ const IncomingHomeScreen = memo((props: any) => {
 	}, [signalingData]);
 
 	useEffect(() => {
-		if (props && props?.payload) {
+		if (props && props?.payload && Platform.OS === 'android') {
 			getDataCall();
 		}
 	}, [props]);

@@ -1,9 +1,9 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
-const { NotificationPreferences } = NativeModules;
+const NotificationPreferences = Platform.OS === 'ios' ? null : NativeModules.NotificationPreferences;
 
 if (!NotificationPreferences) {
-	throw new Error('NotificationPreferences module is not available');
+	console.error('NotificationPreferences module is not available');
 }
 
 /**
@@ -26,7 +26,7 @@ const NotificationPreferencesManager: NotificationPreferencesInterface = {
 	 * @returns The value or null if not found
 	 */
 	getValue: (key: string): Promise<string | null> => {
-		return NotificationPreferences.getValue(key);
+		return NotificationPreferences?.getValue(key);
 	},
 
 	/**
@@ -34,7 +34,7 @@ const NotificationPreferencesManager: NotificationPreferencesInterface = {
 	 * @returns Object containing all key-value pairs
 	 */
 	getAllValues: (): Promise<Record<string, any>> => {
-		return NotificationPreferences.getAllValues();
+		return NotificationPreferences?.getAllValues();
 	},
 
 	/**
@@ -43,7 +43,7 @@ const NotificationPreferencesManager: NotificationPreferencesInterface = {
 	 * @returns Success status
 	 */
 	clearValue: (key: string): Promise<boolean> => {
-		return NotificationPreferences.clearValue(key);
+		return NotificationPreferences?.clearValue(key);
 	},
 
 	/**
@@ -51,7 +51,7 @@ const NotificationPreferencesManager: NotificationPreferencesInterface = {
 	 * @returns Success status
 	 */
 	clearAll: (): Promise<boolean> => {
-		return NotificationPreferences.clearAll();
+		return NotificationPreferences?.clearAll();
 	}
 };
 
