@@ -88,7 +88,7 @@ const ModalInvite = (props: ModalParam) => {
 	const dispatch = useAppDispatch();
 	const fetchSystemMessage = async () => {
 		if (!currentClanId) return;
-		await dispatch(fetchSystemMessageByClanId(currentClanId));
+		await dispatch(fetchSystemMessageByClanId({ clanId: currentClanId }));
 	};
 
 	useEffect(() => {

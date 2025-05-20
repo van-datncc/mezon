@@ -58,7 +58,7 @@ const SystemMessagesManagement = ({
 					welcome_sticker: isWelcomeSticker ? '1' : '0',
 					boost_message: isBoostMessage ? '1' : '0',
 					setup_tips: isSetupTips ? '1' : '0',
-					hide_audit_log: hideAuditLog ? '0' : '1'
+					hide_audit_log: hideAuditLog ? '' : '1'
 				};
 				if (createSystemMessageRequest && createSystemMessageRequest.channel_id) {
 					onGetCreateSystemMessageRequest(createSystemMessageRequest);
@@ -161,7 +161,7 @@ const SystemMessagesManagement = ({
 
 	const handleHideAuditLog = (checked: boolean) => {
 		setHideAuditLog(checked);
-		onHideAuditLog(checked ? '0' : '1');
+		onHideAuditLog(checked ? '' : '1');
 	};
 
 	return (

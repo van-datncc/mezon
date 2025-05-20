@@ -26,18 +26,18 @@ const ClanSettingOverview = () => {
 	const [createSystemMessageRequest, setCreateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
 	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<MezonUpdateSystemMessageBody>({
 		channel_id: systemMessage?.channel_id ?? '',
-		welcome_random: systemMessage?.welcome_random ?? '',
-		welcome_sticker: systemMessage?.welcome_sticker ?? '',
-		boost_message: systemMessage?.boost_message ?? '',
-		setup_tips: systemMessage?.setup_tips ?? '',
-		hide_audit_log: systemMessage?.hide_audit_log ?? ''
+		welcome_random: '',
+		welcome_sticker: '',
+		boost_message: '',
+		setup_tips: '',
+		hide_audit_log: ''
 	});
 
 	const dispatch = useAppDispatch();
 
 	const fetchSystemMessage = async () => {
 		if (!currentClan?.clan_id) return;
-		const resultAction = await dispatch(fetchSystemMessageByClanId(currentClan?.clan_id));
+		const resultAction = await dispatch(fetchSystemMessageByClanId({ clanId: currentClan?.clan_id }));
 		const message = unwrapResult(resultAction);
 		setSystemMessage(message);
 	};
