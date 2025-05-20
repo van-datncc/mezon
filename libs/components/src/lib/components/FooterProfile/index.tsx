@@ -95,7 +95,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const tokenInWallet = useMemo(() => {
-		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
+		return myProfile?.userProfile?.wallet ? myProfile?.userProfile?.wallet : 0;
 	}, [myProfile?.userProfile?.wallet]);
 
 	const handleCloseModalCustomStatus = () => {

@@ -980,7 +980,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const updateAmount =
 				tokenEvent.amount !== undefined ? (isReceiverGiveCoffee ? tokenEvent.amount : isSenderGiveCoffee ? -tokenEvent.amount : 0) : 0;
 
-			dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
+			dispatch(
+				accountActions.updateWalletByAction((currentValue) => {
+					return Number(currentValue) + Number(updateAmount);
+				})
+			);
 		},
 		[dispatch, userId]
 	);
