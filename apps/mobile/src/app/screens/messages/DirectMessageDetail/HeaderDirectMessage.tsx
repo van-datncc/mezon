@@ -50,20 +50,31 @@ function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const previousChannels = useSelector(selectPreviousChannels);
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
-		if (!lastMessage) return;
-		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (!lastMessageState) {
-			markAsReadSeen(lastMessage, mode, 0);
-			return;
-		}
+		const handleMarkAsReadSeen = () => {
+			if (!lastMessage) return;
+			const mode =
+				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+			if (!lastMessageState) {
+				markAsReadSeen(lastMessage, mode, 0);
+				return;
+			}
 
-		if (
-			lastMessage?.create_time_seconds &&
-			lastMessageState?.timestamp_seconds &&
-			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
-		) {
-			markAsReadSeen(lastMessage, mode, 0);
-		}
+			if (
+				lastMessage?.create_time_seconds &&
+				lastMessageState?.timestamp_seconds &&
+				lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
+			) {
+				markAsReadSeen(lastMessage, mode, 0);
+			}
+		};
+
+		handleMarkAsReadSeen();
+
+		return () => {
+			if (lastMessage) {
+				handleMarkAsReadSeen();
+			}
+		};
 	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
 	useEffect(() => {
 		if (previousChannels.at(1)) {
