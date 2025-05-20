@@ -180,7 +180,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.HOME_DEFAULT}
 						component={isTabletLandscape ? HomeScreenTablet : HomeDefaultWrapper}
 						options={{
-							animationEnabled: true,
+							animationEnabled: Platform.OS === 'ios',
 							headerShown: false,
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',

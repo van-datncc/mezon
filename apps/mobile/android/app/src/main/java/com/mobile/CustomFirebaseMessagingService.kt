@@ -121,6 +121,7 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         // Create an intent for when user taps the notification (Answer)
         val answerIntent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = "ANSWER_CALL_ACTION"
             putExtra("action", "ANSWER_CALL")
             putExtra("notificationData", JSONObject(data).toString())
         }
