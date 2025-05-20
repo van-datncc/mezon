@@ -1,10 +1,12 @@
 import i18n from '@mezon/translations';
 import { CreateMezonClientOptions, MezonContextProvider } from '@mezon/transport';
 import * as Sentry from '@sentry/react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 // import codePush from 'react-native-code-push';
 import { load, STORAGE_SESSION_KEY } from '@mezon/mobile-components';
+import analytics from '@react-native-firebase/analytics';
+import { Platform } from 'react-native';
 import 'react-native-svg';
 import RootNavigation from './RootNavigator';
 
@@ -42,6 +44,19 @@ const getMezonConfig = (): CreateMezonClientOptions => {
 const mezon = getMezonConfig();
 
 const App = (props) => {
+	useEffect(() => {
+		const logAppStarted = async () => {
+			try {
+				analytics().logEvent('app_started', {
+					platform: Platform.OS,
+					timestamp: Date.now()
+				});
+			} catch (error) {
+				console.error('Failed to log app started event:', error);
+			}
+		};
+		logAppStarted();
+	}, []);
 	return (
 		<I18nextProvider i18n={i18n}>
 			<MezonContextProvider mezon={mezon} connect={true} isFromMobile={true}>
