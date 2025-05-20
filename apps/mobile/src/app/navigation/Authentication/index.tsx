@@ -192,7 +192,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.MESSAGES.MESSAGE_DETAIL}
 						component={DirectMessageDetailScreen}
 						options={{
-							animationEnabled: false,
+							animationEnabled: Platform.OS === 'ios',
 							headerShown: false,
 							headerShadowVisible: false,
 							gestureEnabled: true,
@@ -206,7 +206,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.MESSAGES.STACK}
 						children={(props) => <MessagesStacks {...props} />}
 						options={{
-							animationEnabled: false
+							animationEnabled: Platform.OS === 'ios'
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.NOTIFICATION.STACK} children={(props) => <NotificationStacks {...props} />} />
@@ -222,7 +222,7 @@ export const Authentication = memo(() => {
 						name={APP_SCREEN.FRIENDS.STACK}
 						children={(props) => <FriendStacks {...props} />}
 						options={{
-							animationEnabled: false
+							animationEnabled: Platform.OS === 'ios'
 						}}
 					/>
 
