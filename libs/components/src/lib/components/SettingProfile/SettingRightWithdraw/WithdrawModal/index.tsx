@@ -263,7 +263,7 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 
 				postHash(res.hash, requestId);
 				const currentWallet = userProfile?.wallet || 0;
-				const newWalletValue = currentWallet - parseFloat(formData.amount.toString());
+				const newWalletValue = Number(currentWallet) - Number(formData.amount);
 				dispatch(accountActions.setWalletValue(newWalletValue));
 				onClose();
 				toast.info('In processing');
