@@ -100,7 +100,6 @@ export interface MessagesState {
 	isSending?: boolean;
 	unreadMessagesEntries?: Record<string, string>;
 	typingUsers?: Record<string, ChannelTypingState>;
-	paramEntries: Record<string, FetchMessageParam>;
 	openOptionMessageState: boolean;
 	firstMessageId: Record<string, string | null>;
 	lastMessageByChannel: Record<string, ApiChannelMessageHeaderWithChannel>;
@@ -353,8 +352,6 @@ export const fetchMessages = createAsyncThunk(
 
 			thunkAPI.dispatch(messagesActions.setFirstMessageId({ channelId: chlId, firstMessageId: !hasMore ? lastLoadMessage?.id : null }));
 
-			thunkAPI.dispatch(messagesActions.setMessageParams({ channelId: chlId, param: { lastLoadMessageId: lastLoadMessage?.id, hasMore } }));
-
 			if (shouldReturnCachedMessages(isFetchingLatestMessages, oldMessages, lastSentMessage, !!fromCache)) {
 				return {
 					messages: [],
@@ -423,7 +420,7 @@ export const loadMoreMessage = createAsyncThunk(
 			}
 
 			if (direction === Direction_Mode.BEFORE_TIMESTAMP) {
-				const lastScrollMessageId = selectLastLoadMessageIDByChannelId(chlId)(getMessagesRootState(thunkAPI));
+				const lastScrollMessageId = state.channelViewPortMessageIds[channelId]?.[0];
 				// const firstChannelMessageId = selectFirstMessageIdByChannelId(chlId)(getMessagesRootState(thunkAPI));
 
 				// if (!lastScrollMessageId || lastScrollMessageId === firstChannelMessageId) {
@@ -850,7 +847,6 @@ export const initialMessagesState: MessagesState = {
 	isSending: false,
 	unreadMessagesEntries: {},
 	typingUsers: {},
-	paramEntries: {},
 	openOptionMessageState: false,
 	firstMessageId: {},
 	lastMessageByChannel: {},
@@ -896,9 +892,6 @@ export const messagesSlice = createSlice({
 		setIsViewingOlderMessages: (state, action: PayloadAction<{ channelId: string; isViewing: boolean }>) => {
 			const { channelId, isViewing } = action.payload;
 			state.isViewingOlderMessagesByChannelId[channelId] = isViewing;
-		},
-		setMessageParams: (state, action: PayloadAction<SetCursorChannelArgs>) => {
-			state.paramEntries[action.payload.channelId] = action.payload.param;
 		},
 		setFirstMessageId: (state, action: PayloadAction<{ channelId: string; firstMessageId: string | null }>) => {
 			state.firstMessageId[action.payload.channelId] = action.payload.firstMessageId;
@@ -1430,7 +1423,6 @@ export const selectIsUserTypingInChannel = createSelector(
 		return typingUsers.some((user) => user.id === userId);
 	}
 );
-export const selectMessageParams = createSelector(getMessagesState, (state) => state.paramEntries);
 
 export const selectHasMoreMessageByChannelId2 = createSelector([getMessagesState, getChannelIdAsSecondParam], (state, channelId) => {
 	const firstMessageId = state.firstMessageId[channelId];
@@ -1451,11 +1443,6 @@ export const selectHasMoreBottomByChannelId2 = createSelector([getMessagesState,
 
 	return !isLastMessageInChannel;
 });
-
-export const selectLastLoadMessageIDByChannelId = (channelId: string) =>
-	createSelector(selectMessageParams, (param) => {
-		return param[channelId]?.lastLoadMessageId;
-	});
 
 export const selectIsFocused = createSelector(getMessagesState, (state) => state.isFocused);
 

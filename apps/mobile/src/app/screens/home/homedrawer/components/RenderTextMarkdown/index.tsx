@@ -311,7 +311,7 @@ export const RenderTextMarkdownContent = ({
 		if (lastIndex < s) {
 			textParts.push(
 				<Text key={`text-${index}`} style={themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}}>
-					{t?.slice(lastIndex, s)}
+					{t?.slice(lastIndex, s).replace(/^\n|\n$/, '')}
 				</Text>
 			);
 		}
@@ -502,7 +502,11 @@ export const RenderTextMarkdownContent = ({
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
 						const basePath = '/chat/clans/';
-						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
+						const contentHasChannelLink =
+							contentInElement?.includes(basePath) &&
+							contentInElement?.includes('/channels/') &&
+							!contentInElement?.includes('/canvas/');
+						const contentHasCanvasLink = contentInElement.includes('canvas') && canvasId && clanId && channelId;
 
 						if (contentHasChannelLink) {
 							const pathSegments = contentInElement?.split('/') as string[];
@@ -558,7 +562,7 @@ export const RenderTextMarkdownContent = ({
 							}
 						}
 
-						if (contentInElement.includes('canvas') && canvasId && clanId && channelId) {
+						if (contentHasCanvasLink) {
 							textParts.push(<RenderCanvasItem key={`canvas-${index}`} clanId={clanId} channelId={channelId} canvasId={canvasId} />);
 						} else if (contentInElement.includes('unknown')) {
 							textParts.push(
@@ -584,6 +588,7 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.LINKYOUTUBE:
 						if (isYouTubeLink(contentInElement)) {
 							const videoId = extractYoutubeVideoId(contentInElement);
+							const widthScreen = Dimensions.get('screen').width;
 
 							markdownBlackParts.push(
 								<RenderYoutubeVideo
@@ -594,6 +599,7 @@ export const RenderTextMarkdownContent = ({
 									onLongPress={onLongPress}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
 									themeValue={themeValue}
+									containerStyle={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}
 								/>
 							);
 						} else {
@@ -623,7 +629,7 @@ export const RenderTextMarkdownContent = ({
 	if (lastIndex < (t?.length ?? 0)) {
 		textParts.push(
 			<Text key="text-end" style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}>
-				{t?.slice(lastIndex)}
+				{t?.slice(lastIndex).replace(/^\n|\n$/, '')}
 			</Text>
 		);
 	}
@@ -653,9 +659,12 @@ export const RenderTextMarkdownContent = ({
 					}}
 				/>
 			)}
-			<Text>{textParts}</Text>
-			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
-			{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+
+			<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+				{textParts?.length > 0 && <Text>{textParts}</Text>}
+				{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			</View>
 		</View>
 	);
 };

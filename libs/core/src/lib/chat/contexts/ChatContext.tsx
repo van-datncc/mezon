@@ -620,7 +620,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const channelId = selectCurrentChannelId(store.getState() as unknown as RootState);
 			const directId = selectDmGroupCurrentId(store.getState());
 			const clanId = selectCurrentClanId(store.getState());
-			user?.user_ids.forEach((userID: string) => {
+			user?.user_ids.forEach((userID: string, index) => {
+				dispatch(clansActions.updateClanBadgeCount({ clanId: user?.clan_id || '', count: -user.badge_counts[index] }));
 				if (userID === userId) {
 					if (channelId === user.channel_id) {
 						navigate(`/chat/clans/${clanId}`);
@@ -979,7 +980,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			const updateAmount =
 				tokenEvent.amount !== undefined ? (isReceiverGiveCoffee ? tokenEvent.amount : isSenderGiveCoffee ? -tokenEvent.amount : 0) : 0;
 
-			dispatch(accountActions.updateWalletByAction((currentValue) => currentValue + updateAmount));
+			dispatch(
+				accountActions.updateWalletByAction((currentValue) => {
+					return Number(currentValue) + Number(updateAmount);
+				})
+			);
 		},
 		[dispatch, userId]
 	);

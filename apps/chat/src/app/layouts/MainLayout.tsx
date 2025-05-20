@@ -1,4 +1,4 @@
-import { ChatContext, ChatContextProvider, ColorRoleProvider, useCustomNavigate, useDragAndDrop, useFriends, useIdleRender } from '@mezon/core';
+import { ChatContext, ChatContextProvider, ColorRoleProvider, useDragAndDrop, useFriends, useIdleRender } from '@mezon/core';
 import {
 	e2eeActions,
 	gifsStickerEmojiActions,
@@ -22,7 +22,6 @@ import ChannelVoice from '../pages/channel/ChannelVoice';
 
 const GlobalEventListener = () => {
 	const { handleReconnect } = useContext(ChatContext);
-	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
 
 	const allNotificationReplyMentionAllClan = useSelector(selectBadgeCountAllClan);

@@ -47,20 +47,26 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 
 	return (
 		<div>
-			<div className="w-full h-full max-w-[100%] flex justify-center items-center">
+			<div className="w-full h-full max-w-[100%] flex justify-center items-center text-textPrimaryLight dark:text-textPrimary">
 				<div className="flex flex-col items-center">
 					<img src={'assets/images/warning.svg'} alt="warning" width={200} height={200} />
 
 					<div className="text-center mt-4">
-						<h1 className="text-3xl font-bold mb-2">Age-Restricted Channel</h1>
+						<h1 className="text-3xl font-bold mb-2 ">Age-Restricted Channel</h1>
 						<p className="mb-4">This channel contains adult content marked as age-restricted. Do you wish to proceed?</p>
 					</div>
 
 					<div className="flex space-x-4">
-						<button className="border-2 border-gray-600 rounded-lg px-6 py-2 bg-gray-600" onClick={handleCloseModal}>
+						<button
+							className="border-2 border-gray-600 rounded-lg px-6 py-2 bg-gray-600 dark:text-textPrimary"
+							onClick={handleCloseModal}
+						>
 							Nope
 						</button>
-						<button className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger" onClick={handleSaveChannelId}>
+						<button
+							className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger dark:text-textPrimary"
+							onClick={handleSaveChannelId}
+						>
 							Continue
 						</button>
 					</div>

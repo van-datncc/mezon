@@ -4,7 +4,6 @@ import { MezonContext } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { BrowserProvider, Contract, ethers } from 'ethers';
 import isElectron from 'is-electron';
-import { safeJSONParse } from 'mezon-js';
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -263,8 +262,8 @@ const WithDrawModal = ({ onClose, totalToken, userId, onRefetch }: IProp) => {
 				const res = await contract?.withdraw(requestId, amount, signature);
 
 				postHash(res.hash, requestId);
-				const currentWallet = safeJSONParse(userProfile?.wallet ?? '{}');
-				const newWalletValue = (currentWallet.value || 0) - parseFloat(formData.amount.toString());
+				const currentWallet = userProfile?.wallet || 0;
+				const newWalletValue = Number(currentWallet) - Number(formData.amount);
 				dispatch(accountActions.setWalletValue(newWalletValue));
 				onClose();
 				toast.info('In processing');

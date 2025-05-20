@@ -11,6 +11,10 @@
         android:name="android.hardware.bluetooth"
         android:required="false"
         tools:node="replace" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.audio.output" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" android:required="false" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" android:required="false" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" android:required="false" />
@@ -103,6 +107,14 @@
             </intent-filter>
         </service>
         <service android:name="io.wazo.callkeep.RNCallKeepBackgroundMessagingService" android:exported="true"/>
+        <receiver
+                android:name=".NotificationActionReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="DECLINE_CALL_ACTION" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".CustomFirebaseMessagingService"
             android:enabled="true"
@@ -112,16 +124,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <receiver
-            android:name=".CustomFirebaseMessagingReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND"
-        >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-            </intent-filter>
-        </receiver>
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

@@ -426,6 +426,7 @@ const ScrollDownButton = memo(
 			const state = getStore().getState();
 
 			const lastSentMessageId = selectLatestMessageId(state, channelId);
+
 			const jumpPresent = !!lastSentMessageId && !messageIds.includes(lastSentMessageId as string) && messageIds.length >= 20;
 
 			dispatch(

@@ -1,12 +1,10 @@
 import { Attributes, Colors, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
-import { HEIGHT, WIDTH } from '../../constants/config';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		notifications: {
-			width: WIDTH,
-			height: HEIGHT,
+			flex: 1,
 			backgroundColor: colors.secondary,
 			paddingVertical: size.s_10
 		},

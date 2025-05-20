@@ -557,21 +557,14 @@ export const style = (colors: Attributes) =>
 			position: 'absolute',
 			right: size.s_10,
 			bottom: size.s_20,
-			backgroundColor: colors.primary,
-			width: size.s_50,
-			height: size.s_50,
-			borderRadius: size.s_50,
+			backgroundColor: colors.border,
+			borderColor: colors.textDisabled,
+			borderWidth: 1,
+			width: size.s_40,
+			height: size.s_40,
+			borderRadius: size.s_40,
 			justifyContent: 'center',
-			alignItems: 'center',
-			shadowColor: Colors.black,
-			shadowOffset: {
-				width: 0,
-				height: 4
-			},
-			shadowOpacity: 0.3,
-			shadowRadius: 4.65,
-			elevation: 8,
-			zIndex: 0
+			alignItems: 'center'
 		},
 		wrapperFooterImagesModal: {
 			flex: 1,
