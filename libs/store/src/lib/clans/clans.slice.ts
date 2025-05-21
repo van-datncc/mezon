@@ -283,9 +283,11 @@ export const updateUser = createAsyncThunk(
 		}
 	}
 );
+
 interface JoinClanPayload {
 	clanId: string;
 }
+
 export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));

@@ -8,7 +8,7 @@ import { checkFileTypeImage, isAudio, isVideo } from '../../../../../utils/helpe
 import RenderAudioChat from '../RenderAudioChat/RenderAudioChat';
 import { RenderImageChat } from '../RenderImageChat';
 import { RenderVideoChat } from '../RenderVideoChat';
-import { style } from './styles'; 
+import { style } from './styles';
 
 export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressImage }: any) => {
 	const { themeValue } = useTheme();

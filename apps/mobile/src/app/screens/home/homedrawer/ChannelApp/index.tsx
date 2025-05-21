@@ -54,6 +54,12 @@ const ChannelAppScreen = ({ navigation, route }) => {
 		return queryString ? `${baseUrl}${queryString}` : baseUrl;
 	}, [paramsRoute?.channelId, paramsRoute?.clanId, paramsRoute?.code, paramsRoute?.subpath]);
 
+	const mezon_session = JSON.stringify({
+		host: process.env.NX_CHAT_APP_API_HOST as string,
+		port: process.env.NX_CHAT_APP_API_PORT as string,
+		ssl: true
+	});
+
 	const injectedJS = `
     (function() {
 	const authData = {
@@ -63,6 +69,7 @@ const ChannelAppScreen = ({ navigation, route }) => {
 		"_persist": JSON.stringify({"version":-1,"rehydrated":true})
 	};
     localStorage.setItem('persist:auth', JSON.stringify(authData));
+	localStorage.setItem('mezon_session', JSON.stringify(${mezon_session}));
     })();
 	true;
 	(function() {
