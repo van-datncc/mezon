@@ -60,7 +60,7 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
 			htmlFor={type?.toString()}
 		>
-			<div className="ChannelChat w-6 h-6 relative">{iconMap[type]}</div>
+			<div className={type === ChannelType.CHANNEL_TYPE_CHANNEL ? 'w-6 h-9' : 'w-6 h-6'}>{iconMap[type]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
 				<div className="Text self-stretch text-stone-300 text-sm font-bold leading-normal text-[10px]">
 					<p className="dark:text-white text-black">{labelMap[type]}</p>
