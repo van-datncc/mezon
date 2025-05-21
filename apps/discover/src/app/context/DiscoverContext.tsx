@@ -30,19 +30,24 @@ export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('all');
 
-	const fetchClans = async (page: number) => {
+	const fetchClansDiscover = async (page: number) => {
 		try {
 			setLoading(true);
 			setError(null);
 
-			const mezon = new Client('HTTP3m3zonPr0dkey', 'gw.mezon.ai', '443', true);
+			const mezon = new Client(
+				process.env.NX_CHAT_APP_API_KEY as string,
+				process.env.NX_CHAT_APP_API_GW_HOST as string,
+				process.env.NX_CHAT_APP_API_GW_PORT as string,
+				process.env.NX_CHAT_APP_API_SECURE === 'true'
+			);
+
 			const request: ApiClanDiscoverRequest = {
 				page_number: page,
 				item_per_page: PAGINATION.ITEMS_PER_PAGE
 			};
 
-			const response = await mezon.listClanDiscover('https://dev-mezon.nccsoft.vn:8088', request);
-
+			const response = await mezon.listClanDiscover(`${process.env.NX_CHAT_APP_REDIRECT_URI}:${process.env.NX_CHAT_APP_API_GW_PORT}`, request);
 			if (!response) {
 				throw new Error('No response from API');
 			}
@@ -58,7 +63,7 @@ export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 	};
 
 	useEffect(() => {
-		fetchClans(currentPage);
+		fetchClansDiscover(currentPage);
 	}, [currentPage]);
 
 	const handlePageChange = (page: number) => {

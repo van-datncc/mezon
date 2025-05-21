@@ -1,8 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
 import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ChannelType, ClanUpdatedEvent, Client } from 'mezon-js';
-import { ApiClanDesc, ApiClanDiscoverRequest, ApiListClanDiscover, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
+import { ChannelType, ClanUpdatedEvent } from 'mezon-js';
+import { ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
 import { batch } from 'react-redux';
 import { accountActions } from '../account/account.slice';
 import { channelsActions } from '../channels/channels.slice';
@@ -25,12 +25,6 @@ export const CLANS_FEATURE_KEY = 'clans';
 
 export interface ClansEntity extends IClan {
 	id: string; // Primary ID
-	clan_logo?: string;
-	verified?: boolean;
-	description?: string;
-	about?: string;
-	online_members?: number;
-	total_members?: number;
 }
 
 export const mapClanToEntity = (clanRes: ApiClanDesc) => {
@@ -60,11 +54,6 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	inviteChannelId?: string;
 	inviteClanId?: string;
 	clansOrder?: string[];
-	discoverClans: ClansEntity[];
-	discoverCurrentPage: number;
-	discoverTotalPages: number;
-	discoverError?: string | null;
-	discoverLoadingStatus: LoadingStatus;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -247,28 +236,6 @@ type UpdateLinkUser = {
 	encrypt_private_key?: string;
 };
 
-export const fetchClansDiscover = createAsyncThunk<ApiListClanDiscover, { page: number; itemPerPage: number }>(
-	'clans/fetchClansDiscover',
-	async ({ page = 1, itemPerPage = LIMIT_CLAN_ITEM }, thunkAPI) => {
-		try {
-			const mezon = new Client('HTTP3m3zonPr0dkey', 'gw.mezon.ai', '443', true);
-			const request: ApiClanDiscoverRequest = {
-				page_number: page,
-				item_per_page: itemPerPage
-			};
-			const basePath = process.env.NEXT_PUBLIC_MEZON_API_URL;
-			const response = await mezon.listClanDiscover('https://dev-mezon.nccsoft.vn:8088', request);
-			if (!response) {
-				return thunkAPI.rejectWithValue('No response from API');
-			}
-			return response;
-		} catch (error) {
-			console.error('Error in fetchClansDiscover:', error);
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
-
 export const updateUser = createAsyncThunk(
 	'clans/updateUser',
 	async ({ user_name, avatar_url, display_name, about_me, logo, noCache = false, dob, encrypt_private_key }: UpdateLinkUser, thunkAPI) => {
@@ -339,12 +306,7 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	invitePeople: false,
 	inviteChannelId: undefined,
 	inviteClanId: undefined,
-	clansOrder: [],
-	discoverClans: [],
-	discoverCurrentPage: 1,
-	discoverTotalPages: 1,
-	discoverError: null,
-	discoverLoadingStatus: 'not loaded'
+	clansOrder: []
 });
 
 type UpdateClanBadgeCountPayload = {
@@ -457,9 +419,6 @@ export const clansSlice = createSlice({
 					});
 				}
 			}
-		},
-		setCurrentPage: (state, action: PayloadAction<number>) => {
-			state.discoverCurrentPage = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -498,23 +457,6 @@ export const clansSlice = createSlice({
 			state.loadingStatus = 'error';
 			state.error = action.error.message;
 		});
-		builder
-			.addCase(fetchClansDiscover.pending, (state) => {
-				state.discoverLoadingStatus = 'loading';
-			})
-			.addCase(fetchClansDiscover.fulfilled, (state, action: PayloadAction<ApiListClanDiscover>) => {
-				state.discoverLoadingStatus = 'loaded';
-				state.discoverClans = (action.payload.clan_discover || []).map((clan) => ({
-					...clan,
-					id: clan.clan_id || '',
-					clan_logo: clan.clan_logo || ''
-				}));
-				state.discoverTotalPages = action.payload.page_count || 1;
-			})
-			.addCase(fetchClansDiscover.rejected, (state, action) => {
-				state.discoverLoadingStatus = 'error';
-				state.discoverError = action.error.message;
-			});
 	}
 });
 
@@ -620,9 +562,3 @@ export const selectInviteClanId = createSelector(getClansState, (state) => state
 export const selectWelcomeChannelByClanId = createSelector([getClansState, (state, clanId: string) => clanId], (state, clanId) => {
 	return selectById(state, clanId)?.welcome_channel_id || null;
 });
-
-export const selectDiscoverClans = createSelector(getClansState, (state) => state.discoverClans);
-export const selectClansCurrentPage = createSelector(getClansState, (state) => state.discoverCurrentPage);
-export const selectClansTotalPages = createSelector(getClansState, (state) => state.discoverTotalPages);
-export const selectDiscoverError = createSelector(getClansState, (state) => state.discoverError);
-export const selectDiscoverLoadingStatus = createSelector(getClansState, (state) => state.discoverLoadingStatus);

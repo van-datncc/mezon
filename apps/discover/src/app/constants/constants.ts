@@ -1,4 +1,3 @@
-// Navigation links
 export const NAVIGATION_LINKS = {
 	HOME: {
 		url: 'https://mezon.ai',
@@ -18,11 +17,10 @@ export const NAVIGATION_LINKS = {
 	},
 	DISCOVER: {
 		url: '/clans',
-		label: 'Clans'
+		label: 'Discover'
 	}
 };
 
-// Categories data
 export const CATEGORIES = [
 	{
 		id: 'all',
@@ -68,19 +66,16 @@ export const CATEGORIES = [
 	}
 ];
 
-// Default images
 export const DEFAULT_IMAGES = {
 	BANNER: 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL',
 	LOGO: 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL'
 };
 
-// Pagination
 export const PAGINATION = {
 	ITEMS_PER_PAGE: 12,
 	MAX_PAGE_NUMBERS: 5
 };
 
-// Colors
 export const COLORS = {
 	PRIMARY: '#5865f2',
 	PRIMARY_HOVER: '#4752c4',
@@ -89,14 +84,12 @@ export const COLORS = {
 	BORDER: '#4465FF4D'
 };
 
-// Z-index values
 export const Z_INDEX = {
 	HEADER: 100,
 	MOBILE_MENU: 100,
 	DROPDOWN: 50
 };
 
-// Breakpoints
 export const BREAKPOINTS = {
 	MOBILE: 'md',
 	DESKTOP: 'lg'

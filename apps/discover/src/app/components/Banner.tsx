@@ -46,7 +46,7 @@ const Banner: React.FC<BannerProps> = ({ onSearch, searchTerm }) => {
 							ref={searchInputRef}
 							type="text"
 							placeholder="Explore communities"
-							className="block w-full pl-10 pr-4 py-3 rounded-full border-none focus:ring-2 focus:ring-[#5865f2] text-gray-900 placeholder-gray-500"
+							className="block w-full pl-10 pr-4 py-3 rounded-full border-none focus:outline-none focus:ring-2 focus:ring-[#5865f2] text-gray-900 placeholder-gray-500"
 							value={searchTerm}
 							onChange={(e) => onSearch(e.target.value)}
 						/>
