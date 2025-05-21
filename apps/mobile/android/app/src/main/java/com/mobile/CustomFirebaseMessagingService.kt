@@ -26,6 +26,7 @@ import android.view.View
 import org.json.JSONArray
 import android.app.ActivityManager
 import android.media.MediaPlayer
+import android.os.PowerManager
 
 class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
@@ -34,13 +35,14 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         private const val PREF_NAME = "NotificationPrefs"
         private const val CHANNEL_ID = "calling_channel"
         private const val NOTIFICATION_ID = 1001
-        private const val CALL_TIMEOUT_MS: Long = 60000L // 60 seconds timeout as Long
+        private const val CALL_TIMEOUT_MS: Long = 40000L
     }
 
     private var vibrator: Vibrator? = null
     private var callTimeoutHandler: android.os.Handler? = null
     private var callTimeoutRunnable: Runnable? = null
     private var mediaPlayer: MediaPlayer? = null
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -109,6 +111,8 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
 
     private fun showCallNotification(data: Map<String, String>) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // Acquire WakeLock to keep the screen active
+        acquireWakeLock()
 
         // Create notification channel for Android O and above
         createCallNotificationChannel(notificationManager)
@@ -139,6 +143,14 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val dismissIntent = Intent(this, NotificationActionReceiver::class.java).apply {
+            action = "NOTIFICATION_DISMISSED"
+        }
+        val dismissPendingIntent = PendingIntent.getBroadcast(
+            this, 2, dismissIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         // Get ringtone sound
         val soundUri = Uri.parse("android.resource://${packageName}/raw/ringing")
 
@@ -163,6 +175,7 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
             .setColorized(true)
             .setOngoing(true)
             .setAutoCancel(true)
+            .setDeleteIntent(dismissPendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setVibrate(longArrayOf(0, 500, 1000, 500))
 
@@ -200,10 +213,38 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         Log.d(TAG, "Call timeout scheduled for $CALL_TIMEOUT_MS ms")
     }
 
-    private fun cancelCallTimeout() {
+    internal fun cancelCallTimeout() {
         callTimeoutRunnable?.let { runnable ->
             callTimeoutHandler?.removeCallbacks(runnable)
-            Log.d(TAG, "Call timeout cancelled")
+        }
+        callTimeoutHandler = null
+        callTimeoutRunnable = null
+    }
+
+    private fun acquireWakeLock() {
+        try {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            wakeLock = powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "$packageName:WAKE_LOCK"
+            )
+            wakeLock?.acquire(30 * 1000L /* 30s timeout */)
+            Log.d(TAG, "WakeLock acquired")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error acquiring WakeLock: ${e.message}")
+        }
+    }
+
+    private fun releaseWakeLock() {
+        try {
+            wakeLock?.let {
+                if (it.isHeld) {
+                    it.release()
+                    Log.d(TAG, "WakeLock released")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing WakeLock: ${e.message}")
         }
     }
 
@@ -213,6 +254,7 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
         stopVibration()
         removeNotificationData()
         cancelCallTimeout()
+        releaseWakeLock()
     }
 
     private fun createCallNotificationChannel(notificationManager: NotificationManager) {
@@ -239,19 +281,17 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
     }
 
     private fun startVibration() {
-        try {
-            // Todo add loop vibration
-        } catch (e: Exception) {
-            Log.e(TAG, "Error starting vibration: ${e.message}")
+        val serviceIntent = Intent(this, VibrationService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
         }
     }
 
     private fun stopVibration() {
-        try {
-            // Stop vibration
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping vibration: ${e.message}")
-        }
+        val serviceIntent = Intent(this, VibrationService::class.java)
+        stopService(serviceIntent)
     }
 
     private fun isAppInForeground(): Boolean {
