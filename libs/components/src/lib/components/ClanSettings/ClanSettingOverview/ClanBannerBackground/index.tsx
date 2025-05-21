@@ -2,17 +2,15 @@ import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { fileTypeImage } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanBannerBackgroundProps = {
-	hasChanges: boolean;
 	onUpload: (urlImage: string) => void;
-	onHasChanges: (hasChanges: boolean) => void;
 };
 
-const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
+const ClanBannerBackground = ({ onUpload }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const currentClan = useSelector(selectCurrentClan);
 
@@ -64,21 +62,6 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 			fileInputRef.current.click();
 		}
 	};
-
-	useEffect(() => {
-		if (urlImage !== currentClan?.banner) {
-			onHasChanges(true);
-		} else {
-			onHasChanges(false);
-		}
-	}, [urlImage, currentClan?.banner]);
-
-	useEffect(() => {
-		if (!hasChanges && fileInputRef.current) {
-			setUrlImage(currentClan?.banner ?? undefined);
-			fileInputRef.current.value = '';
-		}
-	}, [hasChanges]);
 
 	return (
 		<div className="flex sbm:flex-row flex-col pt-10 mt-10 border-t gap-x-5 gap-y-[10px]  dark:border-borderDivider border-borderDividerLight">
