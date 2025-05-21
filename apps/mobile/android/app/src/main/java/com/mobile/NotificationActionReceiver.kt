@@ -30,6 +30,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 // Stop vibration
                 stopVibration(context)
             }
+            "NOTIFICATION_DISMISSED" -> {
+                val service = context as CustomFirebaseMessagingService
+                service.cancelCallTimeout()
+            }
         }
     }
 

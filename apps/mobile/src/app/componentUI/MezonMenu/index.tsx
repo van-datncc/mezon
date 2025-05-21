@@ -1,6 +1,5 @@
 import { size } from '@mezon/mobile-ui';
 import { View } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { IMezonMenuItemProps } from './MezonMenuItem';
 import MezonMenuSection, { IMezonMenuSectionProps } from './MezonMenuSection';
 
@@ -20,10 +19,10 @@ export default function MezonMenu({ menu, marginVertical = size.s_18 }: IMezonMe
 }
 
 export const reserve = () => {
-	Toast.show({
-		type: 'info',
-		text1: 'Coming soon'
-	});
+	// Toast.show({
+	// 	type: 'info',
+	// 	text1: 'Coming soon'
+	// });
 };
 
 export { IMezonMenuItemProps, IMezonMenuSectionProps };
