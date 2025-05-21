@@ -15,7 +15,7 @@ export default function ClanDetailPage() {
 	const clan = clans.find((c: any) => c.clan_id === id);
 	const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
-	const { toClanPage } = useAppNavigation(); // Đưa hook này lên đầu, trước mọi return
+	const { toClanPage } = useAppNavigation();
 
 	if (!clan) {
 		return <div className="text-center py-20">Clan not found.</div>;
