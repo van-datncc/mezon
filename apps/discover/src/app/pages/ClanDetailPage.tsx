@@ -1,10 +1,10 @@
-import { useAppNavigation } from '@mezon/core';
 import { useState } from 'react';
 import { FaCopy, FaDiscord, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
 import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
 import { IoMdClose } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
 import { useDiscover } from '../context/DiscoverContext';
+import { useNavigation } from '../hooks/useNavigation';
 
 const DEFAULT_BANNER = 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL';
 const DEFAULT_LOGO = 'https://play-lh.googleusercontent.com/UPav_gp7_ZAxEiseeV6UMZHGt_Y9vzanriemFsWZgud3S70IPfP4BBVnqIVOk_GR3_U';
@@ -15,7 +15,7 @@ export default function ClanDetailPage() {
 	const clan = clans.find((c: any) => c.clan_id === id);
 	const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
-	const { toClanPage } = useAppNavigation();
+	const { toClanPage } = useNavigation();
 
 	if (!clan) {
 		return <div className="text-center py-20">Clan not found.</div>;
