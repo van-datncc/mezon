@@ -12,40 +12,16 @@ import androidx.core.app.NotificationCompat
 import android.util.Log
 
 class VibrationService : android.app.Service() {
-
     private var vibrator: Vibrator? = null
-    private val CHANNEL_ID = "vibration_service_channel"
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
-        startForeground(1, createNotification())
         startVibration()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         stopVibration()
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Vibration Service",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(channel)
-        }
-    }
-
-    private fun createNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Vibration Service")
-            .setContentText("Running vibration in the background")
-            .setSmallIcon(R.drawable.ic_notification)
-            .build()
     }
 
     private fun startVibration() {
