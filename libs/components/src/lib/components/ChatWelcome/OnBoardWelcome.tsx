@@ -44,8 +44,8 @@ export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 					{currentClan?.banner ? (
 						<img src={currentClan?.banner} />
 					) : (
-						<div className="w-full h-28 font-bold text-4xl text-bgSecondary500  rounded-lg flex items-center justify-center">
-							<p className="[text-shadow:_0_1px_2px_#ffffff]">Click Launch App</p>
+						<div className="w-full h-28 font-bold text-2xl text-bgSecondary500  rounded-lg flex items-center justify-center">
+							<p className="[text-shadow:_0_1px_2px_#ffffff]">Click Launch App To Start</p>
 						</div>
 					)}
 				</div>
