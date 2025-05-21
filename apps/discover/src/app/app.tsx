@@ -1,8 +1,8 @@
-import { useMezon } from '@mezon/transport';
 import { lazy, Suspense, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import HeaderMezon from './components/HeaderMezon';
 import { DiscoverProvider } from './context/DiscoverContext';
+import { useMezonDiscover } from './hooks/useMezonDiscover';
 
 const DiscoverPage = lazy(() => import('./pages/DiscoverPage'));
 const ClanDetailPage = lazy(() => import('./pages/ClanDetailPage'));
@@ -40,10 +40,14 @@ function AppWithStore() {
 }
 
 export default function App() {
-	const mezon = useMezon();
+	const { isLoading, error } = useMezonDiscover();
 
-	if (!mezon) {
-		return <div className="loading">Loading...</div>;
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
+
+	if (error) {
+		return <div className="text-center py-20 text-red-500">{error}</div>;
 	}
 
 	return (
