@@ -79,7 +79,8 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	}, [availableMemberList, availableRoleList, t]);
 
 	const onPrivateChannelChange = useCallback(() => {
-		const isPrivateChannel = !isChannelPublic;
+		setIsChannelPublic(!isChannelPublic);
+		const isPrivateChannel = isChannelPublic;
 		const data = {
 			children: (
 				<MezonConfirm
@@ -99,7 +100,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			)
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, []);
+	}, [isChannelPublic, channel]);
 
 	const openBottomSheet = () => {
 		bottomSheetRef.current?.present();
@@ -116,8 +117,10 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				role_ids: []
 			})
 		);
-		setIsChannelPublic(!isChannelPublic);
 		const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
+		if (isError) {
+			setIsChannelPublic(isPublicChannel(channel));
+		}
 		Toast.show({
 			type: 'success',
 			props: {
