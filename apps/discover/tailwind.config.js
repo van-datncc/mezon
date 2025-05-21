@@ -1,11 +1,6 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const Colors = require('../../libs/ui/src/lib/Variables/Colors');
-const topBarHeight = '50px';
-const titleBarHeight = '21px';
-
-const heightWithoutTopBar = `calc(100dvh - ${topBarHeight})`;
-const heightWithoutTopBarMobile = `calc(100dvh - ${topBarHeight})`;
 
 const plugin = require('tailwindcss/plugin');
 
@@ -45,38 +40,24 @@ module.exports = {
         250: '250px',
       },
       width: {
-        widthSideBar: `calc(100vw - 72px)`,
-        widthHeader: `calc(100% - 344px)`,
         "4/5": "80%",
-        "9/10": "90%",
-        widthTitleBar: '100%'
+        "9/10": "90%"
       },
       height: {
-        heightWithoutTopBar,
-        heightWithoutTopBarMobile,
-        heightTopBar: topBarHeight,
-        heightHeader: "50px",
-        "9/10": "90%",
-        heightTitleBar: `calc(100dvh - ${titleBarHeight})`,
-        heightTitleBarWithoutTopBar: `calc(calc(100dvh - 30px) - 21px)`,
-        heightTitleBarWithoutTopBarMobile: `calc(${heightWithoutTopBarMobile} - ${titleBarHeight})`
+        "9/10": "90%"
       },
-
       maxWidth: {
         '9/10': '90%',
         '2/5': "40%"
       },
-
       maxHeight: {
         '4/5': '80%',
         '9/10': "90%",
         "50vh": "50vh"
       },
-
       minHeight: {
         600: '600px'
       },
-
       fontFamily: {
         ggSans: ['gg sans', 'sans-serif'],
       },
