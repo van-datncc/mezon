@@ -286,7 +286,7 @@ const DirectMessage = () => {
 						)}
 
 						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
-							{currentDmGroup.type === ChannelType.CHANNEL_TYPE_DM && currentDmGroup.user_id?.length === 0 ? (
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && currentDmGroup.user_id?.length === 0 ? (
 								<div className="text-textSecondary800"> You do not have permission to send message</div>
 							) : (
 								<>
