@@ -1,13 +1,14 @@
-import { toChannelPage, useChatSending, useCustomNavigate, useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
+import { toChannelPage, useAuth, useChatSending, useCustomNavigate, useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
 import {
 	DirectEntity,
 	RootState,
 	appActions,
-	audioCallActions,
 	canvasAPIActions,
 	channelsActions,
+	generateMeetToken,
 	getStore,
 	getStoreAsync,
+	handleParticipantVoiceState,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
@@ -36,13 +37,13 @@ import {
 	selectStatusMenu,
 	selectTheme,
 	threadsActions,
-	toastActions,
 	topicsActions,
 	useAppDispatch,
-	useAppSelector
+	useAppSelector,
+	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, createImgproxyUrl } from '@mezon/utils';
+import { IMessageSendPayload, ParticipantMeetState, SubPanelName, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -388,16 +389,38 @@ const DmTopbarTools = memo(() => {
 		[dispatch]
 	);
 
-	const handleStartCall = (isVideoCall = false) => {
-		if (!isInCall) {
-			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
-			dispatch(audioCallActions.startDmCall({ groupId: currentDmGroup.channel_id, isVideo: isVideoCall }));
-			dispatch(audioCallActions.setGroupCallId(currentDmGroup.channel_id));
-			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
-			dispatch(audioCallActions.setIsBusyTone(false));
-		} else {
-			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
-		}
+	const { userProfile } = useAuth();
+
+	const participantMeetState = async (state: ParticipantMeetState, clanId?: string, channelId?: string): Promise<void> => {
+		if (!clanId || !channelId || !userProfile?.user?.id) return;
+
+		await dispatch(
+			handleParticipantVoiceState({
+				clan_id: clanId,
+				channel_id: channelId,
+				display_name: userProfile?.user?.display_name ?? '',
+				state
+			})
+		);
+	};
+	const handleStartCall = async (isVideoCall = false) => {
+		const result = await dispatch(
+			generateMeetToken({
+				channelId: currentDmGroup?.channel_id as string,
+				roomName: currentDmGroup?.meeting_code as string
+			})
+		).unwrap();
+		await participantMeetState(ParticipantMeetState.JOIN, currentDmGroup?.clan_id as string, currentDmGroup?.channel_id as string);
+		dispatch(voiceActions.setJoined(true));
+		dispatch(voiceActions.setToken(result));
+		dispatch(
+			voiceActions.setVoiceInfo({
+				clanId: currentDmGroup?.clan_id as string,
+				clanName: currentDmGroup?.clan_name as string,
+				channelId: currentDmGroup?.channel_id as string,
+				channelLabel: currentDmGroup?.channel_label as string
+			})
+		);
 	};
 
 	return (
