@@ -45,11 +45,9 @@ export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 						<img src={currentClan?.banner} />
 					) : (
 						<div className="w-full h-28 font-bold text-4xl text-bgSecondary500  rounded-lg flex items-center justify-center">
-							<p className="[text-shadow:_0_1px_2px_#ffffff]">App Image</p>
+							<p className="[text-shadow:_0_1px_2px_#ffffff]">Click Launch App</p>
 						</div>
 					)}
-					<p className="font-bold text-white">What do you want to do</p>
-					<AppInfor desc="This is title of App Infor" link="https://www.w3schools.com/TAGs/tryit.asp?filename=tryhtml_link_target" />
 				</div>
 			) : (
 				<>
