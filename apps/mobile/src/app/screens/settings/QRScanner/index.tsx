@@ -8,11 +8,11 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Camera } from 'react-native-camera-kit';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
-import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 import RNQRGenerator from 'rn-qr-generator';
 import LogoMezonDark from '../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../assets/svg/logoMezonLight.svg';
@@ -24,44 +24,48 @@ import { style } from './styles';
 export const QRScanner = () => {
 	const { t } = useTranslation(['qrScanner']);
 	const [hasPermission, setHasPermission] = useState(false);
-	const device = useCameraDevice('back');
+	const [doScanBarcode, setDoScanBarcode] = useState(true);
 	const navigation = useNavigation<any>();
 	const [valueCode, setValueCode] = useState<string>('');
+	const [cameraKey, setCameraKey] = useState(0);
 	const [isSuccess, setIsSuccess] = useState<boolean>(false);
 	const { confirmLoginRequest } = useAuth();
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 
-	const codeScanner = useCodeScanner({
-		codeTypes: ['qr'],
-		onCodeScanned: (codes) => {
-			onNavigationScanned(codes?.[0]?.value || '');
-		}
-	});
-
 	useEffect(() => {
-		const requestCameraPermission = async () => {
-			const permission = await Camera.requestCameraPermission();
-			setHasPermission(permission === 'granted');
-		};
-
 		requestCameraPermission();
 	}, []);
 
+	useEffect(() => {
+		navigation.addListener('focus', () => {
+			setCameraKey((prev) => prev + 1);
+		});
+	}, [navigation]);
+
 	const requestCameraPermission = async () => {
-		const permission = await Camera.requestCameraPermission();
-		if (permission === 'denied') {
-			Alert.alert(
-				t('cameraPermissionDenied'),
-				t('pleaseAllowCamera'),
-				[
-					{ text: t('cancel'), style: 'cancel' },
-					{ text: t('openSettings'), onPress: () => Linking.openSettings() }
-				],
-				{ cancelable: false }
-			);
+		try {
+			if (Platform.OS === 'android') {
+				const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+					setHasPermission(true);
+				} else {
+					Alert.alert(
+						t('cameraPermissionDenied'),
+						t('pleaseAllowCamera'),
+						[
+							{ text: t('cancel'), style: 'cancel' },
+							{ text: t('openSettings'), onPress: () => Linking.openSettings() }
+						],
+						{ cancelable: false }
+					);
+				}
+			} else if (Platform.OS === 'ios') {
+				setHasPermission(true);
+			}
+		} catch (err) {
+			console.warn(err);
 		}
-		setHasPermission(permission === 'granted');
 	};
 
 	const onConfirmLogin = async () => {
@@ -100,6 +104,7 @@ export const QRScanner = () => {
 				mediaType: 'photo'
 			});
 			const fileUri = result?.assets?.[0]?.uri;
+
 			if (fileUri) {
 				const res = await RNQRGenerator.detect({
 					uri: fileUri
@@ -150,6 +155,8 @@ export const QRScanner = () => {
 		} catch (error) {
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			console.error('log  => error', error);
+		} finally {
+			setDoScanBarcode(true);
 		}
 	};
 
@@ -159,7 +166,7 @@ export const QRScanner = () => {
 		});
 	};
 
-	if (device == null || !hasPermission) {
+	if (!hasPermission) {
 		return (
 			<View style={styles.wrapper}>
 				<View style={[styles.popupLogin, { backgroundColor: 'rgba(0,0,0,0.16)' }]}>
@@ -199,7 +206,19 @@ export const QRScanner = () => {
 
 	return (
 		<View style={styles.wrapper}>
-			<Camera codeScanner={codeScanner} style={StyleSheet.absoluteFill} device={device} isActive={!valueCode} />
+			<Camera
+				key={cameraKey}
+				showFrame={false}
+				onReadCode={(event) => {
+					const qrValue = event?.nativeEvent?.codeStringValue;
+					if (qrValue) {
+						setDoScanBarcode(false);
+						onNavigationScanned(qrValue);
+					}
+				}}
+				scanBarcode={doScanBarcode}
+				style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+			/>
 			{!valueCode ? (
 				<View style={{ flex: 1 }}>
 					<View
