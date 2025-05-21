@@ -1,4 +1,4 @@
-import { MemberProfile } from '@mezon/components';
+import { SimpleMemberProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
 import { ChannelMembersEntity, FriendsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -166,7 +166,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				className="py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-[#393c41] hover:bg-[#eaebed] rounded-lg"
 			>
 				<div key={friend?.user?.id} className={'flex-1'}>
-					<MemberProfile
+					<SimpleMemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
 						usernameAva={friend?.user?.username ?? ''}
