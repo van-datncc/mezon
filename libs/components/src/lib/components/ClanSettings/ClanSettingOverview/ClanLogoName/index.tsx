@@ -7,13 +7,11 @@ import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanLogoNameProps = {
-	hasChanges: boolean;
 	onUpload: (url: string) => void;
 	onGetClanName: (clanName: string) => void;
-	onHasChanges: (hasChanges: boolean) => void;
 };
 
-const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: ClanLogoNameProps) => {
+const ClanLogoName = ({ onUpload, onGetClanName }: ClanLogoNameProps) => {
 	const { sessionRef, clientRef } = useMezon();
 	const currentClan = useSelector(selectCurrentClan);
 
@@ -78,22 +76,6 @@ const ClanLogoName = ({ hasChanges, onUpload, onGetClanName, onHasChanges }: Cla
 			fileInputRef.current.click();
 		}
 	};
-
-	useEffect(() => {
-		if (clanName !== currentClan?.clan_name || urlLogo !== currentClan?.logo) {
-			onHasChanges(true);
-		} else {
-			onHasChanges(false);
-		}
-	}, [clanName, urlLogo, currentClan?.logo, currentClan?.clan_name]);
-
-	useEffect(() => {
-		if (!hasChanges && fileInputRef.current) {
-			setUrlLogo(currentClan?.logo ?? undefined);
-			fileInputRef.current.value = '';
-			setClanName(currentClan?.clan_name ?? '');
-		}
-	}, [hasChanges]);
 
 	useEffect(() => {
 		if (clanName === currentClan?.clan_name) {

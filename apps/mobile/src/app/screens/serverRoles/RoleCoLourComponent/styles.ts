@@ -13,13 +13,13 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between'
 		},
 		textBtn: {
-			fontSize: size.label,
+			fontSize: size.small,
 			fontWeight: '500',
 			color: colors.white,
 			textAlign: 'center'
 		},
 		colorText: {
-			fontSize: size.label,
+			fontSize: size.small,
 			color: colors.textDisabled
 		},
 		checkedIcon: {

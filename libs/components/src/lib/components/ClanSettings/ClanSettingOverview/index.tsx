@@ -1,8 +1,8 @@
 import { useClans } from '@mezon/core';
 import { createSystemMessage, fetchSystemMessageByClanId, selectCurrentClan, updateSystemMessage, useAppDispatch } from '@mezon/store';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { ApiSystemMessage, ApiSystemMessageRequest, MezonUpdateClanDescBody, MezonUpdateSystemMessageBody } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { ApiSystemMessage, ApiSystemMessageRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClanBannerBackground from './ClanBannerBackground';
 import ClanLogoName from './ClanLogoName';
@@ -12,7 +12,7 @@ import SystemMessagesManagement from './SystemMessagesManagement';
 const ClanSettingOverview = () => {
 	const { updateClan } = useClans();
 	const currentClan = useSelector(selectCurrentClan);
-	const [hasChanges, setHasChanges] = useState<boolean>(false);
+
 	const [clanRequest, setClanRequest] = useState<MezonUpdateClanDescBody>({
 		banner: currentClan?.banner ?? '',
 		clan_name: currentClan?.clan_name ?? '',
@@ -23,15 +23,7 @@ const ClanSettingOverview = () => {
 	});
 
 	const [systemMessage, setSystemMessage] = useState<ApiSystemMessage | null>(null);
-	const [createSystemMessageRequest, setCreateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
-	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<MezonUpdateSystemMessageBody>({
-		channel_id: systemMessage?.channel_id ?? '',
-		welcome_random: '',
-		welcome_sticker: '',
-		boost_message: '',
-		setup_tips: '',
-		hide_audit_log: ''
-	});
+	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
 
 	const dispatch = useAppDispatch();
 
@@ -40,6 +32,7 @@ const ClanSettingOverview = () => {
 		const resultAction = await dispatch(fetchSystemMessageByClanId({ clanId: currentClan?.clan_id }));
 		const message = unwrapResult(resultAction);
 		setSystemMessage(message);
+		setUpdateSystemMessageRequest(message);
 	};
 
 	useEffect(() => {
@@ -58,34 +51,6 @@ const ClanSettingOverview = () => {
 		setClanRequest({ ...clanRequest, clan_name: clanName ?? '' });
 	};
 
-	const handleCreateSystemMessageRequest = (createSystemMessageRequest: ApiSystemMessageRequest) => {
-		setCreateSystemMessageRequest(createSystemMessageRequest);
-	};
-
-	const handleChangeChannelId = (channelId: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, channel_id: channelId ?? '' });
-	};
-
-	const handleChangeWelcomeRandom = (welcomeRandom: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, welcome_random: welcomeRandom ?? '' });
-	};
-
-	const handleChangeWelcomeSticker = (welcomeSticker: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, welcome_sticker: welcomeSticker ?? '' });
-	};
-
-	const handleChangeBoostMessage = (boostMessage: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, boost_message: boostMessage ?? '' });
-	};
-
-	const handleChangeSetupTips = (setupTips: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, setup_tips: setupTips ?? '' });
-	};
-
-	const handleChangeHideAuditLog = (hideAuditLog: string) => {
-		setUpdateSystemMessageRequest({ ...updateSystemMessageRequest, hide_audit_log: hideAuditLog ?? '' });
-	};
-
 	const handleSave = async () => {
 		if (currentClan?.clan_id) {
 			await updateClan({
@@ -99,55 +64,64 @@ const ClanSettingOverview = () => {
 	const updateSystemMessages = async () => {
 		if (systemMessage && Object.keys(systemMessage).length > 0 && currentClan?.clan_id && updateSystemMessageRequest) {
 			const cachedMessageUpdate: ApiSystemMessage = {
-				boost_message: updateSystemMessageRequest.boost_message || systemMessage.boost_message,
-				channel_id: systemMessage.channel_id,
-				clan_id: systemMessage.clan_id,
-				id: systemMessage.id,
-				hide_audit_log: updateSystemMessageRequest.hide_audit_log || systemMessage.hide_audit_log,
-				setup_tips: updateSystemMessageRequest.setup_tips || systemMessage.setup_tips,
-				welcome_random: updateSystemMessageRequest.welcome_random || systemMessage.welcome_random,
-				welcome_sticker: updateSystemMessageRequest.welcome_sticker || systemMessage.welcome_sticker
+				boost_message:
+					updateSystemMessageRequest?.boost_message === systemMessage?.boost_message ? '' : updateSystemMessageRequest?.boost_message,
+				channel_id: updateSystemMessageRequest?.channel_id === systemMessage?.channel_id ? '' : updateSystemMessageRequest?.channel_id,
+				clan_id: systemMessage?.clan_id,
+				id: systemMessage?.id,
+				hide_audit_log:
+					updateSystemMessageRequest?.hide_audit_log === systemMessage?.hide_audit_log ? '' : updateSystemMessageRequest?.hide_audit_log,
+				setup_tips: updateSystemMessageRequest?.setup_tips === systemMessage?.setup_tips ? '' : updateSystemMessageRequest?.setup_tips,
+				welcome_random:
+					updateSystemMessageRequest?.welcome_random === systemMessage?.welcome_random ? '' : updateSystemMessageRequest?.welcome_random,
+				welcome_sticker:
+					updateSystemMessageRequest?.welcome_sticker === systemMessage?.welcome_sticker ? '' : updateSystemMessageRequest?.welcome_sticker
 			};
 			const request = {
 				clanId: currentClan.clan_id,
-				newMessage: updateSystemMessageRequest,
-				cachedMessage: cachedMessageUpdate
+				newMessage: cachedMessageUpdate,
+				cachedMessage: updateSystemMessageRequest
 			};
 			await dispatch(updateSystemMessage(request));
-		} else if (createSystemMessageRequest) {
-			await dispatch(createSystemMessage(createSystemMessageRequest));
+		} else if (updateSystemMessageRequest) {
+			await dispatch(createSystemMessage(updateSystemMessageRequest));
 		}
 	};
 
-	const handleReset = () => {
-		setHasChanges(false);
-	};
+	const hasChanges = useMemo(() => {
+		if (systemMessage && updateSystemMessageRequest) {
+			const hasSystemMessageChanges = Object.keys(systemMessage).some((key) => {
+				const typedKey = key as keyof ApiSystemMessageRequest;
+				return updateSystemMessageRequest[typedKey] !== systemMessage[typedKey];
+			});
+			if (hasSystemMessageChanges) return true;
+		}
 
+		if (!systemMessage && updateSystemMessageRequest) {
+			return true;
+		}
+
+		if (currentClan && clanRequest) {
+			const hasClanChanges = Object.keys(clanRequest).some((key) => {
+				const typedKey = key as keyof typeof clanRequest;
+				if (clanRequest[typedKey] || currentClan[typedKey]) return clanRequest[typedKey] !== currentClan[typedKey];
+			});
+			if (hasClanChanges) return true;
+		}
+
+		return false;
+	}, [systemMessage, updateSystemMessageRequest, currentClan, clanRequest]);
+
+	const handleReset = () => {};
 	return (
 		<div className="h-full pb-10">
-			<ClanLogoName
-				hasChanges={hasChanges}
-				onUpload={handleUploadLogo}
-				onGetClanName={handleChangeName}
-				onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
-			/>
-			<ClanBannerBackground
-				hasChanges={hasChanges}
-				onUpload={handleUploadBackground}
-				onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
-			/>
+			<ClanLogoName onUpload={handleUploadLogo} onGetClanName={handleChangeName} />
+			<ClanBannerBackground onUpload={handleUploadBackground} />
 			{systemMessage && (
 				<SystemMessagesManagement
-					hasChanges={hasChanges}
-					systemMessage={systemMessage}
-					onGetCreateSystemMessageRequest={handleCreateSystemMessageRequest}
-					onGetChannelId={handleChangeChannelId}
-					onGetWelcomeRandom={handleChangeWelcomeRandom}
-					onGetWelcomeSticker={handleChangeWelcomeSticker}
-					onGetBoostMessage={handleChangeBoostMessage}
-					onGetSetupTips={handleChangeSetupTips}
-					onHasChanges={(hasChanges) => setHasChanges(hasChanges)}
-					onHideAuditLog={handleChangeHideAuditLog}
+					updateSystem={updateSystemMessageRequest}
+					setUpdateSystemMessageRequest={setUpdateSystemMessageRequest}
+					channelSelectedId={updateSystemMessageRequest?.channel_id as string}
 				/>
 			)}
 
