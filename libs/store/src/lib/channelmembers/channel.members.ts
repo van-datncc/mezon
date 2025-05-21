@@ -21,6 +21,7 @@ export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
 export interface ChannelMembersEntity extends IChannelMember {
 	id: string; // Primary ID
 	name?: string;
+	type?: number;
 }
 
 export interface ChannelMemberAvatar {

@@ -1,5 +1,7 @@
 import {
 	DirectMessageBox,
+	DirectMessageContextMenuProvider,
+	DMCT_GROUP_CHAT_ID,
 	FileUploadByDnD,
 	GifStickerEmojiPopup,
 	MemberListGroupChat,
@@ -9,13 +11,13 @@ import {
 } from '@mezon/components';
 import { EmojiSuggestionProvider, useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
-	DirectEntity,
-	MessagesEntity,
 	channelsActions,
 	directActions,
+	DirectEntity,
 	directMetaActions,
 	e2eeActions,
 	gifsStickerEmojiActions,
+	MessagesEntity,
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
@@ -37,7 +39,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, SubPanelName, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { EmojiPlaces, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop, SubPanelName } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -133,6 +135,7 @@ const DirectMessage = () => {
 
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+	// check
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directId ?? ''));
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -312,12 +315,18 @@ const DirectMessage = () => {
 						</div>
 					</div>
 					{Number(type) === ChannelType.CHANNEL_TYPE_GROUP && isShowMemberListDM && (
-						<div
-							className={`contain-strict dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_50px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+						<DirectMessageContextMenuProvider
+							contextMenuId={DMCT_GROUP_CHAT_ID}
+							dataMemberCreate={{ createId: currentDmGroup?.creator_id || '' }}
 						>
-							<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
-						</div>
+							<div
+								className={`contain-strict dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_50px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+							>
+								<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
+							</div>
+						</DirectMessageContextMenuProvider>
 					)}
+
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && isUseProfileDM && (
 						<div
 							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
