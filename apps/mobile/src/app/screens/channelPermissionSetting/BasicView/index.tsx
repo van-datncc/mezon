@@ -110,11 +110,12 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		const response = await dispatch(
 			channelsActions.updateChannelPrivate({
 				channel_id: channel.id,
-				channel_private: isPublicChannel(channel) ? 1 : 0,
+				channel_private: isPublicChannel(channel) ? 0 : 1,
 				user_ids: [userId],
 				role_ids: []
 			})
 		);
+		dispatch(channelsActions.fetchChannels({ clanId: channel?.clan_id, noCache: true, isMobile: true }));
 		const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
 		Toast.show({
 			type: 'success',
