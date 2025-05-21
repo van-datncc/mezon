@@ -68,37 +68,37 @@ export const markdownStyles = (
 			color: colors.text,
 			fontSize: size.h1,
 			lineHeight: size.h1 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		heading2: {
 			color: colors.text,
 			fontSize: size.h2,
 			lineHeight: size.h2 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		heading3: {
 			color: colors.text,
 			fontSize: size.h3,
 			lineHeight: size.h3 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		heading4: {
 			color: colors.text,
 			fontSize: size.h4,
 			lineHeight: size.h4 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		heading5: {
 			color: colors.text,
 			fontSize: size.h5,
 			lineHeight: size.h5 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		heading6: {
 			color: colors.text,
 			fontSize: size.h6,
 			lineHeight: size.h6 + size.s_8,
-			fontWeight: 'bold'
+			fontWeight: '600'
 		},
 		body: commonHeadingStyle,
 		em: commonHeadingStyle,
