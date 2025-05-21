@@ -275,7 +275,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 					autoUpload
 				/>
 
-				<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_34 }} onPress={handleClearBanner}>
+				<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_2 }} onPress={handleClearBanner}>
 					<MezonIconCDN icon={IconCDN.circleXIcon} height={25} width={25} color={themeValue.white} />
 				</Pressable>
 
