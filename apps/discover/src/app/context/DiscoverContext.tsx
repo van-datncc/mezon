@@ -52,7 +52,10 @@ export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 				item_per_page: PAGINATION.ITEMS_PER_PAGE
 			};
 
-			const response = await mezon.listClanDiscover(`${process.env.NX_CHAT_APP_API_GW_HOST}:${process.env.NX_CHAT_APP_API_GW_PORT}`, request);
+			const response = await mezon.listClanDiscover(
+				`https://${process.env.NX_CHAT_APP_API_GW_HOST}:${process.env.NX_CHAT_APP_API_GW_PORT}`,
+				request
+			);
 			if (!response) {
 				throw new Error('No response from API');
 			}
