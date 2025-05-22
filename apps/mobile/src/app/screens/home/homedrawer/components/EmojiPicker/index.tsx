@@ -6,6 +6,7 @@ import { Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
 import {
 	getStoreAsync,
 	gifsActions,
+	selectAnonymousMode,
 	selectCurrentChannel,
 	selectCurrentClanId,
 	selectDmGroupCurrent,
@@ -68,6 +69,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const currentChannel = useSelector(selectCurrentChannel);
 	const clanId = useSelector(selectCurrentClanId);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
 	const [mode, setMode] = useState<ExpressionType>('emoji');
 	const [searchText, setSearchText] = useState<string>('');
@@ -112,9 +114,9 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>
 		) => {
-			sendMessage(content, mentions, attachments, references, false, false, true);
+			sendMessage(content, mentions, attachments, references, dmMode ? false : anonymousMode, false, true);
 		},
-		[sendMessage]
+		[anonymousMode, dmMode, sendMessage]
 	);
 
 	function handleSelected(type: ExpressionType, data: any) {
