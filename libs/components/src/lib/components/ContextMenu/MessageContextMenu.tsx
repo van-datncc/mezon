@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useAppParams, useAuth, useChatReaction, useDirect, usePermissionChecker, useReference, useSendInviteMessage } from '@mezon/core';
 import {
+	channelMetaActions,
 	createEditCanvas,
 	directActions,
 	gifsStickerEmojiActions,
@@ -403,6 +404,28 @@ function MessageContextMenu({
 			toast.error('Failed to note this message');
 		}
 	}, [dispatch, message]);
+
+	const handleMarkUnread = useCallback(async () => {
+		try {
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					clanId: message?.clan_id || '',
+					channelId: message?.channel_id,
+					messageId: message?.id,
+					mode: message?.mode || 0,
+					badge_count: 0
+				})
+			);
+			dispatch(
+				channelMetaActions.setChannelLastSeenTimestamp({
+					channelId: message?.channel_id as string,
+					timestamp: message.create_time_seconds || Date.now()
+				})
+			);
+		} catch (error) {
+			toast.error('Failed to note this message');
+		}
+	}, [dispatch, message]);
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
 			return true;
@@ -656,14 +679,16 @@ function MessageContextMenu({
 			);
 		});
 
-		// builder.when(checkPos, (builder) => {
-		// 	builder.addMenuItem(
-		// 		'copyMessageLink',
-		// 		'Copy Message Link',
-		// 		() => console.log('copyMessageLink'),
-		// 		<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
-		// 	);
-		// });
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'markUnread',
+				'Mark Unread',
+				handleMarkUnread,
+				<svg height="16px" width="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					<path d="M410.9,0H85.1C72.3,0,61.8,10.4,61.8,23.3V512L248,325.8L434.2,512V23.3C434.2,10.4,423.8,0,410.9,0z" fill="currentColor" />
+				</svg>
+			);
+		});
 		message?.code !== TypeMessage.Topic &&
 			notAllowedType &&
 			!isTopic &&
