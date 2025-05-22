@@ -96,6 +96,9 @@ const RoomView = ({
 		}
 	}, [isCameraEnabled, localParticipant]);
 
+	console.log('isCameraEnabled', isCameraEnabled);
+	console.log('isMicrophoneEnabled', isMicrophoneEnabled);
+
 	const handleToggleMicrophone = useCallback(async () => {
 		try {
 			if (isMicrophoneEnabled) {
@@ -104,18 +107,43 @@ const RoomView = ({
 				try {
 					await localParticipant.setMicrophoneEnabled(true);
 				} catch (enableError) {
-					try {
-						const newAudioTrack = await createLocalAudioTrack();
+					console.error('Error enabling microphone:', enableError);
+					let newAudioTrack;
 
+					try {
+						newAudioTrack = await createLocalAudioTrack();
+					} catch (createError) {
+						console.error('Error enabling microphone:', createError);
+						try {
+							const devices = await navigator.mediaDevices.enumerateDevices();
+							const audioInputDevices = devices?.filter((device) => device?.kind === 'audioinput');
+							if (audioInputDevices?.length === 0) {
+								console.error('No audio input devices found');
+								return;
+							}
+							newAudioTrack = await createLocalAudioTrack({
+								deviceId: { exact: audioInputDevices?.[0]?.deviceId }
+							});
+						} catch (deviceError) {
+							console.error('Error creating audio track with device:', deviceError);
+						}
+					}
+
+					try {
 						const oldAudioPublication = Array.from(localParticipant.audioTrackPublications.values()).find(
 							(publication) => publication.source === Track.Source.Microphone
 						);
 						if (oldAudioPublication && oldAudioPublication.track) {
 							await localParticipant.unpublishTrack(oldAudioPublication.track, true);
 						}
+					} catch (unpublicError) {
+						console.error('error unpublic old track: ', unpublicError);
+					}
+
+					try {
 						await localParticipant.publishTrack(newAudioTrack);
-					} catch (newError) {
-						console.error('err: ', newError);
+					} catch (publishError) {
+						console.error('Error publish audio track:', publishError);
 					}
 				}
 			}
