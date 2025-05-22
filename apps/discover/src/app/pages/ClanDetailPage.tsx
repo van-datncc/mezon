@@ -3,11 +3,9 @@ import { FaCopy, FaDiscord, FaFacebook, FaReddit, FaTwitter } from 'react-icons/
 import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
 import { IoMdClose } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
+import { DEFAULT_IMAGES } from '../constants/constants';
 import { useDiscover } from '../context/DiscoverContext';
 import { useNavigation } from '../hooks/useNavigation';
-
-const DEFAULT_BANNER = 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL';
-const DEFAULT_LOGO = 'https://play-lh.googleusercontent.com/UPav_gp7_ZAxEiseeV6UMZHGt_Y9vzanriemFsWZgud3S70IPfP4BBVnqIVOk_GR3_U';
 
 export default function ClanDetailPage() {
 	const { id } = useParams();
@@ -62,11 +60,10 @@ export default function ClanDetailPage() {
 	return (
 		<>
 			<div className="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
-				{/* Banner + Logo */}
 				<div className="relative h-56 bg-gray-200">
-					<img src={clan.banner || DEFAULT_BANNER} alt="banner" className="w-full h-full object-cover" />
+					<img src={clan.banner || DEFAULT_IMAGES.BANNER} alt="banner" className="w-full h-full object-cover" />
 					<div className="absolute left-8 -bottom-10 w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-lg overflow-hidden border-4 border-white">
-						<img src={clan.clan_logo || DEFAULT_LOGO} alt="logo" className="w-full h-full object-cover" />
+						<img src={clan.clan_logo || DEFAULT_IMAGES.LOGO} alt="logo" className="w-full h-full object-cover" />
 					</div>
 				</div>
 				<div className="pt-14 px-8 pb-8">
@@ -84,7 +81,7 @@ export default function ClanDetailPage() {
 									</svg>
 								)}
 							</div>
-							<div className="text-gray-600 mb-2">{clan.description || clan.about || 'No description.'}</div>
+							<div className="text-gray-600 mb-2">{clan.description || 'No description.'}</div>
 							<div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
 								<div className="flex items-center gap-1">
 									<div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -163,7 +160,7 @@ export default function ClanDetailPage() {
 					</div>
 					<div className="mt-8">
 						<h2 className="text-lg font-bold mb-2">About</h2>
-						<div className="text-gray-700 text-sm">{clan.about || clan.description || 'No additional information.'}</div>
+						<div className="text-gray-700 text-sm">{clan.about || 'No additional information.'}</div>
 					</div>
 				</div>
 			</div>
