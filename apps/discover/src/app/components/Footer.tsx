@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { MEZON_LOGO } from '../constants/constants';
 
 const Footer: React.FC = () => {
 	return (
@@ -133,10 +134,10 @@ const Footer: React.FC = () => {
 
 				<div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
 					<div className="flex items-center mb-4 md:mb-0">
-						<Link to="/" className="flex items-center">
-							<img src="assets/images/mezon-logo-white.svg" alt="Mezon Logo" className="w-8 h-8 mr-2" />
+						<a href="/clans" className="flex items-center gap-[4.92px]">
+							<img src={MEZON_LOGO.DARK} alt="Mezon Logo" className="w-11 h-11 mr-2" />
 							<span className="text-white font-semibold text-lg">Mezon</span>
-						</Link>
+						</a>
 					</div>
 				</div>
 			</div>

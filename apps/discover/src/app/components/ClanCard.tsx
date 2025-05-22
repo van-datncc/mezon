@@ -2,6 +2,7 @@ import { ApiClanDiscover } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_IMAGES } from '../constants/constants';
+import ImageWithSkeleton from './common/ImageWithSkeleton';
 /**
  * @param clan
  */
@@ -15,6 +16,8 @@ const ClanCard: React.FC<ClanCardProps> = ({ clan }) => {
 	const navigate = useNavigate();
 	const [bannerError, setBannerError] = useState(false);
 	const [logoError, setLogoError] = useState(false);
+	const [isLogoLoading, setIsLogoLoading] = useState(true);
+	const [isBannerLoading, setIsBannerLoading] = useState(true);
 
 	const formatNumber = (num: number | undefined) => {
 		return num?.toLocaleString('en-US') || '0';
@@ -37,31 +40,28 @@ const ClanCard: React.FC<ClanCardProps> = ({ clan }) => {
 			onClick={() => navigate(`/clan/${clan.clan_id}`)}
 		>
 			<div className="flex-shrink-0 w-24 sm:w-40 h-24 sm:h-28 md:w-48 md:h-32 bg-gray-200 flex items-center justify-center">
-				{clan.banner && !bannerError ? (
-					<img
-						src={clan.banner}
-						alt={`${clanName} banner`}
-						className="w-full h-full object-cover rounded-l-xl"
-						onError={handleBannerError}
-					/>
-				) : (
-					<img src={DEFAULT_IMAGES.BANNER} alt="Default banner" className="w-full h-full object-cover rounded-l-xl" />
-				)}
+				<ImageWithSkeleton
+					src={clan.banner && !bannerError ? clan.banner : DEFAULT_IMAGES.BANNER}
+					alt={`${clanName} banner`}
+					className="w-full h-full object-cover rounded-l-xl"
+					skeletonClassName="rounded-l-xl"
+					onError={handleBannerError}
+				/>
 			</div>
 			<div className="flex-1 flex flex-col justify-center px-3 sm:px-4 py-2 sm:py-3 min-w-0">
 				<div className="flex items-center gap-2 min-w-0 mb-1">
 					<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center overflow-hidden flex-shrink-0">
-						{clan.clan_logo && !logoError ? (
-							<img src={clan.clan_logo} alt={`${clanName} logo`} className="w-full h-full object-cover" onError={handleLogoError} />
-						) : (
-							<img src={DEFAULT_IMAGES.LOGO} alt="Default logo" className="w-full h-full object-cover" />
-						)}
+						<ImageWithSkeleton
+							src={clan.clan_logo && !logoError ? clan.clan_logo : DEFAULT_IMAGES.LOGO}
+							alt={`${clanName} logo`}
+							className="w-full h-full object-cover"
+							skeletonClassName="rounded-full"
+							onError={handleLogoError}
+						/>
 					</div>
 					<h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 truncate">{clanName}</h3>
 				</div>
-				<p className="text-xs sm:text-sm text-gray-700 line-clamp-2 mb-1">
-					{clan.description || (clan.about ? clan.about : 'Community clan')}
-				</p>
+				<p className="text-xs sm:text-sm text-gray-700 line-clamp-2 mb-1">{clan.description || 'Community clan'}</p>
 				<div className="flex items-center text-gray-500 text-[10px] sm:text-xs space-x-2 sm:space-x-3 mb-1">
 					<div className="flex items-center">
 						<div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 mr-1"></div>

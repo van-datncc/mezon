@@ -21,8 +21,13 @@ interface DiscoverContextType {
 
 const DiscoverContext = createContext<DiscoverContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'discover_clans';
+
 export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [clans, setClans] = useState<ApiClanDiscover[]>([]);
+	const [clans, setClans] = useState<ApiClanDiscover[]>(() => {
+		const savedClans = localStorage.getItem(STORAGE_KEY);
+		return savedClans ? JSON.parse(savedClans) : [];
+	});
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -52,8 +57,11 @@ export const DiscoverProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 				throw new Error('No response from API');
 			}
 
-			setClans(response.clan_discover || []);
+			const newClans = response.clan_discover || [];
+			setClans(newClans);
 			setTotalPages(response.page_count || 1);
+
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(newClans));
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'An error occurred');
 			toast.error('Cannot fetch clans, please try again later');
