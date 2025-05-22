@@ -1,3 +1,8 @@
+import Mezon_Dark from '../assets/Logo_mezon_dark.png';
+import Mezon_Light from '../assets/Logo_mezon_light.png';
+import No_Banner from '../assets/no_banner.jpg';
+import No_Logo from '../assets/no_logo.png';
+
 export const NAVIGATION_LINKS = {
 	HOME: {
 		url: 'https://mezon.ai',
@@ -20,7 +25,10 @@ export const NAVIGATION_LINKS = {
 		label: 'Discover'
 	}
 };
-
+export const MEZON_LOGO = {
+	LIGHT: Mezon_Light,
+	DARK: Mezon_Dark
+};
 export const CATEGORIES = [
 	{
 		id: 'all',
@@ -67,8 +75,8 @@ export const CATEGORIES = [
 ];
 
 export const DEFAULT_IMAGES = {
-	BANNER: 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL',
-	LOGO: 'https://avatars.mds.yandex.net/get-altay/2714499/2a00000171f9f3edac1a338e6573cf9da97b/XXXL'
+	BANNER: No_Banner,
+	LOGO: No_Logo
 };
 
 export const PAGINATION = {
