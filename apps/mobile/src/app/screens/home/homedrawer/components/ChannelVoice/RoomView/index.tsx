@@ -96,9 +96,6 @@ const RoomView = ({
 		}
 	}, [isCameraEnabled, localParticipant]);
 
-	console.log('isCameraEnabled', isCameraEnabled);
-	console.log('isMicrophoneEnabled', isMicrophoneEnabled);
-
 	const handleToggleMicrophone = useCallback(async () => {
 		try {
 			if (isMicrophoneEnabled) {
