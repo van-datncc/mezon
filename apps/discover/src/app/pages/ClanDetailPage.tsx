@@ -3,6 +3,7 @@ import { FaCopy, FaDiscord, FaFacebook, FaReddit, FaTwitter } from 'react-icons/
 import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
 import { IoMdClose } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
+import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
 import { DEFAULT_IMAGES } from '../constants/constants';
 import { useDiscover } from '../context/DiscoverContext';
 import { useNavigation } from '../hooks/useNavigation';
@@ -61,9 +62,18 @@ export default function ClanDetailPage() {
 		<>
 			<div className="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
 				<div className="relative h-56 bg-gray-200">
-					<img src={clan.banner || DEFAULT_IMAGES.BANNER} alt="banner" className="w-full h-full object-cover" />
+					<ImageWithSkeleton
+						src={clan.banner || DEFAULT_IMAGES.BANNER}
+						alt="banner"
+						className="w-full h-full object-cover"
+					/>
 					<div className="absolute left-8 -bottom-10 w-20 h-20 rounded-2xl bg-white flex items-center justify-center shadow-lg overflow-hidden border-4 border-white">
-						<img src={clan.clan_logo || DEFAULT_IMAGES.LOGO} alt="logo" className="w-full h-full object-cover" />
+						<ImageWithSkeleton
+							src={clan.clan_logo || DEFAULT_IMAGES.LOGO}
+							alt="logo"
+							className="w-full h-full object-cover"
+							skeletonClassName="rounded-2xl"
+						/>
 					</div>
 				</div>
 				<div className="pt-14 px-8 pb-8">
@@ -186,9 +196,8 @@ export default function ClanDetailPage() {
 								/>
 								<button
 									onClick={handleCopy}
-									className={`flex items-center gap-1 px-3 py-1.5 rounded-md w-[80px] text-sm transition-colors ${
-										isCopied ? 'bg-gray-200 text-gray-600' : 'bg-[#5865f2] text-white hover:bg-[#4752c4]'
-									}`}
+									className={`flex items-center gap-1 px-3 py-1.5 rounded-md w-[80px] text-sm transition-colors ${isCopied ? 'bg-gray-200 text-gray-600' : 'bg-[#5865f2] text-white hover:bg-[#4752c4]'
+										}`}
 								>
 									<FaCopy size={14} />
 									{isCopied ? 'Copied!' : 'Copy'}

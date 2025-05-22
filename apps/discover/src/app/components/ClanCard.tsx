@@ -2,6 +2,7 @@ import { ApiClanDiscover } from 'mezon-js/api.gen';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_IMAGES } from '../constants/constants';
+import ImageWithSkeleton from './common/ImageWithSkeleton';
 /**
  * @param clan
  */
@@ -39,24 +40,22 @@ const ClanCard: React.FC<ClanCardProps> = ({ clan }) => {
 			onClick={() => navigate(`/clan/${clan.clan_id}`)}
 		>
 			<div className="flex-shrink-0 w-24 sm:w-40 h-24 sm:h-28 md:w-48 md:h-32 bg-gray-200 flex items-center justify-center">
-				{isBannerLoading && <div className="w-full h-full skeleton rounded-l-xl" />}
-				<img
+				<ImageWithSkeleton
 					src={clan.banner && !bannerError ? clan.banner : DEFAULT_IMAGES.BANNER}
 					alt={`${clanName} banner`}
-					className={`w-full h-full object-cover rounded-l-xl ${isBannerLoading ? 'hidden' : ''}`}
-					onLoad={() => setIsBannerLoading(false)}
+					className="w-full h-full object-cover rounded-l-xl"
+					skeletonClassName="rounded-l-xl"
 					onError={handleBannerError}
 				/>
 			</div>
 			<div className="flex-1 flex flex-col justify-center px-3 sm:px-4 py-2 sm:py-3 min-w-0">
 				<div className="flex items-center gap-2 min-w-0 mb-1">
 					<div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center overflow-hidden flex-shrink-0">
-						{isLogoLoading && <div className="w-full h-full skeleton rounded-full" />}
-						<img
+						<ImageWithSkeleton
 							src={clan.clan_logo && !logoError ? clan.clan_logo : DEFAULT_IMAGES.LOGO}
 							alt={`${clanName} logo`}
-							className={`w-full h-full object-cover ${isLogoLoading ? 'hidden' : ''}`}
-							onLoad={() => setIsLogoLoading(false)}
+							className="w-full h-full object-cover"
+							skeletonClassName="rounded-full"
 							onError={handleLogoError}
 						/>
 					</div>
