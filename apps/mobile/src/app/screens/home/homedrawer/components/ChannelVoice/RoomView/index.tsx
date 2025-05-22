@@ -13,6 +13,7 @@ import {
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { clansActions, selectIsPiPMode, selectVoiceInfo, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import * as Sentry from '@sentry/react-native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
@@ -112,6 +113,7 @@ const RoomView = ({
 						newAudioTrack = await createLocalAudioTrack();
 					} catch (createError) {
 						console.error('Error enabling microphone:', createError);
+						Sentry.captureException('ToogleMicMezonMeet', { extra: { createError } });
 						try {
 							const devices = await navigator.mediaDevices.enumerateDevices();
 							const audioInputDevices = devices?.filter((device) => device?.kind === 'audioinput');
