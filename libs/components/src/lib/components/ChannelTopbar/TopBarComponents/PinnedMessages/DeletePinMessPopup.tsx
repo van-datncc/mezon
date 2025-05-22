@@ -2,7 +2,7 @@ import { PinMessageEntity, selectMemberClanByUserId } from '@mezon/store';
 import { safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
-import { MemberProfile } from '../../../MemberProfile';
+import { SimpleMemberProfile } from '../../../MemberProfile';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 import { ListPinAttachment } from './ItemPinMessage';
 
@@ -30,7 +30,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 					</div>
 					<div className="p-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
 						<div className="flex items-start p-4 pr-6 shadow-md dark:shadow-black rounded">
-							<MemberProfile
+							<SimpleMemberProfile
 								isHideUserName={true}
 								avatar={pinMessage.avatar || ''}
 								name={pinMessage.username ?? ''}
