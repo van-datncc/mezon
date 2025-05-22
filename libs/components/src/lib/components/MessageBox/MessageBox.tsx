@@ -55,8 +55,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
 
-			if (anonymousMessage) {
-			}
+
 
 			if (attachmentFilteredByChannelId?.files?.length + 1 > MAX_FILE_ATTACHMENTS) {
 				setOverUploadingState(true, UploadLimitReason.COUNT);
@@ -109,8 +108,6 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 				}
 			}
 
-			if (anonymousMessage) {
-			}
 		},
 		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode, attachmentFilteredByChannelId?.files?.length]
 	);
