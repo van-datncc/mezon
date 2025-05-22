@@ -13,7 +13,6 @@ import {
 	selectAllChannels,
 	selectChannelsByClanId,
 	selectChannelThreads,
-	selectCurrentClanId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -26,7 +25,6 @@ export function useMarkAsRead() {
 	const [statusMarkAsReadChannel, setStatusMarkAsReadChannel] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const [statusMarkAsReadCategory, setStatusMarkAsReadCategory] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const [statusMarkAsReadClan, setStatusMarkAsReadClan] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
-	const currentClanId = useAppSelector(selectCurrentClanId);
 	const channelsInClan = useAppSelector(selectAllChannels);
 
 	const actionMarkAsRead = useCallback(
