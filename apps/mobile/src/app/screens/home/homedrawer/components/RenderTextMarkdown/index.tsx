@@ -64,12 +64,42 @@ export const markdownStyles = (
 		fontSize: isLastMessage ? size.small : size.medium
 	};
 	return StyleSheet.create({
-		heading1: commonHeadingStyle,
-		heading2: commonHeadingStyle,
-		heading3: commonHeadingStyle,
-		heading4: commonHeadingStyle,
-		heading5: commonHeadingStyle,
-		heading6: commonHeadingStyle,
+		heading1: {
+			color: colors.text,
+			fontSize: size.h1,
+			lineHeight: size.h1 + size.s_8,
+			fontWeight: '600'
+		},
+		heading2: {
+			color: colors.text,
+			fontSize: size.h2,
+			lineHeight: size.h2 + size.s_8,
+			fontWeight: '600'
+		},
+		heading3: {
+			color: colors.text,
+			fontSize: size.h3,
+			lineHeight: size.h3 + size.s_8,
+			fontWeight: '600'
+		},
+		heading4: {
+			color: colors.text,
+			fontSize: size.h4,
+			lineHeight: size.h4 + size.s_8,
+			fontWeight: '600'
+		},
+		heading5: {
+			color: colors.text,
+			fontSize: size.h5,
+			lineHeight: size.h5 + size.s_8,
+			fontWeight: '600'
+		},
+		heading6: {
+			color: colors.text,
+			fontSize: size.h6,
+			lineHeight: size.h6 + size.s_8,
+			fontWeight: '600'
+		},
 		body: commonHeadingStyle,
 		em: commonHeadingStyle,
 		s: commonHeadingStyle,
@@ -81,7 +111,6 @@ export const markdownStyles = (
 		},
 		code_block: {
 			color: colors.text,
-			paddingVertical: size.s_10,
 			borderColor: colors.secondary,
 			fontSize: size.h7,
 			lineHeight: size.s_22,
@@ -99,7 +128,8 @@ export const markdownStyles = (
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
-			overflow: 'hidden'
+			overflow: 'hidden',
+			paddingVertical: size.s_10
 		},
 		link: {
 			color: colors.textLink,
@@ -432,6 +462,14 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.PRE:
+					case EBacktickType.TRIPLE: {
+						const lines = (
+							contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
+								? contentInElement.slice(3, -3)
+								: contentInElement
+						)
+							?.replace(/^\n+|\n+$/g, '')
+							?.split('\n');
 						textParts.push(
 							<Text>
 								{s !== 0 && '\n'}
@@ -451,44 +489,37 @@ export const RenderTextMarkdownContent = ({
 												: {}
 										}
 									>
-										<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
-									</View>
-								</View>
-							</Text>
-						);
-						break;
+										{lines.map((line, idx) => {
+											const headingMatch = line.match(/^#{1,6}\s+.+$/);
+											if (headingMatch && themeValue) {
+												const level = line.indexOf(' ');
+												const headingText = line.substring(level).trim();
 
-					case EBacktickType.TRIPLE:
-						textParts.push(
-							<Text>
-								{s !== 0 && '\n'}
-								<View
-									style={
-										themeValue
-											? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage, isTabletLandscape)
-													.blockSpacing
-											: {}
-									}
-								>
-									<View
-										key={`pre-${index}`}
-										style={
-											themeValue
-												? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage, isTabletLandscape).fence
-												: {}
-										}
-									>
-										<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
-											{(contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
-												? contentInElement?.slice(3, -3)
-												: contentInElement
-											)?.replace(/^\n+|\n+$/g, '')}
-										</Text>
+												return (
+													<Text
+														key={`line-${idx}`}
+														style={[
+															markdownStyles(themeValue).code_block,
+															markdownStyles(themeValue)?.[`heading${level}`]
+														]}
+													>
+														{headingText}
+													</Text>
+												);
+											}
+
+											return (
+												<Text key={`line-${idx}`} style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+													{line}
+												</Text>
+											);
+										})}
 									</View>
 								</View>
 							</Text>
 						);
 						break;
+					}
 
 					case EBacktickType.BOLD:
 						textParts.push(
