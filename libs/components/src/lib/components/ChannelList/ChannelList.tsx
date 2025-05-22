@@ -29,7 +29,7 @@ import {
 	toggleDisableHover,
 	useSyncEffect
 } from '@mezon/utils';
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -232,6 +232,35 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 		const { currentScrollIndex } = findScrollIndex();
 		return currentScrollIndex === -1;
 	};
+	const dragItemIndex = useRef<string | null>(null);
+	const dragOverItemIndex = useRef<number | null>(null);
+	const handleDragStart = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, idElement: string) => {
+		dragItemIndex.current = idElement;
+	}, []);
+
+	const handleDragEnter = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, idElement: string) => {
+		const element = document.getElementById(idElement);
+		if (element) {
+			if (dragItemIndex.current && dragItemIndex.current !== (e.target as HTMLDivElement).id && (e.target as HTMLDivElement).id) {
+				element.style.borderBottom = '3px solid #22c55e';
+				const privousElement = document.getElementById(dragItemIndex.current);
+				if (privousElement) {
+					privousElement.style.borderBottom = 'none';
+					dragItemIndex.current = idElement;
+				}
+			}
+		}
+	}, []);
+
+	const handleDragEnd = useCallback(() => {
+		if (dragItemIndex.current) {
+			const privousElement = document.getElementById(dragItemIndex.current);
+			if (privousElement) {
+				privousElement.style.borderBottom = 'none';
+			}
+			dragItemIndex.current = null;
+		}
+	}, []);
 
 	return (
 		<div
@@ -266,7 +295,7 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 					}}
 					className="channel-wrap"
 				>
-					{items.map((virtualRow) => {
+					{items.map((virtualRow, index) => {
 						const item = data[virtualRow.index];
 						if (virtualRow.index === 0) {
 							return (
@@ -281,6 +310,9 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									key={virtualRow.key}
 									data-index={virtualRow.index}
 									ref={virtualizer.measureElement}
+									id={`drag-detect-${item.id}`}
+									onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
+									onDragEnd={handleDragEnd}
 								>
 									<CategorizedItem key={item.id} category={item} />
 								</div>
@@ -288,7 +320,17 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 						} else {
 							if (!(item as IChannel)?.parent_id || (item as IChannel).parent_id === '0') {
 								return (
-									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<div
+										key={virtualRow.key}
+										data-index={virtualRow.index}
+										id={`drag-detect-${item.id}`}
+										draggable
+										onDragStart={(e) => handleDragStart(index, e, `drag-detect-${item.id}`)}
+										onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
+										onDragEnd={handleDragEnd}
+										className="py-1"
+										ref={virtualizer.measureElement}
+									>
 										<ChannelListItem
 											isActive={currentChannelId === (item as IChannel).channel_id && !(item as IChannel).isFavor}
 											key={item.id}

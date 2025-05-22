@@ -110,7 +110,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 				channel?.count_mess_unread)
 		) {
 			return (
-				<div className={'pt-1'}>
+				<>
 					{renderChannelLink()}
 					{channelMemberList?.length > 0 && (
 						<div className="flex gap-1 px-4">
@@ -135,7 +135,7 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 							</div>
 						</div>
 					)}
-				</div>
+				</>
 			);
 		}
 
