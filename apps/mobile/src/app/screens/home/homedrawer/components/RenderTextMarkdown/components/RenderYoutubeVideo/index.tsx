@@ -40,8 +40,8 @@ const RenderYoutubeVideo = ({
 				)}
 
 				<YoutubePlayer
-					height={size.s_180}
-					width={size.s_325}
+					height={size.s_170}
+					width={size.s_300}
 					videoId={videoId}
 					play={false}
 					onReady={() => setIsVideoReady(true)}

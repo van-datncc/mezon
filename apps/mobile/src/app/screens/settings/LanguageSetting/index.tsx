@@ -1,5 +1,5 @@
 import { CheckIcon } from '@mezon/mobile-components';
-import { Colors } from '@mezon/mobile-ui';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
@@ -7,6 +7,8 @@ import { styles } from './styles';
 
 export const LanguageSetting = () => {
 	const [currentLanguage, setCurrentLanguage] = useState<string>('en');
+	const { themeValue } = useTheme();
+	const themeStyles = styles(themeValue);
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
@@ -16,7 +18,7 @@ export const LanguageSetting = () => {
 	const languageList = useMemo(() => {
 		return [
 			{
-				title: 'English, UK',
+				title: 'English',
 				value: 'en'
 			},
 			{
@@ -32,14 +34,14 @@ export const LanguageSetting = () => {
 	};
 
 	return (
-		<View style={styles.languageSettingContainer}>
+		<View style={themeStyles.languageSettingContainer}>
 			<FlatList
 				data={languageList}
 				keyExtractor={(item) => item.value}
 				ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
 				renderItem={({ item }) => (
-					<Pressable onPress={() => changeLanguage(item.value)} style={[styles.languageItem]}>
-						<Text style={styles.optionText}>{item.title}</Text>
+					<Pressable onPress={() => changeLanguage(item.value)} style={[themeStyles.languageItem]}>
+						<Text style={themeStyles.optionText}>{item.title}</Text>
 						{currentLanguage === item.value ? <CheckIcon color={Colors.bgViolet} /> : null}
 					</Pressable>
 				)}

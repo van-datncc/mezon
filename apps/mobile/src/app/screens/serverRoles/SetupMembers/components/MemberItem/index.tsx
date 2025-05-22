@@ -78,7 +78,7 @@ export const MemberItem = memo((props: IMemberItemProps) => {
 			>
 				<View style={{ flex: 1, flexDirection: 'row', gap: size.s_10, alignItems: 'center' }}>
 					<MezonAvatar avatarUrl={member?.user?.avatar_url} username={member?.user?.username} />
-					<View>
+					<View style={{ width: '80%' }}>
 						{memberName ? <Text color={themeValue.white}>{memberName}</Text> : null}
 						<Text color={themeValue.text}>{member?.user?.username}</Text>
 					</View>

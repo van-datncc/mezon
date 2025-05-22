@@ -90,7 +90,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			channelType !== ChannelType.CHANNEL_TYPE_STREAMING &&
 			channelType !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
 		) {
-			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+			navigation.replace(APP_SCREEN.HOME_DEFAULT);
 			requestAnimationFrame(async () => {
 				await store.dispatch(channelsActions.joinChannel({ clanId: clanID ?? '', channelId: channelID, noFetchMembers: false }));
 			});
@@ -98,7 +98,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			await sleep(1000);
 		} else {
-			navigation.navigate(APP_SCREEN.HOME);
+			navigation.replace(APP_SCREEN.HOME);
 		}
 		setChannelName('');
 		dispatch(appActions.setLoadingMainMobile(false));

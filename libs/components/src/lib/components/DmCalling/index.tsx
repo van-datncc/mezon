@@ -31,7 +31,7 @@ import { Dropdown } from 'flowbite-react';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { MemberProfile } from '../MemberProfile';
+import { SimpleMemberProfile } from '../MemberProfile';
 import DeviceSelector from './DeviceSelector';
 import LabelDm from './labelDm';
 
@@ -205,7 +205,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
-					<MemberProfile
+					<SimpleMemberProfile
 						numberCharacterCollapse={22}
 						avatar={
 							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP

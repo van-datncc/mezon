@@ -16,7 +16,7 @@ import {
 import { isPublicChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import React, { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -41,6 +41,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const everyoneRole = useSelector(selectEveryoneRole);
 	const allClanMembers = useSelector(selectAllUserClans);
+	const [isChannelPublic, setIsChannelPublic] = useState<boolean>(isPublicChannel(channel));
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
 	const listOfChannelMember = useAppSelector(selectAllUserChannel(channel?.channel_id));
@@ -78,19 +79,19 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	}, [availableMemberList, availableRoleList, t]);
 
 	const onPrivateChannelChange = useCallback(() => {
-		const isPrivateChannel = !isPublicChannel(channel);
+		setIsChannelPublic(!isChannelPublic);
 		const data = {
 			children: (
 				<MezonConfirm
 					onConfirm={updateChannel}
 					title={
-						isPrivateChannel
+						isChannelPublic
 							? t('channelPermission.warningModal.privateChannelTitle')
 							: t('channelPermission.warningModal.publicChannelTitle')
 					}
 					confirmText={t('channelPermission.warningModal.confirm')}
 					content={
-						isPrivateChannel
+						isChannelPublic
 							? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
 							: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
 					}
@@ -98,24 +99,29 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 			)
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, []);
+	}, [isChannelPublic, channel]);
 
 	const openBottomSheet = () => {
 		bottomSheetRef.current?.present();
 	};
 
-	const updateChannel = async () => {
+	const updateChannel = useCallback(async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+
+		console.log('updateChannel', isChannelPublic);
 
 		const response = await dispatch(
 			channelsActions.updateChannelPrivate({
 				channel_id: channel.id,
-				channel_private: isPublicChannel(channel) ? 1 : 0,
+				channel_private: isChannelPublic ? 0 : 1,
 				user_ids: [userId],
 				role_ids: []
 			})
 		);
 		const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
+		if (isError) {
+			setIsChannelPublic(isPublicChannel(channel));
+		}
 		Toast.show({
 			type: 'success',
 			props: {
@@ -127,7 +133,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				)
 			}
 		});
-	};
+	}, [dispatch, channel, isChannelPublic, userId]);
 
 	const renderWhoCanAccessItem = useCallback(
 		({ item }) => {
@@ -171,7 +177,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 					<View style={{ alignItems: 'center' }}>
 						<Text color={themeValue.text}>{t('channelPermission.privateChannel')}</Text>
 					</View>
-					<MezonSwitch value={!isPublicChannel(channel)} onValueChange={onPrivateChannelChange} />
+					<MezonSwitch value={!isChannelPublic} onValueChange={onPrivateChannelChange} />
 				</View>
 			</TouchableOpacity>
 

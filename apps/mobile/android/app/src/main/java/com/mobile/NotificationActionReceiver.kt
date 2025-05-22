@@ -5,6 +5,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.os.Build
 
 class NotificationActionReceiver : BroadcastReceiver() {
 
@@ -13,6 +17,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         private const val NOTIFICATION_ID = 1001
         private const val PREF_NAME = "NotificationPrefs"
     }
+    private var vibrator: Vibrator? = null
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "Received broadcast action: ${intent.action}")
@@ -25,10 +30,15 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 notificationManager.cancel(NOTIFICATION_ID)
 
                 // Remove stored notification data
-                removeNotificationData(context)
+                val serviceIntent = Intent(context, VibrationService::class.java)
+                context.stopService(serviceIntent)
 
-                // Stop vibration
-                stopVibration(context)
+                // Remove stored notification data
+                removeNotificationData(context)
+            }
+            "NOTIFICATION_DISMISSED" -> {
+                val service = context as CustomFirebaseMessagingService
+                service.cancelCallTimeout()
             }
         }
     }
@@ -41,21 +51,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
             editor.apply()
         } catch (e: Exception) {
             Log.e(TAG, "Error removing notification data: ${e.message}")
-        }
-    }
-
-    private fun stopVibration(context: Context) {
-        try {
-            val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-                vibratorManager.defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                context.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-            }
-            vibrator.cancel()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error stopping vibration: ${e.message}")
         }
     }
 }

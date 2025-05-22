@@ -1,5 +1,5 @@
 import { IOption } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
@@ -43,7 +43,7 @@ const HeaderTooltip = ({ onPressOption, options }: ITooltipHeaderProps) => {
 				>
 					{!isShowTooltip && (
 						<TouchableOpacity onPress={toggleTooltip} style={styles.iconTooltip}>
-							<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={size.s_20} width={size.s_18} color={Colors.textGray} />
+							<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={size.s_20} width={size.s_18} color={themeValue.text} />
 						</TouchableOpacity>
 					)}
 				</Tooltip>
