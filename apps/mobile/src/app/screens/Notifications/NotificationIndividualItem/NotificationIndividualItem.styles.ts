@@ -24,6 +24,7 @@ export const style = (colors: Attributes) =>
 			flex: 1
 		},
 		notifyUserName: {
+			color: colors.text,
 			fontSize: size.s_16,
 			fontWeight: 'bold'
 		},

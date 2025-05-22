@@ -58,6 +58,7 @@ export const style = (colors: Attributes) =>
 		},
 		username: {
 			fontSize: size.medium,
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			color: colors.text
 		}
 	});
