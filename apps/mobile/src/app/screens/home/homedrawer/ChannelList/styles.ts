@@ -62,7 +62,7 @@ export const style = (colors: Attributes, isTablet: boolean) =>
 			fontSize: size.s_14,
 			color: colors.textStrong
 		},
-		buttonBadgeCountText: { textAlign: 'center', fontSize: size.medium, fontWeight: '600', color: colors.white, textTransform: 'uppercase' },
+		buttonBadgeCountText: { textAlign: 'center', fontSize: size.medium, fontWeight: '600', color: 'white', textTransform: 'uppercase' },
 		buttonBadgeCount: {
 			backgroundColor: baseColor.redStrong,
 			position: 'absolute',

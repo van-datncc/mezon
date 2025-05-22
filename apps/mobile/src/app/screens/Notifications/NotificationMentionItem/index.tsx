@@ -1,6 +1,6 @@
 import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
-import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, selectClanById, useAppSelector } from '@mezon/store-mobile';
 import { getNameForPrioritize } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
@@ -63,7 +63,6 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 	const clan = useAppSelector(selectClanById(notify?.content?.clan_id as string));
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(notify?.sender_id);
 	const messageTimeDifference = convertTimestampToTimeAgo(data?.create_time?.seconds);
-	const colorsUsername = useColorsRoleById(notify?.sender_id)?.highestPermissionRoleColor;
 	const subjectText = useMemo(() => {
 		return clan?.clan_name && channelInfo?.channel_label
 			? `${clan?.clan_name ? `(${clan.clan_name})` : ''} - ${channelInfo?.channel_label || ''}`
@@ -93,7 +92,7 @@ const NotificationMentionItem = React.memo(({ notify, onLongPressNotify, onPress
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							<Text style={{ ...styles.username, color: colorsUsername }}>{username} </Text>
+							<Text style={styles.username}>{username} </Text>
 							{subjectText}
 						</Text>
 						<View style={styles.contentMessage}>

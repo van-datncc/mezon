@@ -46,9 +46,12 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 		id: MEMBER_CONTEXT_MENU_ID
 	});
 
-	const showMenu = (event: React.MouseEvent) => {
-		show({ event });
-	};
+	const showMenu = useCallback(
+		(event: React.MouseEvent) => {
+			show({ event });
+		},
+		[show]
+	);
 
 	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 

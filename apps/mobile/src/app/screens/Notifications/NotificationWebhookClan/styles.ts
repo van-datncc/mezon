@@ -9,9 +9,8 @@ export const style = (colors: Attributes) =>
 
 		notifyHeader: {
 			flexDirection: 'row',
-			alignItems: 'flex-start',
-			justifyContent: 'space-between',
-			gap: 10
+			alignItems: 'center',
+			gap: size.s_4
 		},
 
 		notifyContent: {
@@ -33,8 +32,8 @@ export const style = (colors: Attributes) =>
 		boxImage: {
 			width: size.s_40,
 			height: size.s_40,
-			borderRadius: 50,
-			marginBottom: 10,
+			borderRadius: size.s_50,
+			marginBottom: size.s_8,
 			fontSize: size.medium
 		},
 
@@ -50,14 +49,14 @@ export const style = (colors: Attributes) =>
 			textAlign: 'left',
 			alignItems: 'flex-start',
 			alignSelf: 'flex-start',
-			marginBottom: 10,
 			borderLeftColor: colors.borderDim,
 			borderLeftWidth: 3,
-			paddingLeft: 8,
+			paddingLeft: size.s_8,
 			fontSize: size.medium
 		},
 		username: {
 			fontSize: size.medium,
-			fontWeight: 'bold'
+			fontWeight: 'bold',
+			color: colors.text
 		}
 	});
