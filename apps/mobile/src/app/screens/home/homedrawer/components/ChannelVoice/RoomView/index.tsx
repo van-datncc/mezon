@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -115,7 +116,10 @@ const RoomView = ({
 							const devices = await navigator.mediaDevices.enumerateDevices();
 							const audioInputDevices = devices?.filter((device) => device?.kind === 'audioinput');
 							if (audioInputDevices?.length === 0) {
-								console.error('No audio input devices found');
+								Toast.show({
+									type: 'error',
+									text1: 'No audio input devices found'
+								});
 								return;
 							}
 							newAudioTrack = await createLocalAudioTrack({
@@ -123,6 +127,10 @@ const RoomView = ({
 							});
 						} catch (deviceError) {
 							console.error('Error creating audio track with device:', deviceError);
+							Toast.show({
+								type: 'error',
+								text1: `Error creating audio device: ${deviceError}`
+							});
 						}
 					}
 
