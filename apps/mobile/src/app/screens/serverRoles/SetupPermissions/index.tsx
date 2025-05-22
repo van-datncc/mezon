@@ -50,9 +50,9 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	}, [rolesClan]);
 
 	const isCanEditRole = useMemo(() => {
-		if (isEveryoneRole) return false;
+		if (isEveryoneRole && !newRole) return false;
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;
-	}, [hasAdminPermission, hasManageClanPermission, isClanOwner, isEveryoneRole]);
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner, isEveryoneRole, newRole]);
 
 	const getDisablePermission = useCallback(
 		(slug: string) => {

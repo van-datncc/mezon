@@ -1,6 +1,6 @@
 import { useChatSending } from '@mezon/core';
 import { ActionEmitEvent, ENotificationActive, ETypeSearch, IOption } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { accountActions, selectAnonymousMode, selectChannelById, selectCurrentChannel, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStatusEnum, TypeMessage, sleep } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -34,13 +34,13 @@ const HomeDefaultHeader = React.memo(
 				title: 'anonymous',
 				content: anonymousMode ? 'Turn off Anonymous' : 'Turn on Anonymous',
 				value: OptionChannelHeader.Anonymous,
-				icon: <MezonIconCDN icon={IconCDN.anonymous} color={Colors.textGray} height={size.s_18} width={size.s_18} />
+				icon: <MezonIconCDN icon={IconCDN.anonymous} color={themeValue.text} height={size.s_18} width={size.s_18} />
 			},
 			{
 				title: 'buzz',
 				content: 'Buzz',
 				value: OptionChannelHeader.Buzz,
-				icon: <MezonIconCDN icon={IconCDN.buzz} color={Colors.textGray} height={size.s_18} width={size.s_18} />
+				icon: <MezonIconCDN icon={IconCDN.buzz} color={themeValue.text} height={size.s_18} width={size.s_18} />
 			}
 		];
 
@@ -169,12 +169,12 @@ const HomeDefaultHeader = React.memo(
 					</TouchableOpacity>
 				) : currentChannel ? (
 					<TouchableOpacity style={styles.iconBell} onPress={() => navigateToSearchPage()}>
-						<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_20} width={size.s_20} color={Colors.textGray} />
+						<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
 					</TouchableOpacity>
 				) : (
 					<View />
 				)}
-				<View style={{position: 'relative', zIndex: 0}}>
+				<View style={{ position: 'relative', zIndex: 0 }}>
 					<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
 				</View>
 			</View>

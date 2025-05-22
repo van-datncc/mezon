@@ -306,7 +306,7 @@ const UserProfile = React.memo(
 								top: size.s_10,
 								padding: size.s_6,
 								borderRadius: size.s_20,
-								backgroundColor: Colors.darkGray
+								backgroundColor: themeValue.primary
 							}}
 						>
 							<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} width={size.s_20} height={size.s_20} />

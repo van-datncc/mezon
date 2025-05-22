@@ -3,7 +3,6 @@ import {
 	ChannelMembersEntity,
 	EStateFriend,
 	channelUsersActions,
-	notificationSettingActions,
 	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentClan,
@@ -18,7 +17,6 @@ import { CSSProperties, FC, createContext, useCallback, useContext, useState } f
 import { Menu, useContextMenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import { useSelector } from 'react-redux';
-import { directMessageValueProps } from '../../components/DmList/DMListItem';
 import ModalRemoveMemberClan from '../../components/MemberProfile/ModalRemoveMemberClan';
 import { MemberMenuItem } from './MemberMenuItem';
 import { MEMBER_CONTEXT_MENU_ID, MemberContextMenuContextType, MemberContextMenuHandlers, MemberContextMenuProps } from './types';
@@ -48,9 +46,12 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 		id: MEMBER_CONTEXT_MENU_ID
 	});
 
-	const showMenu = (event: React.MouseEvent) => {
-		show({ event });
-	};
+	const showMenu = useCallback(
+		(event: React.MouseEvent) => {
+			show({ event });
+		},
+		[show]
+	);
 
 	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 
@@ -183,16 +184,8 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 	};
 
 	const showContextMenu = useCallback(
-		async (event: React.MouseEvent, user?: ChannelMembersEntity, directMessageValue?: directMessageValueProps) => {
+		async (event: React.MouseEvent, user?: ChannelMembersEntity) => {
 			event.preventDefault();
-
-			if (directMessageValue) {
-				await dispatch(
-					notificationSettingActions.getNotificationSetting({
-						channelId: directMessageValue?.dmID || ''
-					})
-				);
-			}
 
 			if (user) {
 				setCurrentUser(user);

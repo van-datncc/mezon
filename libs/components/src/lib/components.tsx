@@ -32,7 +32,7 @@ export { default as CanvasHashtag } from './components/MarkdownFormatText/Canvas
 export { default as ChannelHashtag } from './components/MarkdownFormatText/HashTag';
 export { default as MentionUser } from './components/MarkdownFormatText/MentionUser';
 export { default as MemberList } from './components/MemberList';
-export { MemberProfile } from './components/MemberProfile';
+export { MemberProfile, SimpleMemberProfile } from './components/MemberProfile';
 export { default as Message } from './components/Message';
 export { default as ChannelMessageOpt } from './components/Message/ChannelMessageOpt';
 export { default as UnreadMessageBreak } from './components/Message/UnreadMessageBreak';

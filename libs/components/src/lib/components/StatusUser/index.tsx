@@ -114,22 +114,4 @@ const StatusUser = (props: StatusUserProps) => {
 	return props.isListDm || props.isDM ? <DMStatusUser {...props} /> : <ClanStatusUser {...props} />;
 };
 
-const arePropsEqual = (prevProps: StatusUserProps, nextProps: StatusUserProps) => {
-	return (
-		prevProps.status?.status === nextProps.status?.status &&
-		prevProps.status?.isMobile === nextProps.status?.isMobile &&
-		prevProps.isMemberDMGroup === nextProps.isMemberDMGroup &&
-		prevProps.isMemberChannel === nextProps.isMemberChannel &&
-		prevProps.isListDm === nextProps.isListDm &&
-		prevProps.directMessageValue?.dmID === nextProps.directMessageValue?.dmID &&
-		prevProps.directMessageValue?.userId === nextProps.directMessageValue?.userId &&
-		prevProps.directMessageValue?.type === nextProps.directMessageValue?.type &&
-		prevProps.userId === nextProps.userId &&
-		prevProps.isTyping === nextProps.isTyping &&
-		prevProps.sizeStatusIcon === nextProps.sizeStatusIcon &&
-		prevProps.customStatus === nextProps.customStatus &&
-		prevProps.isDM === nextProps.isDM
-	);
-};
-
-export default memo(StatusUser, arePropsEqual);
+export default memo(StatusUser);

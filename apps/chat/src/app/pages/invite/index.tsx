@@ -61,6 +61,18 @@ export default function InvitePage() {
 		if (userJoined) {
 			navigate(`/chat/clans/${clanId}/channels/${channeId}`);
 			toast.info('You are already a member!');
+		} else {
+			const handleKeyDown = (event: KeyboardEvent) => {
+				if (event.key === 'Escape') {
+					navigate(`/chat/direct/friends`);
+				}
+			};
+
+			document.addEventListener('keydown', handleKeyDown);
+
+			return () => {
+				document.removeEventListener('keydown', handleKeyDown);
+			};
 		}
 	}, [userJoined, navigate, clanId, channeId]);
 

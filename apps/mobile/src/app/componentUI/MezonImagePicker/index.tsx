@@ -189,17 +189,6 @@ export default memo(
 							<Text style={styles.textPlaceholder}>Choose an image</Text>
 						)}
 					</View>
-
-					{!disabled && (
-						<View
-							style={[
-								styles.btnWrapper,
-								penPosition && { top: penPosition.top, bottom: penPosition.bottom, left: penPosition.left, right: penPosition.right }
-							]}
-						>
-							<MezonIconCDN icon={IconCDN.pencilIcon} height={size.s_12} width={size.s_12} color={themeValue.text} />
-						</View>
-					)}
 				</View>
 			</TouchableOpacity>
 		);

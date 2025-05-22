@@ -323,7 +323,7 @@ export const MessageLine = ({
 			formattedContent.push(
 				<p
 					key={`edited-status-${lastindex}-end`}
-					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]"
+					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px] select-none"
 				>
 					(edited)
 				</p>
