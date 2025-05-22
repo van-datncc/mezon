@@ -233,14 +233,15 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 		return currentScrollIndex === -1;
 	};
 	const dragItemIndex = useRef<string | null>(null);
-
+	const dragInfor = useRef<ICategoryChannel | null>(null);
 	const handleDragStart = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
 		dragItemIndex.current = id;
+		dragInfor.current = data[index];
 	}, []);
 
 	const handleDragEnter = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
 		const target = e.target as HTMLDivElement;
-		if (!id || dragItemIndex.current === target.id) return;
+		if (!target.id || dragItemIndex.current === target.id || dragInfor.current?.category_id !== data[index]?.category_id) return;
 
 		const currentEl = document.getElementById(id);
 		const previousEl = document.getElementById(dragItemIndex.current!);
@@ -306,7 +307,7 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									data-index={virtualRow.index}
 									ref={virtualizer.measureElement}
 									id={`drag-detect-${item.id}`}
-									onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
+									onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
 									onDragEnd={handleDragEnd}
 								>
 									<CategorizedItem key={item.id} category={item} />
@@ -320,8 +321,8 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 										data-index={virtualRow.index}
 										id={`drag-detect-${item.id}`}
 										draggable
-										onDragStart={(e) => handleDragStart(index, e, `drag-detect-${item.id}`)}
-										onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
+										onDragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
+										onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
 										onDragEnd={handleDragEnd}
 										className="py-1"
 										ref={virtualizer.measureElement}
