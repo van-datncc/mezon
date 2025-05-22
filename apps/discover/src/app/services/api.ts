@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NX_API_URL || 'https://api.mezon.app';
+const API_BASE_URL = process.env.NX_CHAT_APP_API_GW_HOST || 'https://api.mezon.ai';
 
 const handleResponse = async (response: Response) => {
 	if (!response.ok) {
