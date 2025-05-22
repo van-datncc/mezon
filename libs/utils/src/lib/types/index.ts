@@ -1410,8 +1410,8 @@ export type MentionReactInputProps = {
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
 	readonly isTopic?: boolean;
-	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
-	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>, anonymousMessage?: boolean) => Promise<void>;
+	readonly handleConvertToFile?: (valueContent: string, anonymousMessage?: boolean) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;
