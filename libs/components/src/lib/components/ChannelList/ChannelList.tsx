@@ -233,33 +233,28 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 		return currentScrollIndex === -1;
 	};
 	const dragItemIndex = useRef<string | null>(null);
-	const dragOverItemIndex = useRef<number | null>(null);
-	const handleDragStart = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, idElement: string) => {
-		dragItemIndex.current = idElement;
+
+	const handleDragStart = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+		dragItemIndex.current = id;
 	}, []);
 
-	const handleDragEnter = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, idElement: string) => {
-		const element = document.getElementById(idElement);
-		if (element) {
-			if (dragItemIndex.current && dragItemIndex.current !== (e.target as HTMLDivElement).id && (e.target as HTMLDivElement).id) {
-				element.style.borderBottom = '3px solid #22c55e';
-				const privousElement = document.getElementById(dragItemIndex.current);
-				if (privousElement) {
-					privousElement.style.borderBottom = 'none';
-					dragItemIndex.current = idElement;
-				}
-			}
-		}
+	const handleDragEnter = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+		const target = e.target as HTMLDivElement;
+		if (!id || dragItemIndex.current === target.id) return;
+
+		const currentEl = document.getElementById(id);
+		const previousEl = document.getElementById(dragItemIndex.current!);
+
+		if (currentEl) currentEl.style.borderBottom = '3px solid #22c55e';
+		if (previousEl) previousEl.style.borderBottom = 'none';
+
+		dragItemIndex.current = id;
 	}, []);
 
 	const handleDragEnd = useCallback(() => {
-		if (dragItemIndex.current) {
-			const privousElement = document.getElementById(dragItemIndex.current);
-			if (privousElement) {
-				privousElement.style.borderBottom = 'none';
-			}
-			dragItemIndex.current = null;
-		}
+		const el = document.getElementById(dragItemIndex.current!);
+		if (el) el.style.borderBottom = 'none';
+		dragItemIndex.current = null;
 	}, []);
 
 	return (
