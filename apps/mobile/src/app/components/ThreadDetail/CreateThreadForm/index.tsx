@@ -218,7 +218,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 										checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL
 									}
 									channelId={currentChannel?.channel_id}
-									isNumberOfLine={true}
 									preventAction
 								/>
 							</View>
