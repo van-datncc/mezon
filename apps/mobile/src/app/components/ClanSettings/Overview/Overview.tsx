@@ -211,7 +211,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		setSelectedChannelMessage(channel);
 		setUpdateSystemMessageRequest((prev) => ({
 			...prev,
-			channel_id: channel.channel_id
+			channel_id: channel?.channel_id
 		}));
 	}, []);
 
