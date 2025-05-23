@@ -137,7 +137,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			dispatch(searchMessagesActions.setValueInputSearch({ channelId, value }));
 			setValueDisplay(newPlainTextValue);
 			const filter: SearchFilter[] = [];
-			// TODO: check logic below code
+
 			if (cleanedValue) {
 				filter.push({
 					field_name: 'content',
@@ -179,7 +179,7 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			if (valueInputSearch && event.key === 'Enter') {
 				setIsShowSearchMessageModal(false);
 				dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: true }));
-				// TODO: check logic below code
+				dispatch(searchMessagesActions.setCurrentPage(1));
 				setIsShowCreateThread(false, currentChannel?.parent_id !== '0' ? currentChannel?.parent_id : currentChannel.channel_id);
 				if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
@@ -285,9 +285,8 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 	return (
 		<div className="relative hidden sbm:block " ref={inputRef}>
 			<div
-				className={`transition-all duration-300 ${
-					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
+				className={`transition-all duration-300 ${expanded ? 'w-80' : 'w-40'
+					} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
 			>
 				<MentionsInput
 					inputRef={searchRef}

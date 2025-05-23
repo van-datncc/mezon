@@ -1,6 +1,6 @@
 import { size, Text, useTheme } from '@mezon/mobile-ui';
-import { CategoriesEntity, channelsActions, selectAllCategories, useAppDispatch } from '@mezon/store-mobile';
-import { ApiUpdateChannelDescRequest } from 'mezon-js';
+import { CategoriesEntity, channelsActions, getStore, selectAllCategories, selectAppChannelById, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, TouchableOpacity, View } from 'react-native';
@@ -19,11 +19,25 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
 	const dispatch = useAppDispatch();
 
 	const handleMoveChannelToNewCategory = async (category: CategoriesEntity) => {
-		const updateChannel: ApiUpdateChannelDescRequest = {
+		let appUrl = '';
+		if (channel?.type === ChannelType.CHANNEL_TYPE_APP) {
+			const store = getStore();
+			const appChannel = selectAppChannelById(store.getState(), channel.channel_id as string);
+			if (appChannel) {
+				appUrl = appChannel?.app_url;
+			}
+		}
+		const updateChannel = {
 			category_id: category.id,
 			channel_id: channel?.channel_id ?? '',
 			channel_label: channel?.channel_label,
-			app_id: ''
+			app_url: appUrl,
+			app_id: channel?.app_id || '',
+			age_restricted: channel?.age_restricted,
+			e2ee: channel?.e2ee,
+			topic: channel?.topic,
+			parent_id: channel?.parent_id,
+			channel_private: channel?.channel_private
 		};
 		await dispatch(channelsActions.updateChannel(updateChannel)).then(() => {
 			navigation.goBack();

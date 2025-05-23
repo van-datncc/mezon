@@ -2,15 +2,20 @@ import { useClans, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
+	ChannelsEntity,
 	checkDuplicateNameClan,
+	createSystemMessage,
 	fetchSystemMessageByClanId,
 	getStoreAsync,
-	selectChannelById2,
-	selectClanSystemMessage,
+	selectAllChannels,
+	updateSystemMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { ChannelType } from 'mezon-js';
+import { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js/api.gen';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -18,8 +23,9 @@ import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonImagePicker from '../../../componentUI/MezonImagePicker';
 import MezonInput from '../../../componentUI/MezonInput';
-import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../componentUI/MezonMenu';
+import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../../componentUI/MezonMenu';
 import MezonOption from '../../../componentUI/MezonOption';
+import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { validInput } from '../../../utils/validate';
@@ -45,8 +51,9 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	]);
 	const [isCheckValid, setIsCheckValid] = useState<boolean>();
 	const [errorMessage, setErrorMessage] = useState<string>('');
-	const systemMessage = useSelector(selectClanSystemMessage);
-	const channelMessage = useSelector((state) => selectChannelById2(state, systemMessage?.channel_id || ''));
+	const [systemMessage, setSystemMessage] = useState<ApiSystemMessage | null>(null);
+	const [selectedChannelMessage, setSelectedChannelMessage] = useState<ChannelsEntity>(null);
+	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
 
 	const dispatch = useAppDispatch();
 
@@ -56,26 +63,45 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		return isDuplicate?.payload || false;
 	};
 
+	const channelsList = useSelector(selectAllChannels);
+	const listChannelWithoutVoice = channelsList.filter(
+		(channel) => channel?.clan_id === currentClan?.clan_id && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL
+	);
+
 	useEffect(() => {
-		if (clanName === currentClan?.clan_name) {
-			setIsCheckValid(banner !== (currentClan?.banner || ''));
-			return;
-		} else {
-			if (!validInput(clanName)) {
-				setErrorMessage(t('menu.serverName.errorMessage'));
-			}
-			setIsCheckValid(validInput(clanName));
+		const isClanNameChanged = clanName !== currentClan?.clan_name;
+		const isBannerChanged = banner !== (currentClan?.banner || '');
+
+		let hasSystemMessageChanged = false;
+		if (updateSystemMessageRequest && systemMessage) {
+			hasSystemMessageChanged =
+				systemMessage.welcome_random !== updateSystemMessageRequest.welcome_random ||
+				systemMessage.welcome_sticker !== updateSystemMessageRequest.welcome_sticker ||
+				systemMessage.boost_message !== updateSystemMessageRequest.boost_message ||
+				systemMessage.setup_tips !== updateSystemMessageRequest.setup_tips ||
+				systemMessage.channel_id !== updateSystemMessageRequest.channel_id;
 		}
-	}, [clanName, banner]);
+
+		if (!validInput(clanName)) {
+			setErrorMessage(t('menu.serverName.errorMessage'));
+		}
+
+		setIsCheckValid((isClanNameChanged && validInput(clanName)) || isBannerChanged || hasSystemMessageChanged);
+	}, [clanName, banner, updateSystemMessageRequest, systemMessage]);
 
 	const fetchSystemMessage = async () => {
 		if (!currentClan?.clan_id) return;
-		await dispatch(fetchSystemMessageByClanId(currentClan?.clan_id));
+		const resultAction = await dispatch(fetchSystemMessageByClanId({ clanId: currentClan?.clan_id, noCache: true }));
+		const message = unwrapResult(resultAction);
+		if (message) {
+			setSystemMessage(message);
+			setUpdateSystemMessageRequest(message);
+		}
 	};
 
 	useEffect(() => {
 		fetchSystemMessage();
-	}, []);
+	}, [currentClan]);
 
 	const disabled = useMemo(() => {
 		return !(hasAdminPermission || hasManageClanPermission || clanOwnerPermission);
@@ -94,10 +120,40 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		}
 	});
 
+	const handleUpdateSystemMessage = async () => {
+		if (systemMessage && Object.keys(systemMessage).length > 0 && currentClan?.clan_id && updateSystemMessageRequest) {
+			const cachedMessageUpdate: ApiSystemMessage = {
+				boost_message:
+					updateSystemMessageRequest?.boost_message === systemMessage?.boost_message ? '' : updateSystemMessageRequest?.boost_message,
+				channel_id: updateSystemMessageRequest?.channel_id === systemMessage?.channel_id ? '' : updateSystemMessageRequest?.channel_id,
+				clan_id: systemMessage?.clan_id,
+				id: systemMessage?.id,
+				hide_audit_log:
+					updateSystemMessageRequest?.hide_audit_log === systemMessage?.hide_audit_log ? '' : updateSystemMessageRequest?.hide_audit_log,
+				setup_tips: updateSystemMessageRequest?.setup_tips === systemMessage?.setup_tips ? '' : updateSystemMessageRequest?.setup_tips,
+				welcome_random:
+					updateSystemMessageRequest?.welcome_random === systemMessage?.welcome_random ? '' : updateSystemMessageRequest?.welcome_random,
+				welcome_sticker:
+					updateSystemMessageRequest?.welcome_sticker === systemMessage?.welcome_sticker ? '' : updateSystemMessageRequest?.welcome_sticker
+			};
+			const request = {
+				clanId: currentClan.clan_id,
+				newMessage: cachedMessageUpdate,
+				cachedMessage: updateSystemMessageRequest
+			};
+			await dispatch(updateSystemMessage(request));
+		} else if (updateSystemMessageRequest) {
+			await dispatch(createSystemMessage(updateSystemMessageRequest));
+		}
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+	};
+
 	async function handleSave() {
 		setLoading(true);
 
-		if (banner === currentClan?.banner) {
+		const isClanNameChanged = clanName !== currentClan?.clan_name;
+
+		if (isClanNameChanged) {
 			const isDuplicateClan = await handleCheckDuplicateClanname();
 			if (isDuplicateClan) {
 				setErrorMessage(t('menu.serverName.duplicateNameMessage'));
@@ -118,6 +174,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				welcome_channel_id: currentClan?.welcome_channel_id ?? ''
 			}
 		});
+		await handleUpdateSystemMessage();
 
 		setLoading(false);
 		Toast.show({
@@ -150,71 +207,125 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		}
 	};
 
+	const handleSelectChannel = useCallback((channel) => {
+		setSelectedChannelMessage(channel);
+		setUpdateSystemMessageRequest((prev) => ({
+			...prev,
+			channel_id: channel?.channel_id
+		}));
+	}, []);
+
 	const openBottomSheet = () => {
 		const data = {
 			heightFitContent: true,
 			children: <DeleteClanModal />
 		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const openBottomSheetSystemChannel = () => {
 		const data = {
 			heightFitContent: true,
-			children: <ChannelsMessageSystem />
+			children: <ChannelsMessageSystem onSelectChannel={handleSelectChannel} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	};
 
-	const inactiveMenu: IMezonMenuItemProps[] = [
-		{
-			title: t('menu.inactive.inactiveChannel'),
-			expandable: true,
-			previewValue: 'No Active channel',
-			onPress: () => reserve(),
-			disabled: disabled
-		},
-		{
-			title: t('menu.inactive.inactiveTimeout'),
-			expandable: true,
-			previewValue: '5 mins',
-			disabled: disabled,
-			onPress: () => reserve()
-		}
-	];
+	// const inactiveMenu: IMezonMenuItemProps[] = [
+	// 	{
+	// 		title: t('menu.inactive.inactiveChannel'),
+	// 		expandable: true,
+	// 		previewValue: 'No Active channel',
+	// 		onPress: () => reserve(),
+	// 		disabled: disabled
+	// 	},
+	// 	{
+	// 		title: t('menu.inactive.inactiveTimeout'),
+	// 		expandable: true,
+	// 		previewValue: '5 mins',
+	// 		disabled: disabled,
+	// 		onPress: () => reserve()
+	// 	}
+	// ];
+
+	// ...existing code...
 
 	const systemMessageMenu: IMezonMenuItemProps[] = [
 		{
 			title: t('menu.systemMessage.channel'),
 			expandable: true,
-			component: <Text style={{ color: 'white', fontSize: 11 }}>{channelMessage?.channel_label || 'general'}</Text>,
+			component: (
+				<Text style={{ color: 'white', fontSize: 11 }}>
+					{selectedChannelMessage?.channel_label || listChannelWithoutVoice[0]?.channel_label}
+				</Text>
+			),
 			onPress: openBottomSheetSystemChannel,
 			disabled: disabled
+		},
+		{
+			title: t('menu.systemMessage.welcomeRandom'),
+			component: (
+				<MezonSwitch
+					disabled={disabled}
+					value={systemMessage?.welcome_random === '1'}
+					onValueChange={(value) =>
+						setUpdateSystemMessageRequest((prev) => ({
+							...prev,
+							welcome_random: value ? '1' : '0'
+						}))
+					}
+				/>
+			),
+			disabled: disabled
+		},
+		{
+			title: t('menu.systemMessage.welcomeSticker'),
+			component: (
+				<MezonSwitch
+					disabled={disabled}
+					value={systemMessage?.welcome_sticker === '1'}
+					onValueChange={(value) =>
+						setUpdateSystemMessageRequest((prev) => ({
+							...prev,
+							welcome_sticker: value ? '1' : '0'
+						}))
+					}
+				/>
+			),
+			disabled: disabled
+		},
+		{
+			title: t('menu.systemMessage.boostMessage'),
+			component: (
+				<MezonSwitch
+					disabled={disabled}
+					value={systemMessage?.boost_message === '1'}
+					onValueChange={(value) =>
+						setUpdateSystemMessageRequest((prev) => ({
+							...prev,
+							boost_message: value ? '1' : '0'
+						}))
+					}
+				/>
+			),
+			disabled: disabled
+		},
+		{
+			title: t('menu.systemMessage.setupTips'),
+			component: (
+				<MezonSwitch
+					disabled={disabled}
+					value={systemMessage?.setup_tips === '1'}
+					onValueChange={(value) =>
+						setUpdateSystemMessageRequest((prev) => ({
+							...prev,
+							setup_tips: value ? '1' : '0'
+						}))
+					}
+				/>
+			),
+			disabled: disabled
 		}
-		// {
-		// 	title: t('menu.systemMessage.sendRandomWelcome'),
-		// 	component: <MezonSwitch disabled={disabled} />,
-		// 	onPress: () => reserve(),
-		// 	disabled: disabled
-		// },
-		// {
-		// 	title: t('menu.systemMessage.promptMembersReply'),
-		// 	component: <MezonSwitch disabled={disabled} />,
-		// 	onPress: () => reserve(),
-		// 	disabled: disabled
-		// },
-		// {
-		// 	title: t('menu.systemMessage.sendMessageBoost'),
-		// 	component: <MezonSwitch disabled={disabled} />,
-		// 	onPress: () => reserve(),
-		// 	disabled: disabled
-		// },
-		// {
-		// 	title: t('menu.systemMessage.sendHelpfulTips'),
-		// 	component: <MezonSwitch disabled={disabled} />,
-		// 	onPress: () => reserve(),
-		// 	disabled: disabled
-		// },
 	];
 
 	const deleteMenu: IMezonMenuItemProps[] = [
