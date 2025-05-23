@@ -134,6 +134,7 @@
 		<string>remote-notification</string>
 		<string>audio</string>
 		<string>voip</string>
+		<string>background-processing</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
