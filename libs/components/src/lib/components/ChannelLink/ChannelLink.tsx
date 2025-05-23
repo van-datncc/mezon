@@ -23,7 +23,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { ApiChannelAppResponseExtend, ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { DragEvent, memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -44,6 +44,8 @@ export type ChannelLinkProps = {
 	channelType?: number;
 	permissions: IChannelLinkPermission;
 	isActive: boolean;
+	dragStart: (e: DragEvent<HTMLDivElement>) => void;
+	dragEnter: (e: DragEvent<HTMLDivElement>) => void;
 };
 
 export interface Coords {
@@ -77,7 +79,9 @@ const ChannelLinkComponent = ({
 	numberNotification,
 	isActive,
 	channelType,
-	permissions
+	permissions,
+	dragStart,
+	dragEnter
 }: ChannelLinkProps) => {
 	const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 	const dispatch = useAppDispatch();
@@ -230,9 +234,10 @@ const ChannelLinkComponent = ({
 	return (
 		<div
 			onContextMenu={handleMouseClick}
-			id={channel.channel_id}
-			onDragEnter={(e) => {}}
+			id={channel.id}
 			role="button"
+			onDragStart={(e) => dragStart(e)}
+			onDragEnd={(e) => dragEnter(e)}
 			className={`relative group z-10 dark:bg-bgSecondary bg-bgLightSecondary ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
@@ -261,7 +266,7 @@ const ChannelLinkComponent = ({
 					{channel.status === StatusVoiceChannel.No_Active && <Icons.LoadingSpinner />}
 				</span>
 			) : (
-				<Link to={channelPath} onClick={handleClick} className="channel-link" draggable="false">
+				<Link to={channelPath} id={`drag-detect-${channel.id}`} onClick={handleClick} className="channel-link block" draggable="false">
 					<span
 						ref={channelLinkRef}
 						className={`${classes[state]} pointer-events-none ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}
