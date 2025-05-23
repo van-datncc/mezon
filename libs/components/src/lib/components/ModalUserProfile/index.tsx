@@ -113,8 +113,8 @@ const ModalUserProfile = ({
 
 	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
 
-	const sendMessage = async (userId: string, username?: string, avatar?: string) => {
-		const response = await createDirectMessageWithUser(userId, username, avatar);
+	const sendMessage = async (userId: string, display_name?: string, username?: string, avatar?: string) => {
+		const response = await createDirectMessageWithUser(userId, display_name, username, avatar);
 		if (response.channel_id) {
 			const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 			sendInviteMessage(content, response.channel_id, channelMode);
@@ -255,6 +255,7 @@ const ModalUserProfile = ({
 											sendMessage(
 												userById?.user?.id || '',
 												userById?.user?.display_name || userById?.user?.username,
+												userById?.user?.username,
 												userById.user?.avatar_url
 											);
 											return;
