@@ -45,7 +45,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
 import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
 import useTabletLandscape from '../hooks/useTabletLandscape';
-import { handleFCMToken, setupNotificationListeners } from '../utils/pushNotificationHelpers';
+import { getVoIPToken, handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
 
 const RootListener = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
@@ -80,9 +80,9 @@ const RootListener = () => {
 
 	const startupRunning = async (navigation: any, isTabletLandscape: boolean) => {
 		await setupNotificationListeners(navigation, isTabletLandscape);
-		// if (Platform.OS === 'ios') {
-		// 	await setupCallKeep();
-		// }
+		if (Platform.OS === 'ios') {
+			await setupCallKeep();
+		}
 	};
 
 	const initAppLoading = async () => {
@@ -123,7 +123,7 @@ const RootListener = () => {
 						channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE || ChannelType.CHANNEL_TYPE_MEZON_VOICE
 					})
 				),
-				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true })),
+				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true }))
 			];
 			await Promise.all(promise);
 			return null;
@@ -218,8 +218,9 @@ const RootListener = () => {
 				return;
 			}
 			const fcmtoken = await handleFCMToken();
+			const voipToken = Platform.OS === 'ios' ? await getVoIPToken() : '';
 			if (fcmtoken) {
-				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: username, platform: Platform.OS }));
+				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: username, platform: Platform.OS, voipToken }));
 			}
 		} catch (error) {
 			console.error('Error loading FCM config:', error);
