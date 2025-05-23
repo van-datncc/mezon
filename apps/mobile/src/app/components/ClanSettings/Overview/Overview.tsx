@@ -220,7 +220,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 			heightFitContent: true,
 			children: <DeleteClanModal />
 		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const openBottomSheetSystemChannel = () => {
