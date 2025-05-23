@@ -390,7 +390,7 @@ export const RenderTextMarkdownContent = ({
 						]}
 						onPress={() => onMention?.(isRoleMention ? link.replace('@role', '@') : link)}
 					>
-						{text}
+						{text || contentInElement}
 					</Text>
 				);
 				break;

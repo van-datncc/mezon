@@ -17,7 +17,8 @@ import {
 	selectNotificationMentions,
 	selectTopicsSort,
 	topicsActions,
-	useAppDispatch
+	useAppDispatch,
+	usersClanActions
 } from '@mezon/store-mobile';
 import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -184,8 +185,8 @@ const Notifications = () => {
 					}
 					if (notify?.content?.clan_id !== currentClanId) {
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
+						promises.push(store.dispatch(usersClanActions.fetchUsersClan({ clanId: notify?.content?.clan_id })));
 					}
-
 					promises.push(
 						store.dispatch(
 							channelsActions.joinChannel({
