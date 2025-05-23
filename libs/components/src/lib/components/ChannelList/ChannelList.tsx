@@ -3,6 +3,7 @@ import {
 	ClansEntity,
 	FAVORITE_CATEGORY_ID,
 	categoriesActions,
+	listChannelRenderAction,
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
@@ -29,7 +30,7 @@ import {
 	toggleDisableHover,
 	useSyncEffect
 } from '@mezon/utils';
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { CreateNewChannelModal } from '../CreateChannelModal';
@@ -232,6 +233,57 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 		const { currentScrollIndex } = findScrollIndex();
 		return currentScrollIndex === -1;
 	};
+	const dragItemIndex = useRef<{ idElement: string; indexEnd: number } | null>(null);
+	const dragInfor = useRef<ICategoryChannel | null>(null);
+	const handleDragStart = useCallback(
+		(index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+			dragItemIndex.current = {
+				idElement: id,
+				indexEnd: index
+			};
+			dragInfor.current = data[index];
+		},
+		[data]
+	);
+
+	const handleDragEnter = useCallback(
+		(index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+			const target = e.target as HTMLDivElement;
+			if (!target.id || dragItemIndex.current?.idElement === target.id || dragInfor.current?.category_id !== data[index]?.category_id) return;
+			const currentEl = document.getElementById(id);
+			const previousEl = document.getElementById(dragItemIndex.current!.idElement);
+			if (currentEl) currentEl.style.borderBottom = '3px solid #22c55e';
+			if (previousEl) previousEl.style.borderBottom = 'none';
+			dragItemIndex.current = {
+				idElement: id,
+				indexEnd: index
+			};
+		},
+		[data]
+	);
+
+	const handleDragEnd = useCallback(
+		(dragIndex: number) => {
+			const el = document.getElementById(dragItemIndex.current!.idElement);
+			if (el) el.style.borderBottom = 'none';
+
+			if (dragItemIndex.current!.indexEnd === dragIndex) {
+				dragItemIndex.current = null;
+				return;
+			}
+			if (dragIndex - dragItemIndex.current!.indexEnd >= 2 || dragIndex < dragItemIndex.current!.indexEnd) {
+				dispatch(
+					listChannelRenderAction.sortChannelInCategory({
+						categoryId: data[dragIndex].category_id as string,
+						clanId: data[dragIndex].clan_id as string,
+						indexEnd: dragItemIndex.current!.indexEnd,
+						indexStart: dragIndex
+					})
+				);
+			}
+		},
+		[data]
+	);
 
 	return (
 		<div
@@ -266,7 +318,7 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 					}}
 					className="channel-wrap"
 				>
-					{items.map((virtualRow) => {
+					{items.map((virtualRow, index) => {
 						const item = data[virtualRow.index];
 						if (virtualRow.index === 0) {
 							return (
@@ -281,6 +333,9 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									key={virtualRow.key}
 									data-index={virtualRow.index}
 									ref={virtualizer.measureElement}
+									id={`drag-detect-${item.id}`}
+									onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
+									onDragEnd={() => handleDragEnd(virtualRow.index)}
 								>
 									<CategorizedItem key={item.id} category={item} />
 								</div>
@@ -288,7 +343,17 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 						} else {
 							if (!(item as IChannel)?.parent_id || (item as IChannel).parent_id === '0') {
 								return (
-									<div key={virtualRow.key} data-index={virtualRow.index} ref={virtualizer.measureElement}>
+									<div
+										key={virtualRow.key}
+										data-index={virtualRow.index}
+										id={`drag-detect-${item.id}`}
+										draggable
+										onDragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
+										onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
+										onDragEnd={() => handleDragEnd(virtualRow.index)}
+										className="py-1"
+										ref={virtualizer.measureElement}
+									>
 										<ChannelListItem
 											isActive={currentChannelId === (item as IChannel).channel_id && !(item as IChannel).isFavor}
 											key={item.id}

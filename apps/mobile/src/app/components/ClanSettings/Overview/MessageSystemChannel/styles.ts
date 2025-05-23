@@ -9,10 +9,16 @@ export const style = (colors: Attributes) =>
 			gap: size.s_10,
 			padding: size.s_16
 		},
+		containerIcon: {
+			marginTop: size.s_2
+		},
+		containerText: {
+			gap: size.s_24,
+			flexDirection: 'row'
+		},
 		channelItemText: {
 			color: colors.text,
 			fontSize: Metrics.size.l,
-			fontWeight: '500',
-			width: 200
+			fontWeight: '500'
 		}
 	});

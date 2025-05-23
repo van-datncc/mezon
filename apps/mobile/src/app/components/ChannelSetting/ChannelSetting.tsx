@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, Pressable, ScrollView, Text, View } from 'react-native';
@@ -22,7 +22,7 @@ import MezonConfirm from '../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
-import MezonOption from '../../componentUI/MezonOption';
+import { IMezonOptionData } from '../../componentUI/MezonOption';
 import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
@@ -99,11 +99,17 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		const isCheckNameChannelValue =
 			!!channelsClan?.length && channelsClan?.some((channel) => channel?.channel_label === currentSettingValue?.channelName);
 		setIsCheckDuplicateNameChannel(isCheckNameChannelValue);
-		const updateChannel: ApiUpdateChannelDescRequest = {
+		const updateChannel = {
 			channel_id: channel?.channel_id || '',
 			channel_label: currentSettingValue?.channelName,
-			category_id: channel.category_id,
-			app_url: ''
+			category_id: channel?.category_id,
+			app_url: channel?.app_url || '',
+			app_id: channel?.app_id || '',
+			age_restricted: channel?.age_restricted,
+			e2ee: channel?.e2ee,
+			topic: channel?.topic,
+			parent_id: channel?.parent_id,
+			channel_private: channel?.channel_private
 		};
 		if (isCheckNameChannelValue || !isCheckValid) return;
 		await dispatch(channelsActions.updateChannel(updateChannel));

@@ -23,10 +23,12 @@
       "title": "Cài đặt thông báo hệ thống",
       "description": "Đây là kênh chúng tôi gửi thông báo sự kiện hệ thống. Bạn có thể tắt chúng bất cứ lúc nào.",
       "channel": "Kênh",
-      "sendRandomWelcome": "Gửi tin nhắn chào mừng ngẫu nhiên khi ai đó tham gia vào clan này.",
-      "promptMembersReply": "Yêu cầu thành viên trả lời tin nhắn chào mừng bằng nhãn dán.",
-      "sendMessageBoost": "Gửi tin nhắn khi ai đó tăng cấp clan này",
-      "sendHelpfulTips": "Gửi các mẹo hữu ích để thiết lập clan"
+      "selectChannel": "Chọn kênh thông báo",
+      "channelDescription": "Đây là kênh mà các tin nhắn hệ thống sẽ được gửi đến",
+      "welcomeRandom": "Gửi tin nhắn chào mừng ngẫu nhiên khi ai đó tham gia vào clan này",
+      "welcomeSticker": "Yêu cầu thành viên trả lời tin nhắn chào mừng bằng nhãn dán",
+      "boostMessage": "Gửi tin nhắn khi ai đó tăng cấp clan này",
+      "setupTips": "Gửi các mẹo hữu ích để thiết lập clan"
     },
     "deleteServer": {
       "title": "Xóa clan",

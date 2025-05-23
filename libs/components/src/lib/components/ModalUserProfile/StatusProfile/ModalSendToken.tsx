@@ -13,7 +13,7 @@ type ModalSendTokenProps = {
 	token: number;
 	setToken: (token: number) => void;
 	setSelectedUserId: (id: string) => void;
-	handleSaveSendToken: (id: string, username?: string, avatar?: string) => void;
+	handleSaveSendToken: (id: string, username?: string, avatar?: string, display_name?: string) => void;
 	setNote: (note: string) => void;
 	error: string | null;
 	userSearchError: string | null;
@@ -149,7 +149,7 @@ const ModalSendToken = ({
 
 	const handleSendToken = () => {
 		const userData = filteredUsers.find((user) => user.username === searchTerm) || '';
-		handleSaveSendToken(userData?.id, userData?.username, userData?.avatar_url);
+		handleSaveSendToken(userData?.id, userData?.username, userData?.avatar_url, userData?.display_name);
 	};
 
 	return (
