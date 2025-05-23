@@ -139,11 +139,9 @@ const SearchMessageChannel = ({ mode }: SearchMessageChannelProps) => {
 			const filter: SearchFilter[] = [];
 
 			if (cleanedValue) {
-				const escapedValue = cleanedValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-				const exactMatchPattern = `\\b${escapedValue}\\b`;
 				filter.push({
 					field_name: 'content',
-					field_value: exactMatchPattern
+					field_value: cleanedValue
 				});
 			}
 
