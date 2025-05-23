@@ -71,7 +71,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
 			references?: Array<ApiMessageRef>,
-			anonymous?: boolean,
+			_anonymous?: boolean,
 			mentionEveryone?: boolean,
 			isMobile?: boolean,
 			code?: number
@@ -130,7 +130,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 					mentions: mentions,
 					attachments,
 					references,
-					anonymous,
+					anonymous: anonymousMode,
 					mentionEveryone,
 					senderId: currentUserId,
 					avatar: priorityAvatar,
@@ -151,7 +151,8 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			priorityAvatar,
 			priorityNameToShow,
 			currentTopicId,
-			createTopic
+			createTopic,
+			anonymousMode
 		]
 	);
 

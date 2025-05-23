@@ -1,5 +1,5 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
+import { referencesActions, selectAllStickerSuggestion, selectAnonymousMode, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
@@ -40,6 +40,7 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 
 function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const clanStickers = useAppSelector(selectAllStickerSuggestion);
+	const anonymousMode = useSelector(selectAnonymousMode);
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,
 		mode,
@@ -82,7 +83,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 
 	const handleClickImage = (image: StickerPanel) => {
 		if (isReplyAction) {
-			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences]);
+			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences], undefined, anonymousMode);
 
 			dispatch(
 				referencesActions.setDataReferences({
@@ -91,7 +92,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 				})
 			);
 		} else {
-			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], []);
+			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [], undefined, anonymousMode);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};

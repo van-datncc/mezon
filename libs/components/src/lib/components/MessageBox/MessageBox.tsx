@@ -49,11 +49,13 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { setOverUploadingState } = useDragAndDrop();
 
 	const onConvertToFiles = useCallback(
-		async (content: string) => {
+		async (content: string, anonymousMessage?: boolean) => {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
 			const filename = now + '.txt';
 			const file = new File([fileContent], filename, { type: 'text/plain' });
+
+
 
 			if (attachmentFilteredByChannelId?.files?.length + 1 > MAX_FILE_ATTACHMENTS) {
 				setOverUploadingState(true, UploadLimitReason.COUNT);
@@ -78,7 +80,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	);
 
 	const onPastedFiles = useCallback(
-		async (event: React.ClipboardEvent<HTMLDivElement>) => {
+		async (event: React.ClipboardEvent<HTMLDivElement>, anonymousMessage?: boolean) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
 			const files: File[] = [];
 			if (items) {
@@ -105,6 +107,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 					);
 				}
 			}
+
 		},
 		[clientRef, currentChannelId, currentClanId, sessionRef, props.mode, attachmentFilteredByChannelId?.files?.length]
 	);
@@ -130,14 +133,12 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
 				<div
-					className={`${
-						checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
-					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
+						} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
 					<div
-						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${
-							appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
-						}`}
+						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
+							}`}
 					>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
