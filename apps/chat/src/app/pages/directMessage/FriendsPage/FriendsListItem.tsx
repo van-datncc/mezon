@@ -105,7 +105,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		const name = friend?.user?.display_name || friend.user?.username;
 		const avatar = friend.user?.avatar_url;
 
-		const response = await createDirectMessageWithUser(userID, name, avatar);
+		const response = await createDirectMessageWithUser(userID, name, friend.user?.username, avatar);
 		if (response.channel_id) {
 			const directChat = toDmGroupPageFromFriendPage(response.channel_id, Number(response.type));
 			navigate(directChat);
