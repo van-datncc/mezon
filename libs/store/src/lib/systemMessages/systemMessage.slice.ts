@@ -34,14 +34,16 @@ export const fetchSystemMesssageByClanCached = memoizeAndTrack(
 		if (defaultResponse) {
 			return defaultResponse;
 		}
+		console.log('clanId: ', clanId);
 		const response: ApiSystemMessage = await mezon.client.getSystemMessageByClanId(mezon.session, clanId);
+		console.log('response: ', response);
 		return response;
 	},
 	{
 		promise: true,
 		maxAge: FOR_15_MINUTES,
 		normalizer: (args) => {
-			return args[0]?.session?.username || '' + args[1];
+			return args[1] + args[0]?.session?.username || '';
 		}
 	}
 );
@@ -59,7 +61,10 @@ export const fetchSystemMessageByClanId = createAsyncThunk(
 		if (noCache) {
 			fetchSystemMesssageByClanCached.delete(mezon, clanId);
 		}
+		console.log('Here', clanId);
 		const response: ApiSystemMessage = await fetchSystemMesssageByClanCached(mezon, clanId);
+		console.log('response: ', response);
+
 		return response;
 	}
 );
