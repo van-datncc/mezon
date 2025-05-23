@@ -1,7 +1,7 @@
 import { throttle } from 'lodash';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { BREAKPOINTS, NAVIGATION_LINKS, Z_INDEX } from '../constants/constants';
+import { BREAKPOINTS, MEZON_LOGO, NAVIGATION_LINKS, Z_INDEX } from '../constants/constants';
 
 interface HeaderProps {
 	sideBarIsOpen: boolean;
@@ -35,17 +35,16 @@ const HeaderMezon = memo((props: HeaderProps) => {
 	try {
 		return (
 			<div
-				className={`layout fixed flex flex-col items-center w-full transition-all duration-300 ${
-					isScrolled ? 'bg-white/90 shadow-sm backdrop-blur-md' : 'bg-transparent'
-				} h-[80px] max-md:h-[72px] z-[100]`}
+				className={`layout fixed flex flex-col items-center w-full transition-all duration-300 ${isScrolled ? 'bg-white/90 shadow-sm backdrop-blur-md' : 'bg-transparent'
+					} h-[80px] max-md:h-[72px] z-[100]`}
 			>
 				<div ref={refHeader} className={`header fixed z-[${Z_INDEX.HEADER}] w-10/12 max-lg:w-full max-md:border-b max-md:border-gray-100`}>
 					<div className="flex items-center justify-between md:px-[32px] max-md:px-[16px] max-md:py-[14px] h-[80px] max-md:h-[72px]">
 						<div className="flex items-center gap-[40px]">
-							<Link to={'/'} className="flex items-center gap-[4.92px]">
-								<img src="/assets/images/mezon-logo-black.svg" alt="Mezon" className="w-8 h-8 aspect-square object-cover" />
+							<a href="/clans" className="flex items-center gap-[4.92px]">
+								<img src={MEZON_LOGO.LIGHT} alt="Mezon" className="w-11 h-11 aspect-square object-cover" />
 								<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em] text-gray-900">mezon</div>
-							</Link>
+							</a>
 							<div className={`hidden ${BREAKPOINTS.MOBILE}:flex items-center gap-[32px]`}>
 								{Object.entries(NAVIGATION_LINKS).map(([key, link]) =>
 									key === 'DISCOVER' ? (
@@ -99,10 +98,9 @@ const HeaderMezon = memo((props: HeaderProps) => {
 											key={key}
 											to={link.url}
 											className={({ isActive }) =>
-												`font-medium py-2 transition-colors ${
-													isActive
-														? 'text-[#5865f2] underline decoration-2 underline-offset-4'
-														: 'text-gray-600 hover:text-[#5865f2]'
+												`font-medium py-2 transition-colors ${isActive
+													? 'text-[#5865f2] underline decoration-2 underline-offset-4'
+													: 'text-gray-600 hover:text-[#5865f2]'
 												}`
 											}
 										>
@@ -130,7 +128,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 			<div className={`fixed top-0 left-0 right-0 z-[${Z_INDEX.HEADER}] bg-white h-[80px] max-md:h-[72px] border-b border-gray-200`}>
 				<div className="container mx-auto flex items-center justify-between px-4 h-full">
 					<Link to={'/'} className="flex items-center gap-2">
-						<img src="/assets/images/mezon-logo-black.svg" alt="Mezon" className="w-8 h-8" />
+						<img src={MEZON_LOGO.LIGHT} alt="Mezon" className="w-12 h-12" />
 						<div className="font-semibold text-xl">mezon</div>
 					</Link>
 					<div className="w-fit">

@@ -22,6 +22,16 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [isOpen]);
 
+	// Lock scroll when dropdown is open
+	useEffect(() => {
+		if (isOpen) {
+			document.body.classList.add('overflow-hidden');
+		} else {
+			document.body.classList.remove('overflow-hidden');
+		}
+		return () => document.body.classList.remove('overflow-hidden');
+	}, [isOpen]);
+
 	return (
 		<>
 			<div className="lg:hidden mb-4 categories-dropdown">
@@ -45,8 +55,8 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 				</button>
 
 				{isOpen && (
-					<div className="fixed inset-0 z-[${Z_INDEX.DROPDOWN}] lg:hidden" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-						<div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg max-h-[80vh] overflow-y-auto">
+					<div className="fixed inset-0 z-[9999] lg:hidden" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+						<div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg max-h-[80vh] overflow-y-auto z-[10000]">
 							<div className="p-4">
 								<div className="flex justify-between items-center mb-4">
 									<h3 className="text-lg font-semibold text-gray-800">Categories</h3>
@@ -65,10 +75,9 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 												setIsOpen(false);
 											}}
 											className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-all duration-300 rounded-lg
-                                                ${
-													selectedCategory === category.id
-														? `bg-[${COLORS.PRIMARY}] text-white`
-														: 'text-gray-700 hover:bg-gray-100'
+                                                ${selectedCategory === category.id
+													? `bg-[${COLORS.PRIMARY}] text-white`
+													: 'text-gray-700 hover:bg-gray-100'
 												}`}
 										>
 											<div className="flex items-center gap-3">
@@ -103,10 +112,9 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 							key={category.id}
 							onClick={() => onCategorySelect(category.id)}
 							className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-all duration-300
-                                ${
-									selectedCategory === category.id
-										? `bg-[${COLORS.PRIMARY}] text-white transform scale-[1.02]`
-										: 'text-gray-700 hover:bg-gray-100'
+                                ${selectedCategory === category.id
+									? `bg-[${COLORS.PRIMARY}] text-white transform scale-[1.02]`
+									: 'text-gray-700 hover:bg-gray-100'
 								}`}
 						>
 							<div className="flex items-center gap-3 min-w-0">

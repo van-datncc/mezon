@@ -74,6 +74,7 @@ export const EmbedAnimation = ({
                 }
                 .box_animation_${index}_${messageId}{
                 animation: animation_embed_${index}_${messageId}_small ${duration}s steps(1) forwards;
+                animation-iteration-count: ${repeat ? repeat : 'infinite'};
 
                 }
             }

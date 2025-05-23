@@ -12,9 +12,11 @@ import {
 } from '@react-native-camera-roll/camera-roll';
 import { iosReadGalleryPermission } from '@react-native-camera-roll/camera-roll/src/CameraRollIOSPermission';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	ActivityIndicator,
-	Alert, AppState,
+	Alert,
+	AppState,
 	DeviceEventEmitter,
 	Dimensions,
 	EmitterSubscription,
@@ -28,7 +30,6 @@ import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
-import { Camera } from 'react-native-vision-camera';
 import { IFile } from '../../../../../../componentUI/MezonImagePicker';
 import GalleryItem from './components/GalleryItem';
 
@@ -40,6 +41,8 @@ interface IProps {
 
 const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation(['qrScanner']);
+	const [hasPermission, setHasPermission] = useState(false);
 	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [currentAlbums, setCurrentAlbums] = useState<string>('All');
 	const [pageInfo, setPageInfo] = useState(null);
@@ -303,18 +306,41 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		[onPickGallery]
 	);
 
-	const checkPermissionCamera = async () => {
-		const permission = await Camera.requestCameraPermission();
-		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-			alertOpenSettings('Camera Permission', 'This app needs access to your camera');
+	const requestCameraPermission = async () => {
+		try {
+			if (Platform.OS === 'android') {
+				const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+					setHasPermission(true);
+					return true;
+				} else {
+					Alert.alert(
+						t('cameraPermissionDenied'),
+						t('pleaseAllowCamera'),
+						[
+							{ text: t('cancel'), style: 'cancel' },
+							{ text: t('openSettings'), onPress: () => Linking.openSettings() }
+						],
+						{ cancelable: false }
+					);
+					return false;
+				}
+			} else if (Platform.OS === 'ios') {
+				setHasPermission(true);
+				return true;
+			}
+		} catch (err) {
+			console.warn(err);
+			return false;
 		}
-		return permission === PermissionsAndroid.RESULTS.GRANTED;
+		return false;
 	};
 
 	const onOpenCamera = useCallback(async () => {
-		const isHavePermission = await checkPermissionCamera();
-
-		if (!isHavePermission) return;
+		if (!hasPermission) {
+			const granted = await requestCameraPermission();
+			if (!granted) return;
+		}
 
 		const options = {
 			durationLimit: 10000,
@@ -342,7 +368,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				onPickGallery(fileFormat);
 			}
 		});
-	}, [checkPermissionCamera, onPickGallery]);
+	}, [hasPermission, onPickGallery]);
 
 	const handleLoadMore = async () => {
 		if (pageInfo?.has_next_page) {
