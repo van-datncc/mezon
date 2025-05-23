@@ -207,8 +207,10 @@ export const removeDuplicatesById = (array: any) => {
 	}, []);
 };
 export const getTimeDifferenceDate = (dateString: string) => {
-	const now = new Date();
+	if (!dateString) return '-';
 	const codeTime = new Date(dateString);
+	if (isNaN(codeTime.getTime())) return '-';
+	const now = new Date();
 	const hoursDifference = differenceInHours(now, codeTime);
 	const daysDifference = differenceInDays(now, codeTime);
 	const monthsDifference = differenceInMonths(now, codeTime);
