@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from 'react';
+import React, { DragEvent, memo, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -22,34 +22,21 @@ import { AvatarUserShort } from '../../ClanSettings/SettingChannel';
 import UserListVoiceChannel from '../../UserListVoiceChannel';
 import { IChannelLinkPermission } from '../CategorizedChannels';
 
-type ChannelListItemProp = {
-	channel: ChannelThreads;
-	isActive: boolean;
-	permissions: IChannelLinkPermission;
-};
-
 export type ChannelListItemRef = {
 	channelId: string;
 	channelRef: ChannelLinkRef | null;
 	isInViewport: () => boolean;
 };
 
-const ChannelListItem: React.FC<ChannelListItemProp> = (props) => {
-	const { channel, isActive, permissions } = props;
-
-	return <ChannelLinkContent channel={channel} isActive={isActive} permissions={permissions} />;
-};
-
-export default memo(ChannelListItem);
-
 type ChannelLinkContentProps = {
 	channel: ChannelThreads;
-
+	dragStart: (e: DragEvent<HTMLDivElement>) => void;
+	dragEnter: (e: DragEvent<HTMLDivElement>) => void;
 	isActive: boolean;
 	permissions: IChannelLinkPermission;
 };
 
-const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActive, permissions }) => {
+const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActive, permissions, dragStart, dragEnter }) => {
 	const dispatch = useDispatch();
 	const isUnreadChannel = useSelector((state) => selectIsUnreadChannelById(state, channel.id));
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel.id));
@@ -85,6 +72,8 @@ const ChannelLinkContent: React.FC<ChannelLinkContentProps> = ({ channel, isActi
 				channelType={channel?.type}
 				isActive={isActive}
 				permissions={permissions}
+				dragStart={dragStart}
+				dragEnter={dragEnter}
 			/>
 		);
 	};
@@ -176,3 +165,5 @@ const CollapsedMemberList = ({ channelMemberList, isPttList }: ICollapsedMemberL
 		</AvatarGroup>
 	);
 };
+
+export default memo(ChannelLinkContent);

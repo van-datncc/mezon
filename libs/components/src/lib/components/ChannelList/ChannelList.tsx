@@ -346,12 +346,10 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									<div
 										key={virtualRow.key}
 										data-index={virtualRow.index}
-										id={`drag-detect-${item.id}`}
 										draggable
 										onDragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
 										onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
 										onDragEnd={() => handleDragEnd(virtualRow.index)}
-										className="py-1"
 										ref={virtualizer.measureElement}
 									>
 										<ChannelListItem
@@ -359,6 +357,8 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 											key={item.id}
 											channel={item as ChannelThreads}
 											permissions={permissions}
+											dragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
+											dragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
 										/>
 									</div>
 								);

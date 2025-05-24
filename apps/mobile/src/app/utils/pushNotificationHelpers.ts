@@ -7,7 +7,7 @@ import {
 	load,
 	save
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions, usersClanActions } from '@mezon/store-mobile';
 import notifee, { EventType } from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
@@ -244,7 +244,8 @@ export const navigateToNotification = async (store: any, notification: any, navi
 					const joinAndChangeClan = async (store: any, clanId: string) => {
 						await Promise.all([
 							store.dispatch(clansActions.joinClan({ clanId: clanId })),
-							store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
+							store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+							store.dispatch(usersClanActions.fetchUsersClan({ clanId: clanId }))
 						]);
 					};
 					await joinAndChangeClan(store, clanId);
