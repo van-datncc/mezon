@@ -49,6 +49,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>(null);
+	const haveLoadMorePhoto = useRef<any>(false);
 	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
 
 	const isDisableSelectAttachment = useMemo(() => {
@@ -79,7 +80,10 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 	useEffect(() => {
 		const subscription: EmitterSubscription = cameraRollEventEmitter.addListener('onLibrarySelectionChange', (_event) => {
-			loadPhotos(currentAlbums);
+			if (!haveLoadMorePhoto?.current) {
+				loadPhotos(currentAlbums);
+				haveLoadMorePhoto.current = true;
+			}
 		});
 
 		return () => {
