@@ -136,7 +136,6 @@ const MessageText = ({
 	isOnlyContainEmoji?: boolean;
 	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 }) => {
-	console.log('DEBUG MESSAGE CONTENT:', message.content);
 	let patchedContent = content;
 	if ((!content?.mk || content.mk.length === 0) && Array.isArray(content?.lk) && content.lk.length > 0) {
 		patchedContent = {
