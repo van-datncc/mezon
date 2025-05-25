@@ -277,6 +277,11 @@ const GroupCallComponent = memo(
 		};
 
 		const handleCancelPreCall = () => {
+			if (isJoined && token) {
+				handleLeaveRoom();
+				return;
+			}
+
 			const cancelData = createCancelData({
 				isVideo: groupCall.state.isVideoCall,
 				groupId: currentDmGroup?.channel_id || '',
