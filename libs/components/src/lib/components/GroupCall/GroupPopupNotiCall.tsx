@@ -3,21 +3,20 @@ import { selectIsGroupCallActive, selectJoinedCall } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import { WebrtcSignalingFwd } from 'mezon-js';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { useGroupCallAudio } from './hooks/useGroupCallAudio';
 import { useGroupCallSignaling } from './hooks/useGroupCallSignaling';
 import { useGroupCallState } from './hooks/useGroupCallState';
-import { createQuitData, parseSignalingData } from './utils/callDataUtils';
+import { CallSignalingData, createQuitData, parseSignalingData } from './utils/callDataUtils';
 
 interface ModalCallProps {
 	dataCall: WebrtcSignalingFwd;
 	userId: string;
-	triggerCall: () => void;
 }
 
-const GroupPopupNotiCall = ({ dataCall, userId, triggerCall }: ModalCallProps) => {
+const GroupPopupNotiCall = ({ dataCall, userId }: ModalCallProps) => {
 	const user = useUserByUserId(dataCall?.caller_id);
 	const isJoinedCall = useSelector(selectJoinedCall);
 	const isGroupCallActive = useSelector(selectIsGroupCallActive);
@@ -26,43 +25,49 @@ const GroupPopupNotiCall = ({ dataCall, userId, triggerCall }: ModalCallProps) =
 	const groupCallAudio = useGroupCallAudio();
 	const groupCallSignaling = useGroupCallSignaling();
 
+	const callData = useMemo(() => {
+		return parseSignalingData(dataCall?.json_data as string);
+	}, [dataCall?.json_data]);
+
+	const { groupName, memberCount, isVideoCall } = useMemo(
+		() => ({
+			groupName: callData?.group_name || 'Group Call',
+			memberCount: callData?.participants?.length || 0,
+			isVideoCall: callData?.is_video || false
+		}),
+		[callData]
+	);
+
 	useEffect(() => {
 		if (isJoinedCall && !isGroupCallActive) {
-			groupCallState.endGroupCall();
-			groupCallAudio.stopAllAudio();
+			// groupCallState.endGroupCall();
+			// groupCallAudio.stopAllAudio();
 		}
 	}, [isGroupCallActive, isJoinedCall, groupCallState, groupCallAudio]);
 
 	const handleJoinCall = async () => {
-		if (dataCall?.channel_id) {
-			const callData = parseSignalingData(dataCall?.json_data as string);
+		if (dataCall?.channel_id && callData) {
+			groupCallState.setIncomingCallData({
+				groupId: dataCall.channel_id,
+				groupName: callData.group_name || 'Group Call',
+				groupAvatar: callData.group_avatar,
+				meetingCode: callData.meeting_code,
+				clanId: callData.clan_id,
+				participants: callData.participants || [],
+				callerInfo: {
+					id: callData.caller_id,
+					name: callData.caller_name,
+					avatar: callData.caller_avatar
+				}
+			});
 
-			if (callData) {
-				groupCallState.setIncomingCallData({
-					groupId: dataCall.channel_id,
-					groupName: callData.group_name || 'Group Call',
-					groupAvatar: callData.group_avatar,
-					meetingCode: callData.meeting_code,
-					clanId: callData.clan_id,
-					participants: callData.participants || [],
-					callerInfo: {
-						id: callData.caller_id,
-						name: callData.caller_name,
-						avatar: callData.caller_avatar
-					}
-				});
-
-				groupCallState.showPreCallInterface(dataCall.channel_id, callData.is_video);
-
-				groupCallState.autoJoinRoom(true, true);
-				groupCallState.hideIncomingGroupCall();
-			}
+			groupCallState.showPreCallInterface(dataCall.channel_id, callData.is_video);
+			groupCallState.autoJoinRoom(true, true);
+			groupCallState.hideIncomingGroupCall();
 		}
 	};
 
 	const handleCloseCall = async () => {
-		const callData = parseSignalingData(dataCall?.json_data as string);
-
 		if (callData && dataCall?.caller_id) {
 			const quitData = createQuitData({
 				isVideo: callData.is_video,
@@ -70,7 +75,7 @@ const GroupPopupNotiCall = ({ dataCall, userId, triggerCall }: ModalCallProps) =
 				callerId: userId,
 				callerName: user?.user?.display_name || user?.user?.username || '',
 				action: 'decline'
-			});
+			}) as CallSignalingData;
 
 			groupCallSignaling.sendGroupCallQuit([dataCall.caller_id], quitData, dataCall.channel_id ?? '', userId ?? '');
 		}
@@ -79,11 +84,6 @@ const GroupPopupNotiCall = ({ dataCall, userId, triggerCall }: ModalCallProps) =
 		groupCallState.endGroupCall();
 		groupCallAudio.playEndTone();
 	};
-
-	const callData = parseSignalingData(dataCall?.json_data as string);
-	const groupName = callData?.group_name || 'Group Call';
-	const memberCount = callData?.participants?.length || 0;
-	const isVideoCall = callData?.is_video || false;
 
 	return (
 		<div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">

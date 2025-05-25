@@ -1,4 +1,4 @@
-import { audioCallActions, groupCallActions, selectDmGroupCurrent, selectIsVideoGroupCall, useAppDispatch } from '@mezon/store';
+import { audioCallActions, selectDmGroupCurrent, selectIsVideoGroupCall, useAppDispatch } from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -36,9 +36,6 @@ const PreCallInterface = memo(({ onJoinCall, onCancel, loading, directId }: PreC
 		if (!loading && !isConnecting) {
 			setIsConnecting(true);
 			onJoinCall(isVideoCall);
-			setTimeout(() => {
-				dispatch(groupCallActions.hidePreCallInterface());
-			}, 3000);
 		}
 	}, [onJoinCall, loading, isVideoCall, isConnecting]);
 

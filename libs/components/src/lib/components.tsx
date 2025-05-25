@@ -124,10 +124,12 @@ export * from './components/PreJoinCalling/ControlButton';
 export * from './components/PreJoinCalling/JoinForm';
 export * from './components/PreJoinCalling/VideoPreview';
 
-// GroupCall exports
 export * from './components/GroupCall';
-export { default as GroupCallComponent } from './components/GroupCall/GroupCallComponent';
+export * from './components/GroupCall/GroupCallComponent';
 export { default as GroupPopupNotiCall } from './components/GroupCall/GroupPopupNotiCall';
 export { default as PreCallInterface } from './components/GroupCall/PreCallInterface';
 export { CallControls } from './components/GroupCall/components/CallControls';
 export { CallStatus } from './components/GroupCall/components/CallStatus';
+
+export * from './components/DmCall';
+export { DmCallManager } from './components/DmCall/DmCallManager';

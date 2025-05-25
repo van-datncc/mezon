@@ -132,7 +132,6 @@ export const selectIsVideoGroupCall = (state: RootState) => state.groupCall.isVi
 export const selectIsGroupCallLoading = (state: RootState) => state.groupCall.isLoading;
 export const selectShouldAutoJoinRoom = (state: RootState) => state.groupCall.shouldAutoJoinRoom;
 export const selectIsAnsweringCall = (state: RootState) => state.groupCall.isAnsweringCall;
-export const selectGroupCallParticipants = (state: RootState) => state.groupCall.participants;
 export const selectGroupCallStartTime = (state: RootState) => state.groupCall.callStartTime;
 export const selectStoredCallData = (state: RootState) => state.groupCall.storedCallData;
 
