@@ -1,6 +1,6 @@
-import { Attributes, size } from '@mezon/mobile-ui';
+import { size } from '@mezon/mobile-ui';
 import { memo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextStyle, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextStyle, View, useWindowDimensions } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 
 type RenderYoutubeVideoProps = {
@@ -10,38 +10,29 @@ type RenderYoutubeVideoProps = {
 	onPress?: () => void;
 	onLongPress?: () => void;
 	linkStyle?: TextStyle;
-	themeValue?: Attributes;
-	containerStyle?: TextStyle;
 };
 
-const RenderYoutubeVideo = ({
-	key,
-	videoId,
-	contentInElement,
-	onPress,
-	onLongPress,
-	linkStyle,
-	themeValue,
-	containerStyle
-}: RenderYoutubeVideoProps) => {
+const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPress, linkStyle }: RenderYoutubeVideoProps) => {
 	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
+	const { width, height } = useWindowDimensions();
+	const isLandscape = width > height;
 
 	return (
-		<View key={key} style={containerStyle}>
+		<View key={key}>
 			<Text style={linkStyle} onPress={onPress} onLongPress={onLongPress}>
 				{contentInElement}
 			</Text>
 
-			<View style={[themeValue ? styles(themeValue).borderLeftView : {}]}>
+			<View style={styles.borderLeftView}>
 				{!isVideoReady && (
-					<View style={[themeValue ? styles(themeValue).loadingVideoSpinner : {}]}>
+					<View style={styles.loadingVideoSpinner}>
 						<ActivityIndicator size="large" color={'red'} />
 					</View>
 				)}
 
 				<YoutubePlayer
-					height={size.s_170}
-					width={size.s_300}
+					height={size.s_182}
+					width={isLandscape ? width * 0.4 : width * 0.8}
 					videoId={videoId}
 					play={false}
 					onReady={() => setIsVideoReady(true)}
@@ -58,23 +49,22 @@ const RenderYoutubeVideo = ({
 	);
 };
 
-const styles = (colors: Attributes) =>
-	StyleSheet.create({
-		loadingVideoSpinner: {
-			position: 'absolute',
-			top: 0,
-			left: 0,
-			right: 0,
-			bottom: 0,
-			backgroundColor: 'rgba(0,0,0,0.1)',
-			justifyContent: 'center',
-			alignItems: 'center'
-		},
-		borderLeftView: {
-			borderLeftWidth: size.s_4,
-			borderLeftColor: 'red',
-			borderRadius: size.s_4
-		}
-	});
+const styles = StyleSheet.create({
+	loadingVideoSpinner: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(0,0,0,0.1)',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	borderLeftView: {
+		borderLeftWidth: size.s_4,
+		borderLeftColor: 'red',
+		borderRadius: size.s_4
+	}
+});
 
 export default memo(RenderYoutubeVideo);

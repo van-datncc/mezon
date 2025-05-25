@@ -16,41 +16,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var orientationLock: UIInterfaceOrientationMask = .all
 
   func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
-  ) -> Bool {
+      _ application: UIApplication,
+      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
 
-    FirebaseApp.configure()
+      // Configure RNCallKeep
+      let callKeepConfig: [String: Any] = [
+        "appName": "Mezon",
+        "maximumCallGroups": 3,
+        "maximumCallsPerCallGroup": 1,
+        "supportsVideo": false
+      ]
+      RNCallKeep.setup(callKeepConfig)
 
-    // Configure audio session for playback
-    try? AVAudioSession.sharedInstance().setCategory(.playback)
+      // Initialize React Native
+      FirebaseApp.configure()
+      try? AVAudioSession.sharedInstance().setCategory(.playback)
+      setDefaultOrientationForDevice()
 
-    // Set default orientation based on device type
-    setDefaultOrientationForDevice()
+      let delegate = ReactNativeDelegate()
+      let factory = RCTReactNativeFactory(delegate: delegate)
+      delegate.dependencyProvider = RCTAppDependencyProvider()
 
-    // Setup React Native with our custom delegate
-    let delegate = ReactNativeDelegate()
-    let factory = RCTReactNativeFactory(delegate: delegate)
+      reactNativeDelegate = delegate
+      reactNativeFactory = factory
 
-    // Fix or modify the dependency provider usage based on your actual implementation
-     delegate.dependencyProvider = RCTAppDependencyProvider()
-
-    reactNativeDelegate = delegate
-    reactNativeFactory = factory
-
-    // Initialize window and start React Native
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    // Add custom props from Firebase messaging if needed
-    // If RNFBMessagingModule is also not found, you'll need to import it or handle this differently
-    // let initialProps = RNFBMessagingModule.addCustomProps(toUserProps: nil, withLaunchOptions: launchOptions)
-
-    factory.startReactNative(
-      withModuleName: "Mobile", // Changed to match your original module name
-      in: window,
-      // initialProperties: initialProps, // Comment this if RNFBMessagingModule is not available
-      launchOptions: launchOptions
-    )
+      window = UIWindow(frame: UIScreen.main.bounds)
+      factory.startReactNative(
+        withModuleName: "Mobile",
+        in: window,
+        launchOptions: launchOptions
+      )
 
     return true
   }

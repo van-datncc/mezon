@@ -1,11 +1,8 @@
-import { appActions, DMCallActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { sleep } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
-import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
+import { DMCallActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { AppState, Platform, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import CallingModal from '../CallingModal';
 
@@ -13,7 +10,6 @@ const CallingModalWrapper = () => {
 	const userId = useSelector(selectCurrentUserId);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const dispatch = useAppDispatch();
-	const navigation = useNavigation<any>();
 	const appStateRef = useRef(AppState.currentState);
 
 	const handleAppStateChangeListener = useCallback(
@@ -56,7 +52,6 @@ const CallingModalWrapper = () => {
 			const notificationDataParse = safeJSONParse(notificationData || '{}');
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
 			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
-				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {
 					channel_id: data?.channelId,
 					receiver_id: userId,
@@ -72,18 +67,6 @@ const CallingModalWrapper = () => {
 						callerId: data?.callerId
 					})
 				);
-				await sleep(4000);
-				dispatch(appActions.setLoadingMainMobile(false));
-				await NotificationPreferences.clearValue('notificationDataCalling');
-				navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-					screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
-					params: {
-						receiverId: data?.callerId,
-						receiverAvatar: data?.callerAvatar,
-						directMessageId: data?.channelId,
-						isAnswerCall: true
-					}
-				});
 			} else if (notificationData) {
 				await NotificationPreferences.clearValue('notificationDataCalling');
 			} else {
