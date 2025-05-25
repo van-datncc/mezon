@@ -3,6 +3,7 @@ import {
 	ClansEntity,
 	FAVORITE_CATEGORY_ID,
 	categoriesActions,
+	listChannelRenderAction,
 	selectCtrlKFocusChannel,
 	selectCurrentChannelId,
 	selectCurrentClan,
@@ -232,30 +233,57 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 		const { currentScrollIndex } = findScrollIndex();
 		return currentScrollIndex === -1;
 	};
-	const dragItemIndex = useRef<string | null>(null);
+	const dragItemIndex = useRef<{ idElement: string; indexEnd: number } | null>(null);
+	const dragInfor = useRef<ICategoryChannel | null>(null);
+	const handleDragStart = useCallback(
+		(index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+			dragItemIndex.current = {
+				idElement: id,
+				indexEnd: index
+			};
+			dragInfor.current = data[index];
+		},
+		[data]
+	);
 
-	const handleDragStart = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
-		dragItemIndex.current = id;
-	}, []);
+	const handleDragEnter = useCallback(
+		(index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+			const target = e.target as HTMLDivElement;
+			if (!target.id || dragItemIndex.current?.idElement === target.id || dragInfor.current?.category_id !== data[index]?.category_id) return;
+			const currentEl = document.getElementById(id);
+			const previousEl = document.getElementById(dragItemIndex.current!.idElement);
+			if (currentEl) currentEl.style.borderBottom = '3px solid #22c55e';
+			if (previousEl) previousEl.style.borderBottom = 'none';
+			dragItemIndex.current = {
+				idElement: id,
+				indexEnd: index
+			};
+		},
+		[data]
+	);
 
-	const handleDragEnter = useCallback((index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
-		const target = e.target as HTMLDivElement;
-		if (!id || dragItemIndex.current === target.id) return;
+	const handleDragEnd = useCallback(
+		(dragIndex: number) => {
+			const el = document.getElementById(dragItemIndex.current!.idElement);
+			if (el) el.style.borderBottom = 'none';
 
-		const currentEl = document.getElementById(id);
-		const previousEl = document.getElementById(dragItemIndex.current!);
-
-		if (currentEl) currentEl.style.borderBottom = '3px solid #22c55e';
-		if (previousEl) previousEl.style.borderBottom = 'none';
-
-		dragItemIndex.current = id;
-	}, []);
-
-	const handleDragEnd = useCallback(() => {
-		const el = document.getElementById(dragItemIndex.current!);
-		if (el) el.style.borderBottom = 'none';
-		dragItemIndex.current = null;
-	}, []);
+			if (dragItemIndex.current!.indexEnd === dragIndex) {
+				dragItemIndex.current = null;
+				return;
+			}
+			if (dragIndex - dragItemIndex.current!.indexEnd >= 2 || dragIndex < dragItemIndex.current!.indexEnd) {
+				dispatch(
+					listChannelRenderAction.sortChannelInCategory({
+						categoryId: data[dragIndex].category_id as string,
+						clanId: data[dragIndex].clan_id as string,
+						indexEnd: dragItemIndex.current!.indexEnd,
+						indexStart: dragIndex
+					})
+				);
+			}
+		},
+		[data]
+	);
 
 	return (
 		<div
@@ -306,8 +334,8 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									data-index={virtualRow.index}
 									ref={virtualizer.measureElement}
 									id={`drag-detect-${item.id}`}
-									onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
-									onDragEnd={handleDragEnd}
+									onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
+									onDragEnd={() => handleDragEnd(virtualRow.index)}
 								>
 									<CategorizedItem key={item.id} category={item} />
 								</div>
@@ -318,12 +346,10 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 									<div
 										key={virtualRow.key}
 										data-index={virtualRow.index}
-										id={`drag-detect-${item.id}`}
 										draggable
-										onDragStart={(e) => handleDragStart(index, e, `drag-detect-${item.id}`)}
-										onDragEnter={(e) => handleDragEnter(index, e, `drag-detect-${item.id}`)}
-										onDragEnd={handleDragEnd}
-										className="py-1"
+										onDragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
+										onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
+										onDragEnd={() => handleDragEnd(virtualRow.index)}
 										ref={virtualizer.measureElement}
 									>
 										<ChannelListItem
@@ -331,6 +357,8 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 											key={item.id}
 											channel={item as ChannelThreads}
 											permissions={permissions}
+											dragStart={(e) => handleDragStart(virtualRow.index, e, `drag-detect-${item.id}`)}
+											dragEnter={(e) => handleDragEnter(virtualRow.index, e, `drag-detect-${item.id}`)}
 										/>
 									</div>
 								);

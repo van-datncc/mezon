@@ -22,7 +22,6 @@ import BG_CALLING from './bgCalling.png';
 
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
 const IncomingHomeScreen = memo((props: any) => {
-	console.log('log  => props', props);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
@@ -104,6 +103,7 @@ const IncomingHomeScreen = memo((props: any) => {
 		}
 
 		if (signalingData?.[signalingData?.length - 1]?.signalingData.data_type === WebrtcSignalingType.WEBRTC_SDP_QUIT) {
+			stopAndReleaseSound();
 			BackHandler.exitApp();
 		}
 

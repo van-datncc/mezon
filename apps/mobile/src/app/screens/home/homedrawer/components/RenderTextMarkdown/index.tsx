@@ -390,7 +390,7 @@ export const RenderTextMarkdownContent = ({
 						]}
 						onPress={() => onMention?.(isRoleMention ? link.replace('@role', '@') : link)}
 					>
-						{text}
+						{text || contentInElement}
 					</Text>
 				);
 				break;
@@ -619,7 +619,6 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.LINKYOUTUBE:
 						if (isYouTubeLink(contentInElement)) {
 							const videoId = extractYoutubeVideoId(contentInElement);
-							const widthScreen = Dimensions.get('screen').width;
 
 							markdownBlackParts.push(
 								<RenderYoutubeVideo
@@ -629,8 +628,6 @@ export const RenderTextMarkdownContent = ({
 									onPress={() => openUrl(contentInElement, null)}
 									onLongPress={onLongPress}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
-									themeValue={themeValue}
-									containerStyle={{ width: widthScreen - size.s_70, display: 'flex', gap: size.s_4 }}
 								/>
 							);
 						} else {

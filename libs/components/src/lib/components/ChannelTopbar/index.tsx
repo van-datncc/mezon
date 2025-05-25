@@ -8,6 +8,7 @@ import {
 	channelsActions,
 	getStore,
 	getStoreAsync,
+	groupCallActions,
 	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
@@ -351,6 +352,7 @@ const DmTopbarTools = memo(() => {
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
 	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
+	const userProfile = useSelector(selectSession);
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const isInCall = useSelector(selectIsInCall);
@@ -389,11 +391,58 @@ const DmTopbarTools = memo(() => {
 	);
 
 	const handleStartCall = (isVideoCall = false) => {
+		if (currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			if (!isInCall) {
+				if (!currentDmGroup.channel_id) {
+					dispatch(toastActions.addToast({ message: 'Group channel ID is missing', type: 'error', autoClose: 3000 }));
+					return;
+				}
+
+				dispatch(
+					groupCallActions.showPreCallInterface({
+						groupId: currentDmGroup.channel_id,
+						isVideo: isVideoCall
+					})
+				);
+
+				dispatch(
+					groupCallActions.setIncomingCallData({
+						groupId: currentDmGroup.channel_id,
+						groupName: currentDmGroup.channel_label || currentDmGroup.usernames?.join(',') || 'Group Call',
+						groupAvatar: currentDmGroup.channel_avatar?.[0],
+						meetingCode: currentDmGroup.meeting_code,
+						clanId: currentDmGroup.clan_id,
+						participants: currentDmGroup.user_id || [],
+						callerInfo: {
+							id: userProfile?.user_id || '',
+							name: userProfile?.username || '',
+							avatar: ''
+						}
+					})
+				);
+
+				dispatch(audioCallActions.setGroupCallId(currentDmGroup.channel_id));
+				dispatch(audioCallActions.setIsBusyTone(false));
+			} else {
+				dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
+			}
+			return;
+		}
+
 		if (!isInCall) {
+			if (!currentDmGroup.channel_id) {
+				dispatch(toastActions.addToast({ message: 'Direct message channel ID is missing', type: 'error', autoClose: 3000 }));
+				return;
+			}
+
 			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
 			dispatch(audioCallActions.startDmCall({ groupId: currentDmGroup.channel_id, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(currentDmGroup.channel_id));
-			dispatch(audioCallActions.setUserCallId(currentDmGroup?.user_id?.[0]));
+
+			if (currentDmGroup?.user_id?.[0]) {
+				dispatch(audioCallActions.setUserCallId(currentDmGroup.user_id[0]));
+			}
+
 			dispatch(audioCallActions.setIsBusyTone(false));
 		} else {
 			dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
