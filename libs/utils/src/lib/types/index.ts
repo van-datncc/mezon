@@ -365,6 +365,7 @@ export interface IMessageGridItem {
 export interface IMessageCallLog {
 	isVideo: boolean;
 	callLogType: IMessageTypeCallLog;
+	showCallBack?: boolean;
 }
 
 export enum EMessageSelectType {
