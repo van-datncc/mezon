@@ -10,16 +10,6 @@ interface CallStatusProps {
 }
 
 export const CallStatus = memo<CallStatusProps>(({ isConnecting, isConnected, participantCount, callStartTime, groupName, groupAvatar }) => {
-	const getStatusText = () => {
-		if (isConnected) {
-			return `Connected • ${participantCount} participant${participantCount !== 1 ? 's' : ''}`;
-		}
-		if (isConnecting) {
-			return 'Connecting...';
-		}
-		return 'Starting call...';
-	};
-
 	const getCallDuration = () => {
 		if (!callStartTime || !isConnected) return null;
 
@@ -42,7 +32,6 @@ export const CallStatus = memo<CallStatusProps>(({ isConnecting, isConnected, pa
 				)}
 				<div>
 					<h3 className="text-lg font-semibold dark:text-white text-black">{groupName}</h3>
-					{/* <p className="text-sm text-gray-500">{getStatusText()}</p> */}
 				</div>
 			</div>
 

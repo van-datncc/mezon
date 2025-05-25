@@ -31,6 +31,7 @@ import { useSelector } from 'react-redux';
 import PreCallInterface from './PreCallInterface';
 import { useGroupCall } from './hooks/useGroupCall';
 import {
+	CallSignalingData,
 	createCallSignalingData,
 	createCancelData,
 	createParticipantJoinedData,
@@ -111,7 +112,7 @@ const GroupCallComponent = memo(
 				callerAvatar: userProfile?.user?.avatar_url,
 				meetingCode: callGroup?.meeting_code,
 				clanId: callGroup?.clan_id,
-				participants: callGroup?.user_id || []
+				participants: [...(callGroup?.user_id || []), userProfile?.user?.id?.toString() as string]
 			});
 
 			// Send signaling using hook
@@ -145,7 +146,7 @@ const GroupCallComponent = memo(
 
 				if (result) {
 					if (isJoined && voiceInfo) {
-						handleLeaveRoom();
+						// handleLeaveRoom();
 					}
 
 					await participantMeetState(ParticipantMeetState.JOIN, callGroup?.clan_id as string, callGroup?.channel_id as string);
@@ -186,7 +187,9 @@ const GroupCallComponent = memo(
 						userProfile?.user?.id as string
 					);
 
-					groupCall.chat.sendStartCallMessage(videoEnabled);
+					if (!groupCall.state.isAnsweringCall && isDm) {
+						groupCall.chat.sendStartCallMessage(videoEnabled);
+					}
 				} else {
 					dispatch(voiceActions.setToken(''));
 					groupCall.audio.stopAllAudio();
@@ -228,7 +231,7 @@ const GroupCallComponent = memo(
 				callerId: userProfile?.user?.id || '',
 				callerName: userProfile?.user?.display_name || userProfile?.user?.username || '',
 				action: 'leave'
-			});
+			}) as CallSignalingData;
 
 			groupCall.signaling.sendGroupCallQuit(
 				currentDmGroup?.user_id || [],
@@ -274,13 +277,18 @@ const GroupCallComponent = memo(
 		};
 
 		const handleCancelPreCall = () => {
+			if (isJoined && token) {
+				handleLeaveRoom();
+				return;
+			}
+
 			const cancelData = createCancelData({
 				isVideo: groupCall.state.isVideoCall,
 				groupId: currentDmGroup?.channel_id || '',
 				callerId: userProfile?.user?.id || '',
 				callerName: userProfile?.user?.display_name || userProfile?.user?.username || '',
 				reason: 'cancelled'
-			});
+			}) as CallSignalingData;
 
 			groupCall.signaling.sendGroupCallCancel(
 				currentDmGroup?.user_id || [],
@@ -288,6 +296,9 @@ const GroupCallComponent = memo(
 				currentDmGroup?.channel_id as string,
 				userProfile?.user?.id as string
 			);
+
+			// Send cancel call message with proper UX
+			groupCall.chat.sendCancelCallMessage(groupCall.state.isVideoCall);
 
 			groupCall.audio.playEndTone();
 			groupCall.state.hidePreCallInterface();
@@ -299,7 +310,7 @@ const GroupCallComponent = memo(
 
 		return (
 			<>
-				{groupCall.state.isShowPreCallInterface && isActiveForCurrentGroup && (
+				{groupCall.state.isShowPreCallInterface && isActiveForCurrentGroup && !groupCall.state.isAnsweringCall && (
 					<div
 						className={`w-widthThumnailAttachment  absolute top-0 right-0 ${!isOnMenu ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''} z-50`}
 						style={{ height: '240px' }}
@@ -348,5 +359,7 @@ const GroupCallComponent = memo(
 	},
 	() => true
 );
+
+GroupCallComponent.displayName = 'GroupCallComponent';
 
 export default GroupCallComponent;

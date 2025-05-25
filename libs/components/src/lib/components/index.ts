@@ -5,4 +5,5 @@ export * from './VoiceChannel/ControlBar/TrackToggle/ScreenShareToggleButton';
 export * from './VoiceChannel/ControlBar/TrackToggle/TrackToggle';
 export { default as VoicePopout } from './VoiceChannel/VoicePopout/VoicePopout';
 
+export * from './DmCall';
 export * from './GroupCall';

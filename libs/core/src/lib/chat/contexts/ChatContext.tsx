@@ -36,7 +36,6 @@ import {
 	getStore,
 	getStoreAsync,
 	giveCoffeeActions,
-	groupCallActions,
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	mapMessageChannelToEntityAction,
@@ -65,7 +64,6 @@ import {
 	selectCurrentTopicId,
 	selectCurrentUserId,
 	selectDmGroupCurrentId,
-	selectIsGroupCallActive,
 	selectIsInCall,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
@@ -162,6 +160,7 @@ import { ChannelCanvas, DeleteAccountEvent, RemoveFriend, SdTopicEvent } from 'm
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { handleGroupCallSocketEvent } from './groupCallSocketHandler';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -1683,157 +1682,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		// Handle Group Call Events (>= 9)
 		if (event.data_type >= 9) {
 			const store = await getStoreAsync();
-			const isInCall = selectIsInCall(store.getState() as unknown as RootState);
-			const isGroupCallActive = selectIsGroupCallActive(store.getState() as unknown as RootState);
+			const state = store.getState() as unknown as RootState;
 
-			switch (event.data_type) {
-				case 9: {
-					if (event?.channel_id) {
-						dispatch(audioCallActions.setGroupCallId(event.channel_id));
-					}
-					const callData = safeJSONParse((event?.json_data as string) || '{}');
-					const isVideoCall = callData?.is_video === true;
+			const handled = await handleGroupCallSocketEvent(event, state, {
+				dispatch,
+				socketRef,
+				userId
+			});
 
-					const isInAnyCall = isInCall || isGroupCallActive;
-					if (!isInAnyCall) {
-						// Receiver is free - show ring tone and incoming call UI
-						dispatch(audioCallActions.setIsRingTone(true));
-						dispatch(audioCallActions.setIsBusyTone(false));
-						dispatch(audioCallActions.setIsEndTone(false));
-						dispatch(audioCallActions.setIsDialTone(false));
-
-						// Show incoming group call UI
-						dispatch(
-							groupCallActions.showIncomingGroupCall({
-								groupId: event.channel_id,
-								callData: event,
-								isVideo: isVideoCall
-							})
-						);
-					} else {
-						// Receiver is busy - send busy signal back to caller
-						socketRef.current?.forwardWebrtcSignaling(
-							event.caller_id,
-							13, // GROUP_CALL_JOINED_OTHER_CALL
-							JSON.stringify({
-								is_video: isVideoCall,
-								group_id: event.channel_id,
-								caller_id: userId,
-								busy_user_id: userId,
-								timestamp: Date.now(),
-								reason: 'busy'
-							}),
-							event.channel_id,
-							userId || ''
-						);
-					}
-					break;
-				}
-
-				case 10: {
-					// GROUP_CALL_ANSWER
-					dispatch(audioCallActions.setIsRingTone(false));
-					dispatch(audioCallActions.setIsDialTone(false));
-					dispatch(audioCallActions.setIsJoinedCall(true));
-
-					const answerData = safeJSONParse((event?.json_data as string) || '{}');
-					if (answerData.caller_id) {
-						dispatch(groupCallActions.addParticipant(answerData.caller_id));
-					}
-					break;
-				}
-
-				case 11: {
-					// GROUP_CALL_QUIT
-					const quitData = safeJSONParse((event?.json_data as string) || '{}');
-
-					if (quitData.action === 'decline') {
-						dispatch(groupCallActions.hideIncomingGroupCall());
-						dispatch(audioCallActions.setIsRingTone(false));
-					} else if (quitData.action === 'leave') {
-						if (quitData.caller_id === userId) {
-							dispatch(audioCallActions.setIsRingTone(false));
-							dispatch(audioCallActions.setIsDialTone(false));
-						} else {
-							if (quitData.caller_id) {
-								dispatch(groupCallActions.removeParticipant(quitData.caller_id));
-							}
-						}
-					} else {
-						if (quitData.caller_id === userId) {
-							dispatch(groupCallActions.endGroupCall());
-							dispatch(audioCallActions.setIsEndTone(true));
-						} else {
-							dispatch(groupCallActions.removeParticipant(quitData.caller_id));
-							if (!isGroupCallActive) {
-								dispatch(groupCallActions.hideIncomingGroupCall());
-							}
-						}
-					}
-
-					// Always stop ring/dial tone
-					dispatch(audioCallActions.setIsRingTone(false));
-					dispatch(audioCallActions.setIsDialTone(false));
-					break;
-				}
-
-				case 12: // GROUP_CALL_ICE_CANDIDATE
-					break;
-
-				case 13: // GROUP_CALL_JOINED_OTHER_CALL
-					dispatch(audioCallActions.setIsBusyTone(true));
-					dispatch(audioCallActions.setIsRingTone(false));
-					break;
-
-				case 14: {
-					// GROUP_CALL_STATUS_REMOTE_MEDIA
-					const mediaData = safeJSONParse((event?.json_data as string) || '{}');
-					if (mediaData?.micEnabled !== undefined) {
-						dispatch(audioCallActions.setIsRemoteAudio(mediaData?.micEnabled));
-					}
-					if (mediaData?.cameraEnabled !== undefined) {
-						dispatch(audioCallActions.setIsRemoteVideo(mediaData?.cameraEnabled));
-					}
-					break;
-				}
-
-				case 15: // GROUP_CALL_CANCEL
-					dispatch(groupCallActions.endGroupCall());
-					dispatch(groupCallActions.hideIncomingGroupCall());
-					dispatch(audioCallActions.setIsRingTone(false));
-					dispatch(audioCallActions.setIsDialTone(false));
-					break;
-
-				case 16: // GROUP_CALL_TIMEOUT
-					dispatch(groupCallActions.endGroupCall());
-					dispatch(groupCallActions.hideIncomingGroupCall());
-					dispatch(audioCallActions.setIsRingTone(false));
-					dispatch(audioCallActions.setIsDialTone(false));
-					dispatch(audioCallActions.setIsEndTone(true));
-					break;
-
-				case 17: {
-					// GROUP_CALL_PARTICIPANT_JOINED
-					const joinData = safeJSONParse((event?.json_data as string) || '{}');
-					if (joinData.participant_id) {
-						dispatch(groupCallActions.addParticipant(joinData.participant_id));
-					}
-					break;
-				}
-
-				case 18: {
-					// GROUP_CALL_PARTICIPANT_LEFT
-					const leftData = safeJSONParse((event?.json_data as string) || '{}');
-					if (leftData.participant_id) {
-						dispatch(groupCallActions.removeParticipant(leftData.participant_id));
-					}
-					break;
-				}
-
-				default:
-					break;
+			if (handled) {
+				return;
 			}
-			return;
 		}
 
 		const store = await getStoreAsync();

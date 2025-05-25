@@ -1,4 +1,5 @@
 export { default as GroupCallComponent } from './GroupCallComponent';
+export { default as GroupCallManager } from './GroupCallManager';
 export { default as GroupPopupNotiCall } from './GroupPopupNotiCall';
 export { default as PreCallInterface } from './PreCallInterface';
 
@@ -40,6 +41,7 @@ export {
 	// Call display utilities
 	getGroupCallDisplayName,
 	getOtherParticipants,
+	// Utility functions
 	isUserInCall,
 	parseSignalingData,
 	retryWithBackoff,

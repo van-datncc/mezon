@@ -398,6 +398,20 @@ const DmTopbarTools = memo(() => {
 					return;
 				}
 
+				handleSend(
+					{
+						t: `Started ${isVideoCall ? 'video' : 'voice'} call`,
+						callLog: {
+							isVideo: isVideoCall,
+							callLogType: IMessageTypeCallLog.STARTCALL,
+							showCallBack: false
+						}
+					},
+					[],
+					[],
+					[]
+				);
+
 				dispatch(
 					groupCallActions.showPreCallInterface({
 						groupId: currentDmGroup.channel_id,
@@ -412,7 +426,7 @@ const DmTopbarTools = memo(() => {
 						groupAvatar: currentDmGroup.channel_avatar?.[0],
 						meetingCode: currentDmGroup.meeting_code,
 						clanId: currentDmGroup.clan_id,
-						participants: currentDmGroup.user_id || [],
+						participants: [...(currentDmGroup?.user_id || []), userProfile?.user_id?.toString() as string],
 						callerInfo: {
 							id: userProfile?.user_id || '',
 							name: userProfile?.username || '',
@@ -435,7 +449,19 @@ const DmTopbarTools = memo(() => {
 				return;
 			}
 
-			handleSend({ t: ``, callLog: { isVideo: isVideoCall, callLogType: IMessageTypeCallLog.STARTCALL } }, [], [], []);
+			handleSend(
+				{
+					t: `Started ${isVideoCall ? 'video' : 'voice'} call`,
+					callLog: {
+						isVideo: isVideoCall,
+						callLogType: IMessageTypeCallLog.STARTCALL,
+						showCallBack: false
+					}
+				},
+				[],
+				[],
+				[]
+			);
 			dispatch(audioCallActions.startDmCall({ groupId: currentDmGroup.channel_id, isVideo: isVideoCall }));
 			dispatch(audioCallActions.setGroupCallId(currentDmGroup.channel_id));
 
@@ -449,14 +475,26 @@ const DmTopbarTools = memo(() => {
 		}
 	};
 
+	const isGroupCallDisabled = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && !currentDmGroup?.meeting_code;
+
 	return (
 		<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 			<div className=" items-center gap-2 flex">
 				<div className="justify-start items-center gap-[15px] flex">
-					<button title="Start voice call" onClick={() => handleStartCall()}>
+					<button
+						title="Start voice call"
+						onClick={() => handleStartCall()}
+						disabled={isGroupCallDisabled}
+						className={isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+					>
 						<Icons.IconPhoneDM className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`} />
 					</button>
-					<button title="Start Video Call" onClick={() => handleStartCall(true)}>
+					<button
+						title="Start Video Call"
+						onClick={() => handleStartCall(true)}
+						disabled={isGroupCallDisabled}
+						className={isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+					>
 						<Icons.IconMeetDM className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`} />
 					</button>
 					<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
