@@ -68,7 +68,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		(channel) =>
 			!channel?.channel_private &&
 			channel?.clan_id === currentClan?.clan_id &&
-			channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
+			channel?.type === ChannelType?.CHANNEL_TYPE_CHANNEL &&
 			channel?.channel_id !== selectedChannelMessage?.channel_id
 	);
 
