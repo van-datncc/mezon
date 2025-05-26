@@ -317,6 +317,7 @@ export interface IMessageRatioOption {
 	name?: string;
 	value: string;
 	style?: EButtonMessageStyle;
+	disabled?: boolean;
 }
 
 export interface IMessageInput {
