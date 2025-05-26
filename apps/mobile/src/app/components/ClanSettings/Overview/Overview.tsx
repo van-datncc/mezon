@@ -383,16 +383,18 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				<MezonImagePicker
 					disabled={disabled}
 					defaultValue={banner}
-					height={200}
-					width={width - 40}
+					height={size.s_200}
+					width={width - size.s_40}
 					onLoad={handleLoad}
 					showHelpText
 					autoUpload
 				/>
 
-				<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_2 }} onPress={handleClearBanner}>
-					<MezonIconCDN icon={IconCDN.circleXIcon} height={25} width={25} color={themeValue.white} />
-				</Pressable>
+				{banner && (
+					<Pressable style={{ position: 'absolute', right: size.s_14, top: size.s_2 }} onPress={handleClearBanner}>
+						<MezonIconCDN icon={IconCDN.circleXIcon} height={25} width={25} color={themeValue.white} />
+					</Pressable>
+				)}
 
 				<View style={{ marginVertical: 10 }}>
 					<MezonInput
