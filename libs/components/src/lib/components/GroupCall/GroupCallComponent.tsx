@@ -8,6 +8,7 @@ import {
 	generateMeetToken,
 	handleParticipantVoiceState,
 	selectDmGroupCurrent,
+	selectGroupCallJoined,
 	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
 	selectShowCamera,
@@ -17,7 +18,6 @@ import {
 	selectTokenJoinVoice,
 	selectVoiceFullScreen,
 	selectVoiceInfo,
-	selectVoiceJoined,
 	selectVoiceOpenPopOut,
 	useAppDispatch,
 	voiceActions
@@ -50,7 +50,7 @@ const GroupCallComponent = memo(
 
 		const groupCall = useGroupCall({ currentGroup: currentDmGroup });
 
-		const isJoined = useSelector(selectVoiceJoined);
+		const isJoined = useSelector(selectGroupCallJoined);
 		const token = useSelector(selectTokenJoinVoice);
 		const voiceInfo = useSelector(selectVoiceInfo);
 		const showMicrophone = useSelector(selectShowMicrophone);
@@ -154,7 +154,7 @@ const GroupCallComponent = memo(
 					dispatch(voiceActions.setShowMicrophone(true));
 					dispatch(voiceActions.setShowCamera(videoEnabled));
 
-					dispatch(voiceActions.setJoined(true));
+					dispatch(voiceActions.setGroupCallJoined(true));
 					dispatch(voiceActions.setToken(result));
 					dispatch(
 						voiceActions.setVoiceInfo({
