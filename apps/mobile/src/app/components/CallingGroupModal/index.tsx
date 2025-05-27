@@ -1,4 +1,4 @@
-import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
+import { ActionEmitEvent, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { groupCallActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
@@ -6,7 +6,7 @@ import { WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { safeJSONParse, WebrtcSignalingFwd } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
@@ -33,6 +33,37 @@ interface CallSignalingData {
 	reason?: string;
 }
 
+export const useSendSignaling = () => {
+	const mezon = useMezon();
+
+	const sendSignalingToParticipants = useCallback(
+		(participants: string[], signalType: number, data: CallSignalingData | Record<string, any>, channelId: string, currentUserId: string) => {
+			if (!participants?.length || !channelId || !currentUserId) {
+				return;
+			}
+
+			const socket = mezon.socketRef.current;
+			if (!socket) {
+				console.error('Socket not available for signaling');
+				return;
+			}
+
+			participants.forEach((userId) => {
+				if (userId !== currentUserId) {
+					try {
+						socket.forwardWebrtcSignaling(userId, signalType, JSON.stringify(data), channelId, currentUserId);
+					} catch (error) {
+						console.error('Failed to send signaling to participant:', userId, error);
+					}
+				}
+			});
+		},
+		[mezon]
+	);
+
+	return { sendSignalingToParticipants };
+};
+
 const parseSignalingData = (jsonData?: string): CallSignalingData | null => {
 	if (!jsonData) return null;
 
@@ -52,32 +83,7 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
 	}, []);
-	const mezon = useMezon();
-
-	const sendSignalingToParticipants = useCallback(
-		(participants: string[], signalType: number, data: CallSignalingData | Record<string, any>, channelId: string, currentUserId: string) => {
-			if (!participants?.length || !channelId || !currentUserId) {
-				return;
-			}
-
-			participants.forEach((userId) => {
-				if (userId !== currentUserId) {
-					try {
-						const socket = mezon.socketRef.current;
-						if (!socket) {
-							console.error('Socket not available for signaling');
-							return;
-						}
-
-						socket.forwardWebrtcSignaling(userId, signalType, JSON.stringify(data), channelId, currentUserId);
-					} catch (error) {
-						console.error('Failed to send signaling to participant:', userId, error);
-					}
-				}
-			});
-		},
-		[mezon]
-	);
+	const { sendSignalingToParticipants } = useSendSignaling();
 
 	const callData = useMemo(() => {
 		return parseSignalingData(dataCall?.json_data as string);
@@ -132,27 +138,34 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 		Vibration.cancel();
 		setIsVisible(false);
 		if (dataCall?.channel_id && callData) {
-			dispatch(
-				groupCallActions.setIncomingCallData({
-					groupId: dataCall.channel_id,
-					groupName: callData?.group_name || 'Group Call',
-					groupAvatar: callData?.group_avatar,
-					meetingCode: callData?.meeting_code,
-					clanId: callData?.clan_id,
-					participants: callData?.participants || [],
-					callerInfo: {
-						id: callData?.caller_id,
-						name: callData?.caller_name,
-						avatar: callData?.caller_avatar
-					}
-				})
-			);
-			dispatch(groupCallActions.autoJoinRoom({ shouldJoin: true, isAnswering: true }));
 			dispatch(groupCallActions.hideIncomingGroupCall());
+			if (!callData.meeting_code) return;
+			const data = {
+				channelId: dataCall.channel_id || '',
+				roomName: callData?.meeting_code,
+				clanId: ''
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			const joinAction = {
+				participant_id: userId,
+				participant_name: '',
+				participant_avatar: '',
+				timestamp: Date.now()
+			};
+			sendSignalingToParticipants(
+				[dataCall?.caller_id],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_PARTICIPANT_JOINED,
+				joinAction,
+				dataCall?.channel_id || '',
+				userId || ''
+			);
 		}
 	};
 
 	const onDeniedCall = async () => {
+		stopAndReleaseSound();
+		Vibration.cancel();
+		setIsVisible(false);
 		const quitAction = {
 			is_video: callData?.is_video || false,
 			group_id: dataCall?.channel_id || '',
@@ -170,9 +183,6 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 		);
 		dispatch(groupCallActions.hideIncomingGroupCall());
 		dispatch(groupCallActions.endGroupCall());
-		setIsVisible(false);
-		stopAndReleaseSound();
-		Vibration.cancel();
 	};
 
 	if (!isVisible) {

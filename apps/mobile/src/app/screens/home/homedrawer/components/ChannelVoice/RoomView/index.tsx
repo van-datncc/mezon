@@ -10,16 +10,26 @@ import {
 	load,
 	save
 } from '@mezon/mobile-components';
-import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectIsPiPMode, selectVoiceInfo, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { ThemeModeBase, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import {
+	clansActions,
+	groupCallActions,
+	selectIsPiPMode,
+	selectIsShowPreCallInterface,
+	selectVoiceInfo,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
+import LottieView from 'lottie-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
+import { DeviceEventEmitter, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View, findNodeHandle } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../../../../../assets/lottie';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
@@ -33,18 +43,26 @@ const RoomView = ({
 	onPressMinimizeRoom,
 	channelId,
 	clanId,
-	onFocusedScreenChange
+	onFocusedScreenChange,
+	isGroupCall = false,
+	participantsCount = 0,
+	onQuitGroupCall,
+	onCancelCall
 }: {
 	isAnimationComplete: boolean;
 	onPressMinimizeRoom: () => void;
 	channelId: string;
 	clanId: string;
 	onFocusedScreenChange: (track: TrackReference | null) => void;
+	isGroupCall?: boolean;
+	participantsCount?: number;
+	onQuitGroupCall?: () => void;
+	onCancelCall?: () => void;
 }) => {
 	const marginWidth = Dimensions.get('screen').width;
 	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare, Track.Source.ScreenShareAudio]);
 	const dispatch = useAppDispatch();
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const room = useRoomContext();
 	const participants = useParticipants();
@@ -56,12 +74,19 @@ const RoomView = ({
 	const [isHiddenControl, setIsHiddenControl] = useState<boolean>(false);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const screenCaptureRef = React.useRef(null);
+	const isShowPreCallInterface = useSelector(selectIsShowPreCallInterface);
 
 	useEffect(() => {
 		if (localParticipant) {
 			loadLocalDefaults();
 		}
 	}, [localParticipant]);
+
+	useEffect(() => {
+		if (participants?.length > 1 && isShowPreCallInterface) {
+			dispatch(groupCallActions?.hidePreCallInterface());
+		}
+	}, [dispatch, isShowPreCallInterface, participants?.length]);
 
 	const loadLocalDefaults = async () => {
 		await localParticipant.setCameraEnabled(false);
@@ -179,9 +204,16 @@ const RoomView = ({
 	}, [isScreenShareEnabled, localParticipant]);
 
 	const handleEndCall = useCallback(() => {
+		if (isGroupCall) {
+			if (isShowPreCallInterface) {
+				onCancelCall?.();
+			} else {
+				onQuitGroupCall?.();
+			}
+		}
 		room.disconnect();
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: voiceInfo?.clanId, channelId: voiceInfo?.channelId });
-	}, [room, voiceInfo?.channelId, voiceInfo?.clanId]);
+	}, [isGroupCall, isShowPreCallInterface, onCancelCall, onQuitGroupCall, room, voiceInfo?.channelId, voiceInfo?.clanId]);
 
 	const handleShowChat = () => {
 		if (!isTabletLandscape) {
@@ -238,12 +270,16 @@ const RoomView = ({
 					<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
 						{isMicrophoneEnabled ? <MezonIconCDN icon={IconCDN.microphoneIcon} /> : <MezonIconCDN icon={IconCDN.microphoneSlashIcon} />}
 					</TouchableOpacity>
-					<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-						<MezonIconCDN icon={IconCDN.chatIcon} />
-					</TouchableOpacity>
-					<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
-						{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
-					</TouchableOpacity>
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
+							<MezonIconCDN icon={IconCDN.chatIcon} />
+						</TouchableOpacity>
+					)}
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
+							{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
+						</TouchableOpacity>
+					)}
 					<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 						<MezonIconCDN icon={IconCDN.phoneCallIcon} />
 					</TouchableOpacity>
@@ -288,6 +324,17 @@ const RoomView = ({
 					isFocusedScreen={focusedScreenShare}
 					setFocusedScreenShare={setFocusedScreenShare}
 				/>
+			)}
+			{isGroupCall && participants.length <= 1 && isShowPreCallInterface && (
+				<View style={{ alignItems: 'center', justifyContent: 'center', paddingBottom: size.s_100 * 2 }}>
+					<LottieView
+						source={themeBasic === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+						autoPlay
+						loop
+						style={{ width: size.s_60, height: size.s_60 }}
+					/>
+					<Text style={styles.text}>{`${participantsCount} members will be notified`}</Text>
+				</View>
 			)}
 			{isAnimationComplete && <RenderControlBar />}
 			{screenCapturePickerView}
