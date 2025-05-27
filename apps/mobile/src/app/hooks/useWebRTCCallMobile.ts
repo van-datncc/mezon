@@ -10,6 +10,7 @@ import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } fr
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, NativeModules, Platform } from 'react-native';
+import RNCallKeep from 'react-native-callkeep';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
@@ -120,6 +121,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		if (Platform.OS === 'android') {
 			await NotificationPreferences.clearValue('notificationDataCalling');
 		} else {
+			RNCallKeep.endAllCalls();
 			const VoIPManager = NativeModules?.VoIPManager;
 			if (VoIPManager) {
 				await VoIPManager.clearStoredNotificationData();
@@ -178,6 +180,10 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					text1: 'Connection connected'
 				});
 				stopDialTone();
+				const bodyFCMMobile = {
+					offer: 'CANCEL_CALL'
+				};
+				mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 			}
 			if (pc.iceConnectionState === 'checking') {
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
@@ -428,6 +434,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			playEndCall();
 			stopAllTracks();
 
+			if (Platform.OS === 'ios') {
+				RNCallKeep.endAllCalls();
+			}
 			if (peerConnection?.current) {
 				peerConnection?.current.close();
 			}
