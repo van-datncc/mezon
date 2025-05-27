@@ -6,6 +6,7 @@ import {
 	useTracks
 } from '@livekit/components-react';
 import {
+	selectGroupCallJoined,
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
@@ -64,6 +65,8 @@ export function ControlBar({
 	const audioScreenTrackRef = useRef<LocalTrackPublication | null>(null);
 
 	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
+
+	const isGroupCall = useSelector(selectGroupCallJoined);
 
 	const sendEmojiReaction = useSendReaction({ currentChannel: currentChannel });
 
@@ -293,28 +296,30 @@ export function ControlBar({
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-sbm:!hidden max-md:flex-col">
 			<div className="flex justify-start gap-4 max-md:hidden">
-				<Tooltip
-					placement="topLeft"
-					trigger={['click']}
-					overlayClassName="w-auto"
-					visible={showEmojiPanel}
-					onVisibleChange={setShowEmojiPanel}
-					overlay={
-						<EmojiSuggestionProvider>
-							<GifStickerEmojiPopup
-								showTabs={{ emojis: true }}
-								mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-								emojiAction={EmojiPlaces.EMOJI_REACTION}
-								onEmojiSelect={handleEmojiSelect}
-							/>
-						</EmojiSuggestionProvider>
-					}
-					destroyTooltipOnHide
-				>
-					<div>
-						<Icons.VoiceEmojiControlIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
-					</div>
-				</Tooltip>
+				{!isGroupCall && (
+					<Tooltip
+						placement="topLeft"
+						trigger={['click']}
+						overlayClassName="w-auto"
+						visible={showEmojiPanel}
+						onVisibleChange={setShowEmojiPanel}
+						overlay={
+							<EmojiSuggestionProvider>
+								<GifStickerEmojiPopup
+									showTabs={{ emojis: true }}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									emojiAction={EmojiPlaces.EMOJI_REACTION}
+									onEmojiSelect={handleEmojiSelect}
+								/>
+							</EmojiSuggestionProvider>
+						}
+						destroyTooltipOnHide
+					>
+						<div>
+							<Icons.VoiceEmojiControlIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+						</div>
+					</Tooltip>
+				)}
 			</div>
 			<div className="flex justify-center gap-3 flex-1">
 				{visibleControls.microphone && (
