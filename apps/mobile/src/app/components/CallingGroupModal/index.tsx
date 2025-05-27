@@ -1,14 +1,13 @@
 import { load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { groupCallActions, selectIsInCall, useAppDispatch } from '@mezon/store';
+import { groupCallActions, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
-import { useNavigation } from '@react-navigation/native';
+import { WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
-import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { safeJSONParse, WebrtcSignalingFwd } from 'mezon-js';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
-import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
@@ -50,12 +49,35 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const ringtoneRef = useRef<Sound | null>(null);
-	const navigation = useNavigation<any>();
 	const userId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
 	}, []);
-	const isInCall = useSelector(selectIsInCall);
 	const mezon = useMezon();
+
+	const sendSignalingToParticipants = useCallback(
+		(participants: string[], signalType: number, data: CallSignalingData | Record<string, any>, channelId: string, currentUserId: string) => {
+			if (!participants?.length || !channelId || !currentUserId) {
+				return;
+			}
+
+			participants.forEach((userId) => {
+				if (userId !== currentUserId) {
+					try {
+						const socket = mezon.socketRef.current;
+						if (!socket) {
+							console.error('Socket not available for signaling');
+							return;
+						}
+
+						socket.forwardWebrtcSignaling(userId, signalType, JSON.stringify(data), channelId, currentUserId);
+					} catch (error) {
+						console.error('Failed to send signaling to participant:', userId, error);
+					}
+				}
+			});
+		},
+		[mezon]
+	);
 
 	const callData = useMemo(() => {
 		return parseSignalingData(dataCall?.json_data as string);
@@ -71,7 +93,7 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 	};
 
 	useEffect(() => {
-		if (!isInCall && dataCall?.caller_id && callData) {
+		if (dataCall?.caller_id && callData) {
 			setIsVisible(true);
 			Sound.setCategory('Playback');
 
@@ -95,7 +117,7 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 			stopAndReleaseSound();
 			Vibration.cancel();
 		}
-	}, [callData, dataCall?.caller_id, isInCall]);
+	}, [callData, dataCall?.caller_id]);
 
 	const playVibration = () => {
 		const pattern = Platform.select({
@@ -131,18 +153,26 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 	};
 
 	const onDeniedCall = async () => {
+		const quitAction = {
+			is_video: callData?.is_video || false,
+			group_id: dataCall?.channel_id || '',
+			caller_id: userId,
+			caller_name: callData?.caller_name || '',
+			timestamp: Date.now(),
+			action: 'decline'
+		};
+		sendSignalingToParticipants(
+			[dataCall?.caller_id],
+			WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT,
+			quitAction,
+			dataCall?.channel_id || '',
+			userId || ''
+		);
 		dispatch(groupCallActions.hideIncomingGroupCall());
 		dispatch(groupCallActions.endGroupCall());
 		setIsVisible(false);
 		stopAndReleaseSound();
 		Vibration.cancel();
-		await mezon.socketRef.current?.forwardWebrtcSignaling(
-			dataCall?.caller_id,
-			WebrtcSignalingType.WEBRTC_SDP_QUIT,
-			'{}',
-			dataCall?.channel_id,
-			userId
-		);
 	};
 
 	if (!isVisible) {
