@@ -46,8 +46,6 @@ export const GifStickerEmojiPopup = ({
 	onEmojiSelect,
 	showTabs = { gifs: true, stickers: true, emojis: true, sounds: true }
 }: GifStickerEmojiPopupOptions) => {
-	console.log('GifStickerEmojiPopup');
-
 	const { subPanelActive, setSubPanelActive, setValueInputSearch } = useGifsStickersEmoji();
 	const idMessageRefReaction = useSelector(selectIdMessageRefReaction);
 	const currentChannel = useSelector(selectCurrentChannel);
