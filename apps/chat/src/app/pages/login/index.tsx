@@ -1,6 +1,6 @@
 import { QRSection } from '@mezon/components';
 import { useAppNavigation, useAuth } from '@mezon/core';
-import { authActions, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
+import { authActions, selectAccountMode, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
 import { validateEmail, validatePassword } from '@mezon/utils';
 
 import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
@@ -12,6 +12,7 @@ import { ILoginLoaderData } from '../../loaders/loginLoader';
 function Login() {
 	const { navigate } = useAppNavigation();
 	const isLogin = useSelector(selectIsLogin);
+	const isSetAccountMode = useSelector(selectAccountMode);
 	const { redirectTo } = useLoaderData() as ILoginLoaderData;
 	const { qRCode, checkLoginRequest } = useAuth();
 	const [loginId, setLoginId] = useState<string | null>(null);
@@ -59,7 +60,8 @@ function Login() {
 	}, [checkLoginRequest, createSecond, isRemember, loginId]);
 
 	useEffect(() => {
-		if (isLogin) {
+		console.log('isSetAccountMode: ', isSetAccountMode);
+		if (isLogin && !isSetAccountMode) {
 			navigate(redirectTo || '/chat/direct/friends');
 		}
 	}, [redirectTo, isLogin, navigate]);
@@ -142,10 +144,13 @@ function Login() {
 	);
 
 	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail !== 'not loaded';
-
+	const handleBackCurrentAccount = () => {
+		console.log('Back to current page');
+	};
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-300 px-4">
 			<div className="bg-[#0b0b0b] text-white rounded-2xl shadow-lg p-14 max-w-4xl w-[800px] flex flex-row gap-8">
+				{isSetAccountMode && <div onClick={handleBackCurrentAccount}>Back</div>}
 				<div className="flex-1 text-left flex flex-col">
 					<div className="flex flex-col items-center">
 						<h1 className="text-2xl font-bold mb-1">WELCOME BACK</h1>

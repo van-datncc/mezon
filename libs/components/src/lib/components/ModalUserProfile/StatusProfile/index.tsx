@@ -2,6 +2,7 @@ import { useAuth, useMemberCustomStatus } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	accountActions,
+	authActions,
 	clanMembersMetaActions,
 	giveCoffeeActions,
 	selectUserStatus,
@@ -14,6 +15,7 @@ import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
@@ -81,6 +83,13 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		dispatch(clanMembersMetaActions.updateUserStatus({ userId: userProfile?.user?.id || '', user_status: status }));
 		dispatch(accountActions.updateUserStatus(status));
 	};
+	const navigate = useNavigate();
+
+	const handleSetAccount = () => {
+		navigate('/desktop/login');
+		dispatch(authActions.turnOnSetAccount());
+	};
+
 	return (
 		<>
 			<div className="max-md:relative">
@@ -152,7 +161,7 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 			>
 				<ItemProfile avatar={user?.avatar_url} username={user?.username} />
 				<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
-				<ItemStatus children="Manage Accounts" />
+				<ItemStatus children="Manage Accounts" onClick={handleSetAccount} />
 			</Dropdown>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}

@@ -14,6 +14,8 @@ export interface AuthState {
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
 	redirectUrl?: string | null;
+	accounts: Record<string, { session?: ISession; isLogin?: boolean }>;
+	setAccountMode: boolean;
 }
 
 export interface ISession {
@@ -36,7 +38,9 @@ export const initialAuthState: AuthState = {
 	isLogin: false,
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
-	redirectUrl: null
+	redirectUrl: null,
+	accounts: {},
+	setAccountMode: false
 };
 
 function normalizeSession(session: Session): ISession {
@@ -208,6 +212,7 @@ export const authSlice = createSlice({
 		},
 
 		setSession(state, action) {
+			console.log('Here');
 			state.session = action.payload;
 			state.isLogin = true;
 		},
@@ -219,6 +224,12 @@ export const authSlice = createSlice({
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
+		},
+		turnOnSetAccount(state) {
+			state.setAccountMode = true;
+		},
+		turnOffSetAccount(state) {
+			state.setAccountMode = false;
 		}
 	},
 	extraReducers: (builder) => {
@@ -305,6 +316,12 @@ export const authSlice = createSlice({
 				state.loadingStatusEmail = 'loaded';
 				state.session = action.payload;
 				state.isLogin = true;
+				if (action.payload.user_id) {
+					state.accounts[action.payload.user_id] = {
+						session: action.payload,
+						isLogin: true
+					};
+				}
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'error';
@@ -356,3 +373,10 @@ export const selectSession = createSelector(getAuthState, (state: AuthState) => 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
+
+export const selectAccountById = createSelector(
+	[getAuthState, (state, userId: string) => userId],
+	(state: AuthState, userId: string) => state.accounts[userId]
+);
+
+export const selectAccountMode = createSelector(getAuthState, (state: AuthState) => state.setAccountMode);

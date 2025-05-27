@@ -16,7 +16,6 @@ import {
 import { GUEST_NAME } from '@mezon/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ChatStreamExternal from './ChatMeeting';
 
@@ -78,7 +77,8 @@ export default function PreJoinCalling() {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const animationFrameRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
-	const { code } = useParams<{ code: string }>();
+	// const { code } = useParams<{ code: string }>();
+	const code = 'MTc0ODMzNTE5NDkzMjcwMzA0NDoxODQwNjU0NjUzMTA1MTE1MTM2.RNpPSFO_RooaYyVX739cnyTY9IIQFi0CBiQj_9p5qGs';
 
 	const getExternalToken = useSelector(selectExternalToken);
 	const getJoinCallExtStatus = useSelector(selectJoinCallExtStatus);
