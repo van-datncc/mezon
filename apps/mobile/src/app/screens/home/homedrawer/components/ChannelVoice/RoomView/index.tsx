@@ -325,7 +325,7 @@ const RoomView = ({
 					setFocusedScreenShare={setFocusedScreenShare}
 				/>
 			)}
-			{isGroupCall && participants.length <= 1 && isShowPreCallInterface && (
+			{isAnimationComplete && isGroupCall && participants.length <= 1 && isShowPreCallInterface && (
 				<View style={{ alignItems: 'center', justifyContent: 'center', paddingBottom: size.s_100 * 2 }}>
 					<LottieView
 						source={themeBasic === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}

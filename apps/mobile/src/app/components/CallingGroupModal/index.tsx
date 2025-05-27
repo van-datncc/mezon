@@ -1,6 +1,6 @@
-import { ActionEmitEvent, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
-import { groupCallActions, useAppDispatch } from '@mezon/store';
+import { groupCallActions, selectCurrentUserId, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
@@ -8,6 +8,7 @@ import { safeJSONParse, WebrtcSignalingFwd } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeviceEventEmitter, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import Sound from 'react-native-sound';
+import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../assets/lottie';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
@@ -80,9 +81,7 @@ const CallingGroupModal = ({ dataCall }: ICallingGroupProps) => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const ringtoneRef = useRef<Sound | null>(null);
-	const userId = useMemo(() => {
-		return load(STORAGE_MY_USER_ID);
-	}, []);
+	const userId = useSelector(selectCurrentUserId);
 	const { sendSignalingToParticipants } = useSendSignaling();
 
 	const callData = useMemo(() => {
