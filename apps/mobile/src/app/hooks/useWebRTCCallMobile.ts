@@ -66,7 +66,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		storedIceCandidates: null
 	});
 	const peerConnection = useRef<RTCPeerConnection | null>(null);
-	const [pendingCandidates, setPendingCandidates] = useState<(RTCIceCandidate | null)[]>([]);
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
@@ -150,7 +149,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		const pc = new RTCPeerConnection(RTCConfig);
 		pc.addEventListener('icecandidate', async (event) => {
 			if (event?.candidate) {
-				setPendingCandidates((prev) => [...prev, event.candidate]);
 				pendingCandidatesRef.current = [...(pendingCandidatesRef?.current || []), event.candidate];
 			}
 		});
@@ -336,22 +334,16 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const handleAnswer = async (signalingData: any) => {
 		if (!peerConnection?.current) return;
 		await peerConnection?.current.setRemoteDescription(new RTCSessionDescription(signalingData));
-		const dataPendingCandidates = pendingCandidates?.length
-			? pendingCandidates
-			: pendingCandidatesRef?.current?.length
-				? pendingCandidatesRef?.current
-				: [];
-
-		// Add stored ICE candidates
-		if (dataPendingCandidates?.length > 0) {
-			await mezon.socketRef.current?.forwardWebrtcSignaling(
-				dmUserId,
-				WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-				JSON.stringify(dataPendingCandidates?.[dataPendingCandidates?.length - 1]),
-				channelId,
-				userId
-			);
-			setPendingCandidates([]);
+		if (pendingCandidatesRef?.current?.length > 0) {
+			for (const candidateItem of pendingCandidatesRef.current) {
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+					JSON.stringify(candidateItem),
+					channelId,
+					userId
+				);
+			}
 			pendingCandidatesRef.current = [];
 		}
 	};
@@ -363,14 +355,8 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			if (data) {
 				const candidate = new RTCIceCandidate(data);
 				await peerConnection?.current?.addIceCandidate(candidate);
-
-				const dataPendingCandidates = pendingCandidates?.length
-					? pendingCandidates
-					: pendingCandidatesRef?.current?.length
-						? pendingCandidatesRef?.current
-						: [];
-				if (dataPendingCandidates) {
-					for (const candidateItem of dataPendingCandidates) {
+				if (pendingCandidatesRef?.current?.length && peerConnection?.current?.remoteDescription?.type === 'offer') {
+					for (const candidateItem of pendingCandidatesRef.current) {
 						await mezon.socketRef.current?.forwardWebrtcSignaling(
 							dmUserId,
 							WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
@@ -379,7 +365,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 							userId
 						);
 					}
-					setPendingCandidates([]);
 					pendingCandidatesRef.current = [];
 				}
 			} else {
@@ -546,6 +531,22 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				channelId,
 				userId
 			);
+			// Renegotiation needed when adding video track to voice call
+			if (peerConnection?.current) {
+				// Create new offer with video track
+				const offer = await peerConnection.current.createOffer(sessionConstraints);
+				await peerConnection.current.setLocalDescription(offer);
+
+				// Send new offer to remote peer
+				const compressedOffer = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
+			}
 			setLocalMediaControl((prev) => ({
 				...prev,
 				camera: !prev.camera
