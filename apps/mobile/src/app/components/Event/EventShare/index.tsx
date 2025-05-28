@@ -93,12 +93,13 @@ export const ShareEventModal = memo(({ event, onConfirm }: IShareEventModalProps
 	}, [searchText, allForwardObject]);
 
 	const shareLink = useMemo(() => {
-		return channelVoice.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE
+		if (!channelVoice?.channel_id && !event?.meet_room?.external_link) return '';
+		return channelVoice?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE
 			? `https://meet.google.com/${channelVoice.meeting_code}`
 			: channelVoice.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
 				? `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${channelVoice.clan_id}/channels/${channelVoice.channel_id}`
 				: `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
-	}, [channelVoice.channel_id, channelVoice.clan_id, channelVoice.meeting_code, channelVoice.type]);
+	}, [channelVoice, event?.meet_room?.external_link]);
 
 	function handleClose() {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
