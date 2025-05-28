@@ -844,5 +844,18 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_10,
 			marginBottom: size.s_6,
 			borderRadius: size.s_10
+		},
+		wrapperTextAvatar: {
+			width: size.s_100,
+			height: size.s_100,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: colors.colorAvatarDefault,
+			borderRadius: size.s_50
+		},
+		textAvatar: {
+			textAlign: 'center',
+			fontSize: size.h1,
+			color: Colors.white
 		}
 	});
