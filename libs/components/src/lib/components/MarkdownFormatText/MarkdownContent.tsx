@@ -1,7 +1,7 @@
 import { channelsActions, getStore, inviteActions, selectAppChannelById, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,7 +35,11 @@ const extractChannelParams = (url: string) => {
 };
 
 const isGoogleMapsLink = (url?: string) => {
-	return url?.startsWith('https://www.google.com/maps?') || url?.startsWith('https://maps.google.com/maps?') || url?.startsWith('https://www.google.com/maps?q=');
+	return (
+		url?.startsWith('https://www.google.com/maps?') ||
+		url?.startsWith('https://maps.google.com/maps?') ||
+		url?.startsWith('https://www.google.com/maps?q=')
+	);
 };
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
@@ -107,15 +111,17 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 				>
 					<span>A location was shared with you. Tap to open the map</span>
 				</a>
-			) : isLink && (
-				<a
-					onClick={() => onClickLink(content ?? '')}
-					rel="noopener noreferrer"
-					className="text-blue-500 cursor-pointer break-words underline tagLink"
-					target="_blank"
-				>
-					{content}
-				</a>
+			) : (
+				isLink && (
+					<a
+						onClick={() => onClickLink(content ?? '')}
+						rel="noopener noreferrer"
+						className="text-blue-500 cursor-pointer break-words underline tagLink"
+						target="_blank"
+					>
+						{content}
+					</a>
+				)
 			)}
 			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} isSearchMessage={isSearchMessage} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
@@ -161,8 +167,9 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
-				className={`w-full font-sans ${posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
-					} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
+				className={`w-full font-sans ${
+					posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
+				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'break-spaces' }}
 			>
 				{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
@@ -190,34 +197,72 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 			.catch((err) => console.error('Failed to copy text: ', err));
 	};
 
-	const formatContent = () => {
-		if (!contentBacktick) return '';
+	const renderFormattedContent = () => {
+		if (!contentBacktick) return null;
 
 		const content = contentBacktick.trim();
+		if (content === '') return content;
+
 		const lines = content.split('\n');
 
-		const formattedLines = lines.map((line: string) => {
-			if (line.match(/^#{1,6}\s+.+$/)) {
-				const headingLevel = line.indexOf(' ');
-				const headingText = line.substring(headingLevel).trim();
-				const fontSize = 24 - (headingLevel - 1) * 2;
-				return `<div style="font-size: ${fontSize}px; font-weight: bold; margin: 8px 0; line-height: 1">${headingText}</div>`;
-			}
-			return line;
-		});
+		return lines.map((line: string, index: number) => {
+			const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+			if (headingMatch) {
+				const headingLevel = headingMatch[1].length;
+				const headingText = headingMatch[2].trim();
 
-		return formattedLines.join('\n');
+				switch (headingLevel) {
+					case 1:
+						return (
+							<h1 key={index} className="text-2xl font-bold my-2">
+								{headingText}
+							</h1>
+						);
+					case 2:
+						return (
+							<h2 key={index} className="text-xl font-bold my-2">
+								{headingText}
+							</h2>
+						);
+					case 3:
+						return (
+							<h3 key={index} className="text-lg font-bold my-2">
+								{headingText}
+							</h3>
+						);
+					case 4:
+						return (
+							<h4 key={index} className="text-base font-bold my-1">
+								{headingText}
+							</h4>
+						);
+					case 5:
+						return (
+							<h5 key={index} className="text-sm font-bold my-1">
+								{headingText}
+							</h5>
+						);
+					case 6:
+						return (
+							<h6 key={index} className="text-xs font-bold my-1">
+								{headingText}
+							</h6>
+						);
+					default:
+						return <div key={index}>{line}</div>;
+				}
+			}
+
+			return (
+				<React.Fragment key={index}>
+					{line}
+					{index < lines.length - 1 ? '\n' : ''}
+				</React.Fragment>
+			);
+		});
 	};
 
-	const formattedContent = formatContent();
-
-	const displayContent = formattedContent.includes('<div') ? (
-		<div dangerouslySetInnerHTML={{ __html: formattedContent }} />
-	) : contentBacktick.trim() === '' ? (
-		contentBacktick
-	) : (
-		contentBacktick.trim()
-	);
+	const displayContent = renderFormattedContent();
 
 	return (
 		<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
