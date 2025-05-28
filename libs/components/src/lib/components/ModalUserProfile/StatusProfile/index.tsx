@@ -16,6 +16,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import isElectron from 'is-electron';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -92,13 +93,17 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const navigate = useNavigate();
 
 	const handleSetAccount = () => {
-		navigate('/desktop/login');
-		dispatch(authActions.turnOnSetAccount());
+		if (isElectron()) {
+			navigate('/desktop/login');
+			dispatch(authActions.turnOnSetAccount());
+		}
 	};
 
 	const handleSwitchAccount = () => {
-		dispatch(authActions.switchAccount());
-		navigate('/login/callback');
+		if (isElectron()) {
+			dispatch(authActions.switchAccount());
+			navigate('/login/callback');
+		}
 	};
 
 	return (
