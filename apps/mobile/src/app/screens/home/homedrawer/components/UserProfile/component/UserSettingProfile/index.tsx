@@ -184,15 +184,7 @@ const UserSettingProfile = ({
 
 			{/* from setting */}
 			{visibleManageUserModal && (
-				<ManageUserModal
-					visibleKickUserModal={visibleKickUserModal}
-					setVisibleKickUserModal={setVisibleKickUserModal}
-					handleRemoveUserClans={handleRemoveUserClans}
-					visible={visibleManageUserModal}
-					user={user}
-					onclose={handleUserModalClose}
-					profileSetting={profileSetting}
-				/>
+				<ManageUserModal visible={visibleManageUserModal} user={user} onclose={handleUserModalClose} profileSetting={profileSetting} />
 			)}
 		</View>
 	);
