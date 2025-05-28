@@ -128,8 +128,12 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 						isCountBadge={isCountBadge}
 						countBadge={remainingCount}
 					/>
+				) : currenChannel?.channel_avatar && currenChannel.channel_avatar[0] ? (
+					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel.channel_avatar[0]} username={userName} />
 				) : (
-					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={userName} />
+					<View style={styles.wrapperTextAvatar}>
+						<Text style={[styles.textAvatar]}>{currenChannel?.channel_label?.charAt?.(0)}</Text>
+					</View>
 				)
 			) : (
 				<View style={styles.iconWelcomeMessage}>
