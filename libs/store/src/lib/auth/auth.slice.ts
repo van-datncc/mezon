@@ -14,6 +14,8 @@ export interface AuthState {
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
 	redirectUrl?: string | null;
+	setAccountMode: boolean;
+	switchSession?: ISession | null;
 }
 
 export interface ISession {
@@ -36,7 +38,9 @@ export const initialAuthState: AuthState = {
 	isLogin: false,
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
-	redirectUrl: null
+	redirectUrl: null,
+	setAccountMode: false,
+	switchSession: null
 };
 
 function normalizeSession(session: Session): ISession {
@@ -219,6 +223,17 @@ export const authSlice = createSlice({
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
+		},
+		turnOnSetAccount(state) {
+			state.isLogin = false;
+			state.setAccountMode = true;
+		},
+		turnOffSetAccount(state) {
+			state.isLogin = true;
+			state.setAccountMode = false;
+		},
+		switchAccount(state) {
+			state.setAccountMode = !state.setAccountMode;
 		}
 	},
 	extraReducers: (builder) => {
@@ -242,7 +257,11 @@ export const authSlice = createSlice({
 			})
 			.addCase(refreshSession.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (state.setAccountMode) {
+					state.switchSession = action.payload;
+				} else {
+					state.session = action.payload;
+				}
 				state.isLogin = true;
 			})
 			.addCase(refreshSession.rejected, (state: AuthState, action) => {
@@ -303,8 +322,12 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'loaded';
-				state.session = action.payload;
 				state.isLogin = true;
+				if (state.setAccountMode) {
+					state.switchSession = action.payload;
+				} else {
+					state.session = action.payload;
+				}
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'error';
@@ -351,8 +374,18 @@ export const selectAuthIsLoaded = createSelector(getAuthState, (state: AuthState
 
 export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => state.isLogin);
 
-export const selectSession = createSelector(getAuthState, (state: AuthState) => state.session);
+export const selectSession = createSelector(getAuthState, (state: AuthState) => {
+	if (state.setAccountMode) {
+		return state.switchSession;
+	}
+	return state.session;
+});
 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
+
+export const selectAccountMode = createSelector(getAuthState, (state: AuthState) => state.setAccountMode);
+
+export const selectSessionSwitch = createSelector(getAuthState, (state: AuthState) => state.switchSession);
+export const selectSessionMain = createSelector(getAuthState, (state: AuthState) => state.session);

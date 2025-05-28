@@ -2,8 +2,12 @@ import { useAuth, useMemberCustomStatus } from '@mezon/core';
 import {
 	ChannelMembersEntity,
 	accountActions,
+	authActions,
 	clanMembersMetaActions,
 	giveCoffeeActions,
+	selectAccountMode,
+	selectSessionMain,
+	selectSessionSwitch,
 	selectUserStatus,
 	useAppDispatch,
 	userClanProfileActions,
@@ -12,8 +16,10 @@ import {
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
+import isElectron from 'is-electron';
 import { ReactNode, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
@@ -26,6 +32,9 @@ type StatusProfileProps = {
 };
 const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
+	const sessionSwitch = useSelector(selectSessionSwitch);
+	const sessionMain = useSelector(selectSessionMain);
+	const accountSwicth = useSelector(selectAccountMode);
 	const user = userById?.user;
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
@@ -81,6 +90,22 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 		dispatch(clanMembersMetaActions.updateUserStatus({ userId: userProfile?.user?.id || '', user_status: status }));
 		dispatch(accountActions.updateUserStatus(status));
 	};
+	const navigate = useNavigate();
+
+	const handleSetAccount = () => {
+		if (isElectron()) {
+			navigate('/desktop/login');
+			dispatch(authActions.turnOnSetAccount());
+		}
+	};
+
+	const handleSwitchAccount = () => {
+		if (isElectron()) {
+			dispatch(authActions.switchAccount());
+			navigate('/login/callback');
+		}
+	};
+
 	return (
 		<>
 			<div className="max-md:relative">
@@ -150,9 +175,17 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				placement="right-start"
 				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 			>
-				<ItemProfile avatar={user?.avatar_url} username={user?.username} />
-				<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
-				<ItemStatus children="Manage Accounts" />
+				{!sessionSwitch ? (
+					<ItemStatus children="Manage Accounts" onClick={handleSetAccount} />
+				) : (
+					<>
+						{accountSwicth ? (
+							<ItemProfile username={sessionMain?.username} onClick={handleSwitchAccount} />
+						) : (
+							<ItemProfile username={sessionSwitch?.username} onClick={handleSwitchAccount} />
+						)}
+					</>
+				)}
 			</Dropdown>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
