@@ -17,6 +17,7 @@ interface IMezonInputProps {
 	onTextChange?: (value: string) => void;
 	maxCharacter?: number;
 	inputWrapperStyle?: StyleProp<ViewStyle>;
+	inputStyle?: StyleProp<TextStyle>;
 	showBorderOnFocus?: boolean;
 	errorMessage?: string;
 	onFocus?: () => void;
@@ -38,6 +39,7 @@ export default function MezonInput({
 	onTextChange,
 	maxCharacter = 60,
 	inputWrapperStyle,
+	inputStyle,
 	showBorderOnFocus,
 	errorMessage,
 	titleUppercase,
@@ -98,7 +100,7 @@ export default function MezonInput({
 						numberOfLines={textarea ? 4 : 1}
 						textAlignVertical={textarea ? 'top' : 'center'}
 						maxLength={maxCharacter}
-						style={[styles.input, textarea && { height: size.s_100 }]}
+						style={[styles.input, textarea && { height: size.s_100 }, inputStyle]}
 						placeholder={placeHolder}
 						placeholderTextColor="gray"
 						onFocus={handleFocus}
