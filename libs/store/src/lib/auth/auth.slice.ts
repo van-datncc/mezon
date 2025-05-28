@@ -216,8 +216,13 @@ export const authSlice = createSlice({
 			state.isLogin = true;
 		},
 		setLogout(state) {
-			state.session = null;
-			state.isLogin = false;
+			if (state.setAccountMode) {
+				state.switchSession = null;
+				state.setAccountMode = false;
+			} else {
+				state.session = null;
+				state.isLogin = false;
+			}
 			state.loadingStatus = 'not loaded';
 		},
 		refreshStatus(state) {
