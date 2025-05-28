@@ -6,6 +6,8 @@ import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiOnboardingContent } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import EnableCommunity from '../../EnableComnunity';
 import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
@@ -19,11 +21,49 @@ export enum EOnboardingStep {
 const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const dispatch = useAppDispatch();
 	const currentClan = useSelector(selectCurrentClan);
-	const toggleEnableStatus = (enable: boolean) => {
-		dispatch(onboardingActions.enableOnboarding({ clan_id: currentClan?.clan_id as string, onboarding: enable, banner: currentClan?.banner }));
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isCommunityEnabled, setIsCommunityEnabled] = useState(!!currentClan?.is_onboarding);
+	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
+	const [description, setDescription] = useState('');
+	const [about, setAbout] = useState('');
+	const [openModalSaveChanges, setOpenModalSaveChanges] = useState(false);
+	const [initialDescription, setInitialDescription] = useState('');
+	const [initialAbout, setInitialAbout] = useState('');
+	const [showOnboardingHighlight, setShowOnboardingHighlight] = useState(false);
+
+	const handleEnableCommunity = () => {
+		setIsModalOpen(true);
 	};
 
-	const [currentPage, setCurrentPage] = useState<EOnboardingStep>(EOnboardingStep.MAIN);
+	const toggleEnableStatus = (enable: boolean) => {
+		if (!enable) {
+			dispatch(onboardingActions.enableOnboarding({
+				clan_id: currentClan?.clan_id as string,
+				onboarding: false
+			}));
+			setIsCommunityEnabled(false);
+		}
+	};
+
+	const handleConfirm = async () => {
+		if (!checkCreateValidate) {
+			toast.error("You need to create at least one task, question, or rule before enabling the community.!");
+			setShowOnboardingHighlight(true);
+			setTimeout(() => setShowOnboardingHighlight(false), 2000);
+			return;
+		}
+		await handleCreateOnboarding();
+		dispatch(onboardingActions.enableOnboarding({
+			clan_id: currentClan?.clan_id as string,
+			onboarding: true
+		}));
+		setIsCommunityEnabled(true);
+		setIsModalOpen(false);
+		setInitialDescription(description);
+		setInitialAbout(about);
+		setOpenModalSaveChanges(false);
+	};
+
 	const handleGoToPage = (page: EOnboardingStep) => {
 		setCurrentPage(page);
 	};
@@ -76,15 +116,32 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 	const handleResetOnboarding = () => {
 		dispatch(onboardingActions.resetOnboarding({}));
+		setOpenModalSaveChanges(false);
+		setDescription(initialDescription);
+		setAbout(initialAbout);
 	};
-	return (
-		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
+	const handleChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setOpenModalSaveChanges(true);
+		setDescription(e.target.value.slice(0, 300));
+	};
+	const handleChangeAbout = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setOpenModalSaveChanges(true);
+		setAbout(e.target.value.slice(0, 300));
+	};
+
+	const isDescriptionOrAboutChanged = useMemo(() => {
+		return description !== initialDescription || about !== initialAbout;
+	}, [description, about, initialDescription, initialAbout]);
+
+	const renderOnboardingContent = () => (
+		<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm">
 			{currentPage === EOnboardingStep.MAIN && (
 				<MainIndex
 					handleGoToPage={handleGoToPage}
-					isEnableOnBoarding={!!currentClan?.is_onboarding}
+					isEnableOnBoarding={isCommunityEnabled}
 					toggleEnableStatus={toggleEnableStatus}
 					onCloseSetting={onClose}
+					showOnboardingHighlight={showOnboardingHighlight}
 				/>
 			)}
 			{currentPage === EOnboardingStep.QUESTION && <Questions handleGoToPage={handleGoToPage} />}
@@ -99,8 +156,135 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					</div>
 				</MemberProvider>
 			)}
-			{checkCreateValidate && <ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />}
+			{!isModalOpen && openModalSaveChanges && (isDescriptionOrAboutChanged || checkCreateValidate) && <ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />}
+
+			{/* Description Section */}
+			<div className="bg-bgTertiary p-4 rounded-lg mt-6">
+				<h4 className="text-lg font-semibold text-white mb-2">Description</h4>
+				<div className="relative">
+					<textarea
+						className="w-full h-32 bg-bgSecondary text-white rounded-md p-2 resize-none"
+						placeholder="Enter your clan description..."
+						value={description}
+						onChange={handleChangeDescription}
+						maxLength={300}
+					/>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-400">
+						{description.length}/300
+					</div>
+				</div>
+			</div>
+
+			{/* About Section */}
+			<div className="bg-bgTertiary p-4 rounded-lg mt-6">
+				<h4 className="text-lg font-semibold text-white mb-2">About</h4>
+				<div className="relative">
+					<textarea
+						className="w-full h-32 bg-bgSecondary text-white rounded-md p-2 resize-none"
+						placeholder="Tell us about your clan..."
+						value={about}
+						onChange={handleChangeAbout}
+						maxLength={300}
+					/>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-400">
+						{about.length}/300
+					</div>
+				</div>
+			</div>
 		</div>
+	);
+
+	if (!isCommunityEnabled) {
+		return (
+			<>
+				<EnableCommunity onEnable={handleEnableCommunity} />
+				{isModalOpen && (
+					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+						<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
+							<div className="flex justify-between items-center mb-6">
+								<h3 className="text-xl font-semibold text-white">Community Settings</h3>
+								<button
+									onClick={() => setIsModalOpen(false)}
+									className="text-gray-400 hover:text-white"
+								>
+									<Icons.CloseIcon className="w-6 h-6" />
+								</button>
+							</div>
+							{renderOnboardingContent()}
+							<div className="flex justify-end gap-4 mt-6">
+								<button
+									onClick={() => setIsModalOpen(false)}
+									className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
+								>
+									Cancel
+								</button>
+								<button
+									onClick={handleConfirm}
+									className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
+								>
+									Confirm
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
+			</>
+		);
+	}
+
+	return (
+		<>
+			{/* Onboarding Modal */}
+			{isModalOpen && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+					<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+						<div className="flex justify-between items-center mb-6">
+							<h3 className="text-xl font-semibold text-white">Community Settings</h3>
+							<button
+								onClick={() => setIsModalOpen(false)}
+								className="text-gray-400 hover:text-white"
+							>
+								<Icons.CloseIcon className="w-6 h-6" />
+							</button>
+						</div>
+						{renderOnboardingContent()}
+						<div className="flex justify-end gap-4 mt-6">
+							<button
+								onClick={() => setIsModalOpen(false)}
+								className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
+							>
+								Cancel
+							</button>
+							<button
+								onClick={handleConfirm}
+								className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
+							>
+								Confirm
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Main Onboarding UI */}
+			{isCommunityEnabled && (
+				<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
+					<div className="flex items-center justify-between p-4 bg-bgSecondary rounded-lg mb-6">
+						<div className="flex flex-col">
+							<h3 className="text-lg font-semibold text-white">Community Onboarding</h3>
+							<p className="text-sm text-gray-400">Community features are enabled</p>
+						</div>
+						<button
+							onClick={() => toggleEnableStatus(false)}
+							className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
+						>
+							Disable Community
+						</button>
+					</div>
+					{renderOnboardingContent()}
+				</div>
+			)}
+		</>
 	);
 };
 
@@ -109,9 +293,10 @@ interface IMainIndexProps {
 	toggleEnableStatus: (enable: boolean) => void;
 	handleGoToPage: (page: EOnboardingStep) => void;
 	onCloseSetting?: () => void;
+	showOnboardingHighlight?: boolean;
 }
 
-const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting }: IMainIndexProps) => {
+const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onCloseSetting, showOnboardingHighlight }: IMainIndexProps) => {
 	const dispatch = useAppDispatch();
 	const openOnboardingPreviewMode = () => {
 		dispatch(onboardingActions.openOnboardingPreviewMode());
@@ -157,21 +342,6 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					description="Changes will not take effect until you save."
 					className="hover:bg-bgTertiary bg-bgTertiary rounded-none rounded-t-lg "
 					noNeedHover
-					action={
-						<div className="h-full flex items-center">
-							<input
-								className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
-														bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
-														after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
-														hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-														focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
-														disabled:bg-slate-200 disabled:after:bg-slate-300"
-								type="checkbox"
-								checked={isEnableOnBoarding}
-								onChange={() => toggleEnableStatus(!isEnableOnBoarding)}
-							/>
-						</div>
-					}
 				/>
 
 				<GuideItemLayout
@@ -179,7 +349,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					icon={<Icons.HashIcon className="w-6 text-channelTextLabel" />}
 					title="Default Channels"
 					description="You have 7 Default Channels"
-					className="hover:bg-bgSecondaryHover rounded-none"
+					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
 						<div className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-bgModifierHover hover:bg-bgModifierHover cursor-pointer">
 							Edit
@@ -193,7 +363,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					icon={<Icons.People className="w-6 text-channelTextLabel" />}
 					title="Questions"
 					description="7 of 7 public channels are assignable through Questions and Default Channels."
-					className="hover:bg-bgSecondaryHover rounded-none"
+					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
 						<div
 							onClick={() => handleGoToPage(EOnboardingStep.QUESTION)}
@@ -209,7 +379,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					icon={<Icons.GuideIcon defaultSize="w-6 text-channelTextLabel" defaultFill="currentColor" />}
 					title="Clan Guide"
 					description="Your Welcome Message, Banner, To-Do tasks and Resources are all set up"
-					className="hover:bg-bgSecondaryHover rounded-none"
+					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
 						<div className="flex items-center gap-4">
 							<div

@@ -1,7 +1,7 @@
 import { IUserStatus } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import React from 'react';
-import { View, ViewStyle } from 'react-native';
+import { Text, View, ViewStyle } from 'react-native';
 import { UserStatus } from '../../components/UserStatus';
 import MezonClanAvatar from '../MezonClanAvatar';
 import { style } from './styles';
@@ -18,6 +18,8 @@ interface IMezonAvatarProps {
 		avatarUrl: string;
 		username: string;
 	}[];
+	isCountBadge?: boolean;
+	countBadge?: number;
 	isShow?: boolean;
 	statusUserStyles?: ViewStyle;
 }
@@ -33,6 +35,8 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 		isBorderBoxImage,
 		stacks,
 		isShow = true,
+		isCountBadge,
+		countBadge,
 		statusUserStyles
 	} = props;
 	const styles = style(themeValue, height, width, stacks?.length);
@@ -44,11 +48,19 @@ const MezonAvatar = React.memo((props: IMezonAvatarProps) => {
 			<View style={styles.listImageFriend}>
 				{stacks.map((user, idx) => {
 					return (
-						<View key={idx} style={[styles.imageContainer, styles.borderBoxImage, { height, width }, { right: idx * 20 }]}>
+						<View key={idx} style={[styles.imageContainer, styles.borderBoxImage, { height, width }, { left: idx * 20 }]}>
 							<MezonClanAvatar alt={user.username} image={user.avatarUrl} lightMode />
 						</View>
 					);
 				})}
+
+				{isCountBadge && (
+					<View style={[styles.imageContainer, styles.borderBoxImage, { height, width }, { left: 3 * 20 }]}>
+						<View style={styles.countBadge}>
+							<Text style={styles.countBadgeText}>+{countBadge}</Text>
+						</View>
+					</View>
+				)}
 			</View>
 		);
 	}
