@@ -65,5 +65,15 @@ export const style = (colors: Attributes, height: number, width: number, n = 1) 
 			position: 'absolute',
 			borderRadius: size.s_50,
 			overflow: 'hidden'
+		},
+		countBadge: {
+			flex: 1,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: Colors.white
+		},
+		countBadgeText: {
+			fontSize: size.s_14,
+			fontWeight: 'bold'
 		}
 	});
