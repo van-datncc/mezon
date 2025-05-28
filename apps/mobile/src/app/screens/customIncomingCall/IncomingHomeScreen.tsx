@@ -1,13 +1,16 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, appActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
+import { WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import * as React from 'react';
 import { memo, useEffect, useRef } from 'react';
-import { BackHandler, Image, ImageBackground, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { BackHandler, DeviceEventEmitter, Image, ImageBackground, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Bounce } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
+import { useSendSignaling } from '../../components/CallingGroupModal';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
 
@@ -19,6 +22,7 @@ import { style } from './styles';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import BG_CALLING from './bgCalling.png';
+import ChannelVoicePopup from '../home/homedrawer/components/ChannelVoicePopup';
 
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
 const IncomingHomeScreen = memo((props: any) => {
@@ -31,6 +35,8 @@ const IncomingHomeScreen = memo((props: any) => {
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const mezon = useMezon();
 	const ringtoneRef = useRef<Sound | null>(null);
+	const { sendSignalingToParticipants } = useSendSignaling();
+	const [dataCallGroup, setDataCallGroup] = React.useState<any>(null);
 
 	const getDataCall = async () => {
 		try {
@@ -39,7 +45,13 @@ const IncomingHomeScreen = memo((props: any) => {
 
 			const notificationDataParse = safeJSONParse(notificationData || '{}');
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
-			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
+			const dataObj = safeJSONParse(data?.offer || '{}');
+			if (dataObj?.isGroupCall) {
+				setDataCallGroup(dataObj);
+				await NotificationPreferences.clearValue('notificationDataCalling');
+				return;
+			}
+			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer && !dataObj?.isGroupCall) {
 				setDataCalling(data);
 				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {
@@ -130,6 +142,25 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	const onDeniedCall = async () => {
 		stopAndReleaseSound();
+		if (dataCallGroup) {
+			const quitAction = {
+				is_video: false,
+				group_id: dataCallGroup.groupId || '',
+				caller_id: userId,
+				caller_name: dataCallGroup.groupName || '',
+				timestamp: Date.now(),
+				action: 'decline'
+			};
+			sendSignalingToParticipants(
+				[dataCallGroup?.callerId],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT,
+				quitAction,
+				dataCallGroup?.groupId || '',
+				userId || ''
+			);
+			BackHandler.exitApp();
+			return;
+		}
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 		if (!latestSignalingEntry || !mezon.socketRef.current) {
 			BackHandler.exitApp();
@@ -147,7 +178,12 @@ const IncomingHomeScreen = memo((props: any) => {
 		BackHandler.exitApp();
 	};
 
-	const onJoinCall = () => {
+	const onJoinCall = async () => {
+		if (dataCallGroup) {
+			await handleJoinCallGroup(dataCallGroup);
+			stopAndReleaseSound();
+			return;
+		}
 		if (!signalingData?.[signalingData?.length - 1]?.callerId) return;
 		stopAndReleaseSound();
 		dispatch(DMCallActions.setIsInCall(true));
@@ -172,12 +208,37 @@ const IncomingHomeScreen = memo((props: any) => {
 		}
 	};
 
+	const handleJoinCallGroup = async (dataCall: any) => {
+		if (dataCall?.groupId) {
+			if (!dataCall?.meetingCode) return;
+			const data = {
+				channelId: dataCall.groupId || '',
+				roomName: dataCall?.meetingCode,
+				clanId: ''
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			const joinAction = {
+				participant_id: userId,
+				participant_name: '',
+				participant_avatar: '',
+				timestamp: Date.now()
+			};
+			sendSignalingToParticipants(
+				[dataCall?.callerId],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_PARTICIPANT_JOINED,
+				joinAction,
+				dataCall?.channel_id || '',
+				userId || ''
+			);
+		}
+	};
 	if (isInCall) {
 		return <DirectMessageCall route={{ params }} />;
 	}
 
 	return (
 		<ImageBackground source={BG_CALLING} style={styles.container}>
+			<ChannelVoicePopup />
 			{/* Caller Info */}
 			<View style={styles.headerCall}>
 				<Text style={styles.callerName}>{'Incoming Call'}</Text>
