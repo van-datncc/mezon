@@ -1,6 +1,5 @@
 import { AudioSession, LiveKitRoom, TrackReference, useConnectionState, useLocalParticipant } from '@livekit/react-native';
 import { CallSignalingData } from '@mezon/components';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -19,7 +18,7 @@ import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { AppState, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppState, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
@@ -336,76 +335,6 @@ function ChannelVoice({
 
 	const onConnectionConnected = (connected: boolean) => {
 		setConnectionConnected(connected);
-		if (connected) {
-			if (isGroupCall) {
-				const store = getStore();
-				const state = store.getState();
-				const currentDmGroup = selectCurrentDM(state);
-				const userProfile = selectAllAccount(state);
-				dispatch(
-					groupCallActions.showPreCallInterface({
-						groupId: currentDmGroup?.channel_id,
-						isVideo: false
-					})
-				);
-				dispatch(
-					groupCallActions.showPreCallInterface({
-						groupId: currentDmGroup?.channel_id,
-						isVideo: false
-					})
-				);
-				const data = {
-					channelId: currentDmGroup.channel_id || '',
-					roomName: currentDmGroup?.meeting_code,
-					clanId: '',
-					isGroupCall: true,
-					participantsCount: currentDmGroup?.user_id?.length || 0
-				};
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
-				const callOfferAction = {
-					is_video: false,
-					group_id: currentDmGroup?.channel_id,
-					group_name: currentDmGroup?.channel_label,
-					group_avatar: currentDmGroup?.channel_avatar?.[0],
-					caller_id: userProfile?.user?.id,
-					caller_name: userProfile?.user?.display_name || userProfile?.user?.username || '',
-					caller_avatar: userProfile?.user?.avatar_url,
-					meeting_code: currentDmGroup?.meeting_code,
-					clan_id: '',
-					timestamp: Date.now(),
-					participants: currentDmGroup?.user_id || []
-				};
-				sendSignalingToParticipants(
-					currentDmGroup?.user_id || [],
-					WEBRTC_SIGNALING_TYPES.GROUP_CALL_OFFER,
-					callOfferAction as CallSignalingData,
-					currentDmGroup?.channel_id || '',
-					userProfile?.user?.id || ''
-				);
-				dispatch(
-					messagesActions.sendMessage({
-						channelId: currentDmGroup?.channel_id,
-						clanId: '',
-						mode: ChannelStreamMode.STREAM_MODE_GROUP,
-						isPublic: true,
-						content: {
-							t: `Started voice call`,
-							callLog: {
-								isVideo: false,
-								callLogType: IMessageTypeCallLog.STARTCALL,
-								showCallBack: false
-							}
-						},
-						anonymous: false,
-						senderId: userProfile?.user?.id || '',
-						avatar: userProfile?.user?.avatar_url || '',
-						isMobile: true,
-						username: currentDmGroup?.channel_label || ''
-					})
-				);
-				return;
-			}
-		}
 	};
 
 	const onQuitGroupCall = () => {

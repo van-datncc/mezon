@@ -130,7 +130,8 @@ const ChannelVoicePopup = () => {
 							clanId: clanId as string,
 							clanName: clan?.clan_name as string,
 							channelId: channelId as string,
-							channelLabel: channel?.channel_label as string
+							channelLabel: channel?.channel_label as string,
+							channelPrivate: channel?.channel_private as number
 						})
 					);
 					await participantMeetState(ParticipantMeetState.JOIN, clanId as string, channelId as string);

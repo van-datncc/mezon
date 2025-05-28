@@ -2,7 +2,7 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, appActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
-import { WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
+import { WEBRTC_SIGNALING_TYPES, sleep } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import * as React from 'react';
@@ -15,6 +15,7 @@ import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
 
 import Sound from 'react-native-sound';
+import ChannelVoicePopup from '../home/homedrawer/components/ChannelVoicePopup';
 import LOTTIE_PHONE_DECLINE from './phone-decline.json';
 import LOTTIE_PHONE_RING from './phone-ring.json';
 import { style } from './styles';
@@ -22,7 +23,6 @@ import { style } from './styles';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import BG_CALLING from './bgCalling.png';
-import ChannelVoicePopup from '../home/homedrawer/components/ChannelVoicePopup';
 
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
 const IncomingHomeScreen = memo((props: any) => {
@@ -30,6 +30,7 @@ const IncomingHomeScreen = memo((props: any) => {
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const [isInCall, setIsInCall] = React.useState(false);
+	const [isInGroupCall, setIsInGroupCall] = React.useState(false);
 	const [dataCalling, setDataCalling] = React.useState(false);
 	const userId = useSelector(selectCurrentUserId);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
@@ -98,13 +99,13 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			if (!isInCall) {
+			if (!isInCall && !isInGroupCall) {
 				onDeniedCall();
 			}
 		}, 40000);
 
 		return () => clearTimeout(timer);
-	}, [isInCall]);
+	}, [isInCall, isInGroupCall]);
 
 	useEffect(() => {
 		let timer;
@@ -181,6 +182,7 @@ const IncomingHomeScreen = memo((props: any) => {
 	const onJoinCall = async () => {
 		if (dataCallGroup) {
 			await handleJoinCallGroup(dataCallGroup);
+			setIsInGroupCall(true);
 			stopAndReleaseSound();
 			return;
 		}
@@ -214,8 +216,10 @@ const IncomingHomeScreen = memo((props: any) => {
 			const data = {
 				channelId: dataCall.groupId || '',
 				roomName: dataCall?.meetingCode,
+				isGroupCall: true,
 				clanId: ''
 			};
+			await sleep(2000);
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
 			const joinAction = {
 				participant_id: userId,

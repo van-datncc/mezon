@@ -140,7 +140,8 @@ const CallingModalWrapper = () => {
 			const data = {
 				channelId: dataCall.groupId || '',
 				roomName: dataCall?.meetingCode,
-				clanId: ''
+				clanId: '',
+				isGroupCall: true
 			};
 			await sleep(3000);
 			dispatch(appActions.setLoadingMainMobile(false));
