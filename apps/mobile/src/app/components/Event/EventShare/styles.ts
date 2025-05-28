@@ -11,7 +11,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			justifyContent: 'center'
 		},
 		container: {
-			height: '90%',
+			height: '70%',
 			backgroundColor: colors.secondary,
 			padding: Metrics.size.xl,
 			margin: Metrics.size.l,
@@ -80,5 +80,8 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 		},
 		buttonText: {
 			color: baseColor.white
+		},
+		searchText: {
+			fontSize: size.small
 		}
 	});
