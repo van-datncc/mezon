@@ -225,10 +225,15 @@ export const authSlice = createSlice({
 			state.loadingStatusEmail = 'not loaded';
 		},
 		turnOnSetAccount(state) {
+			state.isLogin = false;
 			state.setAccountMode = true;
 		},
 		turnOffSetAccount(state) {
+			state.isLogin = true;
 			state.setAccountMode = false;
+		},
+		switchAccount(state) {
+			state.setAccountMode = !state.setAccountMode;
 		}
 	},
 	extraReducers: (builder) => {
@@ -369,10 +374,18 @@ export const selectAuthIsLoaded = createSelector(getAuthState, (state: AuthState
 
 export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => state.isLogin);
 
-export const selectSession = createSelector(getAuthState, (state: AuthState) => state.session);
+export const selectSession = createSelector(getAuthState, (state: AuthState) => {
+	if (state.setAccountMode) {
+		return state.switchSession;
+	}
+	return state.session;
+});
 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
 
 export const selectAccountMode = createSelector(getAuthState, (state: AuthState) => state.setAccountMode);
+
+export const selectSessionSwitch = createSelector(getAuthState, (state: AuthState) => state.switchSession);
+export const selectSessionMain = createSelector(getAuthState, (state: AuthState) => state.session);

@@ -60,8 +60,7 @@ function Login() {
 	}, [checkLoginRequest, createSecond, isRemember, loginId]);
 
 	useEffect(() => {
-		console.log('isSetAccountMode: ', isSetAccountMode);
-		if (isLogin && !isSetAccountMode) {
+		if (isLogin) {
 			navigate(redirectTo || '/chat/direct/friends');
 		}
 	}, [redirectTo, isLogin, navigate]);
@@ -145,7 +144,7 @@ function Login() {
 
 	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail !== 'not loaded';
 	const handleBackCurrentAccount = () => {
-		console.log('Back to current page');
+		dispatch(authActions.turnOffSetAccount());
 	};
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-300 px-4">

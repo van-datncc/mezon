@@ -5,6 +5,9 @@ import {
 	authActions,
 	clanMembersMetaActions,
 	giveCoffeeActions,
+	selectAccountMode,
+	selectSessionMain,
+	selectSessionSwitch,
 	selectUserStatus,
 	useAppDispatch,
 	userClanProfileActions,
@@ -28,6 +31,9 @@ type StatusProfileProps = {
 };
 const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
+	const sessionSwitch = useSelector(selectSessionSwitch);
+	const sessionMain = useSelector(selectSessionMain);
+	const accountSwicth = useSelector(selectAccountMode);
 	const user = userById?.user;
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
@@ -88,6 +94,11 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	const handleSetAccount = () => {
 		navigate('/desktop/login');
 		dispatch(authActions.turnOnSetAccount());
+	};
+
+	const handleSwitchAccount = () => {
+		dispatch(authActions.switchAccount());
+		navigate('/login/callback');
 	};
 
 	return (
@@ -159,9 +170,17 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 				placement="right-start"
 				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 			>
-				<ItemProfile avatar={user?.avatar_url} username={user?.username} />
-				<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
-				<ItemStatus children="Manage Accounts" onClick={handleSetAccount} />
+				{!sessionSwitch ? (
+					<ItemStatus children="Manage Accounts" onClick={handleSetAccount} />
+				) : (
+					<>
+						{accountSwicth ? (
+							<ItemProfile username={sessionMain?.username} onClick={handleSwitchAccount} />
+						) : (
+							<ItemProfile username={sessionSwitch?.username} onClick={handleSwitchAccount} />
+						)}
+					</>
+				)}
 			</Dropdown>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
