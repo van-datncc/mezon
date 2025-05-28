@@ -18,23 +18,13 @@ const CallingModalWrapper = () => {
 	const appStateRef = useRef(AppState.currentState);
 	const navigation = useNavigation<any>();
 
-	const handleAppStateChangeListener = useCallback(
-		(nextAppState: typeof AppState.currentState) => {
-			if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-				const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-				if (latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
-					getDataCall();
-				} else {
-					if (Platform.OS === 'ios') {
-						RNCallKeep.endAllCalls();
-					}
-				}
-			}
+	const handleAppStateChangeListener = useCallback((nextAppState: typeof AppState.currentState) => {
+		if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+			getDataCall();
+		}
 
-			appStateRef.current = nextAppState;
-		},
-		[signalingData]
-	);
+		appStateRef.current = nextAppState;
+	}, []);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', (nextAppState) => {

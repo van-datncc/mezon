@@ -231,8 +231,28 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		};
 	};
 
+	const setIsSpeaker = async ({ isSpeaker = false }) => {
+		try {
+			if (Platform.OS === 'android') {
+				const { CustomAudioModule } = NativeModules;
+				await CustomAudioModule.setSpeaker(isSpeaker, null);
+				InCallManager.setSpeakerphoneOn(isSpeaker);
+			} else {
+				InCallManager.setSpeakerphoneOn(isSpeaker);
+				InCallManager.setForceSpeakerphoneOn(isSpeaker);
+			}
+			setLocalMediaControl((prev) => ({
+				...prev,
+				speaker: isSpeaker
+			}));
+		} catch (error) {
+			console.error('Failed to initialize speaker', error);
+		}
+	};
+
 	const startCall = async (isVideoCall: boolean, isAnswer = false) => {
 		try {
+			await setIsSpeaker({ isSpeaker: false });
 			if (!isAnswer) {
 				playDialTone();
 				handleSend(
@@ -606,13 +626,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
-	const toggleSpeaker = () => {
+	const toggleSpeaker = async () => {
 		try {
-			InCallManager.setSpeakerphoneOn(!localMediaControl.speaker);
-			setLocalMediaControl((prev) => ({
-				...prev,
-				speaker: !prev.speaker
-			}));
+			await setIsSpeaker({ isSpeaker: !localMediaControl.speaker });
 		} catch (error) {
 			console.error('Failed to toggle speaker', error);
 		}
