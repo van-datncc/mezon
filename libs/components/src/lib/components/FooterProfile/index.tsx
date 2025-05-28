@@ -272,7 +272,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div
 					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
 				>
-					<div className="cursor-pointer flex items-center gap-3 relative " onClick={openProfileModal}>
+					<div className="cursor-pointer flex items-center gap-3 relative flex-1" onClick={openProfileModal}>
 						<AvatarImage
 							alt={''}
 							username={name}
