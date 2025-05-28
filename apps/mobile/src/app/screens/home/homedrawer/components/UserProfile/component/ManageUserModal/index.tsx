@@ -270,7 +270,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 							{!editMode ? (
 								<TouchableOpacity onPress={() => setEditMode(true)} disabled={isLoading}>
 									<View style={{ backgroundColor: themeValue.secondary, padding: size.s_14 }}>
-										<Text color={isLoading ? Colors.textGray : baseColor.blurple} h4>
+										<Text color={isLoading ? Colors.textGray : baseColor.blurple} h5>
 											{t('manage.editRoles')}
 										</Text>
 									</View>
@@ -288,9 +288,12 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 					</View>
 
 					<View style={{ marginHorizontal: size.s_14, marginTop: size.s_20 }}>
-						<Text color={themeValue.text} h5>
-							Actions
-						</Text>
+						{profileSetting.find((item) => item.value !== EActionSettingUserProfile.Manage && item.isShow) && (
+							<Text color={themeValue.text} h5>
+								Actions
+							</Text>
+						)}
+
 						<View style={{ borderRadius: size.s_10, overflow: 'hidden', marginTop: size.s_8 }}>
 							{profileSetting
 								.filter((item) => item.value !== EActionSettingUserProfile.Manage && item.isShow)
@@ -308,7 +311,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 									>
 										{item.icon}
 										<Text color={baseColor.redStrong} style={{ fontSize: verticalScale(14) }}>
-											{item.label} '{user?.user?.username}'
+											{item.label} {user?.user?.username}
 										</Text>
 									</Pressable>
 								))}
