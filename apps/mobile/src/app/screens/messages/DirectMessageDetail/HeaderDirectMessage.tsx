@@ -1,5 +1,5 @@
 import { useChatSending, useMemberStatus, useSeenMessagePool } from '@mezon/core';
-import { ActionEmitEvent, IOption, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, IOption } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
@@ -151,6 +151,17 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	}, [from, navigation]);
 
 	const goToCall = () => {
+		if (isTypeDMGroup) {
+			const data = {
+				channelId: currentDmGroup.channel_id || '',
+				roomName: currentDmGroup?.meeting_code,
+				clanId: '',
+				isGroupCall: true,
+				participantsCount: currentDmGroup?.user_id?.length || 0
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			return;
+		}
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
@@ -228,12 +239,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
-				{isTabletLandscape && (
-					<TouchableOpacity style={styles.iconHeader} onPress={navigateToNotifications}>
-						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-					</TouchableOpacity>
-				)}
-				{!isTypeDMGroup && !!currentDmGroup?.user_id?.[0] && (
+				{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
 					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
 						<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>

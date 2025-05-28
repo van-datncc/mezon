@@ -11,6 +11,7 @@ import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment';
 import { DeviceEventEmitter, Dimensions, Linking, Platform } from 'react-native';
 import BottomSheetRootListener from '../../components/BottomSheetRootListener';
+import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import ModalRootListener from '../../components/ModalRootListener';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -237,6 +238,7 @@ export const Authentication = memo(() => {
 					<RootStack.Screen name={APP_SCREEN.CHANNEL_APP} component={ChannelAppScreen} />
 				</RootStack.Navigator>
 				<CallingModalWrapper />
+				<CallingModalGroupWrapper />
 				<StreamingWrapper />
 				<ChannelVoicePopup />
 				<BottomSheetRootListener />

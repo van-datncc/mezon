@@ -31,6 +31,8 @@ const ChannelVoicePopup = () => {
 	const channel = useSelector((state) => selectChannelById2(state, channelId));
 	const clan = useSelector(selectClanById(clanId));
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
+	const [isGroupCall, setIsGroupCall] = useState(false);
+	const [participantsCount, setParticipantsCount] = useState(0);
 	const { userProfile } = useAuth();
 
 	const panResponder = useRef(
@@ -99,6 +101,10 @@ const ChannelVoicePopup = () => {
 				handleLeaveRoom(data?.clanId, data?.channelId);
 				setVoicePlay(false);
 			} else {
+				if (data?.isGroupCall) {
+					setIsGroupCall(true);
+					setParticipantsCount(data?.participantsCount || 0);
+				}
 				handleJoinChannelVoice(data?.roomName, data?.channelId, data?.clanId);
 			}
 		});
@@ -197,6 +203,8 @@ const ChannelVoicePopup = () => {
 				serverUrl={serverUrl}
 				isAnimationComplete={isPiPMode ? true : isAnimationComplete}
 				onPressMinimizeRoom={handlePressMinimizeRoom}
+				isGroupCall={isGroupCall}
+				participantsCount={participantsCount}
 			/>
 		</Animated.View>
 	);
