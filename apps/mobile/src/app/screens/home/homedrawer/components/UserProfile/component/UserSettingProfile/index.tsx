@@ -1,9 +1,11 @@
 import { useAuth, useChannelMembersActions, usePermissionChecker } from '@mezon/core';
-import { Text, baseColor, useTheme } from '@mezon/mobile-ui';
+import { Colors, Text, baseColor, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../componentUI/MezonIconCDN';
 import { MezonModal } from '../../../../../../../componentUI/MezonModal';
@@ -44,6 +46,7 @@ const UserSettingProfile = ({
 }: IUserSettingProfileProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation('clanOverviewSetting');
 	const [visibleKickUserModal, setVisibleKickUserModal] = useState<boolean>(showKickUserModal);
 	const [visibleManageUserModal, setVisibleManageUserModal] = useState<boolean>(showManagementUserModal);
 	const { userProfile } = useAuth();
@@ -52,7 +55,11 @@ const UserSettingProfile = ({
 	const isItMe = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
 	const isThatClanOwner = useMemo(() => currentClan?.creator_id === user?.user?.id, [user?.user?.id, currentClan?.creator_id]);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const [hasAdminPermission] = usePermissionChecker([EPermission.administrator, EPermission.manageClan]);
+	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([
+		EPermission.clanOwner,
+		EPermission.administrator,
+		EPermission.manageClan
+	]);
 
 	useEffect(() => {
 		setVisibleKickUserModal(showKickUserModal);
@@ -64,6 +71,7 @@ const UserSettingProfile = ({
 
 	const handleSettingUserProfile = useCallback((action?: EActionSettingUserProfile) => {
 		switch (action) {
+			// short profile
 			case EActionSettingUserProfile.Manage:
 				setVisibleManageUserModal(true);
 				onShowManagementUserModalChange?.(true);
@@ -89,36 +97,55 @@ const UserSettingProfile = ({
 				action: handleSettingUserProfile,
 				isShow: hasAdminPermission
 			},
-			{
-				label: `${EActionSettingUserProfile.TimeOut}`,
-				value: EActionSettingUserProfile.TimeOut,
-				icon: <MezonIconCDN icon={IconCDN.clockWarningIcon} color={themeValue.text} width={20} height={20} />,
-				action: handleSettingUserProfile,
-				isShow: hasAdminPermission && !isItMe
-			},
+			// {
+			// 	label: `${EActionSettingUserProfile.TimeOut}`,
+			// 	value: EActionSettingUserProfile.TimeOut,
+			// 	icon: <MezonIconCDN icon={IconCDN.clockWarningIcon} color={themeValue.text} width={20} height={20} />,
+			// 	action: handleSettingUserProfile,
+			// 	isShow: hasAdminPermission && !isItMe
+			// },
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
 				icon: <MezonIconCDN icon={IconCDN.userMinusIcon} width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: hasAdminPermission && !isItMe && !isThatClanOwner
-			},
-			{
-				label: `${EActionSettingUserProfile.Ban}`,
-				value: EActionSettingUserProfile.Ban,
-				icon: <MezonIconCDN icon={IconCDN.hammerIcon} width={20} height={20} color={baseColor.red} />,
-				action: handleSettingUserProfile,
-				isShow: hasAdminPermission && !isItMe
+				isShow: !isItMe && (hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
+			// {
+			// 	label: `${EActionSettingUserProfile.Ban}`,
+			// 	value: EActionSettingUserProfile.Ban,
+			// 	icon: <MezonIconCDN icon={IconCDN.hammerIcon} width={20} height={20} color={baseColor.red} />,
+			// 	action: handleSettingUserProfile,
+			// 	isShow: hasAdminPermission && !isItMe
+			// }
 		];
 		return settingList;
 	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner]);
 
 	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {
-			setVisibleKickUserModal(false);
-			const userIds = [user.user?.id ?? ''];
-			await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
+			try {
+				setVisibleKickUserModal(false);
+				const userIds = [user.user?.id ?? ''];
+				const response = await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
+				if (response) {
+					Toast.show({
+						type: 'success',
+						props: {
+							text2: t('permissions.toast.kickMemberSuccess'),
+							leadingIcon: <MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
+						}
+					});
+				}
+			} catch (error) {
+				Toast.show({
+					type: 'error',
+					props: {
+						text2: t('permissions.toast.kickMemberFailed'),
+						leadingIcon: <MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} />
+					}
+				});
+			}
 		}
 	}, [currentClanId, removeMemberClan, user]);
 
@@ -129,6 +156,7 @@ const UserSettingProfile = ({
 
 	return (
 		<View>
+			{/* short profile */}
 			{showActionOutside && profileSetting.some((action) => action.isShow) && (
 				<View style={styles.wrapper}>
 					{profileSetting?.map((item, index) => {
@@ -154,6 +182,7 @@ const UserSettingProfile = ({
 				<KickUserClanModal onRemoveUserClan={handleRemoveUserClans} user={user} />
 			</MezonModal>
 
+			{/* from setting */}
 			{visibleManageUserModal && (
 				<ManageUserModal
 					visibleKickUserModal={visibleKickUserModal}
