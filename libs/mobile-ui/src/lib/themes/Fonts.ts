@@ -13,13 +13,13 @@ const type = {
 };
 
 export const size = {
-	h1: verticalScale(38),
-	h2: verticalScale(34),
-	h3: verticalScale(30),
-	h4: verticalScale(26),
-	h5: verticalScale(20),
-	h6: verticalScale(19),
-	h7: verticalScale(14),
+	h1: verticalScale(30),
+	h2: verticalScale(26),
+	h3: verticalScale(22),
+	h4: verticalScale(18),
+	h5: verticalScale(16),
+	h6: verticalScale(14),
+	h7: verticalScale(12),
 	h85: verticalScale(12),
 	h8: verticalScale(11),
 	h9: verticalScale(9),

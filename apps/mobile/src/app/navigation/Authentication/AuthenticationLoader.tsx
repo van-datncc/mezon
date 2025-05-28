@@ -143,7 +143,7 @@ export const AuthenticationLoader = () => {
 				const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
 				if (
 					title === 'Incoming call' ||
-					(body && ['started a video call', 'started a audio call', 'Untitled message'].some((text) => body?.includes?.(text))) ||
+					(body && ['video call', 'audio call', 'Untitled message'].some((text) => body?.includes?.(text))) ||
 					!body ||
 					!title ||
 					body?.includes?.('"Untitled message"')
