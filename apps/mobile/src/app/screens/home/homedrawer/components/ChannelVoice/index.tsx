@@ -1,11 +1,27 @@
 import { AudioSession, LiveKitRoom, TrackReference, useConnectionState, useLocalParticipant } from '@livekit/react-native';
+import { CallSignalingData } from '@mezon/components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectChannelById2, selectIsPiPMode, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
+import {
+	ChannelsEntity,
+	getStore,
+	groupCallActions,
+	messagesActions,
+	selectAllAccount,
+	selectChannelById2,
+	selectCurrentDM,
+	selectIsPiPMode,
+	useAppDispatch,
+	useAppSelector,
+	voiceActions
+} from '@mezon/store-mobile';
+import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
 import { AppState, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
+import { useSendSignaling } from '../../../../../components/CallingGroupModal';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import BluetoothManager from './BluetoothManager';
@@ -165,7 +181,9 @@ function ChannelVoice({
 	token,
 	serverUrl,
 	onPressMinimizeRoom,
-	isAnimationComplete
+	isAnimationComplete,
+	isGroupCall = false,
+	participantsCount = 0
 }: {
 	channelId: string;
 	clanId: string;
@@ -173,6 +191,8 @@ function ChannelVoice({
 	token: string;
 	serverUrl: string;
 	isAnimationComplete: boolean;
+	isGroupCall?: boolean;
+	participantsCount?: number;
 }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -183,6 +203,8 @@ function ChannelVoice({
 	const [isConnectionConnected, setConnectionConnected] = useState(false);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
+
+	const { sendSignalingToParticipants } = useSendSignaling();
 
 	useEffect(() => {
 		const activateKeepAwake = async (platform: string) => {
@@ -311,6 +333,78 @@ function ChannelVoice({
 		}
 	};
 
+	const onConnectionConnected = (connected: boolean) => {
+		setConnectionConnected(connected);
+	};
+
+	const onQuitGroupCall = () => {
+		dispatch(groupCallActions.endGroupCall());
+		const store = getStore();
+		const state = store.getState();
+		const currentDmGroup = selectCurrentDM(state);
+		const userProfile = selectAllAccount(state);
+		const quitData = {
+			is_video: false,
+			group_id: currentDmGroup?.channel_id || '',
+			caller_id: userProfile?.user?.id,
+			caller_name: userProfile?.user?.display_name || userProfile?.user?.username || '',
+			timestamp: Date.now(),
+			action: 'leave'
+		} as CallSignalingData;
+		sendSignalingToParticipants(
+			currentDmGroup?.user_id || [],
+			WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT,
+			quitData,
+			currentDmGroup?.channel_id || '',
+			userProfile?.user?.id || ''
+		);
+	};
+
+	const onCancelGroupCall = () => {
+		dispatch(groupCallActions.endGroupCall());
+		const store = getStore();
+		const state = store.getState();
+		const currentDmGroup = selectCurrentDM(state);
+		const userProfile = selectAllAccount(state);
+		const cancelAction = {
+			is_video: false,
+			group_id: currentDmGroup?.channel_id || '',
+			caller_id: userProfile?.user?.id,
+			caller_name: userProfile?.user?.display_name || userProfile?.user?.username || '',
+			timestamp: Date.now(),
+			reason: 'cancelled'
+		};
+		sendSignalingToParticipants(
+			currentDmGroup?.user_id || [],
+			WEBRTC_SIGNALING_TYPES.GROUP_CALL_CANCEL,
+			cancelAction as CallSignalingData,
+			currentDmGroup?.channel_id || '',
+			userProfile?.user?.id || ''
+		);
+		groupCallActions.hidePreCallInterface();
+		dispatch(
+			messagesActions.sendMessage({
+				channelId: currentDmGroup?.channel_id,
+				clanId: '',
+				mode: ChannelStreamMode.STREAM_MODE_GROUP,
+				isPublic: true,
+				content: {
+					t: 'Cancelled voice call',
+					callLog: {
+						isVideo: false,
+						callLogType: IMessageTypeCallLog.CANCELCALL,
+						showCallBack: false
+					}
+				},
+				anonymous: false,
+				senderId: userProfile?.user?.id || '',
+				avatar: userProfile?.user?.avatar_url || '',
+				isMobile: true,
+				username: currentDmGroup?.channel_label || ''
+			})
+		);
+	};
+
 	return (
 		<View>
 			<StatusBarHeight />
@@ -330,13 +424,17 @@ function ChannelVoice({
 							onToggleSpeaker={onToggleSpeaker}
 						/>
 					)}
-					<ConnectionMonitor onConnectionConnected={setConnectionConnected} />
+					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}
 						onPressMinimizeRoom={onPressMinimizeRoom}
 						isAnimationComplete={isAnimationComplete}
 						onFocusedScreenChange={setFocusedScreenShare}
+						isGroupCall={isGroupCall}
+						participantsCount={participantsCount}
+						onQuitGroupCall={onQuitGroupCall}
+						onCancelCall={onCancelGroupCall}
 					/>
 				</LiveKitRoom>
 			</View>

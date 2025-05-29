@@ -1,10 +1,11 @@
 import { useAccount, useAuth, useClanProfileSetting } from '@mezon/core';
-import { isEqual } from '@mezon/mobile-components';
+import { debounce, isEqual } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	ClansEntity,
 	appActions,
 	channelMembersActions,
+	checkDuplicateClanNickName,
 	selectCurrentChannelId,
 	selectCurrentClan,
 	selectCurrentClanId,
@@ -12,8 +13,9 @@ import {
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { RouteProp } from '@react-navigation/native';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Platform, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -67,6 +69,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const { updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
 	const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.id, userProfile?.user?.id ?? ''));
+	const [isDuplicateClanNickname, setIsDuplicateClanNickname] = useState(false);
 
 	const [originUserProfileValue, setOriginUserProfileValue] = useState<IUserProfileValue>({
 		username: '',
@@ -113,15 +116,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		const { nick_name } = userClansProfile || {};
 		const initialValue = {
 			username,
-			imgUrl: userClansProfile?.avatar,
+			imgUrl: userClansProfile?.avatar || userProfile?.user?.avatar_url,
 			displayName: nick_name
 		};
+
 		setOriginClanProfileValue(initialValue);
-		if (!nick_name) {
-			setCurrentClanProfileValue(Object.assign({}, initialValue, { displayName: username }));
-		} else {
-			setCurrentClanProfileValue(initialValue);
-		}
 		setCurrentClanProfileValue(initialValue);
 	}, [userClansProfile, tab, userProfile, selectedClan]);
 
@@ -141,17 +140,42 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		return isEqual(originClanProfileValue, currentClanProfileValue);
 	}, [originClanProfileValue, currentClanProfileValue]);
 
+	const checkDuplicateClanNickname = useCallback(
+		debounce(async (value: string) => {
+			if (!value || value.trim() === '') {
+				setIsDuplicateClanNickname(false);
+				return;
+			}
+
+			const result = unwrapResult(
+				await dispatch(
+					checkDuplicateClanNickName({
+						clanNickName: value,
+						clanId: selectedClan?.id ?? ''
+					})
+				)
+			);
+
+			if (result) {
+				setIsDuplicateClanNickname(true);
+			} else {
+				setIsDuplicateClanNickname(false);
+			}
+		}, 300),
+		[selectedClan?.id]
+	);
+
 	const updateUserProfile = async () => {
 		const { username, imgUrl, displayName, aboutMe } = currentUserProfileValue;
 		try {
 			dispatch(appActions.setLoadingMainMobile(true));
 			const response = await updateUser(
-				username,
-				imgUrl,
-				displayName?.trim() || username,
-				aboutMe,
-				userProfile?.user?.dob,
-				userProfile?.logo,
+				username || '',
+				imgUrl || '',
+				displayName?.trim() || '',
+				aboutMe || '',
+				userProfile?.user?.dob || '',
+				userProfile?.logo || '',
 				true
 			);
 
@@ -179,27 +203,22 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	};
 
 	const updateClanProfile = async () => {
-		const { username = '', displayName, imgUrl } = currentClanProfileValue;
+		const { displayName, imgUrl } = currentClanProfileValue;
 
-		if (currentClanProfileValue?.imgUrl || currentClanProfileValue?.displayName) {
-			try {
-				dispatch(appActions.setLoadingMainMobile(true));
-				const response = await updateUserClanProfile(
-					selectedClan?.clan_id ?? '',
-					displayName?.trim() || username,
-					imgUrl || userProfile?.user?.avatar_url || ''
-				);
-				dispatch(appActions.setLoadingMainMobile(false));
-				if (response) {
-					Toast.show({
-						type: 'info',
-						text1: t('updateClanProfileSuccess')
-					});
-					navigation.goBack();
-				}
-			} catch (e) {
-				dispatch(appActions.setLoadingMainMobile(false));
+		try {
+			dispatch(appActions.setLoadingMainMobile(true));
+			const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName?.trim() || '', imgUrl || '');
+
+			dispatch(appActions.setLoadingMainMobile(false));
+			if (response) {
+				Toast.show({
+					type: 'info',
+					text1: t('updateClanProfileSuccess')
+				});
+				navigation.goBack();
 			}
+		} catch (e) {
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 
@@ -210,8 +229,8 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 				<Text
 					style={[
 						styles.saveChangeButton,
-						(tab === EProfileTab.UserProfile && !isUserProfileNotChanged && !isUserProfileEmptyName) ||
-						(tab === EProfileTab.ClanProfile && !isClanProfileNotChanged && !isClanProfileEmptyName)
+						(tab === EProfileTab.UserProfile && !isUserProfileEmptyName) ||
+						(tab === EProfileTab.ClanProfile && !isClanProfileEmptyName && !isDuplicateClanNickname)
 							? styles.changed
 							: styles.notChange
 					]}
@@ -250,19 +269,25 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		);
 	};
 
+	const handleSelectClan = (clan: ClansEntity) => {
+		setSelectedClan(clan);
+		setIsDuplicateClanNickname(false);
+	};
+
 	const handleTabChange = (index: number) => {
 		setTab(index);
+		setIsDuplicateClanNickname(false);
 	};
 
 	const saveCurrentTab = () => {
 		if (tab === EProfileTab.UserProfile) {
-			if (isUserProfileNotChanged || isUserProfileEmptyName) return;
+			if (isUserProfileEmptyName) return;
 			updateUserProfile();
 			return;
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
-			if (isClanProfileNotChanged || isClanProfileEmptyName) return;
+			if (isClanProfileEmptyName || isDuplicateClanNickname) return;
 			updateClanProfile();
 			return;
 		}
@@ -319,8 +344,10 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 					<ServerProfile
 						clanProfileValue={currentClanProfileValue}
 						isClanProfileNotChanged={isClanProfileNotChanged}
+						isDuplicateClanNickname={isDuplicateClanNickname}
 						setCurrentClanProfileValue={setCurrentClanProfileValue}
-						onSelectedClan={(clan) => setSelectedClan(clan)}
+						onSelectedClan={handleSelectClan}
+						onCheckDuplicateClanNickname={checkDuplicateClanNickname}
 					/>
 				]}
 			/>

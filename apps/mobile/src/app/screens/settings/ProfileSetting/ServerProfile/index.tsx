@@ -3,7 +3,7 @@ import { useAuth } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
 import { Text, size, useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Dimensions, FlatList, Keyboard, KeyboardAvoidingView, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -21,11 +21,20 @@ import { style } from './styles';
 interface IServerProfile {
 	clanProfileValue: IClanProfileValue;
 	isClanProfileNotChanged?: boolean;
+	isDuplicateClanNickname?: boolean;
 	setCurrentClanProfileValue: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
 	onSelectedClan: (clan: ClansEntity) => void;
+	onCheckDuplicateClanNickname: (value: string) => void;
 }
 
-export default function ServerProfile({ clanProfileValue, isClanProfileNotChanged, setCurrentClanProfileValue, onSelectedClan }: IServerProfile) {
+function ServerProfile({
+	clanProfileValue,
+	isClanProfileNotChanged,
+	isDuplicateClanNickname,
+	setCurrentClanProfileValue,
+	onSelectedClan,
+	onCheckDuplicateClanNickname
+}: IServerProfile) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { userProfile, userId } = useAuth();
@@ -45,6 +54,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 
 	const onValueChange = (newValue: Partial<IClanProfileValue>) => {
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, ...newValue }));
+		onCheckDuplicateClanNickname(newValue?.displayName);
 	};
 
 	const switchClan = (clan: ClansEntity) => {
@@ -69,12 +79,13 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 					onPress: () => {
 						setSelectedClan(clan);
 						onSelectedClan(clan);
+						bottomSheetDetail.current?.close();
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 					}
 				}
 			],
 			{ cancelable: false }
 		);
-		bottomSheetDetail.current?.close();
 	};
 
 	const handleAvatarChange = (url: string) => {
@@ -130,6 +141,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	};
+
 	return (
 		<KeyboardAvoidingView behavior={'position'} style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
@@ -143,7 +155,7 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 			</TouchableOpacity>
 
 			<BannerAvatar
-				avatar={clanProfileValue?.imgUrl}
+				avatar={clanProfileValue?.imgUrl || userProfile?.user?.avatar_url}
 				alt={clanProfileValue?.username}
 				onLoad={handleAvatarChange}
 				defaultAvatar={userProfile?.user?.avatar_url || ''}
@@ -157,16 +169,18 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 
 			<View style={styles.clanProfileDetail}>
 				<View style={styles.nameWrapper}>
-					<Text style={styles.displayNameText}>{clanProfileValue?.displayName || clanProfileValue?.username}</Text>
+					<Text style={styles.displayNameText}>{clanProfileValue?.displayName}</Text>
 					<Text style={styles.usernameText}>{clanProfileValue?.username}</Text>
 				</View>
 
 				<MezonInput
-					value={clanProfileValue?.displayName || clanProfileValue?.username}
+					value={clanProfileValue?.displayName}
 					onTextChange={(newValue) => onValueChange({ displayName: newValue })}
 					placeHolder={clanProfileValue?.username}
 					maxCharacter={32}
 					label={t('fields.clanName.label')}
+					errorMessage={isDuplicateClanNickname ? 'The nick name already exists in the clan. Please enter another nick name.' : ''}
+					isValid={!isDuplicateClanNickname}
 				/>
 			</View>
 
@@ -174,3 +188,5 @@ export default function ServerProfile({ clanProfileValue, isClanProfileNotChange
 		</KeyboardAvoidingView>
 	);
 }
+
+export default memo(ServerProfile);

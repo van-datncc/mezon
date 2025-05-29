@@ -1,13 +1,15 @@
-import { isEmpty } from '@mezon/mobile-components';
-import { appActions, DMCallActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { sleep } from '@mezon/utils';
+import { ActionEmitEvent, isEmpty } from '@mezon/mobile-components';
+import { DMCallActions, appActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { WEBRTC_SIGNALING_TYPES, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { safeJSONParse, WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
-import { AppState, NativeModules, Platform, View } from 'react-native';
+import { AppState, DeviceEventEmitter, NativeModules, Platform, View } from 'react-native';
+import RNCallKeep from 'react-native-callkeep';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import NotificationPreferences from '../../utils/NotificationPreferences';
+import { useSendSignaling } from '../CallingGroupModal';
 import CallingModal from '../CallingModal';
 
 const CallingModalWrapper = () => {
@@ -16,20 +18,15 @@ const CallingModalWrapper = () => {
 	const dispatch = useAppDispatch();
 	const appStateRef = useRef(AppState.currentState);
 	const navigation = useNavigation<any>();
+	const { sendSignalingToParticipants } = useSendSignaling();
 
-	const handleAppStateChangeListener = useCallback(
-		(nextAppState: typeof AppState.currentState) => {
-			if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-				const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
-				if (latestSignalingEntry?.signalingData?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER) {
-					getDataCall();
-				}
-			}
+	const handleAppStateChangeListener = useCallback((nextAppState: typeof AppState.currentState) => {
+		if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+			getDataCall();
+		}
 
-			appStateRef.current = nextAppState;
-		},
-		[signalingData]
-	);
+		appStateRef.current = nextAppState;
+	}, []);
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', (nextAppState) => {
@@ -70,9 +67,18 @@ const CallingModalWrapper = () => {
 	};
 	const getDataCall = async () => {
 		try {
+			if (Platform.OS === 'ios') {
+				RNCallKeep.endAllCalls();
+			}
 			const data = await getDataCallStorage();
 			if (isEmpty(data)) return;
-			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
+			const dataObj = safeJSONParse(data?.offer || '{}');
+			if (dataObj?.isGroupCall) {
+				await handleJoinCallGroup(dataObj);
+				await clearUpStorageCalling();
+				return;
+			}
+			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer && !dataObj?.isGroupCall) {
 				if (Platform.OS === 'ios') {
 					dispatch(appActions.setLoadingMainMobile(true));
 				}
@@ -93,7 +99,7 @@ const CallingModalWrapper = () => {
 				);
 
 				if (Platform.OS === 'ios') {
-					await sleep(1000);
+					await sleep(3000);
 					dispatch(appActions.setLoadingMainMobile(false));
 					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
@@ -124,6 +130,35 @@ const CallingModalWrapper = () => {
 			} else {
 				console.error('VoIPManager is not available');
 			}
+		}
+	};
+
+	const handleJoinCallGroup = async (dataCall: any) => {
+		if (dataCall?.groupId) {
+			if (!dataCall?.meetingCode) return;
+			dispatch(appActions.setLoadingMainMobile(true));
+			const data = {
+				channelId: dataCall.groupId || '',
+				roomName: dataCall?.meetingCode,
+				clanId: '',
+				isGroupCall: true
+			};
+			await sleep(3000);
+			dispatch(appActions.setLoadingMainMobile(false));
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			const joinAction = {
+				participant_id: userId,
+				participant_name: '',
+				participant_avatar: '',
+				timestamp: Date.now()
+			};
+			sendSignalingToParticipants(
+				[dataCall?.callerId],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_PARTICIPANT_JOINED,
+				joinAction,
+				dataCall?.channel_id || '',
+				userId || ''
+			);
 		}
 	};
 

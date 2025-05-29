@@ -1,6 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { memo } from 'react';
 import { KeyboardAvoidingView, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { IUserProfileValue } from '..';
@@ -16,7 +17,7 @@ interface IUserProfile {
 	setCurrentUserProfileValue: (updateFn: (prevValue: IUserProfileValue) => IUserProfileValue) => void;
 }
 
-export default function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
+function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const auth = useAuth();
@@ -66,3 +67,5 @@ export default function UserProfile({ userProfileValue, setCurrentUserProfileVal
 		</KeyboardAvoidingView>
 	);
 }
+
+export default memo(UserProfile);

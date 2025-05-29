@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 import { size, useTheme } from '@mezon/mobile-ui';
@@ -37,6 +37,8 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const styles = style(themeValue);
 	const { t } = useTranslation(['userProfile']);
 	const currenChannel = useCurrentChannel(channelId) as IChannel;
+	const [isCountBadge, setIsCountBadge] = useState(false);
+	const [remainingCount, setRemainingCount] = useState(null);
 
 	const userName: string = useMemo(() => {
 		return typeof currenChannel?.usernames === 'string' ? currenChannel?.usernames : currenChannel?.usernames?.[0] || '';
@@ -56,14 +58,28 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 
 	const stackUsers = useMemo(() => {
 		const username = currenChannel?.category_name?.split(',');
-		return isDMGroup
-			? currenChannel?.channel_avatar?.map((avatar) => {
-					return {
-						avatarUrl: avatar,
-						username: username?.shift() || 'Anonymous'
-					};
-				})
-			: [];
+		if (!isDMGroup) return [];
+
+		const allUsers =
+			currenChannel?.channel_avatar?.map((avatar) => {
+				return {
+					avatarUrl: avatar,
+					username: username?.shift() || 'Anonymous'
+				};
+			}) || [];
+
+		if (allUsers.length > 3) {
+			const remainingCount = allUsers.length - 2;
+			const visibleUsers = allUsers.slice(0, 3);
+
+			setIsCountBadge(true);
+			setRemainingCount(remainingCount);
+			return visibleUsers;
+		}
+
+		setIsCountBadge(false);
+		setRemainingCount(null);
+		return allUsers;
 	}, [currenChannel?.category_name, currenChannel?.channel_avatar, isDMGroup]);
 
 	const creatorUser = useAppSelector((state) => selectMemberClanByUserId2(state, currenChannel?.creator_id));
@@ -103,9 +119,21 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 		<View style={[styles.wrapperWelcomeMessage, isDMGroup && styles.wrapperCenter]}>
 			{isDM ? (
 				isDMGroup ? (
-					<MezonAvatar height={size.s_50} width={size.s_50} avatarUrl={''} username={''} stacks={stackUsers} />
+					<MezonAvatar
+						height={size.s_50}
+						width={size.s_50}
+						avatarUrl={''}
+						username={''}
+						stacks={stackUsers}
+						isCountBadge={isCountBadge}
+						countBadge={remainingCount}
+					/>
+				) : currenChannel?.channel_avatar && currenChannel.channel_avatar[0] ? (
+					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel.channel_avatar[0]} username={userName} />
 				) : (
-					<MezonAvatar height={size.s_100} width={size.s_100} avatarUrl={currenChannel?.channel_avatar?.[0]} username={userName} />
+					<View style={styles.wrapperTextAvatar}>
+						<Text style={[styles.textAvatar]}>{currenChannel?.channel_label?.charAt?.(0)}</Text>
+					</View>
 				)
 			) : (
 				<View style={styles.iconWelcomeMessage}>

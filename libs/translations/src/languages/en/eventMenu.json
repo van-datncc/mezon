@@ -30,6 +30,7 @@
     "share": {
         "title": "Share Event to friends",
         "search": "Search",
-        "share": "Share"
+        "share": "Share",
+        "copied": "Link Copied!"
     }
 }

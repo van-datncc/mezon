@@ -10,6 +10,7 @@ import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } fr
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, NativeModules, Platform } from 'react-native';
+import RNCallKeep from 'react-native-callkeep';
 import { deflate, inflate } from 'react-native-gzip';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
@@ -66,7 +67,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		storedIceCandidates: null
 	});
 	const peerConnection = useRef<RTCPeerConnection | null>(null);
-	const [pendingCandidates, setPendingCandidates] = useState<(RTCIceCandidate | null)[]>([]);
 	const { requestMicrophonePermission, requestCameraPermission } = usePermission();
 	const mezon = useMezon();
 	const dispatch = useAppDispatch();
@@ -120,6 +120,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		if (Platform.OS === 'android') {
 			await NotificationPreferences.clearValue('notificationDataCalling');
 		} else {
+			RNCallKeep.endAllCalls();
 			const VoIPManager = NativeModules?.VoIPManager;
 			if (VoIPManager) {
 				await VoIPManager.clearStoredNotificationData();
@@ -150,7 +151,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		const pc = new RTCPeerConnection(RTCConfig);
 		pc.addEventListener('icecandidate', async (event) => {
 			if (event?.candidate) {
-				setPendingCandidates((prev) => [...prev, event.candidate]);
 				pendingCandidatesRef.current = [...(pendingCandidatesRef?.current || []), event.candidate];
 			}
 		});
@@ -178,6 +178,10 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					text1: 'Connection connected'
 				});
 				stopDialTone();
+				const bodyFCMMobile = {
+					offer: 'CANCEL_CALL'
+				};
+				mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 			}
 			if (pc.iceConnectionState === 'checking') {
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
@@ -227,8 +231,28 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		};
 	};
 
+	const setIsSpeaker = async ({ isSpeaker = false }) => {
+		try {
+			if (Platform.OS === 'android') {
+				const { CustomAudioModule } = NativeModules;
+				await CustomAudioModule.setSpeaker(isSpeaker, null);
+				InCallManager.setSpeakerphoneOn(isSpeaker);
+			} else {
+				InCallManager.setSpeakerphoneOn(isSpeaker);
+				InCallManager.setForceSpeakerphoneOn(isSpeaker);
+			}
+			setLocalMediaControl((prev) => ({
+				...prev,
+				speaker: isSpeaker
+			}));
+		} catch (error) {
+			console.error('Failed to initialize speaker', error);
+		}
+	};
+
 	const startCall = async (isVideoCall: boolean, isAnswer = false) => {
 		try {
+			await setIsSpeaker({ isSpeaker: false });
 			if (!isAnswer) {
 				playDialTone();
 				handleSend(
@@ -336,22 +360,16 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	const handleAnswer = async (signalingData: any) => {
 		if (!peerConnection?.current) return;
 		await peerConnection?.current.setRemoteDescription(new RTCSessionDescription(signalingData));
-		const dataPendingCandidates = pendingCandidates?.length
-			? pendingCandidates
-			: pendingCandidatesRef?.current?.length
-				? pendingCandidatesRef?.current
-				: [];
-
-		// Add stored ICE candidates
-		if (dataPendingCandidates?.length > 0) {
-			await mezon.socketRef.current?.forwardWebrtcSignaling(
-				dmUserId,
-				WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
-				JSON.stringify(dataPendingCandidates?.[dataPendingCandidates?.length - 1]),
-				channelId,
-				userId
-			);
-			setPendingCandidates([]);
+		if (pendingCandidatesRef?.current?.length > 0) {
+			for (const candidateItem of pendingCandidatesRef.current) {
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
+					JSON.stringify(candidateItem),
+					channelId,
+					userId
+				);
+			}
 			pendingCandidatesRef.current = [];
 		}
 	};
@@ -363,14 +381,8 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			if (data) {
 				const candidate = new RTCIceCandidate(data);
 				await peerConnection?.current?.addIceCandidate(candidate);
-
-				const dataPendingCandidates = pendingCandidates?.length
-					? pendingCandidates
-					: pendingCandidatesRef?.current?.length
-						? pendingCandidatesRef?.current
-						: [];
-				if (dataPendingCandidates) {
-					for (const candidateItem of dataPendingCandidates) {
+				if (pendingCandidatesRef?.current?.length && peerConnection?.current?.remoteDescription?.type === 'offer') {
+					for (const candidateItem of pendingCandidatesRef.current) {
 						await mezon.socketRef.current?.forwardWebrtcSignaling(
 							dmUserId,
 							WebrtcSignalingType.WEBRTC_ICE_CANDIDATE,
@@ -379,7 +391,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 							userId
 						);
 					}
-					setPendingCandidates([]);
 					pendingCandidatesRef.current = [];
 				}
 			} else {
@@ -428,6 +439,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			playEndCall();
 			stopAllTracks();
 
+			if (Platform.OS === 'ios') {
+				RNCallKeep.endAllCalls();
+			}
 			if (peerConnection?.current) {
 				peerConnection?.current.close();
 			}
@@ -546,6 +560,22 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				channelId,
 				userId
 			);
+			// Renegotiation needed when adding video track to voice call
+			if (peerConnection?.current) {
+				// Create new offer with video track
+				const offer = await peerConnection.current.createOffer(sessionConstraints);
+				await peerConnection.current.setLocalDescription(offer);
+
+				// Send new offer to remote peer
+				const compressedOffer = await compress(JSON.stringify(offer));
+				await mezon.socketRef.current?.forwardWebrtcSignaling(
+					dmUserId,
+					WebrtcSignalingType.WEBRTC_SDP_OFFER,
+					compressedOffer,
+					channelId,
+					userId
+				);
+			}
 			setLocalMediaControl((prev) => ({
 				...prev,
 				camera: !prev.camera
@@ -596,13 +626,9 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
-	const toggleSpeaker = () => {
+	const toggleSpeaker = async () => {
 		try {
-			InCallManager.setSpeakerphoneOn(!localMediaControl.speaker);
-			setLocalMediaControl((prev) => ({
-				...prev,
-				speaker: !prev.speaker
-			}));
+			await setIsSpeaker({ isSpeaker: !localMediaControl.speaker });
 		} catch (error) {
 			console.error('Failed to toggle speaker', error);
 		}

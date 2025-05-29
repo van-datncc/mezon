@@ -136,9 +136,9 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	const addFriendByUsernameContent = () => {
 		return (
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.fill}>
+				<Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
 				<View style={[styles.fill, { paddingVertical: 20 }]}>
 					<View style={styles.fill}>
-						<Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
 						<Text style={styles.defaultText}>{t('addFriend.whoYouWantToAddFriend')}</Text>
 						<View style={styles.searchUsernameWrapper}>
 							<TextInput
@@ -151,8 +151,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 							/>
 						</View>
 						<View style={styles.byTheWayText}>
-							<Text style={styles.defaultText}>{t('addFriend.byTheWay')}</Text>
-							<Text style={styles.whiteText}>{userProfile?.user?.username}</Text>
+							<Text style={styles.defaultText}>{`${t('addFriend.byTheWay')} ${userProfile?.user?.username}`}</Text>
 						</View>
 					</View>
 					<View style={[styles.buttonWrapper, isKeyBoardShow && { marginBottom: 120 }]}>

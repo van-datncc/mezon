@@ -29,15 +29,15 @@ const ChannelRouterListener = () => {
 	};
 
 	useEffect(() => {
-		const onChannelRouter = DeviceEventEmitter.addListener(ActionEmitEvent.ON_CHANNEL_ROUTER, ({ channel }) => {
-			handleRouteData(channel);
+		const onChannelRouter = DeviceEventEmitter.addListener(ActionEmitEvent.ON_CHANNEL_ROUTER, ({ channel, isFromSearch = false }) => {
+			handleRouteData(channel, isFromSearch);
 		});
 		return () => {
 			onChannelRouter.remove();
 		};
 	}, []);
 
-	const handleRouteData = async (channel?: IChannel) => {
+	const handleRouteData = async (channel?: IChannel, isFromSearch = false) => {
 		requestAnimationFrame(async () => {
 			if (channel?.type === ChannelType.CHANNEL_TYPE_STREAMING || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 				openBottomSheetJoinVoice(channel);
@@ -67,6 +67,9 @@ const ChannelRouterListener = () => {
 				);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				if (isFromSearch && channel?.channel_id) {
+					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, channel?.channel_id);
+				}
 			}
 		});
 	};

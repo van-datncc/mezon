@@ -1,11 +1,16 @@
+import { CallSignalingData } from '@mezon/components';
 import { useChatSending, useMemberStatus, useSeenMessagePool } from '@mezon/core';
-import { ActionEmitEvent, IOption, Icons } from '@mezon/mobile-components';
+import { ActionEmitEvent, IOption } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	channelsActions,
 	directActions,
 	directMetaActions,
+	getStore,
+	groupCallActions,
+	messagesActions,
+	selectAllAccount,
 	selectDmGroupCurrent,
 	selectLastMessageByChannelId,
 	selectLastSeenMessageStateByChannelId,
@@ -14,13 +19,14 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { TypeMessage, createImgproxyUrl, sleep } from '@mezon/utils';
+import { IMessageTypeCallLog, TypeMessage, WEBRTC_SIGNALING_TYPES, createImgproxyUrl, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { DeviceEventEmitter, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { useSendSignaling } from '../../../components/CallingGroupModal';
 import ImageNative from '../../../components/ImageNative';
 import { UserStatus } from '../../../components/UserStatus';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -116,6 +122,8 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const isTabletLandscape = useTabletLandscape();
 	const user = useSelector((state) => selectMemberClanByUserId2(state, currentDmGroup?.user_id?.[0]));
 	const status = getUserStatusByMetadata(user?.user?.metadata);
+	const dispatch = useAppDispatch();
+	const { sendSignalingToParticipants } = useSendSignaling();
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ mode, channelOrDirect: currentDmGroup });
@@ -151,6 +159,67 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	}, [from, navigation]);
 
 	const goToCall = () => {
+		if (isTypeDMGroup) {
+			const data = {
+				channelId: currentDmGroup.channel_id || '',
+				roomName: currentDmGroup?.meeting_code,
+				clanId: '',
+				isGroupCall: true,
+				participantsCount: currentDmGroup?.user_id?.length || 0
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			const store = getStore();
+			const state = store.getState();
+			const userProfile = selectAllAccount(state);
+			dispatch(
+				groupCallActions.showPreCallInterface({
+					groupId: currentDmGroup?.channel_id,
+					isVideo: false
+				})
+			);
+			const callOfferAction = {
+				is_video: false,
+				group_id: currentDmGroup?.channel_id,
+				group_name: currentDmGroup?.channel_label,
+				group_avatar: currentDmGroup?.channel_avatar?.[0],
+				caller_id: userProfile?.user?.id,
+				caller_name: userProfile?.user?.display_name || userProfile?.user?.username || '',
+				caller_avatar: userProfile?.user?.avatar_url,
+				meeting_code: currentDmGroup?.meeting_code,
+				clan_id: '',
+				timestamp: Date.now(),
+				participants: currentDmGroup?.user_id || []
+			};
+			sendSignalingToParticipants(
+				currentDmGroup?.user_id || [],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_OFFER,
+				callOfferAction as CallSignalingData,
+				currentDmGroup?.channel_id || '',
+				userProfile?.user?.id || ''
+			);
+			dispatch(
+				messagesActions.sendMessage({
+					channelId: currentDmGroup?.channel_id,
+					clanId: '',
+					mode: ChannelStreamMode.STREAM_MODE_GROUP,
+					isPublic: true,
+					content: {
+						t: `Started voice call`,
+						callLog: {
+							isVideo: false,
+							callLogType: IMessageTypeCallLog.STARTCALL,
+							showCallBack: false
+						}
+					},
+					anonymous: false,
+					senderId: userProfile?.user?.id || '',
+					avatar: userProfile?.user?.avatar_url || '',
+					isMobile: true,
+					username: currentDmGroup?.channel_label || ''
+				})
+			);
+			return;
+		}
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
 			params: {
@@ -228,12 +297,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
-				{isTabletLandscape && (
-					<TouchableOpacity style={styles.iconHeader} onPress={navigateToNotifications}>
-						<Icons.Inbox width={size.s_20} height={size.s_20} color={themeValue.textStrong} />
-					</TouchableOpacity>
-				)}
-				{!isTypeDMGroup && !!currentDmGroup?.user_id?.[0] && (
+				{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
 					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
 						<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>

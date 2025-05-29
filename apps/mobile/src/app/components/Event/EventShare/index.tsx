@@ -1,5 +1,5 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	EventManagementEntity,
@@ -13,11 +13,13 @@ import {
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { ChannelThreads, EBacktickType, IMessageSendPayload, normalizeString } from '@mezon/utils';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -91,12 +93,13 @@ export const ShareEventModal = memo(({ event, onConfirm }: IShareEventModalProps
 	}, [searchText, allForwardObject]);
 
 	const shareLink = useMemo(() => {
-		return channelVoice.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE
+		if (!channelVoice?.channel_id && !event?.meet_room?.external_link) return '';
+		return channelVoice?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE
 			? `https://meet.google.com/${channelVoice.meeting_code}`
 			: channelVoice.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
 				? `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${channelVoice.clan_id}/channels/${channelVoice.channel_id}`
 				: `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
-	}, [channelVoice.channel_id, channelVoice.clan_id, channelVoice.meeting_code, channelVoice.type]);
+	}, [channelVoice, event?.meet_room?.external_link]);
 
 	function handleClose() {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
@@ -169,6 +172,19 @@ export const ShareEventModal = memo(({ event, onConfirm }: IShareEventModalProps
 		);
 	};
 
+	const handleCoppyLink = async () => {
+		if (shareLink) {
+			Clipboard.setString(shareLink);
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('share.copied'),
+					leadingIcon: <MezonIconCDN icon={IconCDN.linkIcon} color={Colors.textLink} />
+				}
+			});
+		}
+	};
+
 	return (
 		<View style={styles.main}>
 			<View style={styles.container}>
@@ -177,9 +193,9 @@ export const ShareEventModal = memo(({ event, onConfirm }: IShareEventModalProps
 				</View>
 				<View style={styles.row}>
 					<TextInput style={styles.textInput} value={shareLink} />
-					<View style={styles.copyButton}>
+					<TouchableOpacity style={styles.copyButton} onPress={handleCoppyLink}>
 						<MezonIconCDN icon={IconCDN.copyIcon} color={themeValue.text} height={size.s_20} width={size.s_20} />
-					</View>
+					</TouchableOpacity>
 				</View>
 
 				<MezonInput
@@ -188,6 +204,7 @@ export const ShareEventModal = memo(({ event, onConfirm }: IShareEventModalProps
 					value={searchText}
 					prefixIcon={<MezonIconCDN icon={IconCDN.magnifyingIcon} color={themeValue.text} height={20} width={20} />}
 					inputWrapperStyle={{ backgroundColor: themeValue.primary, paddingHorizontal: size.s_6 }}
+					inputStyle={styles.searchText}
 				/>
 				<FlashList
 					keyboardShouldPersistTaps="handled"

@@ -3,11 +3,15 @@ import { createImgproxyUrl } from '@mezon/utils';
 type ItemProfileProps = {
 	avatar?: string;
 	username?: string;
+	onClick?: () => void;
 };
 
-const ItemProfile = ({ avatar, username }: ItemProfileProps) => {
+const ItemProfile = ({ avatar, username, onClick }: ItemProfileProps) => {
 	return (
-		<div className="flex items-center justify-between gap-2 rounded-sm dark:hover:bg-zinc-700 hover:bg-bgLightModeButton dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-black px-2">
+		<div
+			className="flex items-center justify-between gap-2 rounded-sm dark:hover:bg-zinc-700 hover:bg-bgLightModeButton dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-black px-2"
+			onClick={onClick}
+		>
 			{avatar ? (
 				<img src={createImgproxyUrl(avatar ?? '')} alt="avatar" className="w-6 h-6 rounded-full object-cover" />
 			) : (

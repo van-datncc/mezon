@@ -171,10 +171,12 @@ export function EventDetail({ event }: IEventDetailProps) {
 					onPress={handleToggleUserEvent}
 				/>
 				{/* <MezonButton title="Start event" fluid type="success" /> */}
-				<MezonButton
-					onPress={handleShareEvent}
-					icon={<MezonIconCDN icon={IconCDN.shareIcon} height={20} width={20} color={themeValue.text} />}
-				/>
+				{!event?.address && (
+					<MezonButton
+						onPress={handleShareEvent}
+						icon={<MezonIconCDN icon={IconCDN.shareIcon} height={20} width={20} color={themeValue.text} />}
+					/>
+				)}
 				{canModifyEvent && (
 					<MezonButton
 						icon={<MezonIconCDN icon={IconCDN.moreVerticalIcon} height={20} width={20} color={themeValue.text} />}
