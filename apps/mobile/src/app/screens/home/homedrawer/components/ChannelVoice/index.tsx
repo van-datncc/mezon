@@ -18,7 +18,7 @@ import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { AppState, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppState, BackHandler, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
@@ -102,9 +102,10 @@ type headerProps = {
 	onPressMinimizeRoom: () => void;
 	onToggleSpeaker: (boolean) => void;
 	isSpeakerOn: boolean;
+	isFromNativeCall: boolean;
 };
 
-const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn }: headerProps) => {
+const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn, isFromNativeCall = false }: headerProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
@@ -145,9 +146,11 @@ const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, is
 	return (
 		<View style={[styles.menuHeader]}>
 			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
-				<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
-					<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
-				</TouchableOpacity>
+				{!isFromNativeCall && (
+					<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
+						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
+					</TouchableOpacity>
+				)}
 				<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
 					{channel?.channel_label}
 				</Text>
@@ -183,7 +186,8 @@ function ChannelVoice({
 	onPressMinimizeRoom,
 	isAnimationComplete,
 	isGroupCall = false,
-	participantsCount = 0
+	participantsCount = 0,
+	isFromNativeCall = false
 }: {
 	channelId: string;
 	clanId: string;
@@ -193,6 +197,7 @@ function ChannelVoice({
 	isAnimationComplete: boolean;
 	isGroupCall?: boolean;
 	participantsCount?: number;
+	isFromNativeCall?: boolean;
 }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -358,6 +363,9 @@ function ChannelVoice({
 			currentDmGroup?.channel_id || '',
 			userProfile?.user?.id || ''
 		);
+		if (isFromNativeCall) {
+			BackHandler.exitApp();
+		}
 	};
 
 	const onCancelGroupCall = () => {
@@ -422,6 +430,7 @@ function ChannelVoice({
 							isSpeakerOn={isSpeakerOn}
 							onPressMinimizeRoom={onPressMinimizeRoom}
 							onToggleSpeaker={onToggleSpeaker}
+							isFromNativeCall={isFromNativeCall}
 						/>
 					)}
 					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />

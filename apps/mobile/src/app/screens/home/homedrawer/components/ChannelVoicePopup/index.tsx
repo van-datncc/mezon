@@ -17,7 +17,7 @@ import { Animated, DeviceEventEmitter, Keyboard, PanResponder } from 'react-nati
 import { useSelector } from 'react-redux';
 import ChannelVoice from '../ChannelVoice';
 
-const ChannelVoicePopup = () => {
+const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
@@ -206,6 +206,7 @@ const ChannelVoicePopup = () => {
 				onPressMinimizeRoom={handlePressMinimizeRoom}
 				isGroupCall={isGroupCall}
 				participantsCount={participantsCount}
+				isFromNativeCall={isFromNativeCall}
 			/>
 		</Animated.View>
 	);
