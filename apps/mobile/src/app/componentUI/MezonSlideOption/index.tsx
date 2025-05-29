@@ -37,8 +37,10 @@ export default function MezonSlideOption({ data, onChange, height = 90, width = 
 		if (index != _index) {
 			const finalIndex = _index >= 0 ? _index : 0;
 			setIndex(finalIndex);
-			setTitle(data[finalIndex].title);
-			onChange && onChange(data[finalIndex].value);
+			if (data?.[finalIndex]?.title) {
+				setTitle(data[finalIndex].title);
+				onChange && onChange(data[finalIndex].value);
+			}
 		}
 	};
 

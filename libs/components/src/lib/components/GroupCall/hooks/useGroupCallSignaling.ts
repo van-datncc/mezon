@@ -31,6 +31,15 @@ export const useGroupCallSignaling = (): GroupCallSignalingHookReturn => {
 						}
 
 						socket.forwardWebrtcSignaling(userId, signalType, JSON.stringify(data), channelId, currentUserId);
+						if (
+							signalType === WEBRTC_SIGNALING_TYPES.GROUP_CALL_OFFER ||
+							signalType === WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT ||
+							signalType === WEBRTC_SIGNALING_TYPES.GROUP_CALL_CANCEL ||
+							signalType === WEBRTC_SIGNALING_TYPES.GROUP_CALL_TIMEOUT
+						) {
+							const isCancel = signalType !== WEBRTC_SIGNALING_TYPES.GROUP_CALL_OFFER;
+							markCallPushMobile({ receiverId: userId, currentUserId, data, isCancel });
+						}
 					} catch (error) {
 						console.error('Failed to send signaling to participant:', userId, error);
 					}
@@ -80,6 +89,53 @@ export const useGroupCallSignaling = (): GroupCallSignalingHookReturn => {
 			sendSignalingToParticipants(participants, WEBRTC_SIGNALING_TYPES.GROUP_CALL_PARTICIPANT_LEFT, leftData, channelId, userId);
 		},
 		[sendSignalingToParticipants]
+	);
+
+	const markCallPushMobile = useCallback(
+		({
+			receiverId,
+			currentUserId,
+			data,
+			isCancel
+		}: {
+			receiverId: string;
+			currentUserId: string;
+			isCancel: boolean;
+			data: CallSignalingData | Record<string, any>;
+		}) => {
+			const socket = mezon.socketRef.current;
+			if (!socket) {
+				console.error('Socket not available for push notifications');
+				return;
+			}
+
+			if (isCancel) {
+				const bodyFCMMobile = { offer: 'CANCEL_CALL' };
+				socket.makeCallPush(receiverId, JSON.stringify(bodyFCMMobile), data.group_id, currentUserId);
+				return;
+			}
+
+			const groupName = data?.group_name || 'Group Call';
+			const offerGroupCall = {
+				isGroupCall: true,
+				groupId: data.group_id,
+				groupName,
+				groupAvatar: data.group_avatar || '',
+				meetingCode: data.meeting_code,
+				callerId: currentUserId
+			};
+
+			const bodyFCMMobile = {
+				offer: JSON.stringify(offerGroupCall),
+				callerName: `Group Call ${groupName}`,
+				callerAvatar: '',
+				callerId: currentUserId,
+				channelId: data.group_id
+			};
+
+			socket.makeCallPush(receiverId, JSON.stringify(bodyFCMMobile), data.group_id, currentUserId);
+		},
+		[mezon]
 	);
 
 	return {

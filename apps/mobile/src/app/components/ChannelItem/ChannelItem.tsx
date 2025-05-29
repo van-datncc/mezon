@@ -33,7 +33,7 @@ export const ChannelItem = React.memo(({ channelData }: ChannelItemProps) => {
 			store.dispatch(clansActions.joinClan({ clanId: channelData?.clan_id }));
 			store.dispatch(clansActions.changeCurrentClan({ clanId: channelData?.clan_id }));
 		}
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_ROUTER, { channel: channelData });
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_ROUTER, { channel: channelData, isFromSearch: true });
 		if (isTabletLandscape) {
 			await sleep(200);
 			navigation.goBack();
