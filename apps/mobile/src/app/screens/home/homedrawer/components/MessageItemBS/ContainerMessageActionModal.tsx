@@ -645,18 +645,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return;
 			}
 			if (!message && isOnlyEmojiPicker) {
-				// if (!socketRef.current || !currentChannel?.channel_id) return;
-				console.log('Message not found, cannot send reaction', clanId, channelId, 2, false, {
-					t: emoij + ' ',
-					ej: [
-						{
-							emojiid: emoji_id,
-							s: 0,
-							e: emoij.length
-						}
-					],
-					vr: ReactionType.VIDEO
-				});
+				if (!socketRef.current) return;
 				socketRef.current.writeChatMessage(
 					clanId,
 					channelId,
@@ -680,6 +669,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					undefined,
 					undefined
 				);
+				return;
 			}
 			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userId);
 		},
