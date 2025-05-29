@@ -159,7 +159,7 @@ export const markdownStyles = (
 		editedText: {
 			fontSize: size.small,
 			color: colors.textDisabled,
-			marginLeft: size.s_6
+			marginTop: size.s_2
 		},
 		mention: {
 			fontSize: size.medium,
@@ -688,10 +688,12 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 
-			<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-				{textParts?.length > 0 && <Text>{textParts}</Text>}
-				{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
-				{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap' }}>
+				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+					{textParts?.length > 0 && <Text>{textParts}</Text>}
+					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				</View>
+				<View>{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}</View>
 			</View>
 		</View>
 	);
