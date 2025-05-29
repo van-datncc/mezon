@@ -57,15 +57,15 @@
         },
         "startTime": {
             "title": "Giờ bắt đầu",
-            "errorMessage": "Vui lòng chọn một thời gian hợp lệ"
+            "errorMessage": "Vui lòng chọn giờ bắt đầu hợp lệ"
         },
         "endDate": {
             "title": "Ngày kết thúc",
               "errorMessage": "Vui lòng chọn ngày hiện tại hoặc ngày trong tương lai"
         },
         "endTime": {
-            "title": "Thời gian kết thúc",
-            "errorMessage": "Vui lòng chọn một thời gian hợp lệ"
+            "title": "Giờ kết thúc",
+            "errorMessage": "Vui lòng chọn giờ kết thúc hợp lệ"
         },
         "eventFrequency": {
             "title": "Tần suất sự kiện",
