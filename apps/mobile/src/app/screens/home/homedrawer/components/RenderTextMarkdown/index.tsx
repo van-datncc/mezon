@@ -119,8 +119,7 @@ export const markdownStyles = (
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.medium,
-			lineHeight: size.s_20
+			fontSize: size.medium
 		},
 		fence: {
 			color: colors.text,
@@ -134,15 +133,13 @@ export const markdownStyles = (
 		link: {
 			color: colors.textLink,
 			fontSize: size.medium,
-			textDecorationLine: 'none',
-			lineHeight: size.s_20
+			textDecorationLine: 'none'
 		},
 		hashtag: {
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
@@ -165,8 +162,7 @@ export const markdownStyles = (
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		blockquote: {
 			backgroundColor: Colors.tertiaryWeight,
@@ -188,8 +184,7 @@ export const markdownStyles = (
 		},
 		textVoiceChannel: {
 			fontSize: size.medium,
-			color: colors.textLink,
-			lineHeight: size.s_20
+			color: colors.textLink
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
