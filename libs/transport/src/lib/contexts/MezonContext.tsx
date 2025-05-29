@@ -108,7 +108,7 @@ export type MezonContextValue = {
 	confirmLoginRequest: (ConfirmRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 
-	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
+	logOutMezon: (device_id?: string, platform?: string, clearSession?: boolean) => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session | undefined>;
 	connectWithSession: (session: Sessionlike) => Promise<Session>;
 
@@ -236,7 +236,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const logOutMezon = useCallback(
-		async (device_id?: string, platform?: string) => {
+		async (device_id?: string, platform?: string, clearSession?: boolean) => {
 			if (socketRef.current) {
 				socketRef.current.ondisconnect = () => {
 					//console.log('loged out');
@@ -255,7 +255,9 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				);
 
 				sessionRef.current = null;
-				clearSessionFromStorage();
+				if (clearSession) {
+					clearSessionFromStorage();
+				}
 				clientRef.current.setBasePath(
 					process.env.NX_CHAT_APP_API_GW_HOST as string,
 					process.env.NX_CHAT_APP_API_GW_PORT as string,
