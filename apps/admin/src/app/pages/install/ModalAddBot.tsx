@@ -1,6 +1,7 @@
 import { addBotChat, selectAllAccount, selectAllClans, useAppDispatch } from '@mezon/store';
 import { memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import FooterModal from './components/FooterModal';
 import HeaderModal from './components/HeaderModal';
@@ -53,15 +54,22 @@ const ModalAddBot = memo(({ nameBot = '', applicationId, handleOpenModal }: Moda
 		const cleanAppId = applicationId.replace(/\s+/g, ' ').trim();
 		const cleanClanId = clanValue.replace(/\s+/g, ' ').trim();
 
-		const resp = await dispatch(
-			addBotChat({
-				appId: cleanAppId,
-				clanId: cleanClanId
-			})
-		);
+		try {
+			const resp = await dispatch(
+				addBotChat({
+					appId: cleanAppId,
+					clanId: cleanClanId
+				})
+			);
 
-		if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
-			toggleSuccess();
+			if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
+				toggleSuccess();
+			} else {
+				toast.error('You are not the owner of this clan. Please choose your own clan.');
+			}
+		} catch (error: any) {
+			console.error('Add bot failed:', error);
+			toast.error('Add bot failed. Refresh the page and try again.');
 		}
 	}, [applicationId, clanValue, dispatch]);
 

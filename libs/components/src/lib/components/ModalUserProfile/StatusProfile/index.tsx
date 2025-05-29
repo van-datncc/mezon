@@ -109,34 +109,22 @@ const StatusProfile = ({ userById, isDM }: StatusProfileProps) => {
 	return (
 		<>
 			<div className="max-md:relative">
-				<Dropdown
-					label=""
-					trigger="click"
-					dismissOnClick={true}
-					renderTrigger={() => (
-						<div>
-							<ItemStatus
-								children={`Balance: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
-								dropdown
-								startIcon={<Icons.Check />}
-							/>
-						</div>
-					)}
-					placement="right-start"
-					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
-				>
-					<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney />} />
-					<ItemStatus
-						onClick={handleOpenWithdrawModal}
-						children="Withdraw"
-						startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
-					/>
-					<ItemStatus
-						onClick={handleOpenHistoryModal}
-						children="History Transaction"
-						startIcon={<Icons.History className="bg-green-500" />}
-					/>
-				</Dropdown>
+				<ItemStatus
+					children={`Balance: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
+					startIcon={<Icons.Check />}
+					disabled={true}
+				/>
+				<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney />} />
+				<ItemStatus
+					onClick={handleOpenWithdrawModal}
+					children="Withdraw"
+					startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
+				/>
+				<ItemStatus
+					onClick={handleOpenHistoryModal}
+					children="History Transaction"
+					startIcon={<Icons.History className="bg-green-500" />}
+				/>
 				<Dropdown
 					trigger="click"
 					dismissOnClick={true}

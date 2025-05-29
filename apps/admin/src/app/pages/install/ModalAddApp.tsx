@@ -113,7 +113,7 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 				toast.error(error.message || 'Channel name already exists, please choose another name');
 			} else {
 				console.error('Create channel failed:', error);
-				toast.error('An unknown error occurred');
+				toast.error('You are not the owner of this clan. Please choose your own clan.');
 			}
 		}
 	}, [applicationId, clanValue, categoryValue, labelValue, dispatch]);

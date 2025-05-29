@@ -190,7 +190,7 @@ const ModalUserProfile = ({
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg bg-indigo-400 rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
