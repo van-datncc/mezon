@@ -144,7 +144,7 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
-	const restoreKey = ['persist:auth', 'persist:apps', 'persist:categories', 'persist:clans'];
+	const restoreKey = ['persist:apps', 'persist:categories', 'persist:clans'];
 	if (sessionState) {
 		restoreKey.push('mezon_session');
 	}
