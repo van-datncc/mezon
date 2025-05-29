@@ -407,7 +407,6 @@ const ClansList = memo(() => {
 					const isOverThis = isDragging && overItem === item.id;
 					const isGroupIntentTarget = groupIntent?.targetId === item.id;
 
-					// IMPROVED: More precise visual feedback for better UX
 					let hoverEffect = '';
 					let dropIndicator = null;
 
@@ -426,7 +425,6 @@ const ClansList = memo(() => {
 								);
 								break;
 							case 'center':
-								// Enhanced center zone feedback
 								if (isGroupIntentTarget) {
 									hoverEffect = 'ring-4 ring-green-400 ring-opacity-90 bg-green-200 dark:bg-green-700/50 transform scale-105';
 								} else {
@@ -436,16 +434,13 @@ const ClansList = memo(() => {
 						}
 					}
 
-					// Check if this gap is being hovered for drop
 					const gapId = `gap-${index}`;
 					const isOverGap = isDragging && overItem === gapId;
 
-					// Special styling for items being dragged from expanded groups
 					const draggedFromGroupStyling = draggedFromGroup && draggedFromGroup.clanId === item.id ? 'opacity-50 transform scale-95' : '';
 
 					return (
 						<div key={item.id}>
-							{/* Gap drop zone ABOVE this item */}
 							{index === 0 && (
 								<div
 									className={`h-3 w-full relative transition-all duration-200 ${isOverGap ? 'bg-blue-100 dark:bg-blue-900/30' : ''}`}
@@ -470,7 +465,6 @@ const ClansList = memo(() => {
 								</div>
 							)}
 
-							{/* The actual item */}
 							<div
 								className={`${item.type === 'group' && item.group.isExpanded ? '' : 'px-2'} relative transition-all duration-200 ${hoverEffect} ${draggedFromGroupStyling}`}
 								onMouseEnter={(e) => handleItemMouseEnter(e, item.id)}
@@ -499,10 +493,8 @@ const ClansList = memo(() => {
 									</div>
 								) : null}
 
-								{/* Drop zone indicators */}
 								{dropIndicator}
 
-								{/* Enhanced center zone indicator for grouping */}
 								{isOverThis && dropZone === 'center' && isGroupIntentTarget && (
 									<div className="absolute inset-0 pointer-events-none">
 										<div className="absolute top-[15%] bottom-[15%] left-0 right-0 border-2 border-dashed border-green-400 rounded bg-green-200/20 dark:bg-green-400/10" />
@@ -510,7 +502,6 @@ const ClansList = memo(() => {
 								)}
 							</div>
 
-							{/* Gap drop zone BELOW this item */}
 							{(() => {
 								const nextGapId = `gap-${index + 1}`;
 								const isOverNextGap = isDragging && overItem === nextGapId;
@@ -553,22 +544,18 @@ const ClansList = memo(() => {
 					}}
 				>
 					{(() => {
-						// Show the dragged item (could be from expanded group)
 						if (draggedFromGroup) {
-							// Find the clan being dragged from group
 							const draggedClan = orderedClansWithGroups
 								.filter((item): item is NonNullable<typeof item> => item != null)
 								.find((item) => item.type === 'group' && 'group' in item && item.group?.clanIds.includes(draggedFromGroup.clanId));
 
 							if (draggedClan && draggedClan.type === 'group' && 'group' in draggedClan) {
-								// Find the specific clan in the group
 								const clan = allClansEntities[draggedFromGroup.clanId];
 								if (clan) {
 									return <SidebarClanItem option={clan} active={false} className="opacity-80" />;
 								}
 							}
 						} else {
-							// Regular dragged item
 							const draggedItemData = orderedClansWithGroups
 								.filter((item): item is NonNullable<typeof item> => item != null)
 								.find((item) => item.id === draggedItem);
