@@ -181,6 +181,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 	}, [isAnimationComplete, voicePlay]);
 
 	const handlePressMinimizeRoom = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		isFullScreen.current = false;
 		handleResizeStreamRoom();
 	}, []);
@@ -192,7 +193,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 			style={[
 				pan?.getLayout(),
 				{
-					zIndex: 999999,
+					zIndex: 999,
 					position: 'absolute'
 				}
 			]}

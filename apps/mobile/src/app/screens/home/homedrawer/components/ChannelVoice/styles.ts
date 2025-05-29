@@ -124,5 +124,17 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.selectedOverlay,
 			borderRadius: size.s_30,
 			padding: size.s_10
+		},
+		reactionContainer: {
+			position: 'absolute',
+			bottom: size.s_100,
+			right: size.s_20,
+			left: size.s_20,
+			height: '80%',
+			zIndex: 1
+		},
+		animatedEmoji: {
+			height: size.s_30,
+			width: size.s_30
 		}
 	});
