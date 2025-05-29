@@ -119,8 +119,7 @@ export const markdownStyles = (
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.medium,
-			lineHeight: size.s_20
+			fontSize: size.medium
 		},
 		fence: {
 			color: colors.text,
@@ -134,15 +133,13 @@ export const markdownStyles = (
 		link: {
 			color: colors.textLink,
 			fontSize: size.medium,
-			textDecorationLine: 'none',
-			lineHeight: size.s_20
+			textDecorationLine: 'none'
 		},
 		hashtag: {
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
@@ -159,14 +156,13 @@ export const markdownStyles = (
 		editedText: {
 			fontSize: size.small,
 			color: colors.textDisabled,
-			marginLeft: size.s_6
+			marginTop: size.s_2
 		},
 		mention: {
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		blockquote: {
 			backgroundColor: Colors.tertiaryWeight,
@@ -188,8 +184,7 @@ export const markdownStyles = (
 		},
 		textVoiceChannel: {
 			fontSize: size.medium,
-			color: colors.textLink,
-			lineHeight: size.s_20
+			color: colors.textLink
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
@@ -688,10 +683,12 @@ export const RenderTextMarkdownContent = ({
 				/>
 			)}
 
-			<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-				{textParts?.length > 0 && <Text>{textParts}</Text>}
-				{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
-				{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap' }}>
+				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+					{textParts?.length > 0 && <Text>{textParts}</Text>}
+					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				</View>
+				<View>{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}</View>
 			</View>
 		</View>
 	);

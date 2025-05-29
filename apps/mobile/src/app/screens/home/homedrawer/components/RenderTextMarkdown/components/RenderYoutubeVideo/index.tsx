@@ -31,7 +31,7 @@ const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPre
 				)}
 
 				<YoutubePlayer
-					height={size.s_182}
+					height={size.s_170}
 					width={isLandscape ? width * 0.4 : width * 0.8}
 					videoId={videoId}
 					play={false}

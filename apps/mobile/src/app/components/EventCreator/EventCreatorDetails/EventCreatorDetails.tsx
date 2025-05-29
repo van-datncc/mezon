@@ -211,6 +211,7 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 							<View style={{ flex: 2 }}>
 								<MezonDateTimePicker
 									title={t('fields.endDate.title')}
+									titleUppercase
 									onChange={setEndDate}
 									value={endDate}
 									keepTime
@@ -220,6 +221,7 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 							<View style={{ flex: 1 }}>
 								<MezonDateTimePicker
 									title={t('fields.endTime.title')}
+									titleUppercase
 									mode="time"
 									onChange={setEndTime}
 									value={endTime}
