@@ -1,6 +1,7 @@
 import { useAuth } from '@mezon/core';
+import { STORAGE_MY_USER_ID, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, useAppDispatch } from '@mezon/store-mobile';
+import { accountActions, appActions, useAppDispatch } from '@mezon/store-mobile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -27,6 +28,10 @@ const NewLoginScreen = () => {
 	const [authUri, setAuthUri] = useState(null);
 	const { loginByEmail } = useAuth();
 	const dispatch = useAppDispatch();
+	const [webKey, setWebKey] = useState(0);
+	const resetWebView = () => {
+		setWebKey((prev) => prev + 1);
+	};
 
 	useEffect(() => {
 		const authUrl = `${OAUTH2_AUTHORIZE_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}&state=${STATE}`;
@@ -51,6 +56,12 @@ const NewLoginScreen = () => {
 										text2: 'Invalid email or password'
 									});
 								}
+								dispatch(accountActions.setAccount(null));
+								resetWebView();
+								await AsyncStorage.clear();
+							}
+							if (res?.user_id) {
+								save(STORAGE_MY_USER_ID, res?.user_id?.toString());
 							}
 							dispatch(appActions.setLoadingMainMobile(false));
 						} catch (error) {
@@ -71,6 +82,8 @@ const NewLoginScreen = () => {
 			{authUri && (
 				<View style={styles.webView}>
 					<WebView
+						incognito={true}
+						key={webKey}
 						originWhitelist={['*']}
 						style={styles.supperContainer}
 						source={{ uri: authUri }}

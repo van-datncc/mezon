@@ -107,103 +107,108 @@ type headerProps = {
 	onToggleSpeaker: (boolean) => void;
 	isSpeakerOn: boolean;
 	isFromNativeCall: boolean;
+	isGroupCall?: boolean;
 };
 
-const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn, isFromNativeCall = false }: headerProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
+const HeaderRoomView = memo(
+	({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn, isFromNativeCall = false, isGroupCall = false }: headerProps) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
+		const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
 
-	const handleSwitchCamera = async () => {
-		try {
-			if (cameraTrack && cameraTrack.track) {
-				if (Platform.OS === 'ios') {
-					const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
-					const videoTrack = videoPublication?.track;
-					const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
-					if (videoTrack) {
-						await localParticipant.unpublishTrack(videoTrack);
-					}
-					const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
-					const devices = await Room.getLocalDevices('videoinput');
-					const targetCamera = devices.find((d) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
-					const newTrack = await createLocalVideoTrack({
-						deviceId: targetCamera.deviceId,
-						facingMode: newFacingMode
-					});
-					await localParticipant.publishTrack(newTrack);
-				} else {
-					if (typeof cameraTrack?.track?.mediaStreamTrack?._switchCamera === 'function') {
-						try {
-							cameraTrack?.track?.mediaStreamTrack?._switchCamera();
-						} catch (error) {
-							console.error(error);
+		const handleSwitchCamera = async () => {
+			try {
+				if (cameraTrack && cameraTrack.track) {
+					if (Platform.OS === 'ios') {
+						const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
+						const videoTrack = videoPublication?.track;
+						const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
+						if (videoTrack) {
+							await localParticipant.unpublishTrack(videoTrack);
+						}
+						const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
+						const devices = await Room.getLocalDevices('videoinput');
+						const targetCamera = devices.find((d) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
+						const newTrack = await createLocalVideoTrack({
+							deviceId: targetCamera.deviceId,
+							facingMode: newFacingMode
+						});
+						await localParticipant.publishTrack(newTrack);
+					} else {
+						if (typeof cameraTrack?.track?.mediaStreamTrack?._switchCamera === 'function') {
+							try {
+								cameraTrack?.track?.mediaStreamTrack?._switchCamera();
+							} catch (error) {
+								console.error(error);
+							}
 						}
 					}
 				}
+			} catch (error) {
+				console.error(error);
 			}
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const handleOpentEmojiPicker = () => {
-		const data = {
-			snapPoints: ['45%', '75%'],
-			children: (
-				<ContainerMessageActionModal
-					message={undefined}
-					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					type={EMessageBSToShow.MessageAction}
-					senderDisplayName={''}
-					isOnlyEmojiPicker={true}
-					channelId={channel?.channel_id}
-					clanId={channel?.clan_id}
-				/>
-			),
-			containerStyle: { zIndex: 1001 },
-			backdropStyle: { zIndex: 1000 }
 		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-	};
 
-	return (
-		<View style={[styles.menuHeader]}>
-			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
-				{!isFromNativeCall && (
-					<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
-						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
-					</TouchableOpacity>
-				)}
-				<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
-					{channel?.channel_label}
-				</Text>
-			</View>
-
-			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
-				<TouchableOpacity onPress={handleOpentEmojiPicker} style={[styles.buttonCircle]}>
-					<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_24} width={size.s_24} color={themeValue.white} />
-				</TouchableOpacity>
-				{isCameraEnabled && (
-					<TouchableOpacity onPress={() => handleSwitchCamera()} style={[styles.buttonCircle]}>
-						<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
-					</TouchableOpacity>
-				)}
-				<TouchableOpacity
-					onPress={() => onToggleSpeaker(!isSpeakerOn)}
-					style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
-				>
-					<MezonIconCDN
-						icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
-						height={size.s_17}
-						width={isSpeakerOn ? size.s_17 : size.s_20}
-						color={isSpeakerOn ? themeValue.border : themeValue.white}
+		const handleOpentEmojiPicker = () => {
+			const data = {
+				snapPoints: ['45%', '75%'],
+				children: (
+					<ContainerMessageActionModal
+						message={undefined}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						type={EMessageBSToShow.MessageAction}
+						senderDisplayName={''}
+						isOnlyEmojiPicker={true}
+						channelId={channel?.channel_id}
+						clanId={channel?.clan_id}
 					/>
-				</TouchableOpacity>
+				),
+				containerStyle: { zIndex: 1001 },
+				backdropStyle: { zIndex: 1000 }
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+		};
+
+		return (
+			<View style={[styles.menuHeader]}>
+				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
+					{!isFromNativeCall && (
+						<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
+							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
+						</TouchableOpacity>
+					)}
+					<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
+						{channel?.channel_label}
+					</Text>
+				</View>
+
+				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleOpentEmojiPicker} style={[styles.buttonCircle]}>
+							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_24} width={size.s_24} color={themeValue.white} />
+						</TouchableOpacity>
+					)}
+					{isCameraEnabled && (
+						<TouchableOpacity onPress={() => handleSwitchCamera()} style={[styles.buttonCircle]}>
+							<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
+						</TouchableOpacity>
+					)}
+					<TouchableOpacity
+						onPress={() => onToggleSpeaker(!isSpeakerOn)}
+						style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
+					>
+						<MezonIconCDN
+							icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
+							height={size.s_17}
+							width={isSpeakerOn ? size.s_17 : size.s_20}
+							color={isSpeakerOn ? themeValue.border : themeValue.white}
+						/>
+					</TouchableOpacity>
+				</View>
 			</View>
-		</View>
-	);
-});
+		);
+	}
+);
 
 function ChannelVoice({
 	channelId,
@@ -458,10 +463,11 @@ function ChannelVoice({
 							onPressMinimizeRoom={onPressMinimizeRoom}
 							onToggleSpeaker={onToggleSpeaker}
 							isFromNativeCall={isFromNativeCall}
+							isGroupCall={isGroupCall}
 						/>
 					)}
 					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />
-					<CallReactionHandler channel={channel} isAnimatedCompleted={isAnimationComplete} />
+					{!isGroupCall && <CallReactionHandler channel={channel} isAnimatedCompleted={isAnimationComplete} />}
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}
