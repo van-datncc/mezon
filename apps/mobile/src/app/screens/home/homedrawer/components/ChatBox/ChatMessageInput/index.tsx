@@ -105,7 +105,7 @@ export const ChatMessageInput = memo(
 			}, [onSendSuccess, ref]);
 
 			const handleTyping = useCallback(async () => {
-				if (anonymousMode && mode !== ChannelStreamMode.STREAM_MODE_GROUP && mode !== ChannelStreamMode.STREAM_MODE_DM) return;
+				if (anonymousMode) return;
 				dispatch(
 					messagesActions.sendTypingUser({
 						clanId: currentClanId || '',

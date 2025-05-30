@@ -641,9 +641,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 
 	const onSelectEmoji = useCallback(
 		async (emoji_id: string, emoij: string) => {
-			if (!emoji_id || !emoij) {
-				return;
-			}
 			if (!message && isOnlyEmojiPicker) {
 				if (!socketRef.current) return;
 				socketRef.current.writeChatMessage(
@@ -669,6 +666,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					undefined,
 					undefined
 				);
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				return;
 			}
 			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userId);
