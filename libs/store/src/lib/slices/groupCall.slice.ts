@@ -125,26 +125,26 @@ export const groupCallActions = groupCallSlice.actions;
 
 export const getGroupCallState = (state: RootState) => state.groupCall;
 
-export const selectIsGroupCallActive = createSelector([getGroupCallState], (groupCallState) => groupCallState.isGroupCallActive);
+export const selectIsGroupCallActive = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isGroupCallActive);
 
-export const selectIsShowPreCallInterface = createSelector([getGroupCallState], (groupCallState) => groupCallState.isShowPreCallInterface);
+export const selectIsShowPreCallInterface = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isShowPreCallInterface);
 
-export const selectIsShowIncomingGroupCall = createSelector([getGroupCallState], (groupCallState) => groupCallState.isShowIncomingGroupCall);
+export const selectIsShowIncomingGroupCall = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isShowIncomingGroupCall);
 
-export const selectCurrentGroupId = createSelector([getGroupCallState], (groupCallState) => groupCallState.currentGroupId);
+export const selectCurrentGroupId = createSelector([getGroupCallState], (groupCallState) => groupCallState?.currentGroupId);
 
-export const selectIncomingCallData = createSelector([getGroupCallState], (groupCallState) => groupCallState.incomingCallData);
+export const selectIncomingCallData = createSelector([getGroupCallState], (groupCallState) => groupCallState?.incomingCallData);
 
-export const selectIsVideoGroupCall = createSelector([getGroupCallState], (groupCallState) => groupCallState.isVideoCall);
+export const selectIsVideoGroupCall = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isVideoCall);
 
-export const selectIsGroupCallLoading = createSelector([getGroupCallState], (groupCallState) => groupCallState.isLoading);
+export const selectIsGroupCallLoading = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isLoading);
 
-export const selectShouldAutoJoinRoom = createSelector([getGroupCallState], (groupCallState) => groupCallState.shouldAutoJoinRoom);
+export const selectShouldAutoJoinRoom = createSelector([getGroupCallState], (groupCallState) => groupCallState?.shouldAutoJoinRoom);
 
-export const selectIsAnsweringCall = createSelector([getGroupCallState], (groupCallState) => groupCallState.isAnsweringCall);
+export const selectIsAnsweringCall = createSelector([getGroupCallState], (groupCallState) => groupCallState?.isAnsweringCall);
 
-export const selectGroupCallStartTime = createSelector([getGroupCallState], (groupCallState) => groupCallState.callStartTime);
+export const selectGroupCallStartTime = createSelector([getGroupCallState], (groupCallState) => groupCallState?.callStartTime);
 
-export const selectStoredCallData = createSelector([getGroupCallState], (groupCallState) => groupCallState.storedCallData);
+export const selectStoredCallData = createSelector([getGroupCallState], (groupCallState) => groupCallState?.storedCallData);
 
 export const groupCallReducer = groupCallSlice.reducer;
