@@ -185,8 +185,10 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 					<ItemStatus
 						children="Manage Accounts"
 						onClick={() => {
-							openModalAddAccount();
-							modalRef.current = true;
+							if (isElectron()) {
+								openModalAddAccount();
+								modalRef.current = true;
+							}
 						}}
 					/>
 				) : (
