@@ -69,6 +69,9 @@ const SuspenseFallback = () => {
 	return null;
 };
 
+// Add a simple HydrateFallback component for the initial hydration
+const HydrateFallback = () => null;
+
 const RouterMonitor = () => {
 	const navigation = useNavigation();
 	const { setIsLoading } = useLoading();
@@ -109,6 +112,7 @@ export const Routes = memo(() => {
 				path: '',
 				loader: loaderWithStore(appLoader),
 				shouldRevalidate: shouldRevalidateApp,
+				HydrateFallback: HydrateFallback,
 				element: (
 					<Suspense fallback={<SuspenseFallback />}>
 						<RouterMonitor />
