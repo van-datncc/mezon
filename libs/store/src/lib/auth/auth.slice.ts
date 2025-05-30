@@ -245,9 +245,10 @@ export const authSlice = createSlice({
 		},
 		checkFormatSession(state) {
 			const newSession: any = state.session;
-			if (newSession.token && !state.activeAccount) {
+			if (newSession.token || !state.activeAccount) {
 				state.session = null;
 				state.isLogin = false;
+				state.activeAccount = null;
 			}
 		},
 		turnOffSetAccount(state) {
