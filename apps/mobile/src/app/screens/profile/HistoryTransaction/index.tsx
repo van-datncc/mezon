@@ -148,19 +148,19 @@ export const HistoryTransactionScreen = () => {
 			<Text style={styles.heading}>{t('historyTransaction.title')}</Text>
 			<View style={styles.tabFilter}>
 				<Pressable style={[styles.itemFilter, activeTab === 'all' && styles.itemFilterActive]} onPress={() => onChangeActiveTab('all')}>
-					<Text style={styles.textFilter}>All</Text>
+					<Text style={[styles.textFilter, activeTab === 'all' && { color: 'white' }]}>{t('all')}</Text>
 				</Pressable>
 				<Pressable
 					style={[styles.itemFilter, activeTab === 'incoming' && styles.itemFilterActive]}
 					onPress={() => onChangeActiveTab('incoming')}
 				>
-					<Text style={styles.textFilter}>Incoming</Text>
+					<Text style={[styles.textFilter, activeTab === 'incoming' && { color: 'white' }]}>{t('inComing')}</Text>
 				</Pressable>
 				<Pressable
 					style={[styles.itemFilter, activeTab === 'outgoing' && styles.itemFilterActive]}
 					onPress={() => onChangeActiveTab('outgoing')}
 				>
-					<Text style={styles.textFilter}>Outgoing</Text>
+					<Text style={[styles.textFilter, activeTab === 'outgoing' && { color: 'white' }]}>{t('outGoing')}</Text>
 				</Pressable>
 			</View>
 			<FlashList

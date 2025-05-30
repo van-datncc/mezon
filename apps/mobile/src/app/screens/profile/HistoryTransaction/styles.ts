@@ -113,7 +113,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			paddingVertical: size.s_6,
 			borderRadius: size.s_10,
-			backgroundColor: colors.borderDim
+			backgroundColor: colors.secondaryLight
 		},
 		itemFilterActive: {
 			backgroundColor: colors.bgViolet
