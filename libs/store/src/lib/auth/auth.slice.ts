@@ -215,7 +215,16 @@ export const authSlice = createSlice({
 		},
 
 		setSession(state, action) {
-			state.session = action.payload;
+			if (action.payload.user_id) {
+				if (!state.session) {
+					state.session = {
+						[action.payload.user_id]: action.payload
+					};
+				} else {
+					state.session[action.payload.user_id] = action.payload;
+				}
+				state.activeAccount = action.payload.user_id;
+			}
 			state.isLogin = true;
 		},
 		setLogout(state) {
@@ -234,9 +243,12 @@ export const authSlice = createSlice({
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
 		},
-		turnOnSetAccount(state) {
-			// state.isLogin = false;
-			// state.setAccountMode = true;
+		checkFormatSession(state) {
+			const newSession: any = state.session;
+			if (newSession.token && !state.activeAccount) {
+				state.session = null;
+				state.isLogin = false;
+			}
 		},
 		turnOffSetAccount(state) {
 			state.isLogin = true;
