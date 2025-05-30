@@ -211,9 +211,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border,
-			paddingRight: size.s_14
-			// paddingVertical: size.s_8,
-			// paddingBottom: size.s_12
+			paddingRight: size.s_14,
+			paddingBottom: size.s_4
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
