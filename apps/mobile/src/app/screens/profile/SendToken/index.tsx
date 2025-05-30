@@ -438,7 +438,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 			<Pressable style={styles.button} onPress={sendToken} disabled={disableButton}>
 				<Text style={styles.buttonTitle}>{t('sendToken')}</Text>
 			</Pressable>
-			<Modal visible={showConfirmModal}>
+			<Modal visible={showConfirmModal} supportedOrientations={['portrait', 'landscape']}>
 				{fileShared && isShowModalShare ? (
 					<Sharing data={fileShared} onClose={onCloseFileShare} />
 				) : (
