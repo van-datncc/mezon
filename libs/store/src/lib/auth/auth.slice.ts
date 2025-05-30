@@ -228,7 +228,7 @@ export const authSlice = createSlice({
 			state.isLogin = true;
 		},
 		setLogout(state) {
-			if (state.session && state.activeAccount && Object.keys(state.session).length >= 2 && (state.session as any).token) {
+			if (state.session && state.activeAccount && Object.keys(state.session).length >= 2 && !(state.session as any).token) {
 				delete state.session?.[state.activeAccount];
 				const key = Object.keys(state.session || [])[0];
 				state.activeAccount = key;
