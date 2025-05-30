@@ -244,10 +244,20 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					<Text style={styles.text}>{userProfile?.user?.username}</Text>
-					<TouchableOpacity
-						onPress={showSendTokenBottomSheet}
-						style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}
-					>
+					{userCustomStatus ? (
+						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+							<TouchableOpacity
+								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								style={styles.customUserStatusBtn}
+							>
+								<Text style={styles.text}>{userCustomStatus}</Text>
+							</TouchableOpacity>
+							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
+								<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
+							</Pressable>
+						</View>
+					) : null}
+					<TouchableOpacity onPress={showSendTokenBottomSheet} style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
 						<CheckIcon width={size.s_20} height={size.s_20} color={Colors.azureBlue} />
 						<View style={styles.token}>
 							<Text style={styles.text}>
@@ -294,19 +304,6 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							<Text style={styles.text}>{tStack('settingStack.historyTransaction')}</Text>
 						</View>
 					</TouchableOpacity>
-					{userCustomStatus ? (
-						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-							<TouchableOpacity
-								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
-								style={styles.customUserStatusBtn}
-							>
-								<Text style={styles.text}>{userCustomStatus}</Text>
-							</TouchableOpacity>
-							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
-								<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
-							</Pressable>
-						</View>
-					) : null}
 					{!isTabletLandscape && (
 						<View style={styles.buttonList}>
 							<MezonButton
