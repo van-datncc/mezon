@@ -555,7 +555,7 @@ export const style = (colors: Attributes) =>
 		btnScrollDown: {
 			position: 'absolute',
 			right: size.s_10,
-			bottom: size.s_20,
+			bottom: size.s_28,
 			backgroundColor: colors.border,
 			borderColor: colors.textDisabled,
 			borderWidth: 1,
