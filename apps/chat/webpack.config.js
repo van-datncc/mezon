@@ -10,7 +10,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-const envFile = process.env.ENV_FILE || (process.env.NODE_ENV === 'production' ? '.env.prod' : '.env');
+const envFile = process.env.ENV_FILE || '.env';
 const envPath = path.resolve(__dirname, envFile);
 let envVars = {};
 
@@ -24,6 +24,7 @@ if (fs.existsSync(envPath)) {
     });
   }
 }
+
 
 envVars['process.env.NODE_ENV'] = JSON.stringify(process.env.NODE_ENV || 'development');
 
