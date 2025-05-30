@@ -1,5 +1,6 @@
 import { AudioSession, LiveKitRoom, TrackReference, useConnectionState, useLocalParticipant } from '@livekit/react-native';
 import { CallSignalingData } from '@mezon/components';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -18,13 +19,16 @@ import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { AppState, BackHandler, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../../../constants/icon_cdn';
+import { EMessageBSToShow } from '../../enums';
+import { ContainerMessageActionModal } from '../MessageItemBS/ContainerMessageActionModal';
 import BluetoothManager from './BluetoothManager';
+import { CallReactionHandler } from './CallReactionHandler';
 import RoomView from './RoomView';
 import { style } from './styles';
 const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
@@ -143,6 +147,26 @@ const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, is
 		}
 	};
 
+	const handleOpentEmojiPicker = () => {
+		const data = {
+			snapPoints: ['45%', '75%'],
+			children: (
+				<ContainerMessageActionModal
+					message={undefined}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					type={EMessageBSToShow.MessageAction}
+					senderDisplayName={''}
+					isOnlyEmojiPicker={true}
+					channelId={channel?.channel_id}
+					clanId={channel?.clan_id}
+				/>
+			),
+			containerStyle: { zIndex: 1001 },
+			backdropStyle: { zIndex: 1000 }
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	};
+
 	return (
 		<View style={[styles.menuHeader]}>
 			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
@@ -157,6 +181,9 @@ const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, is
 			</View>
 
 			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+				<TouchableOpacity onPress={handleOpentEmojiPicker} style={[styles.buttonCircle]}>
+					<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_24} width={size.s_24} color={themeValue.white} />
+				</TouchableOpacity>
 				{isCameraEnabled && (
 					<TouchableOpacity onPress={() => handleSwitchCamera()} style={[styles.buttonCircle]}>
 						<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
@@ -434,6 +461,7 @@ function ChannelVoice({
 						/>
 					)}
 					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />
+					<CallReactionHandler channel={channel} isAnimatedCompleted={isAnimationComplete} />
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}
