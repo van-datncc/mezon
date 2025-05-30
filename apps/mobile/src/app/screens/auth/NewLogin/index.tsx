@@ -1,7 +1,7 @@
 import { useAuth } from '@mezon/core';
 import { STORAGE_MY_USER_ID, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { accountActions, appActions, authActions, useAppDispatch } from '@mezon/store-mobile';
+import { accountActions, appActions, useAppDispatch } from '@mezon/store-mobile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Sentry from '@sentry/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -56,7 +56,6 @@ const NewLoginScreen = () => {
 										text2: 'Invalid email or password'
 									});
 								}
-								dispatch(authActions.logOut({ device_id: '', platform: Platform.OS }));
 								dispatch(accountActions.setAccount(null));
 								resetWebView();
 								await AsyncStorage.clear();
