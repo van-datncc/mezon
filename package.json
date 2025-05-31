@@ -199,7 +199,12 @@
     "image-size": "^1.2.1",
     "semver": "^7.6.3",
     "bl": "^5.0.0",
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "@babel/runtime": "^7.26.10",
+    "@babel/helpers": "^7.26.10",
+    "undici": "^6.21.2",
+    "koa": "^2.16.1",
+    "esbuild": "^0.25.0"
   },
   "optionalDependencies": {
     "@nx/nx-darwin-arm64": "18.2.2",
