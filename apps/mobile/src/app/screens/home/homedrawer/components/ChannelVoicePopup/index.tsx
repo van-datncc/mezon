@@ -1,5 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
+import { size } from '@mezon/mobile-ui';
 import {
 	appActions,
 	generateMeetToken,
@@ -194,7 +195,9 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 				pan?.getLayout(),
 				{
 					zIndex: 999,
-					position: 'absolute'
+					position: 'absolute',
+					width: isAnimationComplete ? '100%' : size.s_100 * 2,
+					height: isAnimationComplete ? '100%' : size.s_150
 				}
 			]}
 		>

@@ -89,7 +89,7 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 		return thunkAPI.rejectWithValue('Invalid refreshSession');
 	}
 
-	if (mezon.sessionRef.current?.token === sessionState?.token) {
+	if (mezon.sessionRef.current?.token && mezon.sessionRef.current?.token === sessionState?.token) {
 		return sessionState;
 	}
 
