@@ -36,6 +36,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import { WalletScreen } from '../../screens/wallet';
 const RootStack = createStackNavigator();
 
 export const Authentication = memo(() => {
@@ -236,6 +237,7 @@ export const Authentication = memo(() => {
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.CHANNEL_APP} component={ChannelAppScreen} />
+					<RootStack.Screen name={APP_SCREEN.WALLET} component={WalletScreen} />
 				</RootStack.Navigator>
 				<CallingModalWrapper />
 				<CallingModalGroupWrapper />

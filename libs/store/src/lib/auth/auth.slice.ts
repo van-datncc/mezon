@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from 'mezon-js';
 import { ensureClientAsync, ensureSession, getMezonCtx, restoreLocalStorage } from '../helpers';
 import { clearAllMemoizedFunctions } from '../memoize';
@@ -9,13 +9,12 @@ export const AUTH_FEATURE_KEY = 'auth';
 export interface AuthState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	session?: ISession | null;
+	session: Record<string, ISession> | null;
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
 	redirectUrl?: string | null;
-	setAccountMode: boolean;
-	switchSession?: ISession | null;
+	activeAccount: string | null;
 }
 
 export interface ISession {
@@ -39,8 +38,7 @@ export const initialAuthState: AuthState = {
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
 	redirectUrl: null,
-	setAccountMode: false,
-	switchSession: null
+	activeAccount: null
 };
 
 function normalizeSession(session: Session): ISession {
@@ -142,10 +140,15 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 
 export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platform }: { device_id?: string; platform?: string }, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	await mezon?.logOutMezon(device_id, platform);
+	const sessionState = selectAllAcount(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
-	restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories', 'persist:clans']);
+	const restoreKey = ['persist:apps', 'persist:categories', 'persist:clans'];
+	if (sessionState) {
+		restoreKey.push('mezon_session');
+	}
+	restoreLocalStorage(restoreKey);
 });
 
 export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {
@@ -212,14 +215,25 @@ export const authSlice = createSlice({
 		},
 
 		setSession(state, action) {
-			state.session = action.payload;
+			if (action.payload.user_id) {
+				if (!state.session) {
+					state.session = {
+						[action.payload.user_id]: action.payload
+					};
+				} else {
+					state.session[action.payload.user_id] = action.payload;
+				}
+				state.activeAccount = action.payload.user_id;
+			}
 			state.isLogin = true;
 		},
 		setLogout(state) {
-			if (state.setAccountMode) {
-				state.switchSession = null;
-				state.setAccountMode = false;
+			if (state.session && state.activeAccount && Object.keys(state.session).length >= 2) {
+				delete state.session?.[state.activeAccount];
+				const key = Object.keys(state.session || [])[0];
+				state.activeAccount = key;
 			} else {
+				state.activeAccount = null;
 				state.session = null;
 				state.isLogin = false;
 			}
@@ -229,16 +243,19 @@ export const authSlice = createSlice({
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
 		},
-		turnOnSetAccount(state) {
-			state.isLogin = false;
-			state.setAccountMode = true;
+		checkFormatSession(state) {
+			const newSession: any = state.session;
+			if (newSession.token || !state.activeAccount) {
+				state.session = null;
+				state.isLogin = false;
+				state.activeAccount = null;
+			}
 		},
 		turnOffSetAccount(state) {
 			state.isLogin = true;
-			state.setAccountMode = false;
 		},
-		switchAccount(state) {
-			state.setAccountMode = !state.setAccountMode;
+		switchAccount(state, action: PayloadAction<string>) {
+			state.activeAccount = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -248,7 +265,17 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateApple.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = action.payload.user_id;
+				}
+
 				state.isLogin = true;
 			})
 			.addCase(authenticateApple.rejected, (state: AuthState, action) => {
@@ -262,10 +289,15 @@ export const authSlice = createSlice({
 			})
 			.addCase(refreshSession.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				if (state.setAccountMode) {
-					state.switchSession = action.payload;
-				} else {
-					state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
 				}
 				state.isLogin = true;
 			})
@@ -279,7 +311,16 @@ export const authSlice = createSlice({
 			})
 			.addCase(checkSessionWithToken.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 				state.isLogin = true;
 			})
 			.addCase(checkSessionWithToken.rejected, (state: AuthState, action) => {
@@ -289,7 +330,14 @@ export const authSlice = createSlice({
 		builder
 			.addCase(checkLoginRequest.fulfilled, (state: AuthState, action) => {
 				if (action.payload !== null) {
-					state.session = action.payload;
+					if (state.session && action.payload.user_id) {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					if (!state.session && action.payload.user_id) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					}
 					state.isLogin = true;
 				}
 			})
@@ -314,7 +362,16 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateMezon.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 				state.isLogin = true;
 			})
 			.addCase(authenticateMezon.rejected, (state: AuthState, action) => {
@@ -328,10 +385,15 @@ export const authSlice = createSlice({
 			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'loaded';
 				state.isLogin = true;
-				if (state.setAccountMode) {
-					state.switchSession = action.payload;
-				} else {
-					state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
 				}
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
@@ -380,17 +442,20 @@ export const selectAuthIsLoaded = createSelector(getAuthState, (state: AuthState
 export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => state.isLogin);
 
 export const selectSession = createSelector(getAuthState, (state: AuthState) => {
-	if (state.setAccountMode) {
-		return state.switchSession;
+	if (state.activeAccount) {
+		return state.session?.[state.activeAccount];
 	}
-	return state.session;
+	const key = Object.keys(state.session || [])[0];
+	return state.session?.[key];
 });
 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
 
-export const selectAccountMode = createSelector(getAuthState, (state: AuthState) => state.setAccountMode);
-
-export const selectSessionSwitch = createSelector(getAuthState, (state: AuthState) => state.switchSession);
-export const selectSessionMain = createSelector(getAuthState, (state: AuthState) => state.session);
+export const selectAllAcount = createSelector(getAuthState, (state: AuthState) => {
+	const key = Object.keys(state.session || []).filter((key) => {
+		return key !== state.activeAccount;
+	});
+	return state.session?.[key[0]];
+});

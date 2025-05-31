@@ -86,6 +86,7 @@ const ModalUserProfile = ({
 	const userById = useUserById(userID);
 	const userStatus = useMemberStatus(userID || '');
 	const userMetaById = useUserMetaById(userID);
+	const modalRef = useRef<boolean>(false);
 	const statusOnline = useMemo(() => {
 		if (userProfile?.user?.metadata && userId === userID) {
 			const metadata = safeJSONParse(userProfile?.user?.metadata);
@@ -159,7 +160,9 @@ const ModalUserProfile = ({
 
 	const profileRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(rootRef || profileRef, onClose);
-	useOnClickOutside(rootRef || profileRef, onClose);
+	useOnClickOutside(rootRef || profileRef, () => {
+		if (!modalRef.current) onClose();
+	});
 
 	const placeholderUserName = useMemo(() => {
 		if (userById) {
@@ -190,7 +193,7 @@ const ModalUserProfile = ({
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg bg-indigo-400 rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
 				style={{ backgroundColor: color }}
 			>
 				{!checkUser && !checkAnonymous && (
@@ -237,7 +240,7 @@ const ModalUserProfile = ({
 					{mode !== 4 && mode !== 3 && !isFooterProfile && <UserDescription title={ETileDetail.MemberSince} detail={timeFormatted} />}
 
 					{isFooterProfile ? (
-						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} />
+						<StatusProfile userById={userById as ChannelMembersEntity} isDM={isDM} modalRef={modalRef} />
 					) : (
 						mode !== 4 && mode !== 3 && !hiddenRole && userById && <RoleUserProfile userID={userID} />
 					)}

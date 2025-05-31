@@ -13,10 +13,11 @@ import { loginLoader } from '../loaders/loginLoader';
 import { mainLoader, shouldRevalidateMain } from '../loaders/mainLoader';
 
 import { MemberProvider } from '@mezon/core';
-import { appActions, useAppDispatch } from '@mezon/store';
+import { appActions, selectSession, useAppDispatch } from '@mezon/store';
 import { canvasLoader, shouldRevalidateCanvas } from '../loaders/canvasLoader';
 import { inviteLoader, shouldRevalidateInvite } from '../loaders/inviteLoader';
 
+import { useSelector } from 'react-redux';
 import { useLoading } from '../app';
 import CanvasRoutes from './CanvasRoutes';
 import ClansRoutes from './ClanRoutes';
@@ -68,6 +69,9 @@ const SuspenseFallback = () => {
 	return null;
 };
 
+// Add a simple HydrateFallback component for the initial hydration
+const HydrateFallback = () => null;
+
 const RouterMonitor = () => {
 	const navigation = useNavigation();
 	const { setIsLoading } = useLoading();
@@ -85,7 +89,7 @@ const RouterMonitor = () => {
 
 export const Routes = memo(() => {
 	const dispatch = useAppDispatch();
-
+	const session = useSelector(selectSession);
 	const loaderWithStore = useCallback(
 		(loaderFunction: CustomLoaderFunction) => {
 			return async (props: LoaderFunctionArgs) =>
@@ -108,6 +112,7 @@ export const Routes = memo(() => {
 				path: '',
 				loader: loaderWithStore(appLoader),
 				shouldRevalidate: shouldRevalidateApp,
+				HydrateFallback: HydrateFallback,
 				element: (
 					<Suspense fallback={<SuspenseFallback />}>
 						<RouterMonitor />
@@ -500,7 +505,7 @@ export const Routes = memo(() => {
 				]
 			}
 		]);
-	}, [loaderWithStore]);
+	}, [loaderWithStore, session]);
 
 	return <RouterProvider router={routes} />;
 });

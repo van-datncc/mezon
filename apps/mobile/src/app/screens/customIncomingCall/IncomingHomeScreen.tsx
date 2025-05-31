@@ -1,17 +1,32 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, appActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
+import { WEBRTC_SIGNALING_TYPES, sleep } from '@mezon/utils';
 import LottieView from 'lottie-react-native';
 import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import * as React from 'react';
 import { memo, useEffect, useRef } from 'react';
-import { BackHandler, Image, ImageBackground, Platform, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import {
+	BackHandler,
+	DeviceEventEmitter,
+	Image,
+	ImageBackground,
+	NativeModules,
+	Platform,
+	Text,
+	TouchableOpacity,
+	Vibration,
+	View
+} from 'react-native';
 import { Bounce } from 'react-native-animated-spinkit';
 import { useSelector } from 'react-redux';
+import { useSendSignaling } from '../../components/CallingGroupModal';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { DirectMessageCall } from '../messages/DirectMessageCall';
 
 import Sound from 'react-native-sound';
+import ChannelVoicePopup from '../home/homedrawer/components/ChannelVoicePopup';
 import LOTTIE_PHONE_DECLINE from './phone-decline.json';
 import LOTTIE_PHONE_RING from './phone-ring.json';
 import { style } from './styles';
@@ -26,11 +41,14 @@ const IncomingHomeScreen = memo((props: any) => {
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const [isInCall, setIsInCall] = React.useState(false);
+	const [isInGroupCall, setIsInGroupCall] = React.useState(false);
 	const [dataCalling, setDataCalling] = React.useState(false);
 	const userId = useSelector(selectCurrentUserId);
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userId || ''));
 	const mezon = useMezon();
 	const ringtoneRef = useRef<Sound | null>(null);
+	const { sendSignalingToParticipants } = useSendSignaling();
+	const [dataCallGroup, setDataCallGroup] = React.useState<any>(null);
 
 	const getDataCall = async () => {
 		try {
@@ -39,7 +57,13 @@ const IncomingHomeScreen = memo((props: any) => {
 
 			const notificationDataParse = safeJSONParse(notificationData || '{}');
 			const data = safeJSONParse(notificationDataParse?.offer || '{}');
-			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer) {
+			const dataObj = safeJSONParse(data?.offer || '{}');
+			if (dataObj?.isGroupCall) {
+				setDataCallGroup(dataObj);
+				await NotificationPreferences.clearValue('notificationDataCalling');
+				return;
+			}
+			if (data?.offer !== 'CANCEL_CALL' && !!data?.offer && !dataObj?.isGroupCall) {
 				setDataCalling(data);
 				dispatch(appActions.setLoadingMainMobile(true));
 				const signalingData = {
@@ -86,13 +110,13 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			if (!isInCall) {
+			if (!isInCall && !isInGroupCall) {
 				onDeniedCall();
 			}
 		}, 40000);
 
 		return () => clearTimeout(timer);
-	}, [isInCall]);
+	}, [isInCall, isInGroupCall]);
 
 	useEffect(() => {
 		let timer;
@@ -130,6 +154,25 @@ const IncomingHomeScreen = memo((props: any) => {
 
 	const onDeniedCall = async () => {
 		stopAndReleaseSound();
+		if (dataCallGroup) {
+			const quitAction = {
+				is_video: false,
+				group_id: dataCallGroup.groupId || '',
+				caller_id: userId,
+				caller_name: dataCallGroup.groupName || '',
+				timestamp: Date.now(),
+				action: 'decline'
+			};
+			sendSignalingToParticipants(
+				[dataCallGroup?.callerId],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT,
+				quitAction,
+				dataCallGroup?.groupId || '',
+				userId || ''
+			);
+			BackHandler.exitApp();
+			return;
+		}
 		const latestSignalingEntry = signalingData?.[signalingData?.length - 1];
 		if (!latestSignalingEntry || !mezon.socketRef.current) {
 			BackHandler.exitApp();
@@ -147,7 +190,20 @@ const IncomingHomeScreen = memo((props: any) => {
 		BackHandler.exitApp();
 	};
 
-	const onJoinCall = () => {
+	const onJoinCall = async () => {
+		if (Platform.OS === 'android') {
+			try {
+				NativeModules?.CallStateModule?.setIsInCall?.(true);
+			} catch (error) {
+				console.error('Error calling native methods:', error);
+			}
+		}
+		if (dataCallGroup) {
+			await handleJoinCallGroup(dataCallGroup);
+			setIsInGroupCall(true);
+			stopAndReleaseSound();
+			return;
+		}
 		if (!signalingData?.[signalingData?.length - 1]?.callerId) return;
 		stopAndReleaseSound();
 		dispatch(DMCallActions.setIsInCall(true));
@@ -172,22 +228,49 @@ const IncomingHomeScreen = memo((props: any) => {
 		}
 	};
 
+	const handleJoinCallGroup = async (dataCall: any) => {
+		if (dataCall?.groupId) {
+			if (!dataCall?.meetingCode) return;
+			const data = {
+				channelId: dataCall.groupId || '',
+				roomName: dataCall?.meetingCode,
+				isGroupCall: true,
+				clanId: ''
+			};
+			await sleep(1000);
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
+			const joinAction = {
+				participant_id: userId,
+				participant_name: '',
+				participant_avatar: '',
+				timestamp: Date.now()
+			};
+			sendSignalingToParticipants(
+				[dataCall?.callerId],
+				WEBRTC_SIGNALING_TYPES.GROUP_CALL_PARTICIPANT_JOINED,
+				joinAction,
+				dataCall?.channel_id || '',
+				userId || ''
+			);
+		}
+	};
 	if (isInCall) {
 		return <DirectMessageCall route={{ params }} />;
 	}
 
 	return (
 		<ImageBackground source={BG_CALLING} style={styles.container}>
+			<ChannelVoicePopup isFromNativeCall={true} />
 			{/* Caller Info */}
 			<View style={styles.headerCall}>
-				<Text style={styles.callerName}>{'Incoming Call'}</Text>
+				<Text style={styles.callerName}>{dataCallGroup ? 'Group ' : ''}Incoming Call</Text>
 				<Image
 					source={{
-						uri: dataCalling?.callerAvatar || AVATAR_DEFAULT
+						uri: dataCallGroup?.groupAvatar || dataCalling?.callerAvatar || AVATAR_DEFAULT
 					}}
 					style={styles.callerImage}
 				/>
-				<Text style={styles.callerInfo}>{dataCalling?.callerName || ''}</Text>
+				<Text style={styles.callerInfo}>{dataCallGroup?.groupName || dataCalling?.callerName || ''}</Text>
 			</View>
 
 			{/* Decline and Answer Buttons */}

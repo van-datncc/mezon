@@ -19,13 +19,16 @@ import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { AppState, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../../../constants/icon_cdn';
+import { EMessageBSToShow } from '../../enums';
+import { ContainerMessageActionModal } from '../MessageItemBS/ContainerMessageActionModal';
 import BluetoothManager from './BluetoothManager';
+import { CallReactionHandler } from './CallReactionHandler';
 import RoomView from './RoomView';
 import { style } from './styles';
 const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
@@ -103,78 +106,109 @@ type headerProps = {
 	onPressMinimizeRoom: () => void;
 	onToggleSpeaker: (boolean) => void;
 	isSpeakerOn: boolean;
+	isFromNativeCall: boolean;
+	isGroupCall?: boolean;
 };
 
-const HeaderRoomView = memo(({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn }: headerProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
+const HeaderRoomView = memo(
+	({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn, isFromNativeCall = false, isGroupCall = false }: headerProps) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
+		const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
 
-	const handleSwitchCamera = async () => {
-		try {
-			if (cameraTrack && cameraTrack.track) {
-				if (Platform.OS === 'ios') {
-					const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
-					const videoTrack = videoPublication?.track;
-					const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
-					if (videoTrack) {
-						await localParticipant.unpublishTrack(videoTrack);
-					}
-					const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
-					const devices = await Room.getLocalDevices('videoinput');
-					const targetCamera = devices.find((d) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
-					const newTrack = await createLocalVideoTrack({
-						deviceId: targetCamera.deviceId,
-						facingMode: newFacingMode
-					});
-					await localParticipant.publishTrack(newTrack);
-				} else {
-					if (typeof cameraTrack?.track?.mediaStreamTrack?._switchCamera === 'function') {
-						try {
-							cameraTrack?.track?.mediaStreamTrack?._switchCamera();
-						} catch (error) {
-							console.error(error);
+		const handleSwitchCamera = async () => {
+			try {
+				if (cameraTrack && cameraTrack.track) {
+					if (Platform.OS === 'ios') {
+						const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
+						const videoTrack = videoPublication?.track;
+						const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
+						if (videoTrack) {
+							await localParticipant.unpublishTrack(videoTrack);
+						}
+						const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
+						const devices = await Room.getLocalDevices('videoinput');
+						const targetCamera = devices.find((d) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
+						const newTrack = await createLocalVideoTrack({
+							deviceId: targetCamera.deviceId,
+							facingMode: newFacingMode
+						});
+						await localParticipant.publishTrack(newTrack);
+					} else {
+						if (typeof cameraTrack?.track?.mediaStreamTrack?._switchCamera === 'function') {
+							try {
+								cameraTrack?.track?.mediaStreamTrack?._switchCamera();
+							} catch (error) {
+								console.error(error);
+							}
 						}
 					}
 				}
+			} catch (error) {
+				console.error(error);
 			}
-		} catch (error) {
-			console.error(error);
-		}
-	};
+		};
 
-	return (
-		<View style={[styles.menuHeader]}>
-			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
-				<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
-					<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
-				</TouchableOpacity>
-				<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
-					{channel?.channel_label}
-				</Text>
-			</View>
-
-			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
-				{isCameraEnabled && (
-					<TouchableOpacity onPress={() => handleSwitchCamera()} style={[styles.buttonCircle]}>
-						<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
-					</TouchableOpacity>
-				)}
-				<TouchableOpacity
-					onPress={() => onToggleSpeaker(!isSpeakerOn)}
-					style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
-				>
-					<MezonIconCDN
-						icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
-						height={size.s_17}
-						width={isSpeakerOn ? size.s_17 : size.s_20}
-						color={isSpeakerOn ? themeValue.border : themeValue.white}
+		const handleOpentEmojiPicker = () => {
+			const data = {
+				snapPoints: ['45%', '75%'],
+				children: (
+					<ContainerMessageActionModal
+						message={undefined}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						type={EMessageBSToShow.MessageAction}
+						senderDisplayName={''}
+						isOnlyEmojiPicker={true}
+						channelId={channel?.channel_id}
+						clanId={channel?.clan_id}
 					/>
-				</TouchableOpacity>
+				),
+				containerStyle: { zIndex: 1001 },
+				backdropStyle: { zIndex: 1000 }
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+		};
+
+		return (
+			<View style={[styles.menuHeader]}>
+				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20, flexGrow: 1, flexShrink: 1 }}>
+					{!isFromNativeCall && (
+						<TouchableOpacity onPress={onPressMinimizeRoom} style={styles.buttonCircle}>
+							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
+						</TouchableOpacity>
+					)}
+					<Text numberOfLines={1} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
+						{channel?.channel_label}
+					</Text>
+				</View>
+
+				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleOpentEmojiPicker} style={[styles.buttonCircle]}>
+							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_24} width={size.s_24} color={themeValue.white} />
+						</TouchableOpacity>
+					)}
+					{isCameraEnabled && (
+						<TouchableOpacity onPress={() => handleSwitchCamera()} style={[styles.buttonCircle]}>
+							<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
+						</TouchableOpacity>
+					)}
+					<TouchableOpacity
+						onPress={() => onToggleSpeaker(!isSpeakerOn)}
+						style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
+					>
+						<MezonIconCDN
+							icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
+							height={size.s_17}
+							width={isSpeakerOn ? size.s_17 : size.s_20}
+							color={isSpeakerOn ? themeValue.border : themeValue.white}
+						/>
+					</TouchableOpacity>
+				</View>
 			</View>
-		</View>
-	);
-});
+		);
+	}
+);
 
 function ChannelVoice({
 	channelId,
@@ -184,7 +218,8 @@ function ChannelVoice({
 	onPressMinimizeRoom,
 	isAnimationComplete,
 	isGroupCall = false,
-	participantsCount = 0
+	participantsCount = 0,
+	isFromNativeCall = false
 }: {
 	channelId: string;
 	clanId: string;
@@ -194,6 +229,7 @@ function ChannelVoice({
 	isAnimationComplete: boolean;
 	isGroupCall?: boolean;
 	participantsCount?: number;
+	isFromNativeCall?: boolean;
 }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -336,76 +372,6 @@ function ChannelVoice({
 
 	const onConnectionConnected = (connected: boolean) => {
 		setConnectionConnected(connected);
-		if (connected) {
-			if (isGroupCall) {
-				const store = getStore();
-				const state = store.getState();
-				const currentDmGroup = selectCurrentDM(state);
-				const userProfile = selectAllAccount(state);
-				dispatch(
-					groupCallActions.showPreCallInterface({
-						groupId: currentDmGroup?.channel_id,
-						isVideo: false
-					})
-				);
-				dispatch(
-					groupCallActions.showPreCallInterface({
-						groupId: currentDmGroup?.channel_id,
-						isVideo: false
-					})
-				);
-				const data = {
-					channelId: currentDmGroup.channel_id || '',
-					roomName: currentDmGroup?.meeting_code,
-					clanId: '',
-					isGroupCall: true,
-					participantsCount: currentDmGroup?.user_id?.length || 0
-				};
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
-				const callOfferAction = {
-					is_video: false,
-					group_id: currentDmGroup?.channel_id,
-					group_name: currentDmGroup?.channel_label,
-					group_avatar: currentDmGroup?.channel_avatar?.[0],
-					caller_id: userProfile?.user?.id,
-					caller_name: userProfile?.user?.display_name || userProfile?.user?.username || '',
-					caller_avatar: userProfile?.user?.avatar_url,
-					meeting_code: currentDmGroup?.meeting_code,
-					clan_id: '',
-					timestamp: Date.now(),
-					participants: currentDmGroup?.user_id || []
-				};
-				sendSignalingToParticipants(
-					currentDmGroup?.user_id || [],
-					WEBRTC_SIGNALING_TYPES.GROUP_CALL_OFFER,
-					callOfferAction as CallSignalingData,
-					currentDmGroup?.channel_id || '',
-					userProfile?.user?.id || ''
-				);
-				dispatch(
-					messagesActions.sendMessage({
-						channelId: currentDmGroup?.channel_id,
-						clanId: '',
-						mode: ChannelStreamMode.STREAM_MODE_GROUP,
-						isPublic: true,
-						content: {
-							t: `Started voice call`,
-							callLog: {
-								isVideo: false,
-								callLogType: IMessageTypeCallLog.STARTCALL,
-								showCallBack: false
-							}
-						},
-						anonymous: false,
-						senderId: userProfile?.user?.id || '',
-						avatar: userProfile?.user?.avatar_url || '',
-						isMobile: true,
-						username: currentDmGroup?.channel_label || ''
-					})
-				);
-				return;
-			}
-		}
 	};
 
 	const onQuitGroupCall = () => {
@@ -429,6 +395,9 @@ function ChannelVoice({
 			currentDmGroup?.channel_id || '',
 			userProfile?.user?.id || ''
 		);
+		if (isFromNativeCall) {
+			BackHandler.exitApp();
+		}
 	};
 
 	const onCancelGroupCall = () => {
@@ -493,9 +462,12 @@ function ChannelVoice({
 							isSpeakerOn={isSpeakerOn}
 							onPressMinimizeRoom={onPressMinimizeRoom}
 							onToggleSpeaker={onToggleSpeaker}
+							isFromNativeCall={isFromNativeCall}
+							isGroupCall={isGroupCall}
 						/>
 					)}
 					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />
+					{!isGroupCall && <CallReactionHandler channel={channel} isAnimatedCompleted={isAnimationComplete} />}
 					<RoomView
 						channelId={channelId}
 						clanId={clanId}

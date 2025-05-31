@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ETokenMessage, IExtendedMessage, getSrcEmoji } from '@mezon/utils';
 import React, { useMemo } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import ImageNative from '../../../components/ImageNative';
 import { style } from './styles';
 
@@ -93,8 +93,10 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 	};
 
 	return (
-		<Text style={[styles.dmMessageContainer, props?.styleText && props?.styleText]} numberOfLines={1}>
-			{convertTextToEmoji()}
-		</Text>
+		<View style={styles.container}>
+			<Text numberOfLines={1} style={[styles.dmMessageContainer, props?.styleText]}>
+				{convertTextToEmoji()}
+			</Text>
+		</View>
 	);
 };

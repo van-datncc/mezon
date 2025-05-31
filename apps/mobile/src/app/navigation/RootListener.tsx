@@ -101,12 +101,8 @@ const RootListener = () => {
 			const currentChannelId = selectCurrentChannelId(store.getState() as any);
 			const currentClanId = selectCurrentClanId(store.getState() as any);
 			handleReconnect('Initial reconnect attempt');
-			if (!currentChannelId) {
-				return null;
-			}
 			dispatch(appActions.setLoadingMainMobile(false));
-			await notifee.cancelAllNotifications();
-			const promise = [
+			if (currentChannelId) {
 				dispatch(
 					messagesActions.fetchMessages({
 						channelId: currentChannelId,
@@ -115,7 +111,9 @@ const RootListener = () => {
 						isClearMessage: true,
 						clanId: currentClanId
 					})
-				),
+				);
+			}
+			const promise = [
 				dispatch(
 					voiceActions.fetchVoiceChannelMembers({
 						clanId: currentClanId ?? '',
@@ -126,6 +124,7 @@ const RootListener = () => {
 				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true }))
 			];
 			await Promise.all(promise);
+			await notifee.cancelAllNotifications();
 			return null;
 		} catch (error) {
 			/* empty */

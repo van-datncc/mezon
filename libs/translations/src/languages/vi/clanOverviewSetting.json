@@ -42,5 +42,11 @@
       "allMessages": "Tất cả tin nhắn",
       "onlyMentions": "Chỉ @mention"
     }
+  },
+  "permissions": {
+    "toast": {
+      "kickMemberSuccess": "Đã đuổi thành viên thành công",
+      "kickMemberFailed": "Không thể đuổi thành viên"
+    }
   }
 }

@@ -3,6 +3,11 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		container: {
+			flexDirection: 'row',
+			flex: 1,
+			overflow: 'hidden'
+		},
 		dmMessageContainer: {
 			flex: 1
 		},

@@ -42,5 +42,11 @@
             "allMessages": "All Messages",
             "onlyMentions": "Only @mention"
         }
+    },
+    "permissions": {
+        "toast": {
+            "kickMemberSuccess": "Member kicked successfully",
+            "kickMemberFailed": "Failed to kick member"
+        }
     }
 }

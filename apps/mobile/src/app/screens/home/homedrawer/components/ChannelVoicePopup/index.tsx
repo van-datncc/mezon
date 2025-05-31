@@ -17,7 +17,7 @@ import { Animated, DeviceEventEmitter, Keyboard, PanResponder } from 'react-nati
 import { useSelector } from 'react-redux';
 import ChannelVoice from '../ChannelVoice';
 
-const ChannelVoicePopup = () => {
+const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
@@ -130,7 +130,8 @@ const ChannelVoicePopup = () => {
 							clanId: clanId as string,
 							clanName: clan?.clan_name as string,
 							channelId: channelId as string,
-							channelLabel: channel?.channel_label as string
+							channelLabel: channel?.channel_label as string,
+							channelPrivate: channel?.channel_private as number
 						})
 					);
 					await participantMeetState(ParticipantMeetState.JOIN, clanId as string, channelId as string);
@@ -180,6 +181,7 @@ const ChannelVoicePopup = () => {
 	}, [isAnimationComplete, voicePlay]);
 
 	const handlePressMinimizeRoom = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		isFullScreen.current = false;
 		handleResizeStreamRoom();
 	}, []);
@@ -191,7 +193,7 @@ const ChannelVoicePopup = () => {
 			style={[
 				pan?.getLayout(),
 				{
-					zIndex: 999999,
+					zIndex: 999,
 					position: 'absolute'
 				}
 			]}
@@ -205,6 +207,7 @@ const ChannelVoicePopup = () => {
 				onPressMinimizeRoom={handlePressMinimizeRoom}
 				isGroupCall={isGroupCall}
 				participantsCount={participantsCount}
+				isFromNativeCall={isFromNativeCall}
 			/>
 		</Animated.View>
 	);

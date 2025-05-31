@@ -262,7 +262,7 @@ const RoomView = ({
 
 	const RenderControlBar = () => {
 		return (
-			<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
+			<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70, zIndex: 2 }]}>
 				<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 					<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
 						{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
