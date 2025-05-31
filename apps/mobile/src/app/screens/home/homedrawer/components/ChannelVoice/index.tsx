@@ -19,7 +19,7 @@ import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
@@ -33,23 +33,17 @@ import RoomView from './RoomView';
 import { style } from './styles';
 const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
 
-type monitorProps = {
-	onConnectionConnected?: (connected: boolean) => void;
-};
-
-const ConnectionMonitor = memo(({ onConnectionConnected }: monitorProps) => {
+const ConnectionMonitor = memo(() => {
 	const connectionState = useConnectionState();
 
 	useEffect(() => {
 		if (connectionState === 'connected') {
-			onConnectionConnected(true);
 			startAudioCall();
 		}
 	}, [connectionState]);
 
 	useEffect(() => {
 		return () => {
-			onConnectionConnected(false);
 			stopAudioCall();
 		};
 	}, []);
@@ -232,12 +226,9 @@ function ChannelVoice({
 	isFromNativeCall?: boolean;
 }) {
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const { width, height } = useWindowDimensions();
 	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
 	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(false);
-	const [isConnectionConnected, setConnectionConnected] = useState(false);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
 
@@ -370,10 +361,6 @@ function ChannelVoice({
 		}
 	};
 
-	const onConnectionConnected = (connected: boolean) => {
-		setConnectionConnected(connected);
-	};
-
 	const onQuitGroupCall = () => {
 		dispatch(groupCallActions.endGroupCall());
 		const store = getStore();
@@ -447,16 +434,16 @@ function ChannelVoice({
 
 	return (
 		<View>
-			<StatusBarHeight />
+			{isAnimationComplete && !focusedScreenShare && <StatusBarHeight />}
 			<View
 				style={{
-					width: isAnimationComplete ? width : size.s_100 * 2,
-					height: isAnimationComplete ? height : size.s_150,
+					width: isAnimationComplete ? '100%' : size.s_100 * 2,
+					height: isAnimationComplete ? '100%' : size.s_150,
 					backgroundColor: themeValue?.primary
 				}}
 			>
 				<LiveKitRoom serverUrl={serverUrl} token={token} connect={true}>
-					{isAnimationComplete && !focusedScreenShare && isConnectionConnected && !isPiPMode && (
+					{isAnimationComplete && !focusedScreenShare && !isPiPMode && (
 						<HeaderRoomView
 							channel={channel}
 							isSpeakerOn={isSpeakerOn}
@@ -466,7 +453,7 @@ function ChannelVoice({
 							isGroupCall={isGroupCall}
 						/>
 					)}
-					<ConnectionMonitor onConnectionConnected={onConnectionConnected} />
+					<ConnectionMonitor />
 					{!isGroupCall && <CallReactionHandler channel={channel} isAnimatedCompleted={isAnimationComplete} />}
 					<RoomView
 						channelId={channelId}

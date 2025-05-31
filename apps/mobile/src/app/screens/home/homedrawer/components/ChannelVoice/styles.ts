@@ -24,8 +24,9 @@ export const style = (colors: Attributes) =>
 		menuFooter: {
 			position: 'absolute',
 			borderRadius: size.s_80,
-			backgroundColor: colors.secondary,
-			padding: size.s_10,
+			backgroundColor: 'rgba(48,48,48,0.55)',
+			paddingHorizontal: size.s_10,
+			paddingVertical: size.s_4,
 			alignItems: 'center',
 			alignSelf: 'center',
 			justifyContent: 'center'
@@ -70,6 +71,8 @@ export const style = (colors: Attributes) =>
 			width: size.s_50,
 			height: size.s_50,
 			backgroundColor: colors.border,
+			borderWidth: 0.5,
+			borderColor: colors.textDisabled,
 			borderRadius: size.s_50
 		},
 		addPeopleBtn: {
@@ -119,7 +122,7 @@ export const style = (colors: Attributes) =>
 		},
 		focusIcon: {
 			position: 'absolute',
-			top: '3%',
+			top: '7%',
 			right: '3%',
 			backgroundColor: colors.selectedOverlay,
 			borderRadius: size.s_30,
