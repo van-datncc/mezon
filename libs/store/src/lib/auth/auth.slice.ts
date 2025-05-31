@@ -144,7 +144,7 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
-	const restoreKey = ['persist:auth', 'persist:apps', 'persist:categories', 'persist:clans'];
+	const restoreKey = ['persist:apps', 'persist:categories', 'persist:clans'];
 	if (sessionState) {
 		restoreKey.push('mezon_session');
 	}
@@ -215,7 +215,16 @@ export const authSlice = createSlice({
 		},
 
 		setSession(state, action) {
-			state.session = action.payload;
+			if (action.payload.user_id) {
+				if (!state.session) {
+					state.session = {
+						[action.payload.user_id]: action.payload
+					};
+				} else {
+					state.session[action.payload.user_id] = action.payload;
+				}
+				state.activeAccount = action.payload.user_id;
+			}
 			state.isLogin = true;
 		},
 		setLogout(state) {
@@ -234,9 +243,13 @@ export const authSlice = createSlice({
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
 		},
-		turnOnSetAccount(state) {
-			// state.isLogin = false;
-			// state.setAccountMode = true;
+		checkFormatSession(state) {
+			const newSession: any = state.session;
+			if (newSession.token || !state.activeAccount) {
+				state.session = null;
+				state.isLogin = false;
+				state.activeAccount = null;
+			}
 		},
 		turnOffSetAccount(state) {
 			state.isLogin = true;
