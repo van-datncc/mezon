@@ -6,7 +6,9 @@ import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
-const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
+
+const CANVAS_LIST_CACHED_TIME = 1000 * 60 * 60;
+const CANVAS_DETAIL_CACHED_TIME = 1000 * 60 * 60;
 
 /*
  * Update these interfaces according to your requirements.
@@ -37,6 +39,7 @@ type fetchCanvasPayload = {
 	id: string;
 	clan_id: string;
 	channel_id: string;
+	noCache?: boolean;
 };
 
 type getCanvasListPayload = {
@@ -47,17 +50,30 @@ type getCanvasListPayload = {
 	noCache?: boolean;
 };
 
-export const fetchCanvasCached = memoizeAndTrack(
+export const fetchCanvasListCached = memoizeAndTrack(
 	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
-		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, LIMIT, page);
+		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit || LIMIT, page);
 		return { ...response, time: Date.now() };
 	},
 	{
 		promise: true,
-		maxAge: FETCH_MESSAGES_CACHED_TIME,
+		maxAge: CANVAS_LIST_CACHED_TIME,
 		normalizer: (args) => {
-			// set default value
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
+			return args[1] + args[2] + (args[3] || '') + (args[4] || '') + args[0].session.username;
+		}
+	}
+);
+
+export const fetchCanvasDetailCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, id: string, clan_id: string, channel_id: string) => {
+		const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
+		return { ...response, time: Date.now() };
+	},
+	{
+		promise: true,
+		maxAge: CANVAS_DETAIL_CACHED_TIME,
+		normalizer: (args) => {
+			return args[1] + args[2] + args[3] + args[0].session.username;
 		}
 	}
 );
@@ -68,6 +84,13 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
+		if (body.channel_id && body.clan_id) {
+			fetchCanvasListCached.delete(mezon, body.channel_id, body.clan_id);
+			if (body.id) {
+				fetchCanvasDetailCached.delete(mezon, body.id, body.clan_id, body.channel_id);
+			}
+		}
+
 		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content, is_default: body.is_default };
 	} catch (error) {
 		captureSentryError(error, 'canvas/editChannelCanvases');
@@ -77,10 +100,23 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 export const getChannelCanvasDetail = createAsyncThunk(
 	'canvas/getChannelCanvasDetail',
-	async ({ id, clan_id, channel_id }: fetchCanvasPayload, thunkAPI) => {
+	async ({ id, clan_id, channel_id, noCache }: fetchCanvasPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
+
+			if (noCache) {
+				fetchCanvasDetailCached.delete(mezon, id, clan_id, channel_id);
+			}
+
+			const response = await fetchCanvasDetailCached(mezon, id, clan_id, channel_id);
+
+			if (Date.now() - response.time > 100) {
+				return {
+					...response,
+					fromCache: true
+				};
+			}
+
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'canvas/getChannelCanvasDetail');
@@ -96,9 +132,9 @@ export const getChannelCanvasList = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchCanvasCached.delete(mezon, channel_id, clan_id, limit, page);
+				fetchCanvasListCached.delete(mezon, channel_id, clan_id, limit, page);
 			}
-			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
+			const response = await fetchCanvasListCached(mezon, channel_id, clan_id, limit, page);
 			if (Date.now() - response.time > 100) {
 				return {
 					fromCache: true
@@ -117,12 +153,36 @@ export const deleteCanvas = createAsyncThunk('canvas/deleteCanvas', async ({ id,
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		const response = await mezon.client.deleteChannelCanvas(mezon.session, id, clan_id, channel_id);
+
+		if (channel_id && clan_id) {
+			fetchCanvasListCached.delete(mezon, channel_id, clan_id);
+			fetchCanvasDetailCached.delete(mezon, id, clan_id, channel_id);
+		}
+
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'canvas/deleteCanvas');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
+
+export const clearCanvasCacheThunk = createAsyncThunk(
+	'canvas/clearCanvasCacheThunk',
+	async ({ channelId, canvasId, clanId }: { channelId: string; canvasId?: string; clanId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			fetchCanvasListCached.delete(mezon, channelId, clanId);
+			if (canvasId) {
+				fetchCanvasDetailCached.delete(mezon, canvasId, clanId, channelId);
+			}
+
+			return { channelId, canvasId, clanId };
+		} catch (error) {
+			captureSentryError(error, 'canvas/clearCanvasCacheThunk');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
 
 export const initialCanvasAPIState: CanvasAPIState = canvasAPIAdapter.getInitialState({
 	loadingStatus: 'not loaded',

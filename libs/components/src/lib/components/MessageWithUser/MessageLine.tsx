@@ -208,23 +208,28 @@ export const MessageLine = ({
 
 						const isCanvas = contentHasChannelLink && contentInElement?.includes('canvas');
 
-						if (isCanvas && channelId) {
+						const canvasTitleFromPayload = content.cvtt?.[canvasId];
+						let canvasTitle = canvasTitleFromPayload;
+
+						if (!canvasTitle) {
 							const state = getStore().getState();
 							const canvases = selectCanvasIdsByChannelId(state, channelId);
 							const foundCanvas = canvases.find((item) => item.id === canvasId);
-							if (foundCanvas) {
-								componentToRender = (
-									<CanvasHashtag
-										key={`canvas-${s}-${messageId}`}
-										clanId={clanId}
-										channelId={channelId}
-										canvasId={canvasId}
-										title={foundCanvas.title}
-										isTokenClickAble={isTokenClickAble}
-										isJumMessageEnabled={isJumMessageEnabled}
-									/>
-								);
-							}
+							canvasTitle = foundCanvas?.title;
+						}
+
+						if (isCanvas && channelId && canvasTitle) {
+							componentToRender = (
+								<CanvasHashtag
+									key={`canvas-${s}-${messageId}`}
+									clanId={clanId}
+									channelId={channelId}
+									canvasId={canvasId}
+									title={canvasTitle}
+									isTokenClickAble={isTokenClickAble}
+									isJumMessageEnabled={isJumMessageEnabled}
+								/>
+							);
 						} else if (!isCanvas && contentHasChannelLink) {
 							const channelFound = getTagByIdOnStored(channelId);
 							if (channelId && channelFound?.id) {

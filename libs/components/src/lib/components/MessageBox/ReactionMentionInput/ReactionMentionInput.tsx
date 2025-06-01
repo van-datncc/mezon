@@ -36,6 +36,7 @@ import {
 	convertMentionOnfile,
 	EBacktickType,
 	ETypeMEntion,
+	extractCanvasIdsFromText,
 	filterEmptyArrays,
 	filterMentionsWithAtSign,
 	formatMentionsToString,
@@ -82,6 +83,7 @@ import processMention from './processMention';
 import darkMentionsInputStyle from './RmentionInputStyle';
 import mentionStyle from './RmentionStyle';
 import SuggestItem from './SuggestItem';
+import { getCanvasTitles } from './utils/canvas';
 
 const MentionsInput = MentionsInputComponent as any;
 const Mention = MentionComponent as any;
@@ -245,12 +247,24 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			});
 
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
-			const payload = {
+			const payload: {
+				t: string;
+				hg: IHashtagOnMessage[];
+				ej: IEmojiOnMessage[];
+				mk: IMarkdownOnMessage[];
+				cvtt?: Record<string, string>;
+			} = {
 				t: text,
 				hg: adjustedHashtagPos as IHashtagOnMessage[],
 				ej: adjustedEmojiPos as IEmojiOnMessage[],
 				mk: [...mk, ...boldMarkdownArr]
 			};
+
+			const canvasLinks = extractCanvasIdsFromText(text || '');
+			const canvasTitles = getCanvasTitles(canvasLinks);
+			if (Object.keys(canvasTitles).length > 0) {
+				payload.cvtt = canvasTitles;
+			}
 
 			const addMentionToPayload = addMention(payload, adjustedMentionsPos);
 			const removeEmptyOnPayload = filterEmptyArrays(addMentionToPayload);
