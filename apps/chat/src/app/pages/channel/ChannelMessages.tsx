@@ -695,10 +695,12 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 				lastMessage?.create_time &&
 				new Date().getTime() - new Date(lastMessage.create_time).getTime() < 500
 			) {
+				const isRelyMessage = lastMessage?.references?.length && lastMessage?.references?.length > 0;
 				const isAtBottom =
 					chatRef?.current &&
 					Math.abs(chatRef.current.scrollHeight - chatRef.current.clientHeight - chatRef.current.scrollTop) <= BOTTOM_THRESHOLD;
-				if (isAtBottom) return;
+
+				if (isAtBottom && !isRelyMessage) return;
 				skipCalculateScroll.current = true;
 				const { scrollHeight, offsetHeight } = container;
 				const newScrollTop = scrollHeight - offsetHeight;

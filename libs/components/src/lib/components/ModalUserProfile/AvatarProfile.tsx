@@ -1,11 +1,10 @@
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ActivitiesType, ChannelMembersEntity, EUserStatus, IUserAccount, MemberProfileType, createImgproxyUrl } from '@mezon/utils';
+import { ActivitiesType, ChannelMembersEntity, EUserStatus, IUserAccount, createImgproxyUrl } from '@mezon/utils';
 import { ApiUserActivity } from 'mezon-js/api.gen';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import StatusUser from '../StatusUser';
 
 type AvatarProfileProps = {
 	avatar?: string;
@@ -35,13 +34,8 @@ const AvatarProfile = ({
 	userStatus,
 	statusOnline
 }: AvatarProfileProps) => {
-	const isMemberDMGroup = useMemo(() => positionType === MemberProfileType.DM_MEMBER_GROUP, [positionType]);
-
-	const isMemberChannel = useMemo(() => positionType === MemberProfileType.MEMBER_LIST, [positionType]);
-
 	const currentClanId = useSelector(selectCurrentClanId);
 
-	const isListDm = useMemo(() => positionType === MemberProfileType.DM_LIST, [positionType]);
 	const dispatch = useAppDispatch();
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
@@ -71,18 +65,6 @@ const AvatarProfile = ({
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"
 				/>
-				<div className="absolute bottom-[0.4rem] right-[0.5rem]">
-					<StatusUser
-						isListDm={isListDm}
-						isMemberChannel={isMemberChannel}
-						isMemberDMGroup={isMemberDMGroup}
-						status={userStatus}
-						userId={userID}
-						isTyping={false}
-						sizeStatusIcon={'w-4 h-4'}
-						customStatus={statusOnline}
-					/>
-				</div>
 			</div>
 
 			{(customStatus || (userStatus?.status && activityByUserId)) && (

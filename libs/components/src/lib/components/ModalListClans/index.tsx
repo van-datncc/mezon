@@ -67,8 +67,7 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 						<Image
 							draggable="false"
 							src={createImgproxyUrl(option?.logo ?? '', { width: 100, height: 100, resizeType: 'fit' }) || ''}
-							placeholder="blur"
-							blurdataurl={option?.logo}
+							placeholder="clan"
 							className="w-[40px] h-[40px] object-cover rounded-lg clan"
 						/>
 					) : (

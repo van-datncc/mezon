@@ -37,26 +37,30 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 	const toggleEnableStatus = (enable: boolean) => {
 		if (!enable) {
-			dispatch(onboardingActions.enableOnboarding({
-				clan_id: currentClan?.clan_id as string,
-				onboarding: false
-			}));
+			dispatch(
+				onboardingActions.enableOnboarding({
+					clan_id: currentClan?.clan_id as string,
+					onboarding: false
+				})
+			);
 			setIsCommunityEnabled(false);
 		}
 	};
 
 	const handleConfirm = async () => {
 		if (!checkCreateValidate) {
-			toast.error("You need to create at least one task, question, or rule before enabling the community.!");
+			toast.error('You need to create at least one task, question, or rule before enabling the community.!');
 			setShowOnboardingHighlight(true);
 			setTimeout(() => setShowOnboardingHighlight(false), 2000);
 			return;
 		}
 		await handleCreateOnboarding();
-		dispatch(onboardingActions.enableOnboarding({
-			clan_id: currentClan?.clan_id as string,
-			onboarding: true
-		}));
+		dispatch(
+			onboardingActions.enableOnboarding({
+				clan_id: currentClan?.clan_id as string,
+				onboarding: true
+			})
+		);
 		setIsCommunityEnabled(true);
 		setIsModalOpen(false);
 		setInitialDescription(description);
@@ -156,7 +160,9 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					</div>
 				</MemberProvider>
 			)}
-			{!isModalOpen && openModalSaveChanges && (isDescriptionOrAboutChanged || checkCreateValidate) && <ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />}
+			{!isModalOpen && openModalSaveChanges && (isDescriptionOrAboutChanged || checkCreateValidate) && (
+				<ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />
+			)}
 
 			{/* Description Section */}
 			<div className="bg-bgTertiary p-4 rounded-lg mt-6">
@@ -169,9 +175,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 						onChange={handleChangeDescription}
 						maxLength={300}
 					/>
-					<div className="absolute bottom-2 right-2 text-sm text-gray-400">
-						{description.length}/300
-					</div>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-400">{description.length}/300</div>
 				</div>
 			</div>
 
@@ -186,9 +190,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 						onChange={handleChangeAbout}
 						maxLength={300}
 					/>
-					<div className="absolute bottom-2 right-2 text-sm text-gray-400">
-						{about.length}/300
-					</div>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-400">{about.length}/300</div>
 				</div>
 			</div>
 		</div>
@@ -203,10 +205,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 						<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
 							<div className="flex justify-between items-center mb-6">
 								<h3 className="text-xl font-semibold text-white">Community Settings</h3>
-								<button
-									onClick={() => setIsModalOpen(false)}
-									className="text-gray-400 hover:text-white"
-								>
+								<button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
 									<Icons.CloseIcon className="w-6 h-6" />
 								</button>
 							</div>
@@ -218,10 +217,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 								>
 									Cancel
 								</button>
-								<button
-									onClick={handleConfirm}
-									className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-								>
+								<button onClick={handleConfirm} className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
 									Confirm
 								</button>
 							</div>
@@ -240,25 +236,16 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
 						<div className="flex justify-between items-center mb-6">
 							<h3 className="text-xl font-semibold text-white">Community Settings</h3>
-							<button
-								onClick={() => setIsModalOpen(false)}
-								className="text-gray-400 hover:text-white"
-							>
+							<button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
 								<Icons.CloseIcon className="w-6 h-6" />
 							</button>
 						</div>
 						{renderOnboardingContent()}
 						<div className="flex justify-end gap-4 mt-6">
-							<button
-								onClick={() => setIsModalOpen(false)}
-								className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
-							>
+							<button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white">
 								Cancel
 							</button>
-							<button
-								onClick={handleConfirm}
-								className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white"
-							>
+							<button onClick={handleConfirm} className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
 								Confirm
 							</button>
 						</div>

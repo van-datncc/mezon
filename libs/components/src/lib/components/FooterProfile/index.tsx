@@ -31,7 +31,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import { UserStatusIcon } from '../MemberProfile';
+import { UserStatusIconDM } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
 import StreamInfo from '../StreamInfo';
@@ -284,7 +284,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 							src={avatar}
 						/>
 						<div className="absolute bottom-1 left-6">
-							<UserStatusIcon status={userCustomStatus?.user_status} />
+							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
 						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode  ">
 							<p className="text-base font-medium max-w-40 truncate dark:text-contentSecondary text-black">{name}</p>
