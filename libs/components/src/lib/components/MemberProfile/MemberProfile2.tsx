@@ -1,10 +1,9 @@
 import { useColorsRoleById } from '@mezon/core';
 import { selectClanMemberMetaUserId, selectMemberClanByUserId2, selectMemberCustomStatusById2, useAppSelector } from '@mezon/store';
-import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
-import { useMemo } from 'react';
+import { UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { AvatarImage } from '../../components';
 import { useMemberContextMenu } from '../../contexts/MemberContextMenu';
-import StatusUser from '../StatusUser';
+import { UserStatusIconClan } from './MemberProfile';
 
 type BaseMemberProfileProps = {
 	id: string;
@@ -40,19 +39,7 @@ export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 		showContextMenu(event, userTemplate);
 	};
 
-	const statusOnline = userMeta?.status;
-
-	const userStatus: EUserStatus = useMemo(() => {
-		if (statusOnline) {
-			return statusOnline;
-		}
-		if (user?.user?.metadata) {
-			return (user?.user?.metadata as any)?.status;
-		}
-	}, [statusOnline, user?.user?.metadata]);
-
 	const isOffline = !userMeta?.online;
-	const isMobile = user.user?.is_mobile;
 
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
@@ -67,13 +54,7 @@ export const BaseMemberProfile = ({ id }: BaseMemberProfileProps) => {
 						src={avatar}
 					/>
 					<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode">
-						{/* <UserStatusIcon status={userMeta?.status} /> */}
-						<StatusUser
-							isMemberChannel={true}
-							status={{ status: !isOffline, isMobile }}
-							userId={user?.user?.id}
-							customStatus={userStatus}
-						/>
+						<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
 					</div>
 				</div>
 

@@ -399,7 +399,7 @@ const ClansList = memo(() => {
 	};
 
 	return (
-		<div className="flex flex-col gap-3 relative">
+		<div className="flex flex-col gap-1 relative">
 			{orderedClansWithGroups
 				.filter((item): item is NonNullable<typeof item> => item != null)
 				.map((item, index) => {
@@ -466,7 +466,7 @@ const ClansList = memo(() => {
 							)}
 
 							<div
-								className={`${item.type === 'group' && item.group.isExpanded ? '' : 'px-2'} relative transition-all duration-200 ${hoverEffect} ${draggedFromGroupStyling}`}
+								className={`${item.type === 'group' && item.group.isExpanded ? '' : 'px-2'} relative transition-all duration-200 ${draggedFromGroupStyling}`}
 								onMouseEnter={(e) => handleItemMouseEnter(e, item.id)}
 								onMouseMove={(e) => handleItemMouseEnter(e, item.id)}
 								onMouseDown={(e) => handleMouseDown(e, item.id)}

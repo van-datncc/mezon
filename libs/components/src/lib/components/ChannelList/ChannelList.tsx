@@ -235,8 +235,14 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 	};
 	const dragItemIndex = useRef<{ idElement: string; indexEnd: number } | null>(null);
 	const dragInfor = useRef<ICategoryChannel | null>(null);
+	const isDraggingRef = useRef(false);
+
 	const handleDragStart = useCallback(
 		(index: number, e: React.DragEvent<HTMLDivElement>, id: string) => {
+			setTimeout(() => {
+				isDraggingRef.current = true;
+			}, 100);
+
 			dragItemIndex.current = {
 				idElement: id,
 				indexEnd: index
@@ -264,6 +270,10 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 
 	const handleDragEnd = useCallback(
 		(dragIndex: number) => {
+			setTimeout(() => {
+				isDraggingRef.current = false;
+			}, 50);
+
 			const el = document.getElementById(dragItemIndex.current!.idElement);
 			if (el) el.style.borderBottom = 'none';
 
@@ -301,8 +311,15 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 				);
 			}
 		},
-		[data, isShowEmptyCategory]
+		[data, isShowEmptyCategory, listChannelRender, dispatch]
 	);
+
+	const handleChannelClick = useCallback((e: React.MouseEvent) => {
+		if (isDraggingRef.current) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+	}, []);
 
 	return (
 		<div
@@ -366,6 +383,7 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 										key={virtualRow.key}
 										data-index={virtualRow.index}
 										draggable
+										onClick={handleChannelClick}
 										onDragStart={(e) => handleDragStart(virtualRow.index, e, `${item.category_id}-${item.id}`)}
 										onDragEnter={(e) => handleDragEnter(virtualRow.index, e, `${item.category_id}-${item.id}`)}
 										onDragEnd={() => handleDragEnd(virtualRow.index)}
