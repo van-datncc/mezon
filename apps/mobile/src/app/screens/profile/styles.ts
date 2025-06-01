@@ -50,6 +50,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 
 		textTitle: {
 			color: colors.textStrong,
+			marginRight: size.s_6,
 			fontWeight: 'bold',
 			fontSize: isTabletLandscape ? size.s_16 : size.s_12
 		},

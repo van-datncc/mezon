@@ -8,7 +8,7 @@ module.exports = {
 
 	/* status */
 	colorDanger: '#DA373C',
-	colorDangerHover: '#DA373C',
+	colorDangerHover: '#DA373CC9',
 	colorSuccess: '#16A34A',
 	colorWarning: '#EAB308',
 	colorNeutral: '#AEAEAE',

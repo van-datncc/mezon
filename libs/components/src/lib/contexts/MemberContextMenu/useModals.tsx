@@ -98,10 +98,6 @@ export const useModals = ({ currentUser }: ModalsProps): ModalsState => {
 		const userIds = [currentUser.user?.id ?? ''];
 
 		await dispatch(clansActions.removeClanUsers({ clanId, userIds }));
-		if (userIds.length <= 0) {
-			await dispatch(clansActions.removeClanUsers({ clanId, userIds }));
-		}
-
 		setOpenModalRemoveMember(false);
 	};
 

@@ -1,6 +1,6 @@
 import { ChannelMembersEntity, selectCurrentClan } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EUserStatus, MemberProfileType, createImgproxyUrl } from '@mezon/utils';
+import { EUserStatus, MemberProfileType, UserStatus, createImgproxyUrl } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo, useRef } from 'react';
 import { AvatarImage } from '../../components';
@@ -244,7 +244,7 @@ export const BaseMemberProfile = (props: BaseMemberProfileProps) => {
 	return <MemberProfileCore {...props} onClick={handleClick} onContextMenu={handleContextMenu} />;
 };
 
-export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
+export const UserStatusIconDM = ({ status }: { status?: EUserStatus }) => {
 	switch (status) {
 		case EUserStatus.ONLINE:
 			return <Icons.OnlineStatus />;
@@ -259,6 +259,28 @@ export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
 	}
 };
 
+export const UserStatusIconClan = ({ status, online }: { status?: EUserStatus; online?: boolean }) => {
+	const normalizedStatus = typeof status === 'object' && status !== null ? (status as UserStatus).status?.toUpperCase() : status?.toUpperCase();
+
+	if (!online) {
+		return <Icons.OfflineStatus />;
+	}
+
+	switch (normalizedStatus) {
+		case 'IDLE':
+			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-[10px] h-[10px]" />;
+		case 'DO NOT DISTURB':
+			return <Icons.MinusCircleIcon className=" w-[10px] h-[10px]" />;
+		case 'INVISIBLE':
+			return <Icons.OfflineStatus />;
+	}
+
+	if (online) {
+		return <Icons.OnlineStatus />;
+	}
+
+	return <Icons.OfflineStatus />;
+};
 interface UserNameProps {
 	name: string;
 	isHiddenAvatarPanel?: boolean;

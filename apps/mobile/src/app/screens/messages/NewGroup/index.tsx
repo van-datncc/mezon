@@ -1,5 +1,5 @@
 import { useFriends } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, FriendsEntity, channelUsersActions, directActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType, User } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
@@ -133,7 +133,7 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 				<View style={styles.newGroupContainer}>
 					<View style={styles.headerWrapper}>
-						<Pressable onPress={() => navigation.goBack()}>
+						<Pressable onPress={() => navigation.goBack()} style={{ width: size.s_70, height: '100%' }}>
 							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={20} width={20} color={themeValue.text} />
 						</Pressable>
 						<View style={styles.screenTitleWrapper}>

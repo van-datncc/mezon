@@ -20,7 +20,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			paddingHorizontal: size.s_12,
-			paddingBottom: size.s_12,
+			paddingBottom: size.s_6,
 			alignItems: 'center'
 		},
 		messageActionGroup: {
@@ -95,7 +95,7 @@ export const style = (colors: Attributes) =>
 			width: size.s_34
 		},
 		reactionImage: {
-			width: size.s_28,
-			height: size.s_28
+			width: size.s_22,
+			height: size.s_22
 		}
 	});

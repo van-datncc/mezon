@@ -3,7 +3,6 @@ export type ImageProps = {
 	width?: number;
 	height?: number;
 	placeholder?: string;
-	blurdataurl?: string;
 	loading?: 'lazy' | 'eager';
 	onClick?: () => void;
 	className?: string;

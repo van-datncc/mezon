@@ -71,7 +71,7 @@ const ConnectionMonitor = memo(() => {
 		} else {
 			await AudioSession.startAudioSession();
 			await AudioSession.setAppleAudioConfiguration({
-				audioCategoryOptions: ['allowBluetooth', 'allowBluetoothA2DP']
+				audioCategoryOptions: ['allowBluetooth', 'allowBluetoothA2DP', 'allowAirPlay', 'mixWithOthers']
 			});
 			InCallManager.start({ media: 'audio' });
 			await AudioSession.configureAudio({

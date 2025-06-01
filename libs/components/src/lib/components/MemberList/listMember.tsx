@@ -13,7 +13,7 @@ import { createImgproxyUrl, isLinuxDesktop, isWindowsDesktop, useSyncEffect, use
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage, useVirtualizer } from '../../components';
-import { UserStatusIcon } from '../MemberProfile';
+import { UserStatusIconClan } from '../MemberProfile';
 import { BaseMemberProfile, ClanUserName } from '../MemberProfile/MemberProfile2';
 
 const heightTopBar = 50;
@@ -42,7 +42,7 @@ const TempMemberItem = memo(({ id }: TempMemberItemProps) => {
 					src={avatar}
 				/>
 				<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode">
-					<UserStatusIcon status={userMeta?.status} />
+					<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
 				</div>
 			</div>
 
