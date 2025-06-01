@@ -59,7 +59,7 @@ const Header = ({ toggleSideBar }: IHeaderProps) => {
 			<div className="flex flex-row items-center justify-center relative">
 				<button onClick={toggleDarkMode} className="mr-4">
 					<img
-						src={isDarkMode ? '../../assets/icons/IconDarkMode.png' : '../../assets/icons/IconLightMode.png'}
+						src={isDarkMode ? 'developers/assets/icons/IconDarkMode.png' : 'developers/assets/icons/IconLightMode.png'}
 						alt="Toggle Dark Mode"
 						className="w-6 h-6 bg-white"
 					/>
