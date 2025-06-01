@@ -26,13 +26,13 @@ export const styles = StyleSheet.create({
 		left: size.s_20
 	},
 	description: {
-		fontSize: size.label,
+		fontSize: size.medium,
 		fontWeight: '500',
 		color: Colors.textGray,
 		textAlign: 'center'
 	},
 	textExample: {
-		fontSize: size.label,
+		fontSize: size.small,
 		fontWeight: '400',
 		color: Colors.textGray
 	}

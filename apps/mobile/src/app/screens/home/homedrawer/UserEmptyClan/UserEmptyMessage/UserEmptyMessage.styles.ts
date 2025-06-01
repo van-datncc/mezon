@@ -18,13 +18,13 @@ export const styles = StyleSheet.create({
 		height: '40%'
 	},
 	title: {
-		fontSize: size.h6,
+		fontSize: size.label,
 		color: Colors.white,
 		fontWeight: '700',
 		textAlign: 'center'
 	},
 	description: {
-		fontSize: size.label,
+		fontSize: size.small,
 		color: Colors.textGray,
 		fontWeight: '500',
 		textAlign: 'center',
@@ -32,12 +32,12 @@ export const styles = StyleSheet.create({
 	},
 	addFriendsBtn: {
 		width: '100%',
-		padding: size.s_14,
+		padding: size.s_10,
 		backgroundColor: Colors.bgButton,
 		borderRadius: size.s_50
 	},
 	textAddFriends: {
-		fontSize: size.label,
+		fontSize: size.medium,
 		color: Colors.white,
 		fontWeight: '600',
 		textAlign: 'center'
