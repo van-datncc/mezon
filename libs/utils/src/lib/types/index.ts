@@ -428,6 +428,7 @@ export interface IMessageSendPayload {
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	canvas?: CanvasDataResponse;
+	cvtt?: Record<string, string>; // canvas title
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
 	tp?: string;

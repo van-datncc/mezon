@@ -140,7 +140,7 @@ const MessageText = ({
 	if ((!content?.mk || content.mk.length === 0) && Array.isArray(content?.lk) && content.lk.length > 0) {
 		patchedContent = {
 			...content,
-			mk: content.lk.map(lkItem => ({ ...lkItem, type: EBacktickType.LINK }))
+			mk: content.lk.map((lkItem) => ({ ...lkItem, type: EBacktickType.LINK }))
 		};
 	}
 
@@ -152,16 +152,14 @@ const MessageText = ({
 		attachmentOnMessage[0].url === contentToMessage?.trim();
 	const showEditted = !message.hide_editted && !isSearchMessage;
 
-	const linkFromMarkdown = patchedContent?.mk?.find?.(item => item.type === EBacktickType.LINK);
+	const linkFromMarkdown = patchedContent?.mk?.find?.((item) => item.type === EBacktickType.LINK);
 	let displayLine = lines;
 	if ((!lines || lines.length === 0) && linkFromMarkdown && typeof linkFromMarkdown.s === 'number' && typeof linkFromMarkdown.e === 'number') {
 		let linkFromLk = '';
 		if (Array.isArray(message?.content?.lk) && typeof message?.content?.lk[0] === 'string') {
 			linkFromLk = message?.content?.lk[0];
 		}
-		displayLine = typeof message?.content?.t === 'string' && message?.content?.t.length > 0
-			? message?.content?.t
-			: linkFromLk;
+		displayLine = typeof message?.content?.t === 'string' && message?.content?.t.length > 0 ? message?.content?.t : linkFromLk;
 		if (!displayLine && message?.content?.t === '') {
 			const raw = message?.content?.t || '';
 			displayLine = raw.substring(linkFromMarkdown.s, linkFromMarkdown.e);
@@ -173,7 +171,7 @@ const MessageText = ({
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
-			{(displayLine?.length > 0 || hasLinkMarkdown) ? (
+			{displayLine?.length > 0 || hasLinkMarkdown ? (
 				<MessageLine
 					isEditted={showEditted}
 					isHideLinkOneImage={checkOneLinkImage}

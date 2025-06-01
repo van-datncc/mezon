@@ -54,6 +54,7 @@ export * from './buildClassName';
 export * from './buildStyle';
 export * from './calculateAlbumLayout';
 export * from './callbacks';
+export * from './canvasLink';
 export * from './detectTokenMessage';
 export * from './file';
 export * from './forceReflow';
