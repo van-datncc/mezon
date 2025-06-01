@@ -239,11 +239,13 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 			<ScrollView style={styles.contentWrapper} contentContainerStyle={{ paddingBottom: size.s_100 }}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
-						<Text style={styles.textName}>{userProfile?.user?.display_name}</Text>
-						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
+					<TouchableOpacity onPress={showUserStatusBottomSheet} style={{ marginBottom: size.s_10 }}>
+						<View style={styles.viewInfo}>
+							<Text style={styles.textName}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
+							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
+						</View>
+						<Text style={styles.text}>{userProfile?.user?.username}</Text>
 					</TouchableOpacity>
-					<Text style={styles.text}>{userProfile?.user?.username}</Text>
 					{userCustomStatus ? (
 						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 							<TouchableOpacity

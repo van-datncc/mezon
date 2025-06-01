@@ -16,7 +16,8 @@ export const style = (colors: Attributes) =>
 			padding: size.s_14,
 			gap: size.s_14,
 			alignItems: 'center',
-			backgroundColor: colors.secondary
+			justifyContent: 'space-between',
+			backgroundColor: colors.primary
 		},
 		screenTitleWrapper: {
 			flex: 1,
@@ -24,15 +25,18 @@ export const style = (colors: Attributes) =>
 		},
 		screenTitle: {
 			color: colors.text,
-			fontSize: size.h6
+			fontSize: size.label,
+			fontWeight: '600'
 		},
 		actions: {
 			flexDirection: 'row',
-			gap: size.s_20
+			justifyContent: 'flex-end',
+			gap: size.s_20,
+			width: size.s_70,
 		},
 		actionText: {
 			color: Colors.textViolet,
-			fontSize: size.label
+			fontSize: size.medium
 		},
 		searchFriend: {
 			backgroundColor: colors.secondary,
@@ -43,7 +47,8 @@ export const style = (colors: Attributes) =>
 		},
 		searchInput: {
 			width: '93%',
-			borderRadius: 20,
+			borderRadius: size.s_20,
+			height: size.s_40,
 			color: colors.textStrong,
 			paddingVertical: size.s_6,
 			marginLeft: 5

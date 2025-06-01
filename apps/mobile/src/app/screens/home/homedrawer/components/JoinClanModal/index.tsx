@@ -63,7 +63,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 			headerStyles={styles.headerModal}
 		>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<View style={{ width: '100%', height: '100%', paddingHorizontal: size.s_20, paddingVertical: size.s_10, position: 'relative' }}>
+				<View style={{ width: '100%', height: '100%', paddingHorizontal: size.s_10, paddingVertical: size.s_10, position: 'relative' }}>
 					<View style={{ marginBottom: size.s_40 }}>
 						<Text style={styles.title}>{t('joinClan.joinExistClan')}</Text>
 						<Text style={styles.description}>{t('joinClan.enterInvite')}</Text>
