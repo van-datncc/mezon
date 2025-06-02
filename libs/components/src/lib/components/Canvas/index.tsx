@@ -89,14 +89,7 @@ const Canvas = () => {
 	);
 
 	useEffect(() => {
-		if (!canvasId) {
-			setError('Canvas ID is required');
-			setShowLoading(false);
-			return;
-		}
-
 		dispatch(appActions.setIsShowCanvas(true));
-
 		refreshCanvasData(false);
 	}, [canvasId, channelId, clanId, dispatch, refreshCanvasData]);
 
