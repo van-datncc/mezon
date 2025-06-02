@@ -12,12 +12,12 @@ import {
 	userClanProfileActions,
 	userStatusActions
 } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
+import { createClient, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
-import { ReactNode, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -91,33 +91,31 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 		dispatch(accountActions.updateUserStatus(status));
 	};
 
-	const { clientRef } = useMezon();
+	const { createSocket } = useMezon();
 	const navigate = useNavigate();
 	const handleSetAccount = (email: string, password: string) => {
 		if (isElectron()) {
-			if (clientRef?.current?.setBasePath) {
-				clientRef.current.setBasePath(
-					process.env.NX_CHAT_APP_API_GW_HOST as string,
-					process.env.NX_CHAT_APP_API_GW_PORT as string,
-					process.env.NX_CHAT_APP_API_SECURE === 'true'
-				);
-				dispatch(
-					authActions.authenticateEmail({
-						email: email,
-						password: password
-					})
-				);
-				navigate('/chat/direct/friend');
-				closeModalAddAccount();
-				modalRef.current = false;
-			}
+			const gw_login = {
+				host: process.env.NX_CHAT_APP_API_GW_HOST as string,
+				port: process.env.NX_CHAT_APP_API_GW_PORT as string,
+				key: process.env.NX_CHAT_APP_API_KEY as string,
+				ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
+			};
+			const clientLogin = createClient(gw_login);
+
+			clientLogin.authenticateEmail(email, password).then((response) => {
+				dispatch(authActions.setSession(response));
+			});
+			navigate('/chat/direct/friend');
+			closeModalAddAccount();
+			modalRef.current = false;
 		}
 	};
 
 	const [openModalAddAccount, closeModalAddAccount] = useModal(() => {
 		return <AddAccountModal handleSetAccount={handleSetAccount} />;
 	});
-	const { createSocket } = useMezon();
+
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			await createSocket();
@@ -126,6 +124,16 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 			navigate('/chat/direct/friend');
 		}
 	};
+	const handleCopyID = useCallback(() => {
+		navigator.clipboard.writeText(userProfile?.user?.id || '');
+	}, [userProfile]);
+
+	const handleOpenSwitchAccount = useCallback(() => {
+		if (isElectron()) {
+			openModalAddAccount();
+			modalRef.current = true;
+		}
+	}, []);
 
 	return (
 		<>
@@ -168,32 +176,30 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 				/>
 			</div>
 			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
-			<Dropdown
-				trigger="click"
-				dismissOnClick={true}
-				renderTrigger={() => (
-					<div>
-						<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
-					</div>
-				)}
-				label=""
-				placement="right-start"
-				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
-			>
-				{!allAccount ? (
-					<ItemStatus
-						children="Manage Accounts"
-						onClick={() => {
-							if (isElectron()) {
-								openModalAddAccount();
-								modalRef.current = true;
-							}
-						}}
-					/>
-				) : (
-					<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
-				)}
-			</Dropdown>
+			{isElectron() && (
+				<Dropdown
+					trigger="click"
+					dismissOnClick={true}
+					renderTrigger={() => (
+						<div>
+							<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
+						</div>
+					)}
+					label=""
+					placement="right-start"
+					className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
+				>
+					{!allAccount ? (
+						<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />
+					) : (
+						<>
+							<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
+						</>
+					)}
+				</Dropdown>
+			)}
+			<ItemStatus onClick={handleCopyID} children="Copy User ID" dropdown={false} startIcon={<Icons.CopyIcon />} />
+
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 		</>
