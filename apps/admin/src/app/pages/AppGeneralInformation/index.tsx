@@ -133,6 +133,7 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	const [openSaveChange, setOpenSaveChange] = useState(false);
 	const [isUrlValid, setIsUrlValid] = useState(true);
 	const [visibleToken, setVisibleToken] = useState<string | null>(null);
+	const [tokenCopied, setTokenCopied] = useState(false);
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -216,9 +217,12 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 		await dispatch(fetchApplications({ noCache: true }));
 		setOpenSaveChange(false);
 	};
-
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
+		if (url === visibleToken) {
+			setTokenCopied(true);
+			setTimeout(() => setTokenCopied(false), 2000);
+		}
 	};
 
 	const handleResetToken = async () => {
@@ -286,7 +290,6 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 
 			<div className="text-[12px] font-semibold flex flex-col gap-2">
 				<div className="uppercase">{setAppOrBot} Token</div>
-
 				{visibleToken ? (
 					<div className="text-gray-500  rounded-sm mt-1">
 						<span className="text-sm text-red-500">
@@ -301,15 +304,17 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 							regenerate a new one.
 						</span>
 					</div>
-				)}
+				)}{' '}
 				{visibleToken && (
 					<div
 						onClick={() => handleCopyUrl(visibleToken)}
-						className={`mt-2 py-[7px] px-[16px] bg-green-600 hover:bg-green-800 flex items-center justify-center cursor-pointer w-[130px] text-[15px] text-white rounded-sm ${
+						className={`mt-2 py-[7px] px-[16px] ${
+							tokenCopied ? 'bg-gray-500' : 'bg-green-600 hover:bg-green-800'
+						} flex items-center justify-center cursor-pointer w-[130px] text-[15px] text-white rounded-sm ${
 							openSaveChange ? 'pointer-events-none opacity-50' : ''
 						}`}
 					>
-						Copy Token
+						{tokenCopied ? 'Copied!' : 'Copy Token'}
 					</div>
 				)}
 				<div
