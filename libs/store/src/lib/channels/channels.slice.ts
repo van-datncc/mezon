@@ -193,7 +193,6 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	} catch (error) {
 		captureSentryError(error, 'channels/joinChat');
 		return thunkAPI.rejectWithValue(error);
-
 	}
 });
 
@@ -523,7 +522,7 @@ export const fetchChannelsCached = memoizeAndTrack(
 		promise: true,
 		maxAge: LIST_CHANNEL_CACHED_TIME,
 		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
+			return (args[0].session.user_id || args[0].session.username || args[0].session.token) + args[1] + args[2] + args[3] + args[4];
 		}
 	}
 );

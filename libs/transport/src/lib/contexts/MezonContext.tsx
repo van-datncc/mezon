@@ -111,7 +111,7 @@ export type MezonContextValue = {
 	logOutMezon: (device_id?: string, platform?: string, clearSession?: boolean) => Promise<void>;
 	refreshSession: (session: Sessionlike) => Promise<Session | undefined>;
 	connectWithSession: (session: Sessionlike) => Promise<Session>;
-
+	createSocket: () => Promise<Socket>;
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 

@@ -100,13 +100,13 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 					process.env.NX_CHAT_APP_API_GW_PORT as string,
 					process.env.NX_CHAT_APP_API_SECURE === 'true'
 				);
-
 				dispatch(
 					authActions.authenticateEmail({
 						email: email,
 						password: password
 					})
 				);
+				navigate('/chat/direct/friend');
 				closeModalAddAccount();
 				modalRef.current = false;
 			}
@@ -116,11 +116,12 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	const [openModalAddAccount, closeModalAddAccount] = useModal(() => {
 		return <AddAccountModal handleSetAccount={handleSetAccount} />;
 	});
-
+	const { createSocket } = useMezon();
 	const handleSwitchAccount = () => {
 		if (isElectron()) {
 			dispatch(authActions.switchAccount(allAccount?.user_id as string));
-			navigate('/desktop/login');
+			navigate('/chat/direct/friend');
+			createSocket();
 		}
 	};
 
