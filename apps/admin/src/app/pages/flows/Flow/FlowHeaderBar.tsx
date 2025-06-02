@@ -41,7 +41,7 @@ const FlowHeaderBar = ({ isExampleFlow, onSaveFlow, flowData, changeOpenModalSav
 		try {
 			await flowService.deleteFlow(flowId);
 			toast.success('Delete flow success');
-			navigate(`developers/applications/${applicationId}/flow`);
+			navigate(`/developers/applications/${applicationId}/flow`);
 		} catch {
 			toast.error('Delete flow failed');
 		} finally {

@@ -46,12 +46,19 @@ const NodeTypes = [
 	{
 		type: 'uploadedImage',
 		label: 'Command Output',
-		schema: yup.object().shape({
-			message: yup
-				.string()
-				.test('no-starts-with-asterisk', 'Message can not start with an asterisk (*)', (value) => !!value && !value.startsWith('*')),
-			image: yup.array().nullable()
-		}),
+		schema: yup
+			.object()
+			.shape({
+				message: yup
+					.string()
+					.test('no-starts-with-asterisk', 'Message can not start with an asterisk (*)', (value) => !value || !value.startsWith('*')),
+				image: yup.array().nullable()
+			})
+			.test('at-least-one-value', 'Either message or image must be provided', (value) => {
+				const hasMessage = !!value?.message && value.message.trim() !== '';
+				const hasImage = Array.isArray(value?.image) && value.image.length > 0;
+				return hasMessage || hasImage;
+			}),
 		bridgeSchema: {
 			type: 'object',
 			properties: {
@@ -59,7 +66,7 @@ const NodeTypes = [
 					type: 'string',
 					uniforms: { component: CustomTextField, label: 'Message', name: 'message', placeholder: 'Enter message' }
 				},
-				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
+				image: { type: 'object', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
 			},
 			required: []
 		},
@@ -88,7 +95,7 @@ const NodeTypes = [
 					type: 'string',
 					uniforms: { component: CustomTextField, label: 'Message', name: 'message', placeholder: 'Enter message' }
 				},
-				image: { type: 'string', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
+				image: { type: 'object', uniforms: { component: MultiImageUploadField, label: 'Uploaded Image', name: 'image' } }
 			},
 			required: []
 		},
@@ -185,13 +192,82 @@ const NodeTypes = [
 		},
 		anchors: {
 			source: [],
-			target: [{ id: 'format-function-target-1', text: 'Api Loader' }]
+			target: [{ id: 'format-function-target-1', text: 'Api Loader/Webhook' }]
 		},
 		initialValue: {
-			functionName: '',
-			variable: '',
+			functionName: 'customResponse',
+			variable: 'data',
 			triggerUser: 'author',
-			functionBody: ''
+			functionBody: `return {
+  "message": data.message,
+  "attachments": data.attachments
+}`
+		}
+	},
+	{
+		type: 'webhook',
+		label: 'Webhook',
+		schema: yup.object().shape({
+			url: yup.string().required('Webhook URL is required'),
+			method: yup.string().oneOf(['GET', 'POST'], 'Method must be GET or POST').required('Method is required'),
+			headers: yup.object().nullable(),
+			body: yup.string().nullable()
+		}),
+		bridgeSchema: {
+			type: 'object',
+			properties: {
+				url: {
+					type: 'string',
+					uniforms: {
+						component: CustomTextField,
+						label: 'Webhook URL',
+						name: 'url',
+						readOnly: true,
+						disabled: true,
+						placeholder: 'https://example.com/webhook'
+					}
+				},
+				method: {
+					type: 'string',
+					uniforms: {
+						component: CustomSelectField,
+						label: 'Method (POST)',
+						name: 'method',
+						defaultValue: 'POST',
+						options: [{ label: 'POST', value: 'POST' }]
+					}
+				},
+				body: {
+					type: 'string',
+					uniforms: {
+						component: CodeEditorField,
+						label: 'Body',
+						name: 'body',
+						readOnly: true,
+						value: `{
+  "channelId": "text",
+  "message": "text",
+  "attachments": [
+    {
+      url: "text",
+      filetype: "image/jpeg"
+    }
+  ]
+}`
+					}
+				}
+			},
+			required: ['url', 'method']
+		},
+		anchors: {
+			source: [{ id: 'webhook-source-1', text: 'Custom JS Function' }],
+			target: []
+		},
+		initialValue: {
+			url: '',
+			method: 'POST',
+			headers: {},
+			body: ''
 		}
 	}
 ];
