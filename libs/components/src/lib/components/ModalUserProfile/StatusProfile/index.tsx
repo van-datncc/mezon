@@ -118,12 +118,12 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 		return <AddAccountModal handleSetAccount={handleSetAccount} />;
 	});
 	const { createSocket } = useMezon();
-	const handleSwitchAccount = () => {
+	const handleSwitchAccount = async () => {
 		if (isElectron()) {
+			await createSocket();
 			dispatch(authActions.switchAccount(allAccount?.user_id as string));
-			navigate('/chat/direct/friend');
 			clearAllMemoizedFunctions();
-			createSocket();
+			navigate('/chat/direct/friend');
 		}
 	};
 
