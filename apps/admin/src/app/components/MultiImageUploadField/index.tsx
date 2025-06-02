@@ -1,14 +1,18 @@
-import { handleUploadFile, useMezon } from '@mezon/transport';
+import { CustomFile, handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
+import { processFile } from '@mezon/utils';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { ChangeEvent, useRef, useState } from 'react';
 import { HTMLFieldProps, connectField } from 'uniforms';
-type CustomFormFieldProps = HTMLFieldProps<string[], HTMLDivElement>;
+
+type CustomFormFieldProps = HTMLFieldProps<ApiMessageAttachment[], HTMLDivElement>;
 const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 	const { value = [], onChange } = props;
 	const { sessionRef, clientRef } = useMezon();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
 	const handleChooseFiles = async (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			const client = clientRef.current;
@@ -20,14 +24,17 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 			setIsUploading(true);
 			setError(null);
 			try {
-				const newAttachments: string[] = [];
+				const newAttachments: Array<ApiMessageAttachment> = [];
 				for (let i = 0; i < e.target.files.length; i++) {
-					const file = e.target.files[i];
+					const file: CustomFile = e.target.files[i];
+					const extraAttributes = await processFile<CustomFile>(file);
+					file.width = extraAttributes.width;
+					file.height = extraAttributes.height;
 					const attachment = await handleUploadFile(client, session, '', '', file.name, file);
 					if (attachment && attachment.url) {
-						newAttachments.push(attachment.url);
+						newAttachments.push(attachment);
 					} else {
-						console.warn(`Failed to upload file: ${file.name}`);
+						console.warn(`Failed to upload file: ${e.target.files[i].name}`);
 					}
 				}
 				if (value === null) {
@@ -43,9 +50,9 @@ const MultiImageUploadField = connectField((props: CustomFormFieldProps) => {
 			}
 		}
 	};
-	const extractFileNameFromUrl = (url: string): string => {
-		const parts = url.split('undefined');
-		return parts[parts.length - 1].split('/').pop() || 'unknown';
+	const extractFileNameFromUrl = (file: ApiMessageAttachment): string => {
+		const parts = file?.url?.split('undefined');
+		return parts?.[parts.length - 1].split('/').pop() || 'unknown';
 	};
 
 	const handleRemoveImage = (index: number) => {

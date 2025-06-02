@@ -1,5 +1,4 @@
 import { useAuth } from '@mezon/core';
-import { selectAppDetail } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	Background,
@@ -18,7 +17,6 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Popover } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
@@ -40,7 +38,6 @@ const Flow = () => {
 	const reactFlowWrapper = useRef(null);
 	const navigate = useNavigate();
 	const { screenToFlowPosition } = useReactFlow();
-	const appDetail = useSelector(selectAppDetail);
 
 	const { flowState, flowDispatch } = React.useContext(FlowContext);
 	const { flowId, applicationId, exampleFlowId } = useParams();
@@ -81,6 +78,9 @@ const Flow = () => {
 		NodeTypes.forEach((item, index) => {
 			if (!obj[item.type]) {
 				obj[item.type] = (props) => {
+					if (item.type === 'webhook') {
+						item.initialValue.url = `${process.env.NX_MEZON_FLOW_URL}/webhook/${applicationId}/{flowId}`;
+					}
 					return (
 						<CustomNode
 							{...props}
@@ -187,7 +187,6 @@ const Flow = () => {
 		const flowDataSave: IFlowDataRequest = {
 			referralId: userProfile?.user?.id,
 			applicationId: applicationId ?? '',
-			applicationToken: appDetail?.token ?? '',
 			username: userProfile?.user?.username ?? '',
 			flowName: flowData?.flowName,
 			description: flowData?.description,
@@ -214,7 +213,7 @@ const Flow = () => {
 				const response = await flowService.createNewFlow(flowDataSave);
 				toast.success('Save flow success');
 				// navigate to flow detail after create flow
-				navigate(`developers/applications/${applicationId}/flow/${response.id}`);
+				navigate(`/developers/applications/${applicationId}/flow/${response.id}`);
 			}
 		} catch (error) {
 			toast.error('Save flow failed');
@@ -222,7 +221,6 @@ const Flow = () => {
 			flowDispatch(changeLoading(false));
 		}
 	}, [
-		appDetail?.token,
 		applicationId,
 		edges,
 		flowData?.description,
