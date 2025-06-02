@@ -1,6 +1,6 @@
 import { toastActions } from '@mezon/store';
 import { handleUploadFile } from '@mezon/transport';
-import { MAX_FILE_SIZE_1MB, resizeFileImage } from '@mezon/utils';
+import { MAX_FILE_SIZE_1MB } from '@mezon/utils';
 import { ApiAccount } from 'mezon-js/api.gen';
 
 export const processImage = async (
@@ -42,7 +42,7 @@ export const processImage = async (
 	try {
 		if (isMounted) setIsLoading(true);
 
-		const imageAvatarResize = (await resizeFileImage(imageCropped, 120, 120, 'file', 80, 80)) as File;
+		const imageAvatarResize = imageCropped as File;
 
 		const attachment = await handleUploadFile(
 			clientRef.current,
