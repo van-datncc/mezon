@@ -1,5 +1,5 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
-import { CheckIcon, isEqual } from '@mezon/mobile-components';
+import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllPermissionsDefault, selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
@@ -14,7 +14,7 @@ import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { SeparatorWithLine } from '../../../components/Common';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
-import { normalizeString } from '../../../utils/helpers';
+import { isEqualStringArrayUnordered, normalizeString } from '../../../utils/helpers';
 
 type SetupPermissionsScreen = typeof APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS;
 export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<SetupPermissionsScreen>) => {
@@ -73,7 +73,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	}, [defaultPermissionList, getDisablePermission]);
 
 	const isNotChange = useMemo(() => {
-		return isEqual(originSelectedPermissions, selectedPermissions);
+		return isEqualStringArrayUnordered(originSelectedPermissions, selectedPermissions);
 	}, [originSelectedPermissions, selectedPermissions]);
 
 	const handleEditPermissions = async () => {
@@ -249,7 +249,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 												<MezonSwitch
 													value={selectedPermissions?.includes(item?.id)}
-													onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
+													onValueChange={(isSelect) => onSelectPermissionChange(!isSelect, item?.id)}
 													disabled={item?.disabled}
 												/>
 											</View>
