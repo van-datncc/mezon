@@ -136,9 +136,9 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black/60 backdrop-blur-sm dark:text-white text-black hide-scrollbar overflow-hidden">
-			<div className="relative w-full sm:h-auto rounded-2xl max-w-[900px] min-h-[60vh] shadow-2xl">
+			<div className="relative w-full sm:h-auto rounded-2xl max-w-[900px] min-h-[60vh] shadow-2xl mx-2 sm:mx-auto">
 				<div className="rounded-t-2xl text-sm overflow-hidden">
-					<div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white flex justify-between items-center p-6">
+					<div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 text-white flex justify-between items-center p-6 rounded-t-2xl">
 						<div className="flex items-center gap-3">
 							<div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
 								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,8 +168,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 				{walletLedger?.length ? (
 					<div className="bg-white dark:bg-gray-900 rounded-b-2xl dark:text-textDarkTheme text-textLightTheme">
 						<div>
-							<div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-								<div className="col-span-5">
+							<div className="grid grid-cols-12 gap-2 sm:gap-4 px-2 sm:px-6 py-2 sm:py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-xs sm:text-sm">
+								<div className="col-span-5 truncate">
 									<span className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase tracking-wider">
 										Sender / Recipient
 									</span>
@@ -182,21 +182,21 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 								</div>
 								<div className="col-span-1"></div>
 							</div>
-							<div className="max-h-[400px] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
+							<div className="max-h-[400px] overflow-y-auto scrollbar-thin [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200 px-1 sm:px-0">
 								{walletLedger?.map((item, index) => {
 									return (
 										<div
 											key={index}
-											className="border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200"
+											className="border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 rounded-lg sm:rounded-none mb-2 sm:mb-0"
 											onClick={() =>
 												setModalDetail({ open: true, detail: { ...item, ...(detailMap[item.transaction_id ?? ''] || {}) } })
 											}
 										>
-											<div className="grid grid-cols-12 gap-6 px-8 py-6 items-center">
-												<div className="col-span-5 flex items-center">{renderSenderRecipient(item)}</div>
+											<div className="grid grid-cols-12 gap-2 sm:gap-6 px-2 sm:px-8 py-4 sm:py-6 items-center text-xs sm:text-base">
+												<div className="col-span-5 flex items-center min-w-0">{renderSenderRecipient(item)}</div>
 												<div className="col-span-3 flex items-center justify-center">{renderAmount(item.value ?? 0)}</div>
 												<div className="col-span-3 flex items-center justify-center">
-													<span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+													<span className="text-sm text-gray-700 dark:text-gray-300 font-medium truncate">
 														{formatDate(item.create_time ?? '')}
 													</span>
 												</div>
@@ -206,7 +206,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 								})}
 							</div>
 						</div>
-						<div className="flex justify-center items-center px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+						<div className="flex justify-center items-center px-2 sm:px-6 py-2 sm:py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
 							<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
 						</div>
 					</div>
@@ -226,7 +226,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 			</div>
 			{modalDetail.open && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-					<div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-[380px] w-full p-0 relative animate-fadeIn overflow-hidden">
+					<div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-[380px] w-full p-0 relative animate-fadeIn overflow-hidden mx-2 sm:mx-0">
 						<button
 							className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 flex items-center justify-center z-10"
 							onClick={() => setModalDetail({ open: false, detail: null })}
