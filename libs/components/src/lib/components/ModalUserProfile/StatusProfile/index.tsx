@@ -12,7 +12,7 @@ import {
 	userClanProfileActions,
 	userStatusActions
 } from '@mezon/store';
-import { useMezon } from '@mezon/transport';
+import { createClient, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
@@ -91,33 +91,31 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 		dispatch(accountActions.updateUserStatus(status));
 	};
 
-	const { clientRef } = useMezon();
+	const { createSocket } = useMezon();
 	const navigate = useNavigate();
 	const handleSetAccount = (email: string, password: string) => {
 		if (isElectron()) {
-			if (clientRef?.current?.setBasePath) {
-				clientRef.current.setBasePath(
-					process.env.NX_CHAT_APP_API_GW_HOST as string,
-					process.env.NX_CHAT_APP_API_GW_PORT as string,
-					process.env.NX_CHAT_APP_API_SECURE === 'true'
-				);
-				dispatch(
-					authActions.authenticateEmail({
-						email: email,
-						password: password
-					})
-				);
-				navigate('/chat/direct/friend');
-				closeModalAddAccount();
-				modalRef.current = false;
-			}
+			const gw_login = {
+				host: process.env.NX_CHAT_APP_API_GW_HOST as string,
+				port: process.env.NX_CHAT_APP_API_GW_PORT as string,
+				key: process.env.NX_CHAT_APP_API_KEY as string,
+				ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
+			};
+			const clientLogin = createClient(gw_login);
+
+			clientLogin.authenticateEmail(email, password).then((response) => {
+				dispatch(authActions.setSession(response));
+			});
+			navigate('/chat/direct/friend');
+			closeModalAddAccount();
+			modalRef.current = false;
 		}
 	};
 
 	const [openModalAddAccount, closeModalAddAccount] = useModal(() => {
 		return <AddAccountModal handleSetAccount={handleSetAccount} />;
 	});
-	const { createSocket } = useMezon();
+
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			await createSocket();

@@ -664,7 +664,7 @@ function MessageContextMenu({
 		// 	builder.addMenuItem('apps', 'Apps', () => console.log('apps'), <Icons.RightArrowRightClick defaultSize="w-4 h-4" />);
 		// });
 
-		builder.when(checkPos, (builder) => {
+		builder.when(checkPos && !message.isAnonymous, (builder) => {
 			builder.addMenuItem(
 				'addToInbox',
 				'Add To Inbox',
