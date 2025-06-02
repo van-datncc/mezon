@@ -61,11 +61,11 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 			let imgHeight = 0;
 
 			if (img.width > img.height) {
-				imgWidth = img.width * scaleFactor <= 292 ? 292 : img.width * scaleFactor;
-				imgHeight = img.width * scaleFactor <= 292 ? (imgWidth * img.height) / img.width : img.height * scaleFactor;
+				imgHeight = img.height * scaleFactor <= 400 ? 400 : img.height * scaleFactor;
+				imgWidth = img.height * scaleFactor <= 400 ? (imgHeight * img.width) / img.height : img.width * scaleFactor;
 			} else {
-				imgHeight = img.height * scaleFactor <= 292 ? 292 : img.height * scaleFactor;
-				imgWidth = img.height * scaleFactor <= 292 ? (imgHeight * img.width) / img.height : img.width * scaleFactor;
+				imgWidth = img.width * scaleFactor <= 400 ? 400 : img.width * scaleFactor;
+				imgHeight = img.width * scaleFactor <= 400 ? (imgWidth * img.height) / img.width : img.height * scaleFactor;
 			}
 
 			// Center image
@@ -83,7 +83,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 			overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
 			// Transparent circular area
-			const radius = 140;
+			const radius = 200;
 			overlayCtx.globalCompositeOperation = 'destination-out';
 			overlayCtx.beginPath();
 			overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
@@ -162,7 +162,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 		if (!ctx) return;
 
 		// Size of the cropped canvas
-		const radius = 140;
+		const radius = 200;
 		const diameter = radius * 2;
 		tempCanvas.width = diameter;
 		tempCanvas.height = diameter;

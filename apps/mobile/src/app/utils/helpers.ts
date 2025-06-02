@@ -117,3 +117,13 @@ export function combineMessageReactions(reactions: any[], message_id: string): a
 
 	return dataCombinedArray;
 }
+
+export function isEqualStringArrayUnordered(a: string[], b: string[]): boolean {
+	try {
+		if (a.length !== b.length) return false;
+		return JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
+	} catch (error) {
+		console.error('Error comparing string arrays:', error);
+		return false;
+	}
+}

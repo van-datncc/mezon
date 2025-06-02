@@ -17,5 +17,12 @@ export const styles = StyleSheet.create({
 		marginBottom: size.s_10,
 		marginTop: size.s_30
 	},
-	titleModal: { flex: 1, textAlign: 'center' }
+	titleModal: {
+		flex: 1,
+		textAlign: 'center',
+		position: 'absolute',
+		alignSelf: 'center',
+		left: 0,
+		right: 0
+	}
 });
