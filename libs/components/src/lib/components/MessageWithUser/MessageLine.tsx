@@ -46,6 +46,92 @@ export function extractIdsFromUrl(url: string) {
 	return { clanId, channelId, canvasId };
 }
 
+const formatMarkdownHeadings = (text: string): React.ReactNode[] => {
+	if (!text) return [text];
+
+	const lines = text.split('\n');
+	const formattedLines: React.ReactNode[] = [];
+	let hasHeadings = false;
+
+	lines.forEach((line: string, index: number) => {
+		const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+		if (headingMatch) {
+			hasHeadings = true;
+			const headingLevel = headingMatch[1].length;
+			const headingText = headingMatch[2].trim();
+
+			switch (headingLevel) {
+				case 1:
+					formattedLines.push(
+						<h1 key={`h1-${index}`} className="text-4xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h1>
+					);
+					break;
+				case 2:
+					formattedLines.push(
+						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h2>
+					);
+					break;
+				case 3:
+					formattedLines.push(
+						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h3>
+					);
+					break;
+				case 4:
+					formattedLines.push(
+						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h4>
+					);
+					break;
+				case 5:
+					formattedLines.push(
+						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h5>
+					);
+					break;
+				case 6:
+					formattedLines.push(
+						<h6 key={`h6-${index}`} className="text-base my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h6>
+					);
+					break;
+				default:
+					formattedLines.push(line);
+					break;
+			}
+		} else {
+			formattedLines.push(line);
+		}
+	});
+
+	if (!hasHeadings) {
+		return [text];
+	}
+
+	return formattedLines;
+};
+
+const FormattedPlainText: React.FC<{ text: string; isSearchMessage?: boolean; messageId?: string; keyPrefix: string }> = ({
+	text,
+	isSearchMessage,
+	messageId,
+	keyPrefix
+}) => {
+	const formattedContent = formatMarkdownHeadings(text);
+	if (formattedContent.length === 1 && typeof formattedContent[0] === 'string') {
+		return <PlainText isSearchMessage={isSearchMessage} text={text} />;
+	}
+	return formattedContent;
+};
+
 // Utility functions for text selection
 const getSelectionIndex = (node: Node, offset: number, containerRef: HTMLDivElement | null) => {
 	let currentNode = node;
@@ -129,7 +215,13 @@ export const MessageLine = ({
 
 			if (lastindex < s) {
 				formattedContent.push(
-					<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-${messageId}`} text={t?.slice(lastindex, s) ?? ''} />
+					<FormattedPlainText
+						key={`plain-${lastindex}-${messageId}`}
+						text={t?.slice(lastindex, s) ?? ''}
+						isSearchMessage={isSearchMessage}
+						messageId={messageId}
+						keyPrefix="plain"
+					/>
 				);
 			}
 
@@ -320,7 +412,13 @@ export const MessageLine = ({
 
 		if (t && lastindex < t?.length) {
 			formattedContent.push(
-				<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end-${messageId}`} text={t.slice(lastindex)} />
+				<FormattedPlainText
+					key={`plain-${lastindex}-end-${messageId}`}
+					text={t.slice(lastindex)}
+					isSearchMessage={isSearchMessage}
+					messageId={messageId}
+					keyPrefix="plain"
+				/>
 			);
 		}
 
