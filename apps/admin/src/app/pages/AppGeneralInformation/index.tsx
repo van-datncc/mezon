@@ -6,6 +6,7 @@ import { ApiApp, ApiMessageAttachment, MezonUpdateAppBody } from 'mezon-js/api.g
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { APP_TYPES } from '../../constants/constants';
 import DeleteAppPopup from '../applications/DeleteAppPopup';
 
@@ -219,6 +220,10 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 
 	const handleCopyUrl = (url: string) => {
 		navigator.clipboard.writeText(url);
+		toast.success('Copied to clipboard', {
+			position: toast.POSITION.BOTTOM_LEFT,
+			autoClose: 3000,
+		});
 	};
 
 	const handleResetToken = async () => {

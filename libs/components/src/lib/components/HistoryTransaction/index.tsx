@@ -44,32 +44,48 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		return `${day}/${month}/${year} ${hours}:${minutes}`;
 	};
 
-	const renderAmount = (amount: number) => {
+	const renderAmount = (amount: number, transactionId: string) => {
+		const isOpened = openedTransactionId === transactionId;
+
 		if (amount < 0) {
 			return (
 				<div className="flex items-center gap-2">
 					<div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-						<Icons.ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+						{isOpened ? (
+							<Icons.ArrowDown className="w-4 h-4 text-red-600 dark:text-red-400 rotate-180" />
+						) : (
+							<Icons.ArrowRight className="w-4 h-4 text-red-600 dark:text-red-400" />
+						)}
 					</div>
 					<div>
-						<p className="text-red-600 dark:text-red-400 font-semibold">{`${formatNumber(Math.abs(amount), 'vi-VN')} VND`}</p>
+						<p className="text-red-600 dark:text-red-400 font-semibold">
+							{`${formatNumber(Math.abs(amount), 'vi-VN')} VND`}
+						</p>
 						<p className="text-xs text-gray-500 dark:text-gray-400">Sent</p>
 					</div>
 				</div>
 			);
 		}
+
 		return (
 			<div className="flex items-center gap-2">
 				<div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+					{isOpened ? (
 					<Icons.ArrowDown className="w-4 h-4 text-green-600 dark:text-green-400 rotate-180" />
+					) : (
+						<Icons.ArrowRight className="w-4 h-4 text-green-600 dark:text-green-400" />
+					)}
 				</div>
 				<div>
-					<p className="text-green-600 dark:text-green-400 font-semibold">{`+${formatNumber(amount, 'vi-VN')} VND`}</p>
+					<p className="text-green-600 dark:text-green-400 font-semibold">
+						{`+${formatNumber(amount, 'vi-VN')} VND`}
+					</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
 				</div>
 			</div>
 		);
 	};
+
 
 	const toggleDetails = (transactionId: string) => {
 		setOpenedTransactionId(openedTransactionId === transactionId ? null : transactionId);
@@ -129,7 +145,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 									<div className="p-4">
 										<div className="flex items-center justify-between">
 											<div className="flex items-center gap-4">
-												{renderAmount(item.value ?? 0)}
+												{renderAmount(item.value ?? 0, item.transaction_id ?? '')}
 												<div className="flex flex-col">
 													<div className="flex items-center gap-2">
 														<p className="dark:text-white text-gray-900 font-medium text-sm">
@@ -142,12 +158,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 													</p>
 												</div>
 											</div>
-											<div className="flex items-center gap-2">
-												<Icons.ArrowRight
-													className={`w-4 h-4 dark:text-gray-400 text-gray-500 transition-transform duration-200 ${openedTransactionId === item.transaction_id ? 'rotate-90' : ''
-														}`}
-												/>
-											</div>
+
 										</div>
 									</div>
 
