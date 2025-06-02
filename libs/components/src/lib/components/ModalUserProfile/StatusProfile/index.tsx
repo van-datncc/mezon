@@ -165,35 +165,39 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 					startIcon={<Icons.SmilingFace />}
 				/>
 			</div>
-			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
-			<Dropdown
-				trigger="click"
-				dismissOnClick={true}
-				renderTrigger={() => (
-					<div>
-						<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
-					</div>
-				)}
-				label=""
-				placement="right-start"
-				className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
-			>
-				{!allAccount ? (
-					<ItemStatus
-						children="Manage Accounts"
-						onClick={() => {
-							if (isElectron()) {
-								openModalAddAccount();
-								modalRef.current = true;
-							}
-						}}
-					/>
-				) : (
-					<>
-						<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
-					</>
-				)}
-			</Dropdown>
+			{isElectron() && (
+				<>
+					<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
+					<Dropdown
+						trigger="click"
+						dismissOnClick={true}
+						renderTrigger={() => (
+							<div>
+								<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
+							</div>
+						)}
+						label=""
+						placement="right-start"
+						className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
+					>
+						{!allAccount ? (
+							<ItemStatus
+								children="Manage Accounts"
+								onClick={() => {
+									if (isElectron()) {
+										openModalAddAccount();
+										modalRef.current = true;
+									}
+								}}
+							/>
+						) : (
+							<>
+								<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
+							</>
+						)}
+					</Dropdown>
+				</>
+			)}
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 		</>
