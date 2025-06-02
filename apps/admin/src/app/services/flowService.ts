@@ -68,13 +68,38 @@ const executionFlow = async (appId: string, appToken: string, message: string, u
 	}
 };
 
+const getApplication = async (appId: string) => {
+	try {
+		const response = await apiInstance(`/application/${appId}`, {
+			method: 'GET'
+		});
+		return response as { id: string };
+	} catch (error) {
+		throw (error as IError).message;
+	}
+};
+
+const createApplication = async (appId: string, appToken: string) => {
+	try {
+		const response = await apiInstance(`/application`, {
+			method: 'POST',
+			body: JSON.stringify({ appId, appToken })
+		});
+		return response as { id: string };
+	} catch (error) {
+		throw (error as IError).message;
+	}
+};
+
 const flowService = {
 	getAllFlowByApplication,
 	getFlowDetail,
 	createNewFlow,
 	updateFlow,
 	deleteFlow,
-	executionFlow
+	executionFlow,
+	getApplication,
+	createApplication
 };
 
 export default flowService;

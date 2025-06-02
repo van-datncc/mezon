@@ -47,11 +47,9 @@ const ModalRemoveMemberClan = ({ openModal, username, onClose, onRemoveMember }:
 						onChange={handleChange}
 						className="text-[#B5BAC1] outline-none w-full h-16 p-[10px] dark:bg-bgInputDark bg-bgTextarea text-base rounded placeholder:text-sm"
 					/>
-				</div>
-
-				<div className="flex justify-end p-4 rounded-b">
+				</div>				<div className="flex justify-end gap-3 p-4 rounded-b bg-gray-50 dark:bg-gray-800/50">
 					<button
-						className="py-2 dark:text-textDarkTheme text-channelTextareaLight h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent"
+						className="w-20 py-2.5 h-10 text-sm font-medium text-white bg-gray-600 dark:bg-gray-700 border border-white dark:border-gray-400 hover:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 shadow-sm"
 						type="button"
 						onClick={onClose}
 					>
@@ -59,9 +57,9 @@ const ModalRemoveMemberClan = ({ openModal, username, onClose, onRemoveMember }:
 					</button>
 					<button
 						onClick={handleSave}
-						className="py-2 h-10 px-4 rounded bg-colorDanger hover:bg-colorDangerHover dark:bg-colorDanger dark:hover:bg-colorDangerHover focus:ring-transparent"
+						className="w-20 py-2.5 h-10 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:bg-red-700 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-50 dark:focus:ring-offset-gray-800 shadow-sm hover:shadow-md"
 					>
-						Save
+						Kick
 					</button>
 				</div>
 			</div>

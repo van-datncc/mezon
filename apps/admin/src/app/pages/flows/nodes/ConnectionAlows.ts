@@ -11,6 +11,10 @@ const ConnectionsAllowed = [
 	{
 		source: 'api-loader-source-1',
 		target: 'format-function-target-1'
+	},
+	{
+		source: 'webhook-source-1',
+		target: 'format-function-target-1'
 	}
 	// add more connections here
 ];

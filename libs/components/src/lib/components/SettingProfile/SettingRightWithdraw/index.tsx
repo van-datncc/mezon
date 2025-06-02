@@ -45,57 +45,106 @@ const SettingRightWithdraw = ({ onClose }: IWithdrawProp) => {
 	const handleRefetch = () => {
 		setRefreshHistory((prev) => !prev);
 	};
+
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
-			<div className={`relative w-full mt-[5%] sm:h-auto rounded-lg max-w-[1000px] `}>
-				<div className="rounded-t-lg text-sm overflow-hidden">
-					<div className="dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black flex justify-between items-center p-4">
-						<h4 className="font-bold text-base">Withdraw</h4>
-
-						<span className="cursor-pointer text-3xl leading-3 dark:hover:text-white hover:text-black" onClick={onClose}>
-							×
-						</span>
+			<div className="relative w-full mt-[5%] sm:h-auto rounded-xl max-w-[900px] mx-4">
+				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">
+					<div className="flex items-center justify-between p-6">
+						<div className="flex items-center gap-3">
+							<div className="w-10 h-10 rounded-full dark:bg-green-600 bg-green-500 flex items-center justify-center">
+								<Icons.DollarIcon isWhite className="w-5 h-5" />
+							</div>
+							<div>
+								<h4 className="dark:text-white text-gray-900 text-lg font-semibold">Withdraw Funds</h4>
+								<p className="dark:text-gray-400 text-gray-500 text-sm">Transfer your tokens to external wallet</p>
+							</div>
+						</div>
+						<button
+							onClick={onClose}
+							className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+						>
+							<Icons.Close className="w-5 h-5" />
+						</button>
 					</div>
 				</div>
 
-				<div className="flex gap-8 flex-1 z-0 py-5 px-3 dark:bg-bgPrimary bg-white">
+				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl p-6 space-y-6">
 					{openModalWithdraw && (
 						<LazyWithdrawModal userId={userId} onClose={closeModal} totalToken={totalToken} onRefetch={handleRefetch} />
 					)}
-					<div className="flex flex-1 flex-col gap-8">
-						<div className="flex z-0 gap-x-8 flex-col ">
-							<div className="flex gap-2">
-								<p className="font-semibold tracking-wide text-sm">ESTIMATED BALANCE</p>
-								<button onClick={toggleVisibility} className="outline-none z-50 fill-current cursor-pointer left-0  ">
-									{showCoin ? (
-										<Icons.EyeOpen className="w-5 h-5 text-borderFocus dark:hover:text-white hover:text-black  " />
-									) : (
-										<Icons.EyeClose className="w-5 h-5 text-borderFocus dark:hover:text-white hover:text-black  " />
-									)}
+
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<h3 className="dark:text-white text-gray-900 font-semibold flex items-center gap-2">
+								<Icons.DollarIcon className="w-4 h-4" />
+								Available Balance
+							</h3>
+							<button onClick={toggleVisibility} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+								{showCoin ? (
+									<Icons.EyeOpen className="w-5 h-5 dark:text-gray-400 text-gray-500" />
+								) : (
+									<Icons.EyeClose className="w-5 h-5 dark:text-gray-400 text-gray-500" />
+								)}
+							</button>
+						</div>
+
+						<div className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-6">
+							<div className="flex items-center justify-between">
+								<div className="flex flex-col">
+									<div className="flex items-center gap-2 mb-2">
+										<div className="w-8 h-8 rounded-full dark:bg-blue-600 bg-blue-500 flex items-center justify-center">
+											<Icons.DollarIcon isWhite className="w-4 h-4" />
+										</div>
+										<span className="dark:text-gray-400 text-gray-500 text-sm font-medium">Total Balance</span>
+									</div>
+									<div className="text-3xl font-bold dark:text-white text-gray-900">
+										{!showCoin ? (
+											<span className="text-gray-400">••••••••</span>
+										) : (
+											<span className="flex items-baseline gap-2">
+												{totalToken.toLocaleString('vi-VN')}
+												<span className="text-lg dark:text-gray-400 text-gray-500 font-medium">VND</span>
+											</span>
+										)}
+									</div>
+									<p className="dark:text-gray-400 text-gray-500 text-sm mt-1">Available for withdrawal</p>
+								</div>
+								<button
+									onClick={openModal}
+									disabled={totalToken <= 0}
+									className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-all flex items-center gap-2 shadow-lg hover:shadow-xl"
+								>
+									<Icons.ArrowDown className="w-4 h-4 rotate-180" />
+									Withdraw
 								</button>
 							</div>
 
-							<div className="dark:bg-black bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative p-3 gap-8 ">
-								<div className="flex items-center flex-row gap-2 flex-1 justify-between ">
-									<div className="flex items-center flex-row gap-2">
-										<p className="text-2xl text-center">{!showCoin ? <span>*******</span> : ` ${totalToken} ₫`}</p>
-									</div>
-									<button
-										className="text-[15px] bg-gray-600 rounded-[4px] p-[8px] cursor-pointer hover:bg-opacity-80"
-										onClick={openModal}
-									>
-										Withdraw
-									</button>
+							<div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t dark:border-gray-700 border-gray-200">
+								<div className="text-center">
+									<p className="dark:text-gray-400 text-gray-500 text-xs font-medium uppercase tracking-wide">Wallet Balance</p>
+									<p className="dark:text-white text-gray-900 text-lg font-semibold mt-1">
+										{showCoin ? `${tokenInWallet.toLocaleString('vi-VN')} VND` : '••••••'}
+									</p>
+								</div>
+								<div className="text-center">
+									<p className="dark:text-gray-400 text-gray-500 text-xs font-medium uppercase tracking-wide">Socket Balance</p>
+									<p className="dark:text-white text-gray-900 text-lg font-semibold mt-1">
+										{showCoin ? `${getTokenSocket.toLocaleString('vi-VN')} VND` : '••••••'}
+									</p>
 								</div>
 							</div>
 						</div>
+					</div>
 
-						<div className="flex flex-col gap-2  w-full rounded-lg  bottom-4  h-fit  z-10">
-							<p className="font-semibold tracking-wide text-sm">ORDER HISTORY</p>
+					<div className="space-y-4">
+						<h3 className="dark:text-white text-gray-900 font-semibold flex items-center gap-2">
+							<Icons.ViewRole className="w-4 h-4" />
+							Withdrawal History
+						</h3>
 
-							<div className="dark:bg-black bg-[#f0f0f0] mt-[10px]  rounded-lg flex flex-col relative p-3 gap-8">
-								<HistoriesWithdraw userId={userId} onRefresh={refreshHistory} />
-							</div>
+						<div className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-6">
+							<HistoriesWithdraw userId={userId} onRefresh={refreshHistory} />
 						</div>
 					</div>
 				</div>
