@@ -89,6 +89,12 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   <style>
     ${image_window_css}
   </style>
+  <script>
+  function closeWindow() {
+    selectedImage.src = null;
+    window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
+  }
+</script>
 </head>
 <body>
 <div class="title-bar">
@@ -107,7 +113,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
         />
       </svg>
     </div>
-    <div id="close-window" class="function-button">
+    <div id="close-window" class="function-button" onclick="closeWindow()">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-button">
         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
