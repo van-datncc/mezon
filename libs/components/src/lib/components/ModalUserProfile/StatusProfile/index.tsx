@@ -4,6 +4,7 @@ import {
 	accountActions,
 	authActions,
 	clanMembersMetaActions,
+	clearAllMemoizedFunctions,
 	giveCoffeeActions,
 	selectAllAcount,
 	selectUserStatus,
@@ -121,6 +122,7 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 		if (isElectron()) {
 			dispatch(authActions.switchAccount(allAccount?.user_id as string));
 			navigate('/chat/direct/friend');
+			clearAllMemoizedFunctions();
 			createSocket();
 		}
 	};
