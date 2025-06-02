@@ -197,80 +197,13 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 			.catch((err) => console.error('Failed to copy text: ', err));
 	};
 
-	const renderFormattedContent = () => {
-		if (!contentBacktick) return null;
-
-		const content = contentBacktick.trim();
-		if (content === '') return content;
-
-		const lines = content.split('\n');
-
-		return lines.map((line: string, index: number) => {
-			const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
-			if (headingMatch) {
-				const headingLevel = headingMatch[1].length;
-				const headingText = headingMatch[2].trim();
-
-				switch (headingLevel) {
-					case 1:
-						return (
-							<h1 key={index} className="text-2xl font-bold my-2">
-								{headingText}
-							</h1>
-						);
-					case 2:
-						return (
-							<h2 key={index} className="text-xl font-bold my-2">
-								{headingText}
-							</h2>
-						);
-					case 3:
-						return (
-							<h3 key={index} className="text-lg font-bold my-2">
-								{headingText}
-							</h3>
-						);
-					case 4:
-						return (
-							<h4 key={index} className="text-base font-bold my-1">
-								{headingText}
-							</h4>
-						);
-					case 5:
-						return (
-							<h5 key={index} className="text-sm font-bold my-1">
-								{headingText}
-							</h5>
-						);
-					case 6:
-						return (
-							<h6 key={index} className="text-xs font-bold my-1">
-								{headingText}
-							</h6>
-						);
-					default:
-						return <div key={index}>{line}</div>;
-				}
-			}
-
-			return (
-				<React.Fragment key={index}>
-					{line}
-					{index < lines.length - 1 ? '\n' : ''}
-				</React.Fragment>
-			);
-		});
-	};
-
-	const displayContent = renderFormattedContent();
-
 	return (
 		<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
 			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
 				<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `} onClick={handleCopyClick}>
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
-				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{displayContent}</code>
+				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
 			</pre>
 		</div>
 	);

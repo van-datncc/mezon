@@ -193,7 +193,6 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 	} catch (error) {
 		captureSentryError(error, 'channels/joinChat');
 		return thunkAPI.rejectWithValue(error);
-
 	}
 });
 

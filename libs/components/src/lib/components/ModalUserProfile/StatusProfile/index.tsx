@@ -4,6 +4,7 @@ import {
 	accountActions,
 	authActions,
 	clanMembersMetaActions,
+	clearAllMemoizedFunctions,
 	giveCoffeeActions,
 	selectAllAcount,
 	selectUserStatus,
@@ -100,13 +101,13 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 					process.env.NX_CHAT_APP_API_GW_PORT as string,
 					process.env.NX_CHAT_APP_API_SECURE === 'true'
 				);
-
 				dispatch(
 					authActions.authenticateEmail({
 						email: email,
 						password: password
 					})
 				);
+				navigate('/chat/direct/friend');
 				closeModalAddAccount();
 				modalRef.current = false;
 			}
@@ -116,11 +117,13 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	const [openModalAddAccount, closeModalAddAccount] = useModal(() => {
 		return <AddAccountModal handleSetAccount={handleSetAccount} />;
 	});
-
-	const handleSwitchAccount = () => {
+	const { createSocket } = useMezon();
+	const handleSwitchAccount = async () => {
 		if (isElectron()) {
+			await createSocket();
 			dispatch(authActions.switchAccount(allAccount?.user_id as string));
-			navigate('/desktop/login');
+			clearAllMemoizedFunctions();
+			navigate('/chat/direct/friend');
 		}
 	};
 
@@ -188,9 +191,7 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 						}}
 					/>
 				) : (
-					<>
-						<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
-					</>
+					<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
 				)}
 			</Dropdown>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
