@@ -3,7 +3,7 @@ import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { Label, Modal } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage, useVirtualizer } from '../../../components';
 
@@ -152,30 +152,49 @@ const ModalSendToken = ({
 		handleSaveSendToken(userData?.id, userData?.username, userData?.avatar_url, userData?.display_name);
 	};
 
+	const selectedUser = filteredUsers.find((user) => user.username === searchTerm);
+
 	return (
-		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded">
-				<div>
-					<h1 className="dark:text-textDarkTheme text-xl font-semibold text-center">Transfer To</h1>
-				</div>
-				<div className="flex w-full flex-col gap-5 pt-4">
-					<div className="px-4">
-						<div className="mb-2 block">
-							<Label value={`Transfer to?`} className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold" />
+		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[480px]' } }} show={openModal} dismissible={true} onClose={onClose}>
+			<div className="dark:bg-bgPrimary bg-bgLightMode rounded-xl overflow-hidden">
+				<div className="flex items-center justify-between p-6 border-b dark:border-gray-700 border-gray-200">
+					<div className="flex items-center gap-3">
+						<div className="w-10 h-10 rounded-full dark:bg-blue-600 bg-blue-500 flex items-center justify-center">
+							<Icons.DollarIcon isWhite className="w-5 h-5" />
 						</div>
+						<div>
+							<h1 className="dark:text-white text-gray-900 text-lg font-semibold">Send Tokens</h1>
+							<p className="dark:text-gray-400 text-gray-500 text-sm">Transfer tokens to another user</p>
+						</div>
+					</div>
+					<button
+						onClick={onClose}
+						className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors"
+					>
+						<Icons.Close className="w-5 h-5" />
+					</button>
+				</div>
+
+				<div className="p-6 space-y-6">
+					<div className="space-y-3">
+						<Label value="To" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
+							<Icons.UserIcon className="w-4 h-4" />
+							Recipient
+						</Label>
 						<div className="relative">
 							<input
 								type="text"
 								placeholder="Search users..."
-								className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
+								className="w-full h-12 px-4 pr-10 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all placeholder:dark:text-gray-500 placeholder:text-gray-400"
 								value={searchTerm}
 								onClick={() => setIsDropdownOpen(true)}
 								onChange={handleChangeSearchTerm}
 								disabled={sendTokenInputsState.isUserSelectionDisabled}
 							/>
+							<Icons.ArrowDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 dark:text-gray-400 text-gray-500" />
 							{isDropdownOpen && (
 								<div
-									className="absolute overflow-y-auto overflow-x-hidden max-h-[190px] w-full z-10 mt-[4px] dark:bg-[#232428] bg-bgLightModeThird border-none py-0 customSmallScrollLightMode"
+									className="absolute z-20 w-full mt-2 dark:bg-gray-800 bg-white border dark:border-gray-600 border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll "
 									ref={dropdownRef}
 								>
 									<div
@@ -201,106 +220,95 @@ const ModalSendToken = ({
 															transform: `translateY(${virtualRow.start}px)`
 														}}
 													>
-														<ItemSelect key={user.id} onClick={() => handleSelectUser(user.id, user.username)}>
-															<div className="flex items-center">
-																<AvatarImage
-																	alt={user?.username ?? ''}
-																	username={user?.username ?? ''}
-																	srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
-																		width: 100,
-																		height: 100,
-																		resizeType: 'fit'
-																	})}
-																	src={user.avatar_url}
-																	className="size-4 mr-2"
-																	classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
-																/>
-																<span className="one-line">{user.username}</span>
-															</div>
-														</ItemSelect>
+														<div
+															onClick={() => handleSelectUser(user.id, user.username)}
+															className="flex items-center gap-3 p-3 hover:dark:bg-gray-700 hover:bg-gray-50 cursor-pointer transition-colors"
+														>
+															<AvatarImage
+																alt={user?.username ?? ''}
+																username={user?.username ?? ''}
+																srcImgProxy={createImgproxyUrl(user.avatar_url ?? '', {
+																	width: 100,
+																	height: 100,
+																	resizeType: 'fit'
+																})}
+																src={user.avatar_url}
+																className="w-8 h-8"
+																classNameText="text-xs w-8 h-8"
+															/>
+															<span className="dark:text-white text-gray-900 font-medium">{user.username}</span>
+														</div>
 													</div>
 												);
 											})}
+										{filteredUsers.length === 0 && (
+											<div className="p-4 text-center dark:text-gray-400 text-gray-500">No users found</div>
+										)}
 									</div>
 								</div>
 							)}
-							{userSearchError && <p className="text-red-500 text-xs mt-1">{userSearchError}</p>}
+							{userSearchError && <p className="text-red-500 text-sm mt-2">{userSearchError}</p>}
 						</div>
 					</div>
-					<div className="px-4 mb-4">
-						<div className="mb-2 block">
-							<Label
-								htmlFor="clearAfter"
-								value="Amount"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+
+					<div className="space-y-3">
+						<Label value="Amount" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
+							<Icons.DollarIcon className="w-4 h-4" />
+							Amount
+						</Label>
+						<div className="relative">
+							<input
+								type="text"
+								value={tokenNumber}
+								className="w-full h-12 px-4 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all text-lg font-medium"
+								placeholder="0"
+								onChange={handleChangeSendToken}
+								disabled={sendTokenInputsState.isSendTokenInputDisabled}
 							/>
+							<span className="absolute right-4 top-1/2 transform -translate-y-1/2 dark:text-gray-400 text-gray-500 font-medium">
+								VND
+							</span>
 						</div>
-						<input
-							type="text"
-							value={tokenNumber}
-							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
-							placeholder="VND"
-							onChange={handleChangeSendToken}
-							disabled={sendTokenInputsState.isSendTokenInputDisabled}
-						/>
-						{error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+						{error && <p className="text-red-500 text-sm">{error}</p>}
 					</div>
-					<div className="px-4 mb-4">
-						<div className="mb-2 block">
-							<Label
-								htmlFor="clearAfter"
-								value="Note"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
-							/>
-						</div>
+
+					<div className="space-y-3">
+						<Label value="Note" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
+							<Icons.ThreadIcon className="w-4 h-4" />
+							Note (Optional)
+						</Label>
 						<input
 							type="text"
 							defaultValue={noteSendToken}
-							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm appearance-none"
-							placeholder="Transfer"
+							className="w-full h-12 px-4 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all placeholder:dark:text-gray-500 placeholder:text-gray-400"
+							placeholder="Add a note..."
 							onChange={handleChangeNote}
 						/>
 					</div>
-					<div className="flex justify-end p-4 rounded-b dark:bg-[#2B2D31] bg-[#dedede]">
-						<button
-							className="py-2 h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent dark:text-textDarkTheme text-textLightTheme"
-							type="button"
-							onClick={onClose}
-						>
-							Cancel
-						</button>
-						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
-							type="button"
-							onClick={handleSendToken}
-							disabled={isButtonDisabled}
-						>
-							Send
-						</button>
-					</div>
+
+
+				</div>
+
+				<div className="p-6 border-t dark:border-gray-700 border-gray-200 flex gap-3">
+					<button
+						className="flex-1 h-12 px-4 rounded-xl border dark:border-gray-600 border-gray-300 dark:text-gray-300 text-gray-700 font-medium hover:dark:bg-gray-800 hover:bg-gray-50 transition-all"
+						type="button"
+						onClick={onClose}
+					>
+						Cancel
+					</button>
+					<button
+						className="flex-1 h-12 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium transition-all flex items-center justify-center gap-2"
+						type="button"
+						onClick={handleSendToken}
+						disabled={isButtonDisabled || !selectedUser || token <= 0}
+					>
+						<Icons.DollarIcon isWhite className="w-4 h-4" />
+						Send Tokens
+					</button>
 				</div>
 			</div>
 		</Modal>
-	);
-};
-
-type ItemSelectProps = {
-	children: ReactNode;
-	dropdown?: boolean;
-	startIcon?: ReactNode;
-	onClick?: () => void;
-};
-
-const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps) => {
-	return (
-		<div
-			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm dark:bg-bgInputDark bg-bgLightModeThird cursor-pointer  dark:hover:bg-zinc-700 hover:bg-bgLightMode dark:hover:[&>li]:text-[#fff] hover:[&>li]:text-[#000] px-3"
-		>
-			{startIcon && <div className="flex items-center justify-center h-[18px] w-[18px] mr-2">{startIcon}</div>}
-			<li className="text-[14px] dark:text-[#B5BAC1] text-[#777777] w-full list-none leading-[44px]">{children}</li>
-			<Icons.Check className="w-[18px] h-[18px]" />
-		</div>
 	);
 };
 
