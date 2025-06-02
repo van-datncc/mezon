@@ -237,8 +237,9 @@
   <pre class="code-block">
         <code class="language-javascript">
             <span class="code-line"><span class="code-keyword">const</span> <span class="code-variable">apiKey</span> <span class="code-keyword">=</span> <span class="code-string">"abcdef1234567890"</span>;</span>
-            <span class="code-line"><span class="code-keyword">const</span> <span class="code-variable">mezon</span> <span class="code-keyword">=</span> <span class="code-keyword">new</span> <span class="code-variable">MezonClient</span>(<span class="code-variable">apiKey</span>);</span>
+            <span class="code-line"><span class="code-keyword">const</span> <span class="code-variable">client</span> <span class="code-keyword">=</span> <span class="code-keyword">new</span> <span class="code-variable">MezonClient</span>(<span class="code-variable">apiKey</span>);</span>
             <span class="code-line"><span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">"Mezon Client initialized:"</span>, <span class="code-variable">mezon</span>);</span>
+            <span class="code-line"><span class="code-comment">await client.login();</span></span>
         </code>
     </pre>
 
@@ -250,7 +251,7 @@
   <h4>Syntax</h4>
   <pre class="code-block">
         <code class="language-javascript">
-            <span class="code-line"><span class="code-variable">client</span>.<span class="code-variable">onMessage</span> <span class="code-keyword">=</span> (<span class="code-variable">event</span>: <span class="code-variable">Message</span>) <span class="code-keyword">=></span> {</span>
+            <span class="code-line"><span class="code-variable">client</span>.<span class="code-variable">onChannelMessage</span> <span class="code-keyword">=</span> (<span class="code-variable">event</span>: <span class="code-variable">ChannelMessage</span>) <span class="code-keyword">=></span> {</span>
             <span class="code-line">  <span class="code-comment">// Your message handling logic here</span></span>
             <span class="code-line">  <span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">"Received message:"</span>, <span class="code-variable">event</span>);</span>
             <span class="code-line">};</span>
@@ -282,11 +283,11 @@
   <h4>Example</h4>
   <pre class="code-block">
         <code class="language-javascript">
-            <span class="code-line"><span class="code-variable">mezon</span>.<span class="code-variable">onMessage</span> <span class="code-keyword">=</span> (<span class="code-variable">message</span>) <span class="code-keyword">=></span> {</span>
-            <span class="code-line">  <span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">`New message from channel ${message.channelId}:`</span>, <span class="code-variable">message</span>.<span class="code-variable">data</span>);</span>
+            <span class="code-line"><span class="code-variable">client</span>.<span class="code-variable">onChannelMessage</span> <span class="code-keyword">=</span> (<span class="code-variable">message</span>) <span class="code-keyword">=></span> {</span>
+            <span class="code-line">  <span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">`New message from channel ${message.channel_id}:`</span>, <span class="code-variable">message</span>.<span class="code-variable">content</span>);</span>
             <span class="code-line">  <span class="code-comment">// Process the message data</span></span>
-            <span class="code-line">  <span class="code-keyword">if</span> (<span class="code-variable">message</span>.<span class="code-variable">type</span> <span class="code-keyword">===</span> <span class="code-string">'chat'</span>) {</span>
-            <span class="code-line">    <span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">`Chat message content: ${message.data.text}`</span>);</span>
+            <span class="code-line">  <span class="code-keyword">if</span> (<span class="code-variable">message</span>.<span class="code-variable">content</span>.<span class="code-variable">t</span> <span class="code-keyword">===</span> <span class="code-string">'hello'</span>) {</span>
+            <span class="code-line">    <span class="code-variable">console</span>.<span class="code-variable">log</span>(<span class="code-string">`Chat message content: ${message.content.t}`</span>);</span>
             <span class="code-line">  }</span>
             <span class="code-line">};</span>
         </code>
@@ -300,7 +301,7 @@
   <h4>Syntax</h4>
   <pre class="code-block">
         <code class="language-javascript">
-            <span class="code-line"><span class="code-keyword">const</span> <span class="code-variable">channel</span> <span class="code-keyword">=</span> <span class="code-variable">client</span>.<span class="code-variable">channel</span>.<span class="code-variable">Find</span>(<span class="code-variable">channel_id</span>);</span>
+            <span class="code-line"><span class="code-keyword">const</span> <span class="code-variable">channel</span> <span class="code-keyword">=</span> <span class="code-variable">client</span>.<span class="code-variable">channels</span>.<span class="code-variable">fetch</span>(<span class="code-variable">channel_id</span>);</span>
         </code>
     </pre>
 
