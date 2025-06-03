@@ -29,12 +29,15 @@ export const style = (colors: Attributes) =>
 		},
 		userRowItem: {
 			flex: 1,
-			justifyContent: 'space-between',
-			flexDirection: 'row',
+			gap: size.s_4,
 			marginVertical: size.s_2,
 			paddingBottom: size.s_10,
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border
+		},
+		userRowHeader: {
+			flexDirection: 'row',
+			justifyContent: 'space-between'
 		},
 		username: {
 			color: colors.text,

@@ -3,9 +3,11 @@ import { baseColor, useTheme } from '@mezon/mobile-ui';
 import { fetchDetailTransaction, selectDetailedger, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { formatNumber } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { Flow } from 'react-native-animated-spinkit';
+import Toast from 'react-native-toast-message';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
 import { style } from './styles';
 
@@ -20,6 +22,7 @@ export const TransactionModal = memo(({ transactionId, isMinus }: ITransactionMo
 	const detailLedger = useAppSelector((state) => selectDetailedger(state));
 	const styles = style(themeValue, isTabletLandscape);
 	const dispatch = useAppDispatch();
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	const formatDate = useMemo(() => {
 		const date = new Date(detailLedger?.create_time);
@@ -43,8 +46,23 @@ export const TransactionModal = memo(({ transactionId, isMinus }: ITransactionMo
 		return `+${formatNumber(detailLedger?.amount, 'vi-VN', 'VND')}`;
 	}, [detailLedger?.amount, isMinus]);
 
+	const fetchData = async (transId: string) => {
+		try {
+			setIsLoading(true);
+			await dispatch(fetchDetailTransaction({ transId }));
+			setIsLoading(false);
+		} catch (error) {
+			setIsLoading(false);
+			console.error('Error fetching transaction details:', error);
+			Toast.show({
+				type: 'error',
+				text1: t('historyTransaction.detail.errorFetch')
+			});
+		}
+	};
+
 	useEffect(() => {
-		dispatch(fetchDetailTransaction({ transId: transactionId }));
+		fetchData(transactionId);
 	}, [transactionId]);
 
 	const handleClose = () => {
@@ -54,32 +72,40 @@ export const TransactionModal = memo(({ transactionId, isMinus }: ITransactionMo
 	return (
 		<View style={styles.main}>
 			<View style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.title}>{t('historyTransaction.detail.title')}</Text>
-				</View>
-				<View style={styles.row}>
-					<Text style={styles.title}>{t('historyTransaction.detail.transactionId')}</Text>
-					<Text style={styles.description}>{detailLedger?.trans_id}</Text>
-				</View>
-				<View style={styles.row}>
-					<Text style={styles.title}>{t('historyTransaction.detail.time')}</Text>
-					<Text style={styles.description}>{formatDate}</Text>
-				</View>
-				<View style={styles.row}>
-					<Text style={styles.title}>{t('historyTransaction.detail.senderName')}</Text>
-					<Text style={styles.description}>{detailLedger?.sender_username}</Text>
-				</View>
-				<View style={styles.row}>
-					<Text style={styles.title}>{t('historyTransaction.detail.receiverName')}</Text>
-					<Text style={styles.description}>{detailLedger?.receiver_username}</Text>
-				</View>
-				<View style={styles.row}>
-					<Text style={styles.title}>{t('historyTransaction.detail.amount')}</Text>
-					<Text style={[styles.description, { color: isMinus ? baseColor.buzzRed : baseColor.bgSuccess }]}>{amount}</Text>
-				</View>
-				<Text style={styles.title}>{t('historyTransaction.detail.note')}</Text>
-				<View style={styles.noteField}>
-					<Text style={styles.note}>{note}</Text>
+				{isLoading && (
+					<View style={styles.overlay}>
+						<Flow color={'#919191'} />
+					</View>
+				)}
+
+				<View style={styles.wrapper}>
+					<View style={styles.header}>
+						<Text style={styles.title}>{t('historyTransaction.detail.title')}</Text>
+					</View>
+					<View style={styles.row}>
+						<Text style={styles.title}>{t('historyTransaction.detail.transactionId')}</Text>
+						<Text style={styles.description}>{detailLedger?.trans_id}</Text>
+					</View>
+					<View style={styles.row}>
+						<Text style={styles.title}>{t('historyTransaction.detail.time')}</Text>
+						<Text style={styles.description}>{formatDate}</Text>
+					</View>
+					<View style={styles.row}>
+						<Text style={styles.title}>{t('historyTransaction.detail.senderName')}</Text>
+						<Text style={styles.description}>{detailLedger?.sender_username}</Text>
+					</View>
+					<View style={styles.row}>
+						<Text style={styles.title}>{t('historyTransaction.detail.receiverName')}</Text>
+						<Text style={styles.description}>{detailLedger?.receiver_username}</Text>
+					</View>
+					<View style={styles.row}>
+						<Text style={styles.title}>{t('historyTransaction.detail.amount')}</Text>
+						<Text style={[styles.description, { color: isMinus ? baseColor.buzzRed : baseColor.bgSuccess }]}>{amount}</Text>
+					</View>
+					<Text style={styles.title}>{t('historyTransaction.detail.note')}</Text>
+					<View style={styles.noteField}>
+						<Text style={styles.note}>{note}</Text>
+					</View>
 				</View>
 			</View>
 			<TouchableOpacity style={styles.backdrop} onPress={handleClose} />
