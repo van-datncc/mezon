@@ -23,6 +23,18 @@ const HeaderMezon = memo((props: HeaderProps) => {
 	const refHeader = useRef<HTMLDivElement>(null);
 	const [isScrolled, setIsScrolled] = useState(false);
 
+	// Google Analytics tracking function for header login button
+	const trackHeaderLoginClick = (action: string) => {
+		console.log(`Header Login Click: ${action}`);
+		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
+			(window as any).gtag('event', 'Login Button', {
+				event_category: 'Login Button',
+				event_label: action,
+				custom_parameter_1: 'mezon_header_login'
+			});
+		}
+	};
+
 	const handleScroll = useCallback(
 		throttle(() => {
 			const scrolled = window.scrollY > 50;
@@ -100,11 +112,11 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								Discover
 							</a>
 						</div>
-					</div>
-					<div className="w-fit">
+					</div>					<div className="w-fit">
 						<Link
 							className="hidden md:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
 							to={'/mezon'}
+							onClick={() => trackHeaderLoginClick(isLogin ? 'Open Mezon' : 'Login')}
 						>
 							{isLogin ? 'Open Mezon' : 'Login'}
 						</Link>

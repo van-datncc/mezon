@@ -12,6 +12,20 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
+	// Google Analytics tracking function for footer downloads
+	const trackFooterDownloadEvent = (platform: string, downloadType: string) => {
+		console.log('Tracking footer download event:', platform, downloadType);
+		console.log(`Footer Download clicked: ${platform} - ${downloadType}`);
+		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
+			(window as any).gtag('event', 'download_click', {
+				event_category: 'Footer Downloads',
+				event_label: platform,
+				download_type: downloadType,
+				custom_parameter_1: 'mezon_footer'
+			});
+		}
+	};
+
 	const toggleDropdown = () => {
 		setIsOpen(!isOpen);
 	};
@@ -128,15 +142,23 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 							</div>
 						</div>
 						<div className="flex flex-col gap-[16px]">
-							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>
-							<div className="flex flex-col gap-[16px]">
-								<a href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
+							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>							<div className="flex flex-col gap-[16px]">
+								<a
+									href="https://apps.apple.com/vn/app/mezon/id6502750046"
+									target="_blank"
+									rel="noreferrer"
+									onClick={() => trackFooterDownloadEvent('iOS', 'App Store')}
+								>
 									<Image src={`assets/app-store.svg`} className="max-w-[135px]" />
 								</a>
-								<a href="https://play.google.com/store/apps/details?id=com.mezon.mobile" target="_blank" rel="noreferrer">
+								<a
+									href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
+									target="_blank"
+									rel="noreferrer"
+									onClick={() => trackFooterDownloadEvent('Android', 'Google Play')}
+								>
 									<Image src={`assets/google-play.svg`} className="max-w-[135px]" />
-								</a>
-								{platform === Platform.MACOS ? (
+								</a>								{platform === Platform.MACOS ? (
 									<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
 										<button onClick={toggleDropdown}>
 											<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
@@ -144,7 +166,13 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 
 										{isOpen && (
 											<div className="absolute mt-[8px]">
-												<a className="cursor-pointer leading-[0px] block" href={downloadUrl} target="_blank" rel="noreferrer">
+												<a
+													className="cursor-pointer leading-[0px] block"
+													href={downloadUrl}
+													target="_blank"
+													rel="noreferrer"
+													onClick={() => trackFooterDownloadEvent('macOS', 'Apple Silicon')}
+												>
 													<Icons.MacAppleSilicon className="max-w-full h-[40px] w-fit" />
 												</a>
 												<a
@@ -152,6 +180,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 													href={universalUrl}
 													target="_blank"
 													rel="noreferrer"
+													onClick={() => trackFooterDownloadEvent('macOS', 'Intel')}
 												>
 													<Icons.MacAppleIntel className="max-w-full h-[40px] w-fit" />
 												</a>
@@ -159,24 +188,38 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										)}
 									</div>
 								) : platform === 'Linux' ? (
-									<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+										<a
+											className="cursor-pointer"
+											href={downloadUrl}
+											target="_blank"
+											rel="noreferrer"
+											onClick={() => trackFooterDownloadEvent('Linux', 'DEB Package')}
+										>
 										<Image src={`assets/linux.svg`} className="max-w-[135px]" />
 									</a>
 								) : (
 									<DropdownButton
 										icon={
-											<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+													<a
+														className="cursor-pointer"
+														href={downloadUrl}
+														target="_blank"
+														rel="noreferrer"
+														onClick={() => trackFooterDownloadEvent('Windows', 'EXE Installer')}
+													>
 												<Icons.MicrosoftDropdown className="max-w-full h-[40px] w-fit" />
 											</a>
 										}
 										downloadLinks={[
 											{
 												url: portableUrl,
-												icon: <Icons.MicrosoftWinPortable className="max-w-full h-[40px] max-md:w-fit" />
+												icon: <Icons.MicrosoftWinPortable className="max-w-full h-[40px] max-md:w-fit" />,
+												trackingData: { platform: 'Windows', type: 'Portable' }
 											}
 										]}
 										dropdownRef={dropdownRef}
 										downloadUrl={downloadUrl}
+												onDownloadClick={trackFooterDownloadEvent}
 									/>
 								)}
 							</div>

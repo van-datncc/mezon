@@ -191,7 +191,6 @@ const ModalSendToken = ({
 								onChange={handleChangeSearchTerm}
 								disabled={sendTokenInputsState.isUserSelectionDisabled}
 							/>
-							<Icons.ArrowDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 dark:text-gray-400 text-gray-500" />
 							{isDropdownOpen && (
 								<div
 									className="absolute z-20 w-full mt-2 dark:bg-gray-800 bg-white border dark:border-gray-600 border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll "
