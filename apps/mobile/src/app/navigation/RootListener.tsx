@@ -73,7 +73,7 @@ const RootListener = () => {
 					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
 						console.error('Error in tasks:', error);
 					});
-				}, 1000);
+				}, 500);
 			});
 		}
 	}, [isLoggedIn]);
@@ -89,10 +89,6 @@ const RootListener = () => {
 		const isDisableLoad = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		const isFromFCM = isDisableLoad?.toString() === 'true';
 		await mainLoaderTimeout({ isFromFCM });
-		// if (!isFromFCM) {
-		// 	await sleep(1000);
-		// 	refreshMessageInitApp();
-		// }
 	};
 
 	const messageLoaderBackground = useCallback(async () => {
@@ -121,9 +117,10 @@ const RootListener = () => {
 						channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE || ChannelType.CHANNEL_TYPE_MEZON_VOICE
 					})
 				),
-				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true }))
+				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true })),
+				dispatch(directActions.fetchDirectMessage({ noCache: true }))
 			];
-			await Promise.all(promise);
+			await Promise.allSettled(promise);
 			await notifee.cancelAllNotifications();
 			return null;
 		} catch (error) {
@@ -229,16 +226,16 @@ const RootListener = () => {
 	const mainLoader = useCallback(async () => {
 		try {
 			const promises = [];
-			promises.push(dispatch(listUsersByUserActions.fetchListUsersByUser({})));
-			promises.push(dispatch(friendsActions.fetchListFriends({})));
+			promises.push(dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
+			promises.push(dispatch(friendsActions.fetchListFriends({ noCache: true })));
 			promises.push(dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(dispatch(directActions.fetchDirectMessage({ noCache: true })));
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
 			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({})));
-			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
+			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true })));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
 			promises.push(dispatch(acitvitiesActions.listActivities()));
-			await Promise.all(promises);
+			await Promise.allSettled(promises);
 			return null;
 		} catch (error) {
 			console.log('error mainLoader', error);

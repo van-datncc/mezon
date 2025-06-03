@@ -63,20 +63,6 @@ export const HistoryTransactionScreen = () => {
 		dispatch(fetchListWalletLedger({ page: page }));
 	}, []);
 
-	const handleNextPage = () => {
-		if (count) {
-			dispatch(fetchListWalletLedger({ page: page + 1 }));
-			setPage(page + 1);
-		}
-	};
-
-	const handlePrevPage = () => {
-		if (count) {
-			dispatch(fetchListWalletLedger({ page: page - 1 }));
-			setPage(page - 1);
-		}
-	};
-
 	const toggleDetails = (transactionId: string, isMinus: boolean) => {
 		const data = {
 			children: <TransactionModal transactionId={transactionId} isMinus={isMinus} />
@@ -101,13 +87,13 @@ export const HistoryTransactionScreen = () => {
 					/>
 				</View>
 				<View style={styles.userRowItem}>
-					<View>
+					<View style={styles.userRowHeader}>
 						<Text style={styles.title}>{moment(item?.create_time).format('DD/MM/YYYY')}</Text>
-						<Text style={styles.code}>{t('historyTransaction.transactionCode', { code: item?.transaction_id })}</Text>
+						<Text style={[styles.title, { color: item?.value > 0 ? baseColor.bgSuccess : baseColor.buzzRed, fontWeight: 'bold' }]}>
+							{valueText(item.value)}
+						</Text>
 					</View>
-					<Text style={[styles.title, { color: item?.value > 0 ? baseColor.bgSuccess : baseColor.buzzRed, fontWeight: 'bold' }]}>
-						{valueText(item.value)}
-					</Text>
+					<Text style={styles.code}>{t('historyTransaction.transactionCode', { code: item?.transaction_id })}131231231231231232</Text>
 				</View>
 			</Pressable>
 		);
