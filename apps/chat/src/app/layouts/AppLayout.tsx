@@ -8,7 +8,6 @@ import {
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
-	MezonNotificationService,
 	TITLE_BAR_ACTION,
 	UNMAXIMIZE_WINDOW,
 	isLinuxDesktop,
@@ -93,12 +92,12 @@ const AppLayout = () => {
 	const currentUserId = useSelector(selectAllAccount)?.user?.id;
 
 	useEffect(() => {
-		currentUserId && notificationService.setCurrentUserId(currentUserId);
+		currentUserId && notificationService.setCurrentActiveUserId(currentUserId);
 	}, [currentUserId]);
 
 	useEffect(() => {
 		if (!isLogin) {
-			notificationService.isActive && notificationService.close();
+			notificationService.isActive && notificationService.disconnectAll();
 			return;
 		}
 		handleConnectNoti();
@@ -124,13 +123,13 @@ const AppLayout = () => {
 					})
 				);
 				const token = (response?.payload as { token: string })?.token;
-				const notiService = new MezonNotificationService();
-				notiService.connect(token);
+
+				notificationService.connect(token, sessionData.user_id as string);
 			});
 
 			await Promise.all(tasks.map((fn) => fn()));
 		}
-	}, [sessions]);
+	}, [sessions, currentUserId]);
 	const navigate = useCustomNavigate();
 	useEffect(() => {
 		const handleCustomNavigation = (event: CustomEvent) => {
