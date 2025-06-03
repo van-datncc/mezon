@@ -13,8 +13,6 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const trackFooterDownloadEvent = (platform: string, downloadType: string) => {
-		console.log('Tracking footer download event:', platform, downloadType);
-		console.log(`Footer Download clicked: ${platform} - ${downloadType}`);
 		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
 			(window as any).gtag('event', 'download_click', {
 				event_category: 'Footer Downloads',

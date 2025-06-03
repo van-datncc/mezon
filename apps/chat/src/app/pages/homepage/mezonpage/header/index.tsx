@@ -24,7 +24,6 @@ const HeaderMezon = memo((props: HeaderProps) => {
 	const [isScrolled, setIsScrolled] = useState(false);
 
 	const trackHeaderLoginClick = (action: string) => {
-		console.log(`Header Login Click: ${action}`);
 		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
 			(window as any).gtag('event', 'Login Button', {
 				event_category: 'Login Button',

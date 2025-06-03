@@ -67,7 +67,6 @@ function MezonPage() {
 	};
 
 	const trackDownloadEvent = (platform: string, downloadType: string) => {
-		console.log(`Download clicked: ${platform} - ${downloadType}`);
 		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
 			(window as any).gtag('event', 'download_click', {
 				event_category: 'Downloads',
