@@ -2595,7 +2595,7 @@ export function TrashIcon(props: React.HTMLAttributes<SVGElement>) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
-			className="dark:text-[#AEAEAE] text-textLightTheme"
+			className="dark:text-[#AEAEAE] text-colorTextLightMode"
 			{...props}
 		>
 			<path
@@ -6685,13 +6685,7 @@ export function History(props: React.HTMLAttributes<SVGAElement>) {
 }
 export function HistoryTransaction(props: React.SVGProps<SVGSVGElement>) {
 	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={props.className}
-			{...props}
-		>
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={props.className} {...props}>
 			<g>
 				<path
 					fillRule="evenodd"

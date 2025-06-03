@@ -4,10 +4,11 @@ import { DOWNLOAD_FILE, EFailAttachment, electronBridge, IMessageWithUser } from
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { ModalDeleteMess, RenderAttachmentThumbnail } from '../../components';
+const PDFViewerModal = lazy(() => import('../PDFViewer').then((module) => ({ default: module.PDFViewerModal })));
 
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
@@ -28,6 +29,25 @@ export const AttachmentLoader = ({ appearanceTheme }: { appearanceTheme: 'light'
 	return (
 		<div className="w-[30px] h-[30px] flex justify-center items-center">
 			<div className={appearanceTheme === 'light' ? 'light-attachment-loader' : 'dark-attachment-loader'} />
+		</div>
+	);
+};
+
+const PDFLoadingFallback = () => {
+	return (
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50">
+			<div
+				className={`relative w-[90vw] h-[90vh] max-w-4xl bg-gray-50 dark:bg-[#2f3136] rounded-lg shadow-xl flex items-center justify-center`}
+			>
+				<div className="flex flex-col items-center space-y-4">
+					<div className={`animate-spin rounded-full h-12 w-12 border-b-2 border-gray-200 dark:border-[#202225]}`} />
+					<p
+						className={`text-sm transition-colors duration-200 text-gray-600 dark:text-[#b9bbbe] hover:bg-gray-200 dark:hover:bg-[#40444b]`}
+					>
+						Loading PDF Viewer...
+					</p>
+				</div>
+			</div>
 		</div>
 	);
 };
@@ -65,12 +85,25 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 		attachmentData.filetype !== 'image/jpeg' &&
 		attachmentData.filetype !== 'video/mp4';
 
+	const isPDF = attachmentData.filetype === 'application/pdf' || attachmentData.filename?.toLowerCase().endsWith('.pdf');
+
 	const [hoverShowOptButtonStatus, setHoverShowOptButtonStatus] = useState(false);
 	const hoverOptButton = () => {
 		setHoverShowOptButtonStatus(true);
 	};
 
 	const appearanceTheme = useSelector(selectTheme);
+
+	const [showPDFViewer, closePDFViewer] = useModal(() => {
+		if (isPDF && attachmentData.url) {
+			return (
+				<Suspense fallback={<PDFLoadingFallback />}>
+					<PDFViewerModal isOpen={true} onClose={closePDFViewer} pdfUrl={attachmentData.url as string} filename={attachmentData.filename} />
+				</Suspense>
+			);
+		}
+		return null;
+	}, [isPDF, attachmentData.url, attachmentData.filename]);
 
 	const [showModal, closeModal] = useModal(() => {
 		if (message && mode) {
@@ -103,32 +136,41 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 			) : (
 				<div className="flex items-center">{thumbnailAttachment}</div>
 			)}
-
 			{attachmentData.filename === EFailAttachment.FAIL_ATTACHMENT ? (
 				<div className="text-red-500">Attachment failed to load.</div>
 			) : (
 				hideTheInformationFile && (
 					<>
-						<div className="cursor-pointer" onClick={handleDownload} onKeyDown={handleDownload}>
+						<div className="cursor-pointer flex-1" onClick={handleDownload} onKeyDown={handleDownload}>
 							<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
 							<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
 						</div>
 						{hoverShowOptButtonStatus && (
-							<div className="h-8 absolute right-[-0.6rem] top-[-0.5rem] w-16 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
-								<div
+							<div className="flex space-x-2">
+								<button
 									onClick={handleDownload}
-									role="button"
-									className="rounded-l-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+									className="rounded-md w-8 h-8 flex justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+									title="Download"
 								>
 									<Icons.Download defaultSize="w-4 h-4" />
-								</div>
-								<div
+								</button>
+								<button
 									onClick={handleOpenRemoveAttachementModal}
-									className={`rounded-r-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer hover:bg-[#E13542]`}
+									className="rounded-md w-8 h-8 flex justify-center items-center cursor-pointer  dark:hover:bg-[#393C40] hover:bg-gray-300"
+									title="Remove"
 								>
-									<Icons.TrashIcon className="w-4 h-4" />
-								</div>
+									<Icons.TrashIcon className="w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode" />
+								</button>
 							</div>
+						)}
+						{isPDF && (
+							<button
+								onClick={showPDFViewer}
+								className="px-3 py-1 text-sm rounded transition-all duration-200 text-white bg-[#5865f2] hover:opacity-90"
+								title="View PDF"
+							>
+								View
+							</button>
 						)}
 					</>
 				)
