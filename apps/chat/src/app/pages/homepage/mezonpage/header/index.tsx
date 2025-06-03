@@ -23,7 +23,6 @@ const HeaderMezon = memo((props: HeaderProps) => {
 	const refHeader = useRef<HTMLDivElement>(null);
 	const [isScrolled, setIsScrolled] = useState(false);
 
-	// Google Analytics tracking function for header login button
 	const trackHeaderLoginClick = (action: string) => {
 		console.log(`Header Login Click: ${action}`);
 		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {

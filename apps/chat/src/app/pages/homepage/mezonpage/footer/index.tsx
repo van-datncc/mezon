@@ -12,7 +12,6 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
-	// Google Analytics tracking function for footer downloads
 	const trackFooterDownloadEvent = (platform: string, downloadType: string) => {
 		console.log('Tracking footer download event:', platform, downloadType);
 		console.log(`Footer Download clicked: ${platform} - ${downloadType}`);
