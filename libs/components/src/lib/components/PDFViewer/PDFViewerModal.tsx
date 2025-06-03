@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -8,7 +9,23 @@ import { PDFHeader } from './PDFHeader';
 import { PDFStatusBar } from './PDFStatusBar';
 import type { PDFDocumentProxy, PDFViewerModalProps } from './types';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+let pdfjsPath = '';
+if (isElectron()) {
+	const pathParts = window.location.pathname.split('/');
+	const chatIndex = pathParts.findIndex((part) => part === 'chat');
+	if (chatIndex !== -1) {
+		const appPath = pathParts.slice(0, chatIndex + 1).join('/');
+		pdfjsPath = `file://${appPath}/pdf.worker.min.mjs`;
+	} else {
+		pdfjsPath = 'file://' + window.location.pathname.replace(/\/index\.html.*$/, '/pdf.worker.min.mjs');
+	}
+} else {
+	pdfjsPath = '/pdf.worker.min.mjs';
+}
+
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsPath;
+
+console.log(pdfjsPath, 'pdfjsPath');
 
 export const PDFViewerModal: FC<PDFViewerModalProps> = ({ isOpen, onClose, pdfUrl, filename = 'Document.pdf' }) => {
 	const [numPages, setNumPages] = useState<number>();

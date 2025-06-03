@@ -3,7 +3,7 @@ import { CloseIcon } from './icons';
 import type { PDFHeaderProps } from './types';
 
 export const PDFHeader: React.FC<PDFHeaderProps> = ({ filename, onClose }) => (
-	<div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#202225] bg-gray-50 dark:bg-[#2f3136] rounded-t-lg">
+	<div className="flex items-center justify-between px-4 border-b border-gray-200 dark:border-[#202225] bg-gray-50 dark:bg-[#2f3136] rounded-t-lg">
 		<h3 className="text-lg font-semibold truncate text-gray-900 dark:text-[#dcddde]">{filename}</h3>
 		<button
 			onClick={onClose}

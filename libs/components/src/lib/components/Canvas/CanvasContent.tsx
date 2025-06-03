@@ -29,13 +29,15 @@ type CanvasContentProps = {
 	content: string;
 	idCanvas: string;
 	isEditAndDelCanvas: boolean;
+	onCanvasChange?: () => void;
 };
 
-function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: CanvasContentProps) {
+function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onCanvasChange }: CanvasContentProps) {
 	const [toolbarVisible, setToolbarVisible] = useState(false);
 	const quillRef = useRef<Quill | null>(null);
 	const editorRef = useRef<HTMLDivElement | null>(null);
 	const toolbarRef = useRef<HTMLDivElement | null>(null);
+	const hasSetInitialContent = useRef(false);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
 	const placeholderColor = isLightMode ? 'rgba(0,0,0,0.6)' : '#ffffff';
@@ -83,12 +85,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 	});
 
 	useEffect(() => {
-		if (content && quillRef.current) {
+		if (content && quillRef.current && !hasSetInitialContent.current) {
 			const selection = quillRef.current.getSelection();
 			quillRef.current.setContents(safeJSONParse(content));
 			if (selection) {
 				quillRef.current.setSelection(selection.index, selection.length);
 			}
+			hasSetInitialContent.current = true;
 		}
 	}, [content]);
 
@@ -130,9 +133,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 			quillRef.current.root.style.userSelect = 'none';
 		}
 
-		quillRef.current.on('text-change', () => {
+		quillRef.current.on('text-change', (delta, old, source) => {
 			const data = JSON.stringify(quillRef.current?.getContents());
-			handleContentChange(data);
+			handleContentChange(data, source, delta);
 			const selection = quillRef.current?.getSelection();
 			if (selection) {
 				const formats = quillRef.current?.getFormat(selection.index, selection.length);
@@ -296,8 +299,16 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas }: C
 		};
 	}, [isEditAndDelCanvas]);
 
-	const handleContentChange = (content: string) => {
+	const handleContentChange = (content: string, source: string, delta: any) => {
 		dispatch(canvasActions.setContent(content));
+		const hasContentChanges = delta?.ops?.some((op: any) => {
+			if (op.retain && op.attributes) return true;
+			return false;
+		});
+
+		if (hasContentChanges || source !== 'api') {
+			onCanvasChange?.();
+		}
 	};
 
 	const formatText = (format: keyof ActiveFormats) => {
