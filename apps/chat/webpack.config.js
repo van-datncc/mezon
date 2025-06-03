@@ -75,11 +75,18 @@ module.exports = composePlugins(
               return path.posix.join('.well-known', filename);
             },
           },
+          {
+            from: path.resolve(__dirname, '../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
+            to: 'pdf.worker.min.mjs',
+            noErrorOnMissing: true,
+          },
         ],
       })
     );
 
     config.devServer = config.devServer || {};
+
+    config.devServer.allowedHosts = 'all';
 
     config.devServer.static = {
       directory: path.join(__dirname, 'src/assets'),

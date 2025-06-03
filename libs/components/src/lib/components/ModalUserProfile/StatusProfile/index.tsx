@@ -6,7 +6,7 @@ import {
 	clanMembersMetaActions,
 	clearAllMemoizedFunctions,
 	giveCoffeeActions,
-	selectAllAcount,
+	selectOthersSession,
 	selectUserStatus,
 	useAppDispatch,
 	userClanProfileActions,
@@ -34,14 +34,14 @@ type StatusProfileProps = {
 };
 const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
-	const allAccount = useSelector(selectAllAcount);
+	const allAccount = useSelector(selectOthersSession);
 	const user = userById?.user;
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const userStatus = useSelector(selectUserStatus);
-	const status = userStatus?.status || 'online';
+	const status = userStatus?.status || 'Online';
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;

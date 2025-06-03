@@ -16,6 +16,7 @@ import { EEventAction } from '@mezon/utils';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { useDebouncedCallback } from 'use-debounce';
 
 const CanvasContent = lazy(() => import('./CanvasContent'));
 
@@ -35,7 +36,7 @@ const Canvas = () => {
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const canvasById = useSelector((state) => selectCanvasEntityById(state, currentChannelId, idCanvas));
-	const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+
 	const [showLoading, setShowLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const appearanceTheme = useSelector(selectTheme);
@@ -94,50 +95,55 @@ const Canvas = () => {
 	}, [canvasId, channelId, clanId, dispatch, refreshCanvasData]);
 
 	useEffect(() => {
+		return () => {
+			dispatch(canvasActions.setTitle(''));
+			dispatch(canvasActions.setContent(''));
+			dispatch(canvasActions.setIdCanvas(''));
+			dispatch(appActions.setIsShowCanvas(false));
+		};
+	}, []);
+
+	useEffect(() => {
 		if (textAreaRef.current) {
 			textAreaRef.current.style.height = 'auto';
 			textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
 		}
 	}, [title]);
 
-	const callCreateEditCanvas = async (isCreate: number) => {
-		if (currentChannelId && currentClanId) {
-			const body = {
-				channel_id: currentChannelId,
-				clan_id: currentClanId?.toString(),
-				content: content,
-				...(idCanvas && { id: idCanvas }),
-				...(canvasById?.is_default && { is_default: true }),
-				title: title,
-				status: isCreate
-			};
-			const response = await dispatch(createEditCanvas(body) as any);
-			if (response) {
-				dispatch(canvasActions.setIdCanvas(response?.payload?.id));
+	const callCreateEditCanvas = useCallback(
+		async (isCreate: number) => {
+			if (currentChannelId && currentClanId) {
+				const body = {
+					channel_id: currentChannelId,
+					clan_id: currentClanId?.toString(),
+					content: content,
+					...(idCanvas && { id: idCanvas }),
+					...(canvasById?.is_default && { is_default: true }),
+					title: title,
+					status: isCreate
+				};
+				const response = await dispatch(createEditCanvas(body) as any);
+				if (response) {
+					dispatch(canvasActions.setIdCanvas(response?.payload?.id));
+				}
 			}
+		},
+		[currentChannelId, currentClanId, content, idCanvas, canvasById?.is_default, title, dispatch]
+	);
+
+	const debouncedSave = useDebouncedCallback(() => {
+		let isCreate: number = EEventAction.UPDATE;
+		if (!idCanvas || (title && title !== canvasById?.title) || (content && content !== canvasById?.content)) {
+			isCreate = EEventAction.CREATED;
 		}
-	};
 
-	useEffect(() => {
-		if ((title && title !== canvasById?.title) || (content && content !== canvasById?.content)) {
-			if (debounceTimer) {
-				clearTimeout(debounceTimer);
-			}
-			let isCreate: number;
+		callCreateEditCanvas(isCreate);
+	}, 1000);
 
-			if (!idCanvas || (title && title !== canvasById?.title)) {
-				isCreate = EEventAction.CREATED;
-			}
-
-			const timer = setTimeout(() => {
-				callCreateEditCanvas(isCreate);
-			}, 1000);
-
-			setDebounceTimer(timer);
-
-			return () => clearTimeout(timer);
-		}
-	}, [title, content]);
+	const handleCanvasChange = useCallback(() => {
+		if (!isEditAndDelCanvas) return;
+		debouncedSave();
+	}, [isEditAndDelCanvas, debouncedSave]);
 
 	useEffect(() => {
 		if (canvasById) {
@@ -148,10 +154,10 @@ const Canvas = () => {
 	}, [canvasById]);
 
 	const handleInputChange = (e: { target: { value: any } }) => {
-		if (isEditAndDelCanvas) {
-			const newTitle = e.target.value;
-			dispatch(canvasActions.setTitle(newTitle));
-		}
+		if (!isEditAndDelCanvas) return;
+		const newTitle = e.target.value;
+		dispatch(canvasActions.setTitle(newTitle));
+		handleCanvasChange();
 	};
 
 	if (showLoading) {
@@ -201,6 +207,7 @@ const Canvas = () => {
 						isLightMode={appearanceTheme === 'light'}
 						content={content || ''}
 						isEditAndDelCanvas={isEditAndDelCanvas}
+						onCanvasChange={handleCanvasChange}
 					/>
 				</Suspense>
 			</div>

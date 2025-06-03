@@ -7,3 +7,4 @@ export { default as VoicePopout } from './VoiceChannel/VoicePopout/VoicePopout';
 
 export * from './DmCall';
 export * from './GroupCall';
+export * from './PDFViewer';
