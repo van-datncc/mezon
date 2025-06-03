@@ -41,7 +41,7 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	};
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const userStatus = useSelector(selectUserStatus);
-	const status = userStatus?.status || 'online';
+	const status = userStatus?.status || 'Online';
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
