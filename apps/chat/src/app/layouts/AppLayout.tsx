@@ -1,13 +1,14 @@
 //TODO: recheck
 import { ToastController } from '@mezon/components';
 import { useCustomNavigate } from '@mezon/core';
-import { fcmActions, handleTopicNotification, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { fcmActions, handleTopicNotification, selectAllAccount, selectAllSession, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
+	MezonNotificationService,
 	TITLE_BAR_ACTION,
 	UNMAXIMIZE_WINDOW,
 	isLinuxDesktop,
@@ -15,7 +16,8 @@ import {
 	notificationService
 } from '@mezon/utils';
 import isElectron from 'is-electron';
-import React, { useEffect } from 'react';
+import { Session } from 'mezon-js';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData, useLocation } from 'react-router-dom';
 import { IAppLoaderData } from '../loaders/appLoader';
@@ -87,6 +89,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
+	const sessions = useSelector(selectAllSession);
 	const currentUserId = useSelector(selectAllAccount)?.user?.id;
 
 	useEffect(() => {
@@ -98,23 +101,36 @@ const AppLayout = () => {
 			notificationService.isActive && notificationService.close();
 			return;
 		}
+		handleConnectNoti();
+	}, [isLogin, sessions]);
 
-		dispatch(
-			fcmActions.registFcmDeviceToken({
-				tokenId: 'foo',
-				deviceId: 'bar',
-				platform: 'desktop'
-			})
-		)
-			.then((response): void => {
+	const handleConnectNoti = useCallback(async () => {
+		if (sessions) {
+			const tasks = Object.keys(sessions).map((key) => async () => {
+				const sessionData = sessions[key];
+				const session = new Session(
+					sessionData.token,
+					sessionData.refresh_token,
+					sessionData.created,
+					sessionData.api_url,
+					!!sessionData.is_remember
+				);
+				const response = await dispatch(
+					fcmActions.registFcmDeviceToken({
+						session: session as Session,
+						tokenId: `${sessionData.user_id}`,
+						deviceId: sessionData.username as string,
+						platform: 'desktop'
+					})
+				);
 				const token = (response?.payload as { token: string })?.token;
-				notificationService.connect(token);
-			})
-			.catch((error) => {
-				console.error(error);
+				const notiService = new MezonNotificationService();
+				notiService.connect(token);
 			});
-	}, [isLogin]);
 
+			await Promise.all(tasks.map((fn) => fn()));
+		}
+	}, [sessions]);
 	const navigate = useCustomNavigate();
 	useEffect(() => {
 		const handleCustomNavigation = (event: CustomEvent) => {

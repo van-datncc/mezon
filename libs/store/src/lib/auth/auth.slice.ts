@@ -140,7 +140,7 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 
 export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platform }: { device_id?: string; platform?: string }, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const sessionState = selectAllAcount(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+	const sessionState = selectOthersSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
@@ -453,9 +453,13 @@ export const selectRegisteringStatus = createSelector(getAuthState, (state: Auth
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
 
-export const selectAllAcount = createSelector(getAuthState, (state: AuthState) => {
+export const selectOthersSession = createSelector(getAuthState, (state: AuthState) => {
 	const key = Object.keys(state.session || []).filter((key) => {
 		return key !== state.activeAccount;
 	});
 	return state.session?.[key[0]];
+});
+
+export const selectAllSession = createSelector(getAuthState, (state: AuthState) => {
+	return state.session;
 });

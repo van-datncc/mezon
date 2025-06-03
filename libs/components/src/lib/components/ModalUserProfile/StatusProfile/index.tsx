@@ -6,7 +6,7 @@ import {
 	clanMembersMetaActions,
 	clearAllMemoizedFunctions,
 	giveCoffeeActions,
-	selectAllAcount,
+	selectOthersSession,
 	selectUserStatus,
 	useAppDispatch,
 	userClanProfileActions,
@@ -34,7 +34,7 @@ type StatusProfileProps = {
 };
 const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
-	const allAccount = useSelector(selectAllAcount);
+	const allAccount = useSelector(selectOthersSession);
 	const user = userById?.user;
 	const handleCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
