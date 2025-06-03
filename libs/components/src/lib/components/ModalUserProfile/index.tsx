@@ -253,7 +253,7 @@ const ModalUserProfile = ({
 								placeholder={`Message @${placeholderUserName}`}
 								value={content}
 								onKeyPress={(e) => {
-									if (e.key === 'Enter') {
+									if (e.key === 'Enter' && content) {
 										if (userById) {
 											sendMessage(
 												userById?.user?.id || '',
