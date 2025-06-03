@@ -7,7 +7,6 @@ import {
 	getStore,
 	selectAllFriends,
 	selectAllUserClans,
-	selectClanSystemMessage,
 	selectCurrentClanId,
 	selectDirectsOpenlist,
 	useAppDispatch
@@ -15,6 +14,7 @@ import {
 import Clipboard from '@react-native-clipboard/clipboard';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
+import { ApiSystemMessage } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
@@ -54,7 +54,6 @@ export const FriendList = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const { sendInviteMessage } = useSendInviteMessage();
 		const [sentIdList, setSentIdList] = useState<string[]>([]);
-		const welcomeChannel = useSelector(selectClanSystemMessage);
 		const dispatch = useAppDispatch();
 		const currentInviteLinkRef = useRef('');
 		const store = getStore();
@@ -155,6 +154,8 @@ export const FriendList = React.memo(
 		};
 
 		const fetchInviteLink = async () => {
+			const resp = await dispatch(fetchSystemMessageByClanId({ clanId: currentClanId, noCache: true }));
+			const welcomeChannel = resp?.payload as ApiSystemMessage;
 			const response = await createLinkInviteUser(currentClanId ?? '', channelId ? channelId : welcomeChannel?.channel_id, 10);
 			if (!response || !response?.invite_link) {
 				return;
@@ -162,20 +163,11 @@ export const FriendList = React.memo(
 			currentInviteLinkRef.current = process.env.NX_CHAT_APP_REDIRECT_URI + '/invite/' + response.invite_link;
 		};
 
-		const fetchSystemMessage = async () => {
-			if (!currentClanId) return;
-			await dispatch(fetchSystemMessageByClanId(currentClanId));
-		};
-
-		useEffect(() => {
-			fetchSystemMessage();
-		}, [currentClanId]);
-
 		useEffect(() => {
 			if (currentClanId && currentClanId !== '0') {
 				fetchInviteLink();
 			}
-		}, [currentClanId, channelId, welcomeChannel?.channel_id]);
+		}, [currentClanId, channelId]);
 
 		const inviteToChannelIconList = useMemo(() => {
 			const iconList: IInviteToChannelIconProp[] = [
@@ -256,6 +248,7 @@ export const FriendList = React.memo(
 
 						<FlashList
 							data={userInviteList}
+							extraData={sentIdList}
 							keyExtractor={(item) => `${item?.id}_item_invite`}
 							ItemSeparatorComponent={() => {
 								return <SeparatorWithLine style={{ backgroundColor: themeValue.border }} />;

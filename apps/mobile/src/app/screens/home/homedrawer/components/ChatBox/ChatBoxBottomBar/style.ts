@@ -2,6 +2,9 @@ import { Attributes, baseColor, size } from '@mezon/mobile-ui';
 import { Platform, StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		container: {
+			paddingHorizontal: size.s_2
+		},
 		btnIcon: {
 			width: size.s_40,
 			height: size.s_40,
@@ -14,21 +17,6 @@ export const style = (colors: Attributes) =>
 			position: 'relative',
 			justifyContent: 'center',
 			borderRadius: size.s_22
-		},
-		inputStyle: {
-			maxHeight: size.s_40 * 3,
-			lineHeight: size.s_20,
-			width: '100%',
-			borderBottomWidth: 0,
-			borderRadius: size.s_20,
-			paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
-			paddingRight: size.s_40,
-			fontSize: size.medium,
-			paddingTop: size.s_8,
-			paddingBottom: size.s_12,
-			backgroundColor: colors.tertiary,
-			color: colors.textStrong,
-			textAlignVertical: 'center'
 		},
 		iconEmoji: {
 			position: 'absolute',
@@ -46,5 +34,51 @@ export const style = (colors: Attributes) =>
 			top: -size.s_10,
 			right: -size.s_10,
 			transform: [{ rotate: '45deg' }]
+		},
+		containerInput: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			paddingBottom: size.s_20,
+			paddingTop: size.s_10,
+			paddingLeft: size.s_4
+		},
+		inputWrapper: {
+			position: 'relative',
+			flex: 1,
+			flexDirection: 'row',
+			paddingHorizontal: size.s_6
+		},
+		input: {
+			alignItems: 'center',
+			flex: 1,
+			justifyContent: 'center'
+		},
+		inputStyle: {
+			maxHeight: size.s_40 * 3,
+			lineHeight: size.s_20,
+			width: '100%',
+			borderBottomWidth: 0,
+			borderRadius: size.s_20,
+			paddingLeft: Platform.OS === 'ios' ? size.s_16 : size.s_20,
+			paddingRight: size.s_40,
+			fontSize: size.medium,
+			paddingTop: size.s_8,
+			paddingBottom: size.s_12,
+			backgroundColor: colors.tertiary,
+			color: colors.textStrong,
+			textAlignVertical: 'center'
+		},
+		suggestions: {
+			position: 'absolute',
+			bottom: size.s_70 + size.s_4,
+			left: 0,
+			right: 0,
+			maxHeight: size.s_615,
+			backgroundColor: colors.primary,
+			borderTopColor: colors.secondaryLight,
+			borderRadius: size.s_8,
+			overflow: 'hidden',
+			zIndex: 10
 		}
 	});

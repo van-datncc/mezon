@@ -12,8 +12,6 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 		},
 		container: {
 			backgroundColor: colors.primary,
-			padding: Metrics.size.xl,
-			margin: Metrics.size.l,
 			borderRadius: 10,
 			overflow: 'hidden',
 			width: '90%',
@@ -79,5 +77,19 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			color: colors.text,
 			fontSize: Fonts.size.h7,
 			marginVertical: size.s_6
+		},
+		wrapper: {
+			padding: Metrics.size.xl,
+			margin: Metrics.size.l
+		},
+		overlay: {
+			position: 'absolute',
+			width: '100%',
+			height: '100%',
+			alignItems: 'center',
+			justifyContent: 'center',
+			alignSelf: 'center',
+			backgroundColor: 'rgba(0, 0, 0, 0.5)',
+			zIndex: 1000
 		}
 	});
