@@ -288,7 +288,6 @@ export function ControlBar({
 	const handleEmojiSelect = useCallback(
 		(emoji: string, emojiId: string) => {
 			sendEmojiReaction(emoji, emojiId);
-			setShowEmojiPanel(false);
 		},
 		[sendEmojiReaction]
 	);
