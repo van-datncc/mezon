@@ -3,10 +3,11 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { safeJSONParse } from 'mezon-js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { Camera, CameraType } from 'react-native-camera-kit';
@@ -31,6 +32,7 @@ export const QRScanner = () => {
 	const [isSuccess, setIsSuccess] = useState<boolean>(false);
 	const { confirmLoginRequest } = useAuth();
 	const { themeValue, themeBasic } = useTheme();
+	const scanningRef = useRef(true);
 	const styles = style(themeValue);
 
 	useEffect(() => {
@@ -208,12 +210,16 @@ export const QRScanner = () => {
 				key={cameraKey}
 				cameraType={CameraType.Back}
 				showFrame={false}
-				onReadCode={(event) => {
+				onReadCode={async (event) => {
+					if (!scanningRef.current) return;
 					const qrValue = event?.nativeEvent?.codeStringValue;
+					scanningRef.current = false;
 					if (qrValue) {
 						setDoScanBarcode(false);
-						onNavigationScanned(qrValue);
+						await onNavigationScanned(qrValue);
 					}
+					await sleep(5000);
+					scanningRef.current = true;
 				}}
 				scanBarcode={doScanBarcode}
 				style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}

@@ -108,7 +108,7 @@ const formatMarkdownHeadings = (text: string): React.ReactNode[] => {
 					break;
 			}
 		} else {
-			formattedLines.push(line);
+			formattedLines.push(line + '\n');
 		}
 	});
 

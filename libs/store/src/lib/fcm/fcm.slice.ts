@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
+import { Session } from 'mezon-js';
+import { ensureSession, getMezonCtx } from '../helpers';
 
 const REGIS_FCM_TOKEN_CACHED_TIME = 1000 * 60 * 60;
 
@@ -14,36 +14,26 @@ const initialState: fcm = {
 };
 
 type FcmDeviceTokenPayload = {
+	session: Session;
 	tokenId: string;
 	deviceId: string;
 	platform?: string;
 	voipToken?: string;
 };
 
-export const registFcmDeviceTokenCached = memoizeAndTrack(
-	(mezon: MezonValueContext, tokenId: string, deviceId: string, platform: string, voipToken?: string) =>
-		mezon.client.registFCMDeviceToken(mezon.session, tokenId, deviceId, platform || '', voipToken || ''),
-	{
-		promise: true,
-		maxAge: REGIS_FCM_TOKEN_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.username;
-		}
-	}
-);
-
 export const registFcmDeviceToken = createAsyncThunk(
 	'fcm/registFcmDeviceToken',
-	async ({ tokenId, deviceId, platform, voipToken }: FcmDeviceTokenPayload, thunkAPI) => {
+	async ({ session, tokenId, deviceId, platform, voipToken }: FcmDeviceTokenPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await registFcmDeviceTokenCached(mezon, tokenId, deviceId, platform || '', voipToken || '');
+			const response = await mezon.client.registFCMDeviceToken(session, tokenId, deviceId, platform || '', voipToken || '');
 			if (!response) {
 				return thunkAPI.rejectWithValue(null);
 			}
 			thunkAPI.dispatch(fcmActions.setGotifyToken(response?.token));
 			return response;
-		} catch {
+		} catch (e) {
+			console.error('Error', e);
 			return null;
 		}
 	}
