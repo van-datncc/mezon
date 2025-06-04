@@ -35,7 +35,7 @@ export const EmbedMessage = memo(({ message_id, embed, channel_id, onLongPress }
 			channelId: channel_id
 		};
 		const data = {
-			children: <ImageListModal channelId={''} imageSelected={imageData} isShowForward={true} />
+			children: <ImageListModal channelId={''} imageSelected={imageData} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};

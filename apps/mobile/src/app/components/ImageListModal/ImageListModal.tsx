@@ -17,7 +17,6 @@ import { RenderHeaderModal } from './RenderHeaderModal';
 interface IImageListModalProps {
 	imageSelected?: AttachmentEntity;
 	channelId: string;
-	isShowForward?: boolean;
 }
 
 interface IVisibleToolbarConfig {
@@ -29,7 +28,7 @@ const TIME_TO_HIDE_THUMBNAIL = 5000;
 const TIME_TO_SHOW_SAVE_IMAGE_SUCCESS = 3000;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
-	const { imageSelected, channelId, isShowForward = false } = props;
+	const { imageSelected, channelId } = props;
 	const { t } = useTranslation('common');
 	const [currentImage, setCurrentImage] = useState<AttachmentEntity | null>(null);
 	const [visibleToolbarConfig, setVisibleToolbarConfig] = useState<IVisibleToolbarConfig>({ showHeader: true, showFooter: false });
@@ -174,13 +173,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	return (
 		<View style={{ flex: 1 }}>
 			{visibleToolbarConfig.showHeader && (
-				<RenderHeaderModal
-					onClose={onClose}
-					imageSelected={currentImage}
-					onImageSaved={onImageSaved}
-					onLoading={onLoading}
-					isShowForward={isShowForward}
-				/>
+				<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} onLoading={onLoading} />
 			)}
 			<GalleryAwesome
 				ref={ref}

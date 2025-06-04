@@ -7,7 +7,6 @@ import {
 	selectDmGroupCurrentId,
 	selectMemberClanByUserId2,
 	selectMessageByMessageId,
-	setIsForwardAll,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
@@ -28,10 +27,9 @@ interface IRenderFooterModalProps {
 	imageSelected?: AttachmentEntity;
 	onImageSaved?: () => void;
 	onLoading?: (isLoading: boolean) => void;
-	isShowForward?: boolean;
 }
 
-export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading, isShowForward = false }: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, imageSelected?.uploader || ''));
@@ -46,7 +44,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 		onLoading(true);
 		try {
 			const { url, filetype } = imageSelected;
-			const filetypeParts = filetype?.split('/');
+			const filetypeParts = filetype?.split?.('/');
 			const filePath = await downloadImage(url, filetypeParts[1]);
 			if (filePath) {
 				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0], false);
@@ -66,7 +64,6 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			const message = selectMessageByMessageId(store?.getState(), imageSelected?.channelId, imageSelected?.message_id);
 			if (message) {
 				onClose();
-				dispatch(setIsForwardAll(false));
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				await sleep(500);
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
@@ -122,11 +119,9 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				)}
 			</View>
 			<View style={styles.option}>
-				{isShowForward && (
-					<TouchableOpacity onPress={handleForwardMessage}>
-						<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} />
-					</TouchableOpacity>
-				)}
+				<TouchableOpacity onPress={handleForwardMessage}>
+					<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} />
+				</TouchableOpacity>
 				<TouchableOpacity onPress={handleDownloadImage}>
 					<MezonIconCDN icon={IconCDN.downloadIcon} color={Colors.white} />
 				</TouchableOpacity>
