@@ -198,7 +198,6 @@ const ForwardMessageScreen = () => {
 						sendForwardMessage('', channelId, ChannelStreamMode.STREAM_MODE_GROUP, false, message);
 						break;
 					case ChannelType.CHANNEL_TYPE_CHANNEL:
-						console.log('send forward message to channel', message, clanId, channelId, selectedForwardObjectsRef.current);
 						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, !isPrivate, message);
 						break;
 					default:
