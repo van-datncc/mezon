@@ -25,6 +25,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const totalPages = count === undefined ? 0 : Math.ceil(count / limitWallet);
 	const [openedTransactionId, setOpenedTransactionId] = useState<string | null>(null);
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+
 	useEffect(() => {
 		dispatch(fetchListWalletLedger({ page: 1 }));
 	}, [dispatch]);
@@ -111,6 +113,12 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		);
 	};
 
+	const handleCopy = (text: string) => {
+		navigator.clipboard.writeText(text);
+		setCopiedId(text);
+		setTimeout(() => setCopiedId(null), 1500);
+	};
+
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 			<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
@@ -179,6 +187,19 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 															<p className="dark:text-gray-400 text-gray-600 text-xs font-medium uppercase tracking-wide">
 																{label}
 															</p>
+															{label === 'Transaction ID' && value && (
+																<button
+																	onClick={(e) => { e.stopPropagation(); handleCopy(value); }}
+																	className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+																	title="Copy Transaction ID"
+																>
+																	{copiedId === value ? (
+																		<Icons.CheckIcon className="w-4 h-4" />
+																	) : (
+																		<Icons.CopyIcon className="w-6 h-6" />
+																	)}
+																</button>
+															)}
 														</div>
 														<p className="dark:text-white text-gray-900 text-sm font-medium break-all pl-5">{value}</p>
 													</div>
