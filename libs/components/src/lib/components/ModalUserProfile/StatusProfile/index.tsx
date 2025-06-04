@@ -126,9 +126,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 			navigate('/chat/direct/friend');
 		}
 	};
-	const handleCopyID = useCallback(() => {
-		navigator.clipboard.writeText(userProfile?.user?.id || '');
-	}, [userProfile]);
 
 	const handleOpenSwitchAccount = useCallback(() => {
 		if (isElectron()) {
@@ -201,7 +198,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				</Dropdown>
 			)}
 
-			<ButtonCopy onCopy={handleCopyID} title="Copy User ID" className="py-[6px]" />
+			<ButtonCopy copyText={userProfile?.user?.id || ''} title="Copy User ID" className="py-[6px]" />
 
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}

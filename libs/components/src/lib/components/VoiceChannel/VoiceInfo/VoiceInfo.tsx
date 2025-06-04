@@ -16,7 +16,7 @@ import { ParticipantMeetState, handleCopyLink, useMediaPermissions } from '@mezo
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
-import React, { ReactNode, memo, useCallback } from 'react';
+import React, { ReactNode, memo, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ButtonCopy } from '../../../components';
 import { useGroupCallSignaling, useGroupCallState } from '../../GroupCall';
@@ -132,6 +132,16 @@ const VoiceInfo = React.memo(() => {
 			handleCopyLink(linkVoice);
 		}
 	}, [currentVoiceInfo, isGroupCallActive]);
+
+	const linkVoice = useMemo(() => {
+		if (currentVoiceInfo) {
+			const isGroupCall = currentVoiceInfo.clanId === '0' || isGroupCallActive;
+
+			return isGroupCall
+				? `${process.env.NX_DOMAIN_URL}/chat/direct/message/${currentVoiceInfo.channelId}/${ChannelType.CHANNEL_TYPE_GROUP}`
+				: `${process.env.NX_DOMAIN_URL}/chat/clans/${currentVoiceInfo.clanId}/channels/${currentVoiceInfo.channelId}`;
+		}
+	}, []);
 	return (
 		<div
 			className={`flex flex-col gap-2 border-b-2 dark:border-borderDefault border-gray-300 px-4 py-2 hover:bg-gray-550/[0.16] shadow-sm transition
@@ -149,7 +159,7 @@ const VoiceInfo = React.memo(() => {
 						</div>
 					</button>
 				</div>
-				<ButtonCopy onCopy={handleCopyVoiceLink} />
+				<ButtonCopy copyText={linkVoice} />
 			</div>
 			<div className="flex items-centerg gap-4 justify-between">
 				{hasMicrophoneAccess && (
