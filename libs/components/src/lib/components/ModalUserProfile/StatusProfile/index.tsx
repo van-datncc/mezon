@@ -21,7 +21,7 @@ import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import ButtonSwitch from '../../ButtonSwich';
+import { ButtonCopy } from '../../../components';
 import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
@@ -201,13 +201,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				</Dropdown>
 			)}
 
-			<ButtonSwitch
-				className="dark:text-[#B5BAC1] text-colorTextLightMode gap-2 py-[6px] px-2 text-sm bg-transparent dark:hover:bg-zinc-700 hover:bg-bgLightModeButton "
-				iconDefault={<Icons.CopyIcon />}
-				iconSwitch={<Icons.Tick defaultSize="w-4 h-4" fill="currentColor" />}
-				onClick={handleCopyID}
-				title="Copy User ID"
-			/>
+			<ButtonCopy onCopy={handleCopyID} title="Copy User ID" className="py-[6px]" />
 
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}

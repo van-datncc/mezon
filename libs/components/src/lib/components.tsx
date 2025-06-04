@@ -133,5 +133,6 @@ export { CallControls } from './components/GroupCall/components/CallControls';
 export { CallStatus } from './components/GroupCall/components/CallStatus';
 
 export * from './components/ButtonSwich';
+export { default as ButtonCopy } from './components/ButtonSwich/CopyButtonComponent';
 export * from './components/DmCall';
 export { DmCallManager } from './components/DmCall/DmCallManager';

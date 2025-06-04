@@ -18,6 +18,7 @@ import { ChannelType } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
 import React, { ReactNode, memo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { ButtonCopy } from '../../../components';
 import { useGroupCallSignaling, useGroupCallState } from '../../GroupCall';
 
 const VoiceInfo = React.memo(() => {
@@ -148,9 +149,7 @@ const VoiceInfo = React.memo(() => {
 						</div>
 					</button>
 				</div>
-				<div className="cursor-pointer" onClick={handleCopyVoiceLink}>
-					<Icons.CopyIcon />
-				</div>
+				<ButtonCopy onCopy={handleCopyVoiceLink} />
 			</div>
 			<div className="flex items-centerg gap-4 justify-between">
 				{hasMicrophoneAccess && (
