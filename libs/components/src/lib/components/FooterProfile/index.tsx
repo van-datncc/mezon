@@ -246,7 +246,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setIsProfileModalOpen(prev => {
 			const newState = !prev;
 			isProfileModalOpenRef.current = newState;
-			console.log(newState ? 'open' : 'close');
 			return newState;
 		});
 	};
