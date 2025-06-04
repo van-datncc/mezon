@@ -52,16 +52,16 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: G
 
 	return (
 		<div className="w-full flex gap-2 relative">
-			<div
+			<Link
 				className="w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 				role="button"
+				to={link}
+				onClick={handleOpenCanvas}
 			>
-				<Link to={link} onClick={handleOpenCanvas}>
-					<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
-						{canvas.title ? canvas.title : 'Untitled'}
-					</div>
-				</Link>
-			</div>
+				<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
+					{canvas.title ? canvas.title : 'Untitled'}
+				</div>
+			</Link>
 			<CopyToClipboard text={process.env.NX_CHAT_APP_REDIRECT_URI + link} onCopy={() => setIsCopied(true)}>
 				<button
 					style={{ top: '9px' }}

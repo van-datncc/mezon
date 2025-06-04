@@ -166,24 +166,6 @@ export const deleteCanvas = createAsyncThunk('canvas/deleteCanvas', async ({ id,
 	}
 });
 
-export const clearCanvasCacheThunk = createAsyncThunk(
-	'canvas/clearCanvasCacheThunk',
-	async ({ channelId, canvasId, clanId }: { channelId: string; canvasId?: string; clanId: string }, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			fetchCanvasListCached.delete(mezon, channelId, clanId);
-			if (canvasId) {
-				fetchCanvasDetailCached.delete(mezon, canvasId, clanId, channelId);
-			}
-
-			return { channelId, canvasId, clanId };
-		} catch (error) {
-			captureSentryError(error, 'canvas/clearCanvasCacheThunk');
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
-
 export const initialCanvasAPIState: CanvasAPIState = canvasAPIAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,

@@ -292,11 +292,6 @@ const ChannelTopbarTools = memo(
 			const store = await getStoreAsync();
 			const currentChannel = selectCurrentChannel(store.getState());
 			dispatch(canvasAPIActions.getChannelCanvasList({ channel_id: currentChannel?.channel_id || '', clan_id: currentChannel?.clan_id || '' }));
-			if (currentChannel?.parent_id && currentChannel?.parent_id !== '0') {
-				dispatch(
-					canvasAPIActions.getChannelCanvasList({ channel_id: currentChannel?.parent_id || '', clan_id: currentChannel?.clan_id || '' })
-				);
-			}
 		};
 		return (
 			<div className={`items-center h-full flex`}>
