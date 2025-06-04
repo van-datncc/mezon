@@ -231,37 +231,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, [showModalSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
-	const modalRef = useRef(false);
-
-	const [openProfileModal, closeProfileModal] = useModal(() => (
-		<div ref={rootRef}>
-			<ModalFooterProfile
-				userId={userId ?? ''}
-				avatar={avatar}
-				name={name}
-				isDM={isDM}
-				userStatusProfile={userStatusProfile}
-				rootRef={rootRef}
-				onCloseModal={() => {
-					closeProfileModal();
-					modalRef.current = false;
-				}}
-			/>
-		</div>
-	), [userStatusProfile, rootRef.current, avatar, name]);
-
-	const handleProfileClick = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		if (modalRef.current) {
-			console.log('close');
-			closeProfileModal();
-			modalRef.current = false;
-		} else {
-			console.log('open');
-			openProfileModal();
-			modalRef.current = true;
-		}
-	};
 
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
@@ -270,6 +239,22 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isVoiceJoined = useSelector(selectVoiceJoined);
 	const GroupCallJoined = useSelector(selectGroupCallJoined);
 	const statusMenu = useSelector(selectStatusMenu);
+
+	const [openProfileModal, closeProfileModal] = useModal(() => {
+		return (
+			<div ref={rootRef}>
+				<ModalFooterProfile
+					userId={userId ?? ''}
+					avatar={avatar}
+					name={name}
+					isDM={isDM}
+					userStatusProfile={userStatusProfile}
+					rootRef={rootRef}
+					onCloseModal={closeProfileModal}
+				/>
+			</div>
+		);
+	}, [userStatusProfile, rootRef.current, avatar, name]);
 
 	return (
 		<div
@@ -289,7 +274,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 				<div
 					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
 				>
-					<div className="cursor-pointer flex items-center gap-3 relative flex-1" onClick={handleProfileClick}>
+					<div className="cursor-pointer flex items-center gap-3 relative flex-1" onClick={openProfileModal}>
 						<AvatarImage
 							alt={''}
 							username={name}
