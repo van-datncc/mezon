@@ -1,13 +1,26 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectDmGroupCurrentId, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { convertTimeString } from '@mezon/utils';
+import {
+	AttachmentEntity,
+	getStore,
+	selectChannelById2,
+	selectDmGroupCurrentId,
+	selectMemberClanByUserId2,
+	selectMessageByMessageId,
+	setIsForwardAll,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
+import { convertTimeString, isPublicChannel, sleep } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Platform, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonClanAvatar from '../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
 import { useImage } from '../../hooks/useImage';
+import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import { style } from './styles';
 
 interface IRenderFooterModalProps {
@@ -15,14 +28,17 @@ interface IRenderFooterModalProps {
 	imageSelected?: AttachmentEntity;
 	onImageSaved?: () => void;
 	onLoading?: (isLoading: boolean) => void;
+	isShowForward?: boolean;
 }
 
-export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading }: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading, isShowForward = false }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, imageSelected?.uploader || ''));
 	const { downloadImage, saveImageToCameraRoll } = useImage();
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
+	const dispatch = useAppDispatch();
+	const navigation = useNavigation<any>();
 	const handleDownloadImage = async () => {
 		if (!imageSelected?.url) {
 			return;
@@ -30,7 +46,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 		onLoading(true);
 		try {
 			const { url, filetype } = imageSelected;
-			const filetypeParts = filetype.split('/');
+			const filetypeParts = filetype?.split('/');
 			const filePath = await downloadImage(url, filetypeParts[1]);
 			if (filePath) {
 				await saveImageToCameraRoll('file://' + filePath, filetypeParts[0], false);
@@ -40,6 +56,30 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			console.error(error);
 		}
 		onLoading(false);
+	};
+
+	const handleForwardMessage = async () => {
+		if (!imageSelected?.message_id) return;
+		try {
+			const store = getStore();
+			const channel = selectChannelById2(store?.getState(), imageSelected?.channelId);
+			const message = selectMessageByMessageId(store?.getState(), imageSelected?.channelId, imageSelected?.message_id);
+			if (message) {
+				onClose();
+				dispatch(setIsForwardAll(false));
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				await sleep(500);
+				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
+					screen: APP_SCREEN.MESSAGES.FORWARD_MESSAGE,
+					params: {
+						message: message,
+						isPublic: isPublicChannel(channel)
+					}
+				});
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
@@ -81,9 +121,16 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 					</View>
 				)}
 			</View>
-			<TouchableOpacity onPress={handleDownloadImage}>
-				<MezonIconCDN icon={IconCDN.downloadIcon} color={Colors.white} />
-			</TouchableOpacity>
+			<View style={styles.option}>
+				{isShowForward && (
+					<TouchableOpacity onPress={handleForwardMessage}>
+						<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} />
+					</TouchableOpacity>
+				)}
+				<TouchableOpacity onPress={handleDownloadImage}>
+					<MezonIconCDN icon={IconCDN.downloadIcon} color={Colors.white} />
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 });
