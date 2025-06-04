@@ -7,9 +7,10 @@ export interface ButtonSwitchProps {
 	iconDefault: React.ReactNode;
 	iconSwitch: React.ReactNode;
 	duration?: number;
+	title?: string;
 }
 
-export const ButtonSwitch: React.FC<ButtonSwitchProps> = ({ duration = 1000, onClick, disabled, className, iconDefault, iconSwitch }) => {
+export const ButtonSwitch: React.FC<ButtonSwitchProps> = ({ title, duration = 1000, onClick, disabled, className, iconDefault, iconSwitch }) => {
 	const [isSwitched, setIsSwitched] = useState(false);
 	const [isLeft, setIsLeft] = useState(false);
 	const handleOnClickButton = useCallback(() => {
@@ -35,18 +36,18 @@ export const ButtonSwitch: React.FC<ButtonSwitchProps> = ({ duration = 1000, onC
 		}
 	}, [isSwitched]);
 
-	const displayedIcon = useMemo(() => (isSwitched ? iconDefault : iconSwitch), [isSwitched, iconDefault, iconSwitch]);
+	const displayedIcon = useMemo(() => (isSwitched ? iconSwitch : iconDefault), [isSwitched, iconDefault, iconSwitch]);
 
 	return (
 		<button
 			onMouseLeave={handleSetDefault}
-			className={`flex w-8 aspect-square items-center p-1 rounded-sm bg-bgSecondary hover:bg-bgSecondaryHover ${className ?? ''} `}
+			className={`flex items-center p-1 rounded-sm bg-bgSecondary hover:bg-bgSecondaryHover ${className ?? ''} `}
 			onClick={handleOnClickButton}
 			disabled={disabled}
 		>
-			{displayedIcon}
+			{displayedIcon} {title && <p>{title}</p>}
 		</button>
 	);
 };
 
-export default ButtonSwitch;
+export default React.memo(ButtonSwitch);

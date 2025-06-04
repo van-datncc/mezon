@@ -21,7 +21,7 @@ import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import ButtonSwitch from '../../ButtonSwich';
 import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
@@ -44,7 +44,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const userStatus = useSelector(selectUserStatus);
 	const status = userStatus?.status || 'Online';
-	console.log('status: ', status);
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
@@ -129,8 +128,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	};
 	const handleCopyID = useCallback(() => {
 		navigator.clipboard.writeText(userProfile?.user?.id || '');
-		onClose();
-		toast.success('Copy ID Success');
 	}, [userProfile]);
 
 	const handleOpenSwitchAccount = useCallback(() => {
@@ -203,7 +200,14 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					)}
 				</Dropdown>
 			)}
-			<ItemStatus onClick={handleCopyID} children="Copy User ID" dropdown={false} startIcon={<Icons.CopyIcon />} />
+
+			<ButtonSwitch
+				className="dark:text-[#B5BAC1] text-colorTextLightMode gap-2 py-[6px] px-2 text-sm bg-transparent dark:hover:bg-zinc-700 hover:bg-bgLightModeButton "
+				iconDefault={<Icons.CopyIcon />}
+				iconSwitch={<Icons.Tick defaultSize="w-4 h-4" fill="currentColor" />}
+				onClick={handleCopyID}
+				title="Copy User ID"
+			/>
 
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
