@@ -44,6 +44,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const userCustomStatus = useMemberCustomStatus(user?.id || '', isDM);
 	const userStatus = useSelector(selectUserStatus);
 	const status = userStatus?.status || 'Online';
+	console.log('status: ', status);
 	const { userProfile } = useAuth();
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
@@ -158,7 +159,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					trigger="click"
 					dismissOnClick={true}
 					renderTrigger={() => (
-						<div>
+						<div className="capitalize">
 							<ItemStatus children={status} dropdown startIcon={statusIcon(status)} />
 						</div>
 					)}
