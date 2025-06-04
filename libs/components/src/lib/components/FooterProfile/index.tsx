@@ -28,6 +28,7 @@ import { ESummaryInfo, EUserStatus, ONE_MINUTE, TypeMessage, createImgproxyUrl, 
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiTokenSentEvent } from 'mezon-js/dist/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import { UserStatusIconDM } from '../MemberProfile';
@@ -230,8 +231,37 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	}, [showModalSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
-	const isProfileModalOpenRef = useRef(false);
-	const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+	const modalRef = useRef(false);
+
+	const [openProfileModal, closeProfileModal] = useModal(() => (
+		<div ref={rootRef}>
+			<ModalFooterProfile
+				userId={userId ?? ''}
+				avatar={avatar}
+				name={name}
+				isDM={isDM}
+				userStatusProfile={userStatusProfile}
+				rootRef={rootRef}
+				onCloseModal={() => {
+					closeProfileModal();
+					modalRef.current = false;
+				}}
+			/>
+		</div>
+	), [userStatusProfile, rootRef.current, avatar, name]);
+
+	const handleProfileClick = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (modalRef.current) {
+			console.log('close');
+			closeProfileModal();
+			modalRef.current = false;
+		} else {
+			console.log('open');
+			openProfileModal();
+			modalRef.current = true;
+		}
+	};
 
 	const isElectronUpdateAvailable = useSelector(selectIsElectronUpdateAvailable);
 	const IsElectronDownloading = useSelector(selectIsElectronDownloading);
@@ -240,44 +270,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isVoiceJoined = useSelector(selectVoiceJoined);
 	const GroupCallJoined = useSelector(selectGroupCallJoined);
 	const statusMenu = useSelector(selectStatusMenu);
-
-	const handleProfileClick = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		setIsProfileModalOpen(prev => {
-			const newState = !prev;
-			isProfileModalOpenRef.current = newState;
-			return newState;
-		});
-	};
-
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-				setIsProfileModalOpen(false);
-				isProfileModalOpenRef.current = false;
-			}
-		};
-
-		const handleEsc = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				setIsProfileModalOpen(false);
-				isProfileModalOpenRef.current = false;
-			}
-		};
-
-		if (isProfileModalOpen) {
-			document.addEventListener('click', handleClickOutside);
-			document.addEventListener('keydown', handleEsc);
-		} else {
-			document.removeEventListener('click', handleClickOutside);
-			document.removeEventListener('keydown', handleEsc);
-		}
-
-		return () => {
-			document.removeEventListener('click', handleClickOutside);
-			document.removeEventListener('keydown', handleEsc);
-		};
-	}, [isProfileModalOpen]);
 
 	return (
 		<div
@@ -356,18 +348,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					infoSendToken={infoSendToken}
 					isButtonDisabled={isButtonDisabled}
 				/>
-			)}
-			{isProfileModalOpen && (
-				<div ref={rootRef}>
-					<ModalFooterProfile
-						userId={userId ?? ''}
-						avatar={avatar}
-						name={name}
-						isDM={isDM}
-						userStatusProfile={userStatusProfile}
-						rootRef={rootRef}
-					/>
-				</div>
 			)}
 		</div>
 	);
