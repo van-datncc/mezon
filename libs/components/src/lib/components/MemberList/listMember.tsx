@@ -21,14 +21,16 @@ const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 
 type TempMemberItemProps = {
 	id: string;
+	creator_id?: string;
 };
 
-const TempMemberItem = memo(({ id }: TempMemberItemProps) => {
+const TempMemberItem = memo(({ id, creator_id }: TempMemberItemProps) => {
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
 	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
+	const isOwnerClan = creator_id === user?.user?.id;
 
 	return (
 		<div className="cursor-pointer flex items-center gap-[9px] relative ">
@@ -47,7 +49,7 @@ const TempMemberItem = memo(({ id }: TempMemberItemProps) => {
 			</div>
 
 			<div className="flex flex-col font-medium">
-				<ClanUserName userId={user.user?.id as string} name={username} />
+				<ClanUserName userId={user.user?.id as string} name={username} isOwnerClan={isOwnerClan} />
 				<p className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">{userCustomStatus}</p>
 			</div>
 		</div>
@@ -57,16 +59,18 @@ const TempMemberItem = memo(({ id }: TempMemberItemProps) => {
 type MemberItemProps = {
 	id: string;
 	temp: boolean;
+	creator_id?: string;
 };
 
 const MemoizedMemberItem = memo((props: MemberItemProps) => {
-	const { id, temp } = props;
+	const { id, temp, creator_id } = props;
 
-	return temp ? <TempMemberItem id={id} /> : <BaseMemberProfile id={id} />;
+	return temp ? <TempMemberItem id={id} creator_id={creator_id} /> : <BaseMemberProfile id={id} creator_id={creator_id} />;
 });
 
 const ListMember = () => {
 	const currentClan = useSelector(selectCurrentClan);
+
 	const [showFullList, setShowFullList] = useState(false);
 	useSyncEffect(() => {
 		if (showFullList) {
@@ -202,7 +206,7 @@ const ListMember = () => {
 										Offline - {lisMembers.offlineCount}
 									</p>
 								) : (
-									<MemoizedMemberItem id={user} temp={!showFullList} />
+									<MemoizedMemberItem id={user} temp={!showFullList} creator_id={currentClan?.creator_id} />
 								)}
 							</div>
 						</div>
