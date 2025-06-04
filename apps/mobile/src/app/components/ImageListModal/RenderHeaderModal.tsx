@@ -3,14 +3,13 @@ import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import {
 	AttachmentEntity,
 	getStore,
-	selectChannelById2,
 	selectDmGroupCurrentId,
 	selectMemberClanByUserId2,
 	selectMessageByMessageId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { convertTimeString, isPublicChannel, sleep } from '@mezon/utils';
+import { convertTimeString, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { DeviceEventEmitter, Platform, TouchableOpacity, View } from 'react-native';
@@ -60,7 +59,6 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 		if (!imageSelected?.message_id) return;
 		try {
 			const store = getStore();
-			const channel = selectChannelById2(store?.getState(), imageSelected?.channelId);
 			const message = selectMessageByMessageId(store?.getState(), imageSelected?.channelId, imageSelected?.message_id);
 			if (message) {
 				onClose();
@@ -69,8 +67,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 					screen: APP_SCREEN.MESSAGES.FORWARD_MESSAGE,
 					params: {
-						message: message,
-						isPublic: isPublicChannel(channel)
+						message: message
 					}
 				});
 			}
