@@ -21,6 +21,7 @@ import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import HistoryTransaction from '../../HistoryTransaction';
 import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
@@ -31,8 +32,9 @@ type StatusProfileProps = {
 	userById: ChannelMembersEntity | null;
 	isDM?: boolean;
 	modalRef: React.MutableRefObject<boolean>;
+	onClose: () => void;
 };
-const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
+const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps) => {
 	const dispatch = useAppDispatch();
 	const allAccount = useSelector(selectOthersSession);
 	const user = userById?.user;
@@ -126,6 +128,8 @@ const StatusProfile = ({ userById, isDM, modalRef }: StatusProfileProps) => {
 	};
 	const handleCopyID = useCallback(() => {
 		navigator.clipboard.writeText(userProfile?.user?.id || '');
+		onClose();
+		toast.success('Copy ID Success');
 	}, [userProfile]);
 
 	const handleOpenSwitchAccount = useCallback(() => {
