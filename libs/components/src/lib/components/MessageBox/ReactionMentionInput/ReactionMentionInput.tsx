@@ -1,4 +1,4 @@
-import { useReference } from '@mezon/core';
+import { useGifsStickersEmoji, useReference } from '@mezon/core';
 import {
 	channelMembersActions,
 	ChannelsEntity,
@@ -56,6 +56,7 @@ import {
 	processMarkdownEntities,
 	RequestInput,
 	searchMentionsHashtag,
+	SubPanelName,
 	threadError,
 	ThreadStatus,
 	TITLE_MENTION_HERE,
@@ -181,6 +182,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		editorRef,
 		isTopic: props.isTopic
 	});
+
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	useFocusManager({
 		editorRef,
@@ -328,8 +331,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
+				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setDataReferences({
 						channelId: props.currentChannelId ?? '',
@@ -349,6 +352,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
+				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: props.currentChannelId ?? '',
@@ -371,8 +375,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
+				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setDataReferences({
 						channelId: currTopicId ?? '',
@@ -392,8 +396,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
+				setSubPanelActive(SubPanelName.NONE);
 				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
@@ -442,7 +446,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			valueThread?.attachments,
 			valueThread?.references,
 			setOpenThreadMessageState,
-			updateDraft
+			updateDraft,
+			setSubPanelActive
 		]
 	);
 
