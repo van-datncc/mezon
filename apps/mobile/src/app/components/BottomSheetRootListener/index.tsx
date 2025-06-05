@@ -129,6 +129,7 @@ const BottomSheetRootListener = () => {
 			if (isDismiss) {
 				onCloseBottomSheet();
 			} else {
+				if (!data) return;
 				Keyboard.dismiss();
 				onTriggerBottomSheet(data);
 			}

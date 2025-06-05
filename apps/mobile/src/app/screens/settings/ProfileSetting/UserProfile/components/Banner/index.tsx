@@ -1,6 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
 import { useMixImageColor } from '../../../../../../../app/hooks/useMixImageColor';
 import MezonImagePicker, { IMezonImagePickerHandler } from '../../../../../../componentUI/MezonImagePicker';
@@ -14,15 +14,18 @@ interface IBannerAvatarProps {
 	defaultAvatar?: string;
 }
 
-export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBannerAvatarProps) {
+export default memo(function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBannerAvatarProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { color } = useMixImageColor(avatar);
 	const avatarPickerRef = useRef<IMezonImagePickerHandler>();
 
-	const handleOnload = async (url: string) => {
-		onLoad && onLoad(url);
-	};
+	const handleOnload = useCallback(
+		async (url: string) => {
+			onLoad && onLoad(url);
+		},
+		[onLoad]
+	);
 
 	const removeAvatar = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -52,7 +55,7 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 		[]
 	);
 
-	const openAvatarBS = () => {
+	const openAvatarBS = useCallback(() => {
 		const data = {
 			heightFitContent: true,
 			children: (
@@ -62,7 +65,7 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 			)
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-	};
+	}, [menu]);
 
 	return (
 		<View>
@@ -92,10 +95,12 @@ export default function BannerAvatar({ avatar, onLoad, alt, defaultAvatar }: IBa
 					autoUpload
 					penPosition={{ right: 5, top: 5 }}
 					onPressAvatar={openAvatarBS}
+					imageHeight={400}
+					imageWidth={400}
 				/>
 
 				<View style={[styles.onLineStatus]}></View>
 			</View>
 		</View>
 	);
-}
+});
