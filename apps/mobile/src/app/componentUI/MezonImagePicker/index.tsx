@@ -1,10 +1,10 @@
-import { QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
+import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { forwardRef, memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
+import { DeviceEventEmitter, DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -139,6 +139,7 @@ export default memo(
 			if (file) {
 				timerRef.current = setTimeout(
 					async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 						const croppedFile = await openCropper({
 							path: file.uri,
 							mediaType: 'photo',
