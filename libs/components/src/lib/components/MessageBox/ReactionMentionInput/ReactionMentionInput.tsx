@@ -332,7 +332,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					mentionEveryone
 				);
 				setMentionEveryone(false);
-				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setDataReferences({
 						channelId: props.currentChannelId ?? '',
@@ -352,7 +351,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
 						channelId: props.currentChannelId ?? '',
@@ -376,7 +374,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					mentionEveryone
 				);
 				setMentionEveryone(false);
-				setSubPanelActive(SubPanelName.NONE);
 				dispatch(
 					referencesActions.setDataReferences({
 						channelId: currTopicId ?? '',
@@ -397,7 +394,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					mentionEveryone
 				);
 				setMentionEveryone(false);
-				setSubPanelActive(SubPanelName.NONE);
 				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
@@ -425,6 +421,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			setDisplayPlaintext('');
 			setDisplayPlaintext('');
 			setIsPasteMulti(false);
+			setSubPanelActive(SubPanelName.NONE);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -449,6 +446,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			updateDraft,
 			setSubPanelActive
 		]
+
 	);
 
 	const { onKeyDown } = useKeyboardHandler({
