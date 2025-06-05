@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/ui';
+import { formatNumber } from '@mezon/utils';
 import React from 'react';
 import { ButtonCopy } from '../../../components';
 
@@ -27,12 +28,12 @@ const TransactionDetail: React.FC<TransactionDetailProps> = React.memo(({ detail
     }
 
     const detailFields = [
-        { label: 'Transaction ID', value: detailLedger.trans_id, icon: Icons.ViewRole },
+        { label: 'Transaction ID', value: detailLedger.trans_id, icon: Icons.Transaction },
         { label: 'Sender ', value: detailLedger.sender_username, icon: Icons.UserIcon },
-        { label: 'Amount', value: `${detailLedger.amount} VND`, icon: Icons.DollarIcon },
+        { label: 'Amount', value: `${formatNumber(detailLedger.amount, 'vi-VN')} đ`, icon: () => <Icons.DollarIcon defaultSize="w-3 h-3" isWhite />, },
         { label: 'Receiver ', value: detailLedger.receiver_username, icon: Icons.UserIcon },
         { label: 'Note', value: detailLedger.metadata || 'No note', icon: Icons.PenEdit },
-        { label: 'Created', value: formatDate(detailLedger.create_time ?? ''), icon: Icons.ClockHistory },
+        { label: 'Created', value: formatDate(detailLedger.create_time ?? ''), icon: () => <Icons.ClockHistory defaultSize='w-3 h-3' /> },
     ];
 
     return (
