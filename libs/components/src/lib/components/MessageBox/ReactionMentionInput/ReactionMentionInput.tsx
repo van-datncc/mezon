@@ -1,4 +1,4 @@
-import { useReference } from '@mezon/core';
+import { useGifsStickersEmoji, useReference } from '@mezon/core';
 import {
 	channelMembersActions,
 	ChannelsEntity,
@@ -56,6 +56,7 @@ import {
 	processMarkdownEntities,
 	RequestInput,
 	searchMentionsHashtag,
+	SubPanelName,
 	threadError,
 	ThreadStatus,
 	TITLE_MENTION_HERE,
@@ -181,6 +182,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		editorRef,
 		isTopic: props.isTopic
 	});
+
+	const { setSubPanelActive } = useGifsStickersEmoji();
 
 	useFocusManager({
 		editorRef,
@@ -328,7 +331,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -371,7 +373,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
 				dispatch(
 					referencesActions.setDataReferences({
@@ -392,7 +393,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					anonymousMessage,
 					mentionEveryone
 				);
-
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
@@ -421,6 +421,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			setDisplayPlaintext('');
 			setDisplayPlaintext('');
 			setIsPasteMulti(false);
+			setSubPanelActive(SubPanelName.NONE);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -442,8 +443,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			valueThread?.attachments,
 			valueThread?.references,
 			setOpenThreadMessageState,
-			updateDraft
+			updateDraft,
+			setSubPanelActive
 		]
+
 	);
 
 	const { onKeyDown } = useKeyboardHandler({
