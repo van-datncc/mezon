@@ -39,7 +39,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = React.memo(({ detail
         <div className="border-t dark:border-gray-700 border-gray-200 p-4 dark:bg-gray-900/50 bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {detailFields.map(({ label, value, icon: Icon }) => (
-                    <div key={label} className="space-y-2">
+                    <div key={value} className="space-y-2">
                         <div className="flex items-center gap-2">
                             <Icon className="w-3 h-3 dark:text-gray-400 text-gray-500" />
                             <p className="dark:text-gray-400 text-gray-600 text-xs font-medium uppercase tracking-wide">
