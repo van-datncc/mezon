@@ -49,7 +49,7 @@ const ModalSendToken = ({
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const listDM = dmGroupChatList.filter((groupChat) => groupChat.type === ChannelType.CHANNEL_TYPE_DM);
 	const dropdownRef = useRef<HTMLDivElement>(null);
-	const [searchTerm, setSearchTerm] = useState('');
+	const [searchTerm, setSearchTerm] = useState(infoSendToken?.receiver_name || '');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [tokenNumber, setTokenNumber] = useState('');
 	const [noteSendToken, setNoteSendToken] = useState('');
