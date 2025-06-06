@@ -60,7 +60,7 @@ const SettingSoundEffect = () => {
                                     <Icons.CircleClose className="w-4 h-4" />
                                 </button>
                             </div>
-                            <audio controls src={sound.url} className="w-full rounded-lg border dark:border-borderDivider border-gray-200" />
+                            <audio controls src={sound.url} className="w-full rounded-full border dark:border-borderDivider border-gray-200" />
                         </div>
                     ))}
                 </div>
