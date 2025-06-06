@@ -61,7 +61,7 @@ export function EmbedFields({ fields, message_id, senderId, channelId, observeIn
 										component={field.inputs}
 										messageId={message_id}
 										senderId={senderId}
-										max_options={field.inputs.max_options}
+										max_options={field.inputs?.max_options || 1}
 										channelId={channelId}
 										observeIntersectionForLoading={observeIntersectionForLoading}
 									/>
