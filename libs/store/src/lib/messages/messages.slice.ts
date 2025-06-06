@@ -1532,11 +1532,6 @@ export const selectFirstMessageId = createCachedSelector([getMessagesState, getC
 	return messagesState.firstMessageId[channelId] ?? '';
 });
 
-export const selectFirstMessageIdByChannelId = (channelId: string) =>
-	createSelector(getMessagesState, (state) => {
-		return state.firstMessageId[channelId] || '';
-	});
-
 // select selectLatestMessage's id
 export const selectLatestMessageId = createCachedSelector([getMessagesState, getChannelIdAsSecondParam], (messagesState, channelId) => {
 	return messagesState.lastMessageByChannel[channelId]?.id || '';

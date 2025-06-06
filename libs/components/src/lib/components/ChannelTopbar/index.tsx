@@ -1,5 +1,6 @@
 import { toChannelPage, useChatSending, useCustomNavigate, useGifsStickersEmoji, useMenu, usePathMatch } from '@mezon/core';
 import {
+	DMCallActions,
 	DirectEntity,
 	RootState,
 	appActions,
@@ -40,7 +41,8 @@ import {
 	toastActions,
 	topicsActions,
 	useAppDispatch,
-	useAppSelector
+	useAppSelector,
+	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, createImgproxyUrl } from '@mezon/utils';
@@ -376,6 +378,8 @@ const DmTopbarTools = memo(() => {
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ channelOrDirect: currentDmGroup, mode: mode });
 	const isInCall = useSelector(selectIsInCall);
+	const isGroupCallActive = useSelector((state: RootState) => state.groupCall?.isGroupCallActive || false);
+	const voiceInfo = useSelector((state: RootState) => state.voice?.voiceInfo || null);
 	const handleSend = useCallback(
 		(
 			content: IMessageSendPayload,
@@ -412,7 +416,19 @@ const DmTopbarTools = memo(() => {
 
 	const handleStartCall = (isVideoCall = false) => {
 		if (currentDmGroup.type === ChannelType.CHANNEL_TYPE_GROUP) {
-			if (!isInCall) {
+			if (isGroupCallActive && (voiceInfo as any)?.channelId === currentDmGroup.channel_id) {
+				dispatch(voiceActions.setOpenPopOut(false));
+				dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
+				dispatch(voiceActions.setShowCamera(isVideoCall));
+
+				dispatch(audioCallActions.setIsRingTone(false));
+				dispatch(audioCallActions.setIsBusyTone(false));
+				dispatch(audioCallActions.setIsEndTone(false));
+				dispatch(audioCallActions.setIsDialTone(false));
+				return;
+			}
+
+			if (!isInCall && !isGroupCallActive) {
 				if (!currentDmGroup.channel_id) {
 					dispatch(toastActions.addToast({ message: 'Group channel ID is missing', type: 'error', autoClose: 3000 }));
 					return;
@@ -458,7 +474,33 @@ const DmTopbarTools = memo(() => {
 				dispatch(audioCallActions.setGroupCallId(currentDmGroup.channel_id));
 				dispatch(audioCallActions.setIsBusyTone(false));
 			} else {
-				dispatch(toastActions.addToast({ message: 'You are on another call', type: 'warning', autoClose: 3000 }));
+				const isSameGroup = (voiceInfo as any)?.channelId === currentDmGroup.channel_id;
+
+				if (isSameGroup) {
+					dispatch(voiceActions.setOpenPopOut(false));
+					dispatch(DMCallActions.setIsShowMeetDM(isVideoCall));
+					dispatch(voiceActions.setShowCamera(isVideoCall));
+
+					dispatch(audioCallActions.setIsRingTone(false));
+					dispatch(audioCallActions.setIsBusyTone(false));
+					dispatch(audioCallActions.setIsEndTone(false));
+					dispatch(audioCallActions.setIsDialTone(false));
+
+					dispatch(
+						groupCallActions.showPreCallInterface({
+							groupId: currentDmGroup.channel_id || '',
+							isVideo: isVideoCall
+						})
+					);
+				} else {
+					dispatch(
+						toastActions.addToast({
+							message: 'You are on another call',
+							type: 'warning',
+							autoClose: 3000
+						})
+					);
+				}
 			}
 			return;
 		}
@@ -803,7 +845,7 @@ const AddMemberToGroupDm = memo(({ currentDmGroup }: { currentDmGroup: DirectEnt
 	};
 	const rootRef = useRef<HTMLDivElement>(null);
 	return (
-		<div onClick={handleOpenAddToGroupModal} ref={rootRef} className="cursor-pointer">
+		<div onClick={handleOpenAddToGroupModal} ref={rootRef} className="none-draggable-area cursor-pointer">
 			{openAddToGroup && (
 				<div className="relative">
 					<CreateMessageGroup
