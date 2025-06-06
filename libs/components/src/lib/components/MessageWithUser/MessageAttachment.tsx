@@ -203,7 +203,7 @@ const ImageAlbum = ({
 				url: createImgproxyUrl(attachmentData.url || '', {
 					width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
 					height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
-					resizeType: 'force'
+					resizeType: 'fit'
 				}),
 				uploaderData: {
 					name:
