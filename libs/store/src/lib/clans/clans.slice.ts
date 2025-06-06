@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
+import { FOR_24_HOURS, IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType, ClanUpdatedEvent } from 'mezon-js';
 import { ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
@@ -8,7 +8,8 @@ import { accountActions } from '../account/account.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
-import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
@@ -121,10 +122,25 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 	}
 );
 
+const fetchClansCached = memoizeAndTrack(
+	async (mezon: MezonValueContext, limit?: number, state?: number, cursor?: string) => {
+		const response = await mezon.client.listClanDescs(mezon.session, limit, state, '');
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: FOR_24_HOURS,
+		normalizer: (args) => {
+			return args[0]?.session?.username || '' + args[2] + args[1];
+		}
+	}
+);
+
 export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
+		const response = await fetchClansCached(mezon, LIMIT_CLAN_ITEM, 1, '');
+
 		if (!response.clandesc) {
 			return [];
 		}
