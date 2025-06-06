@@ -143,10 +143,10 @@ const ModalSendToken = ({
 
 	useEffect(() => {
 		const user = filteredUsers.find((user) => user.id === selectedUserId);
-		if (user || infoSendToken) handleSelectUser(infoSendToken?.receiver_id || user?.id, infoSendToken?.receiver_name || user.username);
+		if (user) handleSelectUser(user.id, user.username);
 		setTokenNumber(formatNumber(Number(token), 'vi-VN'));
 		setNoteSendToken(note);
-	}, [token, selectedUserId, note, infoSendToken]);
+	}, [token, selectedUserId, note]);
 
 	const handleSendToken = () => {
 		const userData = mergedUsers.find((user) => user.id === selectedUserId);
