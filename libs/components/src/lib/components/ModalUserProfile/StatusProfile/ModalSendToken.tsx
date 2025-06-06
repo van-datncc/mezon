@@ -150,7 +150,7 @@ const ModalSendToken = ({
 
 	const handleSendToken = () => {
 		const userData = mergedUsers.find((user) => user.id === selectedUserId);
-		handleSaveSendToken(userData.id, userData.username, userData.avatar_url, userData.display_name);
+		handleSaveSendToken(userData?.id, userData?.username, userData?.avatar_url, userData?.display_name);
 	};
 
 	const selectedUser = mergedUsers.find((user) => user.id === selectedUserId);
