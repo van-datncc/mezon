@@ -59,10 +59,6 @@ const ModalSendToken = ({
 			setSearchTerm('');
 			setToken(0);
 		}
-		if (openModal) {
-			setSearchTerm('');
-			setSelectedUserId('');
-		}
 	}, [openModal]);
 
 	useEffect(() => {
