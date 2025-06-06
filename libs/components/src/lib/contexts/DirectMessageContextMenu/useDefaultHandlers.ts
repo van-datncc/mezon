@@ -78,7 +78,7 @@ export function useDefaultHandlers({
 				},
 				handleLeaveGroup: () => {
 					const channelId = user?.channelId || user.channel_id;
-					const isLastOne = (user?.user_id?.length || 0) <= 1;
+					const isLastOne = (user?.user_id?.length || 0) < 1;
 					handleLeaveDmGroup(channelId, isLastOne);
 				}
 			};
