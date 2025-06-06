@@ -40,7 +40,6 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
-	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
 	const { handleChannelClick } = useWebRTCStream();
 	const userProfile = useSelector(selectAllAccount);
 	const sessionUser = useSelector(selectSession);
@@ -60,7 +59,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: channel?.clan_id || '',
-							clanName: clanById?.clan_name || '',
+							clanName: '',
 							streamId: channel?.channel_id || '',
 							streamName: channel?.channel_label || '',
 							parentId: channel?.parent_id || ''
