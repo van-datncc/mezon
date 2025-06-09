@@ -12,7 +12,7 @@ import MezonAvatar from '../../../../../../componentUI/MezonAvatar';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { style } from '../styles';
 
-const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScreenShare, isGridLayout }) => {
+const ParticipantItem = ({ participant, tracks, setFocusedScreenShare, isGridLayout }) => {
 	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -30,10 +30,8 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 
 	const screenTrackRef = tracks.find((t) => t.participant.identity === participant.identity && t.source === Track.Source.ScreenShare);
 
-	const isParticipantFocused = isFocusedScreen === screenTrackRef;
-
 	const handleFocusScreen = () => {
-		setFocusedScreenShare(isParticipantFocused ? null : screenTrackRef);
+		setFocusedScreenShare(screenTrackRef);
 	};
 
 	const isLoading = !member;
@@ -49,26 +47,23 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						isPiPMode && { height: size.s_150, width: size.s_150 + size.s_50 }
 					]}
 				>
-					<VideoTrack objectFit={isPiPMode ? 'cover' : 'contain'} trackRef={screenTrackRef} style={styles.participantView} />
+					<VideoTrack
+						objectFit={isPiPMode ? 'cover' : 'contain'}
+						trackRef={screenTrackRef}
+						style={styles.participantView}
+						iosPIP={{ enabled: true, startAutomatically: true, preferredSize: { width: 12, height: 8 } }}
+					/>
 					{!isPiPMode && (
-						<View style={[styles.userName, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
+						<View style={[styles.userName, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '90%' }]}>
 							<Icons.ShareScreenIcon height={size.s_14} />
-							<Text
-								numberOfLines={1}
-								ellipsizeMode="tail"
-								style={[styles.subTitle, isParticipantFocused ? { width: '100%' } : { width: '48%' }]}
-							>
-								{voiceUsername} {isParticipantFocused && `(Share Screen)`}
+							<Text numberOfLines={1} ellipsizeMode="tail" style={[styles.subTitle, { width: '100%' }]}>
+								{voiceUsername} Share Screen
 							</Text>
 						</View>
 					)}
 					{!isPiPMode && (
-						<View style={styles.focusIcon}>
-							{isParticipantFocused ? (
-								<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_14} />
-							) : (
-								<Icons.ArrowSaltIcon height={size.s_14} />
-							)}
+						<View style={[styles.focusIcon, styles.focusIconAbsolute]}>
+							<Icons.ArrowSaltIcon height={size.s_14} />
 						</View>
 					)}
 				</TouchableOpacity>
@@ -80,10 +75,17 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						styles.userView,
 						isGridLayout && { width: '48%', height: size.s_150 },
 						isTabletLandscape && { height: size.s_150 + size.s_100 },
-						isPiPMode && { height: size.s_60 * 2, width: size.s_100 }
+						isPiPMode && { height: size.s_60 * 2, width: size.s_100 },
+						{
+							flexDirection: 'column'
+						}
 					]}
 				>
-					<VideoTrack trackRef={videoTrackRef} style={styles.participantView} />
+					<VideoTrack
+						trackRef={videoTrackRef}
+						style={styles.participantView}
+						iosPIP={{ enabled: true, startAutomatically: true, preferredSize: { width: 12, height: 8 } }}
+					/>
 					<View style={[styles.userName, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
 						{participant.isMicrophoneEnabled ? (
 							<MezonIconCDN icon={IconCDN.microphoneIcon} height={size.s_14} />
@@ -101,7 +103,10 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						styles.userView,
 						isGridLayout && { width: '48%', height: size.s_150 },
 						isTabletLandscape && { height: size.s_150 + size.s_100 },
-						isPiPMode && { height: size.s_60 * 2, width: size.s_100 }
+						isPiPMode && { height: size.s_60 * 2, width: size.s_100 },
+						{
+							flexDirection: 'column'
+						}
 					]}
 				>
 					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: size.s_10 }}>
@@ -112,7 +117,7 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						)}
 					</View>
 					{!isPiPMode && (
-						<View style={[styles.userName, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
+						<View style={styles.wrapperUser}>
 							{participant.isMicrophoneEnabled ? (
 								<MezonIconCDN icon={IconCDN.microphoneIcon} height={size.s_14} />
 							) : (
@@ -121,7 +126,9 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 							{isLoading ? (
 								<Icons.LoadingIcon width={24} height={24} />
 							) : (
-								<Text style={styles.subTitle}>{voiceUsername || 'Unknown'}</Text>
+								<Text numberOfLines={2} style={styles.subTitle}>
+									{voiceUsername || 'Unknown'}
+								</Text>
 							)}
 						</View>
 					)}
@@ -131,7 +138,7 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 	);
 };
 
-const ParticipantScreen = ({ sortedParticipants, tracks, isFocusedScreen, setFocusedScreenShare }) => {
+const ParticipantScreen = ({ sortedParticipants, tracks, setFocusedScreenShare }) => {
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const videoTrackCount = sortedParticipants.reduce((count, participant) => {
 		if (participant.isScreenShareEnabled) count += 1;
@@ -163,7 +170,6 @@ const ParticipantScreen = ({ sortedParticipants, tracks, isFocusedScreen, setFoc
 							key={participant.identity}
 							participant={participant}
 							tracks={tracks}
-							isFocusedScreen={isFocusedScreen}
 							setFocusedScreenShare={setFocusedScreenShare}
 							isGridLayout={isGridLayout}
 						/>

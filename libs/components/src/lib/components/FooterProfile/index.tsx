@@ -18,7 +18,6 @@ import {
 	selectShowModalSendToken,
 	selectStatusMenu,
 	selectTheme,
-	selectUpdateToken,
 	selectVoiceJoined,
 	useAppDispatch,
 	userClanProfileActions
@@ -57,7 +56,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
-	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
 
 	const userCustomStatus: { status: string; user_status: EUserStatus } = useMemo(() => {
 		const metadata = myProfile.userProfile?.user?.metadata;
@@ -151,7 +149,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		[createDirectMessageWithUser, sendInviteMessage]
 	);
 
-	const handleSaveSendToken = async (id: string, username?: string, avatar?: string, display_name?: string) => {
+	const handleSaveSendToken = async (id?: string, username?: string, avatar?: string, display_name?: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
 			setUserSearchError('Please select a user');
@@ -162,7 +160,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			return;
 		}
 
-		if (token > Number(tokenInWallet) + Number(getTokenSocket)) {
+		if (token > Number(tokenInWallet)) {
 			setError('Your amount exceeds wallet balance');
 			return;
 		}
@@ -179,7 +177,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
-			await sendNotificationMessage(userId, token, note ?? '', username, avatar, display_name);
+			if (id) {
+				await sendNotificationMessage(id, token, note ?? '', username, avatar, display_name);
+			}
 		} catch (err) {
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}

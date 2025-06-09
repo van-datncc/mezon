@@ -1,8 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
-import { IActivity, LoadingStatus } from '@mezon/utils';
+import { FOR_24_HOURS, IActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiCreateActivityRequest, ApiUserActivity } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const ACTIVITIES_API_FEATURE_KEY = 'activitiesapi';
 
@@ -42,11 +43,25 @@ export const createActivity = createAsyncThunk('activity/createActiviy', async (
 	}
 });
 
+const listActivitiesCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.listActivity(mezon.session);
+
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: FOR_24_HOURS,
+		normalizer: (args) => {
+			return args[0]?.session?.username || '';
+		}
+	}
+);
 export const listActivities = createAsyncThunk('activity/listActivities', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.listActivity(mezon.session);
+		const response = await listActivitiesCached(mezon);
 		if (!response.activities) {
 			return [];
 		}
