@@ -1,6 +1,7 @@
 import { useAuth, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
+	ISendTokenDetailType,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
 	authActions,
@@ -9,7 +10,6 @@ import {
 	selectAccountCustomStatus,
 	selectCurrentClanId,
 	selectGroupCallJoined,
-	selectInfoSendToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
@@ -52,7 +52,14 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
-	const infoSendToken = useSelector(selectInfoSendToken);
+	const infoSendToken: ISendTokenDetailType = {
+		amount: 500,
+		receiver_id: '1809615992091840512',
+		extra_attribute: '',
+		note: 'Transfer funds',
+		receiver_name: 'boizBUCKY',
+		sender_id: '1809069169707061200'
+	};
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
