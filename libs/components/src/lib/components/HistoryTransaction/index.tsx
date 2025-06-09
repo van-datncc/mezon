@@ -17,23 +17,148 @@ const limitWallet = 8;
 interface IProps {
 	onClose: () => void;
 }
+
+type FilterType = 'all' | 'sent' | 'received';
+
 const HistoryTransaction = ({ onClose }: IProps) => {
 	const dispatch = useAppDispatch();
 	const walletLedger = useAppSelector((state) => selectWalletLedger(state));
 	const detailLedger = useAppSelector((state) => selectDetailedger(state));
 
 	const count = useAppSelector((state) => selectCountWalletLedger(state));
+
 	const [currentPage, setCurrentPage] = useState(1);
 	const totalPages = count === undefined ? 0 : Math.ceil(count / limitWallet);
+
+	const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+
+	const [sentPage, setSentPage] = useState(1);
+	const [receivedPage, setReceivedPage] = useState(1);
+
+	const [sentTransactions, setSentTransactions] = useState<any[]>([]);
+	const [receivedTransactions, setReceivedTransactions] = useState<any[]>([]);
+	const [sentLoaded, setSentLoaded] = useState(false);
+	const [receivedLoaded, setReceivedLoaded] = useState(false);
+
 	const [openedTransactionId, setOpenedTransactionId] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const loadFilteredData = async (type: 'sent' | 'received') => {
+		if (
+			(type === 'sent' && sentLoaded) ||
+			(type === 'received' && receivedLoaded)
+		) {
+			return;
+		}
+
+		setIsLoading(true);
+		try {
+			const maxPagesToLoad = 10;
+
+			const results: any[] = [];
+
+			for (let i = 1; i <= maxPagesToLoad; i++) {
+				const result = await dispatch(fetchListWalletLedger({ page: i })).unwrap();
+				if (result && result.ledgers) {
+					results.push(...result.ledgers);
+				}
+				if (!result?.ledgers?.length) {
+					break;
+				}
+			}
+
+			const filteredData = results.filter(tx =>
+				type === 'sent' ? (tx.value || 0) < 0 : (tx.value || 0) > 0
+			);
+
+			if (type === 'sent') {
+				setSentTransactions(filteredData);
+				setSentLoaded(true);
+			} else {
+				setReceivedTransactions(filteredData);
+				setReceivedLoaded(true);
+			}
+		} catch (error) {
+			console.error(`Error loading ${type} transactions:`, error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const refreshData = () => {
+		if (activeFilter === 'all') {
+			dispatch(fetchListWalletLedger({ page: currentPage }));
+		} else if (activeFilter === 'sent') {
+			setSentLoaded(false);
+			loadFilteredData('sent');
+		} else if (activeFilter === 'received') {
+			setReceivedLoaded(false);
+			loadFilteredData('received');
+		}
+	};
 
 	useEffect(() => {
-		dispatch(fetchListWalletLedger({ page: 1 }));
-	}, [dispatch]);
+		if (activeFilter === 'all') {
+			dispatch(fetchListWalletLedger({ page: currentPage }));
+		}
+	}, [dispatch, currentPage, activeFilter]);
+
+	useEffect(() => {
+		if (activeFilter === 'sent' && !sentLoaded) {
+			loadFilteredData('sent');
+		} else if (activeFilter === 'received' && !receivedLoaded) {
+			loadFilteredData('received');
+		}
+	}, [dispatch, activeFilter, count, sentLoaded, receivedLoaded]);
 
 	const onPageChange = (page: number) => {
-		setCurrentPage(page);
-		dispatch(fetchListWalletLedger({ page: page }));
+		if (activeFilter === 'all') {
+			setCurrentPage(page);
+		} else if (activeFilter === 'sent') {
+			setSentPage(page);
+		} else if (activeFilter === 'received') {
+			setReceivedPage(page);
+		}
+	};
+
+	const getSentTotalPages = () => {
+		return Math.ceil(sentTransactions.length / limitWallet);
+	};
+
+	const getReceivedTotalPages = () => {
+		return Math.ceil(receivedTransactions.length / limitWallet);
+	};
+
+	const getCurrentPageData = () => {
+		if (activeFilter === 'all') {
+			return walletLedger || [];
+		}
+
+		if (activeFilter === 'sent') {
+			const startIndex = (sentPage - 1) * limitWallet;
+			const endIndex = Math.min(startIndex + limitWallet, sentTransactions.length);
+			return sentTransactions.slice(startIndex, endIndex);
+		}
+
+		if (activeFilter === 'received') {
+			const startIndex = (receivedPage - 1) * limitWallet;
+			const endIndex = Math.min(startIndex + limitWallet, receivedTransactions.length);
+			return receivedTransactions.slice(startIndex, endIndex);
+		}
+
+		return [];
+	};
+
+	const getCurrentPage = () => {
+		if (activeFilter === 'all') return currentPage;
+		if (activeFilter === 'sent') return sentPage;
+		return receivedPage;
+	};
+
+	const getCurrentTotalPages = () => {
+		if (activeFilter === 'all') return totalPages;
+		if (activeFilter === 'sent') return getSentTotalPages();
+		return getReceivedTotalPages();
 	};
 
 	const formatDate = (dateString: string) => {
@@ -80,7 +205,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 				</div>
 				<div>
 					<p className="text-green-600 dark:text-green-400 font-semibold">
-						{`+${formatNumber(amount, 'vi-VN')} đ`}
+						{`${formatNumber(amount, 'vi-VN')} đ`}
 					</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
 				</div>
@@ -112,7 +237,20 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		);
 	};
 
-	if (!walletLedger) {
+	const handleFilterChange = (filter: FilterType) => {
+		if (activeFilter !== filter) {
+			setActiveFilter(filter);
+			if (filter === 'all') {
+				setCurrentPage(1);
+			} else if (filter === 'sent') {
+				setSentPage(1);
+			} else if (filter === 'received') {
+				setReceivedPage(1);
+			}
+		}
+	};
+
+	if (!walletLedger || isLoading) {
 		return (
 			<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 				<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
@@ -127,7 +265,12 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 									<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
 								</div>
 							</div>
-							<div className="w-8 h-8" />
+							<button
+								onClick={onClose}
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+							>
+								<Icons.Close className="w-5 h-5" />
+							</button>
 						</div>
 					</div>
 					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
@@ -150,10 +293,13 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		);
 	}
 
+	const currentData = getCurrentPageData();
+
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 			<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
-				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">					<div className="flex items-center justify-between p-6">
+				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">
+					<div className="flex items-center justify-between p-6">
 						<div className="flex items-center gap-3">
 						<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center shadow-lg">
 							<Icons.HistoryTransaction className="w-9 h-9 text-white" />
@@ -163,54 +309,110 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
 							</div>
 						</div>
-					<button
-							onClick={onClose}
-						className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-						>
-						<Icons.Close className="w-5 h-5" />
-						</button>
+						<div className="flex items-center gap-2">
+							<button
+								onClick={refreshData}
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+							>
+								<Icons.ReloadIcon className="w-5 h-5" />
+							</button>
+							<button
+								onClick={onClose}
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+							>
+								<Icons.Close className="w-5 h-5" />
+							</button>
+						</div>
 					</div>
 				</div>
 
 				{walletLedger?.length ? (
 					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
-						<div className="p-6 space-y-4 max-h-[500px]   overflow-y-auto thread-scroll">
-							{walletLedger?.map((item, index) => (
-								<div
-									key={index}
-									className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer"
-									onClick={() => toggleDetails(item.transaction_id ?? '')}
+						<div className="px-6 pt-4">
+							<div className="flex gap-2 mb-4 border-b dark:border-gray-700 border-gray-200 pb-4">
+								<button
+									onClick={() => handleFilterChange('all')}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'all'
+										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										}`}
 								>
-									<div className="p-4">
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-4">
-												{renderAmount(item.value ?? 0, item.transaction_id ?? '')}
-												<div className="flex flex-col">
-													<div className="flex items-center gap-2">
-														<p className="dark:text-white text-gray-900 font-medium text-sm">
-															Transaction #{item.transaction_id?.slice(-8)}
-														</p>
-														{getStatusBadge(item.value ?? 0)}
-													</div>
-													<p className="dark:text-gray-400 text-gray-500 text-xs mt-1">
-														{formatDate(item.create_time ?? '')}
-													</p>
-												</div>
-											</div>
-
-										</div>
-									</div>
-
-									{detailLedger && openedTransactionId === item.transaction_id && (
-										<TransactionDetail detailLedger={detailLedger} formatDate={formatDate} />
-									)}
-								</div>
-							))}
+									All Transaction
+								</button>
+								<button
+									onClick={() => handleFilterChange('sent')}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'sent'
+										? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										}`}
+								>
+									Send Transaction
+								</button>
+								<button
+									onClick={() => handleFilterChange('received')}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'received'
+										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										}`}
+								>
+									Received Transaction
+								</button>
+							</div>
 						</div>
 
-						{totalPages > 1 && (
+						<div className="px-6 pb-6 space-y-4 max-h-[450px] overflow-y-auto thread-scroll">
+							{currentData.length > 0 ? (
+								currentData.map((item, index) => (
+									<div
+										key={index}
+										className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer"
+										onClick={() => toggleDetails(item.transaction_id ?? '')}
+									>
+										<div className="p-4">
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-4">
+													{renderAmount(item.value ?? 0, item.transaction_id ?? '')}
+													<div className="flex flex-col">
+														<div className="flex items-center gap-2">
+															<p className="dark:text-white text-gray-900 font-medium text-sm">
+																Transaction #{item.transaction_id?.slice(-8)}
+															</p>
+															{getStatusBadge(item.value ?? 0)}
+														</div>
+														<p className="dark:text-gray-400 text-gray-500 text-xs mt-1">
+															{formatDate(item.create_time ?? '')}
+														</p>
+													</div>
+												</div>
+
+											</div>
+										</div>
+
+										{detailLedger && openedTransactionId === item.transaction_id && (
+											<TransactionDetail detailLedger={detailLedger} formatDate={formatDate} />
+										)}
+									</div>
+								))
+							) : (
+								<div className="flex flex-col items-center justify-center py-12">
+									<div className="w-16 h-16 rounded-full dark:bg-gray-700 bg-gray-100 flex items-center justify-center mb-4">
+										<Icons.EmptyType />
+									</div>
+									<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">Không tìm thấy giao dịch</h3>
+									<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
+										Không có giao dịch nào thuộc loại bạn đã chọn. Vui lòng thử loại giao dịch khác.
+									</p>
+								</div>
+							)}
+						</div>
+
+						{getCurrentTotalPages() > 1 && (
 							<div className="border-t dark:border-gray-700 border-gray-200 px-6 py-4 flex justify-center">
-								<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+								<Pagination
+									currentPage={getCurrentPage()}
+									totalPages={getCurrentTotalPages()}
+									onPageChange={onPageChange}
+								/>
 							</div>
 						)}
 					</div>
