@@ -278,21 +278,25 @@ export class MezonNotificationService {
 			const existingWindow = window.open('', '_self');
 
 			if (existingWindow) {
-				existingWindow.focus();
-				const notificationUrl = new URL(link);
-				const path = notificationUrl.pathname;
-				const fromTopic = msg?.extras?.topicId && msg?.extras?.topicId !== '0';
+				try {
+					existingWindow.focus();
+					const notificationUrl = new URL(link);
+					const path = notificationUrl.pathname;
+					const fromTopic = msg?.extras?.topicId && msg?.extras?.topicId !== '0';
 
-				// Switch to the user who received the notification if needed
-				if (connection?.userId && this.currentActiveUserId !== connection.userId) {
-					this.setCurrentActiveUserId(connection.userId);
+					// Switch to the user who received the notification if needed
+					if (connection?.userId && this.currentActiveUserId !== connection.userId) {
+						this.setCurrentActiveUserId(connection.userId);
+					}
+
+					window.dispatchEvent(
+						new CustomEvent('mezon:navigate', {
+							detail: { url: path, msg: fromTopic ? msg : null, userId: connection?.userId }
+						})
+					);
+				} catch (error) {
+					console.error('Error navigating to link:', error);
 				}
-
-				window.dispatchEvent(
-					new CustomEvent('mezon:navigate', {
-						detail: { url: path, msg: fromTopic ? msg : null, userId: connection?.userId }
-					})
-				);
 			} else {
 				window.location.href = link;
 			}
