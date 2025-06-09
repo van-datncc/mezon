@@ -386,7 +386,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
-						{channel?.type === typeChannel.text && (
+						{(channel && channel.type !== undefined &&
+							(channel.type === typeChannel.text || channel.type === typeChannel.thread ||
+								(isThread && channel.parent_id && channel.parent_id !== '0'))) && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}
@@ -397,7 +399,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								)}
 								label=""
 								placement="right-start"
-								className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								className="dark:bg-[#323232] bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
 								<ItemPanel
 									children="Use Category Default"
@@ -468,7 +470,9 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 						) : (
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
-						{(channel.type === typeChannel.text || channel.type === typeChannel.thread) && (
+							{(channel && channel.type !== undefined &&
+								(channel.type === typeChannel.text || channel.type === typeChannel.thread ||
+									(isThread && channel.parent_id && channel.parent_id !== '0'))) && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}
