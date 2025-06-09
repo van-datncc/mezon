@@ -68,7 +68,7 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						</View>
 					)}
 					{!isPiPMode && (
-						<View style={styles.focusIcon}>
+						<View style={[styles.focusIcon, styles.focusIconAbsolute]}>
 							{isParticipantFocused ? (
 								<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_14} />
 							) : (
@@ -110,7 +110,10 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						styles.userView,
 						isGridLayout && { width: '48%', height: size.s_150 },
 						isTabletLandscape && { height: size.s_150 + size.s_100 },
-						isPiPMode && { height: size.s_60 * 2, width: size.s_100 }
+						isPiPMode && { height: size.s_60 * 2, width: size.s_100 },
+						{
+							flexDirection: 'column'
+						}
 					]}
 				>
 					<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: size.s_10 }}>
@@ -121,7 +124,7 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 						)}
 					</View>
 					{!isPiPMode && (
-						<View style={[styles.userName, { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}>
+						<View style={styles.wrapperUser}>
 							{participant.isMicrophoneEnabled ? (
 								<MezonIconCDN icon={IconCDN.microphoneIcon} height={size.s_14} />
 							) : (
@@ -130,7 +133,9 @@ const ParticipantItem = ({ participant, tracks, isFocusedScreen, setFocusedScree
 							{isLoading ? (
 								<Icons.LoadingIcon width={24} height={24} />
 							) : (
-								<Text style={styles.subTitle}>{voiceUsername || 'Unknown'}</Text>
+								<Text numberOfLines={2} style={styles.subTitle}>
+									{voiceUsername || 'Unknown'}
+								</Text>
 							)}
 						</View>
 					)}
