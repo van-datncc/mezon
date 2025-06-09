@@ -389,7 +389,7 @@ export const RenderTextMarkdownContent = ({
 
 		switch (element?.kindOf) {
 			case ETokenMessage.EMOJIS: {
-				const srcEmoji = getSrcEmoji(element.emojiid);
+				const srcEmoji = getSrcEmoji(element?.emojiid);
 				textParts.push(
 					<View key={`emoji-${index}`} style={!isOnlyContainEmoji && markdownStyles(themeValue).emojiInMessageContain}>
 						<ImageNative
@@ -409,8 +409,8 @@ export const RenderTextMarkdownContent = ({
 				const usersInChannel = selectAllChannelMembers(store.getState() as RootState, currentChannelId as string);
 				const mention = MentionUser({
 					tagName: contentInElement,
-					roleId: element.role_id || '',
-					tagUserId: element.user_id,
+					roleId: element?.role_id || '',
+					tagUserId: element?.user_id,
 					mode,
 					usersClan,
 					usersInChannel
@@ -442,7 +442,7 @@ export const RenderTextMarkdownContent = ({
 					const channelsEntities = selectChannelsEntities(store.getState() as any);
 					const hashtagDmEntities = selectHashtagDmEntities(store.getState() as any);
 					const mention = ChannelHashtag({
-						channelHashtagId: element.channelid,
+						channelHashtagId: element?.channelid,
 						mode,
 						currentChannelId,
 						channelsEntities,
@@ -489,7 +489,7 @@ export const RenderTextMarkdownContent = ({
 			}
 
 			case ETokenMessage.MARKDOWNS: {
-				switch (element.type) {
+				switch (element?.type) {
 					case EBacktickType.SINGLE:
 					case EBacktickType.CODE:
 						textParts.push(
