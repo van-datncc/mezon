@@ -367,12 +367,7 @@ const RoomView = ({
 			{!isAnimationComplete ? (
 				<FocusedScreenPopup sortedParticipants={sortedParticipants} tracks={tracks} localParticipant={localParticipant} />
 			) : (
-				<ParticipantScreen
-					sortedParticipants={sortedParticipants}
-					tracks={tracks}
-					isFocusedScreen={focusedScreenShare}
-					setFocusedScreenShare={setFocusedScreenShare}
-				/>
+				<ParticipantScreen sortedParticipants={sortedParticipants} tracks={tracks} setFocusedScreenShare={setFocusedScreenShare} />
 			)}
 			{isAnimationComplete && isGroupCall && participants.length <= 1 && isShowPreCallInterface && (
 				<View style={{ alignItems: 'center', justifyContent: 'center', paddingBottom: size.s_100 * 2 }}>
