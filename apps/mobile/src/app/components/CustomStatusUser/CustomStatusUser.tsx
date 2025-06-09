@@ -1,7 +1,7 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectUserStatus, useAppDispatch, userStatusActions } from '@mezon/store-mobile';
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ export enum EUserStatus {
 	DO_NOT_DISTURB = 'Do Not Disturb',
 	INVISIBLE = 'Invisible'
 }
-export const CustomStatusUser = forwardRef(function CustomStatusUser(props: ICustomStatusUserProps) {
+export const CustomStatusUser = (props: ICustomStatusUserProps) => {
 	const { onPressSetCustomStatus, userCustomStatus, handleCustomUserStatus } = props;
 	const { t } = useTranslation(['customUserStatus']);
 	const userStatus = useSelector(selectUserStatus);
@@ -121,4 +121,4 @@ export const CustomStatusUser = forwardRef(function CustomStatusUser(props: ICus
 			<MezonMenu menu={statusMenu} />
 		</View>
 	);
-});
+};

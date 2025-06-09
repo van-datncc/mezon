@@ -120,7 +120,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 					if (element?.user_id) {
 						formattedContent.push(
 							allUserIdsInChannel?.includes(element?.user_id) || contentInElement === '@here' ? (
-								<Text>
+								<Text key={`plain-${index}`}>
 									<Text style={styles.textMention} key={`mention-${index}`} onPress={() => onMention(`@${element?.username}`)}>
 										{contentInElement?.trim()}
 									</Text>{' '}
