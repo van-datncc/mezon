@@ -1,7 +1,7 @@
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 import { useAuth } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { KeyboardAvoidingView, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { IUserProfileValue } from '..';
@@ -21,12 +21,15 @@ function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProf
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const auth = useAuth();
-	const handleAvatarChange = async (imgUrl: string) => {
-		setCurrentUserProfileValue((prevValue) => ({
-			...prevValue,
-			imgUrl
-		}));
-	};
+	const handleAvatarChange = useCallback(
+		async (imgUrl: string) => {
+			setCurrentUserProfileValue((prevValue) => ({
+				...prevValue,
+				imgUrl
+			}));
+		},
+		[setCurrentUserProfileValue]
+	);
 
 	const handleDetailChange = (newValue: Partial<IUserProfileValue>) => {
 		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, ...newValue }));

@@ -1,7 +1,6 @@
 import { useAuth, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
-	ISendTokenDetailType,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
 	authActions,
@@ -10,6 +9,7 @@ import {
 	selectAccountCustomStatus,
 	selectCurrentClanId,
 	selectGroupCallJoined,
+	selectInfoSendToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
 	selectIsInCall,
@@ -52,14 +52,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
-	const infoSendToken: ISendTokenDetailType = {
-		amount: 500,
-		receiver_id: '1809615992091840512',
-		extra_attribute: '',
-		note: 'Transfer funds',
-		receiver_name: 'boizBUCKY',
-		sender_id: '1809069169707061200'
-	};
+	const infoSendToken = useSelector(selectInfoSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const myProfile = useAuth();
@@ -156,7 +149,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		[createDirectMessageWithUser, sendInviteMessage]
 	);
 
-	const handleSaveSendToken = async (id?: string, username?: string, avatar?: string, display_name?: string) => {
+	const handleSaveSendToken = async (id: string, username?: string, avatar?: string, display_name?: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
 			setUserSearchError('Please select a user');
@@ -184,9 +177,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
-			if (id) {
-				await sendNotificationMessage(id, token, note ?? '', username, avatar, display_name);
-			}
+			await sendNotificationMessage(userId, token, note ?? '', username, avatar, display_name);
 		} catch (err) {
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}
