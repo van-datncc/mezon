@@ -60,7 +60,6 @@ const ModalSendToken = ({
 			setToken(0);
 		}
 		if (openModal) {
-			setSearchTerm('');
 			setSelectedUserId('');
 		}
 	}, [openModal]);
