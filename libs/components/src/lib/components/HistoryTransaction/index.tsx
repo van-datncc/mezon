@@ -80,7 +80,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 				</div>
 				<div>
 					<p className="text-green-600 dark:text-green-400 font-semibold">
-						{`${formatNumber(amount, 'vi-VN')} đ`}
+						{`+${formatNumber(amount, 'vi-VN')} đ`}
 					</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
 				</div>
