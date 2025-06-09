@@ -12,13 +12,18 @@ import { formatNumber } from '@mezon/utils';
 import { Pagination } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import TransactionDetail from '../HistoryTransaction/TransactionDetail';
-const limitWallet = 8;
+import {
+	EMPTY_STATES,
+	FilterType,
+	HEADER,
+	LIMIT_WALLET,
+	TAB_LABELS,
+	TRANSACTION_TYPES
+} from './constans/constans';
 
 interface IProps {
 	onClose: () => void;
 }
-
-type FilterType = 'all' | 'sent' | 'received';
 
 const HistoryTransaction = ({ onClose }: IProps) => {
 	const dispatch = useAppDispatch();
@@ -28,7 +33,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const count = useAppSelector((state) => selectCountWalletLedger(state));
 
 	const [currentPage, setCurrentPage] = useState(1);
-	const totalPages = count === undefined ? 0 : Math.ceil(count / limitWallet);
+	const totalPages = count === undefined ? 0 : Math.ceil(count / LIMIT_WALLET);
 
 	const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
@@ -53,11 +58,11 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 		setIsLoading(true);
 		try {
-			const maxPagesToLoad = 10;
+			const actualTotalPages = count ? Math.ceil(count / LIMIT_WALLET) : 1;
 
 			const results: any[] = [];
 
-			for (let i = 1; i <= maxPagesToLoad; i++) {
+			for (let i = 1; i <= actualTotalPages; i++) {
 				const result = await dispatch(fetchListWalletLedger({ page: i })).unwrap();
 				if (result && result.ledgers) {
 					results.push(...result.ledgers);
@@ -122,11 +127,11 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	};
 
 	const getSentTotalPages = () => {
-		return Math.ceil(sentTransactions.length / limitWallet);
+		return Math.ceil(sentTransactions.length / LIMIT_WALLET);
 	};
 
 	const getReceivedTotalPages = () => {
-		return Math.ceil(receivedTransactions.length / limitWallet);
+		return Math.ceil(receivedTransactions.length / LIMIT_WALLET);
 	};
 
 	const getCurrentPageData = () => {
@@ -135,14 +140,14 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		}
 
 		if (activeFilter === 'sent') {
-			const startIndex = (sentPage - 1) * limitWallet;
-			const endIndex = Math.min(startIndex + limitWallet, sentTransactions.length);
+			const startIndex = (sentPage - 1) * LIMIT_WALLET;
+			const endIndex = Math.min(startIndex + LIMIT_WALLET, sentTransactions.length);
 			return sentTransactions.slice(startIndex, endIndex);
 		}
 
 		if (activeFilter === 'received') {
-			const startIndex = (receivedPage - 1) * limitWallet;
-			const endIndex = Math.min(startIndex + limitWallet, receivedTransactions.length);
+			const startIndex = (receivedPage - 1) * LIMIT_WALLET;
+			const endIndex = Math.min(startIndex + LIMIT_WALLET, receivedTransactions.length);
 			return receivedTransactions.slice(startIndex, endIndex);
 		}
 
@@ -188,7 +193,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						<p className="text-red-600 dark:text-red-400 font-semibold">
 							{`${formatNumber(Math.abs(amount), 'vi-VN')} đ`}
 						</p>
-						<p className="text-xs text-gray-500 dark:text-gray-400">Sent</p>
+						<p className="text-xs text-gray-500 dark:text-gray-400">{TRANSACTION_TYPES.SENT}</p>
 					</div>
 				</div>
 			);
@@ -207,7 +212,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 					<p className="text-green-600 dark:text-green-400 font-semibold">
 						{`${formatNumber(amount, 'vi-VN')} đ`}
 					</p>
-					<p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
+					<p className="text-xs text-gray-500 dark:text-gray-400">{TRANSACTION_TYPES.RECEIVED}</p>
 				</div>
 			</div>
 		);
@@ -221,7 +226,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	};
 
 	const getTransactionType = (amount: number) => {
-		return amount < 0 ? 'Sent' : 'Received';
+		return amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED;
 	};
 
 	const getStatusBadge = (amount: number) => {
@@ -261,8 +266,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 									<Icons.HistoryTransaction className="w-9 h-9 text-white" />
 								</div>
 								<div>
-									<h4 className="dark:text-white text-gray-900 text-lg font-semibold">Transaction History</h4>
-									<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
+									<h4 className="dark:text-white text-gray-900 text-lg font-semibold">{HEADER.TITLE}</h4>
+									<p className="dark:text-gray-400 text-gray-500 text-sm">{HEADER.SUBTITLE}</p>
 								</div>
 							</div>
 							<button
@@ -305,8 +310,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							<Icons.HistoryTransaction className="w-9 h-9 text-white" />
 							</div>
 							<div>
-							<h4 className="dark:text-white text-gray-900 text-lg font-semibold">Transaction History</h4>
-							<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
+								<h4 className="dark:text-white text-gray-900 text-lg font-semibold">{HEADER.TITLE}</h4>
+								<p className="dark:text-gray-400 text-gray-500 text-sm">{HEADER.SUBTITLE}</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
@@ -337,7 +342,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
 										}`}
 								>
-									All Transaction
+									{TAB_LABELS.ALL}
 								</button>
 								<button
 									onClick={() => handleFilterChange('sent')}
@@ -346,7 +351,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
 										}`}
 								>
-									Send Transaction
+									{TAB_LABELS.SENT}
 								</button>
 								<button
 									onClick={() => handleFilterChange('received')}
@@ -355,7 +360,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
 										}`}
 								>
-									Received Transaction
+									{TAB_LABELS.RECEIVED}
 								</button>
 							</div>
 						</div>
@@ -398,9 +403,15 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 									<div className="w-16 h-16 rounded-full dark:bg-gray-700 bg-gray-100 flex items-center justify-center mb-4">
 										<Icons.EmptyType />
 									</div>
-									<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">Không tìm thấy giao dịch</h3>
+										<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
+											{activeFilter === 'all'
+												? EMPTY_STATES.NO_TRANSACTIONS.TITLE
+												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.TITLE}
+										</h3>
 									<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-										Không có giao dịch nào thuộc loại bạn đã chọn. Vui lòng thử loại giao dịch khác.
+											{activeFilter === 'all'
+												? EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION
+												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.DESCRIPTION}
 									</p>
 								</div>
 							)}
@@ -422,10 +433,11 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 								<div className="w-16 h-16 rounded-full dark:bg-gray-800 bg-gray-100 flex items-center justify-center mb-4">
 									<Icons.EmptyType />
 								</div>
-								<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">No Transactions Found</h3>
+								<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
+									{EMPTY_STATES.NO_TRANSACTIONS.TITLE}
+								</h3>
 								<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-									You haven't made any transactions yet. Your transaction history will appear here once you start sending or receiving
-									tokens.
+									{EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION}
 								</p>
 							</div>
 						</div>
