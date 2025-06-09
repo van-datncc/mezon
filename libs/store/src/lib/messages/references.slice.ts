@@ -238,7 +238,7 @@ export const selectIdMessageRefEdit = createSelector(getReferencesState, (state:
 
 export const selectMessageMetionId = createSelector(getReferencesState, (state: ReferencesState) => state.idMessageMention);
 
-export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state.attachmentAfterUpload);
+export const selectAttachmentAfterUpload = createSelector(getReferencesState, (state: ReferencesState) => state?.attachmentAfterUpload);
 
 export const selectAttachmentByChannelId = createSelector(
 	[selectAttachmentAfterUpload, (_, channelId: string) => channelId],
