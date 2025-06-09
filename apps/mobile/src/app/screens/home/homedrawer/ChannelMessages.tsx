@@ -100,18 +100,22 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 		const checkMessageExistence = () => {
 			const store = getStore();
+			if (idMessageToJump.id === 'temp') return;
 			const isMessageExist = selectIsMessageIdExist(store.getState() as any, channelId, idMessageToJump?.id);
 			if (isMessageExist) {
 				const indexToJump = messages?.findIndex?.((message: { id: string }) => message.id === idMessageToJump?.id);
 				if (indexToJump !== -1 && flatListRef.current && indexToJump > 0 && messages?.length - 1 >= indexToJump) {
-					flatListRef?.current?.scrollToIndex?.({
-						animated: true,
-						index: indexToJump,
-						viewPosition: 0.5
-					});
+					setTimeout(() => {
+						flatListRef?.current?.scrollToIndex?.({
+							animated: true,
+							index: indexToJump,
+							viewPosition: 0.5,
+							viewOffset: 20
+						});
+					}, 500);
 					timeout = setTimeout(() => {
 						dispatch(messagesActions.setIdMessageToJump(null));
-					}, 3000);
+					}, 2000);
 				}
 			}
 		};
@@ -139,7 +143,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				if (!hasMoreTop) return;
 			}
 			isLoadMore.current[direction] = true;
-			dispatch(messagesActions.setIdMessageToJump(null));
 			if (direction === ELoadMoreDirection.bottom) {
 				await dispatch(
 					messagesActions.loadMoreMessage({

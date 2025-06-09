@@ -8,6 +8,7 @@ import { DeviceEventEmitter, Keyboard, Platform, StatusBar } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelAppHotbar from './ChannelAppHotbar';
 import ChannelMessages from './ChannelMessages';
 import { ChatBox } from './ChatBox';
@@ -41,7 +42,7 @@ const HomeDefault = React.memo(
 
 		const onOpenDrawer = useCallback(() => {
 			requestAnimationFrame(async () => {
-				navigation.goBack();
+				navigation.navigate(APP_SCREEN.BOTTOM_BAR);
 				onShowKeyboardBottomSheet(false, 'text');
 				Keyboard.dismiss();
 			});
