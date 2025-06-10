@@ -97,8 +97,8 @@ export const FriendStacks = ({ navigation }: { navigation: any }) => {
 					headerTitle: t('headerTitle.requestFriend'),
 					headerStyle: {
 						backgroundColor: themeValue.primary
-					},
-					headerRight: () => <SettingFriendRequestButton navigation={navigation} />
+					}
+					// headerRight: () => <SettingFriendRequestButton navigation={navigation} />
 				}}
 			/>
 			<Stack.Screen
