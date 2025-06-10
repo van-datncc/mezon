@@ -44,10 +44,10 @@ export const AddFriendScreen = () => {
 
 	const waysToAddFriendList = useMemo(() => {
 		return [
-			{
-				title: t('addFriend.findYourFriend'),
-				type: EAddFriendWays.FindFriend
-			},
+			// {
+			// 	title: t('addFriend.findYourFriend'),
+			// 	type: EAddFriendWays.FindFriend
+			// },
 			{
 				title: t('addFriend.addByUserName'),
 				type: EAddFriendWays.UserName
