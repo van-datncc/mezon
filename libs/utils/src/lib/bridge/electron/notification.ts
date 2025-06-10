@@ -23,6 +23,7 @@ export interface NotificationData {
 	date: string;
 	image: string;
 	extras?: IMessageExtras;
+	sender_id?: string;
 }
 
 export enum NotificationPermissionStatus {
@@ -134,14 +135,17 @@ export class MezonNotificationService {
 					const { title, message, image } = msg ?? {};
 
 					const { link, e2eemess } = msg?.extras ?? {};
-					if (msg?.channel_id && msg?.channel_id === connection.currentChannelId && isFocus) {
+
+					if (
+						(msg?.channel_id && msg?.channel_id === connection.currentChannelId && isFocus) ||
+						msg?.sender_id === this.currentActiveUserId
+					) {
 						return;
 					}
 					let msgContent = message;
 					if (e2eemess === 'true') {
 						msgContent = await MessageCrypt.mapE2EEcontent(message, userId, true);
 					}
-
 					this.pushNotification(title, msgContent, image, link, msg, connection);
 					if (isElectron() && msg?.appid && msg.appid !== connection.previousAppId) {
 						connection.previousAppId = msg.appid;
