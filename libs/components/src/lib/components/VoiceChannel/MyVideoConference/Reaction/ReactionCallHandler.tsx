@@ -1,7 +1,8 @@
 import { useMezon } from '@mezon/transport';
 import { getSrcEmoji } from '@mezon/utils';
+import { VoiceReactionSend } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { DisplayedEmoji, ReactionCallHandlerProps, ReactionType } from './types';
+import { DisplayedEmoji, ReactionCallHandlerProps } from './types';
 
 export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ currentChannel }) => {
 	const [displayedEmojis, setDisplayedEmojis] = useState<DisplayedEmoji[]>([]);
@@ -25,39 +26,32 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 	useEffect(() => {
 		if (!socketRef.current || !currentChannel?.channel_id) return;
 
-		const originalOnChannelMessage = socketRef.current.onchannelmessage;
+		const currentSocket = socketRef.current;
 
-		socketRef.current.onchannelmessage = (message: any) => {
-			if (originalOnChannelMessage) {
-				originalOnChannelMessage(message);
-			}
-
+		currentSocket.onvoicereactionmessage = (message: VoiceReactionSend) => {
 			if (currentChannel?.channel_id === message.channel_id) {
 				try {
-					const content = typeof message.content === 'string' ? JSON.parse(message.content) : message.content;
+					const emojis = message.emojis || [];
+					emojis.forEach((emojiId, index) => {
+						if (emojiId) {
+							const position = generatePosition();
 
-					if (content.vr !== ReactionType.VIDEO) return;
+							const newEmoji = {
+								id: `${Date.now()}-${index}`,
+								emoji: '',
+								emojiId: emojiId,
+								timestamp: Date.now(),
+								position
+							};
 
-					if (content.ej && content.ej.length > 0) {
-						const emojiData = content.ej[0];
+							setDisplayedEmojis((prev) => [...prev, newEmoji]);
 
-						const position = generatePosition();
-
-						const newEmoji = {
-							id: message.message_id || Date.now().toString(),
-							emoji: content.t.trim(),
-							emojiId: emojiData.emojiid,
-							timestamp: Date.now(),
-							position
-						};
-
-						setDisplayedEmojis((prev) => [...prev, newEmoji]);
-
-						const durationMs = parseFloat(position.duration) * 1000 + 100;
-						setTimeout(() => {
-							setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
-						}, durationMs);
-					}
+							const durationMs = parseFloat(position.duration) * 1000 + 100;
+							setTimeout(() => {
+								setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
+							}, durationMs);
+						}
+					});
 				} catch (error) {
 					console.error(error);
 				}
@@ -65,8 +59,8 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 		};
 
 		return () => {
-			if (socketRef.current) {
-				socketRef.current.onchannelmessage = originalOnChannelMessage;
+			if (currentSocket) {
+				currentSocket.onvoicereactionmessage = () => {};
 			}
 		};
 	}, [socketRef, currentChannel, generatePosition]);
@@ -90,7 +84,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 						height: '64px'
 					}}
 				>
-					<img src={getSrcEmoji(item.emojiId)} alt={item.emoji} className="w-full h-full object-cover" />
+					<img src={getSrcEmoji(item.emojiId)} alt={''} className="w-full h-full object-cover" />
 				</div>
 			))}
 		</div>
