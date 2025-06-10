@@ -28,7 +28,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 
 		const currentSocket = socketRef.current;
 
-		currentSocket.onVoiceReactionMessage = (message: VoiceReactionSend) => {
+		currentSocket.onvoicereactionmessage = (message: VoiceReactionSend) => {
 			if (currentChannel?.channel_id === message.channel_id) {
 				try {
 					const emojis = message.emojis || [];
@@ -62,7 +62,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 
 		return () => {
 			if (currentSocket) {
-				currentSocket.onVoiceReactionMessage = () => {};
+				currentSocket.onvoicereactionmessage = () => {};
 			}
 		};
 	}, [socketRef, currentChannel, generatePosition]);
