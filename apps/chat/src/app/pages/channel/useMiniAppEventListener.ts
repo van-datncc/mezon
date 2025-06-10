@@ -1,4 +1,13 @@
-import { channelAppActions, getStore, giveCoffeeActions, RolesClanEntity, selectAllChannels, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import {
+	channelAppActions,
+	getStore,
+	giveCoffeeActions,
+	RolesClanEntity,
+	selectAllChannels,
+	selectAllUserClans,
+	selectCurrentClan,
+	useAppDispatch
+} from '@mezon/store';
 import { ChannelMembersEntity, MiniAppEventType } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiAccount, ApiChannelAppResponse } from 'mezon-js/api.gen';
@@ -38,6 +47,8 @@ const useMiniAppEventListener = (
 			const eventData = safeJSONParse(event.data ?? '{}') || {};
 			const { eventType } = eventData;
 			if (!eventType) return;
+
+			const store = getStore();
 
 			switch (eventType) {
 				case MiniAppEventType.PING:
@@ -83,11 +94,23 @@ const useMiniAppEventListener = (
 					);
 					break;
 				case MiniAppEventType.GET_CLAN_USERS:
-					miniAppRef.current?.contentWindow?.postMessage(
-						JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: userChannels }),
-						appChannel.app_url
-					);
+					{
+						const clanUsers = selectAllUserClans(store.getState());
+						const users = [...userChannels];
+
+						clanUsers.forEach((item) => {
+							const index = users.findIndex((u) => u.id === item.id);
+							if (index === -1) return;
+							users[index] = { ...users[index], role_id: item.role_id };
+						});
+
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: users }),
+							appChannel.app_url
+						);
+					}
 					break;
+
 				case MiniAppEventType.JOIN_ROOM:
 					dispatch(channelAppActions.setRoomId({ channelId: appChannel?.channel_id as string, roomId: eventData.eventData?.roomId }));
 					break;
@@ -103,7 +126,6 @@ const useMiniAppEventListener = (
 					);
 					break;
 				case MiniAppEventType.GET_CHANNELS: {
-					const store = getStore();
 					const channels = selectAllChannels(store.getState());
 					miniAppRef.current?.contentWindow?.postMessage(
 						JSON.stringify({ eventType: MiniAppEventType.CHANNELS_RESPONSE, eventData: channels }),
@@ -120,7 +142,6 @@ const useMiniAppEventListener = (
 				}
 
 				case MiniAppEventType.GET_CLAN: {
-					const store = getStore();
 					const clan = selectCurrentClan(store.getState());
 					miniAppRef.current?.contentWindow?.postMessage(
 						JSON.stringify({ eventType: MiniAppEventType.CLAN_RESPONSE, eventData: clan }),
