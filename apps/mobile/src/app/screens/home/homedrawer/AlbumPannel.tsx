@@ -227,7 +227,9 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 			>
 				<Image source={{ uri: item?.coverPhoto }} style={styles.albumCoverImage} />
 				<View style={styles.albumTitleAndCount}>
-					<Text style={styles.albumTitle}>{item.title}</Text>
+					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.albumTitle}>
+						{item.title}
+					</Text>
 					<Text style={styles.albumImageCount}>{item.count}</Text>
 				</View>
 				{item?.title === valueAlbum && (
