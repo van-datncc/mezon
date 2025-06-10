@@ -297,7 +297,6 @@ const { selectAll, selectEntities } = voiceAdapter.getSelectors();
 export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): VoiceState => rootState[VOICE_FEATURE_KEY];
 
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
-export const selectAllVoiceEntities = createSelector(getVoiceState, selectEntities);
 
 export const selectVoiceJoined = createSelector(getVoiceState, (state) => state.isJoined);
 export const selectGroupCallJoined = createSelector(getVoiceState, (state) => state.isGroupCallJoined);
