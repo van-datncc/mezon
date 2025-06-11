@@ -112,7 +112,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 							viewPosition: 0.5,
 							viewOffset: 20
 						});
-					}, 500);
+					}, 100);
 					timeout = setTimeout(() => {
 						dispatch(messagesActions.setIdMessageToJump(null));
 					}, 2000);
