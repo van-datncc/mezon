@@ -195,9 +195,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 				dismiss();
 			},
 			icon: isDmUnmute ? (
-				<MezonIconCDN icon={IconCDN.bellSlashIcon} color={themeValue.textStrong} />
+				<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.textStrong} />
 			) : (
-				<MezonIconCDN icon={IconCDN.bellIcon} width={22} height={22} color={themeValue.text} />
+				<MezonIconCDN icon={IconCDN.bellSlashIcon} width={22} height={22} color={themeValue.text} />
 			)
 		}
 		// {

@@ -54,12 +54,16 @@ export default function NotificationSetting({ channel }: { channel?: ChannelThre
 	const [isChecked, setIsChecked] = useState<boolean>(false);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const notifyReactMessage = useSelector(selectNotifiReactMessage);
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannelId));
+	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(channel?.id || currentChannelId));
 	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const [defaultNotifyName, setDefaultNotifyName] = useState('');
 	useEffect(() => {
 		setIsChecked(notifyReactMessage?.id !== '0');
+		if (!getNotificationChannelSelected?.notification_setting_type) {
+			setRadioBox((prev) => prev.map((item) => (item.id === 0 ? { ...item, isChecked: true } : item)));
+			return;
+		}
 		setRadioBox(radioBox.map((item) => item && { ...item, isChecked: getNotificationChannelSelected?.notification_setting_type === item.value }));
 	}, [notifyReactMessage, getNotificationChannelSelected]);
 

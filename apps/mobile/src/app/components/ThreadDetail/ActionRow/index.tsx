@@ -4,6 +4,7 @@ import React, { useContext } from 'react';
 import { usePermissionChecker } from '@mezon/core';
 import { ENotificationActive, ETypeSearch } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { notificationSettingActions, useAppDispatch } from '@mezon/store-mobile';
 import { EOverriddenPermission, EPermission } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,6 +35,7 @@ export const ActionRow = React.memo(() => {
 		currentChannel?.channel_id ?? ''
 	);
 	const { statusMute } = useStatusMuteChannel();
+	const dispatch = useAppDispatch();
 	const isChannelDm = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
@@ -41,6 +43,11 @@ export const ActionRow = React.memo(() => {
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parent_id));
 	}, [currentChannel]);
+
+	useEffect(() => {
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: currentChannel?.channel_id }));
+	}, []);
+
 	const actionList = [
 		{
 			title: t('search'),
@@ -125,7 +132,13 @@ export const ActionRow = React.memo(() => {
 									action.icon
 								)}
 							</View>
-							<Text style={styles.optionText}>{action.title}</Text>
+							<Text style={styles.optionText}>
+								{[EActionRow.Mute].includes(action.type)
+									? statusMute === ENotificationActive.ON
+										? t('muteNotification')
+										: t('unmuteNotification')
+									: action.title}
+							</Text>
 						</View>
 					</Pressable>
 				) : null

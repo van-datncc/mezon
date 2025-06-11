@@ -29,6 +29,7 @@ export const QRScanner = () => {
 	const navigation = useNavigation<any>();
 	const [valueCode, setValueCode] = useState<string>('');
 	const [cameraKey, setCameraKey] = useState(0);
+	const [isNavigating, setIsNavigating] = useState(false);
 	const [isSuccess, setIsSuccess] = useState<boolean>(false);
 	const { confirmLoginRequest } = useAuth();
 	const { themeValue, themeBasic } = useTheme();
@@ -40,8 +41,10 @@ export const QRScanner = () => {
 	}, []);
 
 	useEffect(() => {
-		navigation.addListener('focus', () => {
+		return navigation.addListener('focus', () => {
 			setCameraKey((prev) => prev + 1);
+			setIsNavigating(false);
+			setDoScanBarcode(true);
 		});
 	}, [navigation]);
 
@@ -128,6 +131,8 @@ export const QRScanner = () => {
 		const store = await getStoreAsync();
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
+			setDoScanBarcode(false);
+			setIsNavigating(true);
 			if (value?.includes('channel-app')) {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, value);
 				return;
@@ -206,24 +211,26 @@ export const QRScanner = () => {
 
 	return (
 		<View style={styles.wrapper}>
-			<Camera
-				key={cameraKey}
-				cameraType={CameraType.Back}
-				showFrame={false}
-				onReadCode={async (event) => {
-					if (!scanningRef.current) return;
-					const qrValue = event?.nativeEvent?.codeStringValue;
-					scanningRef.current = false;
-					if (qrValue) {
-						setDoScanBarcode(false);
-						await onNavigationScanned(qrValue);
-					}
-					await sleep(5000);
-					scanningRef.current = true;
-				}}
-				scanBarcode={doScanBarcode}
-				style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-			/>
+			{!isNavigating && (
+				<Camera
+					key={cameraKey}
+					cameraType={CameraType.Back}
+					showFrame={false}
+					onReadCode={async (event) => {
+						if (!scanningRef.current) return;
+						const qrValue = event?.nativeEvent?.codeStringValue;
+						scanningRef.current = false;
+						if (qrValue) {
+							setDoScanBarcode(false);
+							await onNavigationScanned(qrValue);
+						}
+						await sleep(5000);
+						scanningRef.current = true;
+					}}
+					scanBarcode={doScanBarcode}
+					style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+				/>
+			)}
 			{!valueCode ? (
 				<View style={{ flex: 1 }}>
 					<View

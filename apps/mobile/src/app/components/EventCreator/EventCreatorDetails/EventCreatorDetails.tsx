@@ -247,14 +247,16 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 							initValue={eventFrequency}
 						/>
 						<Text style={styles.label}>{t('fields.cover')}</Text>
-						<MezonImagePicker
-							defaultValue={eventLogo}
-							height={size.s_100 * 2}
-							width={'100%'}
-							onLoad={handleLoad}
-							showHelpText
-							autoUpload
-						/>
+						<View style={{ alignSelf: 'center' }}>
+							<MezonImagePicker
+								defaultValue={eventLogo}
+								height={size.s_100 * 2}
+								width={size.s_100 * 2}
+								onLoad={handleLoad}
+								showHelpText
+								autoUpload
+							/>
+						</View>
 					</View>
 				</ScrollView>
 			</View>
