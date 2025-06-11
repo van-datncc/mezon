@@ -103,9 +103,46 @@ module.exports = composePlugins(
 
     config.devServer.allowedHosts = 'all';
 
+         const trustedDomains = [
+       '\'self\'',
+       '*.mezon.ai',
+       '*.nccsoft.vn',
+       'media.tenor.com',
+       '*.googletagmanager.com',
+       '*.google-analytics.com',
+       '*.googlesyndication.com',
+       '*.gstatic.com',
+       '*.googleapis.com',
+       'googleads.g.doubleclick.net'
+     ].join(' ');
+
+    const basePolicies = [
+      `default-src 'self'`,
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${trustedDomains}`,
+      `style-src 'self' 'unsafe-inline' ${trustedDomains}`,
+      `font-src 'self' data: ${trustedDomains}`,
+      `object-src 'none'`,
+      `worker-src 'self' blob: ${trustedDomains}`,
+      `manifest-src 'self' ${trustedDomains}`
+    ];
+
+          const resourcePolicies = [
+        `img-src 'self' data: blob: https: http: ${trustedDomains}`,
+        `connect-src 'self' ws: wss: https: http: ${trustedDomains}`,
+        `media-src 'self' blob: https: http: ${trustedDomains}`,
+      ];
+
+    const iframePolicies = [
+      `frame-ancestors *`,
+      `child-src *`,
+      `frame-src *`
+    ]
+
+    const cspPolicy = [...basePolicies, ...resourcePolicies, ...iframePolicies].join('; ');
+
     // Add security headers to prevent XSS attacks
     config.devServer.headers = {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; font-src 'self' data:; media-src 'self' https:; object-src 'none'; frame-ancestors 'self';",
+      'Content-Security-Policy': cspPolicy,
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'SAMEORIGIN',
       'X-XSS-Protection': '1; mode=block',
