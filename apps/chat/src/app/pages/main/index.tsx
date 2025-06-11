@@ -332,7 +332,6 @@ const SidebarMenu = memo(
 						<SidebarLogoItem />
 						<DirectUnreadList />
 					</div>
-					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
 
 					<ClansList />
 

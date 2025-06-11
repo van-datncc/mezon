@@ -5,6 +5,8 @@ import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	appActions,
+	clansActions,
+	directActions,
 	getStore,
 	giveCoffeeActions,
 	messagesActions,
@@ -90,10 +92,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const onClose = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
-
-	const isInMezonMeet = useMemo(() => {
-		return message ? false : true;
-	}, [message]);
 
 	const onCloseModalConfirm = useCallback(() => {
 		setCurrentMessageActionType(null);
@@ -190,6 +188,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 		try {
 			if (userId !== message.sender_id) {
+				const currentClanId = selectCurrentClanId(store.getState());
 				const coffeeEvent = {
 					channel_id: message.channel_id,
 					clan_id: message.clan_id,
@@ -216,6 +215,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 						TypeMessage.SendToken
 					);
 				}
+				await dispatch(directActions.setDmGroupCurrentId(''));
+				await dispatch(clansActions.joinClan({ clanId: currentClanId }));
 			}
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
@@ -641,36 +642,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const onSelectEmoji = useCallback(
 		async (emoji_id: string, emoij: string) => {
 			if (!message && isOnlyEmojiPicker) {
-				if (!socketRef.current) return;
-				socketRef.current.writeChatMessage(
-					clanId,
-					channelId,
-					2,
-					false,
-					{
-						t: emoij + ' ',
-						ej: [
-							{
-								emojiid: emoji_id,
-								s: 0,
-								e: emoij.length
-							}
-						],
-						vr: ReactionType.VIDEO
-					},
-					[],
-					[],
-					[],
-					undefined,
-					undefined,
-					undefined
-				);
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				if (!socketRef.current || !channelId) return;
+				await socketRef.current.writeVoiceReaction([emoji_id], channelId);
 				return;
 			}
 			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userId);
 		},
-		[handleReact, message?.id, mode, userId]
+		[channelId, handleReact, isOnlyEmojiPicker, message, mode, socketRef, userId]
 	);
 
 	return (

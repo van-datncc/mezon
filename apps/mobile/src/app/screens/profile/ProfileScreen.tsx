@@ -15,7 +15,7 @@ import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -122,21 +122,24 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		return moment(userProfile?.user?.create_time).format('MMM DD, YYYY');
 	}, [userProfile?.user?.create_time]);
 
-	const handlePressSetCustomStatus = () => {
+	const handlePressSetCustomStatus = useCallback(() => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
-	};
+	}, [isVisibleAddStatusUserModal]);
 
-	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus, duration?: number, noClearStatus?: boolean) => {
-		setIsVisibleAddStatusUserModal(false);
-		dispatch(
-			channelMembersActions.updateCustomStatus({
-				clanId: currentClanId ?? '',
-				customStatus: customStatus,
-				minutes: duration,
-				noClear: noClearStatus
-			})
-		);
-	};
+	const handleCustomUserStatus = useCallback(
+		(customStatus = '', type: ETypeCustomUserStatus, duration?: number, noClearStatus?: boolean) => {
+			setIsVisibleAddStatusUserModal(false);
+			dispatch(
+				channelMembersActions.updateCustomStatus({
+					clanId: currentClanId ?? '',
+					customStatus: customStatus,
+					minutes: duration,
+					noClear: noClearStatus
+				})
+			);
+		},
+		[currentClanId, dispatch]
+	);
 
 	const showUserStatusBottomSheet = () => {
 		const data = {

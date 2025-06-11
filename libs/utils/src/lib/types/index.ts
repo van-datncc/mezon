@@ -1,13 +1,4 @@
-import {
-	ChannelDescription,
-	ChannelMessage,
-	ChannelStreamMode,
-	ChannelType,
-	HashtagDm,
-	NotificationType,
-	SFUSignalingFwd,
-	WebrtcSignalingFwd
-} from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -485,10 +476,6 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
-};
-
-export type IJoinSFU = {
-	joinSFUData: SFUSignalingFwd;
 };
 
 export interface CategoryNameProps {

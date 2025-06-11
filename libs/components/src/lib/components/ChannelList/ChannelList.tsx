@@ -285,9 +285,7 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 
 			if (!isShowEmptyCategory && listChannelRender) {
 				for (let index = 0; index < listChannelRender.length - 1; index++) {
-					const channel = listChannelRender[index];
-
-					if (channel.id === data[dragIndex].id) {
+					if (index === dragIndex + countEmptyCategory) {
 						break;
 					}
 

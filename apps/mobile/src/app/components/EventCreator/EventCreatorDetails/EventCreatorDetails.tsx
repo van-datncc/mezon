@@ -167,7 +167,7 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 	return (
 		<View style={styles.container}>
 			<View style={styles.feedSection}>
-				<ScrollView>
+				<ScrollView showsVerticalScrollIndicator={false}>
 					<View style={styles.headerSection}>
 						<Text style={styles.title}>{t('screens.eventDetails.title')}</Text>
 						<Text style={styles.subtitle}>{t('screens.eventDetails.subtitle')}</Text>
@@ -247,14 +247,16 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 							initValue={eventFrequency}
 						/>
 						<Text style={styles.label}>{t('fields.cover')}</Text>
-						<MezonImagePicker
-							defaultValue={eventLogo}
-							height={size.s_100 * 2}
-							width={'100%'}
-							onLoad={handleLoad}
-							showHelpText
-							autoUpload
-						/>
+						<View style={{ alignSelf: 'center' }}>
+							<MezonImagePicker
+								defaultValue={eventLogo}
+								height={size.s_100 * 2}
+								width={size.s_100 * 2}
+								onLoad={handleLoad}
+								showHelpText
+								autoUpload
+							/>
+						</View>
 					</View>
 				</ScrollView>
 			</View>

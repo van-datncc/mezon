@@ -817,7 +817,8 @@ export const style = (colors: Attributes) =>
 		albumTitleAndCount: {
 			gap: size.s_10,
 			justifyContent: 'flex-start',
-			marginLeft: size.s_10
+			marginLeft: size.s_10,
+			width: '55%'
 		},
 		albumImageCount: {
 			fontSize: size.s_12,

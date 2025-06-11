@@ -9,5 +9,6 @@
     "media": "Media",
     "files": "Files",
     "pins": "Pins",
-    "wallet": "Wallet"
+    "wallet": "Wallet",
+    "unmuteNotification": "Un-mute"
 }
