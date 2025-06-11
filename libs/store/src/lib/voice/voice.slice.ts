@@ -292,7 +292,7 @@ export const voiceActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = voiceAdapter.getSelectors();
+const { selectAll } = voiceAdapter.getSelectors();
 
 export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): VoiceState => rootState[VOICE_FEATURE_KEY];
 
