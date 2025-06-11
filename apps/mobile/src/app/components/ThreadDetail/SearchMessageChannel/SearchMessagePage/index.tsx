@@ -62,10 +62,13 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 		if (!searchText) return allUsesInAllClans;
 		return allUsesInAllClans
 			?.filter((member) => {
-				return member?.username?.toLowerCase()?.includes(searchText?.toLowerCase());
+				return (
+					member?.username?.toLowerCase()?.includes(searchText?.toLowerCase()) ||
+					member?.display_name?.toLowerCase()?.includes(searchText?.toLowerCase())
+				);
 			})
 			.sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'display_name'));
-	}, [searchText]);
+	}, [searchText, store]);
 
 	const TabList = useMemo(() => {
 		return [

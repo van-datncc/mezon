@@ -1,12 +1,12 @@
-import { ActionEmitEvent, PaperclipIcon, STORAGE_MY_USER_ID, convertTimestampToTimeAgo, load } from '@mezon/mobile-components';
+import { PaperclipIcon, STORAGE_MY_USER_ID, convertTimestampToTimeAgo, load } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import { useAppDispatch, useAppSelector } from '@mezon/store';
 import { directActions, selectDirectById, selectIsUnreadDMById } from '@mezon/store-mobile';
-import { IExtendedMessage, createImgproxyUrl, normalizeString } from '@mezon/utils';
+import { IExtendedMessage, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import BuzzBadge from '../../components/BuzzBadge/BuzzBadge';
 import ImageNative from '../../components/ImageNative';
@@ -27,7 +27,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
-	const [hiddenFlag, setHiddenFlag] = useState(false);
 	const isYourAccount = useMemo(() => {
 		const userId = load(STORAGE_MY_USER_ID);
 		return userId?.toString() === directMessage?.last_sent_message?.sender_id?.toString();
@@ -113,28 +112,6 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 		}
 		return null;
 	}, [directMessage]);
-
-	useEffect(() => {
-		const searchDMListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SEARCH_DM, ({ searchText }) => {
-			if (
-				searchText &&
-				!normalizeString(
-					directMessage?.channel_label ||
-						(typeof directMessage?.usernames === 'string' ? directMessage?.usernames : directMessage?.usernames?.[0] || '')
-				)?.includes(normalizeString(searchText))
-			) {
-				setHiddenFlag(true);
-			} else {
-				setHiddenFlag(false);
-			}
-		});
-
-		return () => {
-			searchDMListener.remove();
-		};
-	}, [directMessage?.channel_label, directMessage?.usernames]);
-
-	if (hiddenFlag) return null;
 
 	return (
 		<TouchableOpacity
