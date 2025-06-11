@@ -1,6 +1,7 @@
 import {
 	fetchDetailTransaction,
 	fetchListWalletLedger,
+	fetchTotalWalletLedger,
 	selectCountWalletLedger,
 	selectDetailedger,
 	selectWalletLedger,
@@ -28,6 +29,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const [openedTransactionId, setOpenedTransactionId] = useState<string | null>(null);
 
 	useEffect(() => {
+		dispatch(fetchTotalWalletLedger());
 		dispatch(fetchListWalletLedger({ page: 1 }));
 	}, [dispatch]);
 
@@ -60,7 +62,9 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						)}
 					</div>
 					<div>
-						<p className="text-red-600 dark:text-red-400 font-semibold">{`${formatNumber(Math.abs(amount), 'vi-VN')} đ`}</p>
+						<p className="text-red-600 dark:text-red-400 font-semibold">
+							{`${formatNumber(Math.abs(amount), 'vi-VN')} đ`}
+						</p>
 						<p className="text-xs text-gray-500 dark:text-gray-400">Sent</p>
 					</div>
 				</div>
@@ -77,7 +81,9 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 					)}
 				</div>
 				<div>
-					<p className="text-green-600 dark:text-green-400 font-semibold">{`+${formatNumber(amount, 'vi-VN')} đ`}</p>
+					<p className="text-green-600 dark:text-green-400 font-semibold">
+						{`+${formatNumber(amount, 'vi-VN')} đ`}
+					</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">Received</p>
 				</div>
 			</div>
@@ -98,11 +104,10 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const getStatusBadge = (amount: number) => {
 		return (
 			<span
-				className={`px-2 py-1 text-xs font-medium rounded-full ${
-					amount < 0
-						? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-						: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-				}`}
+				className={`px-2 py-1 text-xs font-medium rounded-full ${amount < 0
+					? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+					: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+					}`}
 			>
 				{getTransactionType(amount)}
 			</span>
@@ -130,10 +135,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
 						<div className="p-6 space-y-4 max-h-[500px] overflow-y-auto thread-scroll">
 							{[...Array(6)].map((_, idx) => (
-								<div
-									key={idx}
-									className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-4 animate-pulse"
-								>
+								<div key={idx} className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-4 animate-pulse">
 									<div className="flex items-center gap-4">
 										<div className="w-8 h-8 rounded-full bg-gray-300" />
 										<div className="flex-1 space-y-2">
@@ -153,23 +155,21 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
 			<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
-				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">
-					{' '}
-					<div className="flex items-center justify-between p-6">
+				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">					<div className="flex items-center justify-between p-6">
 						<div className="flex items-center gap-3">
-							<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center shadow-lg">
-								<Icons.HistoryTransaction className="w-9 h-9 text-white" />
+						<div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 flex items-center justify-center shadow-lg">
+							<Icons.HistoryTransaction className="w-9 h-9 text-white" />
 							</div>
 							<div>
-								<h4 className="dark:text-white text-gray-900 text-lg font-semibold">Transaction History</h4>
-								<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
+							<h4 className="dark:text-white text-gray-900 text-lg font-semibold">Transaction History</h4>
+							<p className="dark:text-gray-400 text-gray-500 text-sm">View all your transaction activities</p>
 							</div>
 						</div>
-						<button
+					<button
 							onClick={onClose}
-							className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+						className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
 						>
-							<Icons.Close className="w-5 h-5" />
+						<Icons.Close className="w-5 h-5" />
 						</button>
 					</div>
 				</div>
@@ -199,6 +199,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 													</p>
 												</div>
 											</div>
+
 										</div>
 									</div>
 
@@ -216,20 +217,19 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						)}
 					</div>
 				) : (
-					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
-						<div className="flex flex-col items-center justify-center py-16 px-6">
-							<div className="w-16 h-16 rounded-full dark:bg-gray-800 bg-gray-100 flex items-center justify-center mb-4">
-								<Icons.EmptyType />
+						<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
+							<div className="flex flex-col items-center justify-center py-16 px-6">
+								<div className="w-16 h-16 rounded-full dark:bg-gray-800 bg-gray-100 flex items-center justify-center mb-4">
+									<Icons.EmptyType />
+								</div>
+								<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">No Transactions Found</h3>
+								<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
+									You haven't made any transactions yet. Your transaction history will appear here once you start sending or receiving
+									tokens.
+								</p>
 							</div>
-							<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">No Transactions Found</h3>
-							<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-								You haven't made any transactions yet. Your transaction history will appear here once you start sending or receiving
-								tokens.
-							</p>
 						</div>
-					</div>
-				)}
-			</div>
+div>
 		</div>
 	);
 };
