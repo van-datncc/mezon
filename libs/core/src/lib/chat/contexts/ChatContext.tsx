@@ -5,6 +5,7 @@ import {
 	AttachmentEntity,
 	ChannelsEntity,
 	DMCallActions,
+	EMarkAsReadType,
 	RootState,
 	ThreadsEntity,
 	accountActions,
@@ -54,6 +55,7 @@ import {
 	selectAllThreads,
 	selectAllUserClans,
 	selectChannelById,
+	selectChannelThreads,
 	selectChannelsByClanId,
 	selectClanView,
 	selectClickedOnTopicStatus,
@@ -120,6 +122,7 @@ import {
 	LastPinMessageEvent,
 	LastSeenMessageEvent,
 	ListActivity,
+	MarkAsRead,
 	MessageButtonClicked,
 	MessageTypingEvent,
 	PermissionChangedEvent,
@@ -1806,6 +1809,76 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		);
 	}, []);
 
+	const onMarkAsRead = useCallback(async (markAsReadEvent: MarkAsRead) => {
+		const store = getStore();
+
+		const channels = selectChannelThreads(store.getState() as RootState);
+		if (!markAsReadEvent.category_id) {
+			console.log('Mark Clan');
+			return;
+		}
+		if (!markAsReadEvent.channel_id) {
+			const channelsInCategory = channels.filter((channel) => channel.category_id === markAsReadEvent.category_id);
+
+			const allChannelsAndThreads = channelsInCategory.flatMap((channel) => [channel, ...(channel.threads || [])]);
+
+			const channelIds = allChannelsAndThreads.map((item) => item.id);
+
+			dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+			dispatch(
+				channelsActions.resetChannelsCount({
+					clanId: markAsReadEvent.clan_id as string,
+					channelIds
+				})
+			);
+			dispatch(
+				listChannelRenderAction.handleMarkAsReadListRender({
+					type: EMarkAsReadType.CATEGORY,
+					clanId: markAsReadEvent.clan_id as string,
+					categoryId: markAsReadEvent.category_id
+				})
+			);
+			dispatch(listChannelsByUserActions.markAsReadChannel(channelIds));
+		} else {
+			const relatedChannels = channels.filter(
+				(channel) => channel.id === markAsReadEvent.channel_id || channel.parent_id === markAsReadEvent.channel_id
+			);
+
+			const channelIds = relatedChannels.map((channel) => channel.id);
+
+			dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+			dispatch(
+				channelsActions.resetChannelsCount({
+					clanId: markAsReadEvent.clan_id as string,
+					channelIds
+				})
+			);
+			dispatch(
+				clansActions.updateClanBadgeCount2({
+					clanId: markAsReadEvent.clan_id as string,
+					channels: relatedChannels.map((channel) => ({
+						channelId: channel.id,
+						count: (channel.count_mess_unread ?? 0) * -1
+					}))
+				})
+			);
+			dispatch(
+				listChannelRenderAction.handleMarkAsReadListRender({
+					type: EMarkAsReadType.CHANNEL,
+					clanId: markAsReadEvent.clan_id as string,
+					channelId: markAsReadEvent.channel_id
+				})
+			);
+
+			const threadIds = relatedChannels.flatMap((channel) => channel.threadIds || []);
+			if (threadIds.length) {
+				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(threadIds));
+			}
+
+			dispatch(listChannelsByUserActions.markAsReadChannel([markAsReadEvent.channel_id, ...threadIds]));
+		}
+	}, []);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1911,6 +1984,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onsdtopicevent = onsdtopicevent;
 
 			socket.onUnpinMessageEvent = onUnpinMessageEvent;
+
+			socket.onmarkasread = onMarkAsRead;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
