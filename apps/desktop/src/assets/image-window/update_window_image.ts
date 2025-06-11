@@ -8,31 +8,70 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 	const time = escapeHtml(formatDateTime(imageData.create_time));
 	const uploaderData = imageData.channelImagesData.images.map((image, index) => {
 		return JSON.stringify({
-			name: image.uploaderData.name,
-			avatar: image.uploaderData.avatar,
+			name: escapeHtml(image.uploaderData.name),
+			avatar: sanitizeUrl(image.uploaderData.avatar),
 			create_item: escapeHtml(formatDateTime(image.create_time)),
-			realUrl: image.realUrl,
-			url: image.url,
-			fileName: image.filename
+			realUrl: sanitizeUrl(image.realUrl),
+			url: sanitizeUrl(image.url),
+			fileName: escapeHtml(image.filename)
 		});
 	});
+
+	// Use safer DOM manipulation instead of innerHTML injection
 	imageWindow.webContents.executeJavaScript(`
-      document.getElementById('channel-label').innerHTML = '${escapeHtml(imageData.channelImagesData.channelLabel)}';
-    	document.getElementById('thumbnails-content').innerHTML = '${listThumnails(imageData.channelImagesData.images, activeIndex)}';
-      selectedImage.src = '${sanitizeUrl(imageData.url)}';
-        document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        document.getElementById('thumbnail-${activeIndex}')?.querySelector('.thumbnail').classList.add('active');
-        document.getElementById('userAvatar').src = "${sanitizeUrl(imageData.uploaderData.avatar)}"
-        document.getElementById('username').innerHTML  = "${escapeHtml(imageData.uploaderData.name)}"
-        document.getElementById('timestamp').innerHTML  = "${escapeHtml(time)}"
-        ${App.imageScriptWindowLoaded === false ? `let currentIndex = ${activeIndex};` : `currentIndex = ${activeIndex};`}
-        currentImageUrl = {
-        fileName : '${escapeHtml(imageData.filename)}',
-        url : '${sanitizeUrl(imageData.url)}',
-          realUrl : '${sanitizeUrl(imageData.realUrl)}'
-      };
-      ${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
-  `);
+		(function() {
+			// Use textContent for text content to prevent XSS
+			const channelLabel = document.getElementById('channel-label');
+			if (channelLabel) {
+				channelLabel.textContent = ${JSON.stringify(imageData.channelImagesData.channelLabel)};
+			}
+
+			// Use safe DOM methods for thumbnail content
+			const thumbnailsContent = document.getElementById('thumbnails-content');
+			if (thumbnailsContent) {
+				thumbnailsContent.innerHTML = ${JSON.stringify(listThumnails(imageData.channelImagesData.images, activeIndex))};
+			}
+
+			// Use safe property assignment for images
+			const selectedImage = document.getElementById('selectedImage');
+			if (selectedImage) {
+				selectedImage.src = ${JSON.stringify(sanitizeUrl(imageData.url))};
+			}
+
+			document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+			const activeThumb = document.getElementById('thumbnail-${activeIndex}');
+			if (activeThumb) {
+				const thumbImg = activeThumb.querySelector('.thumbnail');
+				if (thumbImg) thumbImg.classList.add('active');
+			}
+
+			// Use safe property assignment and textContent
+			const userAvatar = document.getElementById('userAvatar');
+			if (userAvatar) {
+				userAvatar.src = ${JSON.stringify(sanitizeUrl(imageData.uploaderData.avatar))};
+			}
+
+			const username = document.getElementById('username');
+			if (username) {
+				username.textContent = ${JSON.stringify(imageData.uploaderData.name)};
+			}
+
+			const timestamp = document.getElementById('timestamp');
+			if (timestamp) {
+				timestamp.textContent = ${JSON.stringify(time)};
+			}
+
+			${App.imageScriptWindowLoaded === false ? `let currentIndex = ${activeIndex};` : `currentIndex = ${activeIndex};`}
+
+			window.currentImageUrl = {
+				fileName: ${JSON.stringify(escapeHtml(imageData.filename))},
+				url: ${JSON.stringify(sanitizeUrl(imageData.url))},
+				realUrl: ${JSON.stringify(sanitizeUrl(imageData.realUrl))}
+			};
+
+			${scriptThumnails(imageData.channelImagesData.images, activeIndex)}
+		})();
+	`);
 
 	imageWindow.webContents.executeJavaScript(`
       function handleKeydown(e){

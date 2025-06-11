@@ -103,6 +103,15 @@ module.exports = composePlugins(
 
     config.devServer.allowedHosts = 'all';
 
+    // Add security headers to prevent XSS attacks
+    config.devServer.headers = {
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ws: wss: https:; font-src 'self' data:; media-src 'self' https:; object-src 'none'; frame-ancestors 'self';",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'X-XSS-Protection': '1; mode=block',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+    };
+
     config.devServer.static = {
       directory: path.join(__dirname, 'src/assets'),
       publicPath: '/',

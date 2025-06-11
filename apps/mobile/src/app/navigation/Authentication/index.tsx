@@ -115,17 +115,19 @@ export const Authentication = memo(() => {
 	const onNavigationDeeplink = async (path: string) => {
 		if (path?.includes?.('channel-app/')) {
 			const parts = extractChannelParams(path);
-			const channelId = parts?.channelId;
-			const clanId = parts?.clanId;
-			const code = parts?.code;
-			const subpath = parts?.subpath;
-			if (clanId && channelId) {
-				navigation.navigate(APP_SCREEN.CHANNEL_APP, {
-					channelId: channelId,
-					clanId: clanId,
-					code: code,
-					subpath: subpath
-				});
+			if (parts) {
+				const channelId = parts.channelId;
+				const clanId = parts.clanId;
+				const code = parts.code;
+				const subpath = parts.subpath;
+				if (clanId && channelId) {
+					navigation.navigate(APP_SCREEN.CHANNEL_APP, {
+						channelId: channelId,
+						clanId: clanId,
+						code: code,
+						subpath: subpath
+					});
+				}
 			}
 		}
 	};
@@ -139,22 +141,47 @@ export const Authentication = memo(() => {
 						const extraMessage = data?.message;
 						if (extraMessage) {
 							const message = safeJSONParse(extraMessage);
-							if (message?.channel_id) {
-								const createTime = moment.unix(message?.create_time_seconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-								const updateTime = moment.unix(message?.update_time_seconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+							if (message && typeof message === 'object' && message?.channel_id) {
+								const createTimeSeconds = message?.create_time_seconds;
+								const updateTimeSeconds = message?.update_time_seconds;
+
+								const createTime = createTimeSeconds
+									? moment.unix(createTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+									: new Date().toISOString();
+								const updateTime = updateTimeSeconds
+									? moment.unix(updateTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+									: new Date().toISOString();
+
+								let codeValue = 0;
+								if (message?.code) {
+									if (typeof message.code === 'number') {
+										codeValue = message.code;
+									} else if (typeof message.code === 'object' && message.code?.value !== undefined) {
+										codeValue = message.code.value;
+									}
+								}
+
+								const messageId = message?.message_id || message?.id;
+								if (!messageId) {
+									console.warn('onNotificationOpenedApp: Message missing id');
+									continue;
+								}
+
 								const messageData = {
 									...message,
-									code: message?.code?.value || 0,
-									id: message.message_id,
-									content: safeJSONParse(message.content),
-									attachments: safeJSONParse(message.attachments),
-									mentions: safeJSONParse(message.mentions),
-									references: safeJSONParse(message.references),
-									reactions: safeJSONParse(message.reactions),
+									code: codeValue,
+									id: messageId,
+									content: safeJSONParse(message?.content || '{}'),
+									attachments: safeJSONParse(message?.attachments || '[]'),
+									mentions: safeJSONParse(message?.mentions || '[]'),
+									references: safeJSONParse(message?.references || '[]'),
+									reactions: safeJSONParse(message?.reactions || '[]'),
 									create_time: createTime,
 									update_time: updateTime
 								};
 								onchannelmessage(messageData as ChannelMessage);
+							} else {
+								console.warn('onNotificationOpenedApp: Invalid message structure or missing channel_id');
 							}
 						}
 					}
