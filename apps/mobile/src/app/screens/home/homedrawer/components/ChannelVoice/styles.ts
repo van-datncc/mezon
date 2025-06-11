@@ -138,15 +138,17 @@ export const style = (colors: Attributes) =>
 		},
 		reactionContainer: {
 			position: 'absolute',
-			bottom: '30%',
+			bottom: '40%',
+			width: '70%',
+			left: '15%',
+			alignSelf: 'center',
 			right: size.s_20,
-			left: size.s_20,
-			height: '55%',
+			height: '40%',
 			zIndex: 1
 		},
 		animatedEmoji: {
-			height: size.s_30,
-			width: size.s_30
+			height: size.s_40,
+			width: size.s_40
 		},
 		wrapperUser: {
 			flexDirection: 'row',
