@@ -2024,7 +2024,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onVoiceReactionMessage = () => {};
+			socket.onvoicereactionmessage = () => {};
 
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onchannelmessage = () => {};

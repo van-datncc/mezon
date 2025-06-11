@@ -28,12 +28,10 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 
 		const currentSocket = socketRef.current;
 
-		currentSocket.onVoiceReactionMessage = (message: VoiceReactionSend) => {
+		currentSocket.onvoicereactionmessage = (message: VoiceReactionSend) => {
 			if (currentChannel?.channel_id === message.channel_id) {
 				try {
 					const emojis = message.emojis || [];
-					const newEmojis: DisplayedEmoji[] = [];
-
 					emojis.forEach((emojiId, index) => {
 						if (emojiId) {
 							const position = generatePosition();
@@ -46,7 +44,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 								position
 							};
 
-							newEmojis.push(newEmoji);
+							setDisplayedEmojis((prev) => [...prev, newEmoji]);
 
 							const durationMs = parseFloat(position.duration) * 1000 + 100;
 							setTimeout(() => {
@@ -62,7 +60,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 
 		return () => {
 			if (currentSocket) {
-				currentSocket.onVoiceReactionMessage = () => {};
+				currentSocket.onvoicereactionmessage = () => {};
 			}
 		};
 	}, [socketRef, currentChannel, generatePosition]);
@@ -86,7 +84,7 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 						height: '64px'
 					}}
 				>
-					<img src={getSrcEmoji(item.emojiId)} alt={item.emoji} className="w-full h-full object-cover" />
+					<img src={getSrcEmoji(item.emojiId)} alt={''} className="w-full h-full object-cover" />
 				</div>
 			))}
 		</div>
