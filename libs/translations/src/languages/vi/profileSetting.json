@@ -34,5 +34,6 @@
     "searchClanPlaceholder": "Tìm kiếm clan",
     "updateProfileSuccess": "Cập nhật hồ sơ cá nhân thành công",
     "updateClanProfileSuccess": "Cập nhật hồ sơ clan thành công",
-    "emptyUsername": "Tên hiển thị không được để trống!"
+    "emptyUsername": "Tên hiển thị không được để trống!",
+    "duplicateClannick": "Tên clan bị trùng lặp"
 }

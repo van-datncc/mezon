@@ -100,7 +100,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		const initialValue = {
 			username,
 			imgUrl: avatar_url,
-			displayName: display_name,
+			displayName: display_name || username,
 			aboutMe: about_me
 		};
 		setOriginUserProfileValue(initialValue);
@@ -271,25 +271,22 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 
 	const saveCurrentTab = () => {
 		if (tab === EProfileTab.UserProfile) {
-			if (isUserProfileNotChanged) {
-				navigation.goBack();
-				return;
-			}
 			if (isUserProfileEmptyName) {
 				Toast.show({
 					type: 'error',
 					text1: t('emptyUsername')
 				});
-				return;
 			}
 			updateUserProfile();
 			return;
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
-			if (isClanProfileNotChanged || isDuplicateClanNickname) {
-				navigation.goBack();
-				return;
+			if (isDuplicateClanNickname) {
+				Toast.show({
+					type: 'error',
+					text1: t('emptyUsername')
+				});
 			}
 			updateClanProfile();
 			return;
