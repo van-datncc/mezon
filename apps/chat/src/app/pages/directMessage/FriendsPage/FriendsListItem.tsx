@@ -92,7 +92,7 @@ const FriendMenu = ({ friend, coords, onClose, onDeleteFriend, onBlockFriend }: 
 const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
-	const { acceptFriend, blockFriend, deleteFriend, unBlockFriend } = useFriends();
+	const { acceptFriend, onBlockFriend, deleteFriend, onUnblockFriend } = useFriends();
 
 	const coords = useRef<Coords>({
 		mouseX: 0,
@@ -120,12 +120,12 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		deleteFriend(username, id);
 	};
 
-	const handleBlockFriend = (username: string, id: string) => {
-		blockFriend(username, id);
+	const handleBlockFriend = async (username: string, id: string) => {
+		await onBlockFriend(username, id);
 	};
 
-	const handleUnBlockFriend = (username: string, id: string) => {
-		unBlockFriend(username, id);
+	const handleUnBlockFriend = async (username: string, id: string) => {
+		await onUnblockFriend(username, id);
 	};
 
 	const handleMenuClick = (event: React.MouseEvent) => {
@@ -178,7 +178,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						numberCharacterCollapse={100}
 						classParent={friend?.state !== undefined && friend?.state >= 1 ? '' : 'friendList h-10'}
 						positionType={MemberProfileType.LIST_FRIENDS}
-						customStatus={(friend?.user?.metadata as MetaDateStatusUser).status ?? ''}
+						customStatus={(friend?.user?.metadata as MetaDateStatusUser)?.status ?? ''}
 						isDM={true}
 						user={friend as ChannelMembersEntity}
 						statusOnline={userFriend?.metadata?.user_status}
@@ -227,7 +227,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 								className="bg-bgTertiary text-contentSecondary rounded-[6px] text-[14px] p-2 flex items-center justify-center hover:bg-bgPrimary"
 								onClick={() => handleUnBlockFriend(friend?.user?.username as string, friend?.user?.id as string)}
 							>
-								UnBlock
+								Unblock
 							</button>
 						</div>
 					)}

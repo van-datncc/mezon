@@ -1,7 +1,9 @@
 import {
+	EStateFriend,
 	friendsActions,
 	requestAddFriendParam,
 	selectAllFriends,
+	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectGrouplMembers,
 	useAppDispatch,
@@ -9,6 +11,7 @@ import {
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 // check later
 export function useFriends() {
@@ -16,6 +19,7 @@ export function useFriends() {
 	const currentDM = useSelector(selectDmGroupCurrentId);
 	const groupDmMember = useAppSelector((state) => selectGrouplMembers(state, currentDM as string));
 	const numberMemberInDmGroup = useMemo(() => groupDmMember.length, [groupDmMember]);
+	const currentUserId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 
 	const quantityPendingRequest = useMemo(() => {
@@ -52,25 +56,69 @@ export function useFriends() {
 	);
 
 	const blockFriend = useCallback(
-		(username: string, id: string) => {
+		async (username: string, id: string) => {
 			const body = {
 				usernames: [username],
 				ids: [id]
 			};
-			dispatch(friendsActions.sendRequestBlockFriend(body));
+			const response = await dispatch(friendsActions.sendRequestBlockFriend(body));
+
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				dispatch(
+					friendsActions.updateFriendState({
+						userId: id,
+						friendState: EStateFriend.BLOCK,
+						sourceId: currentUserId
+					})
+				);
+				return true;
+			}
+			return false;
+		},
+		[dispatch, currentUserId]
+	);
+
+	const unBlockFriend = useCallback(
+		async (username: string, id: string) => {
+			const body = {
+				usernames: [username],
+				ids: [id]
+			};
+			const response = await dispatch(friendsActions.sendRequestDeleteFriend(body));
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				return true;
+			}
+			return false;
 		},
 		[dispatch]
 	);
 
-	const unBlockFriend = useCallback(
-		(username: string, id: string) => {
-			const body = {
-				usernames: [username],
-				ids: [id]
-			};
-			dispatch(friendsActions.sendRequestDeleteFriend(body));
+	const onBlockFriend = useCallback(
+		async (username: string, id: string) => {
+			try {
+				const isBlocked = await blockFriend(username, id);
+				if (isBlocked) {
+					toast.success('User blocked successfully');
+				}
+			} catch (error) {
+				toast.error('Failed to block user');
+			}
 		},
-		[dispatch]
+		[blockFriend]
+	);
+
+	const onUnblockFriend = useCallback(
+		async (username: string, id: string) => {
+			try {
+				const isUnblocked = await unBlockFriend(username, id);
+				if (isUnblocked) {
+					toast.success('User unblocked successfully');
+				}
+			} catch (error) {
+				toast.error('Failed to unblock user');
+			}
+		},
+		[unBlockFriend]
 	);
 
 	const filteredFriends = useCallback(
@@ -100,9 +148,23 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
+			onBlockFriend,
+			onUnblockFriend,
 			filteredFriends,
 			numberMemberInDmGroup
 		}),
-		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends]
+		[
+			friends,
+			quantityPendingRequest,
+			addFriend,
+			acceptFriend,
+			deleteFriend,
+			blockFriend,
+			unBlockFriend,
+			onBlockFriend,
+			onUnblockFriend,
+			filteredFriends,
+			numberMemberInDmGroup
+		]
 	);
 }

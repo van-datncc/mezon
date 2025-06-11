@@ -2,8 +2,11 @@ import { useAppParams, useFriends } from '@mezon/core';
 import {
 	ChannelsEntity,
 	EStateFriend,
+	RootState,
+	selectAllAccount,
 	selectCurrentChannel,
 	selectDirectById,
+	selectFriendById,
 	selectFriendStatus,
 	selectIsShowCreateThread,
 	selectMemberClanByUserId,
@@ -214,11 +217,24 @@ type StatusFriendProps = {
 
 const StatusFriend = memo((props: StatusFriendProps) => {
 	const { username = '', checkAddFriend, userID } = props;
+	const infoFriend = useAppSelector((state: RootState) => selectFriendById(state, userID));
+	const userProfile = useSelector(selectAllAccount);
 
-	const { acceptFriend, deleteFriend, addFriend } = useFriends();
+	const isFriend = useMemo(() => {
+		return infoFriend?.state === EStateFriend.FRIEND;
+	}, [infoFriend]);
+	const isBlockedByUser = useMemo(() => {
+		return infoFriend?.state === EStateFriend.BLOCK && infoFriend?.source_id === userID && infoFriend?.user?.id === userProfile?.user?.id;
+	}, [userProfile?.user?.id, infoFriend, userID]);
+	const didIBlockUser = useMemo(() => {
+		return infoFriend?.state === EStateFriend.BLOCK && infoFriend?.source_id === userProfile?.user?.id && infoFriend?.user?.id === userID;
+	}, [userProfile?.user?.id, infoFriend, userID]);
+	const { acceptFriend, deleteFriend, addFriend, onBlockFriend, onUnblockFriend } = useFriends();
 
 	const title = useMemo(() => {
 		switch (checkAddFriend) {
+			case EStateFriend.BLOCK:
+				return [];
 			case EStateFriend.MY_PENDING:
 				return ['Accept', 'Ignore'];
 			case EStateFriend.OTHER_PENDING:
@@ -252,6 +268,19 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				});
 		}
 	};
+
+	const handleBlockFriend = async () => {
+		await onBlockFriend(username, userID);
+	};
+
+	const handleUnblockFriend = async () => {
+		await onUnblockFriend(username, userID);
+	};
+
+	if (isBlockedByUser) {
+		return null;
+	}
+
 	return (
 		<div className="flex gap-x-2 items-center text-sm">
 			{checkAddFriend === EStateFriend.MY_PENDING && (
@@ -267,7 +296,14 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 				</button>
 			))}
 
-			<button className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white">Block</button>
+			{(isFriend || didIBlockUser) && (
+				<button
+					onClick={didIBlockUser ? handleUnblockFriend : handleBlockFriend}
+					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+				>
+					{didIBlockUser ? 'Unblock' : 'Block'}
+				</button>
+			)}
 		</div>
 	);
 });

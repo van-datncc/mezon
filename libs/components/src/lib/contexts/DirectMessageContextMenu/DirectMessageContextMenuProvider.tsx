@@ -1,15 +1,17 @@
 import { useAppParams } from '@mezon/core';
 import {
 	ChannelMembersEntity,
+	EStateFriend,
+	RootState,
 	selectAllAccount,
-	selectFriendStatus,
+	selectFriendById,
 	selectHasKeyE2ee,
 	selectNotifiSettingsEntitiesById,
 	useAppSelector
 } from '@mezon/store';
 import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { FC, createContext, useCallback, useContext, useState } from 'react';
+import { FC, createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { Menu, Submenu, useContextMenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import ItemPanelMember from '../../components/PanelMember/ItemPanelMember';
@@ -70,7 +72,9 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		handleLeaveDmGroup,
 		handleEnableE2ee,
 		addFriend,
-		deleteFriend
+		deleteFriend,
+		onBlockFriend,
+		onUnblockFriend
 	} = useMenuHandlers({
 		userProfile,
 		hasKeyE2ee,
@@ -97,7 +101,9 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		muteOrUnMuteChannel,
 		handleEnableE2ee,
 		handleRemoveMemberFromGroup,
-		handleLeaveDmGroup
+		handleLeaveDmGroup,
+		onBlockFriend,
+		onUnblockFriend
 	});
 
 	const { showContextMenu, openProfileItem } = useContextMenuHandlers({
@@ -113,7 +119,14 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 	const isMuted = notificationSettings?.active === 0;
 	const hasMuteTime = notificationSettings?.time_mute ? new Date(notificationSettings.time_mute) > new Date() : false;
 	const isOwnerClanOrGroup = userProfile?.user?.id && dataMemberCreate?.createId && userProfile?.user?.id === dataMemberCreate.createId;
-	const isFriend = Number.isInteger(useSelector(selectFriendStatus(currentUser?.user_id?.[0])));
+	const infoFriend = useAppSelector((state: RootState) => selectFriendById(state, currentUser?.user_id?.[0]));
+	const didIBlockUser = useMemo(() => {
+		return (
+			infoFriend?.state === EStateFriend.BLOCK &&
+			infoFriend?.source_id === userProfile?.user?.id &&
+			infoFriend?.user?.id === currentUser?.user_id?.[0]
+		);
+	}, [currentUser?.user_id, infoFriend, userProfile?.user?.id]);
 
 	const contextValue: DirectMessageContextMenuContextType = {
 		setCurrentHandlers,
@@ -139,10 +152,26 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 
 						{!isSelf && !isDm && !isDmGroup && <MemberMenuItem label="Message" onClick={currentHandlers.handleMessage} />}
 
-						{!isSelf && !isFriend && <MemberMenuItem label="Add Friend" onClick={currentHandlers.handleAddFriend} />}
+						{!isSelf && infoFriend?.state !== EStateFriend.BLOCK && (
+							<>
+								{infoFriend?.state !== EStateFriend.FRIEND &&
+									infoFriend?.state !== EStateFriend.MY_PENDING &&
+									infoFriend?.state !== EStateFriend.OTHER_PENDING && (
+										<MemberMenuItem label="Add Friend" onClick={currentHandlers.handleAddFriend} />
+									)}
 
-						{!isSelf && isFriend && (
-							<MemberMenuItem label="Remove Friend" onClick={currentHandlers.handleRemoveFriend} isWarning={true} />
+								{infoFriend?.state === EStateFriend.FRIEND && (
+									<MemberMenuItem label="Remove Friend" onClick={currentHandlers.handleRemoveFriend} isWarning={true} />
+								)}
+							</>
+						)}
+
+						{!isSelf && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser) && (
+							<MemberMenuItem
+								label={didIBlockUser ? 'Unblock' : 'Block'}
+								onClick={didIBlockUser ? currentHandlers.handleUnblockFriend : currentHandlers.handleBlockFriend}
+								isWarning={!didIBlockUser}
+							/>
 						)}
 
 						{channelId && (

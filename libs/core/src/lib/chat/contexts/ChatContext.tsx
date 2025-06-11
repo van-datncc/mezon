@@ -5,6 +5,7 @@ import {
 	AttachmentEntity,
 	ChannelsEntity,
 	DMCallActions,
+	EStateFriend,
 	RootState,
 	ThreadsEntity,
 	accountActions,
@@ -103,6 +104,7 @@ import {
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
+	BlockFriend,
 	CategoryEvent,
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -1806,6 +1808,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		);
 	}, []);
 
+	const onblockfriend = useCallback(
+		(blockFriend: BlockFriend) => {
+			if (!blockFriend.user_id) {
+				return;
+			}
+			dispatch(
+				friendsActions.updateFriendState({
+					userId: blockFriend.user_id,
+					friendState: EStateFriend.BLOCK,
+					sourceId: blockFriend.user_id
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Socket) => {
 			socket.onvoicejoined = onvoicejoined;
@@ -1911,6 +1929,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onsdtopicevent = onsdtopicevent;
 
 			socket.onUnpinMessageEvent = onUnpinMessageEvent;
+
+			socket.onblockfriend = onblockfriend;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
@@ -1962,7 +1982,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclanupdated,
 			onJoinChannelAppEvent,
 			onsdtopicevent,
-			onUnpinMessageEvent
+			onUnpinMessageEvent,
+			onblockfriend
 		]
 	);
 
@@ -2072,6 +2093,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onsdtopicevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onUnpinMessageEvent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onblockfriend = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -2123,7 +2146,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		ontokensent,
 		onJoinChannelAppEvent,
 		onsdtopicevent,
-		onUnpinMessageEvent
+		onUnpinMessageEvent,
+		onblockfriend
 	]);
 
 	const value = React.useMemo<ChatContextValue>(
