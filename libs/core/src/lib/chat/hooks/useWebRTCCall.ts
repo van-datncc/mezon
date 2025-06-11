@@ -300,6 +300,9 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 					remoteScreenStream: null
 				});
 				peerConnection.current = pc;
+			} else {
+				// if is answer call, need to cancel call native on mobile
+				await cancelCallFCMMobile(userId);
 			}
 		} catch (error) {
 			console.error('Error starting call:', error);
@@ -512,11 +515,9 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 		);
 	};
 
-	const cancelCallFCMMobile = async () => {
-		const bodyFCMMobile = {
-			offer: 'CANCEL_CALL'
-		};
-		await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+	const cancelCallFCMMobile = async (receiverId: string = dmUserId) => {
+		const bodyFCMMobile = { offer: 'CANCEL_CALL' };
+		await mezon.socketRef.current?.makeCallPush(receiverId, JSON.stringify(bodyFCMMobile), channelId, userId);
 	};
 
 	// End call and cleanup
