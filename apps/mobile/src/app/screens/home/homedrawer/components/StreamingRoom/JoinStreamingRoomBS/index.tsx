@@ -10,7 +10,7 @@ import {
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	selectAllAccount,
-  selectClanById,
+	selectClanById,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectSession,
