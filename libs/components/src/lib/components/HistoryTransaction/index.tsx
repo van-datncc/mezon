@@ -1,7 +1,6 @@
 import {
 	fetchDetailTransaction,
 	fetchListWalletLedger,
-	fetchTotalWalletLedger,
 	selectCountWalletLedger,
 	selectDetailedger,
 	selectWalletLedger,
@@ -29,7 +28,6 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const [openedTransactionId, setOpenedTransactionId] = useState<string | null>(null);
 
 	useEffect(() => {
-		dispatch(fetchTotalWalletLedger());
 		dispatch(fetchListWalletLedger({ page: 1 }));
 	}, [dispatch]);
 
@@ -229,7 +227,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 								</p>
 							</div>
 						</div>
-div>
+				)}
+			</div>
 		</div>
 	);
 };
