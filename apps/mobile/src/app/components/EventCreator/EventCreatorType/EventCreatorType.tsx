@@ -6,7 +6,8 @@ import {
 	selectChannelById,
 	selectCurrentClanId,
 	selectEventById,
-	selectVoiceChannelAll
+	selectVoiceChannelAll,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelStatusEnum, OptionEvent } from '@mezon/utils';
 import debounce from 'lodash.debounce';
@@ -36,7 +37,7 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	const textChannels = useSelector(selectAllTextChannel);
 	const [searchText, setSearchText] = useState<string>('');
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentEvent = useSelector((state) => selectEventById(state, currentClanId ?? '', eventId ?? ''));
+	const currentEvent = useAppSelector((state) => selectEventById(state, currentClanId ?? '', eventId ?? ''));
 	const currentEventChannel = useSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : ''));
 
 	navigation.setOptions({
@@ -118,14 +119,14 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	const channelIcon = (type: ChannelType, isPrivate: boolean) => {
 		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isPrivate) {
-				return <MezonIconCDN icon={IconCDN.channelTextLock} height={size.s_24} width={size.s_24} />;
+				return <MezonIconCDN icon={IconCDN.channelTextLock} height={size.s_24} width={size.s_24} color={themeValue.channelNormal} />;
 			}
-			return <MezonIconCDN icon={IconCDN.channelText} height={size.s_24} width={size.s_24} />;
+			return <MezonIconCDN icon={IconCDN.channelText} height={size.s_24} width={size.s_24} color={themeValue.channelNormal} />;
 		} else {
 			if (isPrivate) {
-				return <MezonIconCDN icon={IconCDN.threadLockIcon} height={size.s_24} width={size.s_24} />;
+				return <MezonIconCDN icon={IconCDN.threadLockIcon} height={size.s_24} width={size.s_24} color={themeValue.channelNormal} />;
 			}
-			return <MezonIconCDN icon={IconCDN.threadIcon} height={size.s_24} width={size.s_24} />;
+			return <MezonIconCDN icon={IconCDN.threadIcon} height={size.s_24} width={size.s_24} color={themeValue.channelNormal} />;
 		}
 	};
 

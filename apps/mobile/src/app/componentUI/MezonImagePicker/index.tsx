@@ -1,17 +1,15 @@
-import { QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
+import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { forwardRef, memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
+import { DeviceEventEmitter, DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { openCropper } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
-import { IconCDN } from '../../constants/icon_cdn';
 import MezonClanAvatar from '../MezonClanAvatar';
-import MezonIconCDN from '../MezonIconCDN';
 import { style as _style } from './styles';
 
 export interface IFile {
@@ -46,6 +44,8 @@ interface IMezonImagePickerProps {
 	noDefaultText?: boolean;
 	disabled?: boolean;
 	onPressAvatar?: () => void;
+	imageWidth?: number;
+	imageHeight?: number;
 }
 
 export interface IMezonImagePickerHandler {
@@ -100,7 +100,9 @@ export default memo(
 			},
 			noDefaultText,
 			disabled,
-			onPressAvatar
+			onPressAvatar,
+			imageHeight,
+			imageWidth
 		}: IMezonImagePickerProps,
 		ref
 	) {
@@ -137,13 +139,14 @@ export default memo(
 			if (file) {
 				timerRef.current = setTimeout(
 					async () => {
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 						const croppedFile = await openCropper({
 							path: file.uri,
 							mediaType: 'photo',
 							includeBase64: true,
 							compressImageQuality: QUALITY_IMAGE_UPLOAD,
-							...(typeof width === 'number' && { width: width * SCALE }),
-							...(typeof height === 'number' && { height: height * SCALE })
+							...(typeof width === 'number' && { width: imageWidth || width * SCALE }),
+							...(typeof height === 'number' && { height: imageWidth || height * SCALE })
 						});
 						setImage(croppedFile.path);
 						onChange && onChange(croppedFile);
@@ -153,7 +156,9 @@ export default memo(
 								name: file.name,
 								uri: croppedFile.path,
 								size: croppedFile.size,
-								type: croppedFile.mime
+								type: croppedFile.mime,
+								height: croppedFile.height,
+								width: croppedFile.width
 							} as IFile;
 							const url = await handleUploadImage(uploadImagePayload);
 							if (url) {
@@ -184,7 +189,14 @@ export default memo(
 						{localValue ? (
 							localValue
 						) : image || !showHelpText ? (
-							<MezonClanAvatar image={image} alt={alt} defaultColor={defaultColor} noDefaultText={noDefaultText} />
+							<MezonClanAvatar
+								image={image}
+								alt={alt}
+								defaultColor={defaultColor}
+								noDefaultText={noDefaultText}
+								imageHeight={imageHeight}
+								imageWidth={imageWidth}
+							/>
 						) : (
 							<Text style={styles.textPlaceholder}>Choose an image</Text>
 						)}

@@ -2,17 +2,17 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { IMessageAnimation } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Dimensions, View } from 'react-native';
+import useTabletLandscape from '../../../../../../../hooks/useTabletLandscape';
 import SpriteAnimation from './AnimationSprite';
 import { style } from './styles';
 
 type EmbedAnimationProps = {
 	animationOptions: IMessageAnimation;
-	isVeltical?: boolean;
 };
 
 const screenWith = Dimensions?.get('window').width;
 
-const extractFrames = (data, isVeltical = false) => {
+const extractFrames = (data) => {
 	if (!data?.frames) return [];
 
 	const framesArray = Object.entries(data.frames).map(([key, frameData]) => {
@@ -20,22 +20,15 @@ const extractFrames = (data, isVeltical = false) => {
 		return { name: key, x, y, w, h };
 	});
 
-	if (isVeltical) {
-		framesArray.sort((a, b) => {
-			if (a.y !== b.y) return a.y - b.y;
-			return a.x - b.x;
-		});
-	} else {
-		framesArray.sort((a, b) => {
-			if (a.x !== b.x) return a.x - b.x;
-			return a.y - b.y;
-		});
-	}
+	framesArray.sort((a, b) => {
+		if (a.x !== b.x) return a.x - b.x;
+		return a.y - b.y;
+	});
 
 	return framesArray;
 };
 
-export const EmbedAnimation = ({ animationOptions, isVeltical }: EmbedAnimationProps) => {
+export const EmbedAnimation = ({ animationOptions }: EmbedAnimationProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [frames, setFrames] = useState(null);
@@ -43,6 +36,7 @@ export const EmbedAnimation = ({ animationOptions, isVeltical }: EmbedAnimationP
 	const [frameHeight, setFrameHeight] = useState(0);
 	const [spriteWidth, setSpriteWidth] = useState(0);
 	const [spriteHeight, setSpriteHeight] = useState(0);
+	const isTabletLandscape = useTabletLandscape();
 	const duration = 500;
 
 	useEffect(() => {
@@ -51,7 +45,7 @@ export const EmbedAnimation = ({ animationOptions, isVeltical }: EmbedAnimationP
 				const response = await fetch(animationOptions.url_position);
 				const data = await response.json();
 
-				const frameArray = extractFrames(data, isVeltical);
+				const frameArray = extractFrames(data);
 				if (frameArray) {
 					setFrames(frameArray);
 					setFrameHeight(frameArray?.[0]?.h || 0);
@@ -67,14 +61,14 @@ export const EmbedAnimation = ({ animationOptions, isVeltical }: EmbedAnimationP
 	}, []);
 
 	const animationScale = useMemo(() => {
-		if (isVeltical) return 1;
+		if (isTabletLandscape) return 0.8;
 		if (animationOptions?.pool?.length) {
 			if (animationOptions?.pool?.length * frameWidth >= screenWith - size.s_100) {
-				return (screenWith - size.s_100 * 1.3) / screenWith;
+				return (screenWith - size.s_100) / screenWith;
 			}
 		}
 		return 1;
-	}, [animationOptions?.pool?.length, frameWidth, isVeltical]);
+	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape]);
 
 	if (!frames) {
 		return (

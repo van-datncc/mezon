@@ -284,7 +284,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 						})
 					);
 					handleEndCall({ isCancelGoBack: false });
-				}, 60000);
+				}, 30000);
 
 				const offer = await pc.createOffer(sessionConstraints);
 				await pc.setLocalDescription(offer);

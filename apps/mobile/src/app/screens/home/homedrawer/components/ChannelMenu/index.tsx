@@ -165,9 +165,9 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			},
 			icon: isChannelUnmute ? (
-				<MezonIconCDN icon={IconCDN.bellSlashIcon} color={themeValue.textStrong} />
+				<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.textStrong} />
 			) : (
-				<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.text} />
+				<MezonIconCDN icon={IconCDN.bellSlashIcon} color={themeValue.text} />
 			),
 			isShow: true
 		},
