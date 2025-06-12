@@ -20,16 +20,16 @@ import Toast from 'react-native-toast-message';
 import ChannelVoice from '../ChannelVoice';
 
 const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
-	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL || '';
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
 	const isFullScreen = useRef(true);
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const [voicePlay, setVoicePlay] = useState(false);
 	const dispatch = useAppDispatch();
-	const [channelId, setChannelId] = useState();
+	const [channelId, setChannelId] = useState<string>('');
 	const [clanId, setClanId] = useState('');
-	const [token, setToken] = useState<string | null>(null);
+	const [token, setToken] = useState<string>('');
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const [isGroupCall, setIsGroupCall] = useState(false);
 	const [participantsCount, setParticipantsCount] = useState(0);
@@ -119,12 +119,12 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 				dispatch(appActions.setLoadingMainMobile(false));
 				setVoicePlay(true);
 			} else {
-				setToken(null);
+				setToken('');
 				dispatch(appActions.setLoadingMainMobile(false));
 			}
 		} catch (err) {
 			console.error('Failed to join room:', err);
-			setToken(null);
+			setToken('');
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
@@ -179,8 +179,8 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 				}
 
 				if (isJoined && !data?.isEndCall && voiceInfo?.channelId !== data?.channelId) {
-					await handleLeaveRoom(voiceInfo?.clanId, voiceInfo?.channelId);
-					setToken(null);
+					await handleLeaveRoom(voiceInfo?.clanId || '', voiceInfo?.channelId || '');
+					setToken('');
 					setVoicePlay(false);
 					setIsAnimationComplete(true);
 					dispatch(appActions.setLoadingMainMobile(true));

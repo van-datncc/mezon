@@ -238,13 +238,12 @@ export const createLocalNotification = async (title: string, body: string, data:
 
 		const configDisplayNotificationAndroid: NotificationAndroid =
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
-		const configDisplayNotificationIOS: NotificationIOS =
-			Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
+		const configDisplayNotificationIOS: NotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
 
 		await notifee.displayNotification({
 			title: title.trim(),
 			body: body.trim(),
-			subtitle: isValidString(data?.subtitle) ? data.subtitle as string : '',
+			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',
 			data: data,
 			android: configDisplayNotificationAndroid,
 			ios: configDisplayNotificationIOS
@@ -262,8 +261,7 @@ export const handleFCMToken = async (): Promise<string | undefined> => {
 			badge: true
 		});
 
-		const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-			authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+		const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
 		if (enabled) {
 			const fcmtoken = await messaging().getToken();

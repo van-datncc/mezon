@@ -105,31 +105,47 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 		});
 
 		peerConnection.addEventListener('track', (event) => {
+			if (!event?.streams || !Array.isArray(event.streams) || event.streams.length === 0) {
+				console.error('Invalid event streams in track listener');
+				return;
+			}
+
 			const remoteStream = event.streams[0];
+			if (!remoteStream) {
+				console.error('No remote stream available in first position');
+				return;
+			}
+
 			const newStream = new MediaStream();
 			remoteStream.getTracks().forEach((track) => {
 				newStream.addTrack(track);
 			});
-			if (remoteStream) {
-				setRemoteStream(newStream);
-			}
-			event?.streams[0]?.getVideoTracks()?.forEach((track) => {
-				track.addEventListener('mute', () => {
-					setIsRemoteVideoStream(true);
-				});
-				track.addEventListener('unmute', () => {
-					setIsRemoteVideoStream(true);
-				});
-			});
 
-			event?.streams[0]?.getAudioTracks()?.forEach((track) => {
-				track.addEventListener('mute', () => {
-					setIsRemoteVideoStream(false);
+			setRemoteStream(newStream);
+
+			const videoTracks = remoteStream.getVideoTracks();
+			if (videoTracks && videoTracks.length > 0) {
+				videoTracks.forEach((track) => {
+					track.addEventListener('mute', () => {
+						setIsRemoteVideoStream(true);
+					});
+					track.addEventListener('unmute', () => {
+						setIsRemoteVideoStream(true);
+					});
 				});
-				track.addEventListener('unmute', () => {
-					setIsRemoteVideoStream(false);
+			}
+
+			const audioTracks = remoteStream.getAudioTracks();
+			if (audioTracks && audioTracks.length > 0) {
+				audioTracks.forEach((track) => {
+					track.addEventListener('mute', () => {
+						setIsRemoteVideoStream(false);
+					});
+					track.addEventListener('unmute', () => {
+						setIsRemoteVideoStream(false);
+					});
 				});
-			});
+			}
 		});
 
 		peerConnection.addTransceiver('audio', {});

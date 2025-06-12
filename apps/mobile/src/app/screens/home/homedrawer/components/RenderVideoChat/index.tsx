@@ -22,17 +22,45 @@ export const RenderVideoChat = React.memo(
 			if (videoURL) {
 				setLoading(true);
 				if (Platform.OS === 'android') {
-					NativeModules.VideoThumbnail.getThumbnail(videoURL)
-						.then((path) => {
-							setThumbPath(path);
-						})
-						.catch((err) => console.error(err))
-						.finally(() => setLoading(false));
+					// Safe native module call with error handling
+					try {
+						if (NativeModules?.VideoThumbnail?.getThumbnail) {
+							NativeModules.VideoThumbnail.getThumbnail(videoURL)
+								.then((path) => {
+									if (path && typeof path === 'string') {
+										setThumbPath(path);
+									} else {
+										console.warn('Invalid thumbnail path returned');
+										setThumbPath('');
+									}
+								})
+								.catch((err) => {
+									console.error('VideoThumbnail native module error:', err);
+									setThumbPath('');
+								})
+								.finally(() => setLoading(false));
+						} else {
+							console.warn('VideoThumbnail native module not available');
+							setThumbPath('');
+							setLoading(false);
+						}
+					} catch (error) {
+						console.error('Error accessing VideoThumbnail native module:', error);
+						setThumbPath('');
+						setLoading(false);
+					}
 				} else {
 					createThumbnail({ url: videoURL, timeStamp: 1000 })
-						.then((response) => setThumbPath(response.path))
-						.catch(() => {
-							setThumbPath(null);
+						.then((response) => {
+							if (response?.path) {
+								setThumbPath(response.path);
+							} else {
+								setThumbPath('');
+							}
+						})
+						.catch((error) => {
+							console.error('Error creating thumbnail:', error);
+							setThumbPath('');
 						})
 						.finally(() => setLoading(false));
 				}

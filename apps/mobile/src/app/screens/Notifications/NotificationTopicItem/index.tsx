@@ -51,14 +51,10 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 	}, [memberClan, userIds, userId]);
 
 	useEffect(() => {
-		if (usernames.length === 0) {
-			setSubjectTopic('Topic and you');
-		}
-		if (usernames.length === 1) {
+		if (Array.isArray(usernames) && usernames.length > 0) {
 			setSubjectTopic(`${usernames[0]} and you`);
-		}
-		if (usernames.length > 1) {
-			setSubjectTopic(`${usernames[usernames.length - 1]} and ${usernames.length - 1} others`);
+		} else {
+			setSubjectTopic('Someone and you');
 		}
 	}, [usernames, userIds]);
 
