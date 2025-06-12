@@ -2,6 +2,7 @@
     "title": "Messages",
     "addFriend": "Add Friend",
     "friends": "Friends",
+    "blockedUserMessage": "Blocked message",
     "menu": {
         "leaveGroup": "Leave Group",
         "deleteGroup": "Delete Group",

@@ -108,7 +108,9 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 								textAlign: 'center'
 							}}
 						>
-							{props?.isFriendTargetBlocked && isDM ? t('blockedUserMessage') : t('noSendMessagePermission')}
+							{props?.isFriendTargetBlocked && props?.mode === ChannelStreamMode.STREAM_MODE_DM
+								? t('blockedUserMessage')
+								: t('noSendMessagePermission')}
 						</Text>
 					</View>
 				</View>

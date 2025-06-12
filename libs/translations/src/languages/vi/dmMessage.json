@@ -2,6 +2,7 @@
     "title": "Tin nhắn",
     "addFriend": "Thêm bạn",
     "friends": "Những người bạn",
+    "blockedUserMessage": "Tin nhắn đã bị chặn",
     "menu": {
         "leaveGroup": "Rời nhóm",
         "deleteGroup": "Xóa nhóm",
