@@ -5,6 +5,7 @@ import {
 	AttachmentEntity,
 	ChannelsEntity,
 	DMCallActions,
+	EMarkAsReadType,
 	EStateFriend,
 	RootState,
 	ThreadsEntity,
