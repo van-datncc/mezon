@@ -20,7 +20,7 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 	if ((!src && !username) || isAnonymous)
 		return (
 			<div className={`flex items-center justify-center size-10 rounded-full bg-white ${computedClassName}`}>
-				<svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} viewBox="0 0 87.52 112.55000000000001" x="0px" y="0px">
+				<svg xmlns="http://www.w3.org/2000/svg" className="w-[80%] h-[80%]" viewBox="0 0 87.52 112.55000000000001" x="0px" y="0px">
 					<path
 						d="M48.87,39.09c21.15,0,38.3-2.86,38.3-6.39,0-2.36-7.7-4.42-19.11-5.52C67,22.27,65,12.64,63.71,8.28,62,2.61,55.84,5.52,51.15,8S43.91,7,39,6.27c-3.66-.51-5.11,3.38-5.11,3.38L31.33,27C19,28.09,10.57,30.23,10.57,32.7,10.57,36.23,27.72,39.09,48.87,39.09Z"
 						transform="translate(-5.79 -1.01)"
