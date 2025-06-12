@@ -276,6 +276,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 					type: 'error',
 					text1: t('emptyUsername')
 				});
+				return;
 			}
 			updateUserProfile();
 			return;
@@ -287,6 +288,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 					type: 'error',
 					text1: t('emptyUsername')
 				});
+				return;
 			}
 			updateClanProfile();
 			return;
