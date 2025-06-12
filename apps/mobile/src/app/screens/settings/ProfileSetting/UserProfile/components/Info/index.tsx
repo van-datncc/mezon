@@ -23,7 +23,7 @@ export default function DetailInfo({ value, onChange }: IDetailInfoProps) {
 				</View>
 
 				<MezonInput
-					value={value?.displayName || value?.username}
+					value={value?.displayName}
 					onTextChange={(newValue) => onChange({ displayName: newValue })}
 					placeHolder={value?.username}
 					maxCharacter={32}

@@ -27,7 +27,7 @@ import {
 
 import { ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ChatStream from '../chatStream';
 
@@ -107,28 +107,8 @@ const ChannelVoice = memo(
 			await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo.clanId, voiceInfo.channelId);
 		}, [dispatch, voiceInfo]);
 		const handleFullScreen = useCallback(() => {
-			if (!containerRef.current) return;
-
-			if (!document.fullscreenElement) {
-				containerRef.current
-					.requestFullscreen()
-					.then(() => dispatch(voiceActions.setFullScreen(true)))
-					.catch((err) => {
-						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-					});
-			} else {
-				document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
-			}
-		}, [dispatch]);
-		useEffect(() => {
-			const handleFullscreenChange = () => {
-				if (!document.fullscreenElement) {
-					dispatch(voiceActions.setFullScreen(false));
-				}
-			};
-			document.addEventListener('fullscreenchange', handleFullscreenChange);
-			return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-		}, [dispatch]);
+			dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
+		}, [dispatch, isVoiceFullScreen]);
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
 		const toggleChat = () => {
 			dispatch(appActions.setIsShowChatVoice(!isShowChatVoice));
@@ -140,8 +120,12 @@ const ChannelVoice = memo(
 		const isOnMenu = useSelector(selectStatusMenu);
 		return (
 			<div
-				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0 ${!isOnMenu ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''} z-30`}
-				style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
+				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} ${isVoiceFullScreen ? 'fixed inset-0 z-[100]' : `absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0 z-30`} ${!isOnMenu && !isVoiceFullScreen ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''}`}
+				style={
+					!isVoiceFullScreen
+						? { width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }
+						: { width: '100vw', height: '100vh' }
+				}
 			>
 				{token === '' || !serverUrl ? (
 					<PreJoinVoiceChannel
@@ -162,9 +146,9 @@ const ChannelVoice = memo(
 
 						<LiveKitRoom
 							ref={containerRef}
-							id="livekitRoom"
+							id="livekitRoom11"
 							key={token}
-							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''} flex`}
+							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
 							audio={showMicrophone}
 							video={showCamera}
 							token={token}
