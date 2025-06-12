@@ -50,16 +50,20 @@ const ChannelRouterListener = () => {
 					await Linking.openURL(urlVoice);
 				}
 			} else {
-				if (!isTabletLandscape) navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-				const channelId = channel?.channel_id;
-				const clanId = channel?.clan_id;
+				if (isTabletLandscape) {
+					navigation.navigate(APP_SCREEN.BOTTOM_BAR);
+				} else {
+					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+				}
+				const channelId = channel?.channel_id || '';
+				const clanId = channel?.clan_id || '';
 				const store = await getStoreAsync();
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				store.dispatch(
 					channelsActions.joinChannel({
 						clanId: clanId ?? '',
-						channelId: channelId,
+						channelId: channelId || '',
 						noFetchMembers: false,
 						isClearMessage: true,
 						noCache: true

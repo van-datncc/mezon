@@ -39,11 +39,24 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
     })();
 	true;
 	(function() {
-		const persistApp = JSON.parse(localStorage.getItem('persist:apps'));
-		if (persistApp) {
-			persistApp.theme = JSON.stringify("${themeBasic}");
-			persistApp.themeApp = JSON.stringify("${themeBasic}");
-			localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+		try {
+			const persistAppData = localStorage.getItem('persist:apps');
+			if (persistAppData && typeof persistAppData === 'string') {
+				const persistApp = JSON.parse(persistAppData);
+				if (persistApp && typeof persistApp === 'object') {
+					persistApp.theme = JSON.stringify("${themeBasic}");
+					persistApp.themeApp = JSON.stringify("${themeBasic}");
+					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+				}
+			}
+		} catch (error) {
+			console.error('Error parsing persist:apps data:', error);
+			// Create default app data if parsing fails
+			const defaultAppData = {
+				theme: JSON.stringify("${themeBasic}"),
+				themeApp: JSON.stringify("${themeBasic}")
+			};
+			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
 		}
 	})();
 	true;
@@ -63,7 +76,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 	true;
   `;
 
-	const onMessage = (event) => {
+	const onMessage = (event: any) => {
 		console.error('Received message from WebView:', event?.nativeEvent?.data);
 	};
 

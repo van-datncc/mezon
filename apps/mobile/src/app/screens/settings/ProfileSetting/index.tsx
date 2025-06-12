@@ -97,11 +97,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 
 	useEffect(() => {
 		const { display_name, avatar_url, username, about_me } = userProfile?.user || {};
-		const initialValue = {
-			username,
-			imgUrl: avatar_url,
-			displayName: display_name || username,
-			aboutMe: about_me
+		const initialValue: IUserProfileValue = {
+			username: username || '',
+			imgUrl: avatar_url || '',
+			displayName: display_name || username || '',
+			aboutMe: about_me || ''
 		};
 		setOriginUserProfileValue(initialValue);
 		setCurrentUserProfileValue(initialValue);
@@ -114,10 +114,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 	useEffect(() => {
 		const { username } = userProfile?.user || {};
 		const { nick_name } = userClansProfile || {};
-		const initialValue = {
-			username,
-			imgUrl: userClansProfile?.avatar || userProfile?.user?.avatar_url,
-			displayName: nick_name
+		const initialValue: IUserProfileValue = {
+			username: username || '',
+			imgUrl: userClansProfile?.avatar || userProfile?.user?.avatar_url || '',
+			displayName: nick_name || '',
+			aboutMe: ''
 		};
 
 		setOriginClanProfileValue(initialValue);

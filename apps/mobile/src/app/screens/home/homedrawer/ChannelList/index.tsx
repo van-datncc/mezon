@@ -20,17 +20,8 @@ import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import { ChannelListItem } from '../components/ChannelList/ChannelListItem';
 import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
-import ChannelRouterListener from '../components/ChannelList/ChannelRouterListener';
 import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
-export type ChannelsPositionRef = {
-	current: {
-		[key: number]: {
-			height: number;
-			cateId?: string | number;
-		};
-	};
-};
 
 const ChannelList = () => {
 	const { themeValue } = useTheme();
@@ -118,7 +109,6 @@ const ChannelList = () => {
 	return (
 		<View style={styles.mainList}>
 			<ChannelListScroll data={data} flashListRef={flashListRef} />
-			<ChannelRouterListener />
 			<FlatList
 				ref={flashListRef}
 				data={data}

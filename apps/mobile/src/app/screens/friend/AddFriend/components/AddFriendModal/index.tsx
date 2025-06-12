@@ -34,7 +34,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	});
 	const [isKeyBoardShow, setIsKeyBoardShow] = useState<boolean>(false);
 	const { t } = useTranslation('friends');
-	const inputRef = useRef(null);
+	const inputRef = useRef<TextInput>(null);
 
 	useEffect(() => {
 		if (statusSentMobile !== null) {
@@ -110,7 +110,8 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	};
 
 	const sentFriendRequest = async () => {
-		if (!(requestAddFriend.usernames[0] || '')?.trim()?.length) return null;
+		const firstUsername = Array.isArray(requestAddFriend.usernames) && requestAddFriend.usernames.length > 0 ? requestAddFriend.usernames[0] : '';
+		if (!(firstUsername || '')?.trim()?.length) return null;
 		if (inputRef?.current) {
 			inputRef.current.blur();
 		}
@@ -134,6 +135,8 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 	}, []);
 
 	const addFriendByUsernameContent = () => {
+		const firstUsername = Array.isArray(requestAddFriend.usernames) && requestAddFriend.usernames.length > 0 ? requestAddFriend.usernames[0] : '';
+
 		return (
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.fill}>
 				<Text style={styles.headerTitle}>{t('addFriend.addByUserName')}</Text>
@@ -143,7 +146,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 						<View style={styles.searchUsernameWrapper}>
 							<TextInput
 								ref={inputRef}
-								value={requestAddFriend.usernames[0]}
+								value={firstUsername}
 								placeholder={t('addFriend.searchUsernamePlaceholder')}
 								placeholderTextColor={themeValue.textDisabled}
 								style={styles.searchInput}
@@ -157,7 +160,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 					<View style={[styles.buttonWrapper, isKeyBoardShow && { marginBottom: 120 }]}>
 						<View style={{ height: size.s_50 }}>
 							<MezonButton
-								disabled={!requestAddFriend.usernames[0]?.length}
+								disabled={!firstUsername?.length}
 								onPress={() => sentFriendRequest()}
 								viewContainerStyle={styles.sendButton}
 								textStyle={{ color: baseColor.white, fontSize: size.medium }}

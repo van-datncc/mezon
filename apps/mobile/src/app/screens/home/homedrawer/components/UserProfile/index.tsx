@@ -72,7 +72,9 @@ const UserProfile = React.memo(
 		const messageAvatar = useMemo(() => {
 			return message?.clan_avatar || message?.avatar;
 		}, [message?.clan_avatar, message?.avatar]);
-		const { color } = useMixImageColor(messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url);
+		const { color } = useMixImageColor(
+			messageAvatar || userById?.clan_avatar || userById?.user?.avatar_url || userProfile?.user?.avatar_url || ''
+		);
 		const navigation = useNavigation<any>();
 		const { createDirectMessageWithUser } = useDirect();
 		const listDM = useSelector(selectDirectsOpenlist);
@@ -85,11 +87,13 @@ const UserProfile = React.memo(
 		const dmChannel = useMemo(() => {
 			return listDM?.find((dm) => dm?.id === directId);
 		}, [directId, listDM]);
-		const isDMGroup = useMemo(() => [ChannelType.CHANNEL_TYPE_GROUP].includes(dmChannel?.type), [dmChannel?.type]);
+		const isDMGroup = useMemo(() => {
+			return dmChannel?.type === ChannelType.CHANNEL_TYPE_GROUP;
+		}, [dmChannel?.type]);
 
 		const isDM = useMemo(() => {
-			return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
-		}, [currentChannel]);
+			return currentChannel?.type === ChannelType.CHANNEL_TYPE_DM || currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP;
+		}, [currentChannel?.type]);
 
 		const status = getUserStatusByMetadata(user?.user?.metadata);
 
@@ -117,7 +121,10 @@ const UserProfile = React.memo(
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
-				const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === userId);
+				const directMessage = listDM?.find?.((dm) => {
+					const userIds = dm?.user_id;
+					return Array.isArray(userIds) && userIds.length === 1 && userIds[0] === userId;
+				});
 				if (directMessage?.id) {
 					if (isTabletLandscape) {
 						await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -135,7 +142,7 @@ const UserProfile = React.memo(
 				);
 				if (response?.channel_id) {
 					if (isTabletLandscape) {
-						await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
+						dispatch(directActions.setDmGroupCurrentId(directMessage?.id || ''));
 						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 					} else {
 						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
@@ -236,7 +243,10 @@ const UserProfile = React.memo(
 				action: () => {
 					setIsShowPendingContent(true);
 				},
-				isShow: !!targetUser && [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state),
+				isShow:
+					!!targetUser &&
+					targetUser.state !== undefined &&
+					[EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser.state),
 				textStyles: {
 					color: Colors.goldenrodYellow
 				}
@@ -244,11 +254,11 @@ const UserProfile = React.memo(
 		];
 
 		const handleAcceptFriend = () => {
-			acceptFriend(targetUser?.user?.username, targetUser?.user?.id);
+			acceptFriend(targetUser?.user?.username || '', targetUser?.user?.id || '');
 		};
 
 		const handleIgnoreFriend = () => {
-			deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
+			deleteFriend(targetUser?.user?.username || '', targetUser?.user?.id || '');
 		};
 		const isChannelOwner = useMemo(() => {
 			if (dmChannel?.creator_id) {
@@ -282,7 +292,7 @@ const UserProfile = React.memo(
 		if (isShowPendingContent) {
 			return (
 				<View style={[styles.wrapper]}>
-					<PendingContent targetUser={targetUser} onClose={() => setIsShowPendingContent(false)} />
+					<PendingContent targetUser={targetUser!} onClose={() => setIsShowPendingContent(false)} />
 				</View>
 			);
 		}
@@ -431,7 +441,7 @@ const UserProfile = React.memo(
 								</View>
 							) : null}
 							{isDMGroup && !isCheckOwner && isChannelOwner && (
-								<UserInfoDm currentChannel={dmChannel || currentChannel} user={userById || (user as any)} />
+								<UserInfoDm currentChannel={dmChannel || (currentChannel as ChannelsEntity)} user={userById || (user as any)} />
 							)}
 							{showAction && !isKicked && <UserSettingProfile user={userById || (user as any)} />}
 						</View>
