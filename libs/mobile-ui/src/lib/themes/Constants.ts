@@ -128,7 +128,7 @@ export const themeColors: ThemeColor = {
 		reactionBorder: '#2563eb',
 		selectedOverlay: '#FFFFFF96',
 		bgViolet: '#5a62f4',
-		colorAvatarDefault: '#334155FF',
+		colorAvatarDefault: '#8a97a5',
 		colorActiveClan: '#d8e2f0',
 		textRoleLink: '#00b098',
 		darkMossGreen: '#e2f1e5',

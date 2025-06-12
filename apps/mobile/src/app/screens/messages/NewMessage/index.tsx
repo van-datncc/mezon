@@ -47,8 +47,8 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const filteredFriendList = useMemo(() => {
 		return friendList.filter(
 			(friend) =>
-				normalizeString(friend?.user?.username).includes(normalizeString(searchText)) ||
-				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText))
+				normalizeString(friend?.user?.username || '').includes(normalizeString(searchText)) ||
+				normalizeString(friend?.user?.display_name || '').includes(normalizeString(searchText))
 		);
 	}, [friendList, searchText]);
 
@@ -56,7 +56,10 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 		async (user: FriendsEntity) => {
 			const listDM = selectDirectsOpenlist(store.getState() as any);
 
-			const directMessage = listDM.find((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === user?.user?.id);
+			const directMessage = listDM.find((dm) => {
+				const userIds = dm?.user_id;
+				return Array.isArray(userIds) && userIds.length === 1 && userIds[0] === user?.user?.id;
+			});
 			if (directMessage?.id) {
 				if (isTabletLandscape) {
 					await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
@@ -67,10 +70,10 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				return;
 			}
 			const response = await createDirectMessageWithUser(
-				user?.user?.id,
-				user?.user?.display_name,
-				user?.user?.username,
-				user?.user?.avatar_url
+				user?.user?.id || '',
+				user?.user?.display_name || '',
+				user?.user?.username || '',
+				user?.user?.avatar_url || ''
 			);
 			if (response?.channel_id) {
 				if (isTabletLandscape) {
@@ -94,7 +97,9 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					directMessageWithUser(friend);
 					break;
 				case EFriendItemAction.ShowInformation:
-					setSelectedUser(friend?.user);
+					if (friend?.user) {
+						setSelectedUser(friend.user);
+					}
 					break;
 				default:
 					break;
@@ -148,7 +153,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				showAction={false}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
+			{selectedUser && <UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />}
 		</View>
 	);
 };

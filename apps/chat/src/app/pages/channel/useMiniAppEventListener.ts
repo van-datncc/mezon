@@ -42,11 +42,43 @@ const useMiniAppEventListener = (
 		};
 
 		const handleMessage = async (event: MessageEvent) => {
-			if (!appChannel?.app_url || !compareHost(event.origin, appChannel.app_url)) return;
+			// Enhanced security checks
+			if (!appChannel?.app_url) {
+				console.warn('MiniApp: No app URL configured, ignoring message');
+				return;
+			}
 
-			const eventData = safeJSONParse(event.data ?? '{}') || {};
+			if (!compareHost(event.origin, appChannel.app_url)) {
+				console.warn('MiniApp: Message from unauthorized origin:', event.origin);
+				return;
+			}
+
+			// Validate message data structure
+			if (!event.data || typeof event.data !== 'string') {
+				console.warn('MiniApp: Invalid message data format');
+				return;
+			}
+
+			let eventData;
+			try {
+				eventData = safeJSONParse(event.data) || {};
+			} catch (error) {
+				console.warn('MiniApp: Failed to parse message data:', error);
+				return;
+			}
+
 			const { eventType } = eventData;
-			if (!eventType) return;
+			if (!eventType || typeof eventType !== 'string') {
+				console.warn('MiniApp: Missing or invalid eventType');
+				return;
+			}
+
+			// Sanitize eventType to prevent injection
+			const sanitizedEventType = eventType.replace(/[^\w\-_]/g, '');
+			if (sanitizedEventType !== eventType) {
+				console.warn('MiniApp: EventType contains invalid characters');
+				return;
+			}
 
 			const store = getStore();
 

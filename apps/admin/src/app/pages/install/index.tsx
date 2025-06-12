@@ -1,6 +1,6 @@
-import { selectAppById } from '@mezon/store';
+import { getApplicationDetail, selectAppDetail, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, useLoaderData, useParams } from 'react-router-dom';
 import { useAppearance } from '../../context/AppearanceContext';
@@ -17,7 +17,8 @@ const Install: React.FC = () => {
 		APP: 'app'
 	} as const;
 
-	const appSelect = useSelector(selectAppById(applicationId || ''));
+	const dispatch = useAppDispatch();
+	const appDetail = useSelector(selectAppDetail);
 	const [openModalAdd, setOpenModalAdd] = useState(false);
 	const handleOpenModalAdd = useCallback(() => {
 		setOpenModalAdd(!openModalAdd);
@@ -29,6 +30,12 @@ const Install: React.FC = () => {
 	}, [openModalTry]);
 
 	const { isDarkMode } = useAppearance();
+
+	useEffect(() => {
+		if (applicationId) {
+			dispatch(getApplicationDetail({ appId: applicationId }));
+		}
+	}, [applicationId, dispatch]);
 
 	if (!isLogin) {
 		return <Navigate to={redirect || '/login'} replace />;
@@ -44,17 +51,17 @@ const Install: React.FC = () => {
 					}`}
 				>
 					<div className="rounded-full dark:text-bgAvatarLight text-bgAvatarDark dark:bg-bgAvatarDark bg-bgAvatarLight text-2xl font-bold size-[80px] min-w-[80px] uppercase flex justify-center items-center">
-						{appSelect?.applogo ? (
+						{appDetail?.applogo ? (
 							<img
-								src={appSelect.applogo}
-								alt={`imageApp: ${appSelect?.appname}`}
+								src={appDetail.applogo}
+								alt={`imageApp: ${appDetail.appname}`}
 								className="w-full h-full object-cover rounded-full"
 							/>
 						) : (
-							<span>{appSelect?.appname?.at(0)}</span>
+								<span>{appDetail?.appname?.at(0)}</span>
 						)}
 					</div>
-					<p className="text-2xl font-semibold mt-2 truncate max-w-full">{appSelect?.appname}</p>
+					<p className="text-2xl font-semibold mt-2 truncate max-w-full">{appDetail?.appname}</p>
 
 					<ContentInstall handleOpenModalAdd={handleOpenModalAdd} handleOpenModalTry={handleOpenModalTry} />
 				</div>
@@ -63,17 +70,17 @@ const Install: React.FC = () => {
 					{openModalAdd && (
 						<>
 							{modalType === MODAL_TYPE.BOT && (
-								<ModalAddBot nameBot={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
+									<ModalAddBot handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
 							{modalType === MODAL_TYPE.APP && (
-								<ModalAddApp nameApp={appSelect?.appname} handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
+									<ModalAddApp handleOpenModal={handleOpenModalAdd} applicationId={applicationId || ''} />
 							)}
 							{modalType !== MODAL_TYPE.BOT && modalType !== MODAL_TYPE.APP && (
 								<div className="text-red-500 font-semibold text-lg">Invalid modal type: {modalType}</div>
 							)}
 						</>
 					)}
-					{openModalTry && <ModalTry nameApp={appSelect?.appname} handleOpenModal={handleOpenModalTry} />}
+						{openModalTry && <ModalTry nameApp={appDetail?.appname} handleOpenModal={handleOpenModalTry} />}
 				</>
 			)}
 		</div>

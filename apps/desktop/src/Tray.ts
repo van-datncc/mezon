@@ -4,7 +4,7 @@ import { join } from 'path';
 import App from './app/app';
 
 const assetsDir = join(__dirname, 'assets', 'desktop-taskbar.ico');
-const assetsDirLinux = join(__dirname, 'assets', 'mac-icon.png');
+const assetsDirLinux = join(__dirname, 'assets', 'trayicon-linux.png');
 
 export class TrayIcon {
 	private tray?: Tray;
