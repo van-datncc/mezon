@@ -19,7 +19,6 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	const [heightKeyboardShow, setHeightKeyboardShow] = useState<number>(0);
 	const [typeKeyboardBottomSheet, setTypeKeyboardBottomSheet] = useState<IModeKeyboardPicker>('text');
 	const bottomPickerRef = useRef<BottomSheet>(null);
-	const timer = useRef<NodeJS.Timeout | null>(null);
 	const animatedHeight = useRef(new Animated.Value(0)).current;
 	const [messageActionNeedToResolve, setMessageActionNeedToResolve] = useState<IMessageActionNeedToResolve | null>(null);
 
@@ -32,12 +31,10 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 					duration: 200,
 					useNativeDriver: false
 				}).start();
+				setTypeKeyboardBottomSheet(type);
 				if (type === 'attachment') {
 					Keyboard.dismiss();
 				}
-				timer.current = setTimeout(() => {
-					setTypeKeyboardBottomSheet(type);
-				}, 100);
 			} else {
 				setHeightKeyboardShow(0);
 				Animated.timing(animatedHeight, {
@@ -72,12 +69,6 @@ const PanelKeyboard = React.forwardRef((props: IProps, ref) => {
 	useImperativeHandle(ref, () => ({
 		onShowKeyboardBottomSheet
 	}));
-
-	useEffect(() => {
-		return () => {
-			timer?.current && clearTimeout(timer.current);
-		};
-	}, []);
 
 	const onClose = useCallback(
 		(isFocusKeyboard = true) => {

@@ -657,6 +657,14 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				const state = thunkAPI.getState() as RootState;
 				const currentDM = selectCurrentDM(state);
 				const keys = selectE2eeByUserIds(state, currentDM.user_id as string[]);
+
+				const missingKeys = keys.filter((entity) => !entity?.PK);
+				if (missingKeys.length > 0) {
+					throw new Error(
+						"Some participants haven't set up encryption yet. Please wait for them to complete setup before sending encrypted messages."
+					);
+				}
+
 				const pubKeys = await getPublicKeys(keys.filter((item) => item?.PK).map((item) => item.PK));
 				const otherUserPublicKeys: PublicKeyMaterial[] = pubKeys;
 				if (content?.t) {
@@ -1256,13 +1264,15 @@ export const messagesSlice = createSlice({
 					if (toPresent) {
 						handleRemoveManyMessages(state, channelId);
 					}
+					const offsetId = action.meta.arg.messageId as string;
 
 					handleSetManyMessages({
 						state,
 						channelId,
 						adapterPayload: action.payload.messages,
 						direction,
-						isClearMessage
+						isClearMessage,
+						addMany: !!offsetId && !state.channelMessages[channelId]?.ids?.includes(offsetId)
 					});
 
 					const messageIds = state.channelMessages[channelId]?.ids as string[];
@@ -1274,7 +1284,6 @@ export const messagesSlice = createSlice({
 						return;
 					} else {
 						const oldViewport = state.channelViewPortMessageIds[channelId] || [];
-						const offsetId = action.meta.arg.messageId;
 						let newViewportIds: string[] = [];
 						if (!offsetId) {
 							if (state.isViewingOlderMessagesByChannelId[channelId] && oldViewport.length) {
@@ -1582,22 +1591,23 @@ const handleSetManyMessages = ({
 	channelId,
 	adapterPayload,
 	direction,
-	isClearMessage = false
+	isClearMessage = false,
+	addMany = false
 }: {
 	state: MessagesState;
 	channelId?: string;
 	adapterPayload: MessagesEntity[];
 	direction?: Direction_Mode;
 	isClearMessage?: boolean;
+	addMany?: boolean;
 }) => {
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
 		state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
 			id: channelId
 		});
-	if (isClearMessage) {
-		// fix later
-		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
+	if (addMany) {
+		state.channelMessages[channelId] = channelMessagesAdapter.setAll(state.channelMessages[channelId], adapterPayload);
 	} else {
 		if (!adapterPayload.length) return;
 		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);

@@ -39,7 +39,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 	const currentClanUser = useAppSelector((state) => selectMemberClanByUserId2(state, userId as string));
 	const messageContainerRef = useRef<HTMLDivElement>(null);
 	const onPageChange = (page: number) => {
-		dispatch(searchMessagesActions.setCurrentPage(page));
+		dispatch(searchMessagesActions.setCurrentPage({ channelId, page }));
 	};
 
 	const searchChannel = useAppSelector((state) => selectChannelById(state, channelId ?? '')) || {};

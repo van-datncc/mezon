@@ -41,7 +41,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
 	const messageSearchByChannelId = useAppSelector((state) => selectMessageSearchByChannelId(state, currentChannel?.channel_id));
-	const searchMessages = useSelector(selectAllMessageSearch);
+	const searchMessages = useAppSelector((state) => selectAllMessageSearch(state, currentChannel?.channel_id));
 	const ViewLoadMore = () => {
 		return (
 			<View style={styles.loadMoreChannelMessage}>

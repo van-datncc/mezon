@@ -135,7 +135,8 @@ function MezonPage() {
 								<div>or even building a worldwide community.</div>
 								<div>Customize your own space to talk, play, and hang out.</div>
 							</div>
-						</div>						<div className="flex justify-center items-center gap-[12px]">
+						</div>
+						<div className="flex justify-center items-center gap-[12px]">
 							<a
 								className="cursor-pointer"
 								href="https://apps.apple.com/vn/app/mezon/id6502750046"
@@ -174,25 +175,25 @@ function MezonPage() {
 									onDownloadClick={trackDownloadEvent}
 								/>
 							) : platform === 'Linux' ? (
-									<a
-										className="cursor-pointer leading-[0px]"
-										href={downloadUrl}
-										target="_blank"
-										rel="noreferrer"
-										onClick={() => trackDownloadEvent('Linux', 'DEB Package')}
-									>
+								<a
+									className="cursor-pointer leading-[0px]"
+									href={downloadUrl}
+									target="_blank"
+									rel="noreferrer"
+									onClick={() => trackDownloadEvent('Linux', 'DEB Package')}
+								>
 									<Image src={`assets/linux.svg`} className="max-w-full max-md:h-[32px] max-md:w-full" />
 								</a>
 							) : (
 								<DropdownButton
 									icon={
-												<a
-													className="cursor-pointer"
-													href={downloadUrl}
-													target="_blank"
-													rel="noreferrer"
-													onClick={() => trackDownloadEvent('Windows', 'EXE Installer')}
-												>
+										<a
+											className="cursor-pointer"
+											href={downloadUrl}
+											target="_blank"
+											rel="noreferrer"
+											onClick={() => trackDownloadEvent('Windows', 'EXE Installer')}
+										>
 											<Icons.MicrosoftDropdown className="max-w-full max-md:h-[32px] max-md:w-full" />
 										</a>
 									}
@@ -206,7 +207,7 @@ function MezonPage() {
 									dropdownRef={dropdownRef}
 									downloadUrl={downloadUrl}
 									isWindow={isWindow}
-											onDownloadClick={trackDownloadEvent}
+									onDownloadClick={trackDownloadEvent}
 								/>
 							)}
 						</div>
@@ -244,7 +245,15 @@ interface DropdownButtonProps {
 	onDownloadClick?: (platform: string, downloadType: string) => void;
 }
 
-export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, downloadLinks, dropdownRef, downloadUrl, isWindow, onDownloadClick }) => {
+export const DropdownButton: React.FC<DropdownButtonProps> = ({
+	platform,
+	icon,
+	downloadLinks,
+	dropdownRef,
+	downloadUrl,
+	isWindow,
+	onDownloadClick
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const toggleDropdown = () => {
@@ -313,7 +322,8 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 								<div className="max-md:text-[12px] leading-[20px] max-md:leading-[13px]">CDN Url</div>
 							</div>
 						</div>
-					</div>					{downloadLinks.map((link, index) => (
+					</div>
+					{downloadLinks.map((link, index) => (
 						<a
 							key={index}
 							className="cursor-pointer block"

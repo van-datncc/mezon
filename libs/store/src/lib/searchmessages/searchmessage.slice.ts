@@ -25,14 +25,20 @@ export const mapSearchMessageToEntity = (searchMessage: ApiSearchMessageDocument
 	};
 };
 
-export interface SearchMessageState extends EntityState<SearchMessageEntity, string> {
+export interface SearchMessageState {
+	byChannels: Record<
+		string,
+		{
+			entities: EntityState<SearchMessageEntity, string>;
+			totalResult: number;
+			currentPage: number;
+			valueInputSearch: string;
+			searchedRequest: ApiSearchMessageRequest;
+		}
+	>;
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isSearchMessage: Record<string, boolean>;
-	totalResult: number;
-	currentPage: number;
-	valueInputSearch: Record<string, string>;
-	searchedRequest: Record<string, ApiSearchMessageRequest>;
 }
 
 export const SearchMessageAdapter = createEntityAdapter<SearchMessageEntity>();
@@ -43,18 +49,20 @@ export const fetchListSearchMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
+			const channelId = filters[1].field_value;
 
 			if (!response.messages) {
-				thunkAPI.dispatch(searchMessagesActions.setTotalResults(isMobile ? response.total || 0 : 0));
-				return { searchMessage: [], isMobile };
+				thunkAPI.dispatch(searchMessagesActions.setTotalResults({ channelId, total: isMobile ? response.total || 0 : 0 }));
+				return { searchMessage: [], isMobile, channelId };
 			}
 
 			const searchMessage = response.messages.map(mapSearchMessageToEntity);
-			thunkAPI.dispatch(searchMessagesActions.setTotalResults(response.total ?? 0));
+			thunkAPI.dispatch(searchMessagesActions.setTotalResults({ channelId, total: response.total ?? 0 }));
 
 			return {
 				searchMessage,
-				isMobile
+				isMobile,
+				channelId
 			};
 		} catch (error) {
 			captureSentryError(error, 'searchMessage/fetchListSearchMessage');
@@ -63,39 +71,71 @@ export const fetchListSearchMessage = createAsyncThunk(
 	}
 );
 
-export const initialSearchMessageState: SearchMessageState = SearchMessageAdapter.getInitialState({
+const getInitialChannelState = () => {
+	return {
+		entities: SearchMessageAdapter.getInitialState(),
+		totalResult: 0,
+		currentPage: 1,
+		valueInputSearch: '',
+		searchedRequest: {} as ApiSearchMessageRequest
+	};
+};
+
+export const initialSearchMessageState: SearchMessageState = {
+	byChannels: {},
 	loadingStatus: 'not loaded',
 	error: null,
-	isSearchMessage: {},
-	totalResult: 0,
-	currentPage: 1,
-	valueInputSearch: {},
-	searchedRequest: {}
-});
+	isSearchMessage: {}
+};
 
 export const searchMessageSlice = createSlice({
 	name: SEARCH_MESSAGES_FEATURE_KEY,
 	initialState: initialSearchMessageState,
 	reducers: {
-		add: SearchMessageAdapter.addOne,
-		remove: SearchMessageAdapter.removeOne,
-		setTotalResults: (state, action: PayloadAction<number>) => {
-			state.totalResult = action.payload;
+		add: (state, action: PayloadAction<{ channelId: string; message: SearchMessageEntity }>) => {
+			const { channelId, message } = action.payload;
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			SearchMessageAdapter.addOne(state.byChannels[channelId].entities, message);
+		},
+		remove: (state, action: PayloadAction<{ channelId: string; messageId: string }>) => {
+			const { channelId, messageId } = action.payload;
+			if (state.byChannels[channelId]) {
+				SearchMessageAdapter.removeOne(state.byChannels[channelId].entities, messageId);
+			}
+		},
+		setTotalResults: (state, action: PayloadAction<{ channelId: string; total: number }>) => {
+			const { channelId, total } = action.payload;
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			state.byChannels[channelId].totalResult = total;
 		},
 		setIsSearchMessage: (state, action: PayloadAction<{ channelId: string; isSearchMessage: boolean }>) => {
 			const { channelId, isSearchMessage } = action.payload;
 			state.isSearchMessage[channelId] = isSearchMessage;
 		},
-		setCurrentPage: (state, action: PayloadAction<number>) => {
-			state.currentPage = action.payload;
+		setCurrentPage: (state, action: PayloadAction<{ channelId: string; page: number }>) => {
+			const { channelId, page } = action.payload;
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			state.byChannels[channelId].currentPage = page;
 		},
 		setValueInputSearch: (state, action: PayloadAction<{ channelId: string; value: string }>) => {
 			const { channelId, value } = action.payload;
-			state.valueInputSearch[channelId] = value;
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			state.byChannels[channelId].valueInputSearch = value;
 		},
 		setSearchedRequest: (state, action: PayloadAction<{ channelId: string; value: ApiSearchMessageRequest }>) => {
 			const { channelId, value } = action.payload;
-			state.searchedRequest[channelId] = value;
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			state.byChannels[channelId].searchedRequest = value;
 		}
 	},
 
@@ -108,17 +148,22 @@ export const searchMessageSlice = createSlice({
 				fetchListSearchMessage.fulfilled,
 				(
 					state: SearchMessageState,
-					action: PayloadAction<{ searchMessage: ISearchMessage[]; isMobile?: boolean }, string, { arg: { filters: SearchFilter[] } }>
+					action: PayloadAction<
+						{ searchMessage: ISearchMessage[]; isMobile?: boolean; channelId: string },
+						string,
+						{ arg: { filters: SearchFilter[] } }
+					>
 				) => {
-					const channelId = action.meta.arg.filters[1].field_value;
-					if (action?.payload?.isMobile) {
-						SearchMessageAdapter.addMany(state, action?.payload?.searchMessage);
+					const { channelId, searchMessage, isMobile } = action.payload;
+
+					if (!state.byChannels[channelId]) {
+						state.byChannels[channelId] = getInitialChannelState();
+					}
+
+					if (isMobile) {
+						SearchMessageAdapter.addMany(state.byChannels[channelId].entities, searchMessage);
 					} else {
-						const ids = Object.values(state.entities)
-							.filter((message) => message.channel_id === channelId)
-							.map((message) => message.id);
-						SearchMessageAdapter.removeMany(state, ids);
-						SearchMessageAdapter.setAll(state, action?.payload?.searchMessage);
+						SearchMessageAdapter.setAll(state.byChannels[channelId].entities, searchMessage);
 					}
 					state.loadingStatus = 'loaded';
 				}
@@ -137,40 +182,46 @@ export const searchMessagesActions = {
 	fetchListSearchMessage
 };
 
-const { selectAll, selectEntities, selectIds } = SearchMessageAdapter.getSelectors();
+const { selectAll } = SearchMessageAdapter.getSelectors();
 
 export const getSearchMessageState = (rootState: { [SEARCH_MESSAGES_FEATURE_KEY]: SearchMessageState }): SearchMessageState =>
 	rootState[SEARCH_MESSAGES_FEATURE_KEY];
 
-export const selectAllMessageSearch = createSelector(getSearchMessageState, selectAll);
+export const selectChannelSearchState = (channelId: string) =>
+	createSelector(getSearchMessageState, (state) => state.byChannels?.[channelId] ?? getInitialChannelState());
 
-export const selectEntitesMessageSearch = createSelector(getSearchMessageState, selectEntities);
-export const selectAllMessageIds = createSelector(getSearchMessageState, selectIds);
+export const selectAllMessageSearch = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	const channelState = state.byChannels[channelId];
+	if (!channelState) return [];
 
-export const selectMessageSearchByChannelId = createSelector(
-	[selectEntitesMessageSearch, selectAllMessageIds, (_, channelId: string) => channelId],
-	(entities, ids, channelId) => {
-		return ids
-			.map((id) => entities[id])
-			.filter((message): message is SearchMessageEntity => message !== undefined && message.channel_id === channelId);
-	}
-);
+	return selectAll(channelState.entities);
+});
 
-export const selectTotalResultSearchMessage = createSelector(getSearchMessageState, (state) => state.totalResult);
-export const selectCurrentPage = createSelector(getSearchMessageState, (state) => state.currentPage);
+export const selectMessageSearchByChannelId = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	const channelState = state.byChannels[channelId];
+	if (!channelState) return [];
+
+	return selectAll(channelState.entities);
+});
+
+export const selectTotalResultSearchMessage = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	return state.byChannels[channelId]?.totalResult ?? 0;
+});
+
+export const selectCurrentPage = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	if (!channelId) return 1;
+	return state.byChannels[channelId]?.currentPage ?? 1;
+});
 
 export const selectIsSearchMessage = createSelector(
 	[getSearchMessageState, (_, channelId) => channelId],
-	(state, channelId) => state.isSearchMessage[channelId]
+	(state, channelId) => state.isSearchMessage[channelId] ?? false
 );
 
-export const selectValueInputSearchMessage = createSelector([getSearchMessageState, (state, channelId) => channelId], (state, channelId: string) => {
-	return state.valueInputSearch[channelId];
+export const selectValueInputSearchMessage = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	return state.byChannels[channelId]?.valueInputSearch ?? '';
 });
 
-export const selectSearchedRequestByChannelId = createSelector(
-	[getSearchMessageState, (state, channelId) => channelId],
-	(state, channelId: string) => {
-		return state.searchedRequest[channelId];
-	}
-);
+export const selectSearchedRequestByChannelId = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
+	return state.byChannels[channelId]?.searchedRequest ?? ({} as ApiSearchMessageRequest);
+});
