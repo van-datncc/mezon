@@ -145,7 +145,7 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 			if (valueInputSearch && event.key === 'Enter') {
 				setIsShowSearchMessageModal(false);
 				dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: true }));
-				dispatch(searchMessagesActions.setCurrentPage(1));
+				dispatch(searchMessagesActions.setCurrentPage({ channelId: channelId, page: 1 }));
 				setIsShowCreateThread(false, currentChannel?.parent_id !== '0' ? currentChannel?.parent_id : currentChannel.channel_id);
 				if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
