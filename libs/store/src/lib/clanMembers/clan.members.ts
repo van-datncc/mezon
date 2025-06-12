@@ -40,7 +40,7 @@ const fetchUsersClanCached = memoizeAndTrack(
 		promise: true,
 		maxAge: FOR_15_MINUTES,
 		normalizer: (args) => {
-			return args[0].session.username || '' + args[1];
+			return args[1] + args[0].session.username || '';
 		}
 	}
 );
