@@ -13,8 +13,6 @@ export function useSendForwardMessage() {
 
 	const sendForwardMessage = React.useCallback(
 		async (clanid: string, channel_id: string, mode: number, isPublic: boolean, message: IMessageWithUser) => {
-			console.log('clanid: ', clanid);
-			console.log('message: ', message);
 			const session = sessionRef.current;
 			const client = clientRef.current;
 			const socket = socketRef.current;
@@ -39,7 +37,16 @@ export function useSendForwardMessage() {
 					fwd: true
 				};
 				await socket.joinChat(clanid, channel_id, type, isPublic);
-				await socket.writeChatMessage(clanid, channel_id, mode, isPublic, validatedContent, [], message.attachments, message.references);
+				await socket.writeChatMessage(
+					clanid,
+					channel_id,
+					mode,
+					isPublic,
+					validatedContent,
+					message.channel_id === channel_id ? message.mentions : [],
+					message.attachments,
+					message.references
+				);
 
 				dispatch(
 					toastActions.addToast({

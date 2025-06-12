@@ -92,7 +92,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	};
 
 	const handleForwardAllMessage = async () => {
-		console.log('Here');
 		const store = getStore();
 		const state = store.getState();
 		const channelMessageEntity =
@@ -160,8 +159,6 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	};
 
 	const sentToMessage = async () => {
-		console.log('Here 2');
-
 		for (const selectedObjectIdSend of selectedObjectIdSends) {
 			if (selectedObjectIdSend.type === ChannelType.CHANNEL_TYPE_DM) {
 				await sendForwardMessage('', selectedObjectIdSend.id, ChannelStreamMode.STREAM_MODE_DM, false, {
