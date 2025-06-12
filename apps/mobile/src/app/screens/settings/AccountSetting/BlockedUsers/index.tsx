@@ -1,9 +1,11 @@
 import { useFriends } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
+import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
+import { Colors, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity, selectBlockedUsers } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { APP_SCREEN, SettingScreenProps } from '../../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -14,11 +16,28 @@ export const BlockedUsers = ({ navigation }: SettingScreenProps<BlockedUsersScre
 	const styles = style(themeValue);
 	const { t } = useTranslation(['accountSetting', 'userProfile']);
 	const blockedUsers = useSelector(selectBlockedUsers);
-	const { onUnblockFriend } = useFriends();
+	const { unBlockFriend } = useFriends();
 
 	const handleUnblockFriend = async (user: FriendsEntity) => {
-		if (user?.id) {
-			await onUnblockFriend(user?.user?.username, user?.id);
+		try {
+			const isUnblocked = await unBlockFriend(user?.user?.username, user?.id);
+			if (isUnblocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.unblockUser.success', { ns: 'userProfile' }),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.unblockUser.error', { ns: 'userProfile' }),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
 		}
 	};
 

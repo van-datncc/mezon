@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { EStateFriend, selectDirectById, selectFriendById, useAppSelector } from '@mezon/store-mobile';
+import { EStateFriend, selectFriendById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
 import { Platform, StatusBar } from 'react-native';
@@ -14,13 +14,13 @@ interface IChatMessageWrapperProps {
 	directMessageId: string;
 	isModeDM: boolean;
 	currentClanId: string;
+	targetUserId?: string;
 }
-export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClanId }: IChatMessageWrapperProps) => {
+export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClanId, targetUserId }: IChatMessageWrapperProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const panelKeyboardRef = useRef(null);
-	const directMessage = useAppSelector((state) => selectDirectById(state, directMessageId));
-	const infoFriend = useAppSelector((state) => selectFriendById(state, directMessage?.user_id?.[0] || ''));
+	const infoFriend = useAppSelector((state) => selectFriendById(state, targetUserId || ''));
 	const isBlocked = useMemo(() => {
 		return infoFriend?.state === EStateFriend.BLOCK;
 	}, [infoFriend?.state]);

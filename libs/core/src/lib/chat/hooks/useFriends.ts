@@ -11,7 +11,6 @@ import {
 } from '@mezon/store';
 import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 
 // check later
 export function useFriends() {
@@ -93,34 +92,6 @@ export function useFriends() {
 		[dispatch]
 	);
 
-	const onBlockFriend = useCallback(
-		async (username: string, id: string) => {
-			try {
-				const isBlocked = await blockFriend(username, id);
-				if (isBlocked) {
-					toast.success('User blocked successfully');
-				}
-			} catch (error) {
-				toast.error('Failed to block user');
-			}
-		},
-		[blockFriend]
-	);
-
-	const onUnblockFriend = useCallback(
-		async (username: string, id: string) => {
-			try {
-				const isUnblocked = await unBlockFriend(username, id);
-				if (isUnblocked) {
-					toast.success('User unblocked successfully');
-				}
-			} catch (error) {
-				toast.error('Failed to unblock user');
-			}
-		},
-		[unBlockFriend]
-	);
-
 	const filteredFriends = useCallback(
 		(searchTerm: string, isAddMember?: boolean) => {
 			if (isAddMember) {
@@ -148,8 +119,6 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
-			onBlockFriend,
-			onUnblockFriend,
 			filteredFriends,
 			numberMemberInDmGroup
 		}),
@@ -161,8 +130,6 @@ export function useFriends() {
 			deleteFriend,
 			blockFriend,
 			unBlockFriend,
-			onBlockFriend,
-			onUnblockFriend,
 			filteredFriends,
 			numberMemberInDmGroup
 		]

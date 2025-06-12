@@ -5,6 +5,7 @@ import { Icons } from '@mezon/ui';
 import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { toast } from 'react-toastify';
 
 type FriendProps = {
 	friend: FriendsEntity;
@@ -92,7 +93,7 @@ const FriendMenu = ({ friend, coords, onClose, onDeleteFriend, onBlockFriend }: 
 const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
-	const { acceptFriend, onBlockFriend, deleteFriend, onUnblockFriend } = useFriends();
+	const { acceptFriend, deleteFriend, blockFriend, unBlockFriend } = useFriends();
 
 	const coords = useRef<Coords>({
 		mouseX: 0,
@@ -121,11 +122,25 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	};
 
 	const handleBlockFriend = async (username: string, id: string) => {
-		await onBlockFriend(username, id);
+		try {
+			const isBlocked = await blockFriend(username, id);
+			if (isBlocked) {
+				toast.success('User blocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to block user');
+		}
 	};
 
-	const handleUnBlockFriend = async (username: string, id: string) => {
-		await onUnblockFriend(username, id);
+	const handleUnblockFriend = async (username: string, id: string) => {
+		try {
+			const isUnblocked = await unBlockFriend(username, id);
+			if (isUnblocked) {
+				toast.success('User unblocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to unblock user');
+		}
 	};
 
 	const handleMenuClick = (event: React.MouseEvent) => {
@@ -225,7 +240,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						<div className="flex gap-3 items-center">
 							<button
 								className="bg-bgTertiary text-contentSecondary rounded-[6px] text-[14px] p-2 flex items-center justify-center hover:bg-bgPrimary"
-								onClick={() => handleUnBlockFriend(friend?.user?.username as string, friend?.user?.id as string)}
+								onClick={() => handleUnblockFriend(friend?.user?.username as string, friend?.user?.id as string)}
 							>
 								Unblock
 							</button>

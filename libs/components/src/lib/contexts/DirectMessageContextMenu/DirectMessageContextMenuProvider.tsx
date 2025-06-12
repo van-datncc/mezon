@@ -73,8 +73,8 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		handleEnableE2ee,
 		addFriend,
 		deleteFriend,
-		onBlockFriend,
-		onUnblockFriend
+		blockFriend,
+		unBlockFriend
 	} = useMenuHandlers({
 		userProfile,
 		hasKeyE2ee,
@@ -102,8 +102,8 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		handleEnableE2ee,
 		handleRemoveMemberFromGroup,
 		handleLeaveDmGroup,
-		onBlockFriend,
-		onUnblockFriend
+		blockFriend,
+		unBlockFriend
 	});
 
 	const { showContextMenu, openProfileItem } = useContextMenuHandlers({

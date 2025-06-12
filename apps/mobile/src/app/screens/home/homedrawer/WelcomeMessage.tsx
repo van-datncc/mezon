@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import { useAuth } from '@mezon/core';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { useAuth, useFriends } from '@mezon/core';
+import { CheckIcon, CloseIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	EStateFriend,
 	friendsActions,
@@ -17,10 +18,10 @@ import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Toast from 'react-native-toast-message';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
-import { useFriendsBlock } from '../../../hooks/useFriendsBlock';
 import { style } from './styles';
 
 interface IWelcomeMessage {
@@ -37,7 +38,7 @@ const useCurrentChannel = (channelId: string) => {
 const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { t } = useTranslation(['userProfile']);
+	const { t } = useTranslation(['userProfile', 'dmMessage']);
 	const currenChannel = useCurrentChannel(channelId) as IChannel;
 	const { userProfile } = useAuth();
 	const currentUserId = userProfile?.user?.id;
@@ -46,7 +47,7 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	const [remainingCount, setRemainingCount] = useState(null);
 	const infoFriend = useAppSelector((state) => selectFriendById(state, targetUserId || ''));
 
-	const { onBlockFriend, onUnblockFriend } = useFriendsBlock();
+	const { blockFriend, unBlockFriend } = useFriends();
 	const isBlockedByUser = useMemo(() => {
 		return infoFriend?.state === EStateFriend.BLOCK && infoFriend?.source_id === targetUserId && infoFriend?.user?.id === currentUserId;
 	}, [infoFriend, targetUserId, currentUserId]);
@@ -129,14 +130,48 @@ const WelcomeMessage = React.memo(({ channelId, uri }: IWelcomeMessage) => {
 	};
 
 	const handleBlockFriend = async () => {
-		if (targetUserId) {
-			await onBlockFriend(userName, targetUserId);
+		try {
+			const isBlocked = await blockFriend(userName, targetUserId);
+			if (isBlocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.blockUser.success', { ns: 'dmMessage' }),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.blockUser.error', { ns: 'dmMessage' }),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
 		}
 	};
 
 	const handleUnblockFriend = async () => {
-		if (targetUserId) {
-			await onUnblockFriend(userName, targetUserId);
+		try {
+			const isUnblocked = await unBlockFriend(userName, targetUserId);
+			if (isUnblocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.unblockUser.success', { ns: 'dmMessage' }),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.unblockUser.error', { ns: 'dmMessage' }),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
 		}
 	};
 

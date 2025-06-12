@@ -14,7 +14,6 @@ import {
 } from '@mezon/store-mobile';
 import React, { useCallback, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -82,7 +81,6 @@ const MessageItem = React.memo(
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
-		const blockedUsers = useSelector(selectBlockedUsersForMessage);
 
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		const isMessageCallLog = !!message?.content?.callLog;
@@ -168,6 +166,8 @@ const MessageItem = React.memo(
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
 		const isMessageFromBlockedUser = useMemo(() => {
+			const store = getStore();
+			const blockedUsers = selectBlockedUsersForMessage(store.getState());
 			if (props.mode === ChannelStreamMode.STREAM_MODE_DM) return false;
 
 			const senderId = message?.sender_id;
@@ -178,7 +178,7 @@ const MessageItem = React.memo(
 					(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
 					(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
 			);
-		}, [props.mode, userId, message?.sender_id, blockedUsers]);
+		}, [props.mode, userId, message?.sender_id]);
 
 		if (isMessageFromBlockedUser) {
 			if (previousMessage?.sender_id !== message?.sender_id) {

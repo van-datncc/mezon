@@ -1,6 +1,6 @@
-import { useAuth } from '@mezon/core';
-import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { useAuth, useFriends } from '@mezon/core';
+import { ActionEmitEvent, CheckIcon, CloseIcon, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
+import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
 	EStateFriend,
@@ -27,10 +27,10 @@ import React, { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../src/app/constants/icon_cdn';
-import { useFriendsBlock } from '../../../../../../../src/app/hooks/useFriendsBlock';
 import MezonConfirm from '../../../../../componentUI/MezonConfirm';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -57,7 +57,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			infoFriend?.user?.id === messageInfo?.user_id?.[0]
 		);
 	}, [infoFriend, userProfile?.user?.id, messageInfo?.user_id?.[0]]);
-	const { onBlockFriend, onUnblockFriend } = useFriendsBlock();
+	const { blockFriend, unBlockFriend } = useFriends();
 
 	const dismiss = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -117,17 +117,53 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	];
 
 	const handleBlockFriend = async () => {
-		if (messageInfo?.user_id?.[0]) {
-			await onBlockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		try {
+			const isBlocked = await blockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+			if (isBlocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.blockUser.success'),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.blockUser.error'),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
+		} finally {
+			dismiss();
 		}
-		dismiss();
 	};
 
 	const handleUnblockFriend = async () => {
-		if (messageInfo?.user_id?.[0]) {
-			await onUnblockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		try {
+			const isUnblocked = await unBlockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+			if (isUnblocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.unblockUser.success'),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.unblockUser.error'),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
+		} finally {
+			dismiss();
 		}
-		dismiss();
 	};
 
 	const profileMenu: IMezonMenuItemProps[] = [

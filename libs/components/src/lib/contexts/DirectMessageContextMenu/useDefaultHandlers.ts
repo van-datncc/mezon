@@ -12,8 +12,8 @@ interface UseDefaultHandlersParams {
 	handleEnableE2ee: (directId?: string, e2ee?: number) => Promise<void>;
 	handleRemoveMemberFromGroup: (userId: string, channelId: string) => Promise<void>;
 	handleLeaveDmGroup: (channelId: string, isLastOne: boolean) => Promise<void>;
-	onBlockFriend: (username: string, userId: string) => Promise<void>;
-	onUnblockFriend: (username: string, userId: string) => Promise<void>;
+	blockFriend: (username: string, userId: string) => Promise<boolean>;
+	unBlockFriend: (username: string, userId: string) => Promise<boolean>;
 }
 
 export function useDefaultHandlers({
@@ -27,8 +27,8 @@ export function useDefaultHandlers({
 	handleEnableE2ee,
 	handleRemoveMemberFromGroup,
 	handleLeaveDmGroup,
-	onBlockFriend,
-	onUnblockFriend
+	blockFriend,
+	unBlockFriend
 }: UseDefaultHandlersParams) {
 	const createDefaultHandlers = useCallback(
 		(user?: any): DirectMessageContextMenuHandlers => {
@@ -86,10 +86,10 @@ export function useDefaultHandlers({
 					handleLeaveDmGroup(channelId, isLastOne);
 				},
 				handleBlockFriend: async () => {
-					await onBlockFriend(user?.usernames?.[0], user?.user_id?.[0]);
+					await blockFriend(user?.usernames?.[0], user?.user_id?.[0]);
 				},
 				handleUnblockFriend: async () => {
-					await onUnblockFriend(user?.usernames?.[0], user?.user_id?.[0]);
+					await unBlockFriend(user?.usernames?.[0], user?.user_id?.[0]);
 				}
 			};
 		},
@@ -104,8 +104,8 @@ export function useDefaultHandlers({
 			handleEnableE2ee,
 			handleRemoveMemberFromGroup,
 			handleLeaveDmGroup,
-			onBlockFriend,
-			onUnblockFriend
+			blockFriend,
+			unBlockFriend
 		]
 	);
 

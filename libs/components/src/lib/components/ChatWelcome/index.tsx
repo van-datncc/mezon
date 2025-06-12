@@ -19,6 +19,7 @@ import { ChannelStatusEnum, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 
 export type ChatWelComeProp = {
@@ -229,7 +230,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 	const didIBlockUser = useMemo(() => {
 		return infoFriend?.state === EStateFriend.BLOCK && infoFriend?.source_id === userProfile?.user?.id && infoFriend?.user?.id === userID;
 	}, [userProfile?.user?.id, infoFriend, userID]);
-	const { acceptFriend, deleteFriend, addFriend, onBlockFriend, onUnblockFriend } = useFriends();
+	const { acceptFriend, deleteFriend, addFriend, blockFriend, unBlockFriend } = useFriends();
 
 	const title = useMemo(() => {
 		switch (checkAddFriend) {
@@ -270,11 +271,25 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 	};
 
 	const handleBlockFriend = async () => {
-		await onBlockFriend(username, userID);
+		try {
+			const isBlocked = await blockFriend(username, userID);
+			if (isBlocked) {
+				toast.success('User blocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to block user');
+		}
 	};
 
 	const handleUnblockFriend = async () => {
-		await onUnblockFriend(username, userID);
+		try {
+			const isUnblocked = await unBlockFriend(username, userID);
+			if (isUnblocked) {
+				toast.success('User unblocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to unblock user');
+		}
 	};
 
 	if (isBlockedByUser) {
