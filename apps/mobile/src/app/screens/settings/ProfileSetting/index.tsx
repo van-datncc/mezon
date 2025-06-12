@@ -100,7 +100,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		const initialValue = {
 			username,
 			imgUrl: avatar_url,
-			displayName: display_name,
+			displayName: display_name || username,
 			aboutMe: about_me
 		};
 		setOriginUserProfileValue(initialValue);
@@ -226,17 +226,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
 		headerRight: () => (
 			<Pressable onPress={() => saveCurrentTab()}>
-				<Text
-					style={[
-						styles.saveChangeButton,
-						(tab === EProfileTab.UserProfile && !isUserProfileEmptyName) ||
-						(tab === EProfileTab.ClanProfile && !isClanProfileEmptyName && !isDuplicateClanNickname)
-							? styles.changed
-							: styles.notChange
-					]}
-				>
-					{t('header.save')}
-				</Text>
+				<Text style={[styles.saveChangeButton, styles.changed]}>{t('header.save')}</Text>
 			</Pressable>
 		),
 		headerLeft: () => (
@@ -281,13 +271,25 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 
 	const saveCurrentTab = () => {
 		if (tab === EProfileTab.UserProfile) {
-			if (isUserProfileEmptyName) return;
+			if (isUserProfileEmptyName) {
+				Toast.show({
+					type: 'error',
+					text1: t('emptyUsername')
+				});
+				return;
+			}
 			updateUserProfile();
 			return;
 		}
 
 		if (tab === EProfileTab.ClanProfile) {
-			if (isClanProfileEmptyName || isDuplicateClanNickname) return;
+			if (isDuplicateClanNickname) {
+				Toast.show({
+					type: 'error',
+					text1: t('emptyUsername')
+				});
+				return;
+			}
 			updateClanProfile();
 			return;
 		}
