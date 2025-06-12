@@ -60,7 +60,13 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 	};
 
 	return (
-		<div onMouseDown={onMouseDown} onContextMenu={handleMouseClick} data-id={option?.id} className={`relative h-[40px] ${className}`}>
+		<div
+			onMouseDown={onMouseDown}
+			onContextMenu={handleMouseClick}
+			data-id={option?.id}
+			className={`relative h-[40px] ${className}`}
+			title={option?.clan_name}
+		>
 			<button onClick={handleClick} draggable="false">
 				<NavLinkComponent active={active}>
 					{option?.logo ? (

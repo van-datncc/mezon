@@ -210,7 +210,7 @@ const ClanGroup = ({ group, onMouseDown, onMouseEnter, className = '', isGroupIn
 		>
 			<div className="w-[40px] h-[40px] rounded-lg relative overflow-hidden dark:bg-bgSecondary bg-bgLightMode hover:dark:bg-bgSecondary600 hover:bg-bgLightModeButton transition-all duration-200">
 				{displayClans.length === 1 && displayClans[0] ? (
-					<div className="w-full h-full">
+					<div className="w-full h-full" title={displayClans[0]?.clan_name}>
 						{displayClans[0].logo ? (
 							<img
 								src={createImgproxyUrl(displayClans[0].logo || '', { width: 100, height: 100, resizeType: 'fill-down' })}
@@ -229,7 +229,7 @@ const ClanGroup = ({ group, onMouseDown, onMouseEnter, className = '', isGroupIn
 						{displayClans.slice(0, 2).map(
 							(clan, index) =>
 								clan && (
-									<div key={clan.id} className="w-1/2 h-full">
+									<div key={clan.id} className="w-1/2 h-full" title={clan?.clan_name}>
 										{clan.logo ? (
 											<img
 												src={createImgproxyUrl(clan.logo, { width: 100, height: 100, resizeType: 'fill-down' })}
@@ -251,7 +251,7 @@ const ClanGroup = ({ group, onMouseDown, onMouseEnter, className = '', isGroupIn
 						{displayClans.slice(0, 4).map(
 							(clan, index) =>
 								clan && (
-									<div key={clan.id} className="w-full h-full">
+									<div key={clan.id} className="w-full h-full" title={clan?.clan_name}>
 										{clan.logo ? (
 											<img
 												src={createImgproxyUrl(clan.logo || '', { width: 100, height: 100, resizeType: 'fill-down' })}
