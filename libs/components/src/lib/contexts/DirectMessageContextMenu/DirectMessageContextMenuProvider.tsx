@@ -119,7 +119,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 	const isMuted = notificationSettings?.active === 0;
 	const hasMuteTime = notificationSettings?.time_mute ? new Date(notificationSettings.time_mute) > new Date() : false;
 	const isOwnerClanOrGroup = userProfile?.user?.id && dataMemberCreate?.createId && userProfile?.user?.id === dataMemberCreate.createId;
-	const infoFriend = useAppSelector((state: RootState) => selectFriendById(state, currentUser?.user_id?.[0]));
+	const infoFriend = useAppSelector((state: RootState) => selectFriendById(state, currentUser?.user_id?.[0] || ''));
 	const didIBlockUser = useMemo(() => {
 		return (
 			infoFriend?.state === EStateFriend.BLOCK &&

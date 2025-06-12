@@ -1,7 +1,9 @@
+import { useAuth } from '@mezon/core';
 import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
 import { baseColor, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
+	EStateFriend,
 	channelsActions,
 	deleteChannel,
 	directActions,
@@ -12,6 +14,7 @@ import {
 	removeMemberChannel,
 	selectCurrentClan,
 	selectCurrentUserId,
+	selectFriendById,
 	selectNotifiSettingsEntitiesById,
 	useAppDispatch,
 	useAppSelector
@@ -27,6 +30,7 @@ import FastImage from 'react-native-fast-image';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../src/app/constants/icon_cdn';
+import { useFriendsBlock } from '../../../../../../../src/app/hooks/useFriendsBlock';
 import MezonConfirm from '../../../../../componentUI/MezonConfirm';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps, reserve } from '../../../../../componentUI/MezonMenu';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
@@ -44,6 +48,16 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
 	const currentClan = useSelector(selectCurrentClan);
+	const { userProfile } = useAuth();
+	const infoFriend = useAppSelector((state) => selectFriendById(state, messageInfo?.user_id?.[0] || ''));
+	const didIBlockUser = useMemo(() => {
+		return (
+			infoFriend?.state === EStateFriend.BLOCK &&
+			infoFriend?.source_id === userProfile?.user?.id &&
+			infoFriend?.user?.id === messageInfo?.user_id?.[0]
+		);
+	}, [infoFriend, userProfile?.user?.id, messageInfo?.user_id?.[0]]);
+	const { onBlockFriend, onUnblockFriend } = useFriendsBlock();
 
 	const dismiss = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -102,6 +116,20 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		}
 	];
 
+	const handleBlockFriend = async () => {
+		if (messageInfo?.user_id?.[0]) {
+			await onBlockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		}
+		dismiss();
+	};
+
+	const handleUnblockFriend = async () => {
+		if (messageInfo?.user_id?.[0]) {
+			await onUnblockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		}
+		dismiss();
+	};
+
 	const profileMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: async () => {
@@ -111,6 +139,16 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			title: t('menu.closeDm'),
 			isShow: !isGroup,
 			icon: <MezonIconCDN icon={IconCDN.userMinusIcon} color={baseColor.gray} />
+		},
+		{
+			onPress: didIBlockUser ? handleUnblockFriend : handleBlockFriend,
+			title: didIBlockUser ? t('menu.unblockUser') : t('menu.blockUser'),
+			isShow: !isGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser),
+			icon: didIBlockUser ? (
+				<MezonIconCDN icon={IconCDN.unblockUser} color={baseColor.gray} />
+			) : (
+				<MezonIconCDN icon={IconCDN.blockUser} color={baseColor.gray} />
+			)
 		}
 	];
 

@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { RootState, selectCurrentUserId } from '@mezon/store';
+import { selectCurrentUserId } from '@mezon/store';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Friend } from 'mezon-js';
@@ -235,7 +235,7 @@ export const selectBlockedUsers = createSelector([selectAllFriends, selectCurren
 export const selectBlockedUsersForMessage = createSelector([selectAllFriends], (friends) =>
 	friends.filter((friend) => friend?.state === EStateFriend.BLOCK)
 );
-export const selectFriendById = createSelector([selectAllFriends, (state: RootState, userId: string) => userId], (friends, userId) => {
+export const selectFriendById = createSelector([selectAllFriends, (state, userId: string) => userId], (friends, userId) => {
 	const friendAsTarget = friends.find((friend) => friend?.user?.id === userId);
 	if (friendAsTarget) return friendAsTarget;
 

@@ -86,6 +86,7 @@
     },
     "newMessages": "NEW MESSAGES",
     "noSendMessagePermission": "You don't have permission to send message",
+    "blockedUserMessage": "You can't reply to this conversation",
     "messageInputPlaceHolder": "Write message...",
     "shareLocationModal": {
       "sendThisLocation": "Send this location to",
