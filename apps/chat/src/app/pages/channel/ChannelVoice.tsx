@@ -145,7 +145,7 @@ const ChannelVoice = memo(
 							isCurrentChannel={isShow}
 						/>
 
-					<LiveKitRoom
+						<LiveKitRoom
 							ref={containerRef}
 								id="livekitRoom11"
 							key={token}
