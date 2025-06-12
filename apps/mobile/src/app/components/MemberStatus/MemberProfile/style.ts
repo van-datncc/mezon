@@ -28,7 +28,6 @@ export const style = (colors: Attributes) =>
 
 		nameContainer: {
 			flexDirection: 'row',
-			alignItems: 'center',
 			gap: size.s_6,
 			flexGrow: 1,
 			paddingVertical: size.s_16,
