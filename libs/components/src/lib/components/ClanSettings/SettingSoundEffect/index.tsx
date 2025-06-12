@@ -1,6 +1,19 @@
+import {
+    MediaType,
+    selectAudioByClanId,
+    selectCurrentClanId,
+    soundEffectActions,
+    useAppDispatch
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { useState } from 'react';
+import { ClanSticker } from 'mezon-js';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ModalUploadSound from './ModalUploadSound';
+
+interface ExtendedClanSticker extends ClanSticker {
+    media_type?: MediaType;
+}
 
 export type SoundType = {
     id: string;
@@ -8,13 +21,49 @@ export type SoundType = {
     url: string;
 };
 
+
+const isAudioFile = (url: string): boolean => {
+    const lowerUrl = url.toLowerCase();
+    return lowerUrl.endsWith('.mp3') || lowerUrl.endsWith('.wav') || lowerUrl.endsWith('.mpeg');
+}
+
 const SettingSoundEffect = () => {
     const [showModal, setShowModal] = useState(false);
-    const [soundList, setSoundList] = useState<SoundType[]>([]);
+    const dispatch = useAppDispatch();
+    const currentClanId = useSelector(selectCurrentClanId) || '';
+
+
+    const sounds = useSelector(selectAudioByClanId(currentClanId));
+
+
+    const soundList: SoundType[] = sounds.map(sound => ({
+        id: sound.id || '',
+        name: sound.shortname || '',
+        url: sound.source || '',
+    }));
+
+    useEffect(() => {
+        dispatch(soundEffectActions.fetchSoundByUserId({ noCache: false }));
+    }, [dispatch, currentClanId]);
 
     const handleUploadSuccess = (newSound: SoundType) => {
-        setSoundList((prev) => [...prev, newSound]);
         setShowModal(false);
+
+        dispatch(soundEffectActions.fetchSoundByUserId({ noCache: true }));
+    };
+
+    const handleDeleteSound = async (soundId: string, soundName: string) => {
+        try {
+            await dispatch(soundEffectActions.deleteSound({
+                soundId: soundId,
+                clan_id: currentClanId,
+                soundLabel: soundName
+            }));
+
+            dispatch(soundEffectActions.fetchSoundByUserId({ noCache: true }));
+        } catch (error) {
+            console.error("Error deleting sound:", error);
+        }
     };
 
     return (
@@ -56,7 +105,10 @@ const SettingSoundEffect = () => {
                         <div key={sound.id} className="flex flex-col w-full p-4 border rounded-lg bg-white dark:bg-bgSecondary shadow-sm hover:shadow-md transition duration-200 dark:border-borderDivider border-gray-200">
                             <div className="flex items-center justify-between mb-3">
                                 <p className="font-semibold truncate w-full text-center dark:text-textPrimary text-textLightTheme">{sound.name}</p>
-                                <button className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10">
+                                <button
+                                    className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10"
+                                    onClick={() => handleDeleteSound(sound.id, sound.name)}
+                                >
                                     <Icons.CircleClose className="w-4 h-4" />
                                 </button>
                             </div>

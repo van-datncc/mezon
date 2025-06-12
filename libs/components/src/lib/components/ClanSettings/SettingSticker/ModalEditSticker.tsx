@@ -89,8 +89,14 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				shortname: editingGraphic.shortname,
 				clan_id: currentClanId || ''
 			};
+
+			const requestData = {
+				...updateData,
+				media_type: 0
+			};
+
 			isSticker
-				? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData }))
+				? await dispatch(updateSticker({ stickerId: graphic.id, request: requestData }))
 				: await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: updateData, emojiId: graphic.id }));
 			handleCloseModal();
 			return;
@@ -133,8 +139,14 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				shortname: editingGraphic.shortname,
 				source: attachment.url
 			};
+
+			const requestData = {
+				...request,
+				media_type: 0
+			};
+
 			isSticker
-				? dispatch(createSticker({ request: request, clanId: currentClanId }))
+				? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
 				: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
 		});
 

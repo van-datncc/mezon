@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
+import { MediaType, referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectCurrentClanId, selectDataReferences, soundEffectActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { MessageAudio } from '../MessageWithUser/MessageAudio/MessageAudio';
 
 type ChannelMessageBoxProps = {
@@ -39,7 +38,7 @@ const searchSounds = (sounds: ExtendedApiMessageAttachment[], searchTerm: string
 	return sounds.filter((item) => item?.filename?.toLowerCase().includes(lowerCaseSearchTerm));
 };
 
-const sounds = [
+const systemSounds = [
 	{
 		clan_name: 'SYSTEM SOUNDS',
 		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
@@ -227,7 +226,7 @@ const sounds = [
 ];
 
 function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,
 		mode,
@@ -237,12 +236,42 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 	const dataReferences = useAppSelector((state) => selectDataReferences(state, currentId ?? ''));
 	const isReplyAction = dataReferences.message_ref_id && dataReferences.message_ref_id !== '';
 	const { valueInputToCheckHandleSearch, subPanelActive, setSubPanelActive } = useGifsStickersEmoji();
+
+	const currentClanId = useAppSelector(selectCurrentClanId) || '';
+
+	// Lấy tất cả stickers/sounds từ Redux store
+	const allStickersInStore = useAppSelector(selectAllStickerSuggestion);
+	// Lọc ra các sound (có media_type = 1)
+	const allSoundsInStore = allStickersInStore.filter(sticker => (sticker as any).media_type === MediaType.AUDIO);
+
+	// Tải tất cả sound effects khi component mount
+	useEffect(() => {
+		dispatch(soundEffectActions.fetchSoundByUserId({ noCache: false }));
+	}, [dispatch]);
+
+	const userSounds = useMemo(() => {
+		return allSoundsInStore.map(sound => ({
+			clan_name: sound.clan_name || 'MY SOUNDS',
+			logo: sound.logo || '',
+			clan_id: sound.clan_id || '',
+			id: sound.id || '',
+			filename: sound.shortname || 'sound.mp3',
+			size: 100000,
+			url: sound.source || '',
+			filetype: 'audio/mpeg'
+		}));
+	}, [allSoundsInStore]);
+
+	const allSounds = useMemo(() => {
+		return [...systemSounds, ...userSounds];
+	}, [userSounds]);
+
 	const [searchedSounds, setSearchSounds] = useState<ExtendedApiMessageAttachment[]>([]);
 
 	useEffect(() => {
-		const result = searchSounds(sounds, valueInputToCheckHandleSearch ?? '');
+		const result = searchSounds(allSounds, valueInputToCheckHandleSearch ?? '');
 		setSearchSounds(result);
-	}, [valueInputToCheckHandleSearch, subPanelActive, sounds]);
+	}, [valueInputToCheckHandleSearch, subPanelActive, allSounds]);
 
 	const handleSend = useCallback(
 		(
@@ -258,17 +287,17 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 
 	// get list clan logo to show on leftside
 	const categoryLogo = useMemo(() => {
-		return sounds
+		return allSounds
 			.map((sound) => ({
 				id: sound.clan_id,
 				type: sound.clan_name,
 				url: sound.logo
 			}))
 			.filter((sound, index, self) => index === self.findIndex((s) => s.id === sound.id));
-	}, [sounds]);
+	}, [allSounds]);
 
 	const [selectedType, setSelectedType] = useState('');
-	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({}); 
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const modalRef = useRef<HTMLDivElement>(null);
@@ -348,7 +377,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 							<div ref={(el) => (categoryRefs.current[avt.type || ''] = el)} key={avt.id}>
 								<CategorizedSounds
 									valueInputToCheckHandleSearch={valueInputToCheckHandleSearch}
-									soundList={sounds}
+									soundList={allSounds}
 									onClickSendSound={onClickSendSound}
 									categoryName={avt.type || ''}
 									key={avt.id}
