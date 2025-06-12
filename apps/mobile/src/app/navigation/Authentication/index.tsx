@@ -20,6 +20,7 @@ import ChannelAppScreen from '../../screens/home/homedrawer/ChannelApp';
 import ChannelMessageListener from '../../screens/home/homedrawer/ChannelMessageListener';
 import ChannelMessageReactionListener from '../../screens/home/homedrawer/ChannelMessageReactionListener';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
+import ChannelRouterListener from '../../screens/home/homedrawer/components/ChannelList/ChannelRouterListener';
 import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
 import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
@@ -275,6 +276,7 @@ export const Authentication = memo(() => {
 				<ChannelMessageListener />
 				<ChannelMessageReactionListener />
 				<AuthenticationLoader />
+				<ChannelRouterListener />
 			</ColorRoleProvider>
 		</BottomSheetModalProvider>
 	);

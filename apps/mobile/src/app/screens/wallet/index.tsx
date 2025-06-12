@@ -1,5 +1,8 @@
 import { Icons } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { accountActions } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, Dimensions, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
@@ -84,6 +87,13 @@ export const WalletScreen = React.memo(({ navigation, route }: any) => {
 	const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
 	const overlayOpacity = useRef(new Animated.Value(0)).current;
 	const [activeScreen, setActiveScreen] = useState(route?.params?.activeScreen || 'transfer');
+	const dispatch = useAppDispatch();
+
+	useFocusEffect(
+		useCallback(() => {
+			dispatch(accountActions.getUserProfile({ noCache: true }));
+		}, [dispatch])
+	);
 
 	const openDrawer = () => {
 		setIsDrawerOpen(true);

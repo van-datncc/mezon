@@ -286,7 +286,15 @@ const renderChannelIcon = (channelType: number, channelId: string, themeValue: A
 	return null;
 };
 
-const renderTextPalainContain = (themeValue: Attributes, text: string, lastIndex: number, isLastText = false) => {
+const renderTextPalainContain = (
+	themeValue: Attributes,
+	text: string,
+	lastIndex: number,
+	isUnReadChannel: boolean,
+	isLastMessage: boolean,
+	isBuzzMessage: boolean,
+	isLastText = false
+) => {
 	const lines = text?.split('\n');
 	const headingFormattedLines = [];
 	let hasHeadings = false;
@@ -333,7 +341,10 @@ const renderTextPalainContain = (themeValue: Attributes, text: string, lastIndex
 
 	if (!hasHeadings) {
 		return (
-			<Text key={`text-end_${lastIndex}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+			<Text
+				key={`text-end_${lastIndex}`}
+				style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}
+			>
 				{text}
 			</Text>
 		);
@@ -384,7 +395,7 @@ export const RenderTextMarkdownContent = ({
 		const contentInElement = t?.substring(s, e);
 
 		if (lastIndex < s) {
-			textParts.push(renderTextPalainContain(themeValue, t?.slice(lastIndex, s) ?? '', index));
+			textParts.push(renderTextPalainContain(themeValue, t?.slice(lastIndex, s) ?? '', index, isUnReadChannel, isLastMessage, isBuzzMessage));
 		}
 
 		switch (element?.kindOf) {
@@ -670,7 +681,17 @@ export const RenderTextMarkdownContent = ({
 	});
 
 	if (lastIndex < (t?.length ?? 0)) {
-		textParts.push(renderTextPalainContain(themeValue, t?.slice(lastIndex).replace(/^\n|\n$/, ''), lastIndex, true));
+		textParts.push(
+			renderTextPalainContain(
+				themeValue,
+				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
+				lastIndex,
+				isUnReadChannel,
+				isLastMessage,
+				isBuzzMessage,
+				true
+			)
+		);
 	}
 
 	return (
