@@ -1814,7 +1814,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		const channels = selectChannelThreads(store.getState() as RootState);
 		if (!markAsReadEvent.category_id) {
-			console.log('Mark Clan');
+			const channelIds = channels.map((item) => item.id);
+			dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
+			dispatch(
+				channelsActions.resetChannelsCount({
+					clanId: markAsReadEvent.clan_id,
+					channelIds
+				})
+			);
+			dispatch(clansActions.updateClanBadgeCount({ clanId: markAsReadEvent.clan_id ?? '', count: 0, isReset: true }));
+			dispatch(
+				listChannelRenderAction.handleMarkAsReadListRender({
+					type: EMarkAsReadType.CLAN,
+					clanId: markAsReadEvent.clan_id
+				})
+			);
+			dispatch(listChannelsByUserActions.markAsReadChannel(channelIds));
 			return;
 		}
 		if (!markAsReadEvent.channel_id) {
