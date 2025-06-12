@@ -2,12 +2,11 @@ import { useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, load, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
-	MessagesEntity,
 	appActions,
-	channelsActions,
 	clansActions,
 	directActions,
 	directMetaActions,
+	getStore,
 	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
@@ -15,9 +14,7 @@ import {
 	selectLastMessageByChannelId,
 	selectLastSeenMessageStateByChannelId,
 	selectMemberClanByUserId2,
-	selectPreviousChannels,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -32,65 +29,38 @@ import { style } from './styles';
 
 function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const dispatch = useAppDispatch();
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
-	const mounted = useRef('');
-
-	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
-		dispatch(directActions.setActiveDirect({ directId: channelId }));
-	};
-
-	const previousChannels = useSelector(selectPreviousChannels);
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
-		if (!lastMessage) return;
-		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (!lastMessageState) {
-			markAsReadSeen(lastMessage, mode, 0);
-			return;
-		}
-
-		if (
-			lastMessage?.create_time_seconds &&
-			lastMessageState?.timestamp_seconds &&
-			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
-		) {
-			markAsReadSeen(lastMessage, mode, 0);
-		}
-	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
-	useEffect(() => {
-		if (previousChannels.at(1)) {
-			const timestamp = Date.now() / 1000;
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: previousChannels.at(1)?.clanId || '',
-					channelId: previousChannels.at(1)?.channelId || '',
-					count: 0,
-					isReset: true
-				})
-			);
-			dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
-		}
-	}, [previousChannels]);
-	useEffect(() => {
-		if (lastMessage) {
+		const store = getStore();
+		const lastMessage = selectLastMessageByChannelId(store.getState(), channelId);
+		const lastMessageState = selectLastSeenMessageStateByChannelId(store.getState(), channelId as string);
+		const handleMarkAsReadSeen = () => {
+			if (!lastMessage) return;
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			updateChannelSeenState(channelId, lastMessage);
-		}
-	}, []);
+			const mode =
+				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+			if (!lastMessageState) {
+				markAsReadSeen(lastMessage, mode, 0);
+				return;
+			}
 
-	useEffect(() => {
-		if (mounted.current === channelId) {
-			return;
-		}
-		if (lastMessage) {
-			mounted.current = channelId;
-			updateChannelSeenState(channelId, lastMessage);
-		}
-	}, [dispatch, channelId, lastMessage]);
+			if (
+				lastMessage?.create_time_seconds &&
+				lastMessageState?.timestamp_seconds &&
+				lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
+			) {
+				markAsReadSeen(lastMessage, mode, 0);
+			}
+		};
+
+		handleMarkAsReadSeen();
+
+		return () => {
+			if (lastMessage) {
+				handleMarkAsReadSeen();
+			}
+		};
+	}, [channelId, currentDmGroup?.type, dispatch, markAsReadSeen]);
 }
 
 export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {
