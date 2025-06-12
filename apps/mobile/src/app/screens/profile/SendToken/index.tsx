@@ -62,7 +62,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 	const [plainTokenCount, setPlainTokenCount] = useState(jsonObject?.amount || 0);
 	const userProfile = useSelector(selectAllAccount);
 	const BottomSheetRef = useRef<BottomSheetModal>(null);
-	const [selectedUser, setSelectedUser] = useState<Receiver>(null);
+	const [selectedUser, setSelectedUser] = useState<Receiver | null>(null);
 	const [searchText, setSearchText] = useState<string>('');
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -139,7 +139,15 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 	}, [friendList, listDM, userProfile?.user?.id]);
 
 	const directMessageId = useMemo(() => {
-		const directMessage = listDM?.find?.((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === (jsonObject?.receiver_id || selectedUser?.id));
+		const directMessage = listDM?.find?.((dm) => {
+			const userIds = dm?.user_id;
+			if (!Array.isArray(userIds) || userIds.length !== 1) {
+				return false;
+			}
+			const firstUserId = userIds[0];
+			const targetId = jsonObject?.receiver_id || selectedUser?.id;
+			return firstUserId === targetId;
+		});
 		return directMessage?.id;
 	}, [jsonObject?.receiver_id, listDM, selectedUser?.id]);
 
@@ -259,7 +267,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 		);
 	}, [mergeUser, searchText]);
 
-	const renderItem = ({ item }) => {
+	const renderItem = ({ item }: { item: Receiver }) => {
 		return (
 			<Pressable key={`token_receiver_${item.id}`} style={styles.userItem} onPress={() => handleSelectUser(item)}>
 				<MezonAvatar avatarUrl={item?.avatar_url} username={item?.username} height={size.s_34} width={size.s_34} />

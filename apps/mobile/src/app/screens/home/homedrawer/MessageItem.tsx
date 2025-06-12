@@ -144,10 +144,11 @@ const MessageItem = React.memo(
 				? message?.clan_avatar || message?.avatar
 				: message?.avatar;
 
+		const firstAttachment = Array.isArray(message?.attachments) && message.attachments.length > 0 ? message.attachments[0] : null;
 		const checkOneLinkImage =
 			message?.attachments?.length === 1 &&
-			message?.attachments[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-			message?.attachments[0].url === message?.content?.t?.trim();
+			firstAttachment?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+			firstAttachment?.url === message?.content?.t?.trim();
 
 		const isOnlyContainEmoji = isValidEmojiData(message.content);
 

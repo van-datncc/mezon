@@ -218,12 +218,22 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 				};
 
 				websocket.onmessage = (event) => {
-					const data = JSON.parse(event.data);
+					try {
+						if (!event?.data || typeof event.data !== 'string') {
+							console.error('Invalid websocket event data');
+							return;
+						}
 
-					if ('Key' in data) {
+						const data = JSON.parse(event.data);
+
+						if (!data || typeof data !== 'object' || !('Key' in data)) {
+							console.error('Invalid websocket message format');
+							return;
+						}
+
 						switch (data.Key) {
 							case 'channels':
-								if (data.Value.includes(streamId)) {
+								if (Array.isArray(data.Value) && data.Value.includes(streamId)) {
 									websocket.send(
 										JSON.stringify({
 											Key: 'connect_subscriber',
@@ -241,16 +251,25 @@ export const WebRTCStreamProvider: React.FC<WebRTCProviderProps> = ({ children }
 							case 'session_received':
 								break;
 							case 'error':
+								console.error('WebSocket error:', data.Value);
 								break;
 							case 'sd_answer':
-								startSession(data.Value);
+								if (data.Value && typeof data.Value === 'string') {
+									startSession(data.Value);
+								}
 								break;
 							case 'ice_candidate':
-								pcRef.current?.addIceCandidate(data.Value);
+								if (data.Value && pcRef.current) {
+									pcRef.current.addIceCandidate(data.Value).catch((error) => {
+										console.error('Error adding ICE candidate:', error);
+									});
+								}
 								break;
 							default:
 								console.log('Unhandled message:', data);
 						}
+					} catch (error) {
+						console.error('Error parsing websocket message:', error, event.data);
 					}
 				};
 

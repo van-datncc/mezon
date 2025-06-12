@@ -26,7 +26,7 @@ import { PERMISSIONS, requestMultiple, RESULTS } from 'react-native-permissions'
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 
-// Type definitions
+// Type definitions and validation helpers
 interface VoIPManagerType {
 	registerForVoIPPushes(): Promise<string>;
 	getVoIPToken(): Promise<string>;
@@ -34,18 +34,39 @@ interface VoIPManagerType {
 	endCall(callId: string): Promise<string>;
 }
 
+// Safe validation helpers
+const isValidString = (value: unknown): value is string => {
+	return typeof value === 'string' && value.trim().length > 0;
+};
+
+const isValidObject = (value: unknown): value is Record<string, unknown> => {
+	return value !== null && typeof value === 'object';
+};
+
+const validateNotificationData = (data: Record<string, unknown> | undefined): data is Record<string, string | object> => {
+	return isValidObject(data) && Object.keys(data).length > 0;
+};
+
+const safeGetChannelFromData = (data: Record<string, unknown>): string | null => {
+	const channel = data?.channel;
+	return isValidString(channel) ? channel : null;
+};
+
 export const checkNotificationPermission = async () => {
-	if (Platform.OS === 'ios') await notifee.requestPermission();
+	try {
+		if (Platform.OS === 'ios') await notifee.requestPermission();
 
-	if (Platform.OS === 'android' && Platform.Version >= 33) {
-		await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-	} else {
-		const authorizationStatus = await messaging().hasPermission();
+		if (Platform.OS === 'android' && Platform.Version >= 33) {
+			await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+		} else {
+			const authorizationStatus = await messaging().hasPermission();
 
-		if (authorizationStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
-			// Permission has not been requested yet
-			await requestNotificationPermission();
+			if (authorizationStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
+				await requestNotificationPermission();
+			}
 		}
+	} catch (error) {
+		console.error('Error checking notification permission:', error);
 	}
 };
 
@@ -56,7 +77,6 @@ const requestNotificationPermission = async () => {
 			sound: true,
 			badge: true
 		});
-		// Alert.alert('Notification Permission', 'Notifications have been enabled.');
 	} catch (error) {
 		Alert.alert('Notification Permission', 'Notification permission denied.', [
 			{
@@ -74,21 +94,25 @@ const requestNotificationPermission = async () => {
 };
 
 const openAppSettings = () => {
-	if (Platform.OS === 'ios') {
-		Linking.openURL('app-settings:');
-	} else {
-		Linking.openSettings();
+	try {
+		if (Platform.OS === 'ios') {
+			Linking.openURL('app-settings:');
+		} else {
+			Linking.openSettings();
+		}
+	} catch (error) {
+		console.error('Error opening app settings:', error);
 	}
 };
 
-const getConfigDisplayNotificationAndroid = async (data: { [key: string]: string | object }) => {
+const getConfigDisplayNotificationAndroid = async (data: Record<string, string | object>): Promise<NotificationAndroid> => {
 	const defaultConfig: NotificationAndroid = {
 		visibility: AndroidVisibility.PUBLIC,
 		channelId: 'default',
 		smallIcon: 'ic_notification',
 		color: '#000000',
 		sound: 'default',
-		largeIcon: data?.image,
+		largeIcon: isValidString(data?.image) ? (data.image as string) : undefined,
 		smallIconLevel: 10,
 		importance: AndroidImportance.HIGH,
 		showTimestamp: true,
@@ -99,55 +123,79 @@ const getConfigDisplayNotificationAndroid = async (data: { [key: string]: string
 		}
 	};
 
-	if (!data?.channel) {
+	const channel = safeGetChannelFromData(data);
+	if (!channel) {
 		return defaultConfig;
 	}
 
-	const channelGroup = await getOrCreateChannelGroup(data.channel as string);
-	const channelId = await createNotificationChannel(data.channel as string, channelGroup?.groupId);
+	try {
+		const channelGroup = await getOrCreateChannelGroup(channel);
+		const channelId = await createNotificationChannel(channel, channelGroup?.groupId);
 
-	return {
-		...defaultConfig,
-		channelId,
-		tag: channelId,
-		sortKey: channelId,
-		category: AndroidCategory.MESSAGE,
-		groupId: channelGroup?.groupId,
-		groupSummary: channelGroup?.isGroupSummary
-	};
+		return {
+			...defaultConfig,
+			channelId,
+			tag: channelId,
+			sortKey: channelId,
+			category: AndroidCategory.MESSAGE,
+			groupId: channelGroup?.groupId,
+			groupSummary: channelGroup?.isGroupSummary
+		};
+	} catch (error) {
+		console.error('Error configuring Android notification:', error);
+		return defaultConfig;
+	}
 };
 
-const getOrCreateChannelGroup = async (channelId: string): Promise<any> => {
-	let groupId = '';
-	const group = await notifee.getChannelGroup(channelId);
-	const notifications = await notifee.getDisplayedNotifications();
-	const existInNotification = notifications?.some?.((item) => item?.notification?.android?.groupId === channelId);
-	if (group) {
-		groupId = group?.id;
-	}
-	groupId = await notifee.createChannelGroup({
-		id: channelId,
-		name: channelId
-	});
+const getOrCreateChannelGroup = async (channelId: string): Promise<{ groupId: string; isGroupSummary: boolean } | null> => {
+	try {
+		if (!isValidString(channelId)) return null;
 
-	return {
-		groupId,
-		isGroupSummary: group === null || !existInNotification
-	};
+		let groupId = '';
+		const group = await notifee.getChannelGroup(channelId);
+		const notifications = await notifee.getDisplayedNotifications();
+		const existInNotification = notifications?.some?.((item) => item?.notification?.android?.groupId === channelId);
+
+		if (group?.id) {
+			groupId = group.id;
+		} else {
+			groupId = await notifee.createChannelGroup({
+				id: channelId,
+				name: channelId
+			});
+		}
+
+		return {
+			groupId,
+			isGroupSummary: group === null || !existInNotification
+		};
+	} catch (error) {
+		console.error('Error creating channel group:', error);
+		return null;
+	}
 };
 
 const createNotificationChannel = async (channelId: string, groupId: string): Promise<string> => {
-	return await notifee.createChannel({
-		id: channelId,
-		name: channelId,
-		groupId,
-		importance: AndroidImportance.HIGH,
-		sound: 'default',
-		visibility: AndroidVisibility.PUBLIC
-	});
+	try {
+		if (!isValidString(channelId) || !isValidString(groupId)) {
+			throw new Error('Invalid channel or group ID');
+		}
+
+		return await notifee.createChannel({
+			id: channelId,
+			name: channelId,
+			groupId,
+			importance: AndroidImportance.HIGH,
+			sound: 'default',
+			visibility: AndroidVisibility.PUBLIC
+		});
+	} catch (error) {
+		console.error('Error creating notification channel:', error);
+		return 'default';
+	}
 };
 
-const getConfigDisplayNotificationIOS = async (data: { [key: string]: string | object }) => {
+const getConfigDisplayNotificationIOS = async (data: Record<string, string | object>): Promise<NotificationIOS> => {
 	const defaultConfig: NotificationIOS = {
 		critical: true,
 		criticalVolume: 1.0,
@@ -160,77 +208,112 @@ const getConfigDisplayNotificationIOS = async (data: { [key: string]: string | o
 		}
 	};
 
+	const channel = safeGetChannelFromData(data);
 	return {
 		...defaultConfig,
-		threadId: (data?.channel as string) || undefined
+		threadId: channel || undefined
 	};
 };
 
-export const createLocalNotification = async (title: string, body: string, data: { [key: string]: string | object }) => {
+export const createLocalNotification = async (title: string, body: string, data: Record<string, string | object>) => {
 	try {
+		// Input validation
+		if (!isValidString(title) || !isValidString(body)) {
+			console.error('Invalid notification title or body');
+			return;
+		}
+
+		if (!validateNotificationData(data)) {
+			console.error('Invalid notification data');
+			return;
+		}
+
 		const myUserId = load(STORAGE_MY_USER_ID);
-		if (['video call', 'audio call', 'Untitled message'].some((text) => body?.includes?.(text)) || myUserId === data?.sender) return;
+		const excludedMessages = ['video call', 'audio call', 'Untitled message'];
+
+		// Skip if it's a call message or from the current user
+		if (excludedMessages.some((text) => body.includes(text)) || myUserId === data?.sender) {
+			return;
+		}
+
 		const configDisplayNotificationAndroid: NotificationAndroid =
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
-		const configDisplayNotificationIOS: NotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
+		const configDisplayNotificationIOS: NotificationIOS =
+			Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
+
 		await notifee.displayNotification({
-			title: title || '',
-			body: body,
-			subtitle: (data?.subtitle as string) || '',
+			title: title.trim(),
+			body: body.trim(),
+			subtitle: isValidString(data?.subtitle) ? data.subtitle as string : '',
 			data: data,
 			android: configDisplayNotificationAndroid,
 			ios: configDisplayNotificationIOS
 		});
 	} catch (err) {
-		console.error('log  => err', err);
-		/* empty */
+		console.error('Error creating local notification:', err);
 	}
 };
 
-export const handleFCMToken = async () => {
-	const authStatus = await messaging().requestPermission({
-		alert: true,
-		sound: true,
-		badge: true
-	});
+export const handleFCMToken = async (): Promise<string | undefined> => {
+	try {
+		const authStatus = await messaging().requestPermission({
+			alert: true,
+			sound: true,
+			badge: true
+		});
 
-	const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED || messaging.AuthorizationStatus.PROVISIONAL;
-	// Todo: update later
-	// if (Platform.OS === 'ios') VoipPushNotification.registerVoipToken();
+		const enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+			authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-	if (enabled) {
-		const fcmtoken = await messaging().getToken();
-		if (fcmtoken) {
-			try {
+		if (enabled) {
+			const fcmtoken = await messaging().getToken();
+			if (isValidString(fcmtoken)) {
 				return fcmtoken;
-			} catch (error) {
-				/* empty */
 			}
 		}
+	} catch (error) {
+		console.error('Error handling FCM token:', error);
 	}
+	return undefined;
 };
 
-export const isShowNotification = (currentChannelId, currentDmId, remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
-	if (!remoteMessage?.data) {
-		return false;
-	}
+export const isShowNotification = (
+	currentChannelId: string | undefined,
+	currentDmId: string | undefined,
+	remoteMessage: FirebaseMessagingTypes.RemoteMessage
+): boolean => {
+	try {
+		if (!validateNotificationData(remoteMessage?.data)) {
+			return false;
+		}
 
-	const link = remoteMessage?.data?.link as string;
-	const directMessageId = link?.match?.(clanDirectMessageLinkRegex)?.[1] || '';
-	const channelMessageId = link?.match?.(clanAndChannelIdLinkRegex)?.[2] || '';
+		const link = remoteMessage.data?.link;
+		if (!isValidString(link)) {
+			return false;
+		}
 
-	const areOnChannel = currentChannelId === channelMessageId;
-	const areOnDirectMessage = currentDmId === directMessageId;
+		const directMessageMatch = link.match(clanDirectMessageLinkRegex);
+		const channelMessageMatch = link.match(clanAndChannelIdLinkRegex);
 
-	if (areOnChannel && currentDmId) {
+		const directMessageId = directMessageMatch?.[1] || '';
+		const channelMessageId = channelMessageMatch?.[2] || '';
+
+		const areOnChannel = currentChannelId === channelMessageId;
+		const areOnDirectMessage = currentDmId === directMessageId;
+
+		if (areOnChannel && currentDmId) {
+			return true;
+		}
+
+		if ((channelMessageId && areOnChannel) || (directMessageId && areOnDirectMessage)) {
+			return false;
+		}
+
 		return true;
-	}
-
-	if ((channelMessageId && areOnChannel) || (directMessageId && areOnDirectMessage)) {
+	} catch (error) {
+		console.error('Error checking notification visibility:', error);
 		return false;
 	}
-
-	return true;
 };
 
 export const navigateToNotification = async (store: any, notification: any, navigation: any, isTabletLandscape = false, time?: number) => {

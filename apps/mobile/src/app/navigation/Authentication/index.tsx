@@ -37,6 +37,7 @@ import { MessagesStacks } from './stacks/MessagesStacks';
 import { NotificationStacks } from './stacks/NotificationStacks';
 import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
+import ChannelRouterListener from "../../screens/home/homedrawer/components/ChannelList/ChannelRouterListener";
 const RootStack = createStackNavigator();
 
 export const Authentication = memo(() => {
@@ -275,6 +276,7 @@ export const Authentication = memo(() => {
 				<ChannelMessageListener />
 				<ChannelMessageReactionListener />
 				<AuthenticationLoader />
+				<ChannelRouterListener />
 			</ColorRoleProvider>
 		</BottomSheetModalProvider>
 	);
