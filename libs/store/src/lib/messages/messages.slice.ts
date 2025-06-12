@@ -41,6 +41,7 @@ import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../
 import { memoizeAndTrack } from '../memoize';
 import { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
+import { referencesActions, selectDataReferences } from './references.slice';
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -757,6 +758,13 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 	const channelId = message.channel_id;
 	const isViewingOlderMessages = getMessagesState(getMessagesRootState(thunkAPI))?.isViewingOlderMessagesByChannelId?.[channelId];
 	const isBottom = !selectShowScrollDownButton(state, channelId);
+
+	if (message.code === TypeMessage.ChatRemove) {
+		const replyData = selectDataReferences(state, channelId);
+		if (replyData && replyData.message_ref_id === message.id) {
+			thunkAPI.dispatch(referencesActions.resetAfterReply(message.channel_id));
+		}
+	}
 
 	if (isViewingOlderMessages) {
 		thunkAPI.dispatch(messagesActions.setLastMessage(message));
