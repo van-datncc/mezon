@@ -301,7 +301,7 @@ const renderTextPalainContain = (
 
 	if (!lines?.length) {
 		return (
-			<Text key={`text-end_${lastIndex}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+			<Text key={`text-end_${lastIndex}_${text}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
 				{text}
 			</Text>
 		);
@@ -316,14 +316,14 @@ const renderTextPalainContain = (
 
 			if (headingLevel) {
 				headingFormattedLines.push(
-					<Text key={`line-${idx}`} style={[themeValue ? markdownStyles(themeValue)?.[`heading${headingLevel}`] : {}]}>
+					<Text key={`line-${idx}_${headingText}`} style={[themeValue ? markdownStyles(themeValue)?.[`heading${headingLevel}`] : {}]}>
 						{headingText}
 						{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
 					</Text>
 				);
 			} else {
 				headingFormattedLines.push(
-					<Text key={`line-${idx}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+					<Text key={`line-${idx}_${line}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
 						{line}
 						{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
 					</Text>
@@ -331,7 +331,7 @@ const renderTextPalainContain = (
 			}
 		} else {
 			headingFormattedLines.push(
-				<Text key={`line-${idx}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+				<Text key={`line-${idx}_${line}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
 					{line}
 					{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
 				</Text>
@@ -342,7 +342,7 @@ const renderTextPalainContain = (
 	if (!hasHeadings) {
 		return (
 			<Text
-				key={`text-end_${lastIndex}`}
+				key={`text-end_${lastIndex}_${text}`}
 				style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}
 			>
 				{text}
@@ -516,7 +516,7 @@ export const RenderTextMarkdownContent = ({
 					case EBacktickType.PRE:
 					case EBacktickType.TRIPLE: {
 						textParts.push(
-							<Text>
+							<Text key={`code-triple-${index}`}>
 								{s !== 0 && '\n'}
 								<View
 									style={
@@ -722,10 +722,16 @@ export const RenderTextMarkdownContent = ({
 
 			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap', alignItems: 'flex-end' }}>
 				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-					{textParts?.length > 0 && <Text>{textParts}</Text>}
+					{textParts?.length > 0 && <Text key={`textParts${t}_${lastIndex}`}>{textParts}</Text>}
 					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 				</View>
-				<View>{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}</View>
+				<View>
+					{isEdited && (
+						<Text key={`edited-${textParts}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
+							{translate('edited')}
+						</Text>
+					)}
+				</View>
 			</View>
 		</View>
 	);

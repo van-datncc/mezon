@@ -136,7 +136,7 @@ const FriendsPage = () => {
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div
-				className={`flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader`}
+				className={`draggable-area flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader`}
 			>
 				{closeMenuMobile && (
 					<div onClick={() => setStatusMenu(true)}>

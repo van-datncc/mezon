@@ -1,5 +1,15 @@
 import { useAppNavigation, useDirect, useFriends, useMarkAsRead } from '@mezon/core';
-import { channelUsersActions, deleteChannel, directActions, directMetaActions, removeMemberChannel, useAppDispatch } from '@mezon/store';
+import {
+	channelUsersActions,
+	channelsActions,
+	deleteChannel,
+	directActions,
+	directMetaActions,
+	removeMemberChannel,
+	selectDirectById,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { ChannelType } from 'mezon-js';
 import { useCallback } from 'react';
 
@@ -8,7 +18,7 @@ interface UseMenuHandlersParams {
 	hasKeyE2ee: boolean;
 	directId: string;
 	openUserProfile: () => void;
-	isLastOne: boolean;
+	isLastOne?: boolean;
 }
 
 export function useMenuHandlers({ userProfile, hasKeyE2ee, directId }: UseMenuHandlersParams) {
@@ -17,6 +27,7 @@ export function useMenuHandlers({ userProfile, hasKeyE2ee, directId }: UseMenuHa
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromMainApp, navigate } = useAppNavigation();
 	const { handleMarkAsReadDM } = useMarkAsRead();
+	const currentDirect = useAppSelector((state) => selectDirectById(state, directId));
 
 	const handleDirectMessageWithUser = useCallback(
 		async (user?: any) => {
@@ -89,9 +100,19 @@ export function useMenuHandlers({ userProfile, hasKeyE2ee, directId }: UseMenuHa
 
 	const handleEnableE2ee = useCallback(
 		async (directId?: string, e2ee?: number) => {
-			// Commented out code - implementation placeholder
+			if (!directId || !currentDirect) return;
+
+			const updateChannel = {
+				channel_id: directId,
+				channel_label: '',
+				category_id: currentDirect.category_id,
+				app_id: currentDirect.app_id || '',
+				e2ee: !currentDirect.e2ee ? 1 : 0
+			};
+
+			await dispatch(channelsActions.updateChannel(updateChannel));
 		},
-		[hasKeyE2ee, dispatch]
+		[currentDirect, dispatch]
 	);
 
 	return {
