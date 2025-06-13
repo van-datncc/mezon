@@ -191,7 +191,9 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					{!allAccount ? (
 						<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />
 					) : (
-						<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
+						<>
+							<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
+						</>
 					)}
 				</Dropdown>
 			)}

@@ -104,11 +104,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<MezonAvatar
-								avatarUrl={
-									Array.isArray(currentChannel?.channel_avatar) && currentChannel.channel_avatar.length > 0
-										? currentChannel.channel_avatar[0]
-										: undefined
-								}
+								avatarUrl={Array.isArray(currentChannel?.channel_avatar) && currentChannel.channel_avatar.length > 0 ? currentChannel.channel_avatar[0] : undefined}
 								username={channelLabel}
 								userStatus={userStatus}
 								customStatus={status}
