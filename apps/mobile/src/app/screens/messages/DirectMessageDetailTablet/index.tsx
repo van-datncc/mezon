@@ -2,20 +2,24 @@ import { useMemberStatus, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_IS_DISABLE_LOAD_BACKGROUND, load, save } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
+	MessagesEntity,
 	appActions,
+	channelsActions,
 	clansActions,
 	directActions,
 	directMetaActions,
-	getStore,
 	getStoreAsync,
+	gifsStickerEmojiActions,
 	messagesActions,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	selectLastMessageByChannelId,
 	selectLastSeenMessageStateByChannelId,
 	selectMemberClanByUserId2,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
+import { SubPanelName } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -29,38 +33,63 @@ import { style } from './styles';
 
 function useChannelSeen(channelId: string, currentDmGroup: any) {
 	const dispatch = useAppDispatch();
+	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
+	const mounted = useRef('');
+
+	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
+		dispatch(directActions.setActiveDirect({ directId: channelId }));
+	};
+
+	useEffect(() => {
+		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
+	}, [channelId]);
 	const { markAsReadSeen } = useSeenMessagePool();
 	useEffect(() => {
-		const store = getStore();
-		const lastMessage = selectLastMessageByChannelId(store.getState(), channelId);
-		const lastMessageState = selectLastSeenMessageStateByChannelId(store.getState(), channelId as string);
-		const handleMarkAsReadSeen = () => {
-			if (!lastMessage) return;
+		if (!lastMessage) return;
+		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+		if (!lastMessageState) {
+			markAsReadSeen(lastMessage, mode, 0);
+			return;
+		}
+
+		if (
+			lastMessage?.create_time_seconds &&
+			lastMessageState?.timestamp_seconds &&
+			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
+		) {
+			markAsReadSeen(lastMessage, mode, 0);
+		}
+	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
+	useEffect(() => {
+		const timestamp = Date.now() / 1000;
+		dispatch(
+			channelsActions.updateChannelBadgeCount({
+				clanId: '',
+				channelId: channelId || '',
+				count: 0,
+				isReset: true
+			})
+		);
+		dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
+		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: channelId as string, timestamp }));
+	}, []);
+	useEffect(() => {
+		if (lastMessage) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			const mode =
-				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-			if (!lastMessageState) {
-				markAsReadSeen(lastMessage, mode, 0);
-				return;
-			}
+			updateChannelSeenState(channelId, lastMessage);
+		}
+	}, [lastMessage]);
 
-			if (
-				lastMessage?.create_time_seconds &&
-				lastMessageState?.timestamp_seconds &&
-				lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
-			) {
-				markAsReadSeen(lastMessage, mode, 0);
-			}
-		};
-
-		handleMarkAsReadSeen();
-
-		return () => {
-			if (lastMessage) {
-				handleMarkAsReadSeen();
-			}
-		};
-	}, [channelId, currentDmGroup?.type, dispatch, markAsReadSeen]);
+	useEffect(() => {
+		if (mounted.current === channelId) {
+			return;
+		}
+		if (lastMessage) {
+			mounted.current = channelId;
+			updateChannelSeenState(channelId, lastMessage);
+		}
+	}, [dispatch, channelId, lastMessage]);
 }
 
 export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId?: string }) => {
