@@ -32,13 +32,11 @@ export const useDmCallAudio = (): DmCallAudioHookReturn => {
 	const isPlayEndTone = useSelector(selectAudioEndTone);
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 
-	// Audio refs with lazy initialization
 	const dialTone = useRef<HTMLAudioElement | null>(null);
 	const ringTone = useRef<HTMLAudioElement | null>(null);
 	const endTone = useRef<HTMLAudioElement | null>(null);
 	const busyTone = useRef<HTMLAudioElement | null>(null);
 
-	// Initialize audio objects only once
 	useEffect(() => {
 		if (!dialTone.current) {
 			dialTone.current = new Audio(AUDIO_FILES.dial);
@@ -53,7 +51,6 @@ export const useDmCallAudio = (): DmCallAudioHookReturn => {
 			busyTone.current = new Audio(AUDIO_FILES.busy);
 		}
 
-		// Cleanup function
 		return () => {
 			if (dialTone.current) {
 				dialTone.current.pause();
