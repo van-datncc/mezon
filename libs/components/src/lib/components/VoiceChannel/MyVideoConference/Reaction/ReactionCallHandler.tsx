@@ -1,25 +1,27 @@
 import { useMezon } from '@mezon/transport';
 import { getSrcEmoji } from '@mezon/utils';
 import { VoiceReactionSend } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { DisplayedEmoji, ReactionCallHandlerProps } from './types';
 
 export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ currentChannel }) => {
 	const [displayedEmojis, setDisplayedEmojis] = useState<DisplayedEmoji[]>([]);
 	const { socketRef } = useMezon();
-	const lastPositionRef = useRef<number>(Math.floor(Math.random() * 40));
 
 	const generatePosition = useCallback(() => {
-		const newPosition = (lastPositionRef.current + 10 + Math.floor(Math.random() * 20)) % 40;
-		lastPositionRef.current = newPosition;
+		const horizontalOffset = (Math.random() - 0.5) * 30;
+		const baseLeft = 50;
 
-		const bottomOffset = 35 + Math.floor(Math.random() * 10);
-		const duration = 2.5 + Math.random() * 1;
+		const animationVariant = Math.floor(Math.random() * 3) + 1;
+		const animationName = `reactionFloatCurve${animationVariant}`;
+
+		const duration = 4.0 + Math.random() * 1.0;
 
 		return {
-			left: `${30 + newPosition}%`,
-			bottom: `${bottomOffset}%`,
-			duration: `${duration.toFixed(1)}s`
+			left: `${baseLeft + horizontalOffset}%`,
+			bottom: '15%',
+			duration: `${duration.toFixed(1)}s`,
+			animationName
 		};
 	}, []);
 
@@ -32,26 +34,37 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 			if (currentChannel?.channel_id === message.channel_id) {
 				try {
 					const emojis = message.emojis || [];
-					emojis.forEach((emojiId, index) => {
-						if (emojiId) {
+					const firstEmojiId = emojis[0];
+
+					if (firstEmojiId) {
+						Array.from({ length: 1 }).forEach((_, index) => {
 							const position = generatePosition();
+							const delay = index * 300;
+
+							const baseScale = 1.0 - index * 0.15;
 
 							const newEmoji = {
-								id: `${Date.now()}-${index}`,
+								id: `${Date.now()}-${firstEmojiId}-${index}-${Math.random()}`,
 								emoji: '',
-								emojiId: emojiId,
+								emojiId: firstEmojiId,
 								timestamp: Date.now(),
-								position
+								position: {
+									...position,
+									baseScale,
+									delay: `${delay}ms`
+								}
 							};
 
-							setDisplayedEmojis((prev) => [...prev, newEmoji]);
+							setTimeout(() => {
+								setDisplayedEmojis((prev) => [...prev, newEmoji]);
+							}, delay);
 
-							const durationMs = parseFloat(position.duration) * 1000 + 100;
+							const durationMs = parseFloat(position.duration) * 1000 + delay + 500;
 							setTimeout(() => {
 								setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
 							}, durationMs);
-						}
-					});
+						});
+					}
 				} catch (error) {
 					console.error(error);
 				}
@@ -77,14 +90,29 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 					className="text-5xl"
 					style={{
 						position: 'absolute',
-						bottom: item.position?.bottom || '40%',
-						left: item.position?.left || `${30 + Math.random() * 40}%`,
-						animation: `floatUp ${item.position?.duration || '3s'} ease-out forwards`,
-						opacity: 0.8,
-						height: '64px'
+						bottom: item.position?.bottom || '15%',
+						left: item.position?.left || '50%',
+						animation: `${item.position?.animationName || 'reactionFloatCurve1'} ${item.position?.duration || '4.5s'} linear forwards`,
+						animationDelay: item.position?.delay || '0ms',
+						width: '36px',
+						height: '36px',
+						transform: `scale(${item.position?.baseScale || 1})`,
+						transformOrigin: 'center center',
+						willChange: 'transform, opacity',
+						backfaceVisibility: 'hidden',
+						perspective: '1000px'
 					}}
 				>
-					<img src={getSrcEmoji(item.emojiId)} alt={''} className="w-full h-full object-cover" />
+					<img
+						src={getSrcEmoji(item.emojiId)}
+						alt={''}
+						className="w-full h-full object-contain"
+						style={{
+							filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))',
+							willChange: 'transform',
+							backfaceVisibility: 'hidden'
+						}}
+					/>
 				</div>
 			))}
 		</div>

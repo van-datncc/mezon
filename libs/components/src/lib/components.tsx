@@ -49,6 +49,7 @@ export { default as ReactionBottom } from './components/MessageWithUser/MessageR
 export { default as UserReactionPanel } from './components/MessageWithUser/MessageReaction/UserReactionPanel';
 export { default as ModalNotificationSetting } from './components/NotificationSetting';
 export { default as SearchModal } from './components/SearchModal';
+export { default as MzToast } from './components/ToastController/MzToast';
 export { default as ToastController } from './components/ToastController/ToastController';
 
 export * from './components/AvatarImage/AvatarImage';

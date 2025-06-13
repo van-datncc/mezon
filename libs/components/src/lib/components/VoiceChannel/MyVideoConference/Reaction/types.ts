@@ -22,6 +22,10 @@ export type DisplayedEmoji = {
 		left: string;
 		bottom?: string;
 		duration?: string;
+		animation?: string;
+		animationName?: string;
+		delay?: string;
+		baseScale?: number;
 	};
 };
 
