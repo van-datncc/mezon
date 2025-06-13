@@ -737,7 +737,7 @@ export const markAsReadProcessing = createAsyncThunk(
 					})
 				);
 			}
-			thunkAPI.dispatch(clansActions.fetchClans());
+			thunkAPI.dispatch(clansActions.fetchClans({}));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channels/markAsRead');
