@@ -41,12 +41,44 @@ export const useGroupCallAudio = (): GroupCallAudioHookReturn => {
 	const isPlayRingTone = useSelector(selectAudioRingTone);
 	const isPlayEndTone = useSelector(selectAudioEndTone);
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
+	const dialTone = useRef<HTMLAudioElement | null>(null);
+	const ringTone = useRef<HTMLAudioElement | null>(null);
+	const endTone = useRef<HTMLAudioElement | null>(null);
+	const busyTone = useRef<HTMLAudioElement | null>(null);
 
-	// Audio refs
-	const dialTone = useRef(new Audio(AUDIO_FILES.dial));
-	const ringTone = useRef(new Audio(AUDIO_FILES.ring));
-	const endTone = useRef(new Audio(AUDIO_FILES.end));
-	const busyTone = useRef(new Audio(AUDIO_FILES.busy));
+	useEffect(() => {
+		if (!dialTone.current) {
+			dialTone.current = new Audio(AUDIO_FILES.dial);
+		}
+		if (!ringTone.current) {
+			ringTone.current = new Audio(AUDIO_FILES.ring);
+		}
+		if (!endTone.current) {
+			endTone.current = new Audio(AUDIO_FILES.end);
+		}
+		if (!busyTone.current) {
+			busyTone.current = new Audio(AUDIO_FILES.busy);
+		}
+
+		return () => {
+			if (dialTone.current) {
+				dialTone.current.pause();
+				dialTone.current = null;
+			}
+			if (ringTone.current) {
+				ringTone.current.pause();
+				ringTone.current = null;
+			}
+			if (endTone.current) {
+				endTone.current.pause();
+				endTone.current = null;
+			}
+			if (busyTone.current) {
+				busyTone.current.pause();
+				busyTone.current = null;
+			}
+		};
+	}, []);
 
 	const playAudio = useCallback((audioRef: React.RefObject<HTMLAudioElement>) => {
 		if (audioRef.current) {

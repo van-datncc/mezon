@@ -17,6 +17,13 @@ export interface DmCallAudioHookReturn {
 	stopRingTone: () => void;
 }
 
+const AUDIO_FILES = {
+	dial: 'assets/audio/dialtone.mp3',
+	ring: 'assets/audio/ringing.mp3',
+	end: 'assets/audio/endcall.mp3',
+	busy: 'assets/audio/busytone.mp3'
+};
+
 export const useDmCallAudio = (): DmCallAudioHookReturn => {
 	const dispatch = useAppDispatch();
 
@@ -25,10 +32,44 @@ export const useDmCallAudio = (): DmCallAudioHookReturn => {
 	const isPlayEndTone = useSelector(selectAudioEndTone);
 	const isPlayBusyTone = useSelector(selectAudioBusyTone);
 
-	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
-	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
-	const endTone = useRef(new Audio('assets/audio/endcall.mp3'));
-	const busyTone = useRef(new Audio('assets/audio/busytone.mp3'));
+	const dialTone = useRef<HTMLAudioElement | null>(null);
+	const ringTone = useRef<HTMLAudioElement | null>(null);
+	const endTone = useRef<HTMLAudioElement | null>(null);
+	const busyTone = useRef<HTMLAudioElement | null>(null);
+
+	useEffect(() => {
+		if (!dialTone.current) {
+			dialTone.current = new Audio(AUDIO_FILES.dial);
+		}
+		if (!ringTone.current) {
+			ringTone.current = new Audio(AUDIO_FILES.ring);
+		}
+		if (!endTone.current) {
+			endTone.current = new Audio(AUDIO_FILES.end);
+		}
+		if (!busyTone.current) {
+			busyTone.current = new Audio(AUDIO_FILES.busy);
+		}
+
+		return () => {
+			if (dialTone.current) {
+				dialTone.current.pause();
+				dialTone.current = null;
+			}
+			if (ringTone.current) {
+				ringTone.current.pause();
+				ringTone.current = null;
+			}
+			if (endTone.current) {
+				endTone.current.pause();
+				endTone.current = null;
+			}
+			if (busyTone.current) {
+				busyTone.current.pause();
+				busyTone.current = null;
+			}
+		};
+	}, []);
 
 	const playAudio = useCallback((audioRef: React.RefObject<HTMLAudioElement>, loop = true) => {
 		if (audioRef.current) {
