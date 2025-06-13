@@ -236,9 +236,9 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 	);
 
 	// Effects
-	useEffect(() => {
-		debouncedFetchSearchMessages();
-	}, [channelId, currentPage, debouncedFetchSearchMessages, fetchSearchMessages, searchedRequest]);
+	// useEffect(() => {
+	// 	debouncedFetchSearchMessages();
+	// }, [channelId, currentPage, debouncedFetchSearchMessages, fetchSearchMessages, searchedRequest]);
 
 	useEffect(() => {
 		if (isShowSearchMessageModal) {
