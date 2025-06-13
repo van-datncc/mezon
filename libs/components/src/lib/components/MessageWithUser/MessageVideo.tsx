@@ -44,7 +44,7 @@ function MessageVideo({ attachmentData, isMobile = false }: MessageImage) {
 	const hasZeroDimension = !realWidth || !realHeight;
 
 	const { width, height, isSmall } = hasZeroDimension
-		? { width: 0, height: 150, isSmall: false }
+		? { width: (150 * 16) / 9, height: 150, isSmall: false }
 		: calculateMediaDimensions({
 				media: {
 					mediaType: 'video',
@@ -68,6 +68,11 @@ function MessageVideo({ attachmentData, isMobile = false }: MessageImage) {
 		}
 	}, [showControl]);
 
+	// const fileVideo = RenderAttachmentThumbnail({
+	// 	attachment: attachmentData,
+	// 	size: 'w-8 h-10'
+	// });
+
 	return (
 		<div className="relative overflow-hidden w-full h-full rounded-lg">
 			<video
@@ -81,6 +86,7 @@ function MessageVideo({ attachmentData, isMobile = false }: MessageImage) {
 				ref={videoRef}
 				onCanPlay={(e) => handleOnCanPlay(e)}
 			></video>
+
 			{!showControl && (
 				<div
 					className="cursor-pointer absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-30 group"
