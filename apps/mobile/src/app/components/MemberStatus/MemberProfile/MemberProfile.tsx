@@ -1,5 +1,5 @@
 import { IUserStatus, OwnerIcon } from '@mezon/mobile-components';
-import {size, useColorsRoleById, useTheme} from '@mezon/mobile-ui';
+import { size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { getStore, selectMemberClanByUserId2 } from '@mezon/store-mobile';
 import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
