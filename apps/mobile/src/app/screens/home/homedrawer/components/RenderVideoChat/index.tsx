@@ -10,17 +10,15 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 const widthMedia = Metrics.screenWidth - 150;
 export const RenderVideoChat = React.memo(
 	({ videoURL, onLongPress }: { videoURL: string; onLongPress: () => void }) => {
-		const [loading, setLoading] = useState(true);
 		const navigation = useNavigation<any>();
 		const [thumbPath, setThumbPath] = useState('');
 
 		const handlePlayVideo = () => {
-			navigation.push(APP_SCREEN.VIDEO_DETAIL, { videoURL });
+			navigation.navigate(APP_SCREEN.VIDEO_DETAIL, { videoURL });
 		};
 
 		useEffect(() => {
 			if (videoURL) {
-				setLoading(true);
 				if (Platform.OS === 'android') {
 					// Safe native module call with error handling
 					try {
@@ -37,17 +35,14 @@ export const RenderVideoChat = React.memo(
 								.catch((err) => {
 									console.error('VideoThumbnail native module error:', err);
 									setThumbPath('');
-								})
-								.finally(() => setLoading(false));
+								});
 						} else {
 							console.warn('VideoThumbnail native module not available');
 							setThumbPath('');
-							setLoading(false);
 						}
 					} catch (error) {
 						console.error('Error accessing VideoThumbnail native module:', error);
 						setThumbPath('');
-						setLoading(false);
 					}
 				} else {
 					createThumbnail({ url: videoURL, timeStamp: 1000 })
@@ -62,7 +57,6 @@ export const RenderVideoChat = React.memo(
 							console.error('Error creating thumbnail:', error);
 							setThumbPath('');
 						})
-						.finally(() => setLoading(false));
 				}
 			}
 		}, [videoURL]);
@@ -72,7 +66,7 @@ export const RenderVideoChat = React.memo(
 
 		return (
 			<View style={{ marginTop: size.s_10, marginBottom: size.s_6, opacity: isUploading ? 0.5 : 1 }}>
-				{loading || isUploading ? (
+				{isUploading ? (
 					<View
 						style={{
 							width: Math.max(widthMedia, Metrics.screenWidth - size.s_60 * 2),
