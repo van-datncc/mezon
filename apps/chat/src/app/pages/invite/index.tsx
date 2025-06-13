@@ -1,9 +1,9 @@
 import { useInvite } from '@mezon/core';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { channelsActions, inviteActions, selectInviteById, useAppDispatch } from '@mezon/store';
+import { channelsActions, clansActions, inviteActions, selectInviteById, useAppDispatch } from '@mezon/store';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 export default function InvitePage() {
@@ -11,7 +11,7 @@ export default function InvitePage() {
 	const selectInvite = useSelector(selectInviteById(inviteIdParam || ''));
 	const navigate = useNavigate();
 	const { inviteUser } = useInvite();
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -35,8 +35,9 @@ export default function InvitePage() {
 						navigate(`/chat/clans/${res.clan_id}/channels/${res.channel_id}`);
 					}
 				});
+				dispatch(clansActions.fetchClans({ noCache: true }));
 				if (selectInvite.channel_desc) {
-					const channel = { ...selectInvite.channel_desc, id: selectInvite.channel_desc.channel_id as string };
+					const channel = { ...selectInvite, id: selectInvite.channel_id as string };
 					dispatch(channelsActions.add({ clanId: selectInvite.channel_desc?.clan_id as string, channel: { ...channel, active: 1 } }));
 				}
 			} catch (err) {
