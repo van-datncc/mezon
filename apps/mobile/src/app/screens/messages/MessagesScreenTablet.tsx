@@ -1,19 +1,10 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import {
-	DirectEntity,
-	RootState,
-	directActions,
-	getStoreAsync,
-	selectDirectsOpenlistOrder,
-	selectDmGroupCurrentId,
-	useAppDispatch
-} from '@mezon/store-mobile';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { DirectEntity, RootState, directActions, getStoreAsync, selectDirectsOpenlistOrder, selectDmGroupCurrentId } from '@mezon/store-mobile';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppState, DeviceEventEmitter, FlatList, Pressable, Text, TextInput, View } from 'react-native';
+import { AppState, DeviceEventEmitter, FlatList, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { useThrottledCallback } from 'use-debounce';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
@@ -25,18 +16,16 @@ import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage'
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DirectMessageDetailTablet } from './DirectMessageDetailTablet';
 import { DmListItem } from './DmListItem';
+import SearchDmList from './SearchDmList';
 import { style } from './styles';
 
 const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 	const styles = style(themeValue, isTabletLandscape);
-	const [searchText, setSearchText] = useState<string>('');
 	const dmGroupChatList = useSelector(selectDirectsOpenlistOrder);
 	const { t } = useTranslation(['dmMessage', 'common']);
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
-	const searchInputRef = useRef(null);
-	const dispatch = useAppDispatch();
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 
 	useEffect(() => {
@@ -66,8 +55,6 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.NEW_MESSAGE });
 	};
 
-	const typingSearchDebounce = useThrottledCallback((text) => setSearchText(text), 500);
-
 	const handleLongPress = useCallback((directMessage: DirectEntity) => {
 		const data = {
 			snapPoints: ['40%', '70%'],
@@ -75,17 +62,6 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	}, []);
-
-	const clearTextInput = () => {
-		if (searchInputRef?.current) {
-			searchInputRef.current.clear();
-			setSearchText('');
-		}
-	};
-
-	const handleFriendsPress = async () => {
-		await dispatch(directActions.setDmGroupCurrentId(''));
-	};
 
 	return (
 		<View style={styles.containerMessages}>
@@ -104,29 +80,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 							</Pressable>
 						</View>
 
-						<View style={styles.searchMessage}>
-							<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
-							<TextInput
-								ref={searchInputRef}
-								placeholder={t('common:searchPlaceHolder')}
-								placeholderTextColor={themeValue.text}
-								style={styles.searchInput}
-								onChangeText={(text) => typingSearchDebounce(text)}
-							/>
-							{!!searchText?.length && (
-								<Pressable onPress={clearTextInput}>
-									<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
-								</Pressable>
-							)}
-						</View>
-
-						<Pressable
-							onPress={handleFriendsPress}
-							style={[styles.friendsWrapper, !currentDmGroupId && { backgroundColor: themeValue.secondary }]}
-						>
-							<MezonIconCDN icon={IconCDN.friendIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-							<Text style={styles.headerTitle}>{t('dmMessage:friends')}</Text>
-						</Pressable>
+						<SearchDmList />
 
 						{clansLoadingStatus === 'loaded' && !dmGroupChatList?.length ? (
 							<UserEmptyMessage

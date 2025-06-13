@@ -29,7 +29,6 @@ const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPre
 						<ActivityIndicator size="large" color={'red'} />
 					</View>
 				)}
-
 				<YoutubePlayer
 					height={size.s_170}
 					width={isLandscape ? width * 0.4 : width * 0.8}
@@ -61,7 +60,8 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	borderLeftView: {
-		borderLeftWidth: size.s_4,
+		marginTop: size.s_6,
+		borderLeftWidth: size.s_2,
 		borderLeftColor: 'red',
 		borderRadius: size.s_4
 	}

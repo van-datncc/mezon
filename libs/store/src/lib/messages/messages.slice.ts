@@ -41,6 +41,7 @@ import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../
 import { memoizeAndTrack } from '../memoize';
 import { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
+import { referencesActions, selectDataReferences } from './references.slice';
 const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -530,7 +531,14 @@ export const jumpToMessage = createAsyncThunk(
 			}
 
 			const state = thunkAPI.getState() as RootState;
-			if (state.clans.currentClanId !== clanId || (clanId && state.channels.byClans[clanId]?.currentChannelId !== channelId)) {
+			const currentClanId = state.clans?.currentClanId;
+			const isDirectMessage = !clanId && currentClanId === '0';
+
+			const isClanChanged = currentClanId !== clanId;
+			const isChannelChanged = clanId && state.channels.byClans[clanId]?.currentChannelId !== channelId;
+			const shouldNavigate = !isDirectMessage && (isClanChanged || (clanId && isChannelChanged));
+
+			if (shouldNavigate) {
 				let channelPath = `/chat/clans/${clanId}/channels/${channelId}`;
 				if (clanId === '0') {
 					channelPath = `/chat/direct/message/${channelId}/${mode}`;
@@ -650,6 +658,14 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				const state = thunkAPI.getState() as RootState;
 				const currentDM = selectCurrentDM(state);
 				const keys = selectE2eeByUserIds(state, currentDM.user_id as string[]);
+
+				const missingKeys = keys.filter((entity) => !entity?.PK);
+				if (missingKeys.length > 0) {
+					throw new Error(
+						"Some participants haven't set up encryption yet. Please wait for them to complete setup before sending encrypted messages."
+					);
+				}
+
 				const pubKeys = await getPublicKeys(keys.filter((item) => item?.PK).map((item) => item.PK));
 				const otherUserPublicKeys: PublicKeyMaterial[] = pubKeys;
 				if (content?.t) {
@@ -750,6 +766,13 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 	const channelId = message.channel_id;
 	const isViewingOlderMessages = getMessagesState(getMessagesRootState(thunkAPI))?.isViewingOlderMessagesByChannelId?.[channelId];
 	const isBottom = !selectShowScrollDownButton(state, channelId);
+
+	if (message.code === TypeMessage.ChatRemove) {
+		const replyData = selectDataReferences(state, channelId);
+		if (replyData && replyData.message_ref_id === message.id) {
+			thunkAPI.dispatch(referencesActions.resetAfterReply(message.channel_id));
+		}
+	}
 
 	if (isViewingOlderMessages) {
 		thunkAPI.dispatch(messagesActions.setLastMessage(message));
@@ -1249,13 +1272,15 @@ export const messagesSlice = createSlice({
 					if (toPresent) {
 						handleRemoveManyMessages(state, channelId);
 					}
+					const offsetId = action.meta.arg.messageId as string;
 
 					handleSetManyMessages({
 						state,
 						channelId,
 						adapterPayload: action.payload.messages,
 						direction,
-						isClearMessage
+						isClearMessage,
+						addMany: !!offsetId && !state.channelMessages[channelId]?.ids?.includes(offsetId)
 					});
 
 					const messageIds = state.channelMessages[channelId]?.ids as string[];
@@ -1267,7 +1292,6 @@ export const messagesSlice = createSlice({
 						return;
 					} else {
 						const oldViewport = state.channelViewPortMessageIds[channelId] || [];
-						const offsetId = action.meta.arg.messageId;
 						let newViewportIds: string[] = [];
 						if (!offsetId) {
 							if (state.isViewingOlderMessagesByChannelId[channelId] && oldViewport.length) {
@@ -1575,22 +1599,23 @@ const handleSetManyMessages = ({
 	channelId,
 	adapterPayload,
 	direction,
-	isClearMessage = false
+	isClearMessage = false,
+	addMany = false
 }: {
 	state: MessagesState;
 	channelId?: string;
 	adapterPayload: MessagesEntity[];
 	direction?: Direction_Mode;
 	isClearMessage?: boolean;
+	addMany?: boolean;
 }) => {
 	if (!channelId) return state;
 	if (!state.channelMessages[channelId])
 		state.channelMessages[channelId] = channelMessagesAdapter.getInitialState({
 			id: channelId
 		});
-	if (isClearMessage) {
-		// fix later
-		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);
+	if (addMany) {
+		state.channelMessages[channelId] = channelMessagesAdapter.setAll(state.channelMessages[channelId], adapterPayload);
 	} else {
 		if (!adapterPayload.length) return;
 		state.channelMessages[channelId] = channelMessagesAdapter.setMany(state.channelMessages[channelId], adapterPayload);

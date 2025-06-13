@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 
 export function useSendForwardMessage() {
 	const { clientRef, sessionRef, socketRef } = useMezon();
+
 	const dispatch = useAppDispatch();
 
 	const client = clientRef.current;
@@ -42,7 +43,7 @@ export function useSendForwardMessage() {
 					mode,
 					isPublic,
 					validatedContent,
-					message.mentions,
+					message.channel_id === channel_id ? message.mentions : [],
 					message.attachments,
 					message.references
 				);

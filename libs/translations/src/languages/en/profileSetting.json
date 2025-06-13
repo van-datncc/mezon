@@ -33,5 +33,7 @@
     "selectAClan": "Select A Clan",
     "searchClanPlaceholder": "Search Clan",
     "updateProfileSuccess": "Update profile successfully",
-    "updateClanProfileSuccess": "Update clan profile successfully"
+    "updateClanProfileSuccess": "Update clan profile successfully",
+    "emptyUsername": "Display name cannot be blank!",
+    "duplicateClannick": "Clan nick is duplicate!"
 }

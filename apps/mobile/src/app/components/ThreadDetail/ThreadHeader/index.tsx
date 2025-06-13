@@ -28,9 +28,14 @@ export const ThreadHeader = memo(() => {
 	const isDMThread = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
-	const userStatus = useMemberStatus(currentChannel?.user_id?.length === 1 ? currentChannel?.user_id[0] : '');
 
-	const user = useSelector((state) => selectMemberClanByUserId2(state, currentChannel?.user_id?.length === 1 ? currentChannel?.user_id[0] : ''));
+	const firstUserId = useMemo(() => {
+		const userIds = currentChannel?.user_id;
+		return Array.isArray(userIds) && userIds.length === 1 ? userIds[0] : '';
+	}, [currentChannel?.user_id]);
+
+	const userStatus = useMemberStatus(firstUserId);
+	const user = useSelector((state) => selectMemberClanByUserId2(state, firstUserId));
 	const status = getUserStatusByMetadata(user?.user?.metadata);
 
 	const navigation = useNavigation<any>();
@@ -99,7 +104,7 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<MezonAvatar
-								avatarUrl={currentChannel?.channel_avatar?.[0]}
+								avatarUrl={Array.isArray(currentChannel?.channel_avatar) && currentChannel.channel_avatar.length > 0 ? currentChannel.channel_avatar[0] : undefined}
 								username={channelLabel}
 								userStatus={userStatus}
 								customStatus={status}

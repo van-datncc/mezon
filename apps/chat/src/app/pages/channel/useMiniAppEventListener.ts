@@ -1,4 +1,13 @@
-import { channelAppActions, getStore, giveCoffeeActions, RolesClanEntity, selectAllChannels, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import {
+	channelAppActions,
+	getStore,
+	giveCoffeeActions,
+	RolesClanEntity,
+	selectAllChannels,
+	selectAllUserClans,
+	selectCurrentClan,
+	useAppDispatch
+} from '@mezon/store';
 import { ChannelMembersEntity, MiniAppEventType } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { ApiAccount, ApiChannelAppResponse } from 'mezon-js/api.gen';
@@ -33,11 +42,45 @@ const useMiniAppEventListener = (
 		};
 
 		const handleMessage = async (event: MessageEvent) => {
-			if (!appChannel?.app_url || !compareHost(event.origin, appChannel.app_url)) return;
+			// Enhanced security checks
+			if (!appChannel?.app_url) {
+				console.warn('MiniApp: No app URL configured, ignoring message');
+				return;
+			}
 
-			const eventData = safeJSONParse(event.data ?? '{}') || {};
+			if (!compareHost(event.origin, appChannel.app_url)) {
+				console.warn('MiniApp: Message from unauthorized origin:', event.origin);
+				return;
+			}
+
+			// Validate message data structure
+			if (!event.data || typeof event.data !== 'string') {
+				console.warn('MiniApp: Invalid message data format');
+				return;
+			}
+
+			let eventData;
+			try {
+				eventData = safeJSONParse(event.data) || {};
+			} catch (error) {
+				console.warn('MiniApp: Failed to parse message data:', error);
+				return;
+			}
+
 			const { eventType } = eventData;
-			if (!eventType) return;
+			if (!eventType || typeof eventType !== 'string') {
+				console.warn('MiniApp: Missing or invalid eventType');
+				return;
+			}
+
+			// Sanitize eventType to prevent injection
+			const sanitizedEventType = eventType.replace(/[^\w\-_]/g, '');
+			if (sanitizedEventType !== eventType) {
+				console.warn('MiniApp: EventType contains invalid characters');
+				return;
+			}
+
+			const store = getStore();
 
 			switch (eventType) {
 				case MiniAppEventType.PING:
@@ -83,11 +126,23 @@ const useMiniAppEventListener = (
 					);
 					break;
 				case MiniAppEventType.GET_CLAN_USERS:
-					miniAppRef.current?.contentWindow?.postMessage(
-						JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: userChannels }),
-						appChannel.app_url
-					);
+					{
+						const clanUsers = selectAllUserClans(store.getState());
+						const users = [...userChannels];
+
+						clanUsers.forEach((item) => {
+							const index = users.findIndex((u) => u.id === item.id);
+							if (index === -1) return;
+							users[index] = { ...users[index], role_id: item.role_id };
+						});
+
+						miniAppRef.current?.contentWindow?.postMessage(
+							JSON.stringify({ eventType: MiniAppEventType.CLAN_USERS_RESPONSE, eventData: users }),
+							appChannel.app_url
+						);
+					}
 					break;
+
 				case MiniAppEventType.JOIN_ROOM:
 					dispatch(channelAppActions.setRoomId({ channelId: appChannel?.channel_id as string, roomId: eventData.eventData?.roomId }));
 					break;
@@ -103,7 +158,6 @@ const useMiniAppEventListener = (
 					);
 					break;
 				case MiniAppEventType.GET_CHANNELS: {
-					const store = getStore();
 					const channels = selectAllChannels(store.getState());
 					miniAppRef.current?.contentWindow?.postMessage(
 						JSON.stringify({ eventType: MiniAppEventType.CHANNELS_RESPONSE, eventData: channels }),
@@ -120,7 +174,6 @@ const useMiniAppEventListener = (
 				}
 
 				case MiniAppEventType.GET_CLAN: {
-					const store = getStore();
 					const clan = selectCurrentClan(store.getState());
 					miniAppRef.current?.contentWindow?.postMessage(
 						JSON.stringify({ eventType: MiniAppEventType.CLAN_RESPONSE, eventData: clan }),

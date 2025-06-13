@@ -178,10 +178,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					text1: 'Connection connected'
 				});
 				stopDialTone();
-				const bodyFCMMobile = {
-					offer: 'CANCEL_CALL'
-				};
-				mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+				cancelCallFCMMobile();
 			}
 			if (pc.iceConnectionState === 'checking') {
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
@@ -250,6 +247,11 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
+	const cancelCallFCMMobile = async (receiverId: string = dmUserId) => {
+		const bodyFCMMobile = { offer: 'CANCEL_CALL' };
+		await mezon.socketRef.current?.makeCallPush(receiverId, JSON.stringify(bodyFCMMobile), channelId, userId);
+	};
+
 	const startCall = async (isVideoCall: boolean, isAnswer = false) => {
 		try {
 			await setIsSpeaker({ isSpeaker: false });
@@ -284,7 +286,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 						})
 					);
 					handleEndCall({ isCancelGoBack: false });
-				}, 60000);
+				}, 30000);
 
 				const offer = await pc.createOffer(sessionConstraints);
 				await pc.setLocalDescription(offer);
@@ -311,10 +313,13 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					remoteStream: null
 				});
 				peerConnection.current = pc;
+			} else {
+				// if is answer call, need to cancel call native on mobile
+				await cancelCallFCMMobile(userId);
 			}
 		} catch (error) {
 			console.error('Error starting call:', error);
-			handleEndCall({ isCancelGoBack: false });
+			await handleEndCall({ isCancelGoBack: false });
 		}
 	};
 
@@ -472,10 +477,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 					})
 				);
 			} else {
-				const bodyFCMMobile = {
-					offer: 'CANCEL_CALL'
-				};
-				await mezon.socketRef.current?.makeCallPush(dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
+				cancelCallFCMMobile();
 			}
 			setCallState({
 				localStream: null,
