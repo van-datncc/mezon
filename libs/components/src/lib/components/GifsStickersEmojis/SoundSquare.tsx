@@ -1,6 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import { MediaType, referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectCurrentClanId, selectDataReferences, soundEffectActions, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	MediaType,
+	referencesActions,
+	selectAllStickerSuggestion,
+	selectCurrentClan,
+	selectCurrentClanId,
+	selectDataReferences,
+	soundEffectActions,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -239,18 +249,15 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 
 	const currentClanId = useAppSelector(selectCurrentClanId) || '';
 
-	// Lấy tất cả stickers/sounds từ Redux store
 	const allStickersInStore = useAppSelector(selectAllStickerSuggestion);
-	// Lọc ra các sound (có media_type = 1)
-	const allSoundsInStore = allStickersInStore.filter(sticker => (sticker as any).media_type === MediaType.AUDIO);
+	const allSoundsInStore = allStickersInStore.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO);
 
-	// Tải tất cả sound effects khi component mount
 	useEffect(() => {
 		dispatch(soundEffectActions.fetchSoundByUserId({ noCache: false }));
 	}, [dispatch]);
 
 	const userSounds = useMemo(() => {
-		return allSoundsInStore.map(sound => ({
+		return allSoundsInStore.map((sound) => ({
 			clan_name: sound.clan_name || 'MY SOUNDS',
 			logo: sound.logo || '',
 			clan_id: sound.clan_id || '',
@@ -297,7 +304,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 	}, [allSounds]);
 
 	const [selectedType, setSelectedType] = useState('');
-	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({}); 
+	const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const modalRef = useRef<HTMLDivElement>(null);
