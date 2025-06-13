@@ -42,7 +42,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 }
 
 export const voiceAdapter = createEntityAdapter({
-	selectId: (voice: VoiceEntity) => voice.user_id + voice.voice_channel_id
+	selectId: (voice: VoiceEntity) => voice.id
 });
 
 type fetchVoiceChannelMembersPayload = {
