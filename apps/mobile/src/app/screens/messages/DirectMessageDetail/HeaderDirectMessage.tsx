@@ -12,7 +12,8 @@ import {
 	selectLastMessageByChannelId,
 	selectLastSeenMessageStateByChannelId,
 	selectMemberClanByUserId2,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { IMessageTypeCallLog, TypeMessage, WEBRTC_SIGNALING_TYPES, createImgproxyUrl, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
