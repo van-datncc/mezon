@@ -9,7 +9,7 @@ import {
 	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
-import { selectCurrentClan, topicsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { RoomEvent, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
@@ -155,7 +155,7 @@ export function MyVideoConference({
 
 	useEffect(() => {
 		const handleDisconnected = () => {
-			dispatch(voiceActions.resetVoiceSettings());
+			onLeaveRoom();
 		};
 
 		room?.on('disconnected', handleDisconnected);

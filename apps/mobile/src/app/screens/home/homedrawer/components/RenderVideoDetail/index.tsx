@@ -43,18 +43,38 @@ export const RenderVideoDetail = React.memo(({ route }: { route: any }) => {
 			{!!videoURL && isReadyDisplay && (
 				<Video
 					ref={videoRef}
-					source={{ uri: videoURL }}
+					source={{
+						uri: videoURL,
+						headers: {
+							'Cache-Control': 'max-age=3600, public',
+							'Accept-Encoding': 'gzip, deflate'
+						}
+					}}
 					style={{ width: '100%', height: '100%' }}
 					resizeMode="contain"
 					controls={true}
 					paused={false}
 					disableFocus={true}
 					muted={false}
+					// Performance optimizations for large videos
+					bufferConfig={{
+						minBufferMs: 3000,
+						maxBufferMs: 10000,
+						bufferForPlaybackMs: 2000,
+						bufferForPlaybackAfterRebufferMs: 3000
+					}}
+					maxBitRate={3000000} // Limit to 3Mbps for better performance
 					onError={onError}
 					onBuffer={onBuffer}
+					onReadyForDisplay={() => {
+						setIsPlaying(true);
+						setIsBuffering(false);
+					}}
 					ignoreSilentSwitch="ignore"
 					mixWithOthers="mix"
-					onReadyForDisplay={() => setIsPlaying(true)}
+					preventsDisplaySleepDuringVideoPlayback={true}
+					playWhenInactive={false}
+					playInBackground={false}
 					controlsStyles={{
 						hidePosition: false,
 						hidePlayPause: false,

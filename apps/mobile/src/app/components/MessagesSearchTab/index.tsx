@@ -17,7 +17,6 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useContext, useMemo, useState } from 'react';
 import { ActivityIndicator, Keyboard, Text, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MessageItem from '../../screens/home/homedrawer/MessageItem';
@@ -33,7 +32,6 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	const [hasLoadMore, setHasLoadMore] = useState(true);
 	const dispatch = useAppDispatch();
 	const [pageSearch, setPageSearch] = useState(1);
-	const currentPage = useSelector(selectCurrentPage);
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 
@@ -42,6 +40,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	}, [currentChannel]);
 	const messageSearchByChannelId = useAppSelector((state) => selectMessageSearchByChannelId(state, currentChannel?.channel_id));
 	const searchMessages = useAppSelector((state) => selectAllMessageSearch(state, currentChannel?.channel_id));
+	const currentPage = useAppSelector((state) => selectCurrentPage(state, currentChannel?.channel_id));
 	const ViewLoadMore = () => {
 		return (
 			<View style={styles.loadMoreChannelMessage}>
@@ -156,7 +155,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 	return (
 		<View style={styles.container}>
 			{searchMessagesData?.length ? (
-				<View style={{ height: '100%', width: '100%', paddingBottom: size.s_100 }}>
+				<View style={{ height: '100%', width: '100%', paddingBottom: size.s_20 }}>
 					<FlashList
 						showsVerticalScrollIndicator={false}
 						data={searchMessagesData}
@@ -166,7 +165,7 @@ const MessagesSearchTab = React.memo(({ typeSearch, currentChannel }: { typeSear
 						estimatedItemSize={100}
 						removeClippedSubviews={true}
 						onEndReached={loadMoreMessages}
-						contentContainerStyle={{ paddingBottom: size.s_100 }}
+						contentContainerStyle={{ paddingBottom: size.s_20 }}
 						onEndReachedThreshold={0.5}
 						ListFooterComponent={isLoadingMore && <ViewLoadMore />}
 					/>

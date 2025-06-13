@@ -6,7 +6,8 @@ import {
 	selectAllChannelsByUser,
 	selectAllUsersByUser,
 	selectTotalResultSearchMessage,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -31,7 +32,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const store = getStore();
-	const totalResult = useSelector(selectTotalResultSearchMessage);
+	const totalResult = useAppSelector((state) => selectTotalResultSearchMessage(state, currentChannel?.channel_id));
 	const dispatch = useAppDispatch();
 	const [isContentReady, setIsContentReady] = useState(false);
 

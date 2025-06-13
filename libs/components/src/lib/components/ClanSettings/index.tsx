@@ -16,6 +16,7 @@ import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingOnBoarding from './SettingOnBoarding';
 import SettingSidebar from './SettingSidebar';
+import SettingSoundEffect from './SettingSoundEffect';
 import SettingSticker from './SettingSticker';
 
 export type ModalSettingProps = {
@@ -59,6 +60,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:
 				return <NotificationSoundSetting />;
+			case ItemSetting.UPLOAD_SOUND:
+				return <SettingSoundEffect />;
 			case ItemSetting.STICKERS:
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.CATEGORY_ORDER:

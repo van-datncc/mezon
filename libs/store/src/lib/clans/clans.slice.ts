@@ -136,9 +136,14 @@ const fetchClansCached = memoizeAndTrack(
 	}
 );
 
-export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
+export const fetchClans = createAsyncThunk('clans/fetchClans', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		if (noCache) {
+			fetchClansCached.clear();
+		}
+
 		const response = await fetchClansCached(mezon, LIMIT_CLAN_ITEM, 1, '');
 
 		if (!response.clandesc) {
@@ -199,7 +204,7 @@ export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: Cha
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
 		if (response) {
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({}));
 		}
 	} catch (error) {
 		captureSentryError(error, 'clans/deleteClans');
@@ -219,7 +224,7 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchClans());
+		thunkAPI.dispatch(fetchClans({}));
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'clans/removeClanUsers');
@@ -239,7 +244,7 @@ export const updateClan = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({}));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'clans/updateClans');

@@ -138,7 +138,7 @@ export const style = (colors: Attributes) =>
 		},
 		reactionContainer: {
 			position: 'absolute',
-			bottom: '40%',
+			bottom: '30%',
 			width: '70%',
 			left: '15%',
 			alignSelf: 'center',

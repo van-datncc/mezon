@@ -13,12 +13,14 @@ export const ItemSetting = {
 	ROLES: 'roles',
 	EMOJI: 'emoji',
 	STICKERS: 'Stickers',
+	UPLOAD_SOUND: 'upload-sound',
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
 	CATEGORY_ORDER: 'category-order',
 	AUDIT_LOG: 'audit-log',
 	ON_BOARDING: 'on-boarding'
+
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -27,7 +29,8 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.STICKERS, name: 'Stickers' },
 	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
-	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
+	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
+	{ id: ItemSetting.UPLOAD_SOUND, name: 'Upload Sound ' }
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];

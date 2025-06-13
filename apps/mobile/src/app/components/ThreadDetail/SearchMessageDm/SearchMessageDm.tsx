@@ -1,10 +1,9 @@
 import { debounce, ETypeSearch } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { searchMessagesActions, selectTotalResultSearchMessage, useAppDispatch } from '@mezon/store-mobile';
+import { searchMessagesActions, selectTotalResultSearchMessage, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { SearchFilter, SIZE_PAGE_SEARCH } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { EmptySearchPage } from '../../EmptySearchPage';
 import MessagesSearchTab from '../../MessagesSearchTab';
 import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
@@ -22,9 +21,8 @@ export default function SearchMessageDm({ navigation, route }: any) {
 		setActiveTab(index);
 	}, []);
 	const [filtersSearch, setFiltersSearch] = useState<SearchFilter[]>();
-	const totalResult = useSelector(selectTotalResultSearchMessage);
-
 	const { currentChannel } = route?.params || {};
+	const totalResult = useAppSelector((state) => selectTotalResultSearchMessage(state, currentChannel?.channel_id));
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {

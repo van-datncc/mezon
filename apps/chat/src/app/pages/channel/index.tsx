@@ -371,12 +371,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	};
 
 	useEffect(() => {
-		if (isShowMemberList) {
-			setIsShowCreateThread(false);
-		}
-	}, [isShowMemberList, setIsShowCreateThread]);
-
-	useEffect(() => {
 		if (!isShowCanvas && !isShowAgeRestricted && draggingState) {
 			openUploadFileModal();
 		}

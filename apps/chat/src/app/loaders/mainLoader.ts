@@ -2,7 +2,7 @@ import { acitvitiesActions, appActions, clansActions, gifsActions } from '@mezon
 import { CustomLoaderFunction } from './appLoader';
 
 export const mainLoader: CustomLoaderFunction = async ({ dispatch }) => {
-	dispatch(clansActions.fetchClans());
+	dispatch(clansActions.fetchClans({}));
 	dispatch(acitvitiesActions.listActivities());
 	dispatch(gifsActions.fetchGifCategories());
 	dispatch(gifsActions.fetchGifCategoryFeatured());
