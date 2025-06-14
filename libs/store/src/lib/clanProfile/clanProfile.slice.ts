@@ -4,6 +4,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ApiUpdateClanProfileRequest } from 'mezon-js';
 import { ApiClanProfile } from 'mezon-js/api.gen';
 import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import type { RootState } from '../store';
 export const USER_CLAN_PROFILE_FEATURE_KEY = 'userClanProfile';
 
 export interface UserClanProfileEntity extends IClanProfile {
@@ -68,13 +69,28 @@ export const updateUserClanProfile = createAsyncThunk(
 	'userclanProfile/updateUserClanProfile',
 	async ({ clanId, username, avatarUrl }: updateLinkUserClanProfile, thunkAPI) => {
 		try {
+			const state = thunkAPI.getState() as RootState;
+			const currentUser = state.account?.userProfile;
+
+			const currentUserClanProfile = state.userClanProfile.entities[`${clanId}${currentUser?.user?.id}`];
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
-			const body: ApiUpdateClanProfileRequest = {
-				clan_id: clanId,
-				nick_name: username || '',
-				avatar: avatarUrl || ''
+			const body: Partial<ApiUpdateClanProfileRequest> = {
+				clan_id: clanId
 			};
-			const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body);
+
+			if (username && username !== currentUserClanProfile?.nick_name) {
+				body.nick_name = username || '';
+			}
+
+			if (avatarUrl && avatarUrl !== '' && avatarUrl !== currentUserClanProfile?.avatar) {
+				body.avatar = avatarUrl || '';
+			}
+
+			const hasChanges = Object.keys(body).length > 1;
+			if (!hasChanges) {
+				return true;
+			}
+			const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body as ApiUpdateClanProfileRequest);
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
