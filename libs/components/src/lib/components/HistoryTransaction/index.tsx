@@ -13,11 +13,16 @@ import { Pagination } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import TransactionDetail from '../HistoryTransaction/TransactionDetail';
 import {
+	API_FILTER_PARAMS,
+	CURRENCY,
+	DATE_FORMAT,
 	EMPTY_STATES,
 	FilterType,
 	HEADER,
 	LIMIT_WALLET,
 	TAB_LABELS,
+	TRANSACTION_FILTERS,
+	TRANSACTION_ITEM,
 	TRANSACTION_TYPES
 } from './constans/constans';
 
@@ -29,142 +34,60 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const dispatch = useAppDispatch();
 	const walletLedger = useAppSelector((state) => selectWalletLedger(state));
 	const detailLedger = useAppSelector((state) => selectDetailedger(state));
-
 	const count = useAppSelector((state) => selectCountWalletLedger(state));
 
 	const [currentPage, setCurrentPage] = useState(1);
-	const totalPages = count === undefined ? 0 : Math.ceil(count / LIMIT_WALLET);
-
-	const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-
 	const [sentPage, setSentPage] = useState(1);
 	const [receivedPage, setReceivedPage] = useState(1);
 
-	const [sentTransactions, setSentTransactions] = useState<any[]>([]);
-	const [receivedTransactions, setReceivedTransactions] = useState<any[]>([]);
-	const [sentLoaded, setSentLoaded] = useState(false);
-	const [receivedLoaded, setReceivedLoaded] = useState(false);
-
+	const [activeFilter, setActiveFilter] = useState<FilterType>(TRANSACTION_FILTERS.ALL);
 	const [openedTransactionId, setOpenedTransactionId] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-	const loadFilteredData = async (type: 'sent' | 'received') => {
-		if (
-			(type === 'sent' && sentLoaded) ||
-			(type === 'received' && receivedLoaded)
-		) {
-			return;
-		}
+	const totalPages = count === undefined ? 0 : Math.ceil(count / LIMIT_WALLET);
 
+	const fetchTransactions = async (filter: FilterType, page: number) => {
 		setIsLoading(true);
 		try {
-			const actualTotalPages = count ? Math.ceil(count / LIMIT_WALLET) : 1;
-
-			const results: any[] = [];
-
-			for (let i = 1; i <= actualTotalPages; i++) {
-				const result = await dispatch(fetchListWalletLedger({ page: i })).unwrap();
-				if (result && result.ledgers) {
-					results.push(...result.ledgers);
-				}
-				if (!result?.ledgers?.length) {
-					break;
-				}
-			}
-
-			const filteredData = results.filter(tx =>
-				type === 'sent' ? (tx.value || 0) < 0 : (tx.value || 0) > 0
-			);
-
-			if (type === 'sent') {
-				setSentTransactions(filteredData);
-				setSentLoaded(true);
-			} else {
-				setReceivedTransactions(filteredData);
-				setReceivedLoaded(true);
-			}
+			await dispatch(fetchListWalletLedger({
+				page,
+				filter: API_FILTER_PARAMS[filter]
+			}));
 		} catch (error) {
-			console.error(`Error loading ${type} transactions:`, error);
+			console.error(`Error loading transactions:`, error);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	const refreshData = () => {
-		if (activeFilter === 'all') {
-			dispatch(fetchListWalletLedger({ page: currentPage }));
-		} else if (activeFilter === 'sent') {
-			setSentLoaded(false);
-			loadFilteredData('sent');
-		} else if (activeFilter === 'received') {
-			setReceivedLoaded(false);
-			loadFilteredData('received');
-		}
+		fetchTransactions(activeFilter, getCurrentPage());
 	};
 
 	useEffect(() => {
-		if (activeFilter === 'all') {
-			dispatch(fetchListWalletLedger({ page: currentPage }));
-		}
-	}, [dispatch, currentPage, activeFilter]);
-
-	useEffect(() => {
-		if (activeFilter === 'sent' && !sentLoaded) {
-			loadFilteredData('sent');
-		} else if (activeFilter === 'received' && !receivedLoaded) {
-			loadFilteredData('received');
-		}
-	}, [dispatch, activeFilter, count, sentLoaded, receivedLoaded]);
+		fetchTransactions(activeFilter, getCurrentPage());
+	}, [dispatch, activeFilter, currentPage, sentPage, receivedPage]);
 
 	const onPageChange = (page: number) => {
-		if (activeFilter === 'all') {
+		if (activeFilter === TRANSACTION_FILTERS.ALL) {
 			setCurrentPage(page);
-		} else if (activeFilter === 'sent') {
+		} else if (activeFilter === TRANSACTION_FILTERS.SENT) {
 			setSentPage(page);
-		} else if (activeFilter === 'received') {
+		} else if (activeFilter === TRANSACTION_FILTERS.RECEIVED) {
 			setReceivedPage(page);
 		}
 	};
 
-	const getSentTotalPages = () => {
-		return Math.ceil(sentTransactions.length / LIMIT_WALLET);
-	};
-
-	const getReceivedTotalPages = () => {
-		return Math.ceil(receivedTransactions.length / LIMIT_WALLET);
-	};
-
-	const getCurrentPageData = () => {
-		if (activeFilter === 'all') {
-			return walletLedger || [];
-		}
-
-		if (activeFilter === 'sent') {
-			const startIndex = (sentPage - 1) * LIMIT_WALLET;
-			const endIndex = Math.min(startIndex + LIMIT_WALLET, sentTransactions.length);
-			return sentTransactions.slice(startIndex, endIndex);
-		}
-
-		if (activeFilter === 'received') {
-			const startIndex = (receivedPage - 1) * LIMIT_WALLET;
-			const endIndex = Math.min(startIndex + LIMIT_WALLET, receivedTransactions.length);
-			return receivedTransactions.slice(startIndex, endIndex);
-		}
-
-		return [];
-	};
-
 	const getCurrentPage = () => {
-		if (activeFilter === 'all') return currentPage;
-		if (activeFilter === 'sent') return sentPage;
+		if (activeFilter === TRANSACTION_FILTERS.ALL) return currentPage;
+		if (activeFilter === TRANSACTION_FILTERS.SENT) return sentPage;
 		return receivedPage;
 	};
 
-	const getCurrentTotalPages = () => {
-		if (activeFilter === 'all') return totalPages;
-		if (activeFilter === 'sent') return getSentTotalPages();
-		return getReceivedTotalPages();
-	};
+	const getCurrentTotalPages = () => totalPages;
+
+	const getCurrentPageData = () => walletLedger || [];
 
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
@@ -173,7 +96,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		const year = date.getFullYear();
 		const hours = date.getHours().toString().padStart(2, '0');
 		const minutes = date.getMinutes().toString().padStart(2, '0');
-		return `${day}/${month}/${year} ${hours}:${minutes}`;
+		return `${day}${DATE_FORMAT.SEPARATOR}${month}${DATE_FORMAT.SEPARATOR}${year}${DATE_FORMAT.TIME_SEPARATOR}${hours}:${minutes}`;
 	};
 
 	const renderAmount = (amount: number, transactionId: string) => {
@@ -191,7 +114,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 					</div>
 					<div>
 						<p className="text-red-600 dark:text-red-400 font-semibold">
-							{`${formatNumber(Math.abs(amount), 'vi-VN')} đ`}
+							{`${formatNumber(Math.abs(amount), CURRENCY.CODE)} ${CURRENCY.SYMBOL}`}
 						</p>
 						<p className="text-xs text-gray-500 dark:text-gray-400">{TRANSACTION_TYPES.SENT}</p>
 					</div>
@@ -210,7 +133,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 				</div>
 				<div>
 					<p className="text-green-600 dark:text-green-400 font-semibold">
-						{`${formatNumber(amount, 'vi-VN')} đ`}
+						{`${formatNumber(amount, CURRENCY.CODE)} ${CURRENCY.SYMBOL}`}
 					</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">{TRANSACTION_TYPES.RECEIVED}</p>
 				</div>
@@ -221,36 +144,38 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const toggleDetails = (transactionId: string) => {
 		setOpenedTransactionId(openedTransactionId === transactionId ? null : transactionId);
 		if (openedTransactionId !== transactionId) {
-			dispatch(fetchDetailTransaction({ transId: transactionId }));
+			setIsDetailLoading(true);
+			dispatch(fetchDetailTransaction({ transId: transactionId }))
+				.finally(() => setIsDetailLoading(false));
 		}
 	};
 
-	const getTransactionType = (amount: number) => {
-		return amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED;
-	};
+	const getTransactionType = (amount: number) =>
+		amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED;
 
-	const getStatusBadge = (amount: number) => {
-		return (
-			<span
-				className={`px-2 py-1 text-xs font-medium rounded-full ${amount < 0
-					? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-					: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-					}`}
-			>
-				{getTransactionType(amount)}
-			</span>
-		);
-	};
+	const getStatusBadge = (amount: number) => (
+		<span
+			className={`px-2 py-1 text-xs font-medium rounded-full ${amount < 0
+				? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+				: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+				}`}
+		>
+			{getTransactionType(amount)}
+		</span>
+	);
 
 	const handleFilterChange = (filter: FilterType) => {
 		if (activeFilter !== filter) {
 			setActiveFilter(filter);
-			if (filter === 'all') {
+			if (filter === TRANSACTION_FILTERS.ALL) {
 				setCurrentPage(1);
-			} else if (filter === 'sent') {
+				fetchTransactions(filter, 1);
+			} else if (filter === TRANSACTION_FILTERS.SENT) {
 				setSentPage(1);
-			} else if (filter === 'received') {
+				fetchTransactions(filter, 1);
+			} else if (filter === TRANSACTION_FILTERS.RECEIVED) {
 				setReceivedPage(1);
+				fetchTransactions(filter, 1);
 			}
 		}
 	};
@@ -258,7 +183,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	if (!walletLedger || isLoading) {
 		return (
 			<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
-				<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
+				<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4">
 					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">
 						<div className="flex items-center justify-between p-6">
 							<div className="flex items-center gap-3">
@@ -272,21 +197,55 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							</div>
 							<button
 								onClick={onClose}
-								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700"
 							>
 								<Icons.Close className="w-5 h-5" />
 							</button>
 						</div>
 					</div>
 					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
-						<div className="p-6 space-y-4 max-h-[500px] overflow-y-auto thread-scroll">
-							{[...Array(6)].map((_, idx) => (
-								<div key={idx} className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-4 animate-pulse">
+						<div className="px-6 pt-4">
+							<div className="flex gap-2 mb-4 border-b dark:border-gray-700 border-gray-200 pb-4">
+								<button
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.ALL)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.ALL
+										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+										}`}
+								>
+									{TAB_LABELS.ALL}
+								</button>
+								<button
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.SENT)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.SENT
+										? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+										}`}
+								>
+									{TAB_LABELS.SENT}
+								</button>
+								<button
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.RECEIVED)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.RECEIVED
+										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+										}`}
+								>
+									{TAB_LABELS.RECEIVED}
+								</button>
+							</div>
+						</div>
+						<div className="px-6 pb-6 space-y-4 max-h-[450px] overflow-y-auto thread-scroll">
+							{[...Array(TRANSACTION_ITEM.SKELETON_COUNT)].map((_, idx) => (
+								<div
+									key={idx}
+									className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 p-4"
+								>
 									<div className="flex items-center gap-4">
-										<div className="w-8 h-8 rounded-full bg-gray-300" />
+										<div className="w-8 h-8 rounded-full dark:bg-gray-700 bg-gray-200" />
 										<div className="flex-1 space-y-2">
-											<div className="h-4 w-32 bg-gray-300 rounded" />
-											<div className="h-3 w-24 bg-gray-300 rounded" />
+											<div className="h-4 w-32 dark:bg-gray-700 bg-gray-200 rounded" />
+											<div className="h-3 w-24 dark:bg-gray-700 bg-gray-200 rounded" />
 										</div>
 									</div>
 								</div>
@@ -302,7 +261,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 	return (
 		<div className="outline-none justify-center flex overflow-x-hidden items-center overflow-y-auto fixed inset-0 z-30 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden">
-			<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4 ">
+			<div className="relative w-full sm:h-auto rounded-xl max-w-[800px] mx-4">
 				<div className="dark:bg-bgPrimary bg-bgLightMode rounded-t-xl border-b dark:border-gray-700 border-gray-200">
 					<div className="flex items-center justify-between p-6">
 						<div className="flex items-center gap-3">
@@ -317,13 +276,13 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						<div className="flex items-center gap-2">
 							<button
 								onClick={refreshData}
-								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700"
 							>
-								<Icons.ReloadIcon className="w-5 h-5" />
+								<Icons.ReloadIcon className="w-5 h-5 dark:text-white text-gray-500" />
 							</button>
 							<button
 								onClick={onClose}
-								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+								className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700"
 							>
 								<Icons.Close className="w-5 h-5" />
 							</button>
@@ -336,28 +295,28 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						<div className="px-6 pt-4">
 							<div className="flex gap-2 mb-4 border-b dark:border-gray-700 border-gray-200 pb-4">
 								<button
-									onClick={() => handleFilterChange('all')}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'all'
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.ALL)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.ALL
 										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
 										}`}
 								>
 									{TAB_LABELS.ALL}
 								</button>
 								<button
-									onClick={() => handleFilterChange('sent')}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'sent'
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.SENT)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.SENT
 										? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
 										}`}
 								>
 									{TAB_LABELS.SENT}
 								</button>
 								<button
-									onClick={() => handleFilterChange('received')}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === 'received'
+									onClick={() => handleFilterChange(TRANSACTION_FILTERS.RECEIVED)}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.RECEIVED
 										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
 										}`}
 								>
 									{TAB_LABELS.RECEIVED}
@@ -367,49 +326,54 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 						<div className="px-6 pb-6 space-y-4 max-h-[450px] overflow-y-auto thread-scroll">
 							{currentData.length > 0 ? (
-								currentData.map((item, index) => (
-									<div
-										key={index}
-										className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer"
-										onClick={() => toggleDetails(item.transaction_id ?? '')}
-									>
-										<div className="p-4">
-											<div className="flex items-center justify-between">
-												<div className="flex items-center gap-4">
-													{renderAmount(item.value ?? 0, item.transaction_id ?? '')}
-													<div className="flex flex-col">
-														<div className="flex items-center gap-2">
-															<p className="dark:text-white text-gray-900 font-medium text-sm">
-																Transaction #{item.transaction_id?.slice(-8)}
+								<div className="space-y-4">
+									{currentData.map((item, index) => (
+										<div
+											key={index}
+											className="dark:bg-gray-800 bg-white rounded-xl border dark:border-gray-700 border-gray-200 hover:shadow-lg cursor-pointer"
+											onClick={() => toggleDetails(item.transaction_id ?? '')}
+										>
+											<div className="p-4">
+												<div className="flex items-center justify-between">
+													<div className="flex items-center gap-4">
+														{renderAmount(item.value ?? 0, item.transaction_id ?? '')}
+														<div className="flex flex-col">
+															<div className="flex items-center gap-2">
+																<p className="dark:text-white text-gray-900 font-medium text-sm">
+																	{TRANSACTION_ITEM.ID_PREFIX}{item.transaction_id?.slice(-TRANSACTION_ITEM.ID_LENGTH)}
+																</p>
+																{getStatusBadge(item.value ?? 0)}
+															</div>
+															<p className="dark:text-gray-400 text-gray-500 text-xs mt-1">
+																{formatDate(item.create_time ?? '')}
 															</p>
-															{getStatusBadge(item.value ?? 0)}
 														</div>
-														<p className="dark:text-gray-400 text-gray-500 text-xs mt-1">
-															{formatDate(item.create_time ?? '')}
-														</p>
 													</div>
 												</div>
-
 											</div>
-										</div>
 
-										{detailLedger && openedTransactionId === item.transaction_id && (
-											<TransactionDetail detailLedger={detailLedger} formatDate={formatDate} />
-										)}
-									</div>
-								))
+											{openedTransactionId === item.transaction_id && (
+												<TransactionDetail
+													detailLedger={detailLedger}
+													formatDate={formatDate}
+													isLoading={isDetailLoading}
+												/>
+											)}
+										</div>
+									))}
+								</div>
 							) : (
 								<div className="flex flex-col items-center justify-center py-12">
 									<div className="w-16 h-16 rounded-full dark:bg-gray-700 bg-gray-100 flex items-center justify-center mb-4">
 										<Icons.EmptyType />
 									</div>
 										<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
-											{activeFilter === 'all'
+											{activeFilter === TRANSACTION_FILTERS.ALL
 												? EMPTY_STATES.NO_TRANSACTIONS.TITLE
 												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.TITLE}
 										</h3>
 									<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-											{activeFilter === 'all'
+											{activeFilter === TRANSACTION_FILTERS.ALL
 												? EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION
 												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.DESCRIPTION}
 									</p>

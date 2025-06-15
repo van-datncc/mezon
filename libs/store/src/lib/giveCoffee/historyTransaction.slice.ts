@@ -13,9 +13,9 @@ export interface WalletLedgerState {
 	detailLedger?: ApiTransactionDetail | null;
 }
 
-export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ page }: { page?: number }, thunkAPI) => {
+export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ page, filter }: { page?: number, filter?: number }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listWalletLedger(mezon.session, 8, '', '', page);
+	const response = await mezon.client.listWalletLedger(mezon.session, 8, filter, '', page);
 	return {
 		ledgers: response.wallet_ledger || [],
 		count: response.count || 0
@@ -29,6 +29,7 @@ export const fetchDetailTransaction = createAsyncThunk('walletLedger/fetchDetail
 		detailLedger: response
 	};
 });
+
 export const initialWalletLedgerState: WalletLedgerState = {
 	loadingStatus: 'not loaded',
 	error: null,
@@ -60,7 +61,6 @@ export const walletLedgerSlice = createSlice({
 			})
 			.addCase(fetchDetailTransaction.fulfilled, (state: WalletLedgerState, action) => {
 				state.detailLedger = action.payload.detailLedger;
-
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchDetailTransaction.rejected, (state: WalletLedgerState, action) => {

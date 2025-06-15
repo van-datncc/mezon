@@ -2,6 +2,18 @@ export const LIMIT_WALLET = 8;
 
 export type FilterType = 'all' | 'sent' | 'received';
 
+export const TRANSACTION_FILTERS = {
+    ALL: 'all',
+    SENT: 'sent',
+    RECEIVED: 'received'
+} as const;
+
+export const API_FILTER_PARAMS = {
+    [TRANSACTION_FILTERS.ALL]: undefined,
+    [TRANSACTION_FILTERS.SENT]: 2,
+    [TRANSACTION_FILTERS.RECEIVED]: 1
+};
+
 export const TAB_LABELS = {
     ALL: 'All Transaction',
     SENT: 'Send Transaction',
@@ -40,4 +52,25 @@ export const TRANSACTION_DETAIL = {
     },
     DEFAULT_NOTE: 'No note',
     COPY_DURATION: 1500
+};
+
+export const TRANSACTION_ITEM = {
+    ID_PREFIX: 'Transaction #',
+    ID_LENGTH: 8,
+    SKELETON_COUNT: 6
+};
+
+export const DATE_FORMAT = {
+    DAY: '2-digit',
+    MONTH: '2-digit',
+    YEAR: 'numeric',
+    HOURS: '2-digit',
+    MINUTES: '2-digit',
+    SEPARATOR: '/',
+    TIME_SEPARATOR: ' '
+};
+
+export const CURRENCY = {
+    CODE: 'vi-VN',
+    SYMBOL: 'đ'
 };
