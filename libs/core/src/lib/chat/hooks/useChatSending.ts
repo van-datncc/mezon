@@ -77,8 +77,6 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			code?: number,
 			ephemeralReceiverId?: string
 		) => {
-			console.log(ephemeralReceiverId, 'ephemeralReceiverId');
-
 			if (ephemeralReceiverId) {
 				await dispatch(
 					messagesActions.sendEphemeralMessage({
