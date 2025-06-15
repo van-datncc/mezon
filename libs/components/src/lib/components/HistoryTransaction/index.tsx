@@ -67,7 +67,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 	useEffect(() => {
 		fetchTransactions(activeFilter, getCurrentPage());
-	}, [dispatch, activeFilter, currentPage, sentPage, receivedPage]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [activeFilter, currentPage, sentPage, receivedPage]);
 
 	const onPageChange = (page: number) => {
 		if (activeFilter === TRANSACTION_FILTERS.ALL) {
@@ -169,13 +170,10 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 			setActiveFilter(filter);
 			if (filter === TRANSACTION_FILTERS.ALL) {
 				setCurrentPage(1);
-				fetchTransactions(filter, 1);
 			} else if (filter === TRANSACTION_FILTERS.SENT) {
 				setSentPage(1);
-				fetchTransactions(filter, 1);
 			} else if (filter === TRANSACTION_FILTERS.RECEIVED) {
 				setReceivedPage(1);
-				fetchTransactions(filter, 1);
 			}
 		}
 	};
