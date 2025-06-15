@@ -371,12 +371,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	};
 
 	useEffect(() => {
-		if (isShowMemberList) {
-			setIsShowCreateThread(false);
-		}
-	}, [isShowMemberList, setIsShowCreateThread]);
-
-	useEffect(() => {
 		if (!isShowCanvas && !isShowAgeRestricted && draggingState) {
 			openUploadFileModal();
 		}
@@ -576,16 +570,16 @@ const OnboardingGuide = ({
 		<>
 			{missionDone < missionSum && currentMission ? (
 				<div
-					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
+					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bu dark:bg-bgTertiary bg-bgLightTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold">{currentMission.title} </div>
-						<div className="text-[10px] font-normal text-channelTextLabel">
+						<div className="text-base font-semibold dark:text-white text-black">{currentMission.title} </div>
+						<div className="text-[10px] font-normal text-gray-600 dark:text-gray-300">
 							{' '}
 							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
-							<strong className="text-channelActiveColor">#{channelMission.channel_label}</strong>{' '}
+							<strong className="dark:text-white text-gray-800">#{channelMission.channel_label}</strong>{' '}
 						</div>
 					</div>
 				</div>

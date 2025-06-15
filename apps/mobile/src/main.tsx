@@ -6,19 +6,38 @@ import { enableScreens } from 'react-native-screens';
 import App from './app/navigation';
 import CustomIncomingCall from './app/screens/customIncomingCall';
 import { createLocalNotification, setupIncomingCall } from './app/utils/pushNotificationHelpers';
-notifee.onBackgroundEvent(async () => {});
+
+const isValidString = (value: unknown): value is string => {
+	return typeof value === 'string' && value.trim().length > 0;
+};
+
+notifee.onBackgroundEvent(async () => { });
 
 registerGlobals();
 enableScreens(true);
+
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-	const offer = remoteMessage?.data?.offer;
-	if (offer) {
-		await setupIncomingCall(offer as string);
-	} else if (!remoteMessage?.notification) {
-		await createLocalNotification(remoteMessage?.data?.title as string, remoteMessage?.data?.body as string, remoteMessage.data);
-	} else {
-		// 	empty
+	try {
+		const offer = remoteMessage?.data?.offer;
+
+		// Safe handling of offer data
+		if (offer && isValidString(offer)) {
+			await setupIncomingCall(offer);
+			return;
+		}
+
+		// Safe handling of notification data
+		if (!remoteMessage?.notification && remoteMessage?.data) {
+			const { title, body } = remoteMessage.data;
+
+			if (isValidString(title) && isValidString(body)) {
+				await createLocalNotification(title, body, remoteMessage.data);
+			}
+		}
+	} catch (error) {
+		console.error('Error handling background message:', error);
 	}
 });
+
 AppRegistry.registerComponent('ComingCallApp', () => CustomIncomingCall);
 AppRegistry.registerComponent('Mobile', () => App);

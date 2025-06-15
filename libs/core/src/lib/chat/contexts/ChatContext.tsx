@@ -227,7 +227,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onvoiceleaved = useCallback(
 		(voice: VoiceLeavedEvent) => {
-			dispatch(voiceActions.remove(voice.voice_user_id + voice.voice_channel_id));
+			dispatch(voiceActions.remove(voice.id));
 		},
 		[dispatch]
 	);
@@ -412,9 +412,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							})
 						);
 					}
-					dispatch(
-						channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
-					);
+					if (message.code !== TypeMessage.ChatUpdate && message.code !== TypeMessage.ChatRemove) {
+						dispatch(
+							channelMetaActions.setChannelLastSentTimestamp({ channelId: message.channel_id, timestamp, senderId: message.sender_id })
+						);
+					}
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 					dispatch(threadsActions.updateLastSentInThread({ channelId: message.channel_id, lastSentTime: timestamp }));
 				}

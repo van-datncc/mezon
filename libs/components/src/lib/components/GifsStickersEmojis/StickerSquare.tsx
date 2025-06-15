@@ -1,11 +1,10 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import { referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectDataReferences, useAppSelector } from '@mezon/store';
+import { MediaType, referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectDataReferences, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageRef } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
@@ -39,7 +38,11 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 };
 
 function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
-	const clanStickers = useAppSelector(selectAllStickerSuggestion);
+	const allStickers = useAppSelector(selectAllStickerSuggestion);
+	const clanStickers = allStickers.filter(sticker =>
+		(sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER
+	);
+
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,
 		mode,
@@ -50,7 +53,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 	const currentId = useCurrentInbox()?.channel_id;
 	const dataReferences = useAppSelector((state) => selectDataReferences(state, currentId ?? ''));
 	const isReplyAction = dataReferences.message_ref_id && dataReferences.message_ref_id !== '';
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		const result = searchStickers(clanStickers, valueInputToCheckHandleSearch ?? '');

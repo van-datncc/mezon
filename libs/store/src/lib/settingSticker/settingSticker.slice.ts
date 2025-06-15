@@ -11,6 +11,27 @@ export const SETTING_CLAN_STICKER = 'settingSticker';
 
 const STICKER_CLAN_CACHE_TIME = 1000 * 60 * 60;
 
+export enum MediaType {
+	STICKER = 0,
+	AUDIO = 1
+}
+
+interface CustomRequest extends ApiClanStickerAddRequest {
+	media_type?: MediaType;
+}
+
+interface SoundRequest extends ApiClanStickerAddRequest {
+	media_type: MediaType;
+}
+
+interface CustomUpdateRequest extends MezonUpdateClanStickerByIdBody {
+	media_type?: MediaType;
+}
+
+interface SoundUpdateRequest extends MezonUpdateClanStickerByIdBody {
+	media_type: MediaType;
+}
+
 export interface SettingClanStickerState extends EntityState<ClanSticker, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -18,9 +39,15 @@ export interface SettingClanStickerState extends EntityState<ClanSticker, string
 }
 
 export interface UpdateStickerArgs {
-	request: MezonUpdateClanStickerByIdBody;
+	request: CustomUpdateRequest;
 	stickerId: string;
 }
+
+export interface UpdateSoundArgs {
+	request: SoundUpdateRequest;
+	soundId: string;
+}
+
 export const stickerAdapter = createEntityAdapter({
 	selectId: (sticker: ClanSticker) => sticker.id || ''
 });
@@ -57,7 +84,23 @@ export const fetchStickerByUserId = createAsyncThunk(
 			const response = await fetchStickerByUserIdCached(mezon);
 
 			if (response) {
-				return response.stickers ?? [];
+				const stickersWithMediaType = response.stickers || [];
+
+				const processedStickers = stickersWithMediaType.map((sticker: ClanSticker & { media_type?: MediaType }) => {
+					const isAudioFile = sticker.source &&
+						(sticker.source.endsWith('.mp3') || sticker.source.endsWith('.wav') || sticker.source.includes('/sounds/'));
+
+					const mediaType = sticker.media_type !== undefined
+						? sticker.media_type
+						: (isAudioFile ? MediaType.AUDIO : MediaType.STICKER);
+
+					return {
+						...sticker,
+						media_type: mediaType
+					};
+				});
+
+				return processedStickers;
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
@@ -66,12 +109,20 @@ export const fetchStickerByUserId = createAsyncThunk(
 		}
 	}
 );
+
 export const createSticker = createAsyncThunk(
 	'settingClanSticker/createSticker',
-	async (form: { request: ApiClanStickerAddRequest; clanId: string }, thunkAPI) => {
+	async (form: { request: CustomRequest; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const res = await mezon.client.addClanSticker(mezon.session, form.request);
+
+			const requestWithMediaType = {
+				...form.request,
+				media_type: form.request.media_type !== undefined ? form.request.media_type : MediaType.STICKER
+			};
+
+			const res = await mezon.client.addClanSticker(mezon.session, requestWithMediaType);
+
 			if (res) {
 				thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
 			} else {
@@ -87,9 +138,12 @@ export const createSticker = createAsyncThunk(
 export const updateSticker = createAsyncThunk('settingClanSticker/updateSticker', async ({ request, stickerId }: UpdateStickerArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, request);
+
+		const requestWithMediaType = request;
+
+		const res = await mezon.client.updateClanStickerById(mezon.session, stickerId, requestWithMediaType);
 		if (res) {
-			thunkAPI.dispatch(stickerSettingActions.update({ id: stickerId, changes: { ...request } }));
+			thunkAPI.dispatch(stickerSettingActions.update({ id: stickerId, changes: { ...requestWithMediaType } }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'settingClanSticker/updateSticker');
@@ -117,6 +171,91 @@ export const deleteSticker = createAsyncThunk(
 			}
 		} catch (error) {
 			captureSentryError(error, 'settingClanSticker/deleteSticker');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const createSound = createAsyncThunk(
+	'settingClanSticker/createSound',
+	async (form: { request: SoundRequest; clanId: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const soundRequest = {
+				...form.request,
+				media_type: MediaType.AUDIO
+			};
+
+			const res = await mezon.client.addClanSticker(mezon.session, soundRequest);
+
+			if (res) {
+				thunkAPI.dispatch(fetchStickerByUserId({ noCache: true }));
+			} else {
+				return thunkAPI.rejectWithValue({});
+			}
+		} catch (error) {
+			captureSentryError(error, 'settingClanSticker/createSound');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const updateSound = createAsyncThunk(
+	'settingClanSticker/updateSound',
+	async ({ request, soundId }: UpdateSoundArgs, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const soundRequest = {
+				...request,
+				media_type: MediaType.AUDIO
+			};
+
+			const res = await mezon.client.updateClanStickerById(mezon.session, soundId, soundRequest);
+
+			if (res) {
+				thunkAPI.dispatch(stickerSettingActions.update({ id: soundId, changes: { ...soundRequest } }));
+			}
+		} catch (error) {
+			captureSentryError(error, 'settingClanSticker/updateSound');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const deleteSound = createAsyncThunk(
+	'settingClanSticker/deleteSound',
+	async (data: { soundId: string; clan_id: string; soundLabel: string }, thunkAPI) => {
+		try {
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+			const res = await mezon.client.deleteClanStickerById(mezon.session, data.soundId, data.clan_id, data.soundLabel);
+
+			if (res) {
+				thunkAPI.dispatch(stickerSettingActions.remove(data.soundId));
+			}
+		} catch (error) {
+			captureSentryError(error, 'settingClanSticker/deleteSound');
+			return thunkAPI.rejectWithValue(error);
+		}
+	}
+);
+
+export const fetchSoundByUserId = createAsyncThunk(
+	'settingClanSticker/fetchSound',
+	async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
+		try {
+			await thunkAPI.dispatch(fetchStickerByUserId({ noCache }));
+
+			const state = thunkAPI.getState() as { settingSticker: SettingClanStickerState };
+
+			const allStickers = selectAllStickerSuggestion(state);
+			const sounds = allStickers.filter(sticker => (sticker as any).media_type === MediaType.AUDIO);
+
+			return sounds;
+		} catch (error) {
+			captureSentryError(error, 'settingClanSticker/fetchSound');
 			return thunkAPI.rejectWithValue(error);
 		}
 	}
@@ -171,5 +310,39 @@ export const selectStickerByClanId = (clanId: string) =>
 	createSelector(selectAllStickerSuggestion, (stickers) => {
 		return stickers.filter((sticker) => sticker.clan_id === clanId);
 	});
+
+export const selectStickerByClanIdAndMediaType = (clanId: string, mediaType: MediaType) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		return stickers.filter((sticker) =>
+			sticker.clan_id === clanId &&
+			(sticker as any).media_type === mediaType
+		);
+	});
+
+export const selectStickersByClanId = (clanId: string) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		return stickers.filter((sticker) => {
+			return sticker.clan_id === clanId &&
+				((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined);
+		});
+	});
+
+export const selectAudioByClanId = (clanId: string) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		const sounds = stickers.filter(sticker => {
+			return sticker.clan_id === clanId &&
+				((sticker as any).media_type === MediaType.AUDIO);
+		});
+
+		return sounds;
+	});
+
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByUserId };
+
+export const soundEffectActions = {
+	createSound,
+	updateSound,
+	deleteSound,
+	fetchSoundByUserId
+};

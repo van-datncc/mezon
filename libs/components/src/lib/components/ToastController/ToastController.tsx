@@ -1,7 +1,8 @@
-import { ToastPayload, selectToasts } from '@mezon/store';
+import { ToastPayload, selectTheme, selectToasts } from '@mezon/store';
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast as showToast } from 'react-toastify';
+import MzToast from './MzToast';
 
 function getToastFn(type: ToastPayload['type']) {
 	switch (type) {
@@ -21,7 +22,11 @@ function getToastFn(type: ToastPayload['type']) {
 const ToastController: React.FC = () => {
 	const dispatch = useDispatch();
 	const toasts = useSelector(selectToasts);
+	const appearanceTheme = useSelector(selectTheme);
 	const trackedToasts = useRef<any>({});
+
+	const isDarkMode = appearanceTheme === 'dark';
+	const currentTheme = isDarkMode ? 'dark' : 'light';
 
 	useEffect(() => {
 		for (const toast of toasts) {
@@ -31,20 +36,20 @@ const ToastController: React.FC = () => {
 
 			const toastFn = getToastFn(toast.type);
 
-			const id = toastFn(toast.message, {
+			const id = toastFn(<MzToast message={toast.message || ''} type={toast.type || 'default'} />, {
 				position: toast.position,
 				autoClose: toast.autoClose,
 				hideProgressBar: toast.hideProgressBar,
 				closeOnClick: toast.closeOnClick,
 				pauseOnHover: toast.pauseOnHover,
 				draggable: toast.draggable,
-				theme: toast.theme,
+				theme: toast.theme || currentTheme, // Use dynamic theme
 				toastId: toast.id
 			});
 
 			trackedToasts.current[toast.id] = id;
 		}
-	}, [toasts, trackedToasts, dispatch]);
+	}, [toasts, trackedToasts, dispatch, currentTheme]);
 
 	return (
 		<ToastContainer
@@ -57,7 +62,11 @@ const ToastController: React.FC = () => {
 			pauseOnFocusLoss
 			draggable
 			pauseOnHover
-			theme="light"
+			theme={currentTheme}
+			limit={5}
+			toastStyle={{
+				fontFamily: '"gg sans", "Helvetica Neue", Helvetica, Arial, sans-serif'
+			}}
 		/>
 	);
 };

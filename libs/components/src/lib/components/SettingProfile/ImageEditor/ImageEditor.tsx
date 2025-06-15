@@ -182,7 +182,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 		// Export the cropped image
 		tempCanvas.toBlob((blob) => {
 			if (!blob) return;
-			const file = new File([blob], `${imageSource.filename}+cropped`, { type: 'image/png' });
+			const file = new File([blob], `${imageSource.filename}`, { type: 'image/png' });
 			setImageCropped(file);
 			handleClose();
 		}, 'image/png');

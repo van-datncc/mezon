@@ -136,9 +136,14 @@ const fetchClansCached = memoizeAndTrack(
 	}
 );
 
-export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
+export const fetchClans = createAsyncThunk('clans/fetchClans', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+		if (noCache) {
+			fetchClansCached.clear();
+		}
+
 		const response = await fetchClansCached(mezon, LIMIT_CLAN_ITEM, 1, '');
 
 		if (!response.clandesc) {
@@ -199,7 +204,7 @@ export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: Cha
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
 		if (response) {
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({}));
 		}
 	} catch (error) {
 		captureSentryError(error, 'clans/deleteClans');
@@ -219,7 +224,7 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchClans());
+		thunkAPI.dispatch(fetchClans({}));
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'clans/removeClanUsers');
@@ -239,7 +244,7 @@ export const updateClan = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({}));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'clans/updateClans');
@@ -275,20 +280,46 @@ export const updateUser = createAsyncThunk(
 	'clans/updateUser',
 	async ({ user_name, avatar_url, display_name, about_me, logo, noCache = false, dob, encrypt_private_key }: UpdateLinkUser, thunkAPI) => {
 		try {
+			const state = thunkAPI.getState() as RootState;
+			const currentUser = state.account?.userProfile;
+
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
-			const body: ApiUpdateAccountRequest = {
-				avatar_url: avatar_url || '',
-				display_name: display_name || '',
-				lang_tag: 'en',
-				location: '',
-				timezone: '',
-				username: user_name,
-				about_me: about_me,
-				dob: dob,
-				logo: logo,
-				encrypt_private_key
-			};
-			const response = await mezon.client.updateAccount(mezon.session, body);
+
+			const body: Partial<ApiUpdateAccountRequest> = {};
+
+			if (user_name && user_name !== currentUser?.user?.username) {
+				body.username = user_name;
+			}
+
+			if (avatar_url && avatar_url !== currentUser?.user?.avatar_url) {
+				body.avatar_url = avatar_url || '';
+			}
+
+			if (display_name && display_name !== currentUser?.user?.display_name) {
+				body.display_name = display_name || '';
+			}
+
+			if (about_me && about_me !== currentUser?.user?.about_me) {
+				body.about_me = about_me;
+			}
+
+			if (dob && dob !== currentUser?.user?.dob) {
+				body.dob = dob;
+			}
+
+			if (logo && logo !== currentUser?.logo) {
+				body.logo = logo;
+			}
+
+			if (encrypt_private_key && encrypt_private_key !== currentUser?.encrypt_private_key) {
+				body.encrypt_private_key = encrypt_private_key;
+			}
+
+			if (Object.keys(body).length === 0) {
+				return true;
+			}
+
+			const response = await mezon.client.updateAccount(mezon.session, body as ApiUpdateAccountRequest);
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}

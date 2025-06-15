@@ -1,16 +1,15 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { size } from '@mezon/mobile-ui';
 import { IMessageAnimation } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, View } from 'react-native';
+import { ActivityIndicator, View, useWindowDimensions } from 'react-native';
 import useTabletLandscape from '../../../../../../../hooks/useTabletLandscape';
 import SpriteAnimation from './AnimationSprite';
 import { style } from './styles';
 
 type EmbedAnimationProps = {
 	animationOptions: IMessageAnimation;
+	themeValue?: any;
 };
-
-const screenWith = Dimensions?.get('window').width;
 
 const extractFrames = (data) => {
 	if (!data?.frames) return [];
@@ -28,16 +27,20 @@ const extractFrames = (data) => {
 	return framesArray;
 };
 
-export const EmbedAnimation = ({ animationOptions }: EmbedAnimationProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationProps) => {
+	const isTabletLandscape = useTabletLandscape();
+	const { width, height } = useWindowDimensions();
+
 	const [frames, setFrames] = useState(null);
 	const [frameWidth, setFrameWidth] = useState(0);
 	const [frameHeight, setFrameHeight] = useState(0);
 	const [spriteWidth, setSpriteWidth] = useState(0);
 	const [spriteHeight, setSpriteHeight] = useState(0);
-	const isTabletLandscape = useTabletLandscape();
+	const isPortrait = height > width;
+	const SLOT_ITEM_FRAME_WIDTH = 133;
+	const isSlotGame = frameWidth === SLOT_ITEM_FRAME_WIDTH;
 	const duration = 500;
+	const styles = style(isPortrait, isSlotGame);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -61,14 +64,22 @@ export const EmbedAnimation = ({ animationOptions }: EmbedAnimationProps) => {
 	}, []);
 
 	const animationScale = useMemo(() => {
-		if (isTabletLandscape) return 0.8;
-		if (animationOptions?.pool?.length) {
-			if (animationOptions?.pool?.length * frameWidth >= screenWith - size.s_100) {
-				return (screenWith - size.s_100) / screenWith;
+		if (animationOptions?.pool?.length > 0 && frameWidth > 0) {
+			let horizontalPadding: number;
+			const totalFrameWidth = animationOptions?.pool?.length * frameWidth;
+			const scaleFactor = isTabletLandscape ? 0.36 : 1;
+
+			if (isPortrait) {
+				horizontalPadding = isSlotGame ? size.s_110 : size.s_70;
+			} else if (!isPortrait) {
+				horizontalPadding = isSlotGame ? size.s_210 : size.s_150;
 			}
+
+			const fitScale = (width - horizontalPadding) / totalFrameWidth;
+			return fitScale * scaleFactor;
 		}
 		return 1;
-	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape]);
+	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape, isPortrait, width, isSlotGame]);
 
 	if (!frames) {
 		return (
