@@ -74,8 +74,31 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 			_anonymous?: boolean,
 			mentionEveryone?: boolean,
 			isMobile?: boolean,
-			code?: number
+			code?: number,
+			ephemeralReceiverId?: string
 		) => {
+			console.log(ephemeralReceiverId, 'ephemeralReceiverId');
+
+			if (ephemeralReceiverId) {
+				await dispatch(
+					messagesActions.sendEphemeralMessage({
+						receiverId: ephemeralReceiverId,
+						channelId: channelIdOrDirectId ?? '',
+						clanId: getClanId || '',
+						mode,
+						isPublic: isPublic,
+						content: content,
+						mentions: mentions,
+						attachments,
+						references,
+						senderId: currentUserId,
+						avatar: priorityAvatar,
+						username: priorityNameToShow
+					})
+				);
+				return;
+			}
+
 			if (fromTopic) {
 				if (!currentTopicId) {
 					const topic = (await createTopic()) as ApiSdTopic;

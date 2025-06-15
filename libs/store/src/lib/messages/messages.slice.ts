@@ -759,6 +759,53 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 	}
 });
 
+// Add ephemeral message sending functionality
+type SendEphemeralMessagePayload = {
+	receiverId: string;
+	clanId: string;
+	channelId: string;
+	content: IMessageSendPayload;
+	mentions?: Array<ApiMessageMention>;
+	attachments?: Array<ApiMessageAttachment>;
+	references?: Array<ApiMessageRef>;
+	mode: number;
+	senderId: string;
+	isPublic: boolean;
+	avatar?: string;
+	username?: string;
+};
+
+export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMessage', async (payload: SendEphemeralMessagePayload, thunkAPI) => {
+	const { receiverId, clanId, channelId, content, mentions, attachments, references, mode, senderId, isPublic, avatar, username } = payload;
+
+	try {
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const session = mezon.sessionRef.current;
+		const client = mezon.clientRef.current;
+		const socket = mezon.socketRef.current;
+
+		if (!client || !session || !socket || !channelId) {
+			throw new Error('Client is not initialized');
+		}
+
+		let uploadedFiles: ApiMessageAttachment[] = [];
+		if (attachments && attachments.length > 0) {
+			uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
+		}
+
+		// writeEphemeralMessage(receiver_id: string, clan_id: string, channel_id: string, mode: number, is_public: boolean, content?: any, mentions?: Array<ApiMessageMention>, attachments?: Array<ApiMessageAttachment>, references?: Array<ApiMessageRef>, anonymous_message?: boolean, mention_everyone?: boolean, avatar?: string, code?: number, topic_id?: string): Promise<ChannelMessageAck>;
+		await socket.writeEphemeralMessage(receiverId, clanId, channelId, mode, isPublic, content, mentions, uploadedFiles, references);
+
+		return {
+			message_id: Snowflake.generate(),
+			create_time: new Date().toISOString()
+		};
+	} catch (error) {
+		console.error('Failed to send ephemeral message:', error);
+		throw error;
+	}
+});
+
 export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (message: MessagesEntity, thunkAPI) => {
 	if (!message?.channel_id) return;
 
@@ -1358,6 +1405,7 @@ export const messagesActions = {
 	...messagesSlice.actions,
 	addNewMessage,
 	sendMessage,
+	sendEphemeralMessage,
 	fetchMessages,
 	updateLastSeenMessage,
 	updateTypingUsers,

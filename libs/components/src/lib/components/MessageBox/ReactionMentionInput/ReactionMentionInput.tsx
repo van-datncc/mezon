@@ -87,6 +87,14 @@ import {
 import processMention from './processMention';
 import { getCanvasTitles } from './utils/canvas';
 
+const slashCommands = [
+	{
+		id: 'ephemeral',
+		display: 'ephemeral',
+		description: 'Send an ephemeral message (only visible to selected user)'
+	}
+];
+
 const MentionsInput = MentionsInputComponent as any;
 const Mention = MentionComponent as any;
 
@@ -146,6 +154,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const addEmojiState = useSelector(selectAddEmojiState);
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
 	const { queryEmojis } = useEmojiQuery();
+
+	const [isEphemeralMode, setIsEphemeralMode] = useState(false);
+	const [ephemeralTargetUserId, setEphemeralTargetUserId] = useState<string | null>(null);
+	const [ephemeralTargetUserDisplay, setEphemeralTargetUserDisplay] = useState<string | null>(null);
 
 	const reactionRightState = useSelector(selectReactionRightState);
 	const isNotChannel = props.isThread || props.isTopic;
@@ -332,8 +344,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					[dataReferences],
 					{ nameValueThread, isPrivate },
 					anonymousMessage,
-					mentionEveryone
+					mentionEveryone,
+					undefined,
+					undefined,
+					ephemeralTargetUserId || undefined
 				);
+
 				setMentionEveryone(false);
 				dispatch(referencesActions.resetAfterReply(props.currentChannelId ?? ''));
 				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
@@ -347,7 +363,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					valueThread?.references,
 					{ nameValueThread: nameValueThread ?? valueThread?.content.t, isPrivate },
 					anonymousMessage,
-					mentionEveryone
+					mentionEveryone,
+					undefined,
+					undefined,
+					ephemeralTargetUserId || undefined
 				);
 				dispatch(
 					referencesActions.setAtachmentAfterUpload({
@@ -369,7 +388,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					[dataReferencesTopic],
 					{ nameValueThread, isPrivate },
 					anonymousMessage,
-					mentionEveryone
+					mentionEveryone,
+					undefined,
+					undefined,
+					ephemeralTargetUserId || undefined
 				);
 				setMentionEveryone(false);
 				dispatch(
@@ -389,13 +411,22 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					undefined,
 					{ nameValueThread, isPrivate },
 					anonymousMessage,
-					mentionEveryone
+					mentionEveryone,
+					undefined,
+					undefined,
+					ephemeralTargetUserId || undefined
 				);
 				setMentionEveryone(false);
 				dispatch(threadsActions.setNameValueThread({ channelId: props.currentChannelId as string, nameValue: '' }));
 				setMentionData([]);
 				dispatch(threadsActions.setIsPrivate(0));
 			}
+
+			if (ephemeralTargetUserId) {
+				setEphemeralTargetUserId(null);
+				setEphemeralTargetUserDisplay(null);
+			}
+
 			updateDraft({
 				valueTextInput: '',
 				content: '',
@@ -492,6 +523,41 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 
 		const store = getStore();
 
+		if (newPlainTextValue.startsWith('/ephemeral ')) {
+			const command = newPlainTextValue.substring(11).trim();
+			if (command) {
+				const matchedUser = props.listMentions?.find(
+					(user) =>
+						user.display?.toLowerCase().includes(command.toLowerCase()) || user.username?.toLowerCase().includes(command.toLowerCase())
+				);
+				if (matchedUser) {
+					setEphemeralTargetUserId(String(matchedUser.id));
+					setEphemeralTargetUserDisplay(matchedUser.display || matchedUser.username || '');
+					updateDraft({
+						valueTextInput: '',
+						content: '',
+						mentionRaw: []
+					});
+					return;
+				}
+			}
+		}
+
+		if (isEphemeralMode && newMentions.length > 0) {
+			const selectedUser = newMentions[0];
+			if (selectedUser) {
+				setEphemeralTargetUserId(String(selectedUser.id));
+				setEphemeralTargetUserDisplay(selectedUser.display || '');
+				setIsEphemeralMode(false);
+				updateDraft({
+					valueTextInput: '',
+					content: '',
+					mentionRaw: []
+				});
+				return;
+			}
+		}
+
 		updateDraft({
 			valueTextInput: newValue,
 			content: newPlainTextValue,
@@ -560,6 +626,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			setTitleModalMention('Text channels');
 		} else if (newPlainTextValue.endsWith(':')) {
 			setTitleModalMention('Emoji matching');
+		} else if (newPlainTextValue.endsWith('/')) {
+			setTitleModalMention('Commands');
 		}
 	};
 
@@ -576,9 +644,14 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			}
 
 			setValueHightlight(search);
-			callback(searchMentionsHashtag(search, props.listMentions ?? []));
+			callback(
+				searchMentionsHashtag(
+					search,
+					!isEphemeralMode ? props.listMentions || [] : props.listMentions?.filter((item) => item.display !== '@here') || []
+				)
+			);
 		},
-		[props.listMentions]
+		[props.listMentions, isEphemeralMode]
 	);
 
 	const handleSearchHashtag = useCallback(
@@ -610,6 +683,27 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			}
 		},
 		[isDm]
+	);
+
+	const handleSearchSlashCommands = useCallback((search: string, callback: any) => {
+		setValueHightlight(search);
+		const filteredCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
+		callback(filteredCommands);
+	}, []);
+
+	const handleSlashCommandSelect = useCallback(
+		(commandId: string) => {
+			if (commandId === 'ephemeral') {
+				setIsEphemeralMode(true);
+				setTitleModalMention('Select user for ephemeral message');
+				updateDraft({
+					valueTextInput: '@',
+					content: '@',
+					mentionRaw: []
+				});
+			}
+		},
+		[updateDraft]
 	);
 
 	useClickUpToEditMessage({
@@ -656,7 +750,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						paddingRight: '8px'
 					}}
 				>
-					Write your thoughts here...
+					{ephemeralTargetUserId ? `Ephemeral message to ${ephemeralTargetUserDisplay}...` : 'Write your thoughts here...'}
 				</span>
 				<MentionsInput
 					onPaste={(event: any) => {
@@ -805,6 +899,30 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						}}
 						className="dark:!text-white !text-black"
 						style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: appearanceTheme === 'dark' ? 'white' : 'black' }}
+					/>
+					<Mention
+						trigger="/"
+						markup="/__display__"
+						data={handleSearchSlashCommands}
+						displayTransform={(id: any, display: any) => {
+							return `/${display}`;
+						}}
+						renderSuggestion={(suggestion: any) => {
+							return (
+								<SuggestItem
+									valueHightLight={valueHighlight}
+									display={suggestion.display}
+									symbol="/"
+									subText={suggestion.description}
+									emojiId=""
+								/>
+							);
+						}}
+						onAdd={(id: string) => {
+							handleSlashCommandSelect(id);
+						}}
+						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						appendSpaceOnAdd={true}
 					/>
 				</MentionsInput>
 			</div>
