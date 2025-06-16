@@ -124,21 +124,19 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		if (isElectron()) {
 			clearAllMemoizedFunctions();
 			localStorage.removeItem('remember_channel');
+
 			dispatch(clansActions.setCurrentClanId('0'));
 			navigate('/chat/direct/friend');
 			await createSocket();
-			if (allAccount) {
-				const session = new Session(
-					allAccount.token,
-					allAccount.refresh_token,
-					allAccount.created,
-					allAccount.api_url,
-					!!allAccount.is_remember
-				);
-				await connectWithSession({ ...session, is_remember: true });
-			}
 
-			dispatch(authActions.switchAccount(allAccount?.user_id as string));
+			if (allAccount) {
+				const { token, refresh_token, created, api_url, is_remember, user_id } = allAccount;
+
+				const session = new Session(token, refresh_token, created, api_url, !!is_remember);
+
+				await connectWithSession({ ...session, is_remember: true });
+				if (user_id) dispatch(authActions.switchAccount(user_id));
+			}
 		}
 	};
 
