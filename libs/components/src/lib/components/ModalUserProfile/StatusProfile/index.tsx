@@ -4,6 +4,7 @@ import {
 	accountActions,
 	authActions,
 	clanMembersMetaActions,
+	clansActions,
 	clearAllMemoizedFunctions,
 	giveCoffeeActions,
 	selectOthersSession,
@@ -122,6 +123,8 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			clearAllMemoizedFunctions();
+			localStorage.removeItem('remember_channel');
+			dispatch(clansActions.setCurrentClanId('0'));
 			navigate('/chat/direct/friend');
 			await createSocket();
 			if (allAccount) {
