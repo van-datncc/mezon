@@ -23,7 +23,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	const [focus, setFocus] = useState<boolean>(false);
 	const dispatch = useAppDispatch();
 	const clanId = useSelector(selectCurrentClanId);
-	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname || '');
+	const [nameEmoji, setNameEmoji] = useState<string>(emoji.shortname?.slice(1, -1) || '');
 	const dataAuthor = useSelector(selectMemberClanByUserId(emoji.creator_id ?? ''));
 	const [hasManageClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const currentUserId = useAppSelector(selectCurrentUserId);
@@ -53,7 +53,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 		if (nameEmoji !== emoji.shortname && nameEmoji !== '') {
 			const request: MezonUpdateClanEmojiByIdBody = {
 				source: emoji.src,
-				shortname: nameEmoji,
+				shortname: ':' + nameEmoji + ':',
 				category: emoji.category,
 				clan_id: clanId as string
 			};
@@ -82,7 +82,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 							'h-[26px] px-1 w-fit max-md:w-full relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
 						}
 					>
-						<p className={`max-w-[172px] w-full truncate overflow-hidden inline-block select-none`}>{emoji.shortname}</p>
+						<p className={`max-w-[172px] w-full truncate overflow-hidden inline-block select-none`}>{emoji.shortname?.slice(1, -1)}</p>
 					</div>
 					{showEdit && (
 						<input
