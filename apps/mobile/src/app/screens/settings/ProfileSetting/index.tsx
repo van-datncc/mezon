@@ -181,7 +181,7 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 			);
 
 			dispatch(appActions.setLoadingMainMobile(false));
-			if (response) {
+			if (response && response?.status !== 400) {
 				if (currentChannelId && currentClanId) {
 					await dispatch(
 						channelMembersActions.fetchChannelMembers({
@@ -197,6 +197,11 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 					text1: t('updateProfileSuccess')
 				});
 				navigation.goBack();
+			} else {
+				Toast.show({
+					type: 'error',
+					text1: t('updateProfileError')
+				});
 			}
 		} catch (e) {
 			dispatch(appActions.setLoadingMainMobile(false));

@@ -2,11 +2,9 @@ import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components'
 import { useTheme } from '@mezon/mobile-ui';
 import { selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
-import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { forwardRef, memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { DeviceEventEmitter, DimensionValue, Platform, StyleProp, Text, View, ViewStyle } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { openCropper } from 'react-native-image-crop-picker';
+import { DeviceEventEmitter, DimensionValue, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { openPicker } from 'react-native-image-crop-picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSelector } from 'react-redux';
 import MezonClanAvatar from '../MezonClanAvatar';
@@ -135,39 +133,36 @@ export default memo(
 		}
 
 		async function handleImage() {
-			const file = await handleSelectImage();
-			if (file) {
-				timerRef.current = setTimeout(
-					async () => {
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-						const croppedFile = await openCropper({
-							path: file.uri,
-							mediaType: 'photo',
-							includeBase64: true,
-							compressImageQuality: QUALITY_IMAGE_UPLOAD,
-							...(typeof width === 'number' && { width: imageWidth || width * SCALE }),
-							...(typeof height === 'number' && { height: imageWidth || height * SCALE })
-						});
-						setImage(croppedFile.path);
-						onChange && onChange(croppedFile);
-						if (autoUpload) {
-							const uploadImagePayload = {
-								fileData: croppedFile?.data,
-								name: file.name,
-								uri: croppedFile.path,
-								size: croppedFile.size,
-								type: croppedFile.mime,
-								height: croppedFile.height,
-								width: croppedFile.width
-							} as IFile;
-							const url = await handleUploadImage(uploadImagePayload);
-							if (url) {
-								onLoad && onLoad(url);
-							}
-						}
-					},
-					Platform.OS === 'ios' ? 500 : 0
-				);
+			try {
+				const croppedFile = await openPicker({
+					mediaType: 'photo',
+					includeBase64: true,
+					cropping: true,
+					compressImageQuality: QUALITY_IMAGE_UPLOAD,
+					...(typeof width === 'number' && { width: imageWidth || width * SCALE }),
+					...(typeof height === 'number' && { height: imageWidth || height * SCALE })
+				});
+				setImage(croppedFile.path);
+				onChange && onChange(croppedFile);
+				if (autoUpload) {
+					const uploadImagePayload = {
+						fileData: croppedFile?.data,
+						name: croppedFile?.filename || croppedFile?.path?.split?.('/')?.pop?.().trim() || 'image',
+						uri: croppedFile.path,
+						size: croppedFile.size,
+						type: croppedFile.mime,
+						height: croppedFile.height,
+						width: croppedFile.width
+					} as IFile;
+					const url = await handleUploadImage(uploadImagePayload);
+					if (url) {
+						onLoad && onLoad(url);
+					}
+				}
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+			} catch (error) {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				console.error('Error in handleImage:', error);
 			}
 		}
 
