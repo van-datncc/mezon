@@ -111,8 +111,8 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 	}, [endDate, startDate]);
 
 	const isErrorEndTime = useMemo(() => {
-		return startTime.getTime() >= endTime.getTime();
-	}, [endTime, startTime]);
+		return startDate.getDate() >= endDate.getDate() && startTime.getTime() >= endTime.getTime();
+	}, [endDate, endTime, startDate, startTime]);
 
 	function handlePressNext() {
 		setIsValidEventTitle(!!eventTitle?.trim()?.length);
