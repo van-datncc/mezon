@@ -182,7 +182,6 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 					await handleLeaveRoom(voiceInfo?.clanId || '', voiceInfo?.channelId || '');
 					setToken('');
 					setVoicePlay(false);
-					setIsAnimationComplete(true);
 					dispatch(appActions.setLoadingMainMobile(true));
 					await sleep(1000);
 				}
