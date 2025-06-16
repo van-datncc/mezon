@@ -75,7 +75,7 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 					participant: channelRes.participant || '',
 					voice_channel_label: '',
 					last_screenshot: '',
-					id: channelRes.user_id || ''
+					id: channelRes.id || ''
 				};
 			});
 
