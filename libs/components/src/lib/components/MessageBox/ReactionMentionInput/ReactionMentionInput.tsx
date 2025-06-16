@@ -479,7 +479,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		updateDraft,
 		handleUndoRedoShortcut,
 		handleSend,
-		anonymousMode
+		anonymousMode,
+		isEphemeralMode,
+		setIsEphemeralMode,
+		setEphemeralTargetUserId,
+		setEphemeralTargetUserDisplay,
+		ephemeralTargetUserId
 	});
 
 	const closeMenu = useSelector(selectCloseMenu);
