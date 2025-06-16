@@ -839,8 +839,6 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 		return;
 	}
 
-	console.log('addNewMessage');
-
 	thunkAPI.dispatch(messagesActions.newMessage(message));
 
 	thunkAPI.dispatch(
