@@ -73,12 +73,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       while let presentedController = currentController?.presentedViewController {
           currentController = presentedController
       }
-      
+
       // If we have a modal presented, allow all orientations to prevent crashes
       if currentController != window?.rootViewController {
           return .allButUpsideDown
       }
-      
+
       // No modal presented - apply device-specific rules
       if UIDevice.current.userInterfaceIdiom == .pad {
           return .landscape  // iPad landscape only
