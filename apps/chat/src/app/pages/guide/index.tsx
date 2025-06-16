@@ -9,7 +9,7 @@ function GuideMain() {
 		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll  scrollbar-hide flex flex-col items-center">
 			<div className="flex flex-col w-[104%]">
 				<div
-					className={`h-36 w-full object-cover ${currentClan?.banner ? '' : 'bg-bgModalDark'} rounded-xl flex items-center justify-center`}
+					className={`h-36 w-full object-cover ${currentClan?.banner ? '' : 'bg-gray-200 dark:bg-gray-800'} rounded-xl flex items-center justify-center`}
 				>
 					{currentClan?.banner ? <img src={currentClan.banner} className="w-full h-full object-cover  rounded-xl" /> : null}
 				</div>
@@ -25,7 +25,7 @@ function GuideMain() {
 					)}
 				</div>
 				<div className=" flex gap-3 items-end h-28">
-					<div className="text-[32px] font-bold leading-8">
+					<div className="text-[32px] font-bold leading-8 text-gray-800 dark:text-white">
 						{currentClan?.clan_name ?? `${clanOwner?.user?.display_name ?? clanOwner?.user?.username}'s`} clan
 					</div>
 					<div className="relative h-6 w-6">
@@ -52,7 +52,7 @@ function GuideMain() {
 						</svg>
 					</div>
 					<div className="flex-1 flex justify-end">
-						<div className="w-24 h-9 py-[2px] flex items-center justify-center rounded-md bg-bgModifierHover">Invite</div>
+						<div className="w-24 h-9 py-[2px] flex items-center justify-center rounded-md bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white cursor-pointer">Invite</div>
 					</div>
 				</div>
 			</div>
