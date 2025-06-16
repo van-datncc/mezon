@@ -26,6 +26,7 @@ type searchMessagesProps = {
 	totalResult: number;
 	channelId: string;
 	isDm?: boolean;
+	isLoading?: boolean;
 };
 
 type GroupedMessages = {
@@ -33,12 +34,14 @@ type GroupedMessages = {
 	messages: SearchMessageEntity[];
 }[];
 
-const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, channelId, isDm }: searchMessagesProps) => {
+const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, channelId, isDm, isLoading }: searchMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const userId = useSelector(selectAllAccount)?.user?.id;
 	const currentClanUser = useAppSelector((state) => selectMemberClanByUserId2(state, userId as string));
 	const messageContainerRef = useRef<HTMLDivElement>(null);
 	const onPageChange = (page: number) => {
+		console.log({ page, channelId }, 'page');
+
 		dispatch(searchMessagesActions.setCurrentPage({ channelId, page }));
 	};
 
@@ -71,6 +74,23 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 	}, [currentPage]);
 
 	const appearanceTheme = useSelector(selectTheme);
+
+	if (isLoading) {
+		return (
+			<>
+				<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+				<div className="flex flex-col w-[420px] h-full">
+					<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
+						<h3 className="select-none">Searching...</h3>
+					</div>
+					<div className="flex items-center justify-center flex-1 bg-bgLightSecondary dark:bg-bgSecondary">
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-textPrimary"></div>
+					</div>
+				</div>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
