@@ -13,14 +13,17 @@ export interface WalletLedgerState {
 	detailLedger?: ApiTransactionDetail | null;
 }
 
-export const fetchListWalletLedger = createAsyncThunk('walletLedger/fetchList', async ({ page, filter }: { page?: number, filter?: number }, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const response = await mezon.client.listWalletLedger(mezon.session, 8, filter, '', page);
-	return {
-		ledgers: response.wallet_ledger || [],
-		count: response.count || 0
-	};
-});
+export const fetchListWalletLedger = createAsyncThunk(
+	'walletLedger/fetchList',
+	async ({ page, filter }: { page?: number; filter?: number }, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.listWalletLedger(mezon.session, 8, filter, '', page);
+		return {
+			ledgers: response.wallet_ledger || [],
+			count: response.count || 0
+		};
+	}
+);
 
 export const fetchDetailTransaction = createAsyncThunk('walletLedger/fetchDetailTransaction', async ({ transId }: { transId: string }, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));

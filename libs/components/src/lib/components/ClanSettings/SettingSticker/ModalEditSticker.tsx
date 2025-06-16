@@ -86,7 +86,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			const updateData: MezonUpdateClanEmojiByIdBody = {
 				source: graphicSource,
 				category: graphic?.category,
-				shortname: editingGraphic.shortname,
+				shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
 				clan_id: currentClanId || ''
 			};
 
@@ -136,7 +136,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				id: id,
 				category: category,
 				clan_id: currentClanId,
-				shortname: editingGraphic.shortname,
+				shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
 				source: attachment.url
 			};
 

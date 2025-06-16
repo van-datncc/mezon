@@ -41,7 +41,7 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 	const handleUpdateEmoji = async () => {
 		const request: MezonUpdateClanEmojiByIdBody = {
 			source: item.src,
-			shortname: emojiName,
+			shortname: `:${emojiName}:`,
 			category: item.category,
 			clan_id: item.clan_id
 		};
@@ -86,6 +86,9 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 	};
 
 	const RightAction = () => {
+		if (!hasDeleteOrEditPermission) {
+			return null;
+		}
 		return (
 			<View style={styles.rightItem}>
 				<TouchableOpacity style={styles.deleteButton} onPress={handleDeleteEmoji}>
