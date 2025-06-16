@@ -230,7 +230,7 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
-			className="w-[100dvw] h-[100dvh] bg-black relative z-30 flex items-center justify-center bg-opacity-60"
+			className="w-[100dvw] h-[100dvh] bg-black z-30 flex items-center justify-center bg-opacity-60 fixed top-0"
 		>
 			<form className="space-y-2 bg-black p-12 rounded-lg w-[400px]">
 				<label htmlFor="email" className="block text-sm font-medium text-black dark:text-gray-300">
