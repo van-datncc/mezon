@@ -1,7 +1,9 @@
 import {
+	EStateFriend,
 	friendsActions,
 	requestAddFriendParam,
 	selectAllFriends,
+	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectGrouplMembers,
 	useAppDispatch,
@@ -16,6 +18,7 @@ export function useFriends() {
 	const currentDM = useSelector(selectDmGroupCurrentId);
 	const groupDmMember = useAppSelector((state) => selectGrouplMembers(state, currentDM as string));
 	const numberMemberInDmGroup = useMemo(() => groupDmMember.length, [groupDmMember]);
+	const currentUserId = useSelector(selectCurrentUserId);
 	const dispatch = useAppDispatch();
 
 	const quantityPendingRequest = useMemo(() => {
@@ -52,23 +55,39 @@ export function useFriends() {
 	);
 
 	const blockFriend = useCallback(
-		(username: string, id: string) => {
+		async (username: string, id: string) => {
 			const body = {
 				usernames: [username],
 				ids: [id]
 			};
-			dispatch(friendsActions.sendRequestBlockFriend(body));
+			const response = await dispatch(friendsActions.sendRequestBlockFriend(body));
+
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				dispatch(
+					friendsActions.updateFriendState({
+						userId: id,
+						friendState: EStateFriend.BLOCK,
+						sourceId: currentUserId
+					})
+				);
+				return true;
+			}
+			return false;
 		},
-		[dispatch]
+		[dispatch, currentUserId]
 	);
 
 	const unBlockFriend = useCallback(
-		(username: string, id: string) => {
+		async (username: string, id: string) => {
 			const body = {
 				usernames: [username],
 				ids: [id]
 			};
-			dispatch(friendsActions.sendRequestDeleteFriend(body));
+			const response = await dispatch(friendsActions.sendRequestDeleteFriend(body));
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				return true;
+			}
+			return false;
 		},
 		[dispatch]
 	);
@@ -103,6 +122,16 @@ export function useFriends() {
 			filteredFriends,
 			numberMemberInDmGroup
 		}),
-		[friends, quantityPendingRequest, addFriend, acceptFriend, deleteFriend, blockFriend, unBlockFriend, filteredFriends]
+		[
+			friends,
+			quantityPendingRequest,
+			addFriend,
+			acceptFriend,
+			deleteFriend,
+			blockFriend,
+			unBlockFriend,
+			filteredFriends,
+			numberMemberInDmGroup
+		]
 	);
 }

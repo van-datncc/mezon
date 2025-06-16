@@ -179,7 +179,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			<StatusBarHeight />
 			<HeaderDirectMessage from={from} styles={styles} themeValue={themeValue} directMessageId={directMessageId} />
 			{directMessageId && (
-				<ChatMessageWrapper directMessageId={directMessageId} isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM} currentClanId={'0'} />
+				<ChatMessageWrapper
+					directMessageId={directMessageId}
+					isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM}
+					currentClanId={'0'}
+					targetUserId={currentDmGroup?.user_id?.[0]}
+				/>
 			)}
 		</View>
 	);
