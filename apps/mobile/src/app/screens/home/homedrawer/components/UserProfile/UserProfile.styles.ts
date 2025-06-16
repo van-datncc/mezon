@@ -106,7 +106,7 @@ export const style = (colors: Attributes) =>
 			fontWeight: '400'
 		},
 		defaultText: {
-			color: colors.white,
+			color: 'white',
 			textAlign: 'center'
 		},
 		button: {
