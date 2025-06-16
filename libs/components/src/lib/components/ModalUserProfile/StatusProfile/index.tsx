@@ -12,11 +12,12 @@ import {
 	userClanProfileActions,
 	userStatusActions
 } from '@mezon/store';
-import { createClient, useMezon } from '@mezon/transport';
+import { createClient as createMezonClient, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
+import { Session } from 'mezon-js';
 import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
@@ -93,7 +94,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		dispatch(accountActions.updateUserStatus(status));
 	};
 
-	const { createSocket } = useMezon();
+	const { createSocket, connectWithSession } = useMezon();
 	const navigate = useNavigate();
 	const handleSetAccount = (email: string, password: string) => {
 		if (isElectron()) {
@@ -103,7 +104,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				key: process.env.NX_CHAT_APP_API_KEY as string,
 				ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
 			};
-			const clientLogin = createClient(gw_login);
+			const clientLogin = createMezonClient(gw_login);
 
 			clientLogin.authenticateEmail(email, password).then((response) => {
 				dispatch(authActions.setSession(response));
@@ -120,10 +121,21 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
-			await createSocket();
-			dispatch(authActions.switchAccount(allAccount?.user_id as string));
 			clearAllMemoizedFunctions();
 			navigate('/chat/direct/friend');
+			await createSocket();
+			if (allAccount) {
+				const session = new Session(
+					allAccount.token,
+					allAccount.refresh_token,
+					allAccount.created,
+					allAccount.api_url,
+					!!allAccount.is_remember
+				);
+				await connectWithSession({ ...session, is_remember: true });
+			}
+
+			dispatch(authActions.switchAccount(allAccount?.user_id as string));
 		}
 	};
 
