@@ -1394,7 +1394,8 @@ export type MentionReactInputProps = {
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
 		displayName?: string,
-		clanNick?: string
+		clanNick?: string,
+		ephemeralReceiverId?: string
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
