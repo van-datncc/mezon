@@ -6,6 +6,7 @@ import {
 	ChannelsEntity,
 	DMCallActions,
 	EMarkAsReadType,
+	EStateFriend,
 	RootState,
 	ThreadsEntity,
 	accountActions,
@@ -105,6 +106,7 @@ import {
 import isElectron from 'is-electron';
 import {
 	AddClanUserEvent,
+	BlockFriend,
 	CategoryEvent,
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -1811,6 +1813,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		);
 	}, []);
 
+	const onblockfriend = useCallback(
+		(blockFriend: BlockFriend) => {
+			if (!blockFriend.user_id) {
+				return;
+			}
+			dispatch(
+				friendsActions.updateFriendState({
+					userId: blockFriend.user_id,
+					friendState: EStateFriend.BLOCK,
+					sourceId: blockFriend.user_id
+				})
+			);
+		},
+		[dispatch]
+	);
+
 	const onMarkAsRead = useCallback(async (markAsReadEvent: MarkAsRead) => {
 		const store = getStore();
 
@@ -2002,6 +2020,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onUnpinMessageEvent = onUnpinMessageEvent;
 
+			socket.onblockfriend = onblockfriend;
+
 			socket.onmarkasread = onMarkAsRead;
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2054,7 +2074,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			onclanupdated,
 			onJoinChannelAppEvent,
 			onsdtopicevent,
-			onUnpinMessageEvent
+			onUnpinMessageEvent,
+			onblockfriend
 		]
 	);
 
@@ -2176,6 +2197,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			socket.onsdtopicevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onUnpinMessageEvent = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onblockfriend = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -2227,7 +2250,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		ontokensent,
 		onJoinChannelAppEvent,
 		onsdtopicevent,
-		onUnpinMessageEvent
+		onUnpinMessageEvent,
+		onblockfriend
 	]);
 
 	const value = React.useMemo<ChatContextValue>(

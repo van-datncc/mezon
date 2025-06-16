@@ -8,11 +8,13 @@ import {
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
 } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions } from '@mezon/store-mobile';
+import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions, selectBlockedUsers } from '@mezon/store-mobile';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Platform, Text, TouchableOpacity, View } from 'react-native';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import Toast from 'react-native-toast-message';
+import { useSelector } from 'react-redux';
 import { SeparatorWithLine } from '../../../components/Common';
 import { APP_SCREEN, SettingScreenProps } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -37,6 +39,8 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
 	const { t } = useTranslation('accountSetting');
+	const blockedUsers = useSelector(selectBlockedUsers);
+	const blockedUsersCount = blockedUsers?.length.toString();
 
 	const logout = async () => {
 		const store = await getStoreAsync();
@@ -123,7 +127,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 		const usersOptions: IAccountOption[] = [
 			{
 				title: t('blockedUsers'),
-				description: '0', //TODO: get blocked count
+				description: blockedUsersCount,
 				type: EAccountSettingType.BlockedUsers
 			}
 		];
@@ -143,7 +147,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 			usersOptions,
 			accountManagementOptions
 		};
-	}, [t, userProfile?.user?.username]);
+	}, [t, userProfile?.user?.username, blockedUsersCount]);
 
 	return (
 		<View style={styles.container}>

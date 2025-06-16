@@ -49,9 +49,12 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
+			displayName?: string,
+			clanNick?: string,
+			ephemeralReceiverId?: string
 		) => {
-			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
+			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone, false, undefined, ephemeralReceiverId);
 			handDoMessageMission();
 		},
 		[sendMessage, currentMission]

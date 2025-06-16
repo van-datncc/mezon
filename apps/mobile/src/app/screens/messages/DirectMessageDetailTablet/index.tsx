@@ -230,7 +230,14 @@ export const DirectMessageDetailTablet = ({ directMessageId }: { directMessageId
 	return (
 		<View style={styles.dmMessageContainer}>
 			<HeaderDirectMessage directMessageId={directMessageId} styles={styles} themeValue={themeValue} />
-			{directMessageId && <ChatMessageWrapper directMessageId={directMessageId} isModeDM={isModeDM} currentClanId={'0'} />}
+			{directMessageId && (
+				<ChatMessageWrapper
+					directMessageId={directMessageId}
+					isModeDM={isModeDM}
+					currentClanId={'0'}
+					targetUserId={currentDmGroup?.user_id?.[0]}
+				/>
+			)}
 		</View>
 	);
 };
