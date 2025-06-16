@@ -119,9 +119,9 @@ const ParticipantItem = ({ participant, tracks, setFocusedScreenShare, isGridLay
 					{!isPiPMode && (
 						<View style={styles.wrapperUser}>
 							{participant.isMicrophoneEnabled ? (
-								<MezonIconCDN icon={IconCDN.microphoneIcon} height={size.s_14} />
+								<MezonIconCDN icon={IconCDN.microphoneIcon} height={size.s_14} color={themeValue.textStrong}/>
 							) : (
-								<MezonIconCDN icon={IconCDN.microphoneSlashIcon} height={size.s_14} />
+								<MezonIconCDN icon={IconCDN.microphoneSlashIcon} height={size.s_14} color={themeValue.textStrong}/>
 							)}
 							{isLoading ? (
 								<Icons.LoadingIcon width={24} height={24} />
