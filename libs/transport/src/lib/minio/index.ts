@@ -151,7 +151,7 @@ export function createUploadFilePath(
 	const originalFilename = filename;
 	// Append milliseconds timestamp to filename
 	const ms = Date.now();
-	filename = isMobile ? ms + filename : ms + '_' + index + filename;
+	filename = isMobile ? ms + filename : ms + '_' + (index || '') + filename;
 	filename = filename.replace(/[^a-zA-Z0-9.]/g, '_');
 	// Ensure valid clan and channel IDs
 	if (!currentClanId) {
