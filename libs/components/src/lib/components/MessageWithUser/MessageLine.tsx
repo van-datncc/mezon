@@ -23,6 +23,7 @@ interface RenderContentProps {
 	isReply?: boolean;
 	onClickToMessage?: (event: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => void;
 	className?: string;
+	isEphemeral?: boolean;
 }
 
 export interface ElementToken {
@@ -187,7 +188,8 @@ export const MessageLine = ({
 	onCopy,
 	messageId,
 	isReply,
-	onClickToMessage
+	onClickToMessage,
+	isEphemeral
 }: RenderContentProps) => {
 	mode = mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL;
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], lky = [] } = content || {};
@@ -478,7 +480,7 @@ export const MessageLine = ({
 							minHeight: 30
 						}
 			}
-			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'}`}
+			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
 		>
 			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>

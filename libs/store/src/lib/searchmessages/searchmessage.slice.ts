@@ -225,3 +225,5 @@ export const selectValueInputSearchMessage = createSelector([getSearchMessageSta
 export const selectSearchedRequestByChannelId = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
 	return state.byChannels[channelId]?.searchedRequest ?? ({} as ApiSearchMessageRequest);
 });
+
+export const selectSearchMessagesLoadingStatus = createSelector(getSearchMessageState, (state) => state.loadingStatus);

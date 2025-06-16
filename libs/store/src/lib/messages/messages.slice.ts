@@ -793,8 +793,21 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
 		}
 
-		// writeEphemeralMessage(receiver_id: string, clan_id: string, channel_id: string, mode: number, is_public: boolean, content?: any, mentions?: Array<ApiMessageMention>, attachments?: Array<ApiMessageAttachment>, references?: Array<ApiMessageRef>, anonymous_message?: boolean, mention_everyone?: boolean, avatar?: string, code?: number, topic_id?: string): Promise<ChannelMessageAck>;
-		await socket.writeEphemeralMessage(receiverId, clanId, channelId, mode, isPublic, content, mentions, uploadedFiles, references);
+		await socket.writeEphemeralMessage(
+			receiverId,
+			clanId,
+			channelId,
+			mode,
+			isPublic,
+			content,
+			mentions,
+			uploadedFiles,
+			references,
+			false,
+			false,
+			undefined,
+			TypeMessage.Ephemeral
+		);
 
 		return {
 			message_id: Snowflake.generate(),
@@ -1016,6 +1029,7 @@ export const messagesSlice = createSlice({
 				case TypeMessage.MessageBuzz:
 				case TypeMessage.AuditLog:
 				case TypeMessage.SendToken:
+				case TypeMessage.Ephemeral:
 				case TypeMessage.Chat: {
 					if (topic_id !== '0' && topic_id) {
 						handleAddOneMessage({ state, channelId: topic_id, adapterPayload: action.payload });
