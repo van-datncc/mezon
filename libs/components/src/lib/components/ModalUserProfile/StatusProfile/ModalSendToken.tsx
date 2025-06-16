@@ -141,7 +141,13 @@ const ModalSendToken = ({
 
 	useEffect(() => {
 		const user = filteredUsers.find((user) => user.id === selectedUserId);
-		if (user) handleSelectUser(user.id, user.username);
+		if (user) {
+			handleSelectUser(user.id, user.username);
+			if (amountRef.current) {
+				amountRef.current.focus();
+			}
+		}
+
 		setTokenNumber(formatNumber(Number(token), 'vi-VN'));
 		setNoteSendToken(note);
 	}, [token, selectedUserId, note]);
@@ -151,7 +157,7 @@ const ModalSendToken = ({
 		handleSaveSendToken(userData?.id, userData?.username, userData?.avatar_url, userData?.display_name);
 	};
 
-	const selectedUser = mergedUsers.find((user) => user.id === selectedUserId);
+	const amountRef = useRef<HTMLInputElement | null>(null);
 
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[480px]' } }} show={openModal} dismissible={true} onClose={onClose}>
@@ -189,6 +195,7 @@ const ModalSendToken = ({
 								onClick={() => setIsDropdownOpen(true)}
 								onChange={handleChangeSearchTerm}
 								disabled={sendTokenInputsState.isUserSelectionDisabled}
+								autoFocus={!searchTerm}
 							/>
 							{isDropdownOpen && (
 								<div
@@ -256,12 +263,14 @@ const ModalSendToken = ({
 						</Label>
 						<div className="relative">
 							<input
+								ref={amountRef}
 								type="text"
 								value={tokenNumber}
 								className="w-full h-12 px-4 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all text-lg font-medium"
 								placeholder="0"
 								onChange={handleChangeSendToken}
 								disabled={sendTokenInputsState.isSendTokenInputDisabled}
+								autoFocus={searchTerm ? true : false}
 							/>
 							<span className="absolute right-4 top-1/2 transform -translate-y-1/2 dark:text-gray-400 text-gray-500 font-medium">
 								VND

@@ -1165,7 +1165,8 @@ export enum TypeMessage {
 	MessageBuzz = 8,
 	Topic = 9,
 	AuditLog = 10,
-	SendToken = 11
+	SendToken = 11,
+	Ephemeral = 12
 }
 
 export enum ServerSettingsMenuValue {
