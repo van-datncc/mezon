@@ -16,6 +16,7 @@ import {
 	DirectEntity,
 	directMetaActions,
 	e2eeActions,
+	EStateFriend,
 	gifsStickerEmojiActions,
 	MessagesEntity,
 	selectAudioDialTone,
@@ -24,6 +25,7 @@ import {
 	selectCurrentDM,
 	selectDirectById,
 	selectDmGroupCurrent,
+	selectFriendById,
 	selectHasKeyE2ee,
 	selectIsSearchMessage,
 	selectIsShowCreateThread,
@@ -34,6 +36,7 @@ import {
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
+	selectSearchMessagesLoadingStatus,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	useAppDispatch,
@@ -150,6 +153,10 @@ const DirectMessage = () => {
 	const isHaveCallInChannel = useMemo(() => {
 		return currentDmGroup?.user_id?.some((i) => i === signalingData?.[0]?.callerId);
 	}, [currentDmGroup?.user_id, signalingData]);
+	const infoFriend = useAppSelector((state) => selectFriendById(state, currentDirect?.user_id?.[0] || ''));
+	const isBlocked = useMemo(() => {
+		return infoFriend?.state === EStateFriend.BLOCK;
+	}, [infoFriend?.state]);
 
 	const HEIGHT_EMOJI_PANEL = 457;
 	const WIDTH_EMOJI_PANEL = 500;
@@ -286,8 +293,13 @@ const DirectMessage = () => {
 						)}
 
 						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
-							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && currentDmGroup.user_id?.length === 0 ? (
-								<div className="text-textSecondary800"> You do not have permission to send message</div>
+							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (currentDmGroup.user_id?.length === 0 || isBlocked) ? (
+								<div
+									style={{ height: 44 }}
+									className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+								>
+									{isBlocked ? " You can't reply to this conversation" : ' You do not have permission to send message'}
+								</div>
 							) : (
 								<>
 									<DirectMessageBox
@@ -344,7 +356,7 @@ const DirectMessage = () => {
 							/>
 						</div>
 					)}
-					{isSearchMessage && <SearchMessageChannel />}
+					{isSearchMessage && <SearchMessageChannel channelId={directId} />}
 				</div>
 			</div>
 			<DirectSeenListener channelId={directId as string} mode={mode} currentChannel={currentDmGroup} />
@@ -352,16 +364,18 @@ const DirectMessage = () => {
 	);
 };
 
-const SearchMessageChannel = () => {
+const SearchMessageChannel = ({ channelId }: { channelId: string }) => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isLoading = useAppSelector(selectSearchMessagesLoadingStatus) === 'loading';
+
 	return (
 		<SearchMessageChannelRender
 			searchMessages={messageSearchByChannelId}
 			currentPage={currentPage}
 			totalResult={totalResult}
-			channelId={currentChannelId || ''}
+			channelId={channelId || ''}
 			isDm
+			isLoading={isLoading}
 		/>
 	);
 };

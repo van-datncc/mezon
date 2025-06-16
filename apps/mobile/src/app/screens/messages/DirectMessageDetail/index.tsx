@@ -52,6 +52,7 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 		// Rejoin previous clan (other than 0) when exiting the DM detail screen
 		dispatch(clansActions.joinClan({ clanId: currentClanIdCached }));
 		handleReconnect('DM detail reconnect attempt');
+		dispatch(directActions.fetchDirectMessage({ noCache: true }));
 	};
 
 	const directMessageLoader = async () => {
@@ -179,7 +180,12 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 			<StatusBarHeight />
 			<HeaderDirectMessage from={from} styles={styles} themeValue={themeValue} directMessageId={directMessageId} />
 			{directMessageId && (
-				<ChatMessageWrapper directMessageId={directMessageId} isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM} currentClanId={'0'} />
+				<ChatMessageWrapper
+					directMessageId={directMessageId}
+					isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM}
+					currentClanId={'0'}
+					targetUserId={currentDmGroup?.user_id?.[0]}
+				/>
 			)}
 		</View>
 	);

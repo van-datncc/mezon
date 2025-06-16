@@ -282,7 +282,7 @@ const RootListener = () => {
 					promises.push(dispatch(clansActions.joinClan({ clanId })));
 					promises.push(dispatch(clansActions.changeCurrentClan({ clanId })));
 				}
-				promises.push(dispatch(clansActions.fetchClans()));
+				promises.push(dispatch(clansActions.fetchClans({ noCache: true })));
 				const results = await Promise.all(promises);
 				if (!isFromFCM && !clanId) {
 					const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');

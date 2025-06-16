@@ -212,6 +212,7 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
                 print("log  => Ending call with UUID: \(activeUUID)")
                 RNCallKeep.endCall(withUUID: activeUUID, reason: 6)
                 RNCallKeep.endCall(withUUID: "0731961b-415b-44f3-a960-dd94ef3372fc", reason: 6)
+                clearStoredNotificationDataInternal()
                 RNCallKeep.reportNewIncomingCall(
                   callUUID,
                   handle: callerId.isEmpty ? callerName : callerId,
@@ -234,6 +235,7 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
                 )
             } else {
                 print("log  => No active call UUID found, cannot end call")
+                clearStoredNotificationDataInternal()
             }
             return
         }

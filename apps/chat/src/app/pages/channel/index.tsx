@@ -36,6 +36,7 @@ import {
 	selectOnboardingMode,
 	selectPreviousChannels,
 	selectProcessingByClan,
+	selectSearchMessagesLoadingStatus,
 	selectStatusMenu,
 	selectTheme,
 	selectToCheckAppIsOpening,
@@ -509,6 +510,7 @@ export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, searchMessages } = useSearchMessages();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isLoading = useAppSelector(selectSearchMessagesLoadingStatus) === 'loading';
 
 	return (
 		<SearchMessageChannelRender
@@ -517,6 +519,7 @@ const SearchMessageChannel = () => {
 			totalResult={totalResult}
 			channelId={currentChannel?.id || ''}
 			isDm={false}
+			isLoading={isLoading}
 		/>
 	);
 };

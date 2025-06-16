@@ -6,12 +6,13 @@ import {
 	getStore,
 	getStoreAsync,
 	MessagesEntity,
+	selectBlockedUsersForMessage,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	selectMemberClanByUserId2,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import { EMessageActionType, EMessageBSToShow } from './enums';
 import { style } from './styles';
@@ -34,6 +35,7 @@ import { ContainerMessageActionModal } from './components/MessageItemBS/Containe
 import { MessageAction } from './components/MessageReaction';
 import MessageSendTokenLog from './components/MessageSendTokenLog';
 import MessageTopic from './components/MessageTopic/MessageTopic';
+import MessageWithBlocked from './components/MessageWithBlocked';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { RenderTextMarkdownContent } from './components/RenderTextMarkdown';
 import UserProfile from './components/UserProfile';
@@ -164,6 +166,27 @@ const MessageItem = React.memo(
 		const usernameMessage = isDM ? message?.display_name || message?.user?.username : checkAnonymous ? 'Anonymous' : message?.user?.username;
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
+		const isMessageFromBlockedUser = useMemo(() => {
+			const store = getStore();
+			const blockedUsers = selectBlockedUsersForMessage(store.getState());
+			if (props.mode === ChannelStreamMode.STREAM_MODE_DM) return false;
+
+			const senderId = message?.sender_id;
+			if (!blockedUsers?.length || !userId || !senderId) return false;
+
+			return blockedUsers.some(
+				(blockedUser) =>
+					(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
+					(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
+			);
+		}, [props.mode, userId, message?.sender_id]);
+
+		if (isMessageFromBlockedUser) {
+			if (previousMessage?.sender_id !== message?.sender_id) {
+				return <MessageWithBlocked />;
+			}
+			return null;
+		}
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;

@@ -34,6 +34,22 @@ interface VoIPManagerType {
 	endCall(callId: string): Promise<string>;
 }
 
+const isNotificationAlreadyDisplayed = async (data: Record<string, any>): Promise<boolean> => {
+	try {
+		const displayedNotifications = await notifee.getDisplayedNotifications();
+		if (displayedNotifications?.length === 0) {
+			return false;
+		}
+		const isAlreadyDisplayed = displayedNotifications.some((notification) => {
+			return JSON.stringify(notification.notification?.data?.message) == JSON.stringify(data?.message);
+		});
+		return isAlreadyDisplayed;
+	} catch (error) {
+		console.error('Error checking displayed notifications:', error);
+		return false;
+	}
+};
+
 // Safe validation helpers
 const isValidString = (value: unknown): value is string => {
 	return typeof value === 'string' && value.trim().length > 0;
@@ -240,7 +256,13 @@ export const createLocalNotification = async (title: string, body: string, data:
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
 		const configDisplayNotificationIOS: NotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
 
+		const notificationId = `${data?.sender || 'unknown'}_${data?.link || 'nolink'}_${Date.now()}`;
+		const isAlreadyDisplayed = await isNotificationAlreadyDisplayed(data);
+		if (isAlreadyDisplayed) {
+			return;
+		}
 		await notifee.displayNotification({
+			id: notificationId,
 			title: title.trim(),
 			body: body.trim(),
 			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',

@@ -1,10 +1,12 @@
 /* eslint-disable prefer-const */
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { selectCurrentUserId } from '@mezon/store';
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Friend } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { StatusUserArgs } from '../channelmembers/channel.members';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 
 export const FRIEND_FEATURE_KEY = 'friends';
@@ -13,10 +15,12 @@ const LIMIT_FRIEND = 1000;
 
 export interface FriendsEntity extends Friend {
 	id: string;
+	source_id?: string;
 }
 
 export interface IFriend extends Friend {
 	id: string;
+	source_id?: string;
 }
 
 interface IStatusSentMobile {
@@ -31,9 +35,8 @@ export enum EStateFriend {
 }
 
 export const mapFriendToEntity = (FriendRes: Friend) => {
-	return { ...FriendRes, id: FriendRes?.user?.id || '' };
+	return { ...FriendRes, id: FriendRes?.user?.id || '', source_id: FriendRes?.source_id || '' };
 };
-
 export interface FriendsState extends EntityState<FriendsEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
@@ -124,7 +127,6 @@ export const sendRequestBlockFriend = createAsyncThunk('friends/requestBlockFrie
 	if (!response) {
 		return thunkAPI.rejectWithValue([]);
 	}
-	thunkAPI.dispatch(friendsActions.fetchListFriends({}));
 	return response;
 });
 
@@ -167,6 +169,24 @@ export const friendsSlice = createSlice({
 				//TODO: thai fix later
 				(friendMeta.user.metadata as any).user_status = user_status;
 			}
+		},
+		updateFriendState: (
+			state,
+			action: PayloadAction<{
+				userId: string;
+				friendState: EStateFriend;
+				sourceId?: string;
+			}>
+		) => {
+			const { userId, friendState, sourceId } = action.payload;
+			const friend = state.entities[userId];
+
+			if (friend) {
+				friend.state = friendState;
+				if (sourceId) {
+					friend.source_id = sourceId;
+				}
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -204,10 +224,22 @@ const { selectAll, selectById } = friendsAdapter.getSelectors();
 export const getFriendsState = (rootState: { [FRIEND_FEATURE_KEY]: FriendsState }): FriendsState => rootState[FRIEND_FEATURE_KEY];
 export const selectAllFriends = createSelector(getFriendsState, selectAll);
 export const selectStatusSentMobile = createSelector(getFriendsState, (state) => state.statusSentMobile);
-
 export const selectFriendStatus = (userID: string) =>
 	createSelector(getFriendsState, (state) => {
 		const friend = selectById(state, userID);
 		return friend?.state;
 	});
+export const selectBlockedUsers = createSelector([selectAllFriends, selectCurrentUserId], (friends, currentUserId) =>
+	friends.filter((friend) => friend?.state === EStateFriend.BLOCK && friend?.id !== currentUserId && friend?.source_id === currentUserId)
+);
+export const selectBlockedUsersForMessage = createSelector([selectAllFriends], (friends) =>
+	friends.filter((friend) => friend?.state === EStateFriend.BLOCK)
+);
+export const selectFriendById = createSelector([selectAllFriends, (state, userId: string) => userId], (friends, userId) => {
+	const friendAsTarget = friends.find((friend) => friend?.user?.id === userId);
+	if (friendAsTarget) return friendAsTarget;
+
+	const friendAsSource = friends.find((friend) => friend?.source_id === userId);
+	return friendAsSource;
+});
 export const selectCurrentTabStatus = createSelector(getFriendsState, (state) => state.currentTabStatus);

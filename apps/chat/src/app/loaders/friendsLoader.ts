@@ -3,6 +3,6 @@ import { CustomLoaderFunction } from './appLoader';
 
 export const friendsLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	dispatch(clansActions.joinClan({ clanId: '0' }));
-	dispatch(friendsActions.fetchListFriends({}));
+	dispatch(friendsActions.fetchListFriends({ noCache: true }));
 	return null;
 };

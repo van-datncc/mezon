@@ -1165,7 +1165,8 @@ export enum TypeMessage {
 	MessageBuzz = 8,
 	Topic = 9,
 	AuditLog = 10,
-	SendToken = 11
+	SendToken = 11,
+	Ephemeral = 12
 }
 
 export enum ServerSettingsMenuValue {
@@ -1394,7 +1395,8 @@ export type MentionReactInputProps = {
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
 		displayName?: string,
-		clanNick?: string
+		clanNick?: string,
+		ephemeralReceiverId?: string
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
