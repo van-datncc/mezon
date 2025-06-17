@@ -1,4 +1,3 @@
-
 import { LiveKitRoom } from '@livekit/components-react';
 import '@livekit/components-styles';
 
@@ -147,9 +146,9 @@ const ChannelVoice = memo(
 
 						<LiveKitRoom
 							ref={containerRef}
-								id="livekitRoom11"
+							id="livekitRoom11"
 							key={token}
-								className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
+							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
 							audio={showMicrophone}
 							video={showCamera}
 							token={token}
@@ -187,4 +186,4 @@ const ChannelVoice = memo(
 	() => true
 );
 
-export default ChannelVoice; 
+export default ChannelVoice;

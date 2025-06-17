@@ -21,9 +21,13 @@ export const PreJoinVoiceChannel: React.FC<PreJoinVoiceChannelProps> = ({ channe
 						? `${channel?.channel_label.substring(0, 20)}...`
 						: channel?.channel_label}
 				</div>
-				{voiceChannelMembers.length > 0 ? <div className="text-gray-800 dark:text-white">Everyone is waiting for you inside</div> : <div className="text-gray-800 dark:text-white">No one is currently in voice</div>}
+				{voiceChannelMembers.length > 0 ? (
+					<div className="text-gray-800 dark:text-white">Everyone is waiting for you inside</div>
+				) : (
+					<div className="text-gray-800 dark:text-white">No one is currently in voice</div>
+				)}
 				<button
-					disabled={!roomName}
+					disabled={!roomName || loading}
 					className={`bg-green-700 rounded-3xl p-2 ${roomName ? 'hover:bg-green-600' : 'opacity-50'}`}
 					onClick={handleJoinRoom}
 				>
