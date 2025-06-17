@@ -6,9 +6,12 @@
     "muteNotification": "Tắt tiếng",
     "thread": "Chủ đề",
     "members": "Thành viên",
+    "offlines": "Ngoại tuyến",
     "media": "File phương tiện",
     "files": "Tệp",
     "pins": "Ghim",
     "wallet": "Ví",
-    "unmuteNotification": "Bật tiếng"
+    "unmuteNotification": "Bật tiếng",
+    "inviteMembers": "Mời bạn bè",
+    "addMembers": "Thêm thành viên"
 }

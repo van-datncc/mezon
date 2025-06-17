@@ -1,6 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import i18n from 'i18next';
 import { ApiChannelDescription, ApiUpdateCategoryDescRequest } from 'mezon-js/api.gen';
 import { CategoriesEntity } from '../categories/categories.slice';
 import { clansActions } from '../clans/clans.slice';
@@ -83,7 +84,7 @@ export const listChannelRenderSlice = createSlice({
 					channels: listChannelFavor,
 					id: FAVORITE_CATEGORY_ID,
 					category_id: FAVORITE_CATEGORY_ID,
-					category_name: 'Favorite Channel',
+					category_name: i18n.t('channelMenu:favoriteChannel'),
 					clan_id: clanId,
 					creator_id: '0',
 					category_order: 1,

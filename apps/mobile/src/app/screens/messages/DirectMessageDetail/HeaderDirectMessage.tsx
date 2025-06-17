@@ -224,7 +224,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 			title: 'buzz',
 			content: 'Buzz',
 			value: OptionChannelHeader.Buzz,
-			icon: <MezonIconCDN icon={IconCDN.buzz} color={Colors.textGray} height={size.s_18} width={size.s_18} />
+			icon: <MezonIconCDN icon={IconCDN.buzz} color={themeValue.textStrong} height={size.s_18} width={size.s_18} />
 		}
 	];
 

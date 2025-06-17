@@ -6,9 +6,12 @@
     "muteNotification": "Mute",
     "thread": "Threads",
     "members": "Members",
+    "offlines": "Offlines",
     "media": "Media",
     "files": "Files",
     "pins": "Pins",
     "wallet": "Wallet",
-    "unmuteNotification": "Un-mute"
+    "unmuteNotification": "Un-mute",
+    "inviteMembers": "Invite Members",
+    "addMembers": "Add Members"
 }
