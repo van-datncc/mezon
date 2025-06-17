@@ -11,6 +11,7 @@ import StatusBarHeight from '../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../constants/icon_cdn';
 import { HistoryTransactionScreen } from '../profile/HistoryTransaction';
 import { SendTokenScreen } from '../profile/SendToken';
+import { WalletManageScreen } from '../profile/WalletManage';
 import { style } from './styles';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -45,14 +46,14 @@ const CustomDrawer = ({ onClose, onChangeActiveScreen, navigation, activeScreen 
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
-							onChangeActiveScreen('withdraw');
+							onChangeActiveScreen('manage');
 						}}
-						style={[styles.menuItem, activeScreen === 'withdraw' && { backgroundColor: themeValue?.secondaryLight }]}
+						style={[styles.menuItem, activeScreen === 'manage' && { backgroundColor: themeValue?.secondaryLight }]}
 					>
 						<View style={{ transform: [{ rotate: '180deg' }] }}>
 							<Icons.SendMoney height={size.s_20} width={size.s_20} color={baseColor.gray} />
 						</View>
-						<Text style={styles.menuText}>{tStack('settingStack.withdrawToken')}</Text>
+						<Text style={styles.menuText}>{tStack('settingStack.walletManagement')}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={[styles.menuItem, activeScreen === 'history' && { backgroundColor: themeValue?.secondaryLight }]}
@@ -153,8 +154,10 @@ export const WalletScreen = React.memo(({ navigation, route }: any) => {
 				</TouchableOpacity>
 			</View>
 
-			{activeScreen === 'transfer' || activeScreen === 'withdraw' ? (
+			{activeScreen === 'transfer' ? (
 				<SendTokenScreen navigation={navigation} route={route} />
+			) : activeScreen === 'manage' ? (
+				<WalletManageScreen />
 			) : activeScreen === 'history' ? (
 				<HistoryTransactionScreen />
 			) : (

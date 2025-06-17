@@ -1,6 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
+import { appActions, clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
 import { memo } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -16,9 +16,10 @@ export const DirectMessageLogo = memo(() => {
 	const dispatch = useAppDispatch();
 	const { userProfile } = useAuth();
 
-	const handleOnLoad = (url) => {
+	const handleOnLoad = async (url) => {
 		if (url) {
-			dispatch(
+			dispatch(appActions.setLoadingMainMobile(true));
+			await dispatch(
 				clansActions.updateUser({
 					user_name: userProfile.user.username,
 					avatar_url: userProfile.user.avatar_url,
@@ -28,6 +29,7 @@ export const DirectMessageLogo = memo(() => {
 					logo: url
 				})
 			);
+			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	};
 

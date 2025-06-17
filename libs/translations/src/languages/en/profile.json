@@ -10,5 +10,6 @@
     "copyUserId": "Copy User ID",
     "copySuccess": "User ID Copied",
     "emptyId": "Invalid User ID",
-    "errorCopy": "Error when copy User ID: #{{error}}"
+    "errorCopy": "Error when copy User ID: #{{error}}",
+    "manageWallet": "Manage Wallet"
 }

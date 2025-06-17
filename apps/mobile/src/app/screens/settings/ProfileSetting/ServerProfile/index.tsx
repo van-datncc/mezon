@@ -1,14 +1,22 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useAuth } from '@mezon/core';
+import { useClanProfileSetting } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
 import { Text, size, useTheme } from '@mezon/mobile-ui';
-import { ClansEntity, selectAllClans, selectCurrentClan } from '@mezon/store-mobile';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	ClansEntity,
+	appActions,
+	checkDuplicateClanNickName,
+	selectAllAccount,
+	selectAllClans,
+	selectCurrentClan,
+	selectUserClanProfileByClanID
+} from '@mezon/store-mobile';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { forwardRef, memo, useEffect, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Dimensions, FlatList, Keyboard, KeyboardAvoidingView, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, FlatList, KeyboardAvoidingView, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useSelector } from 'react-redux';
-import { IClanProfileValue } from '..';
+import { useDispatch, useSelector } from 'react-redux';
+import { IClanProfileValue, IUserProfileValue } from '..';
 import { SeparatorWithLine } from '../../../../../app/components/Common';
 import MezonClanAvatar from '../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
@@ -19,106 +27,120 @@ import BannerAvatar from '../UserProfile/components/Banner';
 import { style } from './styles';
 
 interface IServerProfile {
-	clanProfileValue: IClanProfileValue;
-	isClanProfileNotChanged?: boolean;
-	isDuplicateClanNickname?: boolean;
-	setCurrentClanProfileValue: (updateFn: (prevValue: IClanProfileValue) => IClanProfileValue) => void;
-	onSelectedClan: (clan: ClansEntity) => void;
-	onCheckDuplicateClanNickname: (value: string) => void;
+	navigation?: any;
 }
 
-function ServerProfile({
-	clanProfileValue,
-	isClanProfileNotChanged,
-	isDuplicateClanNickname,
-	setCurrentClanProfileValue,
-	onSelectedClan,
-	onCheckDuplicateClanNickname
-}: IServerProfile) {
+const ServerProfile = forwardRef(function ServerProfile({ navigation }: IServerProfile, ref) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { userProfile, userId } = useAuth();
-	const bottomSheetDetail = useRef<BottomSheetModal>(null);
+	const userProfile = useSelector(selectAllAccount);
 	const { t } = useTranslation(['profileSetting']);
 	const clans = useSelector(selectAllClans);
 	const currentClan = useSelector(selectCurrentClan);
+	const dispatch = useDispatch();
+
+	const [isDuplicateClanNickname, setIsDuplicateClanNickname] = useState(false);
 	const [selectedClan, setSelectedClan] = useState<ClansEntity>(currentClan);
-	const [searchClanText, setSearchClanText] = useState('');
+	const { updateUserClanProfile } = useClanProfileSetting({ clanId: selectedClan?.id });
+	const userClansProfile = useSelector(selectUserClanProfileByClanID(selectedClan?.id, userProfile?.user?.id ?? ''));
+	const [currentClanProfileValue, setCurrentClanProfileValue] = useState<IClanProfileValue>({
+		username: '',
+		imgUrl: '',
+		displayName: ''
+	});
+
+	useEffect(() => {
+		const { username } = userProfile?.user || {};
+		const { nick_name } = userClansProfile || {};
+		const initialValue: IUserProfileValue = {
+			username: username || '',
+			imgUrl: userClansProfile?.avatar || userProfile?.user?.avatar_url || '',
+			displayName: nick_name || '',
+			aboutMe: ''
+		};
+
+		setCurrentClanProfileValue(initialValue);
+	}, [userClansProfile, userProfile?.user]);
 
 	const onPressHashtag = () => {
 		Toast.show({
 			type: 'info',
-			text1: 'Original known as ' + userProfile?.user?.username + '#' + userId
+			text1: 'Original known as ' + userProfile?.user?.username + '#' + userProfile?.user?.id
 		});
+	};
+
+	const checkIsDuplicateClanNickname = async (value: string) => {
+		try {
+			if (!value || value.trim() === '') {
+				setIsDuplicateClanNickname(false);
+				return;
+			}
+
+			const result = unwrapResult(
+				await dispatch(
+					checkDuplicateClanNickName({
+						clanNickName: value,
+						clanId: selectedClan?.id ?? ''
+					}) as any
+				)
+			);
+
+			if (result) {
+				setIsDuplicateClanNickname(true);
+				return true;
+			} else {
+				setIsDuplicateClanNickname(false);
+				return false;
+			}
+		} catch (e) {
+			return false;
+		}
 	};
 
 	const onValueChange = (newValue: Partial<IClanProfileValue>) => {
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, ...newValue }));
-		onCheckDuplicateClanNickname(newValue?.displayName);
+	};
+
+	const updateClanProfile = async () => {
+		const { displayName, imgUrl } = currentClanProfileValue;
+		const isDuplicateNickname = await checkIsDuplicateClanNickname(displayName?.trim() || '');
+		if (isDuplicateNickname) return;
+
+		try {
+			dispatch(appActions.setLoadingMainMobile(true));
+			const response = await updateUserClanProfile(selectedClan?.clan_id ?? '', displayName?.trim() || '', imgUrl || '');
+
+			dispatch(appActions.setLoadingMainMobile(false));
+			if (response) {
+				Toast.show({
+					type: 'info',
+					text1: t('updateClanProfileSuccess')
+				});
+				navigation.goBack();
+			}
+		} catch (e) {
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
 	};
 
 	const switchClan = (clan: ClansEntity) => {
-		if (isClanProfileNotChanged) {
-			setSelectedClan(clan);
-			onSelectedClan(clan);
-			bottomSheetDetail.current?.close();
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-			return;
-		}
-
-		Alert.alert(
-			t('changedAlert.title'),
-			t('changedAlert.description'),
-			[
-				{
-					text: t('changedAlert.keepEditing'),
-					style: 'cancel'
-				},
-				{
-					text: t('changedAlert.discard'),
-					onPress: () => {
-						setSelectedClan(clan);
-						onSelectedClan(clan);
-						bottomSheetDetail.current?.close();
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-					}
-				}
-			],
-			{ cancelable: false }
-		);
+		setSelectedClan(clan);
+		setIsDuplicateClanNickname(false);
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 	};
 
 	const handleAvatarChange = (url: string) => {
 		setCurrentClanProfileValue((prevValue) => ({ ...prevValue, imgUrl: url }));
 	};
 
-	useEffect(() => {
-		const keyboardListener = Keyboard.addListener('keyboardDidShow', () => {
-			bottomSheetDetail?.current?.snapToIndex(1);
-		});
-		const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-			bottomSheetDetail?.current?.snapToIndex(0);
-		});
-		return () => {
-			keyboardListener.remove();
-			keyboardDidHideListener.remove();
-		};
-	}, []);
-
-	const filteredClanList = useMemo(() => {
-		return clans?.filter((it) => normalizeString(it?.clan_name)?.includes(normalizeString(searchClanText)));
-	}, [searchClanText, clans]);
-
 	const openBottomSheet = () => {
-		bottomSheetDetail.current?.present();
 		const data = {
 			title: t('selectAClan'),
 			snapPoint: ['80%'],
 			children: (
 				<View style={styles.bottomSheetContainer}>
-					<MezonInput value={searchClanText} onTextChange={setSearchClanText} placeHolder={t('searchClanPlaceholder')} />
 					<FlatList
-						data={filteredClanList}
+						data={clans}
 						keyExtractor={(item) => item?.id}
 						ItemSeparatorComponent={SeparatorWithLine}
 						renderItem={({ item }) => {
@@ -142,6 +164,12 @@ function ServerProfile({
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	};
 
+	useImperativeHandle(ref, () => ({
+		triggerSave: () => {
+			updateClanProfile();
+		}
+	}));
+
 	return (
 		<KeyboardAvoidingView behavior={'position'} style={{ width: Dimensions.get('screen').width }}>
 			<TouchableOpacity onPress={() => openBottomSheet()} style={styles.actionItem}>
@@ -155,8 +183,8 @@ function ServerProfile({
 			</TouchableOpacity>
 
 			<BannerAvatar
-				avatar={clanProfileValue?.imgUrl || userProfile?.user?.avatar_url}
-				alt={clanProfileValue?.username}
+				avatar={currentClanProfileValue?.imgUrl || userProfile?.user?.avatar_url}
+				alt={currentClanProfileValue?.username}
 				onLoad={handleAvatarChange}
 				defaultAvatar={userProfile?.user?.avatar_url || ''}
 			/>
@@ -169,14 +197,14 @@ function ServerProfile({
 
 			<View style={styles.clanProfileDetail}>
 				<View style={styles.nameWrapper}>
-					<Text style={styles.displayNameText}>{clanProfileValue?.displayName}</Text>
-					<Text style={styles.usernameText}>{clanProfileValue?.username}</Text>
+					<Text style={styles.displayNameText}>{currentClanProfileValue?.displayName}</Text>
+					<Text style={styles.usernameText}>{currentClanProfileValue?.username}</Text>
 				</View>
 
 				<MezonInput
-					value={clanProfileValue?.displayName}
+					value={currentClanProfileValue?.displayName}
 					onTextChange={(newValue) => onValueChange({ displayName: newValue })}
-					placeHolder={clanProfileValue?.username}
+					placeHolder={currentClanProfileValue?.username}
 					maxCharacter={32}
 					label={t('fields.clanName.label')}
 					errorMessage={isDuplicateClanNickname ? 'The nick name already exists in the clan. Please enter another nick name.' : ''}
@@ -187,6 +215,6 @@ function ServerProfile({
 			<View style={{ height: 250 }} />
 		</KeyboardAvoidingView>
 	);
-}
+});
 
 export default memo(ServerProfile);
