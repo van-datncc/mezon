@@ -14,10 +14,11 @@ type PanelEventItemProps = {
 	onTrigerEventUpdateId?: () => void;
 	setOpenModalDelEvent?: React.Dispatch<React.SetStateAction<boolean>>;
 	onClose: () => void;
+	handleCopyLink: () => void;
 };
 
 function PanelEventItem(props: PanelEventItemProps) {
-	const { coords, event, onHandle, setOpenModalDelEvent, setOpenModalUpdateEvent, onClose, onTrigerEventUpdateId } = props;
+	const { coords, event, onHandle, setOpenModalDelEvent, setOpenModalUpdateEvent, onClose, onTrigerEventUpdateId, handleCopyLink } = props;
 	const { userProfile } = useAuth();
 	const [isClanOwner, hasClanPermission, hasAdminPermission] = usePermissionChecker([
 		EPermission.clanOwner,
@@ -69,7 +70,7 @@ function PanelEventItem(props: PanelEventItemProps) {
 					<ItemPanel children="Cancel Event" danger={true} onClick={handleDeleteEvent} />
 				</>
 			)}
-			<ItemPanel children="Copy Event Link" />
+			<ItemPanel children="Copy Event Link" onClick={handleCopyLink} />
 		</div>
 	);
 }
