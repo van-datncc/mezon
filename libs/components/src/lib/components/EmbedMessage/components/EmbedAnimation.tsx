@@ -13,10 +13,11 @@ type EmbedAnimationProps = {
 	channelId: string;
 	observeIntersectionForLoading?: ObserveFn;
 };
-const WIDTH_BOX_ANIMATION_SMALL = 80;
 const BREAK_POINT_RESPONSIVE = 1200;
 const DEFAULT_HEIGH = 126;
 const DEFAULT_WIDTH = 133;
+const WIDTH_BOX_ANIMATION_SMALL = 80;
+const HEIGH_BOX_ANIMATION_SMALL = (80 / DEFAULT_WIDTH) * DEFAULT_HEIGH;
 export const EmbedAnimation = ({
 	url_image,
 	url_position,
@@ -41,9 +42,10 @@ export const EmbedAnimation = ({
 
 			pool?.map((poolItem, index) => {
 				const style = document.createElement('style');
-
-				const ratioWidthBig = DEFAULT_WIDTH / jsonPosition.frames[poolItem[index]].frame.w;
-				const ratioWidthSmall = WIDTH_BOX_ANIMATION_SMALL / jsonPosition.frames[poolItem[index]].frame.w;
+				const widthItem = jsonPosition.frames[poolItem[0]].frame.w;
+				const heightItem = jsonPosition.frames[poolItem[0]].frame.h;
+				const ratioWidthBig = widthItem < heightItem ? DEFAULT_WIDTH / widthItem : DEFAULT_HEIGH / heightItem;
+				const ratioWidthSmall = widthItem < heightItem ? WIDTH_BOX_ANIMATION_SMALL / widthItem : HEIGH_BOX_ANIMATION_SMALL / heightItem;
 
 				if (!isResult) {
 					const innerAnimationBig = makeAnimation(jsonPosition, poolItem, ratioWidthBig).animate;
@@ -68,8 +70,8 @@ export const EmbedAnimation = ({
 
             @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
               .box_resize_${index}_${messageId}{
-                width : ${jsonPosition.frames[poolItem[index]].frame.w * ratioWidthSmall}px !important;
-                height : ${jsonPosition.frames[poolItem[index]].frame.h * ratioWidthSmall}px !important;
+                width : ${widthItem * ratioWidthSmall}px !important;
+                height : ${heightItem * ratioWidthSmall}px !important;
                 background-size: ${jsonPosition.meta.size.w * ratioWidthSmall}px ${jsonPosition.meta.size.h * ratioWidthSmall}px;
                 }
                 .box_animation_${index}_${messageId}{
@@ -91,8 +93,8 @@ export const EmbedAnimation = ({
               @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
               .box_resize_${index}_${messageId}{
                 width : ${WIDTH_BOX_ANIMATION_SMALL}px !important;
-                height : ${(WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px !important;
-                 background-size: ${(jsonPosition.meta.size.w / jsonPosition.frames[poolItem[index]].frame.w) * WIDTH_BOX_ANIMATION_SMALL}px ${((jsonPosition.meta.size.h / jsonPosition.frames[poolItem[index]].frame.h) * WIDTH_BOX_ANIMATION_SMALL * jsonPosition.frames[poolItem[index]].frame.h) / jsonPosition.frames[poolItem[index]].frame.w}px;
+                height : ${(WIDTH_BOX_ANIMATION_SMALL * heightItem) / widthItem}px !important;
+                 background-size: ${(jsonPosition.meta.size.w / widthItem) * WIDTH_BOX_ANIMATION_SMALL}px ${(jsonPosition.meta.size.h * WIDTH_BOX_ANIMATION_SMALL) / widthItem}px;
                    background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidthSmall}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidthSmall}px;
                  }
             }
