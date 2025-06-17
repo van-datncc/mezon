@@ -1,7 +1,7 @@
 import { size } from '@mezon/mobile-ui';
 import { IMessageAnimation } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, View, useWindowDimensions } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, View, useWindowDimensions } from 'react-native';
 import useTabletLandscape from '../../../../../../../hooks/useTabletLandscape';
 import SpriteAnimation from './AnimationSprite';
 import { style } from './styles';
@@ -11,7 +11,7 @@ type EmbedAnimationProps = {
 	themeValue?: any;
 };
 
-const extractFrames = (data) => {
+const extractFrames = (data, repeat) => {
 	if (!data?.frames) return [];
 
 	const framesArray = Object.entries(data.frames).map(([key, frameData]) => {
@@ -19,11 +19,12 @@ const extractFrames = (data) => {
 		return { name: key, x, y, w, h };
 	});
 
-	framesArray.sort((a, b) => {
-		if (a.x !== b.x) return a.x - b.x;
-		return a.y - b.y;
-	});
-
+	if (repeat) {
+		framesArray.sort((a, b) => {
+			if (a.x !== b.x) return a.x - b.x;
+			return a.y - b.y;
+		});
+	}
 	return framesArray;
 };
 
@@ -41,6 +42,7 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 	const isSlotGame = frameWidth === SLOT_ITEM_FRAME_WIDTH;
 	const duration = 500;
 	const styles = style(isPortrait, isSlotGame);
+	const globalAnimation = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -48,7 +50,7 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 				const response = await fetch(animationOptions.url_position);
 				const data = await response.json();
 
-				const frameArray = extractFrames(data);
+				const frameArray = extractFrames(data, animationOptions?.repeat);
 				if (frameArray) {
 					setFrames(frameArray);
 					setFrameHeight(frameArray?.[0]?.h || 0);
@@ -102,10 +104,11 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 							frames={frames}
 							duration={duration}
 							finalFrame={item?.at?.(item?.length - 1 || 0)}
-							repeat={animationOptions?.repeat + index}
+							repeat={animationOptions?.repeat ? animationOptions?.repeat + index : 0}
 							isActive={animationOptions?.isResult}
 							spriteHeight={spriteHeight}
 							spriteWidth={spriteWidth}
+							sharedAnimation={globalAnimation}
 						/>
 					);
 				})}

@@ -50,14 +50,14 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 	return (
 		<header id="titlebar" className={`dark:bg-bgTertiary bg-bgLightTertiary`} onDoubleClick={handleDoubleClick}>
 			<div id="drag-region">
-				<div className="dark:text-white ml-3 text-[15.15px] leading-[26.58px] font-semibold text-[#FFFFFF]">Mezon</div>
+				<div className="dark:text-white ml-3 text-[15.15px] leading-[26.58px] font-semibold text-textPrimaryLight">Mezon</div>
 				<div id="window-controls">
 					<div
 						className="button window-hover cursor-pointer dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
 						id="min-button"
 						onClick={handleMinimize}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.WindowMinimize className="w-[14px]" />
 						</div>
 					</div>
@@ -66,7 +66,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 						id="restore-button"
 						onClick={handleMaximize}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.WindowZoom className="w-[10px]" />
 						</div>
 					</div>
@@ -75,7 +75,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 						id="close-button"
 						onClick={handleClose}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.CloseButton className="w-[14px]" />
 						</div>
 					</div>

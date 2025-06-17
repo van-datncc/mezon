@@ -31,8 +31,21 @@ function computeInputOutputRanges(frames) {
 	return { base, inputRangeX, outputRangeX };
 }
 
-const SpriteAnimation = ({ spriteUrl, frameWidth, frameHeight, frames, duration, finalFrame, repeat, spriteWidth, spriteHeight, isActive }) => {
-	const animation = useRef(new Animated.Value(0)).current;
+const SpriteAnimation = ({
+	spriteUrl,
+	frameWidth,
+	frameHeight,
+	frames,
+	duration,
+	finalFrame,
+	repeat,
+	spriteWidth,
+	spriteHeight,
+	isActive,
+	sharedAnimation
+}) => {
+	const localAnimation = useRef(new Animated.Value(0)).current;
+	const animation = !repeat ? sharedAnimation : localAnimation;
 
 	const { base, inputRangeX, outputRangeX } = computeInputOutputRanges(frames);
 
@@ -55,12 +68,12 @@ const SpriteAnimation = ({ spriteUrl, frameWidth, frameHeight, frames, duration,
 			const runAnimation = () => {
 				Animated.timing(animation, {
 					toValue: base,
-					duration: duration,
+					duration: repeat ? duration : frames?.length * 30 || duration,
 					useNativeDriver: true
 				}).start(({ finished }) => {
 					if (finished) {
 						currentLoop += 1;
-						if (currentLoop < repeat) {
+						if (currentLoop < repeat || !repeat) {
 							animation.setValue(0);
 							runAnimation();
 						} else {
@@ -80,6 +93,38 @@ const SpriteAnimation = ({ spriteUrl, frameWidth, frameHeight, frames, duration,
 			animation.setValue(finalIndex);
 		}
 	}, [animation, base, duration, finalIndex, repeat]);
+
+	if (!repeat) {
+		return (
+			<View
+				style={{
+					overflow: 'hidden',
+					width: frameWidth,
+					height: frameHeight,
+					backgroundColor: 'transparent'
+				}}
+				removeClippedSubviews={true}
+			>
+				{frames.map((frame, i) => (
+					<Animated.Image
+						key={`frame-${i}`}
+						source={{ uri: spriteUrl }}
+						style={{
+							position: 'absolute',
+							width: spriteWidth,
+							height: spriteHeight,
+							transform: [{ translateX: -frame.x }, { translateY: -frame.y }],
+							opacity: animation.interpolate({
+								inputRange: [i - 0.8, i, i + 0.8],
+								outputRange: [0, 2, 0],
+								extrapolate: 'clamp'
+							})
+						}}
+					/>
+				))}
+			</View>
+		);
+	}
 
 	return (
 		<View style={{ overflow: 'hidden', width: frameWidth, height: frameHeight }}>

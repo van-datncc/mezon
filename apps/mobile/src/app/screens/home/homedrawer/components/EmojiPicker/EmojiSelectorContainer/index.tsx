@@ -115,16 +115,16 @@ export default function EmojiSelectorContainer({
 
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
-			onSelected(emoji.id, emoji.shortname);
+			onSelected(emoji?.id, emoji?.shortname);
 			handleBottomSheetCollapse?.();
 			if (!isReactMessage) {
-				const emojiItemName = `:${emoji.shortname?.split(':').join('')}:`;
+				const emojiItemName = `:${emoji?.shortname?.split(':').join('')}:`;
 				DeviceEventEmitter.emit(ActionEmitEvent.ADD_EMOJI_PICKED, { shortName: emojiItemName, channelId });
 				dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(emojiItemName));
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
 						shortName: emojiItemName,
-						id: emoji.id
+						id: emoji?.id
 					})
 				);
 			}
@@ -133,7 +133,7 @@ export default function EmojiSelectorContainer({
 	);
 
 	const searchEmojis = (emojis: any[], searchTerm: string) => {
-		return emojis.filter((emoji) => emoji.shortname.toLowerCase().includes(searchTerm?.toLowerCase()));
+		return emojis.filter((emoji) => emoji?.shortname?.toLowerCase().includes(searchTerm?.toLowerCase()));
 	};
 
 	const onSearchEmoji = async (keyword: string) => {
@@ -147,7 +147,7 @@ export default function EmojiSelectorContainer({
 		[]
 	);
 
-	const ListCategoryArea = () => {
+	const ListCategoryArea = useCallback(() => {
 		return (
 			<View style={{ backgroundColor: themeBasic === 'dark' || isReactMessage ? themeValue.primary : themeValue.tertiary }}>
 				<View style={styles.textInputWrapper}>
@@ -164,7 +164,7 @@ export default function EmojiSelectorContainer({
 				<CategoryList categoriesWithIcons={categoriesWithIcons} selectedCategory={selectedCategory} />
 			</View>
 		);
-	};
+	}, [selectedCategory, themeBasic, isReactMessage, themeValue, handleBottomSheetExpand, categoriesWithIcons]);
 
 	const data = useMemo(() => {
 		if (emojisSearch?.length > 0 && keywordSearch) {
@@ -190,29 +190,33 @@ export default function EmojiSelectorContainer({
 		return [{ id: 'listCategoryArea', name: 'listCategoryArea' }, ...categoriesWithIcons];
 	}, [emojisSearch, categoriesWithIcons]);
 
-	const renderItem = useCallback(({ item, index }) => {
-		if (index === 0) {
-			return <ListCategoryArea />;
-		} else {
-			return (
-				<View ref={categoryRefs?.current?.[item?.name]}>
-					<EmojiCategory emojisData={item.emojis} onEmojiSelect={handleEmojiSelect} categoryName={item.name} />
-				</View>
-			);
-		}
-	}, []);
+	const renderItem = useCallback(
+		({ item, index }) => {
+			if (index === 0) {
+				return <ListCategoryArea />;
+			} else {
+				return (
+					<View ref={categoryRefs?.current?.[item?.name]}>
+						<EmojiCategory emojisData={item?.emojis} onEmojiSelect={handleEmojiSelect} categoryName={item?.name} />
+					</View>
+				);
+			}
+		},
+		[ListCategoryArea, handleEmojiSelect]
+	);
 
 	const handleSelectCategory = useCallback(
 		(categoryName: string) => {
-			if (!flatListRef.current || !data) return;
-
-			const targetIndex = data.findIndex((item) => item.name === categoryName);
+			if (!flatListRef?.current || data?.length === 0) return;
+			const targetIndex = data.findIndex((item) => item?.name === categoryName);
 
 			if (targetIndex !== -1) {
 				try {
-					flatListRef.current?.scrollToIndex({
+					flatListRef.current.scrollToIndex({
 						index: targetIndex,
-						animated: true
+						animated: true,
+						viewPosition: 0,
+						viewOffset: 120
 					});
 					setSelectedCategory(categoryName);
 				} catch (error) {
@@ -224,9 +228,9 @@ export default function EmojiSelectorContainer({
 	);
 
 	useEffect(() => {
-		const scrollToCategoryListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SCROLL_TO_CATEGORY_EMOJI, ({ name }) =>
-			handleSelectCategory(name)
-		);
+		const scrollToCategoryListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SCROLL_TO_CATEGORY_EMOJI, ({ name }) => {
+			handleSelectCategory(name);
+		});
 
 		return () => {
 			scrollToCategoryListener.remove();
@@ -245,18 +249,7 @@ export default function EmojiSelectorContainer({
 			windowSize={10}
 			removeClippedSubviews={false}
 			disableVirtualization
-			contentContainerStyle={Platform.OS === 'android' && { minHeight: Metrics.screenHeight * 0.91 }}
-			onScrollToIndexFailed={(info) => {
-				if (info?.highestMeasuredFrameIndex) {
-					const wait = new Promise((resolve) => setTimeout(resolve, 200));
-					if (info.highestMeasuredFrameIndex < info.index) {
-						flatListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: false });
-						wait.then(() => {
-							flatListRef.current?.scrollToIndex({ index: info.index, animated: false });
-						});
-					}
-				}
-			}}
+			contentContainerStyle={Platform.OS === 'android' && { minHeight: Metrics.screenHeight * 0.88 }}
 		/>
 	);
 }
