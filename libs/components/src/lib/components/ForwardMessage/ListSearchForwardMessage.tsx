@@ -72,7 +72,7 @@ const ItemDm = (props: ItemDmProps) => {
 	const { id, name, avatar, searchText, checked, handleToggle, username, hiddenSubText } = props;
 	return (
 		<>
-			<div className="flex-1 mr-1">
+			<div className="flex-1 mr-1" onClick={handleToggle}>
 				<SuggestItem
 					display={name}
 					avatarUrl={avatar}
@@ -105,7 +105,7 @@ const ItemChannel = (props: ItemChannelProps) => {
 
 	return (
 		<>
-			<div className="flex-1 mr-1">
+			<div className="flex-1 mr-1" onClick={handleToggle}>
 				<SuggestItem
 					display={name}
 					subText={clanByClanId?.clan_name || ''}
