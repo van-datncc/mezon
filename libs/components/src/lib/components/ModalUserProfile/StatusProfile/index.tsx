@@ -29,7 +29,6 @@ import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 import ItemStatusUpdate from './ItemStatusUpdate';
-import WalletManagementModal, { WalletIcon } from './WalletManagementModal';
 
 type StatusProfileProps = {
 	userById: ChannelMembersEntity | null;
@@ -53,7 +52,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	}, [userProfile?.wallet]);
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
-	const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
 
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
@@ -70,10 +68,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	};
 	const handleCloseHistoryModal = () => {
 		setIsShowModalHistory(false);
-	};
-
-	const handleWalletManagement = () => {
-		setShowWalletModal(true);
 	};
 	const statusIcon = (status: string): ReactNode => {
 		switch (status) {
@@ -168,16 +162,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
 				/> */}
 				<ItemStatus onClick={handleOpenHistoryModal} children="History Transaction" startIcon={<Icons.History className="bg-green-500" />} />
-				<ItemStatus
-					onClick={handleWalletManagement}
-					children="Manage Wallet"
-					startIcon={
-						<span className="w-5 h-5 flex items-center justify-center">
-							{' '}
-							<WalletIcon />{' '}
-						</span>
-					}
-				/>
 				<Dropdown
 					trigger="click"
 					dismissOnClick={true}
@@ -229,8 +213,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
-
-			<WalletManagementModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />
 		</>
 	);
 };
