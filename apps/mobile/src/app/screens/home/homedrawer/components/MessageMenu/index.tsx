@@ -57,7 +57,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			infoFriend?.user?.id === messageInfo?.user_id?.[0]
 		);
 	}, [infoFriend, userProfile?.user?.id, messageInfo?.user_id?.[0]]);
-	const { blockFriend, unBlockFriend } = useFriends();
+	const { blockFriend, unBlockFriend, deleteFriend, addFriend } = useFriends();
 
 	const dismiss = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -115,6 +115,19 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			textStyle: { color: 'red' }
 		}
 	];
+
+	const handleAddFriend = () => {
+		addFriend({
+			ids: [messageInfo?.user_id?.[0]],
+			usernames: [messageInfo?.usernames?.[0]]
+		});
+		dismiss();
+	};
+
+	const handleDeleteFriend = () => {
+		deleteFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		dismiss();
+	};
 
 	const handleBlockFriend = async () => {
 		try {
@@ -177,6 +190,21 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			icon: <MezonIconCDN icon={IconCDN.userMinusIcon} color={baseColor.gray} />
 		},
 		{
+			onPress: infoFriend?.state === EStateFriend.FRIEND ? handleDeleteFriend : handleAddFriend,
+			title: infoFriend?.state === EStateFriend.FRIEND ? t('menu.removeFriend') : t('menu.addFriend'),
+			isShow:
+				!isGroup &&
+				infoFriend?.state !== EStateFriend.BLOCK &&
+				infoFriend?.state !== EStateFriend.MY_PENDING &&
+				infoFriend?.state !== EStateFriend.OTHER_PENDING,
+			icon:
+				infoFriend?.state === EStateFriend.FRIEND ? (
+					<MezonIconCDN icon={IconCDN.removeFriend} color={baseColor.gray} />
+				) : (
+					<MezonIconCDN icon={IconCDN.userPlusIcon} color={baseColor.gray} />
+				)
+		},
+		{
 			onPress: didIBlockUser ? handleUnblockFriend : handleBlockFriend,
 			title: didIBlockUser ? t('menu.unblockUser') : t('menu.blockUser'),
 			isShow: !isGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser),
@@ -211,7 +239,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		{
 			onPress: async () => await handleMarkAsRead(messageInfo?.channel_id ?? ''),
 			title: t('menu.markAsRead'),
-			icon: <MezonIconCDN icon={IconCDN.eyeIcon} color={themeValue.textStrong} />
+			icon: <MezonIconCDN icon={IconCDN.eyeIcon} color={baseColor.gray} />
 		}
 	];
 
