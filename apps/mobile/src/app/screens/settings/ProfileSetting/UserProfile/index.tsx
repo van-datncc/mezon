@@ -1,26 +1,49 @@
-import { TouchableOpacity } from '@gorhom/bottom-sheet';
-import { useAuth } from '@mezon/core';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { memo, useCallback } from 'react';
-import { KeyboardAvoidingView, View } from 'react-native';
+import { useAccount } from '@mezon/core';
+import { useTheme } from '@mezon/mobile-ui';
+import { appActions, selectAllAccount } from '@mezon/store';
+import { getStore, useAppDispatch } from '@mezon/store-mobile';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { IUserProfileValue } from '..';
-import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
-import { IconCDN } from '../../../../constants/icon_cdn';
 import BannerAvatar from './components/Banner';
 import DetailInfo from './components/Info';
 import { DirectMessageLogo } from './components/Logo';
 import { style } from './styles';
 
 interface IUserProfile {
-	userProfileValue: IUserProfileValue;
-	setCurrentUserProfileValue: (updateFn: (prevValue: IUserProfileValue) => IUserProfileValue) => void;
+	navigation: any;
 }
 
-function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProfile) {
+const UserProfile = forwardRef(function UserProfile({ navigation }: IUserProfile, ref) {
 	const { themeValue } = useTheme();
+	const { updateUser } = useAccount();
+	const dispatch = useAppDispatch();
+	const store = getStore();
+
+	const { t } = useTranslation(['profileSetting']);
+
+	const [currentUserProfileValue, setCurrentUserProfileValue] = useState<IUserProfileValue>({
+		username: '',
+		imgUrl: '',
+		displayName: '',
+		aboutMe: ''
+	});
 	const styles = style(themeValue);
-	const auth = useAuth();
+
+	useEffect(() => {
+		const userProfile = selectAllAccount(store.getState());
+		const { display_name, avatar_url, username, about_me } = userProfile?.user || {};
+		const initialValue: IUserProfileValue = {
+			username: username || '',
+			imgUrl: avatar_url || '',
+			displayName: display_name || username || '',
+			aboutMe: about_me || ''
+		};
+		setCurrentUserProfileValue(initialValue);
+	}, []);
+
 	const handleAvatarChange = useCallback(
 		async (imgUrl: string) => {
 			setCurrentUserProfileValue((prevValue) => ({
@@ -35,33 +58,60 @@ function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProf
 		setCurrentUserProfileValue((prevValue) => ({ ...prevValue, ...newValue }));
 	};
 
-	function handleHashtagPress() {
-		Toast.show({
-			type: 'info',
-			text1: 'Original known as ' + auth.userProfile?.user?.username + '#' + auth.userId
-		});
-	}
+	const updateUserProfile = async () => {
+		const userProfile = selectAllAccount(store.getState());
+		const { username, imgUrl, displayName, aboutMe } = currentUserProfileValue;
+		try {
+			dispatch(appActions.setLoadingMainMobile(true));
+			const response = await updateUser(
+				username || '',
+				imgUrl || '',
+				displayName?.trim() || '',
+				aboutMe || '',
+				userProfile?.user?.dob || '',
+				userProfile?.logo || '',
+				true
+			);
+
+			dispatch(appActions.setLoadingMainMobile(false));
+			if (response && response?.status !== 400) {
+				Toast.show({
+					type: 'info',
+					text1: t('updateProfileSuccess')
+				});
+				navigation.goBack();
+			} else {
+				Toast.show({
+					type: 'error',
+					text1: t('updateProfileError')
+				});
+			}
+		} catch (e) {
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
+	};
+
+	useImperativeHandle(ref, () => ({
+		triggerSave: () => {
+			updateUserProfile();
+		}
+	}));
 
 	return (
 		<KeyboardAvoidingView behavior="position" style={styles.container}>
 			<BannerAvatar
-				avatar={userProfileValue?.imgUrl}
-				alt={userProfileValue?.username}
+				avatar={currentUserProfileValue?.imgUrl}
+				alt={currentUserProfileValue?.username}
 				onLoad={handleAvatarChange}
 				defaultAvatar={process.env.NX_LOGO_MEZON || ''}
 			/>
-			<View style={styles.btnGroup}>
-				<TouchableOpacity onPress={() => handleHashtagPress()} style={styles.btnIcon}>
-					<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} />
-				</TouchableOpacity>
-			</View>
 
 			<DetailInfo
 				value={{
-					displayName: userProfileValue.displayName,
-					username: userProfileValue.username,
-					aboutMe: userProfileValue.aboutMe,
-					imgUrl: userProfileValue.imgUrl
+					displayName: currentUserProfileValue.displayName,
+					username: currentUserProfileValue.username,
+					aboutMe: currentUserProfileValue.aboutMe,
+					imgUrl: currentUserProfileValue.imgUrl
 				}}
 				onChange={handleDetailChange}
 			/>
@@ -69,6 +119,6 @@ function UserProfile({ userProfileValue, setCurrentUserProfileValue }: IUserProf
 			<DirectMessageLogo />
 		</KeyboardAvoidingView>
 	);
-}
+});
 
 export default memo(UserProfile);

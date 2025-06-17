@@ -72,6 +72,7 @@ export const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, 
 		<MezonModal
 			visible={isVisible}
 			title={t('editStatus')}
+			animationType={'fade'}
 			visibleChange={setIsVisible}
 			headerStyles={styles.headerModal}
 			titleStyle={styles.titleModal}
