@@ -178,7 +178,55 @@ export function ControlBar({
 			try {
 				const trackPublication = await localParticipant.localParticipant.publishTrack(videoTrack, {
 					name: 'screen-share',
-					source: Track.Source.ScreenShare
+					source: Track.Source.ScreenShare,
+					simulcast: true,
+					videoSimulcastLayers: [
+						// 480p
+						{
+							encoding: {
+								maxBitrate: 500_000, // 500 kbps
+								maxFramerate: 24
+							},
+							width: 854,
+							height: 480,
+							resolution: {
+								width: 854,
+								height: 480,
+								aspectRatio: 16 / 9,
+								frameRate: 24
+							}
+						},
+						// 720p
+						{
+							encoding: {
+								maxBitrate: 1_500_000, // 1.5 Mbps
+								maxFramerate: 24
+							},
+							width: 1280,
+							height: 720,
+							resolution: {
+								width: 1280,
+								height: 720,
+								aspectRatio: 16 / 9,
+								frameRate: 24
+							}
+						},
+						// 1080p
+						{
+							encoding: {
+								maxBitrate: 3_000_000, // 3 Mbps
+								maxFramerate: 24
+							},
+							width: 1920,
+							height: 1080,
+							resolution: {
+								width: 1920,
+								height: 1080,
+								aspectRatio: 16 / 9,
+								frameRate: 24
+							}
+						}
+					]
 				});
 
 				screenTrackRef.current = trackPublication;
