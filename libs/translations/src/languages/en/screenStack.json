@@ -37,6 +37,7 @@
         "withdrawToken": "Withdraw",
         "historyTransaction": "History Transaction",
         "quit": "Quit",
-        "menu": "Menu"
+        "menu": "Menu",
+        "walletManagement": "Wallet Management"
     }
 }

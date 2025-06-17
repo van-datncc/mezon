@@ -7,11 +7,9 @@ interface IMezonTabHeaderProps {
 	tabIndex: number;
 	tabs: string[];
 	onChange?: (tabIndex: number) => void;
-	isNeedConfirmWhenSwitch?: boolean;
-	confirmCallback?: () => Promise<boolean>;
 }
 
-export default function MezonTabHeader({ tabIndex, tabs, isNeedConfirmWhenSwitch = false, confirmCallback, onChange }: IMezonTabHeaderProps) {
+export default function MezonTabHeader({ tabIndex, tabs, onChange }: IMezonTabHeaderProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [tab, setTab] = useState<number>(tabIndex);
@@ -21,13 +19,6 @@ export default function MezonTabHeader({ tabIndex, tabs, isNeedConfirmWhenSwitch
 	}, [tab, tabIndex]);
 
 	async function handleTabHeaderPress(index: number) {
-		if (isNeedConfirmWhenSwitch) {
-			const isConfirm = await confirmCallback?.();
-			if (!isConfirm) {
-				return;
-			}
-		}
-
 		if (tab !== index) {
 			onChange && onChange(index);
 		}

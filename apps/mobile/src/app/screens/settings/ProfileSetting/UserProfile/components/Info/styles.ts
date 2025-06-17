@@ -1,15 +1,14 @@
-import { Attributes, Fonts } from '@mezon/mobile-ui';
+import {Attributes, Fonts, size} from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
-			flex: 1,
 			backgroundColor: colors.secondary,
-			marginHorizontal: 20,
-			borderRadius: 10,
-			marginTop: 20,
-			padding: 20
+			marginHorizontal: size.s_20,
+			borderRadius: size.s_10,
+			marginTop: size.s_20,
+			padding: size.s_20
 		},
 
 		name: {
@@ -24,6 +23,6 @@ export const style = (colors: Attributes) =>
 		},
 
 		nameWrapper: {
-			marginBottom: 20
+			marginBottom: size.s_20
 		}
 	});

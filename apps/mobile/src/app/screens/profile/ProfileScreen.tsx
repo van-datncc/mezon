@@ -17,7 +17,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -204,61 +204,87 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					</TouchableOpacity>
 				</View>
 
-				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
-					{userProfile?.user?.avatar_url ? (
-						isTabletLandscape ? (
-							<Image
-								source={{
-									uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
-								}}
-								style={styles.imgWrapper}
-							/>
+				<View style={styles.viewImageProfile}>
+					<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.imageProfile}>
+						{userProfile?.user?.avatar_url ? (
+							isTabletLandscape ? (
+								<Image
+									source={{
+										uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									}}
+									style={styles.imgWrapper}
+								/>
+							) : (
+								<FastImage
+									source={{
+										uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									}}
+									style={styles.imgWrapper}
+								/>
+							)
 						) : (
-							<FastImage
-								source={{
-									uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							<View
+								style={{
+									backgroundColor: themeValue.colorAvatarDefault,
+									overflow: 'hidden',
+									width: '100%',
+									height: '100%',
+									borderRadius: isTabletLandscape ? size.s_70 : size.s_50,
+									alignItems: 'center',
+									justifyContent: 'center'
 								}}
-								style={styles.imgWrapper}
-							/>
-						)
-					) : (
-						<View
-							style={{
-								backgroundColor: themeValue.colorAvatarDefault,
-								overflow: 'hidden',
-								width: '100%',
-								height: '100%',
-								borderRadius: isTabletLandscape ? size.s_70 : size.s_50,
-								alignItems: 'center',
-								justifyContent: 'center'
-							}}
-						>
-							<Text style={styles.textAvatar}>{userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
-						</View>
-					)}
+							>
+								<Text style={styles.textAvatar}>{userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
+							</View>
+						)}
 
-					<View
-						style={[
-							{
-								backgroundColor: themeValue.tertiary,
-								borderRadius: size.s_20,
-								position: 'absolute',
-								bottom: -size.s_2,
-								right: -size.s_4
-							},
-							styles.dotStatusUser
-						]}
+						<View
+							style={[
+								{
+									backgroundColor: themeValue.tertiary,
+									borderRadius: size.s_20,
+									position: 'absolute',
+									bottom: -size.s_2,
+									right: -size.s_4
+								},
+								styles.dotStatusUser
+							]}
+						>
+							{userStatusIcon}
+						</View>
+					</TouchableOpacity>
+					<View style={styles.badgeStatusTemp} />
+
+					<TouchableOpacity
+						activeOpacity={1}
+						onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+						style={styles.badgeStatus}
 					>
-						{userStatusIcon}
-					</View>
-				</TouchableOpacity>
+						<View style={styles.badgeStatusInside} />
+						{!userCustomStatus && (
+							<View style={styles.iconAddStatus}>
+								<MezonIconCDN icon={IconCDN.plusLargeIcon} height={size.s_12} width={size.s_12} color={themeValue.primary} />
+							</View>
+						)}
+						<Text numberOfLines={1} style={styles.textStatus}>
+							{userCustomStatus ? userCustomStatus : t('addStatus')}
+						</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 
 			{isTabletLandscape && (
 				<View style={styles.buttonListLandscape}>
-					<MezonButton viewContainerStyle={styles.button} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
+					<MezonButton
+						viewContainerStyle={styles.button}
+						onPress={() => {
+							navigation.push(APP_SCREEN.WALLET, {
+								activeScreen: 'manage'
+							});
+						}}
+					>
 						<MezonIconCDN icon={IconCDN.chatIcon} height={size.s_20} width={size.s_20} color={'white'} />
-						<Text style={styles.whiteText}>{t('addStatus')}</Text>
+						<Text style={styles.whiteText}>{t('manageWallet')}</Text>
 					</MezonButton>
 
 					<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
@@ -277,19 +303,6 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						</View>
 						<Text style={styles.text}>{userProfile?.user?.username}</Text>
 					</TouchableOpacity>
-					{userCustomStatus ? (
-						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-							<TouchableOpacity
-								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
-								style={styles.customUserStatusBtn}
-							>
-								<Text style={styles.text}>{userCustomStatus}</Text>
-							</TouchableOpacity>
-							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
-								<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
-							</Pressable>
-						</View>
-					) : null}
 					<TouchableOpacity onPress={showSendTokenBottomSheet} style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
 						<CheckIcon width={size.s_20} height={size.s_20} color={Colors.azureBlue} />
 						<View style={styles.token}>
@@ -313,19 +326,6 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => {
-							navigation.push(APP_SCREEN.WALLET);
-						}}
-						style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}
-					>
-						<View style={{ transform: [{ rotate: '180deg' }] }}>
-							<Icons.SendMoney height={size.s_20} width={size.s_20} color={baseColor.gray} />
-						</View>
-						<View style={styles.token}>
-							<Text style={styles.text}>{tStack('settingStack.withdrawToken')}</Text>
-						</View>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => {
 							navigation.push(APP_SCREEN.WALLET, {
 								activeScreen: 'history'
 							});
@@ -341,10 +341,14 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 						<View style={styles.buttonList}>
 							<MezonButton
 								viewContainerStyle={styles.button}
-								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								onPress={() => {
+									navigation.push(APP_SCREEN.WALLET, {
+										activeScreen: 'manage'
+									});
+								}}
 							>
-								<MezonIconCDN icon={IconCDN.chatIcon} height={size.s_20} width={size.s_20} color={'white'} />
-								<Text style={styles.whiteText}>{t('addStatus')}</Text>
+								<MezonIconCDN icon={IconCDN.wallet} height={size.s_18} width={size.s_18} color={'white'} />
+								<Text style={styles.whiteText}>{t('manageWallet')}</Text>
 							</MezonButton>
 
 							<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
