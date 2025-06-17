@@ -128,7 +128,7 @@ function GuideBody() {
 									title={rule.title}
 									hightLightIcon={true}
 									description={rule.content}
-									icon={<Icons.RuleIcon />}
+									icon={<Icons.RuleIcon defaultFill="#e4e4e4" />}
 									background="bg-white dark:bg-gray-800"
 									className="shadow-sm dark:shadow-none"
 									action={
@@ -157,7 +157,7 @@ function GuideBody() {
 									description={rule.content}
 									icon={<Icons.RuleIcon />}
 									background="bg-white dark:bg-gray-800"
-									className="shadow-sm dark:shadow-none"
+									className="shadow-sm dark:shadow-none text-white"
 									action={<div className="w-[72px] aspect-square bg-gray-100 dark:bg-black rounded-lg"></div>}
 								/>
 							))}
@@ -213,7 +213,7 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 			title={mission.title}
 			className="cursor-pointer shadow-sm dark:shadow-none"
 			hightLightIcon={true}
-			icon={<Icons.TargetIcon defaultSize="w-6 h-6" />}
+			icon={<Icons.TargetIcon defaultSize="w-6 h-6 " defaultFill="#e4e4e4" />}
 			onClick={onClick}
 			background="bg-white dark:bg-gray-800"
 			description={

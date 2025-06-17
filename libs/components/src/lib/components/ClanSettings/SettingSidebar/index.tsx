@@ -26,6 +26,9 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS, ItemSetting.AUDIT_LOG].includes(item.id)) {
 				return hasClanPermission;
 			}
+			if (item.id === ItemSetting.ON_BOARDING) {
+				return isClanOwner;
+			}
 			return true;
 		});
 
