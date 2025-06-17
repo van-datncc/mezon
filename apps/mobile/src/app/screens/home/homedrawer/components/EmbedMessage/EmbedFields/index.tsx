@@ -117,7 +117,11 @@ export const EmbedFields = memo(({ message_id, fields }: EmbedFieldsProps) => {
 													/>
 												))}
 											{fieldItem?.inputs?.type === EMessageComponentType.ANIMATION && fieldItem?.inputs?.component && (
-												<EmbedAnimation animationOptions={fieldItem?.inputs?.component} themeValue={themeValue} />
+												<EmbedAnimation
+													key={`embed_animation_${message_id}`}
+													animationOptions={fieldItem?.inputs?.component}
+													themeValue={themeValue}
+												/>
 											)}
 										</View>
 									)}
