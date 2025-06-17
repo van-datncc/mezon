@@ -36,6 +36,7 @@ import {
 	selectPositionEmojiButtonSmile,
 	selectPreviousChannels,
 	selectReactionTopState,
+	selectSearchMessagesLoadingStatus,
 	selectSignalingDataByUserId,
 	selectStatusMenu,
 	useAppDispatch,
@@ -355,7 +356,7 @@ const DirectMessage = () => {
 							/>
 						</div>
 					)}
-					{isSearchMessage && <SearchMessageChannel />}
+					{isSearchMessage && <SearchMessageChannel channelId={directId} />}
 				</div>
 			</div>
 			<DirectSeenListener channelId={directId as string} mode={mode} currentChannel={currentDmGroup} />
@@ -363,16 +364,18 @@ const DirectMessage = () => {
 	);
 };
 
-const SearchMessageChannel = () => {
+const SearchMessageChannel = ({ channelId }: { channelId: string }) => {
 	const { totalResult, currentPage, messageSearchByChannelId } = useSearchMessages();
-	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isLoading = useAppSelector(selectSearchMessagesLoadingStatus) === 'loading';
+
 	return (
 		<SearchMessageChannelRender
 			searchMessages={messageSearchByChannelId}
 			currentPage={currentPage}
 			totalResult={totalResult}
-			channelId={currentChannelId || ''}
+			channelId={channelId || ''}
 			isDm
+			isLoading={isLoading}
 		/>
 	);
 };

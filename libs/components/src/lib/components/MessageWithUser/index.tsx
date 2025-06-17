@@ -110,6 +110,7 @@ function MessageWithUser({
 	})();
 
 	const checkMessageHasReply = !!message?.references?.length && message?.code === TypeMessage.Chat;
+	const isEphemeralMessage = message?.code === TypeMessage.Ephemeral;
 
 	const handleOpenShortUser = useCallback(
 		(e: React.MouseEvent<HTMLImageElement, MouseEvent>, userId: string, isClickOnReply = false) => {
@@ -171,8 +172,8 @@ function MessageWithUser({
 			{message && (
 				<HoverStateWrapper
 					isSearchMessage={isSearchMessage}
-					popup={popup}
-					onContextMenu={onContextMenu}
+					popup={!isEphemeralMessage ? popup : undefined}
+					onContextMenu={!isEphemeralMessage ? onContextMenu : () => {}}
 					messageId={message.id}
 					className={classNames(
 						'fullBoxText relative group',
@@ -184,16 +185,19 @@ function MessageWithUser({
 						},
 						{
 							'dark:!bg-[#403D38] !bg-[#EAB3081A]':
-								(hasIncludeMention || checkReplied) && !messageReplyHighlight && !checkMessageTargetToMoved
+								(hasIncludeMention || checkReplied) && !messageReplyHighlight && !checkMessageTargetToMoved && !isEphemeralMessage
 						},
 						{ '!bg-bgMessageReplyHighline': messageReplyHighlight },
 						{ 'dark:!bg-[#383B47] !bg-[#EAB3081A]': isHighlight },
-						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved }
+						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved },
+						{
+							'dark:!bg-[#2D2B3A] !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
+						}
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
 				>
-					{checkMessageHasReply && (
+					{checkMessageHasReply && !isEphemeralMessage && (
 						<MessageReply
 							message={message}
 							mode={mode}
@@ -265,14 +269,23 @@ function MessageWithUser({
 							/>
 						)}
 						{!isEditing && !message?.content?.callLog?.callLogType && !(message.code === TypeMessage.SendToken) && (
-							<MessageContent
-								message={message}
-								isSending={message?.isSending}
-								isError={message?.isError}
-								mode={mode}
-								isSearchMessage={isSearchMessage}
-								isInTopic={isTopic}
-							/>
+							<>
+								<MessageContent
+									message={message}
+									isSending={message?.isSending}
+									isError={message?.isError}
+									mode={mode}
+									isSearchMessage={isSearchMessage}
+									isInTopic={isTopic}
+									isEphemeral={isEphemeralMessage}
+								/>
+								{isEphemeralMessage && (
+									<div className="flex items-center gap-1 mt-1 mb-1 text-xs text-gray-500 dark:text-gray-400 italic">
+										<Icons.EyeClose className="w-3 h-3" />
+										<span>Only visible to recipient</span>
+									</div>
+								)}
+							</>
 						)}
 
 						{(message?.attachments?.length as number) > 0 && (
@@ -323,7 +336,7 @@ function MessageWithUser({
 								</div>
 							))}
 					</div>
-					<MessageReaction message={message} isTopic={!!isTopic} />
+					{!isEphemeralMessage && <MessageReaction message={message} isTopic={!!isTopic} />}
 				</HoverStateWrapper>
 			)}
 		</>

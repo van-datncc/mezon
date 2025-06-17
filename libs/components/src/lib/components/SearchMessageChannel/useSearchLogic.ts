@@ -55,6 +55,7 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 	const [isUseProfileDMBefore, setIsUseProfileDMBefore] = useState<boolean>(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchRef = useRef<HTMLInputElement | null>(null);
+	const previousCurrentPageRef = useRef<Record<string, number>>({});
 
 	const setIsShowCreateThread = useCallback(
 		(isShowCreateThread: boolean, channelId?: string) => {
@@ -140,6 +141,25 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 		searchRef.current?.blur();
 	}, [channelId, isShowMemberListBefore, isShowMemberListDMBefore, isUseProfileDMBefore, dispatch]);
 
+	const executeSearchWithQueue = useDebouncedCallback(() => {
+		if (searchedRequest && channelId && currentClanId) {
+			const requestFilter = [
+				...(searchedRequest.filters || []),
+				{ field_name: 'channel_id', field_value: channelId },
+				{ field_name: 'clan_id', field_value: currentClanId }
+			];
+
+			const requestBody = {
+				...searchedRequest,
+				filters: requestFilter,
+				from: currentPage,
+				size: SIZE_PAGE_SEARCH
+			};
+
+			fetchSearchMessages(requestBody);
+		}
+	}, 100);
+
 	const handleKeyDown = useCallback(
 		(event: React.KeyboardEvent<HTMLTextAreaElement> | React.KeyboardEvent<HTMLInputElement>) => {
 			if (valueInputSearch && event.key === 'Enter') {
@@ -147,18 +167,12 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 				dispatch(searchMessagesActions.setIsSearchMessage({ channelId, isSearchMessage: true }));
 				dispatch(searchMessagesActions.setCurrentPage({ channelId: channelId, page: 1 }));
 				setIsShowCreateThread(false, currentChannel?.parent_id !== '0' ? currentChannel?.parent_id : currentChannel.channel_id);
+
 				if (isActive) dispatch(appActions.setIsShowMemberList(!isActive));
 				if (isShowMemberListDM) dispatch(appActions.setIsShowMemberListDM(!isShowMemberListDM));
 				if (isUseProfileDM) dispatch(appActions.setIsUseProfileDM(!isUseProfileDM));
-				if (searchedRequest) {
-					const requestFilter = [
-						...(searchedRequest.filters || []),
-						{ field_name: 'channel_id', field_value: channelId },
-						{ field_name: 'clan_id', field_value: currentClanId as string }
-					];
-					const requestBody = { ...searchedRequest, filters: requestFilter, from: 1, size: SIZE_PAGE_SEARCH };
-					fetchSearchMessages(requestBody);
-				}
+
+				executeSearchWithQueue();
 			}
 
 			if (event.key === 'Escape') {
@@ -180,11 +194,9 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 			isUseProfileDM,
 			dispatch,
 			setIsShowCreateThread,
-			searchedRequest,
-			currentClanId,
-			fetchSearchMessages,
 			clearSearchInput,
-			resetSearchBar
+			resetSearchBar,
+			executeSearchWithQueue
 		]
 	);
 
@@ -209,19 +221,6 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 		[channelId, valueInputSearch, dispatch]
 	);
 
-	const debouncedFetchSearchMessages = useDebouncedCallback(async () => {
-		if (searchedRequest && channelId) {
-			const requestFilter = [
-				...(searchedRequest.filters || []),
-				{ field_name: 'channel_id', field_value: channelId },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			];
-
-			const requestBody = { ...searchedRequest, filters: requestFilter, from: currentPage, size: SIZE_PAGE_SEARCH };
-			fetchSearchMessages(requestBody);
-		}
-	}, 150);
-
 	const handleSearchFocus = useCallback(
 		(event: KeyboardEvent) => {
 			const platform = getPlatform();
@@ -235,10 +234,16 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 		[handleInputClick]
 	);
 
-	// Effects
-	// useEffect(() => {
-	// 	debouncedFetchSearchMessages();
-	// }, [channelId, currentPage, debouncedFetchSearchMessages, fetchSearchMessages, searchedRequest]);
+	useEffect(() => {
+		if (!currentPage || !channelId || !isSearchMessage) return;
+
+		const previousCurrentPage = previousCurrentPageRef.current[channelId];
+
+		if (previousCurrentPage !== currentPage) {
+			previousCurrentPageRef.current[channelId] = currentPage;
+			executeSearchWithQueue();
+		}
+	}, [executeSearchWithQueue, currentPage, channelId, isSearchMessage]);
 
 	useEffect(() => {
 		if (isShowSearchMessageModal) {

@@ -100,19 +100,19 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 
 	const isErrorStartDate = useMemo(() => {
 		return startDate.getTime() <= today.getTime();
-	}, [startDate]);
+	}, [startDate, today]);
 
 	const isErrorStartTime = useMemo(() => {
 		return startTime.getTime() <= today.getTime();
-	}, [startTime]);
+	}, [startTime, today]);
 
 	const isErrorEndDate = useMemo(() => {
 		return startDate.getTime() >= endDate.getTime();
-	}, [endDate]);
+	}, [endDate, startDate]);
 
 	const isErrorEndTime = useMemo(() => {
-		return startTime.getTime() >= endTime.getTime();
-	}, [endTime]);
+		return startDate.getDate() >= endDate.getDate() && startTime.getTime() >= endTime.getTime();
+	}, [endDate, endTime, startDate, startTime]);
 
 	function handlePressNext() {
 		setIsValidEventTitle(!!eventTitle?.trim()?.length);

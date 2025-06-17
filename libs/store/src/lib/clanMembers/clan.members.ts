@@ -74,11 +74,12 @@ export const UsersClanSlice = createSlice({
 		remove: UsersClanAdapter.removeOne,
 		updateUserClan: (state, action: PayloadAction<{ userId: string; clanNick: string; clanAvt: string }>) => {
 			const { userId, clanNick, clanAvt } = action.payload;
+			const dataCurrent = UsersClanAdapter.getSelectors().selectEntities(state)[userId];
 			UsersClanAdapter.updateOne(state, {
 				id: userId,
 				changes: {
-					clan_nick: clanNick,
-					clan_avatar: clanAvt
+					clan_nick: clanNick || dataCurrent.clan_nick,
+					clan_avatar: clanAvt || dataCurrent.clan_avatar
 				}
 			});
 		},

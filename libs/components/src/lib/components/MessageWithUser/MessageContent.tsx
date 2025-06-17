@@ -24,9 +24,10 @@ type IMessageContentProps = {
 	content?: IExtendedMessage;
 	isSearchMessage?: boolean;
 	isInTopic?: boolean;
+	isEphemeral?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps) => {
+const MessageContent = ({ message, mode, isSearchMessage, isEphemeral }: IMessageContentProps) => {
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
@@ -77,6 +78,7 @@ const MessageContent = ({ message, mode, isSearchMessage }: IMessageContentProps
 			lines={lineValue as string}
 			mode={mode}
 			onCopy={handleCopyMessage}
+			isEphemeral={isEphemeral}
 		/>
 	);
 };
@@ -116,7 +118,11 @@ export const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
 export default memo(
 	MessageContent,
 	(prev, curr) =>
-		prev.message === curr.message && prev.mode === curr.mode && prev.isSearchMessage === curr.isSearchMessage && prev.isInTopic === curr.isInTopic
+		prev.message === curr.message &&
+		prev.mode === curr.mode &&
+		prev.isSearchMessage === curr.isSearchMessage &&
+		prev.isInTopic === curr.isInTopic &&
+		prev.isEphemeral === curr.isEphemeral
 );
 
 const MessageText = ({
@@ -126,7 +132,8 @@ const MessageText = ({
 	content,
 	isOnlyContainEmoji,
 	isSearchMessage,
-	onCopy
+	onCopy,
+	isEphemeral
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -135,6 +142,7 @@ const MessageText = ({
 	isSearchMessage?: boolean;
 	isOnlyContainEmoji?: boolean;
 	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
+	isEphemeral?: boolean;
 }) => {
 	let patchedContent = content;
 	if ((!content?.mk || content.mk.length === 0) && Array.isArray(content?.lk) && content.lk.length > 0) {
@@ -175,7 +183,7 @@ const MessageText = ({
 				<MessageLine
 					isEditted={showEditted}
 					isHideLinkOneImage={checkOneLinkImage}
-					isTokenClickAble={true}
+					isTokenClickAble={!isEphemeral}
 					isSearchMessage={isSearchMessage}
 					isOnlyContainEmoji={isOnlyContainEmoji}
 					isJumMessageEnabled={false}
@@ -184,6 +192,7 @@ const MessageText = ({
 					code={message.code}
 					onCopy={onCopy}
 					messageId={message.id}
+					isEphemeral={isEphemeral}
 				/>
 			) : null}
 		</>
