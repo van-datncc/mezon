@@ -11,14 +11,12 @@ import {
 } from '@mezon/components';
 import { EmojiSuggestionProvider, useApp, useAuth, useDragAndDrop, useGifsStickersEmoji, useSearchMessages, useSeenMessagePool } from '@mezon/core';
 import {
-	channelsActions,
 	directActions,
 	DirectEntity,
 	directMetaActions,
 	e2eeActions,
 	EStateFriend,
 	gifsStickerEmojiActions,
-	MessagesEntity,
 	selectAudioDialTone,
 	selectCloseMenu,
 	selectCurrentChannelId,
@@ -32,9 +30,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectLastMessageByChannelId,
-	selectLastSeenMessageStateByChannelId,
 	selectPositionEmojiButtonSmile,
-	selectPreviousChannels,
 	selectReactionTopState,
 	selectSearchMessagesLoadingStatus,
 	selectSignalingDataByUserId,
@@ -42,7 +38,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EmojiPlaces, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop, SubPanelName } from '@mezon/utils';
+import { EmojiPlaces, isBackgroundModeActive, isLinuxDesktop, isWindowsDesktop, SubPanelName, useBackgroundMode } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { DragEvent, memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -50,76 +46,62 @@ import { useSelector } from 'react-redux';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 
-function useChannelSeen(channelId: string) {
+const ChannelSeen = memo(({ channelId }: { channelId: string }) => {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
-	const mounted = useRef('');
+	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
+	const { markAsReadSeen } = useSeenMessagePool();
 
-	const isFocus = !isBackgroundModeActive();
+	const isMounted = useRef(false);
+	const isWindowFocused = !isBackgroundModeActive();
 
-	const updateChannelSeenState = (channelId: string, lastMessage: MessagesEntity) => {
-		dispatch(directActions.setActiveDirect({ directId: channelId }));
-	};
+	const streamMode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+
+	const markMessageAsRead = useCallback(() => {
+		if (!lastMessage) return;
+
+		if (lastMessage) {
+			markAsReadSeen(lastMessage, streamMode, 0);
+		}
+	}, [lastMessage, markAsReadSeen, streamMode]);
+
+	const updateChannelSeenState = useCallback(
+		(channelId: string) => {
+			dispatch(directActions.setActiveDirect({ directId: channelId }));
+		},
+		[dispatch]
+	);
 
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
-	}, [channelId]);
-	const previousChannels = useSelector(selectPreviousChannels);
-	const { markAsReadSeen } = useSeenMessagePool();
-	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
-	useEffect(() => {
-		if (!lastMessage) return;
-		const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-		if (!lastMessageState) {
-			markAsReadSeen(lastMessage, mode, 0);
-			return;
-		}
+	}, [dispatch, channelId]);
 
-		if (
-			lastMessage?.create_time_seconds &&
-			lastMessageState?.timestamp_seconds &&
-			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
-		) {
-			markAsReadSeen(lastMessage, mode, 0);
-		}
-	}, [lastMessage, channelId, currentDmGroup?.type, lastMessageState, markAsReadSeen]);
 	useEffect(() => {
-		if (previousChannels.at(1)) {
-			const timestamp = Date.now() / 1000;
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: previousChannels.at(1)?.clanId || '',
-					channelId: previousChannels.at(1)?.channelId || '',
-					count: 0,
-					isReset: true
-				})
-			);
-			dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
-		}
-	}, [previousChannels]);
-	useEffect(() => {
-		if (lastMessage && isFocus) {
+		if (lastMessage && isWindowFocused) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			updateChannelSeenState(channelId, lastMessage);
+			updateChannelSeenState(channelId);
+			markMessageAsRead();
 		}
-	}, [isFocus]);
+	}, [lastMessage, isWindowFocused, markMessageAsRead, dispatch, updateChannelSeenState, channelId]);
 
 	useEffect(() => {
-		if (mounted.current === channelId) {
-			return;
-		}
-		if (lastMessage) {
-			mounted.current = channelId;
-			updateChannelSeenState(channelId, lastMessage);
-		}
-	}, [dispatch, channelId, lastMessage]);
-}
+		if (isMounted.current || !lastMessage) return;
+		isMounted.current = true;
+		updateChannelSeenState(channelId);
+	}, [channelId, lastMessage, updateChannelSeenState]);
+
+	useBackgroundMode(undefined, markMessageAsRead, isWindowFocused);
+
+	return null;
+});
 
 function DirectSeenListener({ channelId, mode, currentChannel }: { channelId: string; mode: number; currentChannel: DirectEntity }) {
-	useChannelSeen(channelId);
-	return <KeyPressListener currentChannel={currentChannel} mode={mode} />;
+	return (
+		<>
+			<ChannelSeen channelId={channelId} />
+			<KeyPressListener currentChannel={currentChannel} mode={mode} />
+		</>
+	);
 }
 
 const DirectMessage = () => {

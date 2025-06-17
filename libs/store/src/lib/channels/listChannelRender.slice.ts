@@ -241,9 +241,14 @@ export const listChannelRenderSlice = createSlice({
 		},
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
-			if (state.listChannelRender[clanId]) {
-				state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel) => {
-					if (channel.id === channelId) {
+			const channels = state.listChannelRender[clanId];
+
+			if (channels) {
+				let hasChanged = false;
+
+				const updatedChannels = channels.map((channel) => {
+					if (channel.id === channelId && (channel as any)?.count_mess_unread !== 0) {
+						hasChanged = true;
 						return {
 							...channel,
 							count_mess_unread: 0
@@ -251,6 +256,10 @@ export const listChannelRenderSlice = createSlice({
 					}
 					return channel;
 				});
+
+				if (hasChanged) {
+					state.listChannelRender[clanId] = updatedChannels;
+				}
 			}
 		},
 		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
