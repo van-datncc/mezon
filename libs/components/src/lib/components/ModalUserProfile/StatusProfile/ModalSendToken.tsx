@@ -51,7 +51,7 @@ const ModalSendToken = ({
 	const [searchTerm, setSearchTerm] = useState(infoSendToken?.receiver_name || '');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [tokenNumber, setTokenNumber] = useState('');
-	const [noteSendToken, setNoteSendToken] = useState('');
+	const [noteSendToken, setNoteSendToken] = useState(note || '');
 
 	useEffect(() => {
 		if (!openModal) {
@@ -98,6 +98,7 @@ const ModalSendToken = ({
 	const handleChangeNote = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setNote(value);
+		setNoteSendToken(value);
 	};
 
 	const mergeUniqueUsers = (usersClan: any[], directMessages: any[]) => {
@@ -149,8 +150,7 @@ const ModalSendToken = ({
 		}
 
 		setTokenNumber(formatNumber(Number(token), 'vi-VN'));
-		setNoteSendToken(note);
-	}, [token, selectedUserId, note]);
+	}, [token, selectedUserId]);
 
 	const handleSendToken = () => {
 		const userData = mergedUsers.find((user) => user.id === selectedUserId);
@@ -270,7 +270,6 @@ const ModalSendToken = ({
 								placeholder="0"
 								onChange={handleChangeSendToken}
 								disabled={sendTokenInputsState.isSendTokenInputDisabled}
-								autoFocus={searchTerm ? true : false}
 							/>
 							<span className="absolute right-4 top-1/2 transform -translate-y-1/2 dark:text-gray-400 text-gray-500 font-medium">
 								VND
