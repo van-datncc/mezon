@@ -1,3 +1,4 @@
+import { ButtonCopy } from '@mezon/components';
 import { useAppNavigation, useAuth, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementEntity,
@@ -92,30 +93,30 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	});
 
 	const getPrivateMeetingRoom = useAppSelector((state) => selectMeetRoomByEventId(state, event?.id as string));
-	const [copied, setCopied] = useState(false);
 	const eventIsUpcomming = event?.event_status === EEventStatus.UPCOMING;
 	const eventIsOngoing = event?.event_status === EEventStatus.ONGOING;
 	const externalLink = event?.meet_room?.external_link || getPrivateMeetingRoom?.external_link;
-	const privateRoomLink = `${process.env.NX_CHAT_APP_REDIRECT_URI}${externalLink}`;
 	const hasLink = Boolean(externalLink);
+
+	const link = useMemo(() => {
+		if (isPrivateEvent) {
+			return `${process.env.NX_CHAT_APP_REDIRECT_URI}${externalLink}`;
+		}
+		return `${origin}/chat/clans/${event?.clan_id}/channels/${event?.channel_id}`;
+	}, []);
+
 	const handleCopyLink = useCallback(() => {
-		navigator.clipboard
-			.writeText(privateRoomLink)
-			.then(() => {
-				setCopied(true);
-				setTimeout(() => setCopied(false), 2000);
-			})
-			.catch((err) => {
-				dispatch(toastActions.addToastError({ message: err?.message || 'Failed to copy link.' }));
-			});
-	}, [privateRoomLink]);
+		navigator.clipboard.writeText(link).catch((err) => {
+			dispatch(toastActions.addToastError({ message: err?.message || 'Failed to copy link.' }));
+		});
+	}, [link]);
 
 	const handleOpenLink = useCallback(() => {
-		window.open(privateRoomLink, '_blank', 'noopener,noreferrer');
-	}, [privateRoomLink]);
+		window.open(link, '_blank', 'noopener,noreferrer');
+	}, [link]);
 
 	const [openInviteClanModal, closeInviteClanModal] = useModal(() => (
-		<ModalInvite onClose={closeInviteClanModal} open={true} isInviteExternalCalling={true} privateRoomLink={privateRoomLink} />
+		<ModalInvite onClose={closeInviteClanModal} open={true} isInviteExternalCalling={true} privateRoomLink={link} />
 	));
 
 	const handleInvite = useCallback(() => {
@@ -277,13 +278,8 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					{isPrivateEvent && (
 						<div className="flex gap-x-2 items-center">
 							<Icons.SpeakerLocked />
-							{privateRoomLink ? (
-								<a
-									href={privateRoomLink}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="cursor-pointer whitespace-normal break-words"
-								>
+							{link ? (
+								<a href={link} target="_blank" rel="noopener noreferrer" className="cursor-pointer whitespace-normal break-words">
 									Private Room
 								</a>
 							) : (
@@ -347,12 +343,15 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 								<button onClick={handleOpenLink} className="text-blue-500 hover:underline">
 									Open Link
 								</button>
-								<button onClick={handleCopyLink} className="text-blue-500 hover:underline">
-									{copied ? 'Copied!' : 'Copy Link'}
-								</button>
+
 								<button onClick={handleInvite} className="text-blue-500 hover:underline">
 									Invite
 								</button>
+								<ButtonCopy
+									copyText={link}
+									title="Copy Link"
+									className="bg-transparent flex-row-reverse hover:!bg-transparent !text-blue-500 hover:!underline"
+								/>
 							</>
 						)}
 					</span>
@@ -382,11 +381,12 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							onEventUpdateId(event?.id || '');
 						}
 					}}
+					handleCopyLink={handleCopyLink}
 					onClose={() => setOpenPanel(false)}
 				/>
 			)}
 			{openModalDelEvent && <ModalDelEvent event={event} setOpenModalDelEvent={setOpenModalDelEvent} />}
-			{openModalShare && <ModalShareEvent channel={channelVoice} setOpenModalShareEvent={setOpenModalShare} />}
+			{openModalShare && <ModalShareEvent link={link} channel={channelVoice} setOpenModalShareEvent={setOpenModalShare} />}
 		</div>
 	);
 };

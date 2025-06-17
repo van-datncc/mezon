@@ -82,6 +82,13 @@ export const accountSlice = createSlice({
 				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
 			}
 		},
+		setWalletMetadata(state, action: PayloadAction<any>) {
+			if (state?.userProfile?.user) {
+				const userMetadata = safeJSONParse(state.userProfile.user.metadata || '{}');
+				const updatedUserMetadata = { ...userMetadata, wallet: action.payload };
+				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
+			}
+		},
 		setLogoCustom(state, action: PayloadAction<string | undefined>) {
 			state.logo = action.payload;
 		},
