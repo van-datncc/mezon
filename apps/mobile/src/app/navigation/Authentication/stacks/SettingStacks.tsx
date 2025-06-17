@@ -11,6 +11,7 @@ import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { MyQRCode } from '../../../screens/settings/MyQRCode';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { QRScanner } from '../../../screens/settings/QRScanner';
+import SetPassword from '../../../screens/settings/SetPassword';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
@@ -127,6 +128,18 @@ export const SettingStacks = ({}: any) => {
 				component={MyQRCode}
 				options={{
 					headerTitle: '',
+					gestureEnabled: Platform.OS === 'ios',
+					headerStyle: {
+						backgroundColor: themeValue.primary
+					}
+				}}
+			/>
+
+			<Stack.Screen
+				name={APP_SCREEN.SETTINGS.SET_PASSWORD}
+				component={SetPassword}
+				options={{
+					headerTitle: t('settingStack.setPassword'),
 					gestureEnabled: Platform.OS === 'ios',
 					headerStyle: {
 						backgroundColor: themeValue.primary

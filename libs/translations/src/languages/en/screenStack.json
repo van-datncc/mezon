@@ -38,6 +38,7 @@
         "historyTransaction": "History Transaction",
         "quit": "Quit",
         "menu": "Menu",
-        "walletManagement": "Wallet Management"
+        "walletManagement": "Wallet Management",
+        "setPassword": "Set Password"
     }
 }

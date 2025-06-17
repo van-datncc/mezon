@@ -9,14 +9,27 @@ interface UserTextInputProps {
 	placeholder: string;
 	isPass: boolean;
 	value: string;
-	onChangeText: (text: string) => void;
+	onChangeText?: (text: string) => void;
 	onBlur?: () => void;
 	label: string;
 	error: string;
-	touched: boolean;
+	touched?: boolean;
+	disable?: boolean;
+	require?: boolean;
 }
 
-export const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, label, placeholder, isPass, value, onChangeText, onBlur }) => {
+export const TextInputUser: React.FC<UserTextInputProps> = ({
+	error,
+	touched,
+	label,
+	placeholder,
+	isPass,
+	value,
+	onChangeText,
+	onBlur,
+	disable = false,
+	require = true
+}) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [showPass, setShowPass] = useState<boolean>(true);
@@ -25,7 +38,7 @@ export const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, la
 		<View style={styles.container}>
 			<Text style={styles.label}>
 				{label}
-				<Text style={styles.require}> *</Text>
+				{!!require && <Text style={styles.require}> *</Text>}
 			</Text>
 			<View style={styles.inputTexts}>
 				<TextInput
@@ -37,6 +50,7 @@ export const TextInputUser: React.FC<UserTextInputProps> = ({ error, touched, la
 					secureTextEntry={isPass && showPass}
 					placeholderTextColor="#535353"
 					autoCapitalize="none"
+					editable={!disable}
 				/>
 				{isPass && (
 					<Pressable onPress={() => setShowPass(!showPass)}>
