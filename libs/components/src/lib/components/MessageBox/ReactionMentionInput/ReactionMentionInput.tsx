@@ -528,6 +528,17 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 
 		const store = getStore();
 
+		if (newPlainTextValue === '/ephemeral') {
+			setIsEphemeralMode(true);
+			setTitleModalMention('Select user for ephemeral message');
+			updateDraft({
+				valueTextInput: '@',
+				content: '@',
+				mentionRaw: []
+			});
+			return;
+		}
+
 		if (newPlainTextValue.startsWith('/ephemeral ')) {
 			const command = newPlainTextValue.substring(11).trim();
 			if (command) {
@@ -912,21 +923,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						displayTransform={(id: any, display: any) => {
 							return `/${display}`;
 						}}
-						renderSuggestion={(suggestion: any) => {
-							return (
-								<SuggestItem
-									valueHightLight={valueHighlight}
-									display={suggestion.display}
-									symbol="/"
-									subText={suggestion.description}
-									emojiId=""
-								/>
-							);
-						}}
 						onAdd={(id: string) => {
 							handleSlashCommandSelect(id);
 						}}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
 						appendSpaceOnAdd={true}
 					/>
 				</MentionsInput>
