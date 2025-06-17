@@ -48,6 +48,7 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onFullScreen: () => void;
 	isExternalCalling?: boolean;
 	currentChannel?: ReactionChannelInfo;
+	isShowMember?: boolean;
 }
 
 export function ControlBar({
@@ -58,7 +59,8 @@ export function ControlBar({
 	onLeaveRoom,
 	onFullScreen,
 	isExternalCalling,
-	currentChannel
+	currentChannel,
+	isShowMember = true
 }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
@@ -374,18 +376,18 @@ export function ControlBar({
 						destroyTooltipOnHide
 					>
 						<div>
-							<Icons.VoiceEmojiControlIcon className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+							<Icons.VoiceEmojiControlIcon className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 						</div>
 					</Tooltip>
 				)}
 			</div>
 			<div className="flex justify-center gap-3 flex-1">
 				{visibleControls.microphone && (
-					<div className="relative rounded-full">
+					<div className="relative rounded-full bg-gray-300 dark:bg-black">
 						<TrackToggle
 							key={+showMicrophone}
 							initialState={showMicrophone}
-							className="w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center"
+							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Microphone}
 							onChange={microphoneOnChange}
 							onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Microphone, error })}
@@ -399,11 +401,11 @@ export function ControlBar({
 					</div>
 				)}
 				{visibleControls.camera && (
-					<div className="relative rounded-full">
+					<div className="relative rounded-full ">
 						<TrackToggle
 							key={+showCamera}
 							initialState={showCamera}
-							className="w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center"
+							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Camera}
 							onChange={cameraOnChange}
 							onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Camera, error })}
@@ -427,7 +429,7 @@ export function ControlBar({
 						<TrackToggle
 							key={+showScreen}
 							initialState={showScreen}
-							className="w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center"
+						className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.ScreenShare}
 							captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
 							onChange={onScreenShare}
@@ -436,7 +438,7 @@ export function ControlBar({
 					) : (
 						<ScreenShareToggleButton
 							onClick={handleOpenScreenSelection}
-							className="w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center"
+							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center ${!isShowMember && 'text-white'}`}
 						/>
 					))}
 				{visibleControls.leave && (
@@ -453,11 +455,11 @@ export function ControlBar({
 					<div onClick={togglePopout}>
 						{isOpenPopOut ? (
 							<span>
-								<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] rotate-180" />
+								<Icons.VoicePopOutIcon className={`cursor-pointer rotate-180 ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 							</span>
 						) : (
 							<span>
-								<Icons.VoicePopOutIcon className="cursor-pointer hover:text-white text-[#B5BAC1] " />
+									<Icons.VoicePopOutIcon className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 							</span>
 						)}
 					</div>
@@ -465,17 +467,17 @@ export function ControlBar({
 
 				{isExternalCalling && (
 					<div onClick={toggleChatBox}>
-						<Icons.BoxChatIcon defaultSize="cursor-pointer w-6 h-6" />
+						<Icons.BoxChatIcon defaultSize={`cursor-pointer w-6 h-6 ${!isShowMember && 'text-white'}`} />
 					</div>
 				)}
 				<div onClick={onFullScreen}>
 					{isFullScreen ? (
 						<span>
-							<Icons.ExitFullScreen className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+							<Icons.ExitFullScreen className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 						</span>
 					) : (
 						<span>
-							<Icons.FullScreen className="cursor-pointer hover:text-white text-[#B5BAC1]" />
+								<Icons.FullScreen className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 						</span>
 					)}
 				</div>

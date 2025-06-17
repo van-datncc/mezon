@@ -168,9 +168,9 @@ export function MyVideoConference({
 		<div className="lk-video-conference flex-1">
 			<ReactionCallHandler currentChannel={currentChannel} />
 			<LayoutContextProvider value={layoutContext}>
-				<div className="lk-video-conference-inner relative " onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+				<div className="lk-video-conference-inner relative bg-gray-100 dark:bg-black" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 					{!focusTrack ? (
-						<div className="lk-grid-layout-wrapper !h-full !py-[68px]">
+						<div className="lk-grid-layout-wrapper bg-gray-300 dark:bg-black !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
 								<ParticipantTile isExtCalling={isExternalCalling} />
 							</GridLayout>
@@ -199,7 +199,7 @@ export function MyVideoConference({
 									destroyTooltipOnHide
 								>
 									<div
-										className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[66px]'}
+											className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[140px]'}
 											transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px]`}
 										onClick={handleShowMember}
 									>
@@ -218,16 +218,16 @@ export function MyVideoConference({
 					<div
 						className={`absolute top-0 left-0 w-full transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 					>
-						<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5">
+						<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5 ">
 							<div className="flex justify-start gap-2">
 								<span>
 									{!isExternalCalling ? (
-										<Icons.Speaker defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+										<Icons.Speaker defaultSize="w-6 h-6" defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`} />
 									) : (
-										<Icons.SpeakerLocked defaultSize="w-6 h-6" defaultFill="text-contentTertiary" />
+											<Icons.SpeakerLocked defaultSize="w-6 h-6" defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`} />
 									)}
 								</span>
-								<p className={`text-base font-semibold cursor-default one-line text-contentTertiary`}>{channelLabel}</p>
+								<p className={`text-base font-semibold cursor-default one-line ${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}>{channelLabel}</p>
 							</div>
 							<div className="flex justify-start gap-4">
 								{!isExternalCalling && !propTracks && (
@@ -240,8 +240,8 @@ export function MyVideoConference({
 										>
 											<Icons.Inbox
 												isWhite={isShowInbox}
-												defaultFill="text-contentTertiary"
-												className="hover:text-white text-[#B5BAC1]"
+												defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}
+												className={`${isShowMember ? 'hover:text-black dark:hover:text-white' : 'hover:text-gray-200'}`}
 											/>
 											{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 										</button>
@@ -256,28 +256,28 @@ export function MyVideoConference({
 									align={{
 										offset: [11, -4]
 									}}
-									overlay={<span className="bg-[#2B2B2B] rounded p-[6px] text-[14px]">{focusTrack ? 'Grid' : 'Focus'}</span>}
+									overlay={<span className={`${isShowMember ? 'bg-[#2B2B2B]' : 'bg-[#2B2B2B]'} rounded p-[6px] text-[14px]`}>{focusTrack ? 'Grid' : 'Focus'}</span>}
 									overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
 									overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
 									getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
 								>
 									<span onClick={toggleViewMode} className="cursor-pointer">
 										{focusTrack ? (
-											<Icons.VoiceGridIcon className="hover:text-white text-[#B5BAC1]" />
+											<Icons.VoiceGridIcon className={`${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 										) : (
-											<Icons.VoiceFocusIcon className="hover:text-white text-[#B5BAC1]" />
+												<Icons.VoiceFocusIcon className={`${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
 										)}
 									</span>
 								</Tooltip>
 
 								<button className="relative focus-visible:outline-none" title="Chat" onClick={onToggleChat} style={{ marginLeft: 8 }}>
-									<Icons.Chat className={isShowChatVoice ? 'text-white' : 'text-[#B5BAC1]'} />
+									<Icons.Chat defaultFill={isShowMember ? 'text-colorTextLightMode' : 'text-white'} className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'} />
 								</button>
 							</div>
 						</div>
 					</div>
 					<div
-						className={`absolute bottom-0 left-0 w-full transition-opacity duration-300 ${
+						className={`absolute ${isShowMember ? 'bottom-0' : 'bottom-8'} left-0 w-full transition-opacity duration-300 ${
 							isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
 						}`}
 					>
@@ -286,6 +286,7 @@ export function MyVideoConference({
 							onLeaveRoom={onLeaveRoom}
 							onFullScreen={onFullScreen}
 							currentChannel={currentChannel}
+							isShowMember={isShowMember}
 						/>
 					</div>
 				</div>

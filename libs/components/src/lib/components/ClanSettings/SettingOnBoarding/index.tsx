@@ -30,6 +30,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const [initialDescription, setInitialDescription] = useState('');
 	const [initialAbout, setInitialAbout] = useState('');
 	const [showOnboardingHighlight, setShowOnboardingHighlight] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 
 	const handleEnableCommunity = () => {
 		setIsModalOpen(true);
@@ -48,24 +49,33 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	};
 
 	const handleConfirm = async () => {
-		if (!checkCreateValidate) {
-			toast.error('You need to create at least one task, question, or rule before enabling the community.!');
-			setShowOnboardingHighlight(true);
-			setTimeout(() => setShowOnboardingHighlight(false), 2000);
-			return;
+		setIsSaving(true);
+		try {
+			if (!checkCreateValidate) {
+				toast.error('You need to create at least one task, question, or rule before enabling the community.!');
+				setShowOnboardingHighlight(true);
+				setTimeout(() => setShowOnboardingHighlight(false), 2000);
+				return;
+			}
+			await handleCreateOnboarding();
+			await dispatch(
+				onboardingActions.enableOnboarding({
+					clan_id: currentClan?.clan_id as string,
+					onboarding: true
+				})
+			);
+			setIsCommunityEnabled(true);
+			setIsModalOpen(false);
+			setInitialDescription(description);
+			setInitialAbout(about);
+			setOpenModalSaveChanges(false);
+			toast.success('Community enabled successfully!');
+		} catch (error) {
+			console.error("Error enabling community:", error);
+			toast.error('Failed to enable community. Please try again.');
+		} finally {
+			setIsSaving(false);
 		}
-		await handleCreateOnboarding();
-		dispatch(
-			onboardingActions.enableOnboarding({
-				clan_id: currentClan?.clan_id as string,
-				onboarding: true
-			})
-		);
-		setIsCommunityEnabled(true);
-		setIsModalOpen(false);
-		setInitialDescription(description);
-		setInitialAbout(about);
-		setOpenModalSaveChanges(false);
 	};
 
 	const handleGoToPage = (page: EOnboardingStep) => {
@@ -76,42 +86,55 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	const { sessionRef, clientRef } = useMezon();
 
 	const handleCreateOnboarding = async () => {
-		const uploadImageRule = formOnboarding.rules.map((item) => {
-			if (!item.file) {
-				return undefined;
-			}
-			const id = Snowflake.generate();
-			const path = 'onboarding/' + id + '.webp';
-			if (clientRef.current && sessionRef.current) {
-				return handleUploadEmoticon(clientRef.current, sessionRef.current, path, item.file);
-			}
-		});
-		const imageUrl = await Promise.all(uploadImageRule);
+		setIsSaving(true);
+		try {
+			const uploadImageRule = formOnboarding.rules.map((item) => {
+				if (!item.file) {
+					return undefined;
+				}
+				const id = Snowflake.generate();
+				const path = 'onboarding/' + id + '.webp';
+				if (clientRef.current && sessionRef.current) {
+					return handleUploadEmoticon(clientRef.current, sessionRef.current, path, item.file);
+				}
+			});
+			const imageUrl = await Promise.all(uploadImageRule);
 
-		const formOnboardingRule = formOnboarding.rules.map((rule, index) => {
-			const ruleItem: ApiOnboardingContent = {
-				title: rule.title,
-				content: rule.content,
-				guide_type: rule.guide_type
-			};
-			if (imageUrl[index]) {
-				ruleItem.image_url = imageUrl[index]?.url;
+			const formOnboardingRule = formOnboarding.rules.map((rule, index) => {
+				const ruleItem: ApiOnboardingContent = {
+					title: rule.title,
+					content: rule.content,
+					guide_type: rule.guide_type
+				};
+				if (imageUrl[index]) {
+					ruleItem.image_url = imageUrl[index]?.url;
+				}
+				return ruleItem;
+			});
+
+			const formOnboardingData = [...formOnboarding.questions, ...formOnboardingRule, ...formOnboarding.task];
+
+			if (formOnboarding.greeting) {
+				formOnboardingData.unshift(formOnboarding.greeting);
 			}
-			return ruleItem;
-		});
 
-		const formOnboardingData = [...formOnboarding.questions, ...formOnboardingRule, ...formOnboarding.task];
+			await dispatch(
+				onboardingActions.createOnboardingTask({
+					clan_id: currentClan?.clan_id as string,
+					content: formOnboardingData
+				})
+			);
 
-		if (formOnboarding.greeting) {
-			formOnboardingData.unshift(formOnboarding.greeting);
+			setInitialDescription(description);
+			setInitialAbout(about);
+			setOpenModalSaveChanges(false);
+			toast.success('Changes saved successfully!');
+		} catch (error) {
+			console.error("Error saving changes:", error);
+			toast.error('Failed to save changes. Please try again.');
+		} finally {
+			setIsSaving(false);
 		}
-
-		dispatch(
-			onboardingActions.createOnboardingTask({
-				clan_id: currentClan?.clan_id as string,
-				content: formOnboardingData
-			})
-		);
 	};
 
 	const checkCreateValidate = useMemo(() => {
@@ -153,44 +176,41 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				<MemberProvider>
 					<div className="flex flex-col gap-8">
 						<div onClick={() => handleGoToPage(EOnboardingStep.MAIN)} className="flex gap-3 cursor-pointer">
-							<Icons.LongArrowRight className="rotate-180 w-3" />
-							<div className="font-semibold">BACK</div>
+							<Icons.LongArrowRight className="rotate-180 w-3 text-colorTextLightMode dark:text-white" />
+							<div className="font-semibold text-colorTextLightMode dark:text-white">BACK</div>
 						</div>
-						<ClanGuideSetting />
+						<ClanGuideSetting setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					</div>
 				</MemberProvider>
 			)}
-			{!isModalOpen && openModalSaveChanges && (isDescriptionOrAboutChanged || checkCreateValidate) && (
-				<ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} />
-			)}
 
 			{/* Description Section */}
-			<div className="bg-bgTertiary p-4 rounded-lg mt-6">
-				<h4 className="text-lg font-semibold text-white mb-2">Description</h4>
+			<div className="bg-indigo-200 dark:bg-bgTertiary p-4 rounded-lg mt-6 border border-indigo-300 dark:border-transparent">
+				<h4 className="text-lg font-semibold text-indigo-700 dark:text-white mb-2">Description</h4>
 				<div className="relative">
 					<textarea
-						className="w-full h-32 bg-bgSecondary text-white rounded-md p-2 resize-none"
+						className="w-full h-32 bg-white dark:bg-bgSecondary text-colorTextLightMode dark:text-white rounded-md p-2 resize-none border border-indigo-200 dark:border-transparent focus:border-indigo-400 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:focus:border-blue-500 dark:focus:ring dark:focus:ring-blue-200 dark:focus:ring-opacity-50"
 						placeholder="Enter your clan description..."
 						value={description}
 						onChange={handleChangeDescription}
 						maxLength={300}
 					/>
-					<div className="absolute bottom-2 right-2 text-sm text-gray-400">{description.length}/300</div>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-500 dark:text-gray-400">{description.length}/300</div>
 				</div>
 			</div>
 
 			{/* About Section */}
-			<div className="bg-bgTertiary p-4 rounded-lg mt-6">
-				<h4 className="text-lg font-semibold text-white mb-2">About</h4>
+			<div className="bg-indigo-200 dark:bg-bgTertiary p-4 rounded-lg mt-6 border border-indigo-300 dark:border-transparent">
+				<h4 className="text-lg font-semibold text-indigo-700 dark:text-white mb-2">About</h4>
 				<div className="relative">
 					<textarea
-						className="w-full h-32 bg-bgSecondary text-white rounded-md p-2 resize-none"
+						className="w-full h-32 bg-white dark:bg-bgSecondary text-colorTextLightMode dark:text-white rounded-md p-2 resize-none border border-indigo-200 dark:border-transparent focus:border-indigo-400 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:focus:border-blue-500 dark:focus:ring dark:focus:ring-blue-200 dark:focus:ring-opacity-50"
 						placeholder="Tell us about your clan..."
 						value={about}
 						onChange={handleChangeAbout}
 						maxLength={300}
 					/>
-					<div className="absolute bottom-2 right-2 text-sm text-gray-400">{about.length}/300</div>
+					<div className="absolute bottom-2 right-2 text-sm text-gray-500 dark:text-gray-400">{about.length}/300</div>
 				</div>
 			</div>
 		</div>
@@ -202,10 +222,10 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				<EnableCommunity onEnable={handleEnableCommunity} />
 				{isModalOpen && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-						<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
+						<div className="bg-white dark:bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
 							<div className="flex justify-between items-center mb-6">
-								<h3 className="text-xl font-semibold text-white">Community Settings</h3>
-								<button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
+								<h3 className="text-xl font-semibold text-colorTextLightMode dark:text-white">Community Settings</h3>
+								<button onClick={() => setIsModalOpen(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
 									<Icons.CloseIcon className="w-6 h-6" />
 								</button>
 							</div>
@@ -213,12 +233,24 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 							<div className="flex justify-end gap-4 mt-6">
 								<button
 									onClick={() => setIsModalOpen(false)}
-									className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
+									className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-colorTextLightMode dark:text-white"
+									disabled={isSaving}
 								>
 									Cancel
 								</button>
-								<button onClick={handleConfirm} className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
-									Confirm
+								<button
+									onClick={handleConfirm}
+									className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center min-w-[100px]"
+									disabled={isSaving}
+								>
+									{isSaving ? (
+										<>
+											<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+											Saving...
+										</>
+									) : (
+										'Confirm'
+									)}
 								</button>
 							</div>
 						</div>
@@ -233,20 +265,35 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			{/* Onboarding Modal */}
 			{isModalOpen && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-					<div className="bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+					<div className="bg-white dark:bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
 						<div className="flex justify-between items-center mb-6">
-							<h3 className="text-xl font-semibold text-white">Community Settings</h3>
-							<button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
+							<h3 className="text-xl font-semibold text-colorTextLightMode dark:text-white">Community Settings</h3>
+							<button onClick={() => setIsModalOpen(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
 								<Icons.CloseIcon className="w-6 h-6" />
 							</button>
 						</div>
 						{renderOnboardingContent()}
 						<div className="flex justify-end gap-4 mt-6">
-							<button onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white">
+							<button
+								onClick={() => setIsModalOpen(false)}
+								className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 text-colorTextLightMode dark:text-white"
+								disabled={isSaving}
+							>
 								Cancel
 							</button>
-							<button onClick={handleConfirm} className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
-								Confirm
+							<button
+								onClick={handleConfirm}
+								className="px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center min-w-[100px]"
+								disabled={isSaving}
+							>
+								{isSaving ? (
+									<>
+										<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+										Saving...
+									</>
+								) : (
+									'Confirm'
+								)}
 							</button>
 						</div>
 					</div>
@@ -256,10 +303,10 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			{/* Main Onboarding UI */}
 			{isCommunityEnabled && (
 				<div className="dark:text-channelTextLabel text-colorTextLightMode text-sm pb-10">
-					<div className="flex items-center justify-between p-4 bg-bgSecondary rounded-lg mb-6">
+					<div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-bgSecondary rounded-lg mb-6">
 						<div className="flex flex-col">
-							<h3 className="text-lg font-semibold text-white">Community Onboarding</h3>
-							<p className="text-sm text-gray-400">Community features are enabled</p>
+							<h3 className="text-lg font-semibold text-colorTextLightMode dark:text-white">Community Onboarding</h3>
+							<p className="text-sm text-gray-500 dark:text-gray-400">Community features are enabled</p>
 						</div>
 						<button
 							onClick={() => toggleEnableStatus(false)}
@@ -269,6 +316,9 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 						</button>
 					</div>
 					{renderOnboardingContent()}
+					{!isModalOpen && openModalSaveChanges && (isDescriptionOrAboutChanged || checkCreateValidate) && (
+						<ModalSaveChanges onSave={handleCreateOnboarding} onReset={handleResetOnboarding} isLoading={isSaving} />
+					)}
 				</div>
 			)}
 		</>
@@ -300,7 +350,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 	return (
 		<div className="flex flex-col gap-6 flex-1">
 			<div className="flex flex-col gap-2">
-				<div className="text-[20px] text-white font-semibold">On Boarding</div>
+				<div className="text-[20px] text-colorTextLightMode dark:text-white font-semibold">On Boarding</div>
 				<div className="font-medium">Give your members a simple starting experience with custom channels, roles and first steps.</div>
 				<div className="flex gap-2 items-center">
 					<div className="cursor-pointer text-blue-500 hover:underline">See examples</div>
@@ -323,54 +373,54 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				}
 			/>
 
-			<div className="text-white">
+			<div className="text-colorTextLightMode dark:text-white">
 				<GuideItemLayout
 					title="Onboarding Is Enabled"
 					description="Changes will not take effect until you save."
-					className="hover:bg-bgTertiary bg-bgTertiary rounded-none rounded-t-lg "
+					className="hover:bg-gray-200 dark:hover:bg-bgTertiary bg-gray-200 dark:bg-bgTertiary rounded-none rounded-t-lg "
 					noNeedHover
 				/>
 
 				<GuideItemLayout
 					hightLightIcon
-					icon={<Icons.HashIcon className="w-6 text-channelTextLabel" />}
+					icon={<Icons.HashIcon className="w-6 text-white" />}
 					title="Default Channels"
 					description="You have 7 Default Channels"
-					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
+					className={`hover:bg-gray-100 dark:hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
-						<div className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-bgModifierHover hover:bg-bgModifierHover cursor-pointer">
+						<div className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-gray-300 dark:border-bgModifierHover hover:bg-gray-200 dark:hover:bg-bgModifierHover cursor-pointer">
 							Edit
 						</div>
 					}
 				/>
-				<div className="mx-4 border-t border-bgModifierHover" />
+				<div className="mx-4 border-t border-gray-300 dark:border-bgModifierHover" />
 
 				<GuideItemLayout
 					hightLightIcon
-					icon={<Icons.People className="w-6 text-channelTextLabel" />}
+					icon={<Icons.People className="w-6 text-white" />}
 					title="Questions"
 					description="7 of 7 public channels are assignable through Questions and Default Channels."
-					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
+					className={`hover:bg-gray-100 dark:hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
 						<div
 							onClick={() => handleGoToPage(EOnboardingStep.QUESTION)}
-							className="px-3 py-2 flex gap-2 justify-center items-center rounded-sm bg-gray-600 hover:bg-gray-500 transition-colors cursor-pointer"
+							className="px-3 py-2 flex gap-2 justify-center items-center rounded-sm bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500 transition-colors cursor-pointer"
 						>
 							<div>Set up</div> <Icons.LongArrowRight className="w-3" />
 						</div>
 					}
 				/>
-				<div className="mx-4 border-t border-bgModifierHover" />
+				<div className="mx-4 border-t border-gray-300 dark:border-bgModifierHover" />
 				<GuideItemLayout
 					hightLightIcon
-					icon={<Icons.GuideIcon defaultSize="w-6 text-channelTextLabel" defaultFill="currentColor" />}
+					icon={<Icons.GuideIcon defaultFill="white" defaultSize="w-6 text-gray-500 dark:text-channelTextLabel" />}
 					title="Clan Guide"
 					description="Your Welcome Message, Banner, To-Do tasks and Resources are all set up"
-					className={`hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
+					className={`hover:bg-gray-100 dark:hover:bg-bgSecondaryHover rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
 						<div className="flex items-center gap-4">
 							<div
-								className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-bgModifierHover hover:bg-bgModifierHover cursor-pointer"
+								className="w-[60px] h-[32px] flex justify-center items-center rounded-sm border border-gray-300 dark:border-bgModifierHover hover:bg-gray-200 dark:hover:bg-bgModifierHover cursor-pointer"
 								onClick={() => handleGoToPage(EOnboardingStep.MISSION)}
 							>
 								Edit

@@ -63,7 +63,7 @@ export function MediaDeviceMenu({
 	return (
 		<>
 			<button
-				className="lk-button !w-5 !h-5 !p-2 !absolute !bottom-0 !left-[36px] !rounded-full !border-2 !border-solid !border-[#111]"
+				className="lk-button !w-5 !h-5 !p-2 !absolute !bottom-0 !left-[36px] !rounded-full !border-2 !border-solid bg-zinc-500 dark:bg-zinc-900 !border-zinc-600 dark:border-zinc-950"
 				aria-pressed={isOpen}
 				{...props}
 				ref={button}
