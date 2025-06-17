@@ -1,3 +1,4 @@
+import { ButtonCopy } from '@mezon/components';
 import { useAppNavigation, useAuth, useOnClickOutside, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementEntity,
@@ -15,7 +16,6 @@ import {
 import { Icons } from '@mezon/ui';
 import { EEventStatus, EPermission, OptionEvent, createImgproxyUrl } from '@mezon/utils';
 import isElectron from 'is-electron';
-import { ButtonCopy } from 'libs/components/src/lib/components';
 import { ChannelType } from 'mezon-js';
 import { ApiUserEventRequest } from 'mezon-js/api.gen';
 import Tooltip from 'rc-tooltip';
