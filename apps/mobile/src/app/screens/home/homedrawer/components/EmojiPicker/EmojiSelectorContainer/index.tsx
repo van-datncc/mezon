@@ -17,7 +17,7 @@ import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroup
 import { IEmoji } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, Platform, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, TextInput, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import MezonClanAvatar from '../../../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -48,6 +48,7 @@ export default function EmojiSelectorContainer({
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const flatListRef = useRef(null);
+	const timeoutRef = useRef<NodeJS.Timeout>(null);
 	const { t } = useTranslation('message');
 	const dispatch = useDispatch();
 
@@ -221,7 +222,7 @@ export default function EmojiSelectorContainer({
 
 				try {
 					if (flatListRef.current) {
-						setTimeout(() => {
+						timeoutRef.current = setTimeout(() => {
 							flatListRef.current.scrollToIndex({
 								index: targetIndex,
 								animated: true,
@@ -233,6 +234,10 @@ export default function EmojiSelectorContainer({
 					}
 				} catch (error) {
 					console.warn('Scroll error:', error);
+				} finally {
+					if (timeoutRef?.current) {
+						clearTimeout(timeoutRef.current);
+					}
 				}
 			}
 		},
@@ -249,6 +254,14 @@ export default function EmojiSelectorContainer({
 		};
 	}, [handleSelectCategory]);
 
+	useEffect(() => {
+		return () => {
+			if (timeoutRef?.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
 	return (
 		<BottomSheetFlatList
 			ref={flatListRef}
@@ -261,7 +274,7 @@ export default function EmojiSelectorContainer({
 			windowSize={10}
 			removeClippedSubviews={false}
 			disableVirtualization
-			contentContainerStyle={Platform.OS === 'android' && { minHeight: Dimensions.get('window').height * 0.92 }}
+			contentContainerStyle={{ minHeight: Dimensions.get('window').height * 0.92 }}
 			onScrollToIndexFailed={(info) => {
 				console.warn('onScrollToIndexFailed', info);
 				if (info?.highestMeasuredFrameIndex) {
