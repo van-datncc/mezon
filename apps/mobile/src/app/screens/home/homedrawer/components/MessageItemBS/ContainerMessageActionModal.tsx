@@ -42,7 +42,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Dimensions, Pressable, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
@@ -68,7 +68,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', handleBottomSheetExpand, channelId, clanId } = props;
+	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', channelId, clanId } = props;
 	const { socketRef } = useMezon();
 	const store = getStore();
 
@@ -654,8 +654,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	return (
 		<View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
 			{isShowEmojiPicker || isOnlyEmojiPicker ? (
-				<View style={{ padding: size.s_10, minHeight: Dimensions.get('window').height * 0.8 }}>
-					<EmojiSelector onSelected={onSelectEmoji} isReactMessage handleBottomSheetExpand={handleBottomSheetExpand} />
+				<View style={{ paddingHorizontal: size.s_10, marginBottom: -size.s_10 }}>
+					<EmojiSelector onSelected={onSelectEmoji} isReactMessage />
 				</View>
 			) : (
 				renderMessageItemActions()
