@@ -82,6 +82,8 @@ const CustomDrawer = ({ onClose, onChangeActiveScreen, navigation, activeScreen 
 export const WalletScreen = React.memo(({ navigation, route }: any) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['common']);
+	const { t: tStack } = useTranslation(['screenStack']);
+
 	const styles = style(themeValue);
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -150,7 +152,7 @@ export const WalletScreen = React.memo(({ navigation, route }: any) => {
 					</View>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={openDrawer}>
-					<Text style={styles.headerText}>{t('wallet')}</Text>
+					<Text style={styles.headerText}>{activeScreen === 'manage' ? tStack('settingStack.walletManagement') : t('wallet')}</Text>
 				</TouchableOpacity>
 			</View>
 

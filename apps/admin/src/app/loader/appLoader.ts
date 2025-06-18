@@ -25,7 +25,7 @@ export const appLoader: CustomLoaderFunction = async ({ dispatch }) => {
 	const { pathname } = window.location;
 
 	dispatch(appActions.setInitialPath(pathname));
-	dispatch(clansActions.fetchClans());
+	dispatch(clansActions.fetchClans({}));
 	return {
 		pathname
 	} as IAppLoaderData;

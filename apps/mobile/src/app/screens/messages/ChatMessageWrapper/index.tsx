@@ -2,7 +2,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { EStateFriend, selectFriendById, useAppSelector } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useMemo, useRef } from 'react';
-import { Platform, StatusBar } from 'react-native';
+import { Platform, StatusBar, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import ChannelMessages from '../../home/homedrawer/ChannelMessages';
 import { ChatBox } from '../../home/homedrawer/ChatBox';
@@ -37,13 +37,15 @@ export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClan
 			behavior={'padding'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight}
 		>
-			<ChannelMessages
-				channelId={directMessageId}
-				clanId={'0'}
-				mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
-				isPublic={false}
-				isDM={true}
-			/>
+			<View style={{ flex: 1 }}>
+				<ChannelMessages
+					channelId={directMessageId}
+					clanId={'0'}
+					mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}
+					isPublic={false}
+					isDM={true}
+				/>
+			</View>
 			<ChatBox
 				channelId={directMessageId}
 				mode={Number(isModeDM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)}

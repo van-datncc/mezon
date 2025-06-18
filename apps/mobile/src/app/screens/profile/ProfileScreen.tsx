@@ -255,21 +255,23 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					</TouchableOpacity>
 					<View style={styles.badgeStatusTemp} />
 
-					<TouchableOpacity
-						activeOpacity={1}
-						onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
-						style={styles.badgeStatus}
-					>
+					<View style={styles.badgeStatus}>
 						<View style={styles.badgeStatusInside} />
 						{!userCustomStatus && (
-							<View style={styles.iconAddStatus}>
+							<TouchableOpacity
+								activeOpacity={1}
+								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								style={styles.iconAddStatus}
+							>
 								<MezonIconCDN icon={IconCDN.plusLargeIcon} height={size.s_12} width={size.s_12} color={themeValue.primary} />
-							</View>
+							</TouchableOpacity>
 						)}
-						<Text numberOfLines={1} style={styles.textStatus}>
-							{userCustomStatus ? userCustomStatus : t('addStatus')}
-						</Text>
-					</TouchableOpacity>
+						<TouchableOpacity activeOpacity={1} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
+							<Text numberOfLines={1} style={styles.textStatus}>
+								{userCustomStatus ? userCustomStatus : t('addStatus')}
+							</Text>
+						</TouchableOpacity>
+					</View>
 				</View>
 			</View>
 
@@ -283,7 +285,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							});
 						}}
 					>
-						<MezonIconCDN icon={IconCDN.chatIcon} height={size.s_20} width={size.s_20} color={'white'} />
+						<MezonIconCDN icon={IconCDN.wallet} height={size.s_20} width={size.s_20} color={'white'} />
 						<Text style={styles.whiteText}>{t('manageWallet')}</Text>
 					</MezonButton>
 

@@ -84,7 +84,7 @@ const ChannelListHeader = () => {
 					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
 				</View>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text numberOfLines={1} style={styles.subTitle}>
+					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
 						{`${members} ${t('info.members')}`}
 					</Text>
 					<View
@@ -96,7 +96,7 @@ const ChannelListHeader = () => {
 							marginHorizontal: size.s_8
 						}}
 					/>
-					<Text numberOfLines={1} style={styles.subTitle}>
+					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
 						{t('common.community')}
 					</Text>
 				</View>

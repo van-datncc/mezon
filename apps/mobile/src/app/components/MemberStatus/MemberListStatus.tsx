@@ -46,6 +46,11 @@ export const MemberListStatus = React.memo(() => {
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
 
+	const actionButtons: Record<EActionButton, string> = {
+		[EActionButton.AddMembers]: t('common:addMembers'),
+		[EActionButton.InviteMembers]: t('common:inviteMembers')
+	};
+
 	const myUserId = useMemo(() => {
 		return load(STORAGE_MY_USER_ID);
 	}, []);
@@ -177,7 +182,9 @@ export const MemberListStatus = React.memo(() => {
 							<View style={styles.iconWrapper}>
 								<MezonIconCDN icon={IconCDN.userPlusIcon} height={20} width={20} color={baseColor.white} />
 							</View>
-							<Text style={styles.textInvite}>{isDMThread ? EActionButton.AddMembers : EActionButton.InviteMembers}</Text>
+							<Text style={styles.textInvite}>
+								{isDMThread ? actionButtons[EActionButton.AddMembers] : actionButtons[EActionButton.InviteMembers]}
+							</Text>
 						</View>
 						<View>
 							<MezonIconCDN icon={IconCDN.chevronSmallRightIcon} height={15} width={15} color={themeValue.text} />
@@ -189,14 +196,14 @@ export const MemberListStatus = React.memo(() => {
 			{onlineMembers?.length > 0 || offlineMembers?.length > 0 ? (
 				<SectionList
 					sections={[
-						{ title: 'Member', data: onlineMembers },
-						{ title: 'Offline', data: offlineMembers }
+						{ title: t('common:members'), data: onlineMembers },
+						{ title: t('common:offlines'), data: offlineMembers }
 					]}
 					keyExtractor={(_, index) => `channelMember[${index}]`}
 					renderItem={renderMemberItem}
 					renderSectionHeader={({ section: { title } }) => (
 						<Text style={styles.text}>
-							{title} - {title === 'Member' ? onlineMembers?.length : offlineMembers?.length}
+							{title} - {title === t('common:members') ? onlineMembers?.length : offlineMembers?.length}
 						</Text>
 					)}
 					contentContainerStyle={{ paddingBottom: size.s_60 }}
