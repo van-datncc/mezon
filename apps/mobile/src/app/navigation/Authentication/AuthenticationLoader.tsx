@@ -1,21 +1,21 @@
-import { useAuth } from '@mezon/core';
+import { ChatContext, useAuth } from '@mezon/core';
 import {
 	ActionEmitEvent,
-	load,
-	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
-	STORAGE_MY_USER_ID
+	STORAGE_MY_USER_ID,
+	load,
+	remove
 } from '@mezon/mobile-components';
 import {
+	DMCallActions,
 	appActions,
 	authActions,
 	channelsActions,
 	clansActions,
 	directActions,
-	DMCallActions,
 	getStoreAsync,
 	messagesActions,
 	selectCurrentChannel,
@@ -24,19 +24,22 @@ import {
 	selectLoadingMainMobile
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
+import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Platform, StatusBar } from 'react-native';
+import { ChannelMessage, WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
+import moment from 'moment/moment';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { DeviceEventEmitter, Linking, Platform, StatusBar } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Sound from 'react-native-sound';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
-import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import MezonConfirm from '../../componentUI/MezonConfirm';
+import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
+import NotificationPreferences from '../../utils/NotificationPreferences';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
@@ -54,6 +57,155 @@ export const AuthenticationLoader = () => {
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
 	useCheckUpdatedVersion();
+	const { onchannelmessage } = useContext(ChatContext);
+
+	useEffect(() => {
+		const getUrl = async () => {
+			try {
+				const url = await Linking.getInitialURL();
+				if (url) {
+					await onNavigationDeeplink(url);
+				}
+			} catch (error) {
+				console.error('Error getting initial URL:', error);
+			}
+		};
+		getUrl();
+	}, []);
+
+	useEffect(() => {
+		const eventDeeplink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
+		initLoader();
+		onNotificationOpenedApp();
+
+		return () => {
+			eventDeeplink.remove();
+		};
+	}, []);
+
+	const deleteAllChannelGroupsNotifee = async () => {
+		try {
+			const channelGroups = await notifee.getChannelGroups(); // Fetch all channel groups
+			for (const group of channelGroups) {
+				await notifee.deleteChannelGroup(group.id); // Delete each channel group by its ID
+			}
+		} catch (error) {
+			console.error('Error deleting channel groups:', error);
+		}
+	};
+
+	const initLoader = async () => {
+		try {
+			await notifee.cancelAllNotifications();
+			if (Platform.OS === 'android') {
+				await deleteAllChannelGroupsNotifee();
+			}
+			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+		} catch (error) {
+			console.error('Error in tasks:', error);
+		}
+	};
+
+	const extractChannelParams = (url: string) => {
+		const regex = /channel-app\/(\d+)\/(\d+)(?:\?[^#]*)?/;
+		const baseMatch = url.match(regex);
+		if (!baseMatch) return null;
+
+		const [, id1, id2] = baseMatch;
+
+		const codeMatch = url.match(/[?&]code=([^&]+)/);
+		const subpathMatch = url.match(/[?&]subpath=([^&]+)/);
+
+		return {
+			channelId: id1,
+			clanId: id2,
+			code: codeMatch ? codeMatch[1] : null,
+			subpath: subpathMatch ? subpathMatch[1] : null
+		};
+	};
+
+	const onNavigationDeeplink = async (path: string) => {
+		if (path?.includes?.('channel-app/')) {
+			const parts = extractChannelParams(path);
+			if (parts) {
+				const channelId = parts.channelId;
+				const clanId = parts.clanId;
+				const code = parts.code;
+				const subpath = parts.subpath;
+				if (clanId && channelId) {
+					navigation.navigate(APP_SCREEN.CHANNEL_APP, {
+						channelId: channelId,
+						clanId: clanId,
+						code: code,
+						subpath: subpath
+					});
+				}
+			}
+		}
+	};
+
+	const onNotificationOpenedApp = async () => {
+		if (Platform.OS === 'android') {
+			try {
+				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
+				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
+				if (notificationDataPushedParse.length > 0) {
+					for (const data of notificationDataPushedParse) {
+						const extraMessage = data?.message;
+						if (extraMessage) {
+							const message = safeJSONParse(extraMessage);
+							if (message && typeof message === 'object' && message?.channel_id) {
+								const createTimeSeconds = message?.create_time_seconds;
+								const updateTimeSeconds = message?.update_time_seconds;
+
+								const createTime = createTimeSeconds
+									? moment.unix(createTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+									: new Date().toISOString();
+								const updateTime = updateTimeSeconds
+									? moment.unix(updateTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+									: new Date().toISOString();
+
+								let codeValue = 0;
+								if (message?.code) {
+									if (typeof message.code === 'number') {
+										codeValue = message.code;
+									} else if (typeof message.code === 'object' && message.code?.value !== undefined) {
+										codeValue = message.code.value;
+									}
+								}
+
+								const messageId = message?.message_id || message?.id;
+								if (!messageId) {
+									console.warn('onNotificationOpenedApp: Message missing id');
+									continue;
+								}
+
+								const messageData = {
+									...message,
+									code: codeValue,
+									id: messageId,
+									content: safeJSONParse(message?.content || '{}'),
+									attachments: safeJSONParse(message?.attachments || '[]'),
+									mentions: safeJSONParse(message?.mentions || '[]'),
+									references: safeJSONParse(message?.references || '[]'),
+									reactions: safeJSONParse(message?.reactions || '[]'),
+									create_time: createTime,
+									update_time: updateTime
+								};
+								onchannelmessage(messageData as ChannelMessage);
+							} else {
+								console.warn('onNotificationOpenedApp: Invalid message structure or missing channel_id');
+							}
+						}
+					}
+				}
+				await NotificationPreferences.clearValue('notificationDataPushed');
+			} catch (error) {
+				console.error('Error processing notifications:', error);
+			}
+		}
+	};
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
