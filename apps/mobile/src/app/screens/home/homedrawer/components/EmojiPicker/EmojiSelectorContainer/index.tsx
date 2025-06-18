@@ -222,6 +222,10 @@ export default function EmojiSelectorContainer({
 
 				try {
 					if (flatListRef.current) {
+						if (timeoutRef?.current) {
+							clearTimeout(timeoutRef.current);
+						}
+
 						timeoutRef.current = setTimeout(() => {
 							flatListRef.current.scrollToIndex({
 								index: targetIndex,
@@ -234,10 +238,6 @@ export default function EmojiSelectorContainer({
 					}
 				} catch (error) {
 					console.warn('Scroll error:', error);
-				} finally {
-					if (timeoutRef?.current) {
-						clearTimeout(timeoutRef.current);
-					}
 				}
 			}
 		},
