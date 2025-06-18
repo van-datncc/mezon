@@ -417,6 +417,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 					<Text style={styles.title}>{t('token')}</Text>
 					<View style={styles.textField}>
 						<TextInput
+							autoFocus={!!jsonObject?.receiver_id}
 							editable={!jsonObject?.amount || canEdit}
 							style={styles.textInput}
 							value={tokenCount}
