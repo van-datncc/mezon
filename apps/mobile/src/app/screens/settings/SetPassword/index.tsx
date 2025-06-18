@@ -63,7 +63,6 @@ const SetPassword = ({ navigation }) => {
 
 	const handleSubmit = async () => {
 		try {
-			dispatch(appActions.setLoadingMainMobile(true));
 			const passwordError = validatePassword(password);
 			const confirmError = password !== confirmPassword ? t('setPasswordAccount.error.notEqual') : '';
 
@@ -74,6 +73,7 @@ const SetPassword = ({ navigation }) => {
 				});
 				return;
 			}
+			dispatch(appActions.setLoadingMainMobile(true));
 
 			await dispatch(authActions.registrationPassword({ email: userProfile?.email, password }));
 			dispatch(appActions.setLoadingMainMobile(false));
