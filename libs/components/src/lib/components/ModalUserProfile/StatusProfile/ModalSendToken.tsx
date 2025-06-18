@@ -307,7 +307,6 @@ const ModalSendToken = ({
 						onClick={handleSendToken}
 						disabled={isButtonDisabled || !selectedUserId || token <= 0}
 					>
-						<Icons.DollarIcon isWhite className="w-4 h-4" />
 						Send Tokens
 					</button>
 				</div>
