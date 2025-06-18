@@ -38,6 +38,7 @@
     "historyTransaction": "Lịch sử giao dịch",
     "quit": "Thoát",
     "menu": "Danh mục",
-    "walletManagement": "Quản lý ví"
+    "walletManagement": "Quản lý ví",
+    "setPassword": "Đặt Mật Khẩu"
   }
 }

@@ -24,7 +24,8 @@ enum EAccountSettingType {
 	DisplayName,
 	BlockedUsers,
 	DisableAccount,
-	DeleteAccount
+	DeleteAccount,
+	SetPassword
 }
 
 interface IAccountOption {
@@ -106,6 +107,9 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 					{ cancelable: false }
 				);
 				break;
+			case EAccountSettingType.SetPassword:
+				navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.SET_PASSWORD });
+				break;
 			default:
 				break;
 		}
@@ -133,6 +137,10 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 		];
 
 		const accountManagementOptions: IAccountOption[] = [
+			{
+				title: t('setPassword'),
+				type: EAccountSettingType.SetPassword
+			},
 			{
 				title: t('disableAccount'),
 				type: EAccountSettingType.DisableAccount
