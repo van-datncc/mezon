@@ -249,7 +249,7 @@ export default function EmojiSelectorContainer({
 			windowSize={10}
 			removeClippedSubviews={false}
 			disableVirtualization
-			contentContainerStyle={{ minHeight: Metrics.screenHeight * 0.88 }}
+			contentContainerStyle={Platform.OS === 'android' && { minHeight: Metrics.screenHeight * 0.88 }}
 		/>
 	);
 }
