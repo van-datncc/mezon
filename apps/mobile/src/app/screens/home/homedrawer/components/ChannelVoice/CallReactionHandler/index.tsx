@@ -32,145 +32,132 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: react
 			if (channel?.channel_id === message?.channel_id) {
 				try {
 					const emojis = message.emojis || [];
-					emojis.forEach((emojiId) => {
+					emojis.forEach((emojiId, index) => {
 						if (emojiId) {
-							Array.from({ length: 3 }).forEach((_, index) => {
-								const horizontalOffset = (Math.random() - 0.5) * 150;
-								const delay = index * 300; // More random stagger
-								const verticalOffset = Math.random() * 30; // Small random vertical start variation
+							const horizontalOffset = (Math.random() - 0.5) * 150;
+							const verticalOffset = Math.random() * 30; // Small random vertical start variation
 
-								// Scale decreases with each emoji (first is largest, last is smallest)
-								const baseScale = 1.0 - index * 0.15; // Decreases by 15% each time
+							// Scale decreases with each emoji (first is largest, last is smallest)
+							const baseScale = 1.0; // Decreases by 15% each time
 
-								// Animation values
-								const translateY = new Animated.Value(0);
-								const translateX = new Animated.Value(0);
-								const scale = new Animated.Value(0);
-								const opacity = new Animated.Value(0);
-								const rotation = new Animated.Value(0);
+							// Animation values
+							const translateY = new Animated.Value(0);
+							const translateX = new Animated.Value(0);
+							const scale = new Animated.Value(0);
+							const opacity = new Animated.Value(0);
+							const rotation = new Animated.Value(0);
 
-								// Random trajectory parameters
-								const finalY = -(height * 0.7 + Math.random() * height * 0.2); // Random height
-								const bezierControlX = horizontalOffset * (1.5 + Math.random()); // Curve control
-								const rotationAmount = (Math.random() - 0.5) * 120; // More dramatic rotation
+							// Random trajectory parameters
+							const finalY = -(height * 0.7 + Math.random() * height * 0.2); // Random height
+							const bezierControlX = horizontalOffset * (1.5 + Math.random()); // Curve control
+							const rotationAmount = (Math.random() - 0.5) * 120; // More dramatic rotation
 
-								const newEmoji = {
-									id: `${Date.now()}-${emojiId}-${index}-${Math.random()}`,
-									emojiId,
-									translateY,
-									translateX,
-									scale,
-									opacity,
-									rotation,
-									baseScale, // Store the base scale for this emoji
-									startX: startX + horizontalOffset * 0.2, // Start near center
-									startY: startY - verticalOffset
-								};
+							const newEmoji = {
+								id: `${Date.now()}-${emojiId}-${index}-${Math.random()}`,
+								emojiId,
+								translateY,
+								translateX,
+								scale,
+								opacity,
+								rotation,
+								baseScale, // Store the base scale for this emoji
+								startX: startX + horizontalOffset * 0.2, // Start near center
+								startY: startY - verticalOffset
+							};
 
-								setDisplayedEmojis((prev) => [...prev, newEmoji]);
+							setDisplayedEmojis((prev) => [...prev, newEmoji]);
 
-								// Facebook-style flying animation
-								Animated.sequence([
-									// Initial delay for staggered effect
-									Animated.delay(delay),
-
-									// All animations start together - no pause between appearance and movement
-									Animated.parallel([
-										// Appear with bounce
+							// Facebook-style flying animation
+							Animated.sequence([
+								// All animations start together - no pause between appearance and movement
+								Animated.parallel([
+									// Appear with bounce
+									Animated.sequence([
+										Animated.spring(scale, {
+											toValue: baseScale, // Apply base scale to bounce
+											tension: 150,
+											friction: 6,
+											useNativeDriver: true
+										}),
 										Animated.sequence([
-											Animated.spring(scale, {
-												toValue: 1.1 * baseScale, // Apply base scale to bounce
-												tension: 150,
-												friction: 6,
-												useNativeDriver: true
-											}),
 											Animated.timing(scale, {
-												toValue: 0.9 * baseScale, // Apply base scale
-												duration: 100,
-												easing: Easing.inOut(Easing.quad),
-												useNativeDriver: true
-											}),
-											// Continue scaling during flight
-											Animated.sequence([
-												Animated.timing(scale, {
-													toValue: 1.3 * baseScale, // Apply base scale
-													duration: 700, // Slower scaling
-													easing: Easing.out(Easing.quad),
-													useNativeDriver: true
-												}),
-												Animated.timing(scale, {
-													toValue: 1.0 * baseScale, // Apply base scale
-													duration: 1200, // Slower scaling
-													easing: Easing.inOut(Easing.quad),
-													useNativeDriver: true
-												}),
-												Animated.timing(scale, {
-													toValue: 0.6 * baseScale, // Apply base scale
-													duration: 2100, // Slower scaling
-													easing: Easing.in(Easing.quad),
-													useNativeDriver: true
-												})
-											])
-										]),
-
-										// Opacity animation
-										Animated.sequence([
-											Animated.timing(opacity, {
-												toValue: 1,
-												duration: 300, // Slightly slower fade in
+												toValue: 1.2 * baseScale, // Apply base scale
+												duration: 700, // Slower scaling
 												easing: Easing.out(Easing.quad),
 												useNativeDriver: true
 											}),
-											Animated.delay(3200), // Adjust delay for longer animation
-											Animated.timing(opacity, {
-												toValue: 0,
-												duration: 2000, // Slower fade out to match longer animation
+											Animated.timing(scale, {
+												toValue: 1.4 * baseScale, // Apply base scale
+												duration: 1200, // Slower scaling
+												easing: Easing.inOut(Easing.quad),
+												useNativeDriver: true
+											}),
+											Animated.timing(scale, {
+												toValue: 1.6 * baseScale, // Apply base scale
+												duration: 2100, // Slower scaling
 												easing: Easing.in(Easing.quad),
 												useNativeDriver: true
 											})
-										]),
+										])
+									]),
 
-										// Upward motion starts immediately
-										Animated.timing(translateY, {
-											toValue: finalY,
-											duration: 6000, // Much slower upward movement
-											easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // Ease-out-quad
+									// Opacity animation
+									Animated.sequence([
+										Animated.timing(opacity, {
+											toValue: 1,
+											duration: 300, // Slightly slower fade in
+											easing: Easing.out(Easing.quad),
 											useNativeDriver: true
 										}),
-
-										// Curved horizontal motion starts immediately
-										Animated.sequence([
-											Animated.timing(translateX, {
-												toValue: bezierControlX * 0.3,
-												duration: 1000, // Slower horizontal movement
-												easing: Easing.out(Easing.circle),
-												useNativeDriver: true
-											}),
-											Animated.timing(translateX, {
-												toValue: bezierControlX * 0.7,
-												duration: 1400, // Slower horizontal movement
-												easing: Easing.inOut(Easing.sin),
-												useNativeDriver: true
-											}),
-											Animated.timing(translateX, {
-												toValue: horizontalOffset,
-												duration: 1600, // Slower horizontal movement
-												easing: Easing.in(Easing.circle),
-												useNativeDriver: true
-											})
-										]),
-
-										// Smooth rotation starts immediately
-										Animated.timing(rotation, {
-											toValue: rotationAmount,
-											duration: 6000, // Match the slower upward movement
-											easing: Easing.inOut(Easing.circle),
+										Animated.delay(1200), // Adjust delay for longer animation
+										Animated.timing(opacity, {
+											toValue: 0,
+											duration: 1000, // Slower fade out to match longer animation
+											easing: Easing.in(Easing.quad),
 											useNativeDriver: true
 										})
-									])
-								]).start(() => {
-									setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
-								});
+									]),
+
+									// Upward motion starts immediately
+									Animated.timing(translateY, {
+										toValue: finalY,
+										duration: 6000, // Much slower upward movement
+										easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // Ease-out-quad
+										useNativeDriver: true
+									}),
+
+									// Curved horizontal motion starts immediately
+									Animated.sequence([
+										Animated.timing(translateX, {
+											toValue: bezierControlX * 0.3,
+											duration: 1000, // Slower horizontal movement
+											easing: Easing.out(Easing.circle),
+											useNativeDriver: true
+										}),
+										Animated.timing(translateX, {
+											toValue: bezierControlX * 0.7,
+											duration: 1400, // Slower horizontal movement
+											easing: Easing.inOut(Easing.sin),
+											useNativeDriver: true
+										}),
+										Animated.timing(translateX, {
+											toValue: horizontalOffset,
+											duration: 1600, // Slower horizontal movement
+											easing: Easing.in(Easing.circle),
+											useNativeDriver: true
+										})
+									]),
+
+									// Smooth rotation starts immediately
+									Animated.timing(rotation, {
+										toValue: rotationAmount,
+										duration: 6000, // Match the slower upward movement
+										easing: Easing.inOut(Easing.circle),
+										useNativeDriver: true
+									})
+								])
+							]).start(() => {
+								setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
 							});
 						}
 					});

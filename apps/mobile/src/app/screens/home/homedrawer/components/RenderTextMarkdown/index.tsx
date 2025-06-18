@@ -725,13 +725,13 @@ export const RenderTextMarkdownContent = ({
 					{textParts?.length > 0 && <Text key={`textParts${t}_${lastIndex}`}>{textParts}</Text>}
 					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 				</View>
-				<View>
-					{isEdited && (
+				{isEdited && (
+					<View>
 						<Text key={`edited-${textParts}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
 							{translate('edited')}
 						</Text>
-					)}
-				</View>
+					</View>
+				)}
 			</View>
 		</View>
 	);

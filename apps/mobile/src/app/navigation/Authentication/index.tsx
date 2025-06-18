@@ -1,35 +1,22 @@
-import React, { memo, useContext, useEffect } from 'react';
+import React, { memo } from 'react';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ChatContext } from '@mezon/core';
-import { ActionEmitEvent, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_KEY_TEMPORARY_ATTACHMENT, remove } from '@mezon/mobile-components';
 import { ColorRoleProvider } from '@mezon/mobile-ui';
-import notifee from '@notifee/react-native';
-import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
-import { ChannelMessage, safeJSONParse } from 'mezon-js';
-import moment from 'moment';
-import { DeviceEventEmitter, Dimensions, Linking, Platform } from 'react-native';
-import BottomSheetRootListener from '../../components/BottomSheetRootListener';
+import { Dimensions, Platform } from 'react-native';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
-import ModalRootListener from '../../components/ModalRootListener';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
 import ChannelAppScreen from '../../screens/home/homedrawer/ChannelApp';
-import ChannelMessageListener from '../../screens/home/homedrawer/ChannelMessageListener';
-import ChannelMessageReactionListener from '../../screens/home/homedrawer/ChannelMessageReactionListener';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
-import ChannelRouterListener from '../../screens/home/homedrawer/components/ChannelList/ChannelRouterListener';
-import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
-import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { WalletScreen } from '../../screens/wallet';
-import NotificationPreferences from '../../utils/NotificationPreferences';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
+import { ListenerLoader } from './ListenerLoader';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
 import { MenuClanStacks } from './stacks/MenuSererStack';
@@ -42,157 +29,6 @@ const RootStack = createStackNavigator();
 
 export const Authentication = memo(() => {
 	const isTabletLandscape = useTabletLandscape();
-	const { onchannelmessage } = useContext(ChatContext);
-	const navigation = useNavigation<any>();
-
-	useEffect(() => {
-		const getUrl = async () => {
-			try {
-				const url = await Linking.getInitialURL();
-				if (url) {
-					await onNavigationDeeplink(url);
-				}
-			} catch (error) {
-				console.error('Error getting initial URL:', error);
-			}
-		};
-		getUrl();
-	}, []);
-
-	useEffect(() => {
-		const eventDeelink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
-		return () => {
-			eventDeelink.remove();
-		};
-	}, []);
-
-	useEffect(() => {
-		initLoader();
-		onNotificationOpenedApp();
-	}, []);
-
-	const deleteAllChannelGroupsNotifee = async () => {
-		try {
-			const channelGroups = await notifee.getChannelGroups(); // Fetch all channel groups
-			for (const group of channelGroups) {
-				await notifee.deleteChannelGroup(group.id); // Delete each channel group by its ID
-			}
-		} catch (error) {
-			console.error('Error deleting channel groups:', error);
-		}
-	};
-
-	const initLoader = async () => {
-		try {
-			await notifee.cancelAllNotifications();
-			if (Platform.OS === 'android') {
-				await deleteAllChannelGroupsNotifee();
-			}
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		} catch (error) {
-			console.error('Error in tasks:', error);
-		}
-	};
-
-	const extractChannelParams = (url: string) => {
-		const regex = /channel-app\/(\d+)\/(\d+)(?:\?[^#]*)?/;
-		const baseMatch = url.match(regex);
-		if (!baseMatch) return null;
-
-		const [, id1, id2] = baseMatch;
-
-		const codeMatch = url.match(/[?&]code=([^&]+)/);
-		const subpathMatch = url.match(/[?&]subpath=([^&]+)/);
-
-		return {
-			channelId: id1,
-			clanId: id2,
-			code: codeMatch ? codeMatch[1] : null,
-			subpath: subpathMatch ? subpathMatch[1] : null
-		};
-	};
-
-	const onNavigationDeeplink = async (path: string) => {
-		if (path?.includes?.('channel-app/')) {
-			const parts = extractChannelParams(path);
-			if (parts) {
-				const channelId = parts.channelId;
-				const clanId = parts.clanId;
-				const code = parts.code;
-				const subpath = parts.subpath;
-				if (clanId && channelId) {
-					navigation.navigate(APP_SCREEN.CHANNEL_APP, {
-						channelId: channelId,
-						clanId: clanId,
-						code: code,
-						subpath: subpath
-					});
-				}
-			}
-		}
-	};
-	const onNotificationOpenedApp = async () => {
-		if (Platform.OS === 'android') {
-			try {
-				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
-				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
-				if (notificationDataPushedParse.length > 0) {
-					for (const data of notificationDataPushedParse) {
-						const extraMessage = data?.message;
-						if (extraMessage) {
-							const message = safeJSONParse(extraMessage);
-							if (message && typeof message === 'object' && message?.channel_id) {
-								const createTimeSeconds = message?.create_time_seconds;
-								const updateTimeSeconds = message?.update_time_seconds;
-
-								const createTime = createTimeSeconds
-									? moment.unix(createTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
-									: new Date().toISOString();
-								const updateTime = updateTimeSeconds
-									? moment.unix(updateTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
-									: new Date().toISOString();
-
-								let codeValue = 0;
-								if (message?.code) {
-									if (typeof message.code === 'number') {
-										codeValue = message.code;
-									} else if (typeof message.code === 'object' && message.code?.value !== undefined) {
-										codeValue = message.code.value;
-									}
-								}
-
-								const messageId = message?.message_id || message?.id;
-								if (!messageId) {
-									console.warn('onNotificationOpenedApp: Message missing id');
-									continue;
-								}
-
-								const messageData = {
-									...message,
-									code: codeValue,
-									id: messageId,
-									content: safeJSONParse(message?.content || '{}'),
-									attachments: safeJSONParse(message?.attachments || '[]'),
-									mentions: safeJSONParse(message?.mentions || '[]'),
-									references: safeJSONParse(message?.references || '[]'),
-									reactions: safeJSONParse(message?.reactions || '[]'),
-									create_time: createTime,
-									update_time: updateTime
-								};
-								onchannelmessage(messageData as ChannelMessage);
-							} else {
-								console.warn('onNotificationOpenedApp: Invalid message structure or missing channel_id');
-							}
-						}
-					}
-				}
-				await NotificationPreferences.clearValue('notificationDataPushed');
-			} catch (error) {
-				console.error('Error processing notifications:', error);
-			}
-		}
-	};
 
 	return (
 		<BottomSheetModalProvider>
@@ -267,16 +103,10 @@ export const Authentication = memo(() => {
 					<RootStack.Screen name={APP_SCREEN.CHANNEL_APP} component={ChannelAppScreen} />
 					<RootStack.Screen name={APP_SCREEN.WALLET} component={WalletScreen} />
 				</RootStack.Navigator>
+				<AuthenticationLoader />
 				<CallingModalWrapper />
 				<CallingModalGroupWrapper />
-				<StreamingWrapper />
-				<ChannelVoicePopup />
-				<BottomSheetRootListener />
-				<ModalRootListener />
-				<ChannelMessageListener />
-				<ChannelMessageReactionListener />
-				<AuthenticationLoader />
-				<ChannelRouterListener />
+				<ListenerLoader />
 			</ColorRoleProvider>
 		</BottomSheetModalProvider>
 	);
