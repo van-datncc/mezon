@@ -193,7 +193,8 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			backgroundColor: colors.primary,
 			justifyContent: 'center',
 			alignItems: 'center',
-			paddingHorizontal: size.s_12
+			paddingHorizontal: size.s_12,
+			overflow: 'visible'
 		},
 		badgeStatusInside: {
 			position: 'absolute',
