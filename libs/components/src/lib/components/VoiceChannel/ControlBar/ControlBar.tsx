@@ -23,7 +23,7 @@ import { ChannelStreamMode } from 'mezon-js';
 
 import { EmojiSuggestionProvider } from '@mezon/core';
 import isElectron from 'is-electron';
-import { LocalTrackPublication, RoomEvent, Track } from 'livekit-client';
+import { LocalTrackPublication, RoomEvent, ScreenSharePresets, Track, VideoPresets } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -38,7 +38,6 @@ import { BackgroundEffectsMenu } from './BackgroundEffectsMenu';
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
 import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
-
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 	variation?: 'minimal' | 'verbose' | 'textOnly';
@@ -175,58 +174,31 @@ export function ControlBar({
 				screenTrackRef.current = null;
 			}
 			if (!stream) return;
-
 			const videoTrack = stream.getVideoTracks()[0];
 			try {
 				const trackPublication = await localParticipant.localParticipant.publishTrack(videoTrack, {
 					name: 'screen-share',
 					source: Track.Source.ScreenShare,
-					simulcast: true,
-					videoSimulcastLayers: [
-						// 480p
-						{
-							encoding: {
-								maxBitrate: 500_000, // 500 kbps
-								maxFramerate: 24
-							},
-							width: 854,
-							height: 480,
-							resolution: {
-								width: 854,
-								height: 480,
-								aspectRatio: 16 / 9,
-								frameRate: 24
-							}
-						},
+					simulcast: false,
+					screenShareSimulcastLayers: [
 						// 720p
 						{
-							encoding: {
-								maxBitrate: 1_500_000, // 1.5 Mbps
-								maxFramerate: 24
-							},
-							width: 1280,
-							height: 720,
-							resolution: {
-								width: 1280,
-								height: 720,
-								aspectRatio: 16 / 9,
-								frameRate: 24
-							}
+							...VideoPresets.h720,
+							encoding: ScreenSharePresets.h720fps30.encoding,
+							resolution: ScreenSharePresets.h720fps30.resolution
 						},
 						// 1080p
 						{
-							encoding: {
-								maxBitrate: 3_000_000, // 3 Mbps
-								maxFramerate: 24
-							},
-							width: 1920,
-							height: 1080,
-							resolution: {
-								width: 1920,
-								height: 1080,
-								aspectRatio: 16 / 9,
-								frameRate: 24
-							}
+							...VideoPresets.h1080,
+							encoding: ScreenSharePresets.h1080fps30.encoding,
+
+							resolution: ScreenSharePresets.h1080fps30.resolution
+						},
+						{
+							...VideoPresets.h1440,
+							encoding: ScreenSharePresets.original.encoding,
+
+							resolution: ScreenSharePresets.original.resolution
 						}
 					]
 				});
@@ -376,7 +348,9 @@ export function ControlBar({
 						destroyTooltipOnHide
 					>
 						<div>
-							<Icons.VoiceEmojiControlIcon className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
+							<Icons.VoiceEmojiControlIcon
+								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+							/>
 						</div>
 					</Tooltip>
 				)}
@@ -426,12 +400,21 @@ export function ControlBar({
 				{visibleControls.screenShare &&
 					browserSupportsScreenSharing &&
 					(!isDesktop ? (
+						// <TrackToggleLive>
+						// </TrackToggleLive>
 						<TrackToggle
 							key={+showScreen}
 							initialState={showScreen}
-						className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
+							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.ScreenShare}
-							captureOptions={{ audio: true, selfBrowserSurface: 'include' }}
+							captureOptions={{ audio: true, selfBrowserSurface: 'include', resolution: VideoPresets.h720.resolution }}
+							publishOptions={{
+								simulcast: false,
+								videoEncoding: {
+									...VideoPresets.h720.encoding,
+									priority: 'high'
+								}
+							}}
 							onChange={onScreenShare}
 							onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
 						/>
@@ -455,11 +438,15 @@ export function ControlBar({
 					<div onClick={togglePopout}>
 						{isOpenPopOut ? (
 							<span>
-								<Icons.VoicePopOutIcon className={`cursor-pointer rotate-180 ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
+								<Icons.VoicePopOutIcon
+									className={`cursor-pointer rotate-180 ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								/>
 							</span>
 						) : (
 							<span>
-									<Icons.VoicePopOutIcon className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
+								<Icons.VoicePopOutIcon
+									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								/>
 							</span>
 						)}
 					</div>
@@ -473,11 +460,15 @@ export function ControlBar({
 				<div onClick={onFullScreen}>
 					{isFullScreen ? (
 						<span>
-							<Icons.ExitFullScreen className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
+							<Icons.ExitFullScreen
+								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+							/>
 						</span>
 					) : (
 						<span>
-								<Icons.FullScreen className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`} />
+							<Icons.FullScreen
+								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+							/>
 						</span>
 					)}
 				</div>
@@ -530,28 +521,3 @@ function useMediaQuery(query: string): boolean {
 const supportsScreenSharing = () => {
 	return typeof navigator !== 'undefined' && navigator.mediaDevices && !!navigator.mediaDevices.getDisplayMedia;
 };
-
-async function getAudioScreenStream() {
-	if (!isElectron() || !window.electron) return null;
-	try {
-		const devices = await navigator.mediaDevices.enumerateDevices();
-		const outputDevice = devices.find((device) => device.kind === 'audiooutput');
-		const device = await navigator.mediaDevices.getUserMedia({
-			audio: {
-				deviceId: { exact: outputDevice?.deviceId },
-				// noiseSuppression: true,
-				// echoCancellation: true,
-				sampleRate: 96000, // 44100, 48000, 96000
-				channelCount: 2,
-				autoGainControl: true,
-				sampleSize: 32 // 8, 16, 24, 32
-				// voiceIsolation: true
-			},
-			video: false
-		});
-		return device;
-	} catch (error) {
-		console.error('Error getting screen stream:', error);
-		return null;
-	}
-}
