@@ -166,9 +166,10 @@ export function MyVideoConference({
 	}, [room]);
 
 	const onToggleChatBox = () => {
-		onToggleChat?.();
 		if (isExternalCalling) {
 			dispatch(voiceActions.setToggleChatBox());
+		} else {
+			onToggleChat?.();
 		}
 	};
 	return (
