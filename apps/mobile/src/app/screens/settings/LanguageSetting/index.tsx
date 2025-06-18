@@ -1,19 +1,17 @@
 import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import React, { useEffect, useMemo, useState } from 'react';
+import { appActions, selectCurrentLanguage, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { styles } from './styles';
 
 export const LanguageSetting = () => {
-	const [currentLanguage, setCurrentLanguage] = useState<string>('en');
+	const currentLanguage = useAppSelector(selectCurrentLanguage);
+	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const themeStyles = styles(themeValue);
 	const { i18n } = useTranslation();
-
-	useEffect(() => {
-		setCurrentLanguage(i18n.language);
-	}, [i18n]);
 
 	const languageList = useMemo(() => {
 		return [
@@ -28,9 +26,13 @@ export const LanguageSetting = () => {
 		];
 	}, []);
 
-	const changeLanguage = (lang: string) => {
-		setCurrentLanguage(lang);
-		i18n.changeLanguage(lang);
+	const changeLanguage = async (lang: string) => {
+		try {
+			dispatch(appActions.setLanguage(lang));
+			await i18n.changeLanguage(lang);
+		} catch (error: any) {
+			console.error('Error changing language: ', error);
+		}
 	};
 
 	return (

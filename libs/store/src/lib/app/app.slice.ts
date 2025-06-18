@@ -24,6 +24,7 @@ export interface showSettingFooterProps {
 
 export interface AppState {
 	themeApp: 'light' | 'dark' | 'system';
+	currentLanguage: 'en' | 'vi';
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowMemberList: boolean;
@@ -49,6 +50,7 @@ export interface AppState {
 export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
 	themeApp: 'dark',
+	currentLanguage: 'en',
 	isShowMemberList: true,
 	isShowChatStream: false,
 	isShowChatVoice: false,
@@ -64,7 +66,7 @@ export const initialAppState: AppState = {
 	hasInternetMobile: true,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true, profileInitTab: 'USER_SETTING', clanId: '' },
+	isShowSettingFooter: { status: false, initTab: 'Account', profileInitTab: 'USER_SETTING', clanId: '', isUserProfile: true },
 	isShowPopupQuickMess: false,
 	categoryChannelOffsets: {}
 };
@@ -107,7 +109,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 			);
 
 		thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
-		thunkAPI.dispatch(clansActions.fetchClans({}));
+		thunkAPI.dispatch(clansActions.fetchClans());
 		if (isClanView && currentClanId) {
 			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
 			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
@@ -134,6 +136,9 @@ export const appSlice = createSlice({
 	reducers: {
 		setTheme: (state, action) => {
 			state.themeApp = action.payload;
+		},
+		setLanguage: (state, action) => {
+			state.currentLanguage = action.payload;
 		},
 		setIsShowMemberList: (state, action) => {
 			state.isShowMemberList = action.payload;
@@ -240,6 +245,8 @@ export const getAppState = (rootState: { [APP_FEATURE_KEY]: AppState }): AppStat
 export const selectAllApp = createSelector(getAppState, (state: AppState) => state);
 
 export const selectTheme = createSelector(getAppState, (state: AppState) => state.themeApp || 'dark');
+
+export const selectCurrentLanguage = createSelector(getAppState, (state: AppState) => state.currentLanguage || 'en');
 
 export const selectError = createSelector(getAppState, (state: AppState) => state.error);
 

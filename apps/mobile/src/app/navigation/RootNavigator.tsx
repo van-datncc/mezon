@@ -7,13 +7,14 @@ import React, { memo, useEffect, useMemo, useState } from 'react';
 import { ChatContextProvider, EmojiSuggestionProvider, PermissionProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ActionEmitEvent, STORAGE_SESSION_KEY, save } from '@mezon/mobile-components';
-import { ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
+import { LanguageProvider, ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
 import { Session } from 'mezon-js';
 import { DeviceEventEmitter, NativeModules, Platform, StatusBar } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import Xenon from 'react-native-xenon';
 import NetInfoComp from '../components/NetworkInfo';
 import { WebRTCStreamProvider } from '../components/StreamContext/StreamContext';
 import { toastConfig } from '../configs/toastConfig';
@@ -21,6 +22,7 @@ import { DeviceProvider } from '../contexts/device';
 import RootListener from './RootListener';
 import RootStack from './RootStack';
 import { APP_SCREEN } from './ScreenTypes';
+
 const { NavigationBarModule } = NativeModules;
 
 const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) => {
@@ -56,7 +58,7 @@ const NavigationMain = memo(
 					// iOS doesn't have the same navigation bar concept
 				}
 			};
-
+			Xenon.show();
 			getNavigationInfo();
 		}, []);
 
@@ -162,24 +164,28 @@ const RootNavigation = (props) => {
 	}, [mezon]);
 
 	return (
-		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-			<ThemeProvider>
-				<ChatContextProvider>
-					<WebRTCStreamProvider>
-						<DeviceProvider>
-							<PermissionProvider>
-								<EmojiSuggestionProvider isMobile={true}>
-									<KeyboardProvider statusBarTranslucent>
-										<NavigationMain {...props} />
-									</KeyboardProvider>
-								</EmojiSuggestionProvider>
-							</PermissionProvider>
-						</DeviceProvider>
-					</WebRTCStreamProvider>
-				</ChatContextProvider>
-				<Toast config={toastConfig} />
-			</ThemeProvider>
-		</MezonStoreProvider>
+		<Xenon.Wrapper>
+			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+				<ThemeProvider>
+					<LanguageProvider>
+						<ChatContextProvider>
+							<WebRTCStreamProvider>
+								<DeviceProvider>
+									<PermissionProvider>
+										<EmojiSuggestionProvider isMobile={true}>
+											<KeyboardProvider statusBarTranslucent>
+												<NavigationMain {...props} />
+											</KeyboardProvider>
+										</EmojiSuggestionProvider>
+									</PermissionProvider>
+								</DeviceProvider>
+							</WebRTCStreamProvider>
+						</ChatContextProvider>
+						<Toast config={toastConfig} />
+					</LanguageProvider>
+				</ThemeProvider>
+			</MezonStoreProvider>
+		</Xenon.Wrapper>
 	);
 };
 
