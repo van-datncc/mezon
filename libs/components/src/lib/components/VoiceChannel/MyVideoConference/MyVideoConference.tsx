@@ -9,7 +9,7 @@ import {
 	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
-import { selectCurrentClan, topicsActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClan, topicsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { RoomEvent, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
@@ -164,6 +164,14 @@ export function MyVideoConference({
 			room?.off('disconnected', handleDisconnected);
 		};
 	}, [room]);
+
+	const onToggleChatBox = () => {
+		if (isExternalCalling) {
+			dispatch(voiceActions.setToggleChatBox());
+		} else {
+			onToggleChat?.();
+		}
+	};
 	return (
 		<div className="lk-video-conference flex-1">
 			<ReactionCallHandler currentChannel={currentChannel} />
@@ -292,7 +300,12 @@ export function MyVideoConference({
 									</span>
 								</Tooltip>
 
-								<button className="relative focus-visible:outline-none" title="Chat" onClick={onToggleChat} style={{ marginLeft: 8 }}>
+								<button
+									className="relative focus-visible:outline-none"
+									title="Chat"
+									onClick={onToggleChatBox}
+									style={{ marginLeft: 8 }}
+								>
 									<Icons.Chat
 										defaultFill={isShowMember ? 'text-colorTextLightMode' : 'text-white'}
 										className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'}
