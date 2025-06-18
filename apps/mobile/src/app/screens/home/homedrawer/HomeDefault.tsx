@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, StatusBar } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, StatusBar, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
@@ -78,12 +78,14 @@ const HomeDefault = React.memo(
 				{Platform.OS === 'ios' && <LicenseAgreement />}
 				<DrawerListener />
 				<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
-				<ChannelMessages
-					channelId={channelId}
-					clanId={clanId}
-					isPublic={isPublicChannel}
-					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
+				<View style={{ flex: 1 }}>
+					<ChannelMessages
+						channelId={channelId}
+						clanId={clanId}
+						isPublic={isPublicChannel}
+						mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+				</View>
 				{isChannelApp && <ChannelAppHotbar channelId={channelId} clanId={clanId} />}
 				<ChatBox
 					channelId={channelId}

@@ -37,17 +37,17 @@ const BuzzBadge = ({ channelId, isReset, senderId, mode, timestamp }: BuzzBadgeP
 	}, [isReset, senderId, channelId, dispatch, isPosDmOrGr, isChannelOrThread, timestamp, currentClanId]);
 
 	return (
-		<div>
+		<>
 			{isReset && (
 				<div
-					className={`bg-red-500 text-xs absolute z-40 ${
+					className={`bg-red-500 text-xs absolute z-40 shadow-[0px_0px_10px_1px_#ff000040] ${
 						isPosDmOrGr ? 'top-3.5 right-6' : 'top-1.5 right-12'
 					} text-white rounded-sm p-0.5 text-center font-medium`}
 				>
 					Buzz!!
 				</div>
 			)}
-		</div>
+		</>
 	);
 };
 

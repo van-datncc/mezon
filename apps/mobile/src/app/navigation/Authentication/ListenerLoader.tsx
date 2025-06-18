@@ -1,0 +1,32 @@
+import React, { memo } from 'react';
+import BottomSheetRootListener from '../../components/BottomSheetRootListener';
+import ModalRootListener from '../../components/ModalRootListener';
+import ChannelMessageListener from '../../screens/home/homedrawer/ChannelMessageListener';
+import ChannelMessageReactionListener from '../../screens/home/homedrawer/ChannelMessageReactionListener';
+import ChannelRouterListener from '../../screens/home/homedrawer/components/ChannelList/ChannelRouterListener';
+import ChannelVoicePopup from '../../screens/home/homedrawer/components/ChannelVoicePopup';
+import StreamingWrapper from '../../screens/home/homedrawer/components/StreamingWrapper';
+
+export const ListenerLoader = memo(() => {
+	const [showListeners, setShowListeners] = React.useState(false);
+
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			setShowListeners(true);
+		}, 2000);
+
+		return () => clearTimeout(timer);
+	}, []);
+	if (!showListeners) return null;
+	return (
+		<>
+			<StreamingWrapper />
+			<ChannelVoicePopup />
+			<BottomSheetRootListener />
+			<ModalRootListener />
+			<ChannelMessageListener />
+			<ChannelMessageReactionListener />
+			<ChannelRouterListener />
+		</>
+	);
+});
