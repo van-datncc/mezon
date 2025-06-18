@@ -37,7 +37,7 @@ function UserListItem({ user, channelID, isPttList }: { user: IChannelMember; ch
 				{member || userStream ? (
 					<NameComponent id={user.user_id || ''} name={name || ''} />
 				) : (
-					<p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant} (guest)</p>
+					<p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant}</p>
 				)}
 			</div>
 		</div>
