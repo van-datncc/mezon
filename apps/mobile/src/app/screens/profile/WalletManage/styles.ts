@@ -49,17 +49,6 @@ export const style = (colors: Attributes) =>
 			height: size.s_40,
 			color: colors.text
 		},
-		button: {
-			position: 'absolute',
-			justifyContent: 'center',
-			alignItems: 'center',
-			backgroundColor: '#5e65ee',
-			height: size.s_50,
-			width: '90%',
-			bottom: size.s_30,
-			marginHorizontal: size.s_20,
-			borderRadius: size.s_14
-		},
 		buttonTitle: {
 			color: 'white',
 			fontSize: size.s_16,
@@ -112,43 +101,25 @@ export const style = (colors: Attributes) =>
 		},
 		label: {
 			fontSize: size.s_14,
-			color: colors.textDisabled
+			marginBottom: size.s_8,
+			color: colors.text
 		},
 		value: {
 			fontSize: size.s_18,
 			fontWeight: 'bold',
 			color: colors.white
 		},
-		confirmButton: {
+		button: {
 			backgroundColor: colors.white,
 			justifyContent: 'center',
 			alignItems: 'center',
 			height: size.s_50,
 			borderRadius: size.s_50
 		},
-		confirmText: {
-			fontSize: 18,
+		textButton: {
+			fontSize: size.s_16,
 			fontWeight: 'bold',
 			color: colors.black
-		},
-		action: {
-			display: 'flex',
-			gap: size.s_20
-		},
-		actionMore: {
-			display: 'flex',
-			flexDirection: 'row',
-			justifyContent: 'center',
-			gap: size.s_30
-		},
-		buttonActionMore: {
-			display: 'flex',
-			justifyContent: 'center',
-			alignItems: 'center',
-			gap: size.s_4
-		},
-		textActionMore: {
-			color: colors.white
 		},
 		cardWallet: {
 			borderRadius: size.s_10,
@@ -176,5 +147,136 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_18,
 			fontWeight: 'bold',
 			color: colors.white
+		},
+		empty: {
+			alignSelf: 'center',
+			justifyContent: 'center',
+			alignItems: 'center',
+			gap: size.s_20,
+			paddingVertical: size.s_20,
+			marginBottom: size.s_20
+		},
+		iconEmpty: {
+			backgroundColor: colors.secondaryLight,
+			width: size.s_70,
+			height: size.s_70,
+			borderRadius: size.s_70,
+			alignItems: 'center',
+			justifyContent: 'center'
+		},
+		text: {
+			fontSize: size.s_16,
+			fontWeight: 'bold',
+			color: colors.text
+		},
+
+		walletHeader: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginBottom: size.s_20
+		},
+		walletTitle: {
+			fontSize: size.s_18,
+			fontWeight: 'bold',
+			color: colors.white
+		},
+		closeButton: {
+			padding: size.s_8
+		},
+		statusRow: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			marginBottom: size.s_20
+		},
+		statusText: {
+			color: '#16A34A',
+			fontWeight: 'bold',
+			marginLeft: size.s_4
+		},
+		section: {
+			marginBottom: size.s_20
+		},
+		valueBox: {
+			backgroundColor: colors.secondaryLight,
+			borderRadius: size.s_6,
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'center',
+			padding: size.s_10,
+			marginBottom: size.s_10
+		},
+		valueText: {
+			color: colors.text,
+			fontSize: size.s_14,
+			flex: 1
+		},
+		copyButton: {
+			marginLeft: size.s_8,
+			paddingHorizontal: size.s_4
+		},
+		showButton: {
+			backgroundColor: colors.secondaryLight,
+			borderRadius: size.s_6,
+			padding: size.s_10,
+			alignItems: 'center',
+			marginBottom: size.s_10,
+			flexDirection: 'row',
+			justifyContent: 'center'
+		},
+		showButtonText: {
+			color: colors.text,
+			fontWeight: 'bold',
+			marginLeft: size.s_8,
+			fontSize: size.s_14
+		},
+		warningBox: {
+			borderWidth: 1,
+			borderColor: 'rgb(154 52 18)',
+			backgroundColor: '#413232',
+			borderRadius: size.s_10,
+			padding: size.s_14,
+			marginTop: size.s_20
+		},
+		warningTitle: {
+			color: '#FED7AB',
+			fontWeight: 'bold',
+			fontSize: size.s_14,
+			marginBottom: size.s_8
+		},
+		warningText: {
+			color: '#F5B471',
+			fontSize: size.s_14,
+			marginBottom: size.s_4
+		},
+		phraseContainer: {
+			flexDirection: 'row',
+			flexWrap: 'wrap',
+			justifyContent: 'space-between',
+			marginTop: size.s_6,
+			marginBottom: size.s_20,
+			padding: size.s_12,
+			borderRadius: size.s_8,
+			gap: size.s_12,
+			backgroundColor: colors.secondary
+		},
+		wordBox: {
+			width: '30%',
+			backgroundColor: colors.primary,
+			borderRadius: size.s_12,
+			paddingVertical: size.s_6,
+			gap: size.s_4,
+			justifyContent: 'center',
+			alignItems: 'center',
+			borderWidth: 1,
+			borderColor: colors.border
+		},
+		wordIndex: {
+			fontSize: size.s_12,
+			color: colors.textDisabled
+		},
+		word: {
+			fontSize: size.s_14,
+			color: colors.text
 		}
 	});
