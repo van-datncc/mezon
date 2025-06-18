@@ -187,7 +187,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			},
 			title: t('menu.closeDm'),
 			isShow: !isGroup,
-			icon: <MezonIconCDN icon={IconCDN.userMinusIcon} color={baseColor.gray} />
+			icon: <MezonIconCDN icon={IconCDN.userMinusIcon} color={baseColor.gray} color={themeValue.textStrong} />
 		},
 		{
 			onPress: infoFriend?.state === EStateFriend.FRIEND ? handleDeleteFriend : handleAddFriend,
@@ -209,9 +209,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			title: didIBlockUser ? t('menu.unblockUser') : t('menu.blockUser'),
 			isShow: !isGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser),
 			icon: didIBlockUser ? (
-				<MezonIconCDN icon={IconCDN.unblockUser} color={baseColor.gray} />
+				<MezonIconCDN icon={IconCDN.unblockUser} color={themeValue.textStrong} />
 			) : (
-				<MezonIconCDN icon={IconCDN.blockUser} color={baseColor.gray} />
+				<MezonIconCDN icon={IconCDN.blockUser} color={themeValue.textStrong} />
 			)
 		}
 	];
