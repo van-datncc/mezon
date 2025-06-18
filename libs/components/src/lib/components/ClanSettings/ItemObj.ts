@@ -12,8 +12,8 @@ export const ItemSetting = {
 	OVERVIEW: 'overview',
 	ROLES: 'roles',
 	EMOJI: 'emoji',
-	STICKERS: 'Stickers',
-	UPLOAD_SOUND: 'upload-sound',
+	IMAGE_STICKERS: 'Stickers',
+	VOIDE_STICKERS: 'upload-sound',
 	DELETE_SERVER: 'delete_server',
 	INTEGRATIONS: 'integrations',
 	NOTIFICATION_SOUND: 'notification-sound',
@@ -27,10 +27,11 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.OVERVIEW, name: 'Overview' },
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
-	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.IMAGE_STICKERS, name: 'Image Stickers' },
+	{ id: ItemSetting.VOIDE_STICKERS, name: 'Voice Sticker' },
 	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
-	{ id: ItemSetting.UPLOAD_SOUND, name: 'Upload Sound ' }
+
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
@@ -60,7 +61,8 @@ export const sideBarListItem: ListSideBarProps[] = [
 export const listItemSettingClanPermission: ItemObjProps[] = [
 	{ id: ItemSetting.OVERVIEW, name: 'Overview' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
-	{ id: ItemSetting.STICKERS, name: 'Stickers' },
+	{ id: ItemSetting.IMAGE_STICKERS, name: 'Image Stickers' },
+	{ id: ItemSetting.VOIDE_STICKERS, name: 'Voice Sticker' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
 ];
 

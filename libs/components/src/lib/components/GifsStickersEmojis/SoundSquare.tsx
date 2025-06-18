@@ -48,193 +48,6 @@ const searchSounds = (sounds: ExtendedApiMessageAttachment[], searchTerm: string
 	return sounds.filter((item) => item?.filename?.toLowerCase().includes(lowerCaseSearchTerm));
 };
 
-const systemSounds = [
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '1',
-		filename: 'fail-sound-effect.mp3',
-		size: 64503,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/fail-sound-effect.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '2',
-		filename: 'huh_.mp3',
-		size: 130430,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/huh_.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '3',
-		filename: 'dun-dun-dun-sound-effect-brass_8nFBc.mp3',
-		size: 101189,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/dun-dun-dun-sound-effect-brass_8nFBccR.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '4',
-		filename: 'oh-my-god-meme.mp3',
-		size: 303744,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/oh-my-god-meme.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '5',
-		filename: 'nani-meme-sound-effect.mp3',
-		size: 49780,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/nani-meme-sound-effect.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '6',
-		filename: 'bruh.mp3',
-		size: 284194,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/bruh.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	// SYSTEM SOUNDS
-
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '7',
-		filename: 'shocked-sound-effect.mp3',
-		size: 343658,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/shocked-sound-effect.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '8',
-		filename: 'anime-wow-sound-effect-mp3cut.mp3',
-		size: 326558,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/anime-wow-sound-effect-mp3cut.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '9',
-		filename: 'directed-by-robert-b.mp3',
-		size: 107519,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/directed-by-robert-b.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '10',
-		filename: 'punch-gaming-sound.mp3',
-		size: 107519,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/punch-gaming-sound.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '11',
-		filename: 'vine-boom-sound.mp3',
-		size: 340902,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/vine-boom-sound.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '12',
-		filename: 'run.mp3',
-		size: 93308,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/run.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '13',
-		filename: 'among-us-role-reveal-sound.mp3',
-		size: 112695,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/among-us-role-reveal-sound.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '14',
-		filename: 'meme_fail.mp3',
-		size: 151822,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/meme_fail.mp3`,
-		filetype: 'audio/mpeg'
-	},
-
-	// komu -3
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '15',
-		filename: 'error_sound.mp3',
-		size: 304211,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/error_sound.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '16',
-		filename: 'emotional_damage_meme.mp3',
-		size: 151822,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/emotional_damage_meme.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '17',
-		filename: 'are_you_crazy.mp3',
-		size: 132363,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/are_you_crazy.mp3`,
-		filetype: 'audio/mpeg'
-	},
-	{
-		clan_name: 'SYSTEM SOUNDS',
-		logo: 'https://fastly.picsum.photos/id/391/536/354.jpg?hmac=29BA6wFw5oDS6512JTZGg8jXcA_-hnW9154Cqs9OZqw',
-		clan_id: '1775731152322039809',
-		id: '18',
-		filename: 'sad_violin.mp3',
-		size: 361889,
-		url: `${process.env.NX_BASE_IMG_URL}/soundboard/meme/sad_violin.mp3`,
-		filetype: 'audio/mpeg'
-	}
-];
-
 function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const dispatch = useAppDispatch();
 	const { sendMessage } = useChatSending({
@@ -270,7 +83,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 	}, [allSoundsInStore]);
 
 	const allSounds = useMemo(() => {
-		return [...systemSounds, ...userSounds];
+		return [...userSounds];
 	}, [userSounds]);
 
 	const [searchedSounds, setSearchSounds] = useState<ExtendedApiMessageAttachment[]>([]);
@@ -358,11 +171,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 							onClick={(e) => scrollToClanSidebar(e, cat.type)}
 							className="flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]"
 						>
-							{cat.type === 'SYSTEM SOUNDS' ? (
-								<div className="w-7 h-7 rounded-full dark:bg-bgLightModeSecond flex justify-center items-center">
-									<Icons.SoundIcon className="w-5 h-5" />
-								</div>
-							) : cat.url !== '' ? (
+							{cat.url !== '' ? (
 								<img
 									src={cat.url}
 									alt={cat.type}
