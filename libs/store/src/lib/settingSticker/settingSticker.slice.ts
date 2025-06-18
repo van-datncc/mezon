@@ -337,6 +337,24 @@ export const selectAudioByClanId = (clanId: string) =>
 		return sounds;
 	});
 
+export const selectStickersByCurrentUser = (clanId: string, userId: string) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		return stickers.filter((sticker) => {
+			return sticker.clan_id === clanId &&
+				sticker.creator_id === userId &&
+				((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined);
+		});
+	});
+
+export const selectAudioByCurrentUser = (clanId: string, userId: string) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		return stickers.filter(sticker => {
+			return sticker.clan_id === clanId &&
+				sticker.creator_id === userId &&
+				(sticker as any).media_type === MediaType.AUDIO;
+		});
+	});
+
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByUserId };
 
