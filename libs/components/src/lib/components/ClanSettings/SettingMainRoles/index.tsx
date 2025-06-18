@@ -83,6 +83,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		dispatch(setColorRoleNew(DEFAULT_ROLE_COLOR));
 		dispatch(setAddPermissions([]));
 		dispatch(setAddMemberRoles([]));
+		dispatch(setSelectedPermissions([]));
 		dispatch(roleSlice.actions.setCurrentRoleIcon(''));
 		setOpenEdit(true);
 	};

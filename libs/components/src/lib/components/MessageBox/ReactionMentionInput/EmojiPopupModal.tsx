@@ -37,7 +37,7 @@ export const useEmojiPopupModal = (props: EmojiPopupModalProps): EmojiPopupModal
 				onClick={(e) => {
 					e.stopPropagation();
 				}}
-				className="fixed inset-0 z-50 flex items-end justify-end"
+				className="fixed top-0 z-50 flex items-end justify-end"
 				onMouseDown={(e) => {
 					e.stopPropagation();
 				}}
@@ -59,14 +59,6 @@ export const useEmojiPopupModal = (props: EmojiPopupModalProps): EmojiPopupModal
 						/>
 					</EmojiSuggestionProvider>
 				</div>
-				<div
-					className="absolute inset-0 bg-transparent"
-					onClick={() => {
-						hideEmojiModal();
-						setIsEmojiPopupVisible(false);
-						setSubPanelActive(SubPanelName.NONE);
-					}}
-				></div>
 			</div>
 		);
 	}, [currentChannel, mode, setSubPanelActive, clickPosition, isTopic]);
