@@ -301,10 +301,6 @@ export function ControlBar({
 		}
 	}, [dispatch, isOpenPopOut, openVoicePopup, closeVoicePopup]);
 
-	const toggleChatBox = useCallback(() => {
-		dispatch(voiceActions.setToggleChatBox());
-	}, []);
-
 	const [showEmojiPanel, setShowEmojiPanel] = useState(false);
 
 	useEffect(() => {
@@ -452,11 +448,6 @@ export function ControlBar({
 					</div>
 				)}
 
-				{isExternalCalling && (
-					<div onClick={toggleChatBox}>
-						<Icons.BoxChatIcon defaultSize={`cursor-pointer w-6 h-6 ${!isShowMember && 'text-white'}`} />
-					</div>
-				)}
 				<div onClick={onFullScreen}>
 					{isFullScreen ? (
 						<span>
