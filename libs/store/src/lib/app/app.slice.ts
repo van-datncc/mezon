@@ -66,7 +66,7 @@ export const initialAppState: AppState = {
 	hasInternetMobile: true,
 	loadingMainMobile: false,
 	isFromFcmMobile: false,
-	isShowSettingFooter: { status: false, initTab: 'Account', profileInitTab: 'USER_SETTING', clanId: '', isUserProfile: true },
+	isShowSettingFooter: { status: false, initTab: 'Account', isUserProfile: true, profileInitTab: 'USER_SETTING', clanId: '' },
 	isShowPopupQuickMess: false,
 	categoryChannelOffsets: {}
 };
