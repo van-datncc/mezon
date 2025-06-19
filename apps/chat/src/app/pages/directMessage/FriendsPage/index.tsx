@@ -161,7 +161,7 @@ const FriendsPage = () => {
 									{tab.title}
 								</button>
 								{tab.value === 'pending' && quantityPendingRequest !== 0 && (
-									<div className="absolute grid place-items-center w-[20px] h-[20px] rounded-full bg-colorDanger text-white text-[10px] font-medium top-4 right-3">
+									<div className="absolute grid place-items-center w-[20px] h-[20px] rounded-full bg-colorDanger text-white text-[10px] font-medium top-[2px] right-3">
 										{quantityPendingRequest}
 									</div>
 								)}
