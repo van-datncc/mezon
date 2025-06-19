@@ -253,18 +253,6 @@ export const updateClan = createAsyncThunk(
 	}
 );
 
-export const updateBageClanWS = createAsyncThunk(
-	'clans/updateBageClanWS',
-	async ({ clan_id, badge_count }: { clan_id: string; badge_count: number }, thunkAPI) => {
-		try {
-			await thunkAPI.dispatch(clansActions.setBadgeClanSync({ clanId: clan_id, count: badge_count }));
-		} catch (error) {
-			captureSentryError(error, 'clans/updateBageClanWS');
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
-
 type UpdateLinkUser = {
 	user_name: string;
 	avatar_url: string;
@@ -583,22 +571,6 @@ export const clansSlice = createSlice({
 					welcome_channel_id: dataUpdate.welcome_channel_id
 				}
 			});
-		},
-		setBadgeClanSync: (state: ClansState, action: PayloadAction<{ clanId: string; count: number }>) => {
-			const { clanId, count } = action.payload;
-			const entity = state.entities[clanId];
-			if (entity) {
-				const newBadgeCount = count;
-				if (!entity.badge_count && newBadgeCount === 0) return;
-				if (entity.badge_count !== newBadgeCount) {
-					clansAdapter.updateOne(state, {
-						id: clanId,
-						changes: {
-							badge_count: newBadgeCount
-						}
-					});
-				}
-			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -672,8 +644,7 @@ export const clansActions = {
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
-	joinClan,
-	updateBageClanWS
+	joinClan
 };
 
 /*

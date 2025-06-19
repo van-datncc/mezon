@@ -5,13 +5,11 @@ import {
 	clansActions,
 	EMarkAsReadType,
 	getStore,
-	getStoreAsync,
 	listChannelRenderAction,
 	listChannelsByUserActions,
 	markAsReadProcessing,
 	RootState,
 	selectAllChannels,
-	selectChannelsByClanId,
 	selectChannelThreads,
 	useAppDispatch,
 	useAppSelector
@@ -160,24 +158,6 @@ export function useMarkAsRead() {
 			try {
 				await actionMarkAsRead(body);
 				setStatusMarkAsReadClan('success');
-				const store = await getStoreAsync();
-				const channel = selectChannelsByClanId(store.getState(), clanId);
-				const channelIds = channel.map((item) => item.id);
-				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
-				dispatch(
-					channelsActions.resetChannelsCount({
-						clanId,
-						channelIds
-					})
-				);
-				dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: 0, isReset: true }));
-				dispatch(
-					listChannelRenderAction.handleMarkAsReadListRender({
-						type: EMarkAsReadType.CLAN,
-						clanId: clanId
-					})
-				);
-				dispatch(listChannelsByUserActions.markAsReadChannel(channelIds));
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadClan('error');

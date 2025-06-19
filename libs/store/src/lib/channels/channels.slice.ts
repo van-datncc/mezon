@@ -35,7 +35,6 @@ import {
 import { FetchCategoriesPayload, categoriesActions } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { clansActions } from '../clans/clans.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
 import { messagesActions } from '../messages/messages.slice';
@@ -737,7 +736,7 @@ export const markAsReadProcessing = createAsyncThunk(
 					})
 				);
 			}
-			thunkAPI.dispatch(clansActions.fetchClans({}));
+			// remove because get old cache
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channels/markAsRead');
@@ -1081,20 +1080,17 @@ export const channelsSlice = createSlice({
 			action: PayloadAction<{ clanId: string; channelId: string; count: number; isReset?: boolean }>
 		) => {
 			const { clanId, channelId, count, isReset = false } = action.payload;
-			if (state.byClans[clanId]) {
-				const entity = state.byClans[clanId].entities.entities[channelId];
-				if (entity) {
-					const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
-					if (entity.count_mess_unread !== newCountMessUnread) {
-						channelsAdapter.updateOne(state.byClans[clanId].entities, {
-							id: channelId,
-							changes: {
-								count_mess_unread: newCountMessUnread
-							}
-						});
-					}
+			if (!state.byClans[clanId]) return;
+			const entity = state.byClans[clanId].entities.entities[channelId];
+			if (!entity) return;
+			const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
+			if (entity.count_mess_unread === newCountMessUnread) return;
+			channelsAdapter.updateOne(state.byClans[clanId].entities, {
+				id: channelId,
+				changes: {
+					count_mess_unread: newCountMessUnread
 				}
-			}
+			});
 		},
 		resetChannelsCount: (
 			state: ChannelsState,
