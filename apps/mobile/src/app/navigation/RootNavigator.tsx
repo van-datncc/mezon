@@ -21,7 +21,6 @@ import { DeviceProvider } from '../contexts/device';
 import RootListener from './RootListener';
 import RootStack from './RootStack';
 import { APP_SCREEN } from './ScreenTypes';
-
 const { NavigationBarModule } = NativeModules;
 
 const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) => {
@@ -57,6 +56,7 @@ const NavigationMain = memo(
 					// iOS doesn't have the same navigation bar concept
 				}
 			};
+
 			getNavigationInfo();
 		}, []);
 
@@ -162,24 +162,24 @@ const RootNavigation = (props) => {
 	}, [mezon]);
 
 	return (
-			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-				<ThemeProvider>
-					<ChatContextProvider>
-						<WebRTCStreamProvider>
-							<DeviceProvider>
-								<PermissionProvider>
-									<EmojiSuggestionProvider isMobile={true}>
-										<KeyboardProvider statusBarTranslucent>
-											<NavigationMain {...props} />
-										</KeyboardProvider>
-									</EmojiSuggestionProvider>
-								</PermissionProvider>
-							</DeviceProvider>
-						</WebRTCStreamProvider>
-					</ChatContextProvider>
-					<Toast config={toastConfig} />
-				</ThemeProvider>
-			</MezonStoreProvider>
+		<MezonStoreProvider store={store} loading={null} persistor={persistor}>
+			<ThemeProvider>
+				<ChatContextProvider>
+					<WebRTCStreamProvider>
+						<DeviceProvider>
+							<PermissionProvider>
+								<EmojiSuggestionProvider isMobile={true}>
+									<KeyboardProvider statusBarTranslucent>
+										<NavigationMain {...props} />
+									</KeyboardProvider>
+								</EmojiSuggestionProvider>
+							</PermissionProvider>
+						</DeviceProvider>
+					</WebRTCStreamProvider>
+				</ChatContextProvider>
+				<Toast config={toastConfig} />
+			</ThemeProvider>
+		</MezonStoreProvider>
 	);
 };
 
