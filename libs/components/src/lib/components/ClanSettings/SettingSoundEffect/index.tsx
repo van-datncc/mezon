@@ -1,7 +1,8 @@
 import {
     MediaType,
-    selectAudioByClanId,
+    selectAudioByCurrentUser,
     selectCurrentClanId,
+    selectCurrentUserId,
     soundEffectActions,
     useAppDispatch
 } from '@mezon/store';
@@ -31,9 +32,9 @@ const SettingSoundEffect = () => {
     const [showModal, setShowModal] = useState(false);
     const dispatch = useAppDispatch();
     const currentClanId = useSelector(selectCurrentClanId) || '';
+    const currentUserId = useSelector(selectCurrentUserId) || '';
 
-
-    const sounds = useSelector(selectAudioByClanId(currentClanId));
+    const sounds = useSelector(selectAudioByCurrentUser(currentClanId, currentUserId));
 
 
     const soundList: SoundType[] = sounds.map(sound => ({

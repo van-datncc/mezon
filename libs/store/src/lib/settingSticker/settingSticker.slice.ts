@@ -6,6 +6,7 @@ import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
+import { RootState } from '../store';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
 
@@ -336,6 +337,40 @@ export const selectAudioByClanId = (clanId: string) =>
 
 		return sounds;
 	});
+
+export const selectStickersByCurrentUserSelector = createSelector(
+	[
+		selectAllStickerSuggestion,
+		(_state: RootState, clanId: string) => clanId,
+		(_state: RootState, _clanId: string, userId: string) => userId
+	],
+	(stickers, clanId, userId) =>
+		stickers.filter((sticker) =>
+			sticker.clan_id === clanId &&
+			sticker.creator_id === userId &&
+			((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined)
+		)
+);
+
+export const selectStickersByCurrentUser = (clanId: string, userId: string) =>
+	(state: RootState) => selectStickersByCurrentUserSelector(state, clanId, userId);
+
+export const selectAudioByCurrentUserSelector = createSelector(
+	[
+		selectAllStickerSuggestion,
+		(_state: RootState, clanId: string) => clanId,
+		(_state: RootState, _clanId: string, userId: string) => userId
+	],
+	(stickers, clanId, userId) =>
+		stickers.filter(sticker =>
+			sticker.clan_id === clanId &&
+			sticker.creator_id === userId &&
+			(sticker as any).media_type === MediaType.AUDIO
+		)
+);
+
+export const selectAudioByCurrentUser = (clanId: string, userId: string) =>
+	(state: RootState) => selectAudioByCurrentUserSelector(state, clanId, userId);
 
 export const settingStickerReducer = settingClanStickerSlice.reducer;
 export const settingClanStickerActions = { ...settingClanStickerSlice.actions, fetchStickerByUserId };

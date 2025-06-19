@@ -1,4 +1,4 @@
-import { selectCurrentClanId, selectStickersByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
+import { selectCurrentClanId, selectCurrentUserId, selectStickersByCurrentUser, settingClanStickerActions, useAppDispatch } from '@mezon/store';
 import { Button, Icons, Modal } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
 import { RefObject, useCallback, useState } from 'react';
@@ -10,7 +10,8 @@ const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> })
 	const [showModalSticker, setShowModalSticker] = useState<boolean>(false);
 	const [editSticker, setEditSticker] = useState<ClanSticker | null>(null);
 	const currentClanId = useSelector(selectCurrentClanId) || '';
-	const listSticker = useSelector(selectStickersByClanId(currentClanId));
+	const currentUserId = useSelector(selectCurrentUserId) || '';
+	const listSticker = useSelector(selectStickersByCurrentUser(currentClanId, currentUserId));
 
 	const dispatch = useAppDispatch();
 	const handleUpdateSticker = (sticker: ClanSticker) => {

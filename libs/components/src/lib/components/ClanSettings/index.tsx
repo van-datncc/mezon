@@ -60,10 +60,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:
 				return <NotificationSoundSetting />;
-			case ItemSetting.UPLOAD_SOUND:
-				return <SettingSoundEffect />;
-			case ItemSetting.STICKERS:
+			case ItemSetting.IMAGE_STICKERS:
 				return <SettingSticker parentRef={modalRef} />;
+			case ItemSetting.VOIDE_STICKERS:
+				return <SettingSoundEffect />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 			case ItemSetting.AUDIT_LOG:
