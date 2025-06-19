@@ -19,6 +19,7 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 
 	// Use safer DOM manipulation instead of innerHTML injection
 	imageWindow.webContents.executeJavaScript(`
+		${App.imageScriptWindowLoaded === false ? `let currentIndex = ${activeIndex};` : `currentIndex =  ${activeIndex};`}
 		(function() {
 			// Use textContent for text content to prevent XSS
 			const channelLabel = document.getElementById('channel-label');
@@ -61,7 +62,6 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 				timestamp.textContent = ${JSON.stringify(time)};
 			}
 
-			${App.imageScriptWindowLoaded === false ? `let currentIndex = ${activeIndex};` : `currentIndex = ${activeIndex};`}
 
 			window.currentImageUrl = {
 				fileName: ${JSON.stringify(escapeHtml(imageData.filename))},
