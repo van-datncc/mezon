@@ -315,7 +315,7 @@ export function MyVideoConference({
 						</div>
 					</div>
 					<div
-						className={`absolute ${isShowMember ? 'bottom-0' : 'bottom-8'} left-0 w-full transition-opacity duration-300 ${
+						className={`absolute ${isShowMember ? 'bottom-0' : (focusTrack ? 'bottom-8' : 'bottom-0')} left-0 w-full transition-opacity duration-300 ${
 							isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
 						}`}
 					>
