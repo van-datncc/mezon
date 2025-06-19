@@ -35,7 +35,7 @@ import { MessageButtonClicked } from 'mezon-js/socket';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import { listChannelsByUserActions } from '../channels/channelUser.slice';
 import { channelMetaActions } from '../channels/channelmeta.slice';
-import { selectShowScrollDownButton } from '../channels/channels.slice';
+import { channelsActions, selectShowScrollDownButton } from '../channels/channels.slice';
 import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 import { clansActions } from '../clans/clans.slice';
 import { directActions, selectCurrentDM } from '../direct/direct.slice';
@@ -578,6 +578,16 @@ export const updateLastSeenMessage = createAsyncThunk(
 			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, now, badge_count);
 			if (clanId !== '0') {
 				thunkAPI.dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId, channelId }));
+				thunkAPI.dispatch(
+					channelsActions.updateChannelBadgeCount({
+						clanId,
+						channelId,
+						count: 0,
+						isReset: true
+					})
+				);
+				thunkAPI.dispatch(listChannelsByUserActions.resetBadgeCount({ channelId }));
+				thunkAPI.dispatch(listChannelsByUserActions.updateLastSeenTime({ channelId }));
 			} else {
 				thunkAPI.dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
 				thunkAPI.dispatch(listChannelsByUserActions.resetBadgeCount({ channelId }));
