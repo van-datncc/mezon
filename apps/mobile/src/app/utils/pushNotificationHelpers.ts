@@ -351,27 +351,26 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
-				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-				const clanIdCache = load(STORAGE_CLAN_ID);
-				if (clanIdCache !== clanId || time) {
-					const joinAndChangeClan = async (store: any, clanId: string) => {
-						await Promise.all([
-							store.dispatch(clansActions.joinClan({ clanId: clanId })),
-							store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
-							store.dispatch(usersClanActions.fetchUsersClan({ clanId: clanId }))
-						]);
-					};
-					await joinAndChangeClan(store, clanId);
+				const joinAndChangeClan = async (store: any, clanId: string) => {
+					await Promise.allSettled([
+						store.dispatch(clansActions.joinClan({ clanId: clanId })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+					]);
+				};
+
+				await joinAndChangeClan(store, clanId);
+				if (channelId) {
+					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+					store.dispatch(
+						channelsActions.joinChannel({
+							clanId: clanId ?? '',
+							channelId: channelId,
+							noFetchMembers: false,
+							isClearMessage: true,
+							noCache: true
+						})
+					);
 				}
-				store.dispatch(
-					channelsActions.joinChannel({
-						clanId: clanId ?? '',
-						channelId: channelId,
-						noFetchMembers: false,
-						isClearMessage: true,
-						noCache: true
-					})
-				);
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				save(STORAGE_CLAN_ID, clanId);

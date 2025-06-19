@@ -185,7 +185,6 @@ const Notifications = () => {
 					}
 					if (notify?.content?.clan_id !== currentClanId) {
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
-						promises.push(store.dispatch(usersClanActions.fetchUsersClan({ clanId: notify?.content?.clan_id })));
 					}
 					promises.push(
 						store.dispatch(

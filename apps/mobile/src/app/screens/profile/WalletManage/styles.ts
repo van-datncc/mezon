@@ -110,16 +110,16 @@ export const style = (colors: Attributes) =>
 			color: colors.white
 		},
 		button: {
-			backgroundColor: colors.white,
+			backgroundColor: '#5a62f4',
 			justifyContent: 'center',
 			alignItems: 'center',
 			height: size.s_50,
 			borderRadius: size.s_50
 		},
 		textButton: {
-			fontSize: size.s_16,
+			fontSize: size.s_14,
 			fontWeight: 'bold',
-			color: colors.black
+			color: 'white'
 		},
 		cardWallet: {
 			borderRadius: size.s_10,
