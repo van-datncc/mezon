@@ -46,7 +46,6 @@ export const LanguageSetting = () => {
 					</Pressable>
 				)}
 			/>
-			<Text style={{ color: Colors.textGray }}>{currentLanguage}</Text>
 		</View>
 	);
 };
