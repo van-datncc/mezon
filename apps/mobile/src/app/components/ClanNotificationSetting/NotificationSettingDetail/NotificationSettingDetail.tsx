@@ -41,8 +41,8 @@ const NotificationSettingDetail = ({ route }: { route: any }) => {
 	}, [getNotificationChannelSelected]);
 
 	const optionsNotificationSetting = useMemo(() => {
-		return optionNotification?.map((option) => ({ ...option, disabled: !isUnmute }));
-	}, [isUnmute]);
+		return optionNotification(t)?.map((option) => ({ ...option, disabled: !isUnmute }));
+	}, [isUnmute, t]);
 
 	useEffect(() => {
 		setSelectedOption(notifyChannelCategorySetting?.notification_setting_type);
