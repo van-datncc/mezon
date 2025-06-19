@@ -180,7 +180,7 @@ export const WalletManageScreen = ({ navigation }: any) => {
 					</View>
 					<TouchableOpacity disabled={loadingGenWallet} style={styles.button} onPress={onGenerateNewWallet}>
 						{loadingGenWallet ? (
-							<ActivityIndicator size="small" color={themeValue.black} />
+							<ActivityIndicator size="small" color={'white'} />
 						) : (
 							<Text style={styles.textButton}>{t('genNewWallet')}</Text>
 						)}
