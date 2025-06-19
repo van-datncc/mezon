@@ -11,7 +11,7 @@ import {
 } from '@livekit/components-react';
 import { selectCurrentClan, topicsActions, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { RoomEvent, Track } from 'livekit-client';
+import { LocalParticipant, LocalTrackPublication, RoomEvent, Track } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -157,9 +157,17 @@ export function MyVideoConference({
 		const handleDisconnected = () => {
 			onLeaveRoom();
 		};
+		const handleTrackPublished = (publication: LocalTrackPublication, participant: LocalParticipant) => {
+			if (publication.source === Track.Source.ScreenShare) {
+				dispatch(voiceActions.setShowScreen(false));
+			}
+			if (publication.source === Track.Source.Camera) {
+				dispatch(voiceActions.setShowCamera(false));
+			}
+		};
 
 		room?.on('disconnected', handleDisconnected);
-
+		room?.on('localTrackUnpublished', handleTrackPublished);
 		return () => {
 			room?.off('disconnected', handleDisconnected);
 		};
@@ -315,7 +323,7 @@ export function MyVideoConference({
 						</div>
 					</div>
 					<div
-						className={`absolute ${isShowMember ? 'bottom-0' : (focusTrack ? 'bottom-8' : 'bottom-0')} left-0 w-full transition-opacity duration-300 ${
+						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 ${
 							isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
 						}`}
 					>
