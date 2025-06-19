@@ -1,7 +1,7 @@
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { categoriesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ApiCreateCategoryDescRequest } from 'mezon-js/api.gen';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -24,30 +24,32 @@ export function CategoryCreator({ navigation }: MenuClanScreenProps<CreateCatego
 	const currentClanId = useSelector(selectCurrentClanId);
 	const { t } = useTranslation(['categoryCreator']);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerRight: () => (
-			<Pressable onPress={handleCreateCategory}>
-				<Text
-					style={{
-						color: baseColor.blurple,
-						fontWeight: 'bold',
-						paddingHorizontal: 20,
-						opacity: categoryName?.trim()?.length > 0 ? 1 : 0.5,
-						fontSize: size.medium
-					}}
-				>
-					{t('actions.create')}
-				</Text>
-			</Pressable>
-		),
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerRight: () => (
+				<Pressable onPress={handleCreateCategory}>
+					<Text
+						style={{
+							color: baseColor.blurple,
+							fontWeight: 'bold',
+							paddingHorizontal: 20,
+							opacity: categoryName?.trim()?.length > 0 ? 1 : 0.5,
+							fontSize: size.medium
+						}}
+					>
+						{t('actions.create')}
+					</Text>
+				</Pressable>
+			),
 
-		headerLeft: () => (
-			<Pressable style={{ padding: 20 }} onPress={handleClose}>
-				<MezonIconCDN icon={IconCDN.closeSmallBold} height={size.s_20} width={size.s_20} color={themeValue.text} />
-			</Pressable>
-		)
-	});
+			headerLeft: () => (
+				<Pressable style={{ padding: 20 }} onPress={handleClose}>
+					<MezonIconCDN icon={IconCDN.closeSmallBold} height={size.s_20} width={size.s_20} color={themeValue.text} />
+				</Pressable>
+			)
+		});
+	}, [navigation, categoryName, t, themeValue.text]);
 
 	const handleCreateCategory = async () => {
 		if (!validInput(categoryName)) return;

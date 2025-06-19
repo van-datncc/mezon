@@ -93,33 +93,36 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parent_id));
 	}, [currentChannel]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerShown: true,
-		headerTitle: () => (
-			<View>
-				<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
-					{isDMThread
-						? t('notifySettingThreadModal.muteThisConversation')
-						: isChannel
-							? t('notifySettingThreadModal.headerTitleMuteChannel')
-							: t('notifySettingThreadModal.headerTitleMuteThread')}
-				</Text>
-				<Text numberOfLines={1} style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400', maxWidth: '90%' }}>
-					{isDMThread
-						? currentChannel?.channel_label
-						: isChannel
-							? `#${currentChannel?.channel_label}`
-							: `"${currentChannel?.channel_label}"`}
-				</Text>
-			</View>
-		),
-		headerLeft: () => (
-			<TouchableOpacity style={styles.headerLeftBtn} onPress={() => navigation.goBack()}>
-				<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		),
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerShown: true,
+			headerTitle: () => (
+				<View>
+					<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
+						{isDMThread
+							? t('notifySettingThreadModal.muteThisConversation')
+							: isChannel
+								? t('notifySettingThreadModal.headerTitleMuteChannel')
+								: t('notifySettingThreadModal.headerTitleMuteThread')}
+					</Text>
+					<Text numberOfLines={1} style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400', maxWidth: '90%' }}>
+						{isDMThread
+							? currentChannel?.channel_label
+							: isChannel
+								? `#${currentChannel?.channel_label}`
+								: `"${currentChannel?.channel_label}"`}
+					</Text>
+				</View>
+			),
+			headerLeft: () => (
+				<TouchableOpacity style={styles.headerLeftBtn} onPress={() => navigation.goBack()}>
+					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			)
+		});
+	}, [currentChannel?.channel_label, isChannel, isDMThread, navigation, styles.headerLeftBtn, t, themeValue.text, themeValue.textStrong]);
+
 	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.channel_id));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();

@@ -2,6 +2,7 @@ import { useAuth, useClans, useEventManagement } from '@mezon/core';
 import { Fonts, useTheme } from '@mezon/mobile-ui';
 import { eventManagementActions, useAppDispatch } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
@@ -23,24 +24,26 @@ export function EventCreatorPreview({ navigation, route }: MenuClanScreenProps<C
 		route.params || {};
 	const dispatch = useAppDispatch();
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: t('screens.eventPreview.headerTitle'),
-		headerTitleStyle: {
-			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled
-		},
-		headerLeft: () => (
-			<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
-				<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		),
-		headerRight: () => (
-			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
-				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: t('screens.eventPreview.headerTitle'),
+			headerTitleStyle: {
+				fontSize: Fonts.size.h7,
+				color: themeValue.textDisabled
+			},
+			headerLeft: () => (
+				<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
+					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			),
+			headerRight: () => (
+				<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
+					<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			)
+		});
+	}, [navigation, t, themeValue.textDisabled, themeValue.textStrong]);
 
 	function handleClose() {
 		onGoBack?.();

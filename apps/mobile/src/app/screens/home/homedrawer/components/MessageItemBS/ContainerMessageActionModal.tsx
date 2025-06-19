@@ -654,7 +654,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	return (
 		<View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
 			{isShowEmojiPicker || isOnlyEmojiPicker ? (
-				<View style={{ paddingHorizontal: size.s_10, marginBottom: -size.s_10 }}>
+				<View style={{ padding: size.s_10 }}>
 					<EmojiSelector onSelected={onSelectEmoji} isReactMessage />
 				</View>
 			) : (

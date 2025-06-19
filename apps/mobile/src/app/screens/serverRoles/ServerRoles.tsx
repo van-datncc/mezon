@@ -2,7 +2,7 @@ import { usePermissionChecker } from '@mezon/core';
 import { Text, size, useTheme } from '@mezon/mobile-ui';
 import { RolesClanEntity, selectAllRolesClan, selectEveryoneRole } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Platform, Pressable, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -29,14 +29,16 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 		return (rolesClan || []).map((role) => ({ ...role, isView: !(hasAdminPermission || hasManageClanPermission || isClanOwner) }));
 	}, [rolesClan, hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerRight: () => (
-			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE)}>
-				<MezonIconCDN icon={IconCDN.plusLargeIcon} height={20} width={20} color={themeValue.textStrong} />
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerRight: () => (
+				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.CREATE_NEW_ROLE)}>
+					<MezonIconCDN icon={IconCDN.plusLargeIcon} height={20} width={20} color={themeValue.textStrong} />
+				</Pressable>
+			)
+		});
+	}, [navigation, t, themeValue.textStrong]);
 
 	const navigateToRoleEveryone = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS, { roleId: everyoneRole?.id });

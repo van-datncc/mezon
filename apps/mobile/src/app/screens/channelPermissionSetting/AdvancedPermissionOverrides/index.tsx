@@ -93,37 +93,39 @@ export const AdvancedPermissionOverrides = ({ navigation, route }: MenuChannelSc
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, [navigation, isSettingNotChange]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: () => (
-			<View>
-				<Text bold h3 color={themeValue?.white}>
-					{t('channelPermission.permissionOverrides')}
-				</Text>
-			</View>
-		),
-		headerRight: () => {
-			if (isSettingNotChange) return null;
-			return (
-				<TouchableOpacity onPress={saveChannelPermission}>
-					<View style={{ marginRight: size.s_20, paddingVertical: size.s_10 }}>
-						<Text h4 color={Colors.textViolet}>
-							{t('channelPermission.save')}
-						</Text>
-					</View>
-				</TouchableOpacity>
-			);
-		},
-		headerLeft: () => {
-			return (
-				<TouchableOpacity onPress={handleBack}>
-					<View style={{ marginLeft: size.s_16 }}>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
-					</View>
-				</TouchableOpacity>
-			);
-		}
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: () => (
+				<View>
+					<Text bold h3 color={themeValue?.white}>
+						{t('channelPermission.permissionOverrides')}
+					</Text>
+				</View>
+			),
+			headerRight: () => {
+				if (isSettingNotChange) return null;
+				return (
+					<TouchableOpacity onPress={saveChannelPermission}>
+						<View style={{ marginRight: size.s_20, paddingVertical: size.s_10 }}>
+							<Text h4 color={Colors.textViolet}>
+								{t('channelPermission.save')}
+							</Text>
+						</View>
+					</TouchableOpacity>
+				);
+			},
+			headerLeft: () => {
+				return (
+					<TouchableOpacity onPress={handleBack}>
+						<View style={{ marginLeft: size.s_16 }}>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
+						</View>
+					</TouchableOpacity>
+				);
+			}
+		});
+	}, [isSettingNotChange, navigation, saveChannelPermission, t, themeValue.white]);
 
 	const onPermissionStatusChange = useCallback(
 		(permissionId: string, status: EPermissionStatus) => {

@@ -1,7 +1,14 @@
 import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
+import {
+	appActions,
+	categoriesActions,
+	selectCurrentClan,
+	selectDefaultNotificationClan,
+	selectIsShowEmptyCategory,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { EPermission, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,6 +41,7 @@ export default function ClanMenu() {
 	const { t } = useTranslation(['clanMenu']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const dispatch = useAppDispatch();
@@ -225,7 +233,12 @@ export default function ClanMenu() {
 					/>
 					<MezonButtonIcon
 						title={t('actions.notifications')}
-						icon={<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.textStrong} />}
+						icon={
+							<MezonIconCDN
+								icon={defaultNotificationClan?.notification_setting_type === 3 ? IconCDN.bellSlashIcon : IconCDN.bellIcon}
+								color={themeValue.textStrong}
+							/>
+						}
 						onPress={handelOpenNotifications}
 					/>
 

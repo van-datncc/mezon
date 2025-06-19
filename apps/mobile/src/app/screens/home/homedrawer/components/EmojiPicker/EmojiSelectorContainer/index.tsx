@@ -17,7 +17,7 @@ import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroup
 import { IEmoji } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, TextInput, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import MezonClanAvatar from '../../../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -274,7 +274,8 @@ export default function EmojiSelectorContainer({
 			windowSize={10}
 			removeClippedSubviews={false}
 			disableVirtualization
-			contentContainerStyle={{ minHeight: Dimensions.get('window').height * 0.92 }}
+			style={{ marginBottom: -size.s_20 }}
+			contentContainerStyle={{ minHeight: '100%' }}
 			onScrollToIndexFailed={(info) => {
 				console.warn('onScrollToIndexFailed', info);
 				if (info?.highestMeasuredFrameIndex) {

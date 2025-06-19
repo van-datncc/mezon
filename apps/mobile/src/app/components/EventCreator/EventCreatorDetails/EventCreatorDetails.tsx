@@ -24,24 +24,26 @@ export function EventCreatorDetails({ navigation, route }: MenuClanScreenProps<C
 	const language = useMemo(() => (i18n.language === 'vi' ? 'vi' : 'en'), [i18n]);
 	const today = new Date();
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: t('screens.eventDetails.headerTitle'),
-		headerTitleStyle: {
-			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled
-		},
-		headerLeft: () => (
-			<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
-				<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		),
-		headerRight: () => (
-			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
-				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: t('screens.eventDetails.headerTitle'),
+			headerTitleStyle: {
+				fontSize: Fonts.size.h7,
+				color: themeValue.textDisabled
+			},
+			headerLeft: () => (
+				<TouchableOpacity style={{ marginLeft: 20 }} onPress={() => navigation.goBack()}>
+					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			),
+			headerRight: () => (
+				<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
+					<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			)
+		});
+	}, [navigation, t, themeValue.textDisabled, themeValue.textStrong]);
 
 	function handleClose() {
 		onGoBack?.();
