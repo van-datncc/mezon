@@ -152,7 +152,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 
 						{!isSelf && !isDm && !isDmGroup && <MemberMenuItem label="Message" onClick={currentHandlers.handleMessage} />}
 
-						{!isSelf && infoFriend?.state !== EStateFriend.BLOCK && (
+						{!isSelf && !isDmGroup && infoFriend?.state !== EStateFriend.BLOCK && (
 							<>
 								{infoFriend?.state !== EStateFriend.FRIEND &&
 									infoFriend?.state !== EStateFriend.MY_PENDING &&
@@ -166,7 +166,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 							</>
 						)}
 
-						{!isSelf && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser) && (
+						{!isSelf && !isDmGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser) && (
 							<MemberMenuItem
 								label={didIBlockUser ? 'Unblock' : 'Block'}
 								onClick={didIBlockUser ? currentHandlers.handleUnblockFriend : currentHandlers.handleBlockFriend}
