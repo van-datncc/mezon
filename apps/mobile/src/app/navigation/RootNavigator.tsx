@@ -14,7 +14,6 @@ import BootSplash from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import Xenon from 'react-native-xenon';
 import NetInfoComp from '../components/NetworkInfo';
 import { WebRTCStreamProvider } from '../components/StreamContext/StreamContext';
 import { toastConfig } from '../configs/toastConfig';
@@ -58,7 +57,6 @@ const NavigationMain = memo(
 					// iOS doesn't have the same navigation bar concept
 				}
 			};
-			Xenon.show();
 			getNavigationInfo();
 		}, []);
 
@@ -164,7 +162,6 @@ const RootNavigation = (props) => {
 	}, [mezon]);
 
 	return (
-		<Xenon.Wrapper>
 			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 				<ThemeProvider>
 					<LanguageProvider>
@@ -185,7 +182,6 @@ const RootNavigation = (props) => {
 					</LanguageProvider>
 				</ThemeProvider>
 			</MezonStoreProvider>
-		</Xenon.Wrapper>
 	);
 };
 
