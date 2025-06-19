@@ -127,7 +127,8 @@ const ChannelVoice = memo(
 						: { width: '100vw', height: '100vh' }
 				}
 			>
-				{token === '' || !serverUrl ? (
+				{/* voiceInfo?.clanId = 0 is group call */}
+				{token === '' || !serverUrl || voiceInfo?.clanId === '0' ? (
 					<PreJoinVoiceChannel
 						channel={currentChannel || undefined}
 						roomName={currentChannel?.meeting_code}
