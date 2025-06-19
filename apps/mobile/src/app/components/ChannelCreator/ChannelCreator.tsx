@@ -98,7 +98,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			await sleep(1000);
 		} else {
-			navigation.replace(APP_SCREEN.HOME);
+			navigation.goBack();
 		}
 		setChannelName('');
 		dispatch(appActions.setLoadingMainMobile(false));

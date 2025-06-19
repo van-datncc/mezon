@@ -9,13 +9,10 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectCurrentClanId,
-	selectCurrentStreamInfo,
 	selectDmGroupCurrentId,
 	selectGrouplMembers,
 	selectSession,
-	selectStatusStream,
-	useAppDispatch,
-	videoStreamActions
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -25,6 +22,8 @@ import { useSelector } from 'react-redux';
 import { useWebRTCStream } from '../../../components/StreamContext/StreamContext';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { linkGoogleMeet } from '../../../utils/helpers';
+import JoinChannelVoiceBS from './components/ChannelVoice/JoinChannelVoiceBS';
+import JoinStreamingRoomBS from './components/StreamingRoom/JoinStreamingRoomBS';
 import UserProfile from './components/UserProfile';
 
 const ChannelMessageListener = React.memo(() => {
@@ -79,51 +78,26 @@ const ChannelMessageListener = React.memo(() => {
 					await Linking.openURL(urlVoice);
 				} else if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && channel?.meeting_code) {
 					const data = {
-						channelId: channelId || '',
-						roomName: channel?.meeting_code,
-						clanId: clanId
+						snapPoints: ['45%'],
+						children: <JoinChannelVoiceBS channel={channel} />
 					};
-					DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, data);
-				} else if (
-					[
-						ChannelType.CHANNEL_TYPE_CHANNEL,
-						ChannelType.CHANNEL_TYPE_THREAD,
-						ChannelType.CHANNEL_TYPE_STREAMING,
-						ChannelType.CHANNEL_TYPE_APP
-					].includes(type)
-				) {
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+				} else if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
+					const data = {
+						snapPoints: ['45%'],
+						children: <JoinStreamingRoomBS channel={channel} />
+					};
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+				} else if ([ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD, ChannelType.CHANNEL_TYPE_APP].includes(type)) {
 					const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 					await jumpToChannel(channelId, clanId);
-					if (type === ChannelType.CHANNEL_TYPE_STREAMING) {
-						const currentStreamInfo = selectCurrentStreamInfo(store.getState());
-						const playStream = selectStatusStream(store.getState());
-						if (currentStreamInfo?.streamId !== channel?.id || (!playStream && currentStreamInfo?.streamId === channel?.id)) {
-							disconnect();
-							handleChannelClick(
-								channel?.clan_id as string,
-								channel?.channel_id as string,
-								userProfile?.user?.id as string,
-								channel?.channel_id as string,
-								userProfile?.user?.username as string,
-								sessionUser?.token
-							);
-							dispatch(
-								videoStreamActions.startStream({
-									clanId: channel?.clan_id || '',
-									clanName: channel?.clan_name || '',
-									streamId: channel?.channel_id || '',
-									streamName: channel?.channel_label || '',
-									parentId: channel?.parent_id || ''
-								})
-							);
-						}
-					} else {
-						if (currentDirectId) {
-							dispatch(directActions.setDmGroupCurrentId(''));
-							navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-						}
+
+					if (currentDirectId) {
+						dispatch(directActions.setDmGroupCurrentId(''));
+						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
 					}
+
 					if (currentClanId !== clanId) {
 						changeClan(clanId);
 					}
