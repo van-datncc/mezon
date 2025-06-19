@@ -30,6 +30,7 @@ import {
 	selectIsShowMemberListDM,
 	selectIsUseProfileDM,
 	selectLastMessageByChannelId,
+	selectLastSeenMessageStateByChannelId,
 	selectPositionEmojiButtonSmile,
 	selectReactionTopState,
 	selectSearchMessagesLoadingStatus,
@@ -50,20 +51,27 @@ const ChannelSeen = memo(({ channelId }: { channelId: string }) => {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
+	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
+
 	const { markAsReadSeen } = useSeenMessagePool();
 
 	const isMounted = useRef(false);
 	const isWindowFocused = !isBackgroundModeActive();
 
-	const streamMode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-
 	const markMessageAsRead = useCallback(() => {
 		if (!lastMessage) return;
 
-		if (lastMessage) {
-			markAsReadSeen(lastMessage, streamMode, 0);
+		if (
+			lastMessage?.create_time_seconds &&
+			lastMessageState?.timestamp_seconds &&
+			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
+		) {
+			const mode =
+				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+
+			markAsReadSeen(lastMessage, mode, 0);
 		}
-	}, [lastMessage, markAsReadSeen, streamMode]);
+	}, [lastMessage, markAsReadSeen, currentDmGroup, lastMessageState]);
 
 	const updateChannelSeenState = useCallback(
 		(channelId: string) => {
@@ -79,10 +87,9 @@ const ChannelSeen = memo(({ channelId }: { channelId: string }) => {
 	useEffect(() => {
 		if (lastMessage && isWindowFocused) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			updateChannelSeenState(channelId);
 			markMessageAsRead();
 		}
-	}, [lastMessage, isWindowFocused, markMessageAsRead, dispatch, updateChannelSeenState, channelId]);
+	}, [lastMessage, isWindowFocused, markMessageAsRead, dispatch, channelId]);
 
 	useEffect(() => {
 		if (isMounted.current || !lastMessage) return;

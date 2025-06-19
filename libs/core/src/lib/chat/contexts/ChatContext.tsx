@@ -604,22 +604,37 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
-		const timestamp = Date.now() / 1000;
-		dispatch(listChannelRenderAction.removeBadgeFromChannel({ channelId: lastSeenMess.channel_id, clanId: lastSeenMess.clan_id }));
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
-		await dispatch(clansActions.updateBageClanWS({ clan_id: lastSeenMess.clan_id, badge_count: lastSeenMess.badge_count }));
-		dispatch(
-			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
-		);
-		dispatch(
-			listChannelsByUserActions.updateChannelBadgeCount({
-				channelId: lastSeenMess.channel_id,
-				count: 0,
-				isReset: true
-			})
-		);
-		dispatch(directActions.addBadgeDirect({ channelId: lastSeenMess.channel_id as string }));
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
+		const now = Date.now() / 1000;
+		const { clan_id, channel_id, badge_count } = lastSeenMess;
+		if (clan_id !== '0') {
+			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: clan_id, channelId: channel_id }));
+			dispatch(
+				channelsActions.updateChannelBadgeCount({
+					clanId: clan_id,
+					channelId: channel_id,
+					count: 0,
+					isReset: true
+				})
+			);
+
+			dispatch(
+				channelMetaActions.setChannelLastSeenTimestamp({
+					channelId: channel_id,
+					timestamp: now + TIME_OFFSET
+				})
+			);
+			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channel_id }));
+			dispatch(listChannelsByUserActions.updateLastSeenTime({ channelId: channel_id }));
+		} else {
+			dispatch(directActions.removeBadgeDirect({ channelId: channel_id }));
+			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channel_id }));
+			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: channel_id, timestamp: now }));
+			// dispatch(directMetaActions.updateLastSeenTime(lastSeenMess));
+		}
+
+		if (clan_id !== '0' && badge_count !== undefined && badge_count > 0) {
+			dispatch(clansActions.updateClanBadgeCount({ clanId: clan_id, count: badge_count * -1 }));
+		}
 	}, []);
 
 	const onuserchannelremoved = useCallback(

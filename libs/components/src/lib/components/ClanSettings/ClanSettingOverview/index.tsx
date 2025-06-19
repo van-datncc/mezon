@@ -57,6 +57,7 @@ const ClanSettingOverview = () => {
 				clan_id: currentClan?.clan_id as string,
 				request: clanRequest
 			});
+			setClanRequest(clanRequest);
 			await updateSystemMessages();
 		}
 	};
@@ -85,6 +86,7 @@ const ClanSettingOverview = () => {
 			await dispatch(updateSystemMessage(request));
 		} else if (updateSystemMessageRequest) {
 			await dispatch(createSystemMessage(updateSystemMessageRequest));
+			setSystemMessage(updateSystemMessageRequest);
 		}
 	};
 
@@ -104,7 +106,7 @@ const ClanSettingOverview = () => {
 		if (currentClan && clanRequest) {
 			const hasClanChanges = Object.keys(clanRequest).some((key) => {
 				const typedKey = key as keyof typeof clanRequest;
-				if (clanRequest[typedKey] || currentClan[typedKey]) return clanRequest[typedKey] !== currentClan[typedKey];
+				return clanRequest[typedKey] !== currentClan[typedKey];
 			});
 			if (hasClanChanges) return true;
 		}
