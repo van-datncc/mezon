@@ -76,7 +76,7 @@ const ChannelMessageListener = React.memo(() => {
 				if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;
 					await Linking.openURL(urlVoice);
-				} else if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && channel?.meeting_code) {
+				} else if (type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 					const data = {
 						snapPoints: ['45%'],
 						children: <JoinChannelVoiceBS channel={channel} />
