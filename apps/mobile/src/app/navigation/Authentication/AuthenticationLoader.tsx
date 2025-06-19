@@ -20,14 +20,17 @@ import {
 	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
+	selectCurrentLanguage,
 	selectDmGroupCurrentId,
-	selectLoadingMainMobile
+	selectLoadingMainMobile,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, StatusBar } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Sound from 'react-native-sound';
@@ -53,7 +56,17 @@ export const AuthenticationLoader = () => {
 	const [fileShared, setFileShared] = useState<any>();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
+
+	const currentLanguage = useAppSelector(selectCurrentLanguage);
+	const { i18n } = useTranslation();
+
 	useCheckUpdatedVersion();
+
+	useEffect(() => {
+		if (i18n.language !== currentLanguage) {
+			i18n.changeLanguage(currentLanguage);
+		}
+	}, [currentLanguage, i18n]);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
