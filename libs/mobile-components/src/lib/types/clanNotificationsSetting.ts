@@ -1,18 +1,19 @@
 import { NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
+import { TFunction } from 'i18next';
 import { ChannelType, NotificationType } from 'mezon-js';
 import { ViewStyle } from 'react-native';
 
-export const optionNotification = [
+export const optionNotification = (t: TFunction) => [
 	{
-		title: 'All Message',
+		title: t('notifySettingOption.allMessage'),
 		value: NotificationType.ALL_MESSAGE
 	},
 	{
-		title: 'Only @mentions',
+		title: t('notifySettingOption.onlyMentions'),
 		value: NotificationType.MENTION_MESSAGE
 	},
 	{
-		title: 'Nothing',
+		title: t('notifySettingOption.nothing'),
 		value: NotificationType.NOTHING_MESSAGE
 	}
 ];

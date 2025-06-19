@@ -1,13 +1,15 @@
 import { useClans, usePermissionChecker } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
+import { ActionEmitEvent, optionNotification } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	checkDuplicateNameClan,
 	createSystemMessage,
+	defaultNotificationActions,
 	fetchSystemMessageByClanId,
 	getStoreAsync,
 	selectAllChannels,
+	selectDefaultNotificationClan,
 	updateSystemMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -41,6 +43,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const styles = style(themeValue);
 	const { currentClan, updateClan } = useClans();
 	const { t } = useTranslation(['clanOverviewSetting']);
+	const { t: tNotification } = useTranslation('clanNotificationsSetting');
 	const [clanName, setClanName] = useState<string>(currentClan?.clan_name ?? '');
 	const [banner, setBanner] = useState<string>(currentClan?.banner ?? '');
 	const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +57,8 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	const [systemMessage, setSystemMessage] = useState<ApiSystemMessage | null>(null);
 	const [selectedChannelMessage, setSelectedChannelMessage] = useState<ChannelsEntity>(null);
 	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+	const [notificationSetting, setNotificationSetting] = useState<number>(defaultNotificationClan?.notification_setting_type);
 
 	const dispatch = useAppDispatch();
 
@@ -75,6 +80,7 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 	useEffect(() => {
 		const isClanNameChanged = clanName !== currentClan?.clan_name;
 		const isBannerChanged = banner !== (currentClan?.banner || '');
+		const isNotificationSettingChanged = notificationSetting !== defaultNotificationClan?.notification_setting_type;
 
 		let hasSystemMessageChanged = false;
 		if (updateSystemMessageRequest && systemMessage) {
@@ -90,8 +96,8 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 			setErrorMessage(t('menu.serverName.errorMessage'));
 		}
 
-		setIsCheckValid((isClanNameChanged && validInput(clanName)) || isBannerChanged || hasSystemMessageChanged);
-	}, [clanName, banner, updateSystemMessageRequest, systemMessage]);
+		setIsCheckValid((isClanNameChanged && validInput(clanName)) || isBannerChanged || hasSystemMessageChanged || isNotificationSettingChanged);
+	}, [clanName, banner, updateSystemMessageRequest, systemMessage, notificationSetting, defaultNotificationClan?.notification_setting_type]);
 
 	const fetchSystemMessage = async () => {
 		if (!currentClan?.clan_id) return;
@@ -182,6 +188,11 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				welcome_channel_id: currentClan?.welcome_channel_id ?? ''
 			}
 		});
+
+		await dispatch(
+			defaultNotificationActions.setDefaultNotificationClan({ clan_id: currentClan?.clan_id, notification_type: notificationSetting })
+		);
+
 		await handleUpdateSystemMessage();
 
 		setLoading(false);
@@ -359,19 +370,6 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		}
 	];
 
-	const optionData = [
-		{
-			title: t('fields.defaultNotification.allMessages'),
-			value: 0,
-			disabled: disabled
-		},
-		{
-			title: t('fields.defaultNotification.onlyMentions'),
-			value: 1,
-			disabled: disabled
-		}
-	];
-
 	return (
 		<View
 			style={{
@@ -410,9 +408,11 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 				<MezonMenu menu={generalMenu} />
 
 				<MezonOption
+					value={notificationSetting}
 					title={t('fields.defaultNotification.title')}
 					bottomDescription={t('fields.defaultNotification.description')}
-					data={optionData}
+					data={optionNotification(tNotification)}
+					onChange={(value) => setNotificationSetting(value as number)}
 				/>
 				{!disabled && <MezonMenu menu={dangerMenu} />}
 			</ScrollView>

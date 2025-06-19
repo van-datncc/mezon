@@ -101,7 +101,7 @@ const ClanNotificationSetting = ({ navigation }: MenuClanScreenProps<ClanNotific
 				value={defaultNotificationClan?.notification_setting_type}
 				onChange={handleNotificationClanChange}
 				title={t('notifySettingOption.title')}
-				data={optionNotification}
+				data={optionNotification(t)}
 			/>
 			<MezonMenu menu={generalMenu} />
 			<MezonMenu menu={notificationOverridesMenu} />
