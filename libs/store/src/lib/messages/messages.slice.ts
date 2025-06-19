@@ -33,13 +33,10 @@ import { ChannelMessage } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MessageButtonClicked } from 'mezon-js/socket';
 import { accountActions, selectAllAccount } from '../account/account.slice';
-import { listChannelsByUserActions } from '../channels/channelUser.slice';
+import { resetChannelBadgeCount } from '../badge/badgeHelpers';
 import { channelMetaActions } from '../channels/channelmeta.slice';
-import { channelsActions, selectShowScrollDownButton } from '../channels/channels.slice';
-import { listChannelRenderAction } from '../channels/listChannelRender.slice';
-import { clansActions } from '../clans/clans.slice';
-import { directActions, selectCurrentDM } from '../direct/direct.slice';
-import { directMetaActions } from '../direct/directmeta.slice';
+import { selectShowScrollDownButton } from '../channels/channels.slice';
+import { selectCurrentDM } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -576,27 +573,13 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
 			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, now, badge_count);
-			if (clanId !== '0') {
-				thunkAPI.dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId, channelId }));
-				thunkAPI.dispatch(
-					channelsActions.updateChannelBadgeCount({
-						clanId,
-						channelId,
-						count: 0,
-						isReset: true
-					})
-				);
-				thunkAPI.dispatch(listChannelsByUserActions.resetBadgeCount({ channelId }));
-				thunkAPI.dispatch(listChannelsByUserActions.updateLastSeenTime({ channelId }));
-			} else {
-				thunkAPI.dispatch(directActions.removeBadgeDirect({ channelId: channelId }));
-				thunkAPI.dispatch(listChannelsByUserActions.resetBadgeCount({ channelId }));
-				thunkAPI.dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: channelId, timestamp: now }));
-			}
-
-			if (clanId !== '0' && badge_count !== undefined && badge_count > 0) {
-				thunkAPI.dispatch(clansActions.updateClanBadgeCount({ clanId, count: badge_count * -1 }));
-			}
+			resetChannelBadgeCount(thunkAPI.dispatch, {
+				clanId,
+				channelId,
+				badgeCount: badge_count,
+				timestamp: now,
+				messageId
+			});
 		} catch (e) {
 			console.error(e, 'updateLastSeenMessage');
 			captureSentryError(e, 'messages/updateLastSeenMessage');

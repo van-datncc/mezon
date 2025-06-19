@@ -7,6 +7,7 @@ export * from './lib/attachment/attachments.slice';
 export * from './lib/auditLog/auditLog.slice';
 export * from './lib/auditLog/auditLogFilter.slice';
 export * from './lib/auth/auth.slice';
+export * from './lib/badge/badgeHelpers';
 export * from './lib/canvas/canvas.slice';
 export * from './lib/canvas/canvasAPI.slice';
 export * from './lib/categories/categories.slice';
