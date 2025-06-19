@@ -68,7 +68,7 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, list
 					</Pressable>
 				);
 			}}
-			keyExtractor={(_, index) => `${index}_mention_suggestion`}
+			keyExtractor={(item, index) => `${item?.id}_${index}_mention_suggestion`}
 			onEndReachedThreshold={0.1}
 			keyboardShouldPersistTaps="handled"
 			windowSize={5}
@@ -237,3 +237,4 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) 
 });
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
+
