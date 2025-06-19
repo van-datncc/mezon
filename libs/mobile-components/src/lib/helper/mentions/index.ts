@@ -99,6 +99,9 @@ export const createFormattedString = (data: IExtendedMessage) => {
 				emojiPicked?.push({ ...element, shortName: contentInElement });
 				formatContentDraft += contentInElement;
 				break;
+			case ETokenMessage.MARKDOWNS:
+				formatContentDraft += '```' + contentInElement?.replace(/^```|```$/g, '') + '```';
+				break;
 			default:
 				formatContentDraft += contentInElement;
 				break;
