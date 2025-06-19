@@ -50,6 +50,7 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
+	resetChannelBadgeCount,
 	rolesClanActions,
 	selectAllEmojiSuggestion,
 	selectAllTextChannel,
@@ -97,7 +98,6 @@ import {
 	ModeResponsive,
 	NotificationCategory,
 	NotificationCode,
-	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
@@ -604,37 +604,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
-		const now = Date.now() / 1000;
-		const { clan_id, channel_id, badge_count } = lastSeenMess;
-		if (clan_id !== '0') {
-			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: clan_id, channelId: channel_id }));
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: clan_id,
-					channelId: channel_id,
-					count: 0,
-					isReset: true
-				})
-			);
-
-			dispatch(
-				channelMetaActions.setChannelLastSeenTimestamp({
-					channelId: channel_id,
-					timestamp: now + TIME_OFFSET
-				})
-			);
-			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channel_id }));
-			dispatch(listChannelsByUserActions.updateLastSeenTime({ channelId: channel_id }));
-		} else {
-			dispatch(directActions.removeBadgeDirect({ channelId: channel_id }));
-			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channel_id }));
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: channel_id, timestamp: now }));
-			// dispatch(directMetaActions.updateLastSeenTime(lastSeenMess));
-		}
-
-		if (clan_id !== '0' && badge_count !== undefined && badge_count > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: clan_id, count: badge_count * -1 }));
-		}
+		const { clan_id, channel_id, badge_count, message_id } = lastSeenMess;
+		resetChannelBadgeCount(dispatch, {
+			clanId: clan_id,
+			channelId: channel_id,
+			badgeCount: badge_count,
+			messageId: message_id
+		});
 	}, []);
 
 	const onuserchannelremoved = useCallback(
