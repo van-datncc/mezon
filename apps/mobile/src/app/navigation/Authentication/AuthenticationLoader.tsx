@@ -20,8 +20,10 @@ import {
 	messagesActions,
 	selectCurrentChannel,
 	selectCurrentClan,
+	selectCurrentLanguage,
 	selectDmGroupCurrentId,
-	selectLoadingMainMobile
+	selectLoadingMainMobile,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import notifee from '@notifee/react-native';
@@ -43,6 +45,7 @@ import NotificationPreferences from '../../utils/NotificationPreferences';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
+import { useTranslation } from 'react-i18next';
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -56,6 +59,10 @@ export const AuthenticationLoader = () => {
 	const [fileShared, setFileShared] = useState<any>();
 	const currentDmGroupIdRef = useRef(currentDmGroupId);
 	const currentChannelRef = useRef(currentClan);
+
+	const currentLanguage = useAppSelector(selectCurrentLanguage);
+	const { i18n } = useTranslation();
+
 	useCheckUpdatedVersion();
 	const { onchannelmessage } = useContext(ChatContext);
 
@@ -206,6 +213,12 @@ export const AuthenticationLoader = () => {
 			}
 		}
 	};
+
+	useEffect(() => {
+		if (i18n.language !== currentLanguage) {
+			i18n.changeLanguage(currentLanguage);
+		}
+	}, [currentLanguage, i18n]);
 
 	useEffect(() => {
 		currentDmGroupIdRef.current = currentDmGroupId;
