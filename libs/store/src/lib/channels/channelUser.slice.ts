@@ -107,6 +107,18 @@ export const listChannelsByUserSlice = createSlice({
 				}
 			});
 		},
+		updateLastSeenTime: (state, action: PayloadAction<{ channelId: string }>) => {
+			const payload = action.payload;
+			const timestamp = Date.now() / 1000;
+			listChannelsByUserAdapter.updateOne(state, {
+				id: payload.channelId,
+				changes: {
+					last_seen_message: {
+						timestamp_seconds: timestamp
+					}
+				}
+			});
+		},
 		resetBadgeCount: (state, action: PayloadAction<{ channelId: string }>) => {
 			const payload = action.payload;
 			const existingChannel = listChannelsByUserAdapter.getSelectors().selectById(state, payload.channelId);

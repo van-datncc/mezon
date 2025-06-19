@@ -123,7 +123,7 @@ export function parseHtmlAsFormattedText(html: string): ApiFormattedText {
 	});
 
 	return {
-		text,
+		text: !entities.length && !text ? html : text,
 		entities: entities.length ? entities : undefined
 	};
 }

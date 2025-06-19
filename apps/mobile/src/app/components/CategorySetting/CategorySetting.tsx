@@ -43,14 +43,16 @@ export function CategorySetting({ navigation, route }: MenuClanScreenProps<Scree
 		return isEqual(categorySettingValue, currentSettingValue);
 	}, [categorySettingValue, currentSettingValue]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerRight: () => (
-			<Pressable onPress={() => handleSaveCategorySetting()}>
-				<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerRight: () => (
+				<Pressable onPress={() => handleSaveCategorySetting()}>
+					<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
+				</Pressable>
+			)
+		});
+	}, [navigation, isNotChanged, styles.saveChangeButton, styles.changed, styles.notChange, t]);
 
 	useEffect(() => {
 		if (category?.category_id) {

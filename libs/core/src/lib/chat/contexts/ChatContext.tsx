@@ -50,6 +50,7 @@ import {
 	permissionRoleChannelActions,
 	pinMessageActions,
 	policiesActions,
+	resetChannelBadgeCount,
 	rolesClanActions,
 	selectAllEmojiSuggestion,
 	selectAllTextChannel,
@@ -97,7 +98,6 @@ import {
 	ModeResponsive,
 	NotificationCategory,
 	NotificationCode,
-	TIME_OFFSET,
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
@@ -604,22 +604,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
-		const timestamp = Date.now() / 1000;
-		dispatch(listChannelRenderAction.removeBadgeFromChannel({ channelId: lastSeenMess.channel_id, clanId: lastSeenMess.clan_id }));
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp + TIME_OFFSET }));
-		await dispatch(clansActions.updateBageClanWS({ clan_id: lastSeenMess.clan_id, badge_count: lastSeenMess.badge_count }));
-		dispatch(
-			channelsActions.updateChannelBadgeCount({ clanId: lastSeenMess.clan_id, channelId: lastSeenMess.channel_id, count: 0, isReset: true })
-		);
-		dispatch(
-			listChannelsByUserActions.updateChannelBadgeCount({
-				channelId: lastSeenMess.channel_id,
-				count: 0,
-				isReset: true
-			})
-		);
-		dispatch(directActions.addBadgeDirect({ channelId: lastSeenMess.channel_id as string }));
-		dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: lastSeenMess.channel_id, timestamp: timestamp }));
+		const { clan_id, channel_id, badge_count, message_id } = lastSeenMess;
+		resetChannelBadgeCount(dispatch, {
+			clanId: clan_id,
+			channelId: channel_id,
+			badgeCount: badge_count,
+			messageId: message_id
+		});
 	}, []);
 
 	const onuserchannelremoved = useCallback(

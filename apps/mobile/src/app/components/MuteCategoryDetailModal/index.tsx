@@ -79,20 +79,23 @@ const MuteCategoryDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 	const [timeMuted, setTimeMuted] = useState('');
 	const { currentCategory } = route?.params || {};
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerShown: true,
-		headerTitle: () => (
-			<View>
-				<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
-					{t('notifySettingThreadModal.muteThisConversation')}
-				</Text>
-				<Text numberOfLines={1} style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400', width: '100%' }}>
-					{currentCategory.category_name}
-				</Text>
-			</View>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerShown: true,
+			headerTitle: () => (
+				<View>
+					<Text style={{ color: themeValue.textStrong, fontSize: size.label, fontWeight: '700' }}>
+						{t('notifySettingThreadModal.muteThisConversation')}
+					</Text>
+					<Text numberOfLines={1} style={{ color: themeValue.text, fontSize: size.medium, fontWeight: '400', width: '100%' }}>
+						{currentCategory.category_name}
+					</Text>
+				</View>
+			)
+		});
+	}, [currentCategory.category_name, navigation, t, themeValue.text, themeValue.textStrong]);
+
 	const defaultCategoryNotificationSetting = useSelector(selectDefaultNotificationCategory);
 
 	const currentClanId = useSelector(selectCurrentClanId);

@@ -66,15 +66,17 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 	}, [channel?.category_name]);
 	const currentUserId = useSelector(selectCurrentUserId);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
-		headerRight: () => (
-			<Pressable onPress={() => handleSaveChannelSetting()}>
-				<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
+			headerRight: () => (
+				<Pressable onPress={() => handleSaveChannelSetting()}>
+					<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
+				</Pressable>
+			)
+		});
+	}, [navigation, isNotChanged, styles.saveChangeButton, styles.changed, styles.notChange, t, isChannel, t1]);
 
 	const handleUpdateValue = (value: Partial<IChannelSettingValue>) => {
 		setCurrentSettingValue({ ...currentSettingValue, ...value });

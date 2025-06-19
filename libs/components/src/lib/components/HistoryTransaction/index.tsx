@@ -50,10 +50,12 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 	const fetchTransactions = async (filter: FilterType, page: number) => {
 		setIsLoading(true);
 		try {
-			await dispatch(fetchListWalletLedger({
-				page,
-				filter: API_FILTER_PARAMS[filter]
-			}));
+			await dispatch(
+				fetchListWalletLedger({
+					page,
+					filter: API_FILTER_PARAMS[filter]
+				})
+			);
 		} catch (error) {
 			console.error(`Error loading transactions:`, error);
 		} finally {
@@ -133,9 +135,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 					)}
 				</div>
 				<div>
-					<p className="text-green-600 dark:text-green-400 font-semibold">
-						{`${formatNumber(amount, CURRENCY.CODE)} ${CURRENCY.SYMBOL}`}
-					</p>
+					<p className="text-green-600 dark:text-green-400 font-semibold">{`${formatNumber(amount, CURRENCY.CODE)} ${CURRENCY.SYMBOL}`}</p>
 					<p className="text-xs text-gray-500 dark:text-gray-400">{TRANSACTION_TYPES.RECEIVED}</p>
 				</div>
 			</div>
@@ -146,20 +146,19 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 		setOpenedTransactionId(openedTransactionId === transactionId ? null : transactionId);
 		if (openedTransactionId !== transactionId) {
 			setIsDetailLoading(true);
-			dispatch(fetchDetailTransaction({ transId: transactionId }))
-				.finally(() => setIsDetailLoading(false));
+			dispatch(fetchDetailTransaction({ transId: transactionId })).finally(() => setIsDetailLoading(false));
 		}
 	};
 
-	const getTransactionType = (amount: number) =>
-		amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED;
+	const getTransactionType = (amount: number) => (amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED);
 
 	const getStatusBadge = (amount: number) => (
 		<span
-			className={`px-2 py-1 text-xs font-medium rounded-full ${amount < 0
-				? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-				: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-				}`}
+			className={`px-2 py-1 text-xs font-medium rounded-full ${
+				amount < 0
+					? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+					: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+			}`}
 		>
 			{getTransactionType(amount)}
 		</span>
@@ -214,28 +213,31 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							<div className="flex gap-2 mb-4 border-b dark:border-gray-700 border-gray-200 pb-4">
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.ALL)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${activeFilter === TRANSACTION_FILTERS.ALL
-										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-										: 'dark:text-gray-400 text-gray-600  hover:bg-gray-300 hover:dark:bg-gray-100 '
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${
+										activeFilter === TRANSACTION_FILTERS.ALL
+											? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+											: 'dark:text-gray-400 text-gray-600  hover:bg-gray-300 hover:dark:bg-gray-100 '
+									}`}
 								>
 									{TAB_LABELS.ALL}
 								</button>
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.SENT)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${activeFilter === TRANSACTION_FILTERS.SENT
-										? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-										: 'dark:text-gray-400 text-gray-600  hover:bg-gray-300 hover:dark:bg-gray-100'
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${
+										activeFilter === TRANSACTION_FILTERS.SENT
+											? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+											: 'dark:text-gray-400 text-gray-600  hover:bg-gray-300 hover:dark:bg-gray-100'
+									}`}
 								>
 									{TAB_LABELS.SENT}
 								</button>
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.RECEIVED)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${activeFilter === TRANSACTION_FILTERS.RECEIVED
-										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100 '
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors  ${
+										activeFilter === TRANSACTION_FILTERS.RECEIVED
+											? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+											: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100 '
+									}`}
 								>
 									{TAB_LABELS.RECEIVED}
 								</button>
@@ -323,28 +325,31 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							<div className="flex gap-2 mb-4 border-b dark:border-gray-700 border-gray-200 pb-4">
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.ALL)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.ALL
-										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+										activeFilter === TRANSACTION_FILTERS.ALL
+											? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+											: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+									}`}
 								>
 									{TAB_LABELS.ALL}
 								</button>
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.SENT)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.SENT
-										? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+										activeFilter === TRANSACTION_FILTERS.SENT
+											? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+											: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+									}`}
 								>
 									{TAB_LABELS.SENT}
 								</button>
 								<button
 									onClick={() => handleFilterChange(TRANSACTION_FILTERS.RECEIVED)}
-									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === TRANSACTION_FILTERS.RECEIVED
-										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-										: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
-										}`}
+									className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+										activeFilter === TRANSACTION_FILTERS.RECEIVED
+											? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+											: 'dark:text-gray-400 text-gray-600 hover:bg-gray-300 hover:dark:bg-gray-100'
+									}`}
 								>
 									{TAB_LABELS.RECEIVED}
 								</button>
@@ -367,7 +372,8 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 														<div className="flex flex-col">
 															<div className="flex items-center gap-2">
 																<p className="dark:text-white text-gray-900 font-medium text-sm">
-																	{TRANSACTION_ITEM.ID_PREFIX}{item.transaction_id?.slice(-TRANSACTION_ITEM.ID_LENGTH)}
+																	{TRANSACTION_ITEM.ID_PREFIX}
+																	{item.transaction_id?.slice(-TRANSACTION_ITEM.ID_LENGTH)}
 																</p>
 																{getStatusBadge(item.value ?? 0)}
 															</div>
@@ -380,11 +386,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 											</div>
 
 											{openedTransactionId === item.transaction_id && (
-												<TransactionDetail
-													detailLedger={detailLedger}
-													formatDate={formatDate}
-													isLoading={isDetailLoading}
-												/>
+												<TransactionDetail detailLedger={detailLedger} formatDate={formatDate} isLoading={isDetailLoading} />
 											)}
 										</div>
 									))}
@@ -394,15 +396,15 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 									<div className="w-16 h-16 rounded-full dark:bg-gray-700 bg-gray-100 flex items-center justify-center mb-4">
 										<Icons.EmptyType />
 									</div>
-										<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
-											{activeFilter === TRANSACTION_FILTERS.ALL
-												? EMPTY_STATES.NO_TRANSACTIONS.TITLE
-												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.TITLE}
-										</h3>
+									<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
+										{activeFilter === TRANSACTION_FILTERS.ALL
+											? EMPTY_STATES.NO_TRANSACTIONS.TITLE
+											: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.TITLE}
+									</h3>
 									<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-											{activeFilter === TRANSACTION_FILTERS.ALL
-												? EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION
-												: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.DESCRIPTION}
+										{activeFilter === TRANSACTION_FILTERS.ALL
+											? EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION
+											: EMPTY_STATES.NO_FILTERED_TRANSACTIONS.DESCRIPTION}
 									</p>
 								</div>
 							)}
@@ -410,28 +412,22 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 						{getCurrentTotalPages() > 1 && (
 							<div className="border-t dark:border-gray-700 border-gray-200 px-6 py-4 flex justify-center">
-								<Pagination
-									currentPage={getCurrentPage()}
-									totalPages={getCurrentTotalPages()}
-									onPageChange={onPageChange}
-								/>
+								<Pagination currentPage={getCurrentPage()} totalPages={getCurrentTotalPages()} onPageChange={onPageChange} />
 							</div>
 						)}
 					</div>
 				) : (
-						<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
-							<div className="flex flex-col items-center justify-center py-16 px-6">
-								<div className="w-16 h-16 rounded-full dark:bg-gray-800 bg-gray-100 flex items-center justify-center mb-4">
-									<Icons.EmptyType />
-								</div>
-								<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">
-									{EMPTY_STATES.NO_TRANSACTIONS.TITLE}
-								</h3>
-								<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
-									{EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION}
-								</p>
+					<div className="dark:bg-bgPrimary bg-bgLightMode rounded-b-xl">
+						<div className="flex flex-col items-center justify-center py-16 px-6">
+							<div className="w-16 h-16 rounded-full dark:bg-gray-800 bg-gray-100 flex items-center justify-center mb-4">
+								<Icons.EmptyType />
 							</div>
+							<h3 className="dark:text-white text-gray-900 text-lg font-semibold mb-2">{EMPTY_STATES.NO_TRANSACTIONS.TITLE}</h3>
+							<p className="dark:text-gray-400 text-gray-500 text-sm text-center max-w-sm">
+								{EMPTY_STATES.NO_TRANSACTIONS.DESCRIPTION}
+							</p>
 						</div>
+					</div>
 				)}
 			</div>
 		</div>

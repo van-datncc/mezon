@@ -40,20 +40,22 @@ export const EventCreatorType = memo(function ({ navigation, route }: MenuClanSc
 	const currentEvent = useAppSelector((state) => selectEventById(state, currentClanId ?? '', eventId ?? ''));
 	const currentEventChannel = useSelector((state) => selectChannelById(state, currentEvent ? currentEvent.channel_id || '' : ''));
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: t('screens.eventType.headerTitle'),
-		headerTitleStyle: {
-			fontSize: Fonts.size.h7,
-			color: themeValue.textDisabled
-		},
-		headerLeft: () => <View />,
-		headerRight: () => (
-			<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
-				<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
-			</TouchableOpacity>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: t('screens.eventType.headerTitle'),
+			headerTitleStyle: {
+				fontSize: Fonts.size.h7,
+				color: themeValue.textDisabled
+			},
+			headerLeft: () => <View />,
+			headerRight: () => (
+				<TouchableOpacity style={{ marginRight: 20 }} onPress={handleClose}>
+					<MezonIconCDN icon={IconCDN.closeLargeIcon} height={Fonts.size.s_18} width={Fonts.size.s_18} color={themeValue.textStrong} />
+				</TouchableOpacity>
+			)
+		});
+	}, [navigation, t, themeValue.textDisabled, themeValue.textStrong]);
 
 	function handleClose() {
 		onGoBack?.();

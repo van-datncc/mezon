@@ -137,7 +137,7 @@ const processText = (inputString: string, emojiObjPicked: any) => {
 			if (i < inputString.length && inputString.substring(i, i + tripleBacktick.length) === tripleBacktick) {
 				i += tripleBacktick.length;
 				const endindex = i;
-				if (markdown.trim().length > 0) {
+				if (markdown?.length > 0) {
 					markdowns.push({ type: EBacktickType.TRIPLE, s: startindex, e: endindex });
 				}
 			}

@@ -51,7 +51,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	const editProfile = useMemo(() => {
 		const profileVaile = {
 			displayName: '',
-			urlImage: userProfile?.user?.avatar_url ?? ''
+			urlImage: ''
 		};
 		if (draftProfile?.nick_name) {
 			profileVaile.displayName = draftProfile?.nick_name;
