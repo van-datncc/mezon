@@ -109,53 +109,55 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		}
 	};
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: !isEditRoleMode
-			? t('setupPermission.title')
-			: () => {
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: !isEditRoleMode
+				? t('setupPermission.title')
+				: () => {
+						return (
+							<View>
+								<Text center bold h3 color={themeValue?.white}>
+									{clanRole?.title}
+								</Text>
+								<Text center color={themeValue?.text}>
+									{t('roleDetail.role')}
+								</Text>
+							</View>
+						);
+					},
+			headerLeft: () => {
+				if (isEditRoleMode) {
 					return (
-						<View>
-							<Text center bold h3 color={themeValue?.white}>
-								{clanRole?.title}
-							</Text>
-							<Text center color={themeValue?.text}>
-								{t('roleDetail.role')}
-							</Text>
-						</View>
+						<Pressable style={{ padding: 20 }} onPress={() => navigation.goBack()}>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={20} width={20} color={themeValue.textStrong} />
+						</Pressable>
 					);
-				},
-		headerLeft: () => {
-			if (isEditRoleMode) {
+				}
 				return (
-					<Pressable style={{ padding: 20 }} onPress={() => navigation.goBack()}>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={20} width={20} color={themeValue.textStrong} />
+					<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
+						<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
 					</Pressable>
 				);
+			},
+			headerRight: () => {
+				if (!isEditRoleMode || (isEditRoleMode && isNotChange)) return null;
+				return (
+					<TouchableOpacity onPress={() => handleEditPermissions()}>
+						<View
+							style={{
+								marginRight: size.s_14
+							}}
+						>
+							<Text h4 color={Colors.textViolet}>
+								{t('roleDetail.save')}
+							</Text>
+						</View>
+					</TouchableOpacity>
+				);
 			}
-			return (
-				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
-					<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
-				</Pressable>
-			);
-		},
-		headerRight: () => {
-			if (!isEditRoleMode || (isEditRoleMode && isNotChange)) return null;
-			return (
-				<TouchableOpacity onPress={() => handleEditPermissions()}>
-					<View
-						style={{
-							marginRight: size.s_14
-						}}
-					>
-						<Text h4 color={Colors.textViolet}>
-							{t('roleDetail.save')}
-						</Text>
-					</View>
-				</TouchableOpacity>
-			);
-		}
-	});
+		});
+	}, [clanRole?.title, isEditRoleMode, isNotChange, navigation, t, themeValue?.text, themeValue.textStrong, themeValue?.white]);
 
 	const onSelectPermissionChange = (value: boolean, permissionId: string) => {
 		const uniqueSelectedPermission = new Set(selectedPermissions);

@@ -121,18 +121,20 @@ export function ClanOverviewSetting({ navigation }: MenuClanScreenProps<ClanSett
 		return !(hasAdminPermission || hasManageClanPermission || clanOwnerPermission);
 	}, [clanOwnerPermission, hasAdminPermission, hasManageClanPermission]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerBackTitleVisible: false,
-		headerRight: () => {
-			if (disabled) return <View />;
-			return (
-				<Pressable onPress={handleSave} disabled={loading || !isCheckValid}>
-					<Text style={{ ...styles.headerActionTitle, opacity: loading || !isCheckValid ? 0.5 : 1 }}>{t('header.save')}</Text>
-				</Pressable>
-			);
-		}
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerBackTitleVisible: false,
+			headerRight: () => {
+				if (disabled) return <View />;
+				return (
+					<Pressable onPress={handleSave} disabled={loading || !isCheckValid}>
+						<Text style={{ ...styles.headerActionTitle, opacity: loading || !isCheckValid ? 0.5 : 1 }}>{t('header.save')}</Text>
+					</Pressable>
+				);
+			}
+		});
+	}, [navigation, disabled, loading, isCheckValid, styles.headerActionTitle, t]);
 
 	const handleUpdateSystemMessage = async () => {
 		if (systemMessage && Object.keys(systemMessage).length > 0 && currentClan?.clan_id && updateSystemMessageRequest) {

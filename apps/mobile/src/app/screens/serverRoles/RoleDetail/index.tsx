@@ -62,40 +62,42 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, [isNotChange, navigation]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: () => (
-			<View>
-				<Text center bold h3 color={themeValue?.white}>
-					{clanRole?.title}
-				</Text>
-				<Text center color={themeValue?.text}>
-					{t('roleDetail.role')}
-				</Text>
-			</View>
-		),
-		headerRight: () => {
-			if (isNotChange) return null;
-			return (
-				<TouchableOpacity onPress={async () => handleSave()}>
-					<View style={{ marginRight: size.s_20 }}>
-						<Text h4 color={Colors.textViolet}>
-							{t('roleDetail.save')}
-						</Text>
-					</View>
-				</TouchableOpacity>
-			);
-		},
-		headerLeft: () => {
-			return (
-				<TouchableOpacity onPress={handleBack}>
-					<View style={{ marginLeft: size.s_16 }}>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
-					</View>
-				</TouchableOpacity>
-			);
-		}
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: () => (
+				<View>
+					<Text center bold h3 color={themeValue?.white}>
+						{clanRole?.title}
+					</Text>
+					<Text center color={themeValue?.text}>
+						{t('roleDetail.role')}
+					</Text>
+				</View>
+			),
+			headerRight: () => {
+				if (isNotChange) return null;
+				return (
+					<TouchableOpacity onPress={async () => handleSave()}>
+						<View style={{ marginRight: size.s_20 }}>
+							<Text h4 color={Colors.textViolet}>
+								{t('roleDetail.save')}
+							</Text>
+						</View>
+					</TouchableOpacity>
+				);
+			},
+			headerLeft: () => {
+				return (
+					<TouchableOpacity onPress={handleBack}>
+						<View style={{ marginLeft: size.s_16 }}>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
+						</View>
+					</TouchableOpacity>
+				);
+			}
+		});
+	}, [clanRole?.title, isNotChange, navigation, t, themeValue?.text, themeValue.white]);
 
 	const handleSave = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });

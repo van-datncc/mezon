@@ -53,37 +53,39 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;
 	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: !isEditRoleMode
-			? t('setupMember.title')
-			: () => {
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: !isEditRoleMode
+				? t('setupMember.title')
+				: () => {
+						return (
+							<View>
+								<Text center bold h3 color={themeValue?.white}>
+									{clanRole?.title}
+								</Text>
+								<Text center color={themeValue?.text}>
+									{t('roleDetail.role')}
+								</Text>
+							</View>
+						);
+					},
+			headerLeft: () => {
+				if (isEditRoleMode) {
 					return (
-						<View>
-							<Text center bold h3 color={themeValue?.white}>
-								{clanRole?.title}
-							</Text>
-							<Text center color={themeValue?.text}>
-								{t('roleDetail.role')}
-							</Text>
-						</View>
+						<Pressable style={{ padding: 20 }} onPress={() => navigation.goBack()}>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={20} width={20} color={themeValue.textStrong} />
+						</Pressable>
 					);
-				},
-		headerLeft: () => {
-			if (isEditRoleMode) {
+				}
 				return (
-					<Pressable style={{ padding: 20 }} onPress={() => navigation.goBack()}>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={20} width={20} color={themeValue.textStrong} />
+					<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
+						<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
 					</Pressable>
 				);
 			}
-			return (
-				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
-					<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
-				</Pressable>
-			);
-		}
-	});
+		});
+	}, [clanRole?.title, isEditRoleMode, navigation, t, themeValue?.text, themeValue.textStrong, themeValue?.white]);
 
 	const setInitialSelectedMember = useCallback(() => {
 		const assignedMemberIds = clanRole?.role_user_list?.role_users?.map((user) => user?.id);

@@ -1,7 +1,7 @@
 import { size, Text, useTheme } from '@mezon/mobile-ui';
 import { CategoriesEntity, channelsActions, getStore, selectAllCategories, selectAppChannelById, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -72,25 +72,27 @@ export const ChangeCategory = ({ navigation, route }: MenuChannelScreenProps<Cha
 		}
 	];
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: () => (
-			<View>
-				<Text bold h3 color={themeValue?.white}>
-					{t('changeCategory.title')}
-				</Text>
-			</View>
-		),
-		headerLeft: () => {
-			return (
-				<TouchableOpacity onPress={() => navigation.goBack()}>
-					<View style={{ marginLeft: size.s_16 }}>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
-					</View>
-				</TouchableOpacity>
-			);
-		}
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: () => (
+				<View>
+					<Text bold h3 color={themeValue?.white}>
+						{t('changeCategory.title')}
+					</Text>
+				</View>
+			),
+			headerLeft: () => {
+				return (
+					<TouchableOpacity onPress={() => navigation.goBack()}>
+						<View style={{ marginLeft: size.s_16 }}>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
+						</View>
+					</TouchableOpacity>
+				);
+			}
+		});
+	}, [navigation, t, themeValue.white]);
 
 	return (
 		<View style={{ flex: 1, backgroundColor: themeValue.primary, paddingHorizontal: size.s_12 }}>

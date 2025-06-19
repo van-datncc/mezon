@@ -2,7 +2,7 @@ import { useRoles } from '@mezon/core';
 import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId } from '@mezon/store-mobile';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Pressable, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -20,15 +20,17 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 	const { createRole } = useRoles();
 	const { themeValue } = useTheme();
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: t('createNewRole.title'),
-		headerLeft: () => (
-			<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
-				<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: t('createNewRole.title'),
+			headerLeft: () => (
+				<Pressable style={{ padding: 20 }} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
+					<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
+				</Pressable>
+			)
+		});
+	}, [navigation, t, themeValue.textStrong]);
 
 	const onRoleNameChange = (roleName: string) => {
 		setRoleName(roleName);

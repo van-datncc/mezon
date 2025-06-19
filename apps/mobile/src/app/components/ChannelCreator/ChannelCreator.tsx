@@ -5,7 +5,7 @@ import { channelsActions, createNewChannel, getStoreAsync, selectCurrentClanId }
 import { sleep } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiCreateChannelDescRequest } from 'mezon-js/api.gen';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -33,29 +33,31 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 	const { t } = useTranslation(['channelCreator']);
 	const dispatch = useAppDispatch();
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerRight: () => (
-			<Pressable onPress={handleCreateChannel}>
-				<Text
-					style={{
-						color: baseColor.blurple,
-						fontWeight: 'bold',
-						paddingHorizontal: size.s_20,
-						opacity: channelName?.trim()?.length > 0 ? 1 : 0.5
-					}}
-				>
-					{t('actions.create')}
-				</Text>
-			</Pressable>
-		),
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerRight: () => (
+				<Pressable onPress={handleCreateChannel}>
+					<Text
+						style={{
+							color: baseColor.blurple,
+							fontWeight: 'bold',
+							paddingHorizontal: size.s_20,
+							opacity: channelName?.trim()?.length > 0 ? 1 : 0.5
+						}}
+					>
+						{t('actions.create')}
+					</Text>
+				</Pressable>
+			),
 
-		headerLeft: () => (
-			<Pressable style={{ padding: size.s_20 }} onPress={handleClose}>
-				<CrossIcon height={size.s_16} width={size.s_16} color={themeValue.text} />
-			</Pressable>
-		)
-	});
+			headerLeft: () => (
+				<Pressable style={{ padding: size.s_20 }} onPress={handleClose}>
+					<CrossIcon height={size.s_16} width={size.s_16} color={themeValue.text} />
+				</Pressable>
+			)
+		});
+	}, [channelName, navigation, t, themeValue.text]);
 
 	async function handleCreateChannel() {
 		if (!validInput(channelName)) return;

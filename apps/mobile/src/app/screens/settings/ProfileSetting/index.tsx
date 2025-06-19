@@ -50,19 +50,21 @@ export const ProfileSetting = ({ navigation, route }: { navigation: any; route: 
 		if (profileTab >= 0) setTab(profileTab);
 	}, []);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerRight: () => (
-			<Pressable onPress={() => saveCurrentTab()}>
-				<Text style={[styles.saveChangeButton, styles.changed]}>{t('header.save')}</Text>
-			</Pressable>
-		),
-		headerLeft: () => (
-			<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backArrow}>
-				<MezonIconCDN icon={IconCDN.closeSmallBold} color={themeValue.text} />
-			</TouchableOpacity>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerRight: () => (
+				<Pressable onPress={() => saveCurrentTab()}>
+					<Text style={[styles.saveChangeButton, styles.changed]}>{t('header.save')}</Text>
+				</Pressable>
+			),
+			headerLeft: () => (
+				<TouchableOpacity onPress={() => navigation.goBack()} style={styles.backArrow}>
+					<MezonIconCDN icon={IconCDN.closeSmallBold} color={themeValue.text} />
+				</TouchableOpacity>
+			)
+		});
+	}, [navigation, styles.backArrow, styles.changed, styles.saveChangeButton, t, themeValue.text]);
 
 	const handleTabChange = (index: number) => {
 		setTab(index);
