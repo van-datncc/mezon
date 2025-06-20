@@ -18,5 +18,23 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center'
 		},
-		textBtnJoinVoice: { fontSize: size.s_16, fontWeight: '600', color: baseColor.black }
+		textBtnJoinVoice: { fontSize: size.s_16, fontWeight: '600', color: baseColor.black },
+		avatarCircle: {
+			width: size.s_40,
+			height: size.s_40,
+			borderRadius: size.s_40,
+			overflow: 'hidden',
+			marginLeft: -5,
+			borderWidth: 1,
+			borderColor: 'white',
+			backgroundColor: 'white'
+		},
+		badgeContainer: {
+			width: size.s_40,
+			height: size.s_40,
+			borderRadius: size.s_20,
+			backgroundColor: colors.tertiary,
+			justifyContent: 'center',
+			alignItems: 'center'
+		}
 	});

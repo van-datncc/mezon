@@ -8,10 +8,9 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, selectMemberClanByUserId2, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { selectCurrentClanId, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import ImageNative from 'apps/mobile/src/app/components/ImageNative';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +21,7 @@ import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import InviteToChannel from '../../InviteToChannel';
 import { style } from './JoinChannelVoiceBS.styles';
+import VoiceChannelAvatar from './VoiceChannelAvatar';
 function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -31,9 +31,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel.channel_id));
 
-	const memberIds = voiceChannelMembers.map((member) => member.user_id);
-
-	const allUsers = useAppSelector((state) => memberIds.map((id) => selectMemberClanByUserId2(state, id)).filter(Boolean));
+	const userIds = voiceChannelMembers.map((m) => m.user_id);
 
 	const handleJoinVoice = async () => {
 		if (!channel.meeting_code) return;
@@ -73,42 +71,6 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 		dismiss();
 	};
 
-	const RenderItem = () => {
-		const display: typeof allUsers = Array.isArray(allUsers) ? allUsers.slice(0, 3) : [];
-		const badge = allUsers.length > 3 ? allUsers.length - 3 : 0;
-
-		if (allUsers.length === 0) {
-			return <MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong}/>;
-		}
-
-		return (
-			<View style={{ flexDirection: 'row' }}>
-				{display.map((item) => (
-					<View
-						key={item.user.id}
-						style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden', marginLeft: -5, borderWidth: 1, borderColor: 'white' }}
-					>
-						<ImageNative url={item.clan_avatar} style={{ width: size.s_40, height: size.s_40 }} />
-					</View>
-				))}
-				{badge > 0 && (
-					<View
-						style={{
-							width: size.s_40,
-							height: size.s_40,
-							borderRadius: size.s_20,
-							backgroundColor: themeValue.tertiary,
-							justifyContent: 'center',
-							alignItems: 'center'
-						}}
-					>
-						<Text style={styles.text}>+{badge}</Text>
-					</View>
-				)}
-			</View>
-		);
-	};
-
 	return (
 		<View style={{ width: '100%', paddingVertical: size.s_10, paddingHorizontal: size.s_10 }}>
 			<View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
@@ -145,15 +107,15 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 			<View style={{ alignItems: 'center', gap: size.s_6, marginTop: size.s_20 }}>
 				<View
 					style={{
-						width: allUsers.length === 0 ? size.s_100 : size.s_200,
+						width: voiceChannelMembers.length === 0 ? size.s_100 : size.s_200,
 						height: size.s_100,
 						justifyContent: 'center',
 						alignItems: 'center',
-						borderRadius: allUsers.length === 0 ? size.s_100 : size.s_40,
+						borderRadius: voiceChannelMembers.length === 0 ? size.s_100 : size.s_40,
 						backgroundColor: themeValue.tertiary
 					}}
 				>
-					{RenderItem()}
+					<VoiceChannelAvatar userIds={userIds} />
 				</View>
 				<Text style={styles.text}>{t('joinChannelVoiceBS.channelVoice')}</Text>
 				<Text style={styles.textDisable}>{t('joinChannelVoiceBS.readyTalk')}</Text>
