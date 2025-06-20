@@ -40,10 +40,9 @@ const isNotificationAlreadyDisplayed = async (data: Record<string, any>): Promis
 		if (displayedNotifications?.length === 0) {
 			return false;
 		}
-		const isAlreadyDisplayed = displayedNotifications.some((notification) => {
+		return displayedNotifications?.some?.((notification) => {
 			return JSON.stringify(notification.notification?.data?.message) == JSON.stringify(data?.message);
 		});
-		return isAlreadyDisplayed;
 	} catch (error) {
 		console.error('Error checking displayed notifications:', error);
 		return false;
@@ -261,13 +260,28 @@ export const createLocalNotification = async (title: string, body: string, data:
 		if (isAlreadyDisplayed) {
 			return;
 		}
+		if (configDisplayNotificationAndroid?.groupSummary && Platform.OS === 'android') {
+			await notifee.displayNotification({
+				title: '',
+				subtitle: '',
+				id: notificationId + `${new Date().getTime()}`,
+				android: {
+					...configDisplayNotificationAndroid,
+					groupSummary: true
+				},
+				ios: configDisplayNotificationIOS
+			});
+		}
 		await notifee.displayNotification({
 			id: notificationId,
 			title: title.trim(),
 			body: body.trim(),
 			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',
 			data: data,
-			android: configDisplayNotificationAndroid,
+			android: {
+				...configDisplayNotificationAndroid,
+				groupSummary: false
+			},
 			ios: configDisplayNotificationIOS
 		});
 	} catch (err) {
