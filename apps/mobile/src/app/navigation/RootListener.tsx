@@ -11,6 +11,7 @@ import {
 	fcmActions,
 	friendsActions,
 	getStore,
+	getStoreAsync,
 	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
@@ -41,12 +42,15 @@ import {
 	save,
 	setCurrentClanLoader
 } from '@mezon/mobile-components';
-import notifee from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelType, Session } from 'mezon-js';
+import { ChannelMessage, ChannelType, Session, safeJSONParse } from 'mezon-js';
+import moment from 'moment';
 import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
 import useTabletLandscape from '../hooks/useTabletLandscape';
-import { getVoIPToken, handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
+import NotificationPreferences from '../utils/NotificationPreferences';
+import { getVoIPToken, handleFCMToken, processNotification, setupCallKeep } from '../utils/pushNotificationHelpers';
 
 const RootListener = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
@@ -56,6 +60,7 @@ const RootListener = () => {
 	const navigation = useNavigation<any>();
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const appStateRef = useRef(AppState.currentState);
+	const { onchannelmessage } = useContext(ChatContext);
 
 	useEffect(() => {
 		startupRunning(navigation, isTabletLandscape);
@@ -79,6 +84,92 @@ const RootListener = () => {
 		}
 	}, [isLoggedIn]);
 
+	const setupNotificationListeners = async (navigation, isTabletLandscape = false) => {
+		try {
+			messaging()
+				.getInitialNotification()
+				.then(async (remoteMessage) => {
+					if (remoteMessage?.data && Platform.OS === 'ios') {
+						mapMessageNotificationToSlice([remoteMessage?.data]);
+					}
+					notifee
+						.getInitialNotification()
+						.then(async (resp) => {
+							if (resp) {
+								const store = await getStoreAsync();
+								save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+								store.dispatch(appActions.setIsFromFCMMobile(true));
+								if (resp) {
+									await processNotification({
+										notification: { ...resp?.notification, data: resp?.notification?.data },
+										navigation,
+										time: 1,
+										isTabletLandscape
+									});
+								}
+							}
+						})
+						.catch((err) => {
+							console.error('*** err getInitialNotification', err);
+						});
+					if (remoteMessage) {
+						const store = await getStoreAsync();
+						save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+						store.dispatch(appActions.setIsFromFCMMobile(true));
+						if (remoteMessage?.notification?.title) {
+							await processNotification({
+								notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
+								navigation,
+								time: 1,
+								isTabletLandscape
+							});
+						}
+					}
+				});
+
+			messaging().onNotificationOpenedApp(async (remoteMessage) => {
+				if (remoteMessage?.data && Platform.OS === 'ios') {
+					mapMessageNotificationToSlice([remoteMessage?.data]);
+				}
+				await processNotification({
+					notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
+					navigation,
+					time: 0,
+					isTabletLandscape
+				});
+			});
+
+			notifee.onBackgroundEvent(async ({ type, detail }) => {
+				// const { notification, pressAction, input } = detail;
+				if (type === EventType.PRESS && detail) {
+					await processNotification({
+						notification: detail.notification,
+						navigation,
+						time: 1,
+						isTabletLandscape
+					});
+				}
+			});
+
+			return notifee.onForegroundEvent(({ type, detail }) => {
+				switch (type) {
+					case EventType.DISMISSED:
+						break;
+					case EventType.PRESS:
+						processNotification({
+							notification: detail.notification,
+							navigation,
+							time: 1,
+							isTabletLandscape
+						});
+						break;
+				}
+			});
+		} catch (error) {
+			console.error('Error setting up notification listeners:', error);
+		}
+	};
+
 	const startupRunning = async (navigation: any, isTabletLandscape: boolean) => {
 		await setupNotificationListeners(navigation, isTabletLandscape);
 		if (Platform.OS === 'ios') {
@@ -90,6 +181,81 @@ const RootListener = () => {
 		const isDisableLoad = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		const isFromFCM = isDisableLoad?.toString() === 'true';
 		await mainLoaderTimeout({ isFromFCM });
+	};
+
+	const onNotificationOpenedApp = async () => {
+		try {
+			if (Platform.OS === 'android') {
+				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
+				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
+				mapMessageNotificationToSlice(notificationDataPushedParse ? notificationDataPushedParse.slice(0, 30) : []);
+				await NotificationPreferences.clearValue('notificationDataPushed');
+			} else {
+				const notificationsDisplay = await notifee.getDisplayedNotifications();
+				const notificationDataPushedParse = notificationsDisplay?.map?.((item) => {
+					return item?.notification?.data;
+				});
+				mapMessageNotificationToSlice(notificationDataPushedParse ? notificationDataPushedParse.slice(0, 30) : []);
+			}
+			await notifee.cancelAllNotifications();
+		} catch (error) {
+			await notifee.cancelAllNotifications();
+			console.error('Error processing notifications:', error);
+		}
+	};
+
+	const mapMessageNotificationToSlice = (notificationDataPushedParse: any) => {
+		console.log('log  => notificationDataPushedParse', notificationDataPushedParse);
+		if (notificationDataPushedParse.length > 0) {
+			for (const data of notificationDataPushedParse) {
+				const extraMessage = data?.message;
+				if (extraMessage) {
+					const message = safeJSONParse(extraMessage);
+					if (message && typeof message === 'object' && message?.channel_id) {
+						const createTimeSeconds = message?.create_time_seconds;
+						const updateTimeSeconds = message?.update_time_seconds;
+
+						const createTime = createTimeSeconds
+							? moment.unix(createTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+							: new Date().toISOString();
+						const updateTime = updateTimeSeconds
+							? moment.unix(updateTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+							: new Date().toISOString();
+
+						let codeValue = 0;
+						if (message?.code) {
+							if (typeof message.code === 'number') {
+								codeValue = message.code;
+							} else if (typeof message.code === 'object' && message.code?.value !== undefined) {
+								codeValue = message.code.value;
+							}
+						}
+
+						const messageId = message?.message_id || message?.id;
+						if (!messageId) {
+							console.warn('onNotificationOpenedApp: Message missing id');
+							continue;
+						}
+
+						const messageData = {
+							...message,
+							code: codeValue,
+							id: messageId,
+							content: safeJSONParse(message?.content || '{}'),
+							attachments: safeJSONParse(message?.attachments || '[]'),
+							mentions: safeJSONParse(message?.mentions || '[]'),
+							references: safeJSONParse(message?.references || '[]'),
+							reactions: safeJSONParse(message?.reactions || '[]'),
+							create_time: createTime,
+							update_time: updateTime
+						};
+						onchannelmessage(messageData as ChannelMessage);
+					} else {
+						console.warn('onNotificationOpenedApp: Invalid message structure or missing channel_id');
+					}
+				}
+			}
+		}
 	};
 
 	const activeAgainLoaderBackground = useCallback(async () => {
@@ -111,7 +277,7 @@ const RootListener = () => {
 				];
 				await Promise.allSettled(promise);
 			}
-			await notifee.cancelAllNotifications();
+			await onNotificationOpenedApp();
 			return null;
 		} catch (error) {
 			/* empty */
@@ -149,8 +315,10 @@ const RootListener = () => {
 			// Note: if is DM
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
 			const isFromFcmMobile = selectIsFromFCMMobile(store.getState());
-			if (state === 'active' && !currentDirectId) {
+			if (state === 'active') {
 				await activeAgainLoaderBackground();
+			}
+			if (state === 'active' && !currentDirectId) {
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 					/* empty */
 				} else {
@@ -163,6 +331,7 @@ const RootListener = () => {
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChangeListener);
+		onNotificationOpenedApp();
 		return () => {
 			appStateSubscription.remove();
 		};
@@ -192,6 +361,7 @@ const RootListener = () => {
 					await sleep(1000);
 					continue;
 				}
+				handleReconnect('Auth Loader');
 				const profileResponse = await dispatch(accountActions.getUserProfile());
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-expect-error

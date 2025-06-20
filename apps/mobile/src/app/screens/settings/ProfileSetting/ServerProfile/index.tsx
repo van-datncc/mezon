@@ -22,7 +22,6 @@ import MezonClanAvatar from '../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../../componentUI/MezonInput';
 import { IconCDN } from '../../../../constants/icon_cdn';
-import { normalizeString } from '../../../../utils/helpers';
 import BannerAvatar from '../UserProfile/components/Banner';
 import { style } from './styles';
 
@@ -61,13 +60,6 @@ const ServerProfile = forwardRef(function ServerProfile({ navigation }: IServerP
 
 		setCurrentClanProfileValue(initialValue);
 	}, [userClansProfile, userProfile?.user]);
-
-	const onPressHashtag = () => {
-		Toast.show({
-			type: 'info',
-			text1: 'Original known as ' + userProfile?.user?.username + '#' + userProfile?.user?.id
-		});
-	};
 
 	const checkIsDuplicateClanNickname = async (value: string) => {
 		try {
@@ -188,12 +180,6 @@ const ServerProfile = forwardRef(function ServerProfile({ navigation }: IServerP
 				onLoad={handleAvatarChange}
 				defaultAvatar={userProfile?.user?.avatar_url || ''}
 			/>
-
-			<View style={styles.btnGroup}>
-				<TouchableOpacity onPress={() => onPressHashtag()} style={styles.btnIcon}>
-					<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} />
-				</TouchableOpacity>
-			</View>
 
 			<View style={styles.clanProfileDetail}>
 				<View style={styles.nameWrapper}>
