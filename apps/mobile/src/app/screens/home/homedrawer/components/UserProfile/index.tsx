@@ -335,7 +335,17 @@ const UserProfile = React.memo(
 							statusUserStyles={styles.statusUser}
 						/>
 					</View>
+					{displayStatus ? (
+						<>
+							<View style={styles.badgeStatusTemp} />
+							<View style={styles.badgeStatus}>
+								<View style={styles.badgeStatusInside} />
+								<Text numberOfLines={2} style={styles.customStatusText}>{displayStatus}</Text>
+							</View>
+						</>
+					) : null}
 				</View>
+
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
 						<Text style={[styles.username]}>
@@ -358,7 +368,6 @@ const UserProfile = React.memo(
 								? userById?.user?.username
 								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
-						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
 							<View style={[styles.userAction]}>
