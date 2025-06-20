@@ -32,7 +32,6 @@ const ChannelMessageListener = React.memo(() => {
 	const dispatch = useAppDispatch();
 	const { handleChannelClick, disconnect } = useWebRTCStream();
 	const { userProfile } = useAuth();
-	const sessionUser = useSelector(selectSession);
 
 	const onMention = useCallback(
 		async (mentionedUser: string) => {

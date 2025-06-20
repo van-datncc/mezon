@@ -13,7 +13,7 @@ export const ListenerLoader = memo(() => {
 	React.useEffect(() => {
 		const timer = setTimeout(() => {
 			setShowListeners(true);
-		}, 2000);
+		}, 1000);
 
 		return () => clearTimeout(timer);
 	}, []);
