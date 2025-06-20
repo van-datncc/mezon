@@ -31,7 +31,6 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel.channel_id));
 
-	const display = voiceChannelMembers?.slice(0, 3);
 	const badge = useMemo(() => (voiceChannelMembers?.length > 3 ? voiceChannelMembers?.length - 3 : 0), [voiceChannelMembers]);
 
 	const handleJoinVoice = async () => {
@@ -120,9 +119,8 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
 					) : (
 						<View style={{ flexDirection: 'row' }}>
-							{display.map((m) => {
-								const member = useAppSelector((state) => selectMemberClanByUserId2(state, m.user_id));
-								return <VoiceChannelAvatar key={m.user_id} member={member} userId={m.user_id} />;
+							{voiceChannelMembers.slice(0,3).map((m) => {
+								return <VoiceChannelAvatar key={m.} userId={m.user_id} />;
 							})}
 							{badge > 0 && (
 								<View style={styles.badgeContainer}>
