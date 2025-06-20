@@ -315,7 +315,7 @@ export function MyVideoConference({
 									style={{ marginLeft: 8 }}
 								>
 									<Icons.Chat
-										defaultFill={isShowMember ? 'text-colorTextLightMode' : 'text-white'}
+										defaultFill={isShowMember ? 'text-colorTextLightMode dark:text-[#B5BAC1]' : 'text-white'}
 										className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'}
 									/>
 								</button>
