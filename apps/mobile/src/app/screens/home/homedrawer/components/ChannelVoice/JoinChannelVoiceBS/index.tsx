@@ -8,11 +8,11 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { selectCurrentClanId, selectMemberClanByUserId2, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -31,7 +31,8 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 
 	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel.channel_id));
 
-	const userIds = voiceChannelMembers.map((m) => m.user_id);
+	const display = voiceChannelMembers?.slice(0, 3);
+	const badge = useMemo(() => (voiceChannelMembers?.length > 3 ? voiceChannelMembers?.length - 3 : 0), [voiceChannelMembers]);
 
 	const handleJoinVoice = async () => {
 		if (!channel.meeting_code) return;
@@ -115,7 +116,21 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						backgroundColor: themeValue.tertiary
 					}}
 				>
-					<VoiceChannelAvatar userIds={userIds} />
+					{voiceChannelMembers.length === 0 ? (
+						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
+					) : (
+						<View style={{ flexDirection: 'row' }}>
+							{display.map((m) => {
+								const member = useAppSelector((state) => selectMemberClanByUserId2(state, m.user_id));
+								return <VoiceChannelAvatar key={m.user_id} member={member} userId={m.user_id} />;
+							})}
+							{badge > 0 && (
+								<View style={styles.badgeContainer}>
+									<Text style={styles.text}>+{badge}</Text>
+								</View>
+							)}
+						</View>
+					)}
 				</View>
 				<Text style={styles.text}>{t('joinChannelVoiceBS.channelVoice')}</Text>
 				<Text style={styles.textDisable}>{t('joinChannelVoiceBS.readyTalk')}</Text>
