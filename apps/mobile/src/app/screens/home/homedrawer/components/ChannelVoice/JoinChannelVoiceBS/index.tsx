@@ -86,7 +86,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 				{display.map((item) => (
 					<View
 						key={item.user.id}
-						style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden', marginLeft: -5 }}
+						style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden', marginLeft: -5, borderWidth: 1, borderColor: 'white' }}
 					>
 						<ImageNative url={item.clan_avatar} style={{ width: size.s_40, height: size.s_40 }} />
 					</View>
