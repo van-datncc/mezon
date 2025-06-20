@@ -11,10 +11,11 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId, selectMemberClanByUserId2, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import ImageNative from 'apps/mobile/src/app/components/ImageNative';
 import { ChannelType } from 'mezon-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
@@ -73,21 +74,22 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 	};
 
 	const RenderItem = () => {
-		if (allUsers.length === 0) {
-			return <MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />;
-		};
-
-		const display = allUsers.slice(0, 3);
+		const display: typeof allUsers = Array.isArray(allUsers) ? allUsers.slice(0, 3) : [];
 		const badge = allUsers.length > 3 ? allUsers.length - 3 : 0;
 
+		if (allUsers.length === 0) {
+			return <MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong}/>;
+		}
+
 		return (
-			<View style={{ flexDirection: 'row'}}>
+			<View style={{ flexDirection: 'row' }}>
 				{display.map((item) => (
-					<Image
-						key={item.id}
-						source={{ uri: item.clan_avatar || item.user?.avatar_url }}
-						style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_20, marginLeft: -5 }}
-					/>
+					<View
+						key={item.user.id}
+						style={{ width: size.s_40, height: size.s_40, borderRadius: size.s_40, overflow: 'hidden', marginLeft: -5 }}
+					>
+						<ImageNative url={item.clan_avatar} style={{ width: size.s_40, height: size.s_40 }} />
+					</View>
 				))}
 				{badge > 0 && (
 					<View
