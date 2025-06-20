@@ -12,7 +12,7 @@ import { selectCurrentClanId, selectMemberClanByUserId2, selectVoiceChannelMembe
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -119,8 +119,8 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
 					) : (
 						<View style={{ flexDirection: 'row' }}>
-							{voiceChannelMembers.slice(0,3).map((m) => {
-								return <VoiceChannelAvatar key={m.} userId={m.user_id} />;
+							{voiceChannelMembers?.slice(0,3)?.map((m) => {
+								return <VoiceChannelAvatar key={m.user_id} userId={m.user_id} />;
 							})}
 							{badge > 0 && (
 								<View style={styles.badgeContainer}>

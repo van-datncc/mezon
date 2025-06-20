@@ -4,6 +4,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { style } from './JoinChannelVoiceBS.styles';
 import { selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
+import MezonClanAvatar from 'apps/mobile/src/app/componentUI/MezonClanAvatar';
 
 const VoiceChannelAvatar = ({ userId }) => {
 	const { themeValue } = useTheme();
@@ -13,7 +14,7 @@ const VoiceChannelAvatar = ({ userId }) => {
 
 	return (
 		<View style={styles.avatarCircle}>
-			<ImageNative url={member?.clan_avatar} style={{ width: size.s_40, height: size.s_40 }} />
+			<MezonClanAvatar alt={member.user.username} image={member.clan_avatar || member.user.avatar_url} lightMode />
 		</View>
 	);
 };
