@@ -2,6 +2,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { selectIsLogin } from '@mezon/store-mobile';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import { Platform } from 'react-native';
 import { useSelector } from 'react-redux';
 import IncomingHomeScreen from '../screens/customIncomingCall/IncomingHomeScreen';
 import { Authentication } from './Authentication';
@@ -14,7 +15,7 @@ const RootStack = (props) => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const { themeValue } = useTheme();
 
-	if (props?.payload && isLoggedIn) return <IncomingHomeScreen {...props} />;
+	if (props?.payload && isLoggedIn && Platform.OS === 'android') return <IncomingHomeScreen {...props} />;
 	return (
 		<Root.Navigator
 			screenOptions={{
