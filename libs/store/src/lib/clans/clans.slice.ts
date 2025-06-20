@@ -204,7 +204,7 @@ export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: Cha
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
 		if (response) {
-			thunkAPI.dispatch(fetchClans({}));
+			thunkAPI.dispatch(fetchClans({ noCache: true }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'clans/deleteClans');
@@ -224,7 +224,7 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchClans({}));
+		thunkAPI.dispatch(fetchClans({ noCache: true }));
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'clans/removeClanUsers');
