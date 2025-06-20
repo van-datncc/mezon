@@ -176,7 +176,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 							</div>
 						)}
 						<div className="flex flex-col justify-between items-start w-full">
-							<p className="dark:text-textPrimary text-textPrimary400">{select.placeholder}</p>
+							<p className="dark:text-textPrimary text-textPrimary400">{select?.placeholder}</p>
 							<p className={'text-xs italic'}>{getSelectNote()}</p>
 						</div>
 					</div>
