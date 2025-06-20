@@ -22,7 +22,6 @@ import MezonConfirm from '../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
-import { IMezonOptionData } from '../../componentUI/MezonOption';
 import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
@@ -61,9 +60,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		return isEqual(originSettingValue, currentSettingValue);
 	}, [originSettingValue, currentSettingValue]);
 
-	const currentCategoryName = useMemo(() => {
-		return channel?.category_name;
-	}, [channel?.category_name]);
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	useEffect(() => {
@@ -146,13 +142,13 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: t('fields.privateChannelInvite.addMember'),
 					expandable: true,
 					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
-					isShow: isChannel && !!channel.channel_private && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
+					isShow: isChannel && !!channel?.channel_private && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
 					onPress: () => {
 						bottomSheetRef?.current?.present();
 					}
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[channel?.channel_private, channel?.type, channelId, isChannel, t, themeValue.text]
 	);
 
 	const webhookMenu = useMemo(
@@ -173,7 +169,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					}
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[channel?.channel_id, channel?.type, t, themeValue.text]
 	);
 
 	const deleteMenu = useMemo(
@@ -183,7 +179,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: isChannel ? t('fields.channelDelete.delete') : t('fields.threadDelete.delete'),
 					textStyle: { color: 'red' },
 					onPress: () => handlePressDeleteChannel(),
-					icon: <MezonIconCDN icon={IconCDN.trashIcon} color="red" />
+					icon: <MezonIconCDN icon={IconCDN.trashIcon} color={Colors.textRed} />
 				},
 				{
 					title: isChannel ? t('fields.channelDelete.leave') : t('fields.threadLeave.leave'),
@@ -193,7 +189,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					isShow: channel?.creator_id !== currentUserId && channel?.type !== ChannelType.CHANNEL_TYPE_APP
 				}
 			] satisfies IMezonMenuItemProps[],
-		[channel?.creator_id, currentUserId, isChannel, t]
+		[channel?.creator_id, channel?.type, currentUserId, isChannel, t]
 	);
 
 	const topMenu = useMemo(
@@ -209,33 +205,33 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				// 	bottomDescription: ''
 				// }
 			] satisfies IMezonMenuSectionProps[],
-		[currentCategoryName]
+		[channel?.type, permissionMenu, t]
 	);
 
 	const bottomMenu = useMemo(() => [{ items: webhookMenu }, { items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
 
-	const hideInactiveOptions = useMemo(
-		() =>
-			[
-				{
-					title: t('fields.channelHideInactivity._1hour'),
-					value: 0
-				},
-				{
-					title: t('fields.channelHideInactivity._24hours'),
-					value: 1
-				},
-				{
-					title: t('fields.channelHideInactivity._3days'),
-					value: 2
-				},
-				{
-					title: t('fields.channelHideInactivity._1Week'),
-					value: 3
-				}
-			] satisfies IMezonOptionData,
-		[]
-	);
+	// const hideInactiveOptions = useMemo(
+	// 	() =>
+	// 		[
+	// 			{
+	// 				title: t('fields.channelHideInactivity._1hour'),
+	// 				value: 0
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._24hours'),
+	// 				value: 1
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._3days'),
+	// 				value: 2
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._1Week'),
+	// 				value: 3
+	// 			}
+	// 		] satisfies IMezonOptionData,
+	// 	[]
+	// );
 
 	const handleDeleteChannel = useCallback(async () => {
 		await dispatch(
@@ -255,7 +251,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				})
 			);
 		}
-	}, []);
+	}, [channel?.channel_id, channel?.clan_id, channel?.parent_id]);
 
 	const handleJoinChannel = async () => {
 		const channelId = channel?.parent_id || '';
@@ -274,13 +270,13 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				clanId: channel?.clan_id || '',
 				channelId: channel?.parent_id || '',
 				threadId: channel?.id || '',
-				isPrivate: channel.channel_private || 0
+				isPrivate: channel?.channel_private || 0
 			})
 		);
 		navigation.navigate(APP_SCREEN.HOME);
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		handleJoinChannel();
-	}, []);
+	}, [channel?.channel_private, channel?.clan_id, channel?.id, channel?.parent_id]);
 
 	const handlePressLeaveChannel = () => {
 		const data = {

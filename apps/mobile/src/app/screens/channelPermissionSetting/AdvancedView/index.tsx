@@ -18,13 +18,13 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation('channelSetting');
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const allUserInChannel = useSelector(selectAllUserChannel(channel.channel_id));
+	const allUserInChannel = useSelector(selectAllUserChannel(channel?.channel_id));
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		dispatch(rolesClanActions.fetchRolesClan({ clanId: channel?.clan_id }));
 		dispatch(fetchUserChannels({ channelId: channel?.channel_id }));
-	}, [channel?.channel_id]);
+	}, [channel?.channel_id, channel?.clan_id]);
 
 	const listOfRoleAndMemberInChannel = useMemo(() => {
 		if ((!listOfChannelRole?.length && !allUserInChannel?.length) || !channel?.channel_private) {
@@ -44,7 +44,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 				type: EOverridePermissionType.Member
 			}))
 		];
-	}, [listOfChannelRole, allUserInChannel, t]);
+	}, [listOfChannelRole, allUserInChannel, channel?.channel_private, t]);
 
 	const navigateToPermissionOverridesDetail = useCallback(
 		(id: string, type: EOverridePermissionType) => {
@@ -58,7 +58,7 @@ export const AdvancedView = memo(({ isAdvancedEditMode, channel }: IAdvancedView
 				}
 			});
 		},
-		[navigation, channel?.id]
+		[channel?.id, channel?.clan_id]
 	);
 
 	const renderItem = useCallback(
