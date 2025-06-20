@@ -115,7 +115,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						backgroundColor: themeValue.tertiary
 					}}
 				>
-					{voiceChannelMembers.length === 0 ? (
+					{voiceChannelMembers?.length === 0 ? (
 						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
 					) : (
 						<View style={{ flexDirection: 'row' }}>
