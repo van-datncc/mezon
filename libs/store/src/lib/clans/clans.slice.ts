@@ -244,7 +244,7 @@ export const updateClan = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			thunkAPI.dispatch(fetchClans({}));
+			thunkAPI.dispatch(fetchClans({ noCache: true }));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'clans/updateClans');
@@ -560,6 +560,8 @@ export const clansSlice = createSlice({
 		},
 		update: (state, action: PayloadAction<{ dataUpdate: ClanUpdatedEvent }>) => {
 			const { dataUpdate } = action.payload;
+
+			const currentClanData = clansAdapter.getSelectors().selectById(state, dataUpdate.clan_id);
 			clansAdapter.updateOne(state, {
 				id: dataUpdate.clan_id as string,
 				changes: {
@@ -568,7 +570,7 @@ export const clansSlice = createSlice({
 					logo: dataUpdate.logo,
 					banner: dataUpdate.banner,
 					is_onboarding: dataUpdate.is_onboarding,
-					welcome_channel_id: dataUpdate.welcome_channel_id
+					welcome_channel_id: dataUpdate.welcome_channel_id !== '-1' ? dataUpdate.welcome_channel_id : currentClanData.welcome_channel_id
 				}
 			});
 		}
@@ -580,6 +582,7 @@ export const clansSlice = createSlice({
 			})
 			.addCase(fetchClans.fulfilled, (state: ClansState, action: PayloadAction<IClan[]>) => {
 				clansAdapter.setAll(state, action.payload);
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchClans.rejected, (state: ClansState, action) => {
