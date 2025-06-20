@@ -346,6 +346,18 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
+			if (channelId) {
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+				store.dispatch(
+					channelsActions.joinChannel({
+						clanId: clanId ?? '',
+						channelId: channelId,
+						noFetchMembers: false,
+						isClearMessage: true,
+						noCache: true
+					})
+				);
+			}
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
@@ -359,23 +371,10 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				};
 
 				await joinAndChangeClan(store, clanId);
-				if (channelId) {
-					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					store.dispatch(
-						channelsActions.joinChannel({
-							clanId: clanId ?? '',
-							channelId: channelId,
-							noFetchMembers: false,
-							isClearMessage: true,
-							noCache: true
-						})
-					);
-				}
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				save(STORAGE_CLAN_ID, clanId);
 			}
-			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (topicId && topicId !== '0' && !!topicId) {
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
@@ -397,13 +396,11 @@ export const navigateToNotification = async (store: any, notification: any, navi
 						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: messageId });
 					}
 				}
-				store.dispatch(appActions.setLoadingMainMobile(false));
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 			} else {
-				store.dispatch(appActions.setLoadingMainMobile(false));
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -411,7 +408,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 		}
 	} else {
-		store.dispatch(appActions.setLoadingMainMobile(false));
 		setTimeout(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
 			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -437,7 +433,6 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 export const processNotification = async ({ notification, navigation, time = 0, isTabletLandscape = false }) => {
 	const store = await getStoreAsync();
 	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
