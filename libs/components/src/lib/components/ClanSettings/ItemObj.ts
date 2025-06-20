@@ -28,7 +28,7 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.ROLES, name: 'Roles' },
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.IMAGE_STICKERS, name: 'Image Stickers' },
-	{ id: ItemSetting.VOIDE_STICKERS, name: 'Voice Sticker' },
+	{ id: ItemSetting.VOIDE_STICKERS, name: 'Voice Stickers' },
 	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
 	{ id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' },
 
