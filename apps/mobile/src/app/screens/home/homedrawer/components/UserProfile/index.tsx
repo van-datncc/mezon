@@ -4,11 +4,13 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
+	EStateFriend,
 	RolesClanEntity,
 	directActions,
 	selectAccountCustomStatus,
 	selectAllRolesClan,
 	selectDirectsOpenlist,
+	selectFriendById,
 	selectMemberClanByUserId2,
 	useAppDispatch,
 	useAppSelector
@@ -94,6 +96,10 @@ const UserProfile = React.memo(
 		const isDM = useMemo(() => {
 			return currentChannel?.type === ChannelType.CHANNEL_TYPE_DM || currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP;
 		}, [currentChannel?.type]);
+		const infoFriend = useAppSelector((state) => selectFriendById(state, userId || user?.id));
+		const isBlocked = useMemo(() => {
+			return infoFriend?.state === EStateFriend.BLOCK;
+		}, [infoFriend?.state]);
 
 		const status = getUserStatusByMetadata(user?.user?.metadata);
 
@@ -231,7 +237,7 @@ const UserProfile = React.memo(
 						});
 					}
 				},
-				isShow: !targetUser,
+				isShow: !targetUser && !isBlocked,
 				textStyles: {
 					color: Colors.green
 				}
