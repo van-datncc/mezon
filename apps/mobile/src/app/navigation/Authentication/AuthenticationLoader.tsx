@@ -1,4 +1,4 @@
-import { ChatContext, useAuth } from '@mezon/core';
+import { useAuth } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	STORAGE_CHANNEL_CURRENT_CACHE,
@@ -29,9 +29,9 @@ import { useMezon } from '@mezon/transport';
 import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelMessage, WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
-import moment from 'moment/moment';
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Linking, Platform, StatusBar } from 'react-native';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import Sound from 'react-native-sound';
@@ -41,11 +41,9 @@ import MezonConfirm from '../../componentUI/MezonConfirm';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
-import NotificationPreferences from '../../utils/NotificationPreferences';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
-import { useTranslation } from 'react-i18next';
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -64,7 +62,6 @@ export const AuthenticationLoader = () => {
 	const { i18n } = useTranslation();
 
 	useCheckUpdatedVersion();
-	const { onchannelmessage } = useContext(ChatContext);
 
 	useEffect(() => {
 		const getUrl = async () => {
@@ -83,7 +80,6 @@ export const AuthenticationLoader = () => {
 	useEffect(() => {
 		const eventDeeplink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
 		initLoader();
-		onNotificationOpenedApp();
 
 		return () => {
 			eventDeeplink.remove();
@@ -103,7 +99,6 @@ export const AuthenticationLoader = () => {
 
 	const initLoader = async () => {
 		try {
-			await notifee.cancelAllNotifications();
 			if (Platform.OS === 'android') {
 				await deleteAllChannelGroupsNotifee();
 			}
@@ -148,68 +143,6 @@ export const AuthenticationLoader = () => {
 						subpath: subpath
 					});
 				}
-			}
-		}
-	};
-
-	const onNotificationOpenedApp = async () => {
-		if (Platform.OS === 'android') {
-			try {
-				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
-				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
-				if (notificationDataPushedParse.length > 0) {
-					for (const data of notificationDataPushedParse) {
-						const extraMessage = data?.message;
-						if (extraMessage) {
-							const message = safeJSONParse(extraMessage);
-							if (message && typeof message === 'object' && message?.channel_id) {
-								const createTimeSeconds = message?.create_time_seconds;
-								const updateTimeSeconds = message?.update_time_seconds;
-
-								const createTime = createTimeSeconds
-									? moment.unix(createTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
-									: new Date().toISOString();
-								const updateTime = updateTimeSeconds
-									? moment.unix(updateTimeSeconds).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
-									: new Date().toISOString();
-
-								let codeValue = 0;
-								if (message?.code) {
-									if (typeof message.code === 'number') {
-										codeValue = message.code;
-									} else if (typeof message.code === 'object' && message.code?.value !== undefined) {
-										codeValue = message.code.value;
-									}
-								}
-
-								const messageId = message?.message_id || message?.id;
-								if (!messageId) {
-									console.warn('onNotificationOpenedApp: Message missing id');
-									continue;
-								}
-
-								const messageData = {
-									...message,
-									code: codeValue,
-									id: messageId,
-									content: safeJSONParse(message?.content || '{}'),
-									attachments: safeJSONParse(message?.attachments || '[]'),
-									mentions: safeJSONParse(message?.mentions || '[]'),
-									references: safeJSONParse(message?.references || '[]'),
-									reactions: safeJSONParse(message?.reactions || '[]'),
-									create_time: createTime,
-									update_time: updateTime
-								};
-								onchannelmessage(messageData as ChannelMessage);
-							} else {
-								console.warn('onNotificationOpenedApp: Invalid message structure or missing channel_id');
-							}
-						}
-					}
-				}
-				await NotificationPreferences.clearValue('notificationDataPushed');
-			} catch (error) {
-				console.error('Error processing notifications:', error);
 			}
 		}
 	};

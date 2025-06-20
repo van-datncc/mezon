@@ -113,7 +113,7 @@ const IncomingHomeScreen = memo((props: any) => {
 			if (!isInCall && !isInGroupCall) {
 				onDeniedCall();
 			}
-		}, 40000);
+		}, 30000);
 
 		return () => clearTimeout(timer);
 	}, [isInCall, isInGroupCall]);

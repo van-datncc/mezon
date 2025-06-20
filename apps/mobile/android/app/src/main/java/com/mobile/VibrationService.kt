@@ -13,15 +13,47 @@ import android.util.Log
 
 class VibrationService : android.app.Service() {
     private var vibrator: Vibrator? = null
+    private val CHANNEL_ID = "VibrationServiceChannel"
+    private val NOTIFICATION_ID = 1113
 
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannel()
+        startForeground(NOTIFICATION_ID, createNotification())
         startVibration()
     }
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "You have an ongoing call"
+            val descriptionText = "Ignore this notification, it will auto-hide"
+            val importance = NotificationManager.IMPORTANCE_LOW
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun createNotification(): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("You have an ongoing call")
+            .setContentText("Ignore this notification, it will auto-hide")
+            .setSmallIcon(android.R.drawable.ic_notification_overlay)
+            .setPriority(NotificationCompat.VISIBILITY_SECRET)
+            .setOngoing(true)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setTimeoutAfter(30000)
+            .build()
+    }
+
     override fun onDestroy() {
-        super.onDestroy()
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID)
         stopVibration()
+        super.onDestroy()
     }
 
     private fun startVibration() {
@@ -58,8 +90,9 @@ class VibrationService : android.app.Service() {
         }
     }
 
-
     private fun stopVibration() {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(NOTIFICATION_ID)
         vibrator?.cancel()
     }
 
