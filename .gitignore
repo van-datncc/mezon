@@ -124,7 +124,3 @@ yarn-error.log
 
 .nx/
 
-apps/mobile/yarn.lock
-yarn.lock
-apps/mobile/.yarn
-apps/mobile/android/.kotlin
