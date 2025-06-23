@@ -73,7 +73,7 @@ const HomeDefault = React.memo(
 			<KeyboardAvoidingView
 				style={styles.channelView}
 				behavior={'padding'}
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight}
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
 			>
 				{Platform.OS === 'ios' && <LicenseAgreement />}
 				<DrawerListener />
