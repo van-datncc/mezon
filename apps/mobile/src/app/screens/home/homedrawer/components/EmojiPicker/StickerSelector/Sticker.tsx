@@ -34,7 +34,7 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 								<>
 									<RenderAudioItem audioURL={sticker?.url} />
 									<Text style={styles.soundName} numberOfLines={1}>
-										{sticker.name + '.mp3'}
+										{sticker?.name}
 									</Text>
 								</>
 							) : (
