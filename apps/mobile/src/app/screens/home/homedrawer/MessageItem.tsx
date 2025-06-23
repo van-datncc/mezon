@@ -81,7 +81,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
 
-		const isEphemeralMessage = message?.code === TypeMessage.Ephemeral;
+		const isEphemeralMessage = useMemo(() => message?.code === TypeMessage.Ephemeral, [message?.code]);
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		const isMessageCallLog = !!message?.content?.callLog;
 		const isGoogleMapsLink = Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
