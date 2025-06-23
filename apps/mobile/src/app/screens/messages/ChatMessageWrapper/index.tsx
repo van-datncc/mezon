@@ -35,7 +35,7 @@ export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClan
 		<KeyboardAvoidingView
 			style={styles.content}
 			behavior={'padding'}
-			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
 		>
 			<View style={{ flex: 1 }}>
 				<ChannelMessages
