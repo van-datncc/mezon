@@ -1,6 +1,6 @@
 import { ChatContext, useChatReaction } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { selectDmGroupCurrentId, useAppDispatch } from '@mezon/store';
+import { selectDmGroupCurrentId } from '@mezon/store';
 import { getStore, selectCurrentChannel } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { isPublicChannel } from '@mezon/utils';
@@ -11,7 +11,6 @@ import { IReactionMessageProps } from './components/MessageReaction';
 
 const maxRetries = 10;
 const ChannelMessageReactionListener = React.memo(() => {
-	const dispatch = useAppDispatch();
 	const store = getStore();
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const { reactionMessageDispatch } = useChatReaction({ isMobile: true, isClanViewMobile: !currentDirectId });

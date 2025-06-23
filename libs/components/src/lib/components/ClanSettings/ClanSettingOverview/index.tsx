@@ -2,7 +2,7 @@ import { useClans } from '@mezon/core';
 import { createSystemMessage, fetchSystemMessageByClanId, selectCurrentClan, updateSystemMessage, useAppDispatch } from '@mezon/store';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ApiSystemMessage, ApiSystemMessageRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClanBannerBackground from './ClanBannerBackground';
 import ClanLogoName from './ClanLogoName';
@@ -18,7 +18,6 @@ const ClanSettingOverview = () => {
 		clan_name: currentClan?.clan_name ?? '',
 		creator_id: currentClan?.creator_id ?? '',
 		logo: currentClan?.logo ?? '',
-		is_onboarding: currentClan?.is_onboarding,
 		welcome_channel_id: currentClan?.welcome_channel_id ?? ''
 	});
 
@@ -50,17 +49,51 @@ const ClanSettingOverview = () => {
 	const handleChangeName = (clanName: string) => {
 		setClanRequest({ ...clanRequest, clan_name: clanName ?? '' });
 	};
-
-	const handleSave = async () => {
-		if (currentClan?.clan_id) {
-			await updateClan({
-				clan_id: currentClan?.clan_id as string,
-				request: clanRequest
-			});
-			setClanRequest(clanRequest);
-			await updateSystemMessages();
+	const hasSystemMessageChanges = useMemo(() => {
+		if (!systemMessage && updateSystemMessageRequest) {
+			return true;
 		}
-	};
+		if (systemMessage && updateSystemMessageRequest) {
+			const hasSystemMessageChanges = Object.keys(systemMessage).some((key) => {
+				const typedKey = key as keyof ApiSystemMessageRequest;
+				return updateSystemMessageRequest[typedKey] !== systemMessage[typedKey];
+			});
+			if (hasSystemMessageChanges) {
+				return true;
+			}
+		}
+		return false;
+	}, [systemMessage, updateSystemMessageRequest]);
+
+	const hasClanChanges = useMemo(() => {
+		if (currentClan && clanRequest) {
+			const hasChanges = Object.keys(clanRequest).some((key) => {
+				const typedKey = key as keyof typeof clanRequest;
+				if (clanRequest[typedKey] || currentClan[typedKey]) {
+					return clanRequest[typedKey] !== currentClan[typedKey];
+				}
+			});
+			if (hasChanges) {
+				return true;
+			}
+		}
+
+		return false;
+	}, [currentClan, clanRequest]);
+
+	const handleSave = useCallback(async () => {
+		if (currentClan?.clan_id) {
+			if (hasClanChanges) {
+				await updateClan({
+					clan_id: currentClan?.clan_id as string,
+					request: clanRequest
+				});
+			}
+			if (hasSystemMessageChanges) {
+				await updateSystemMessages();
+			}
+		}
+	}, [currentClan, hasSystemMessageChanges, hasClanChanges, clanRequest, updateSystemMessageRequest, systemMessage]);
 
 	const updateSystemMessages = async () => {
 		if (systemMessage && Object.keys(systemMessage).length > 0 && currentClan?.clan_id && updateSystemMessageRequest) {
@@ -84,41 +117,28 @@ const ClanSettingOverview = () => {
 				cachedMessage: updateSystemMessageRequest
 			};
 			await dispatch(updateSystemMessage(request));
+			setSystemMessage(cachedMessageUpdate);
 		} else if (updateSystemMessageRequest) {
 			await dispatch(createSystemMessage(updateSystemMessageRequest));
 			setSystemMessage(updateSystemMessageRequest);
 		}
 	};
 
-	const hasChanges = useMemo(() => {
-		if (systemMessage && updateSystemMessageRequest) {
-			const hasSystemMessageChanges = Object.keys(systemMessage).some((key) => {
-				const typedKey = key as keyof ApiSystemMessageRequest;
-				return updateSystemMessageRequest[typedKey] !== systemMessage[typedKey];
-			});
-			if (hasSystemMessageChanges) return true;
-		}
-
-		if (!systemMessage && updateSystemMessageRequest) {
-			return true;
-		}
-
-		if (currentClan && clanRequest) {
-			const hasClanChanges = Object.keys(clanRequest).some((key) => {
-				const typedKey = key as keyof typeof clanRequest;
-				return clanRequest[typedKey] !== currentClan[typedKey];
-			});
-			if (hasClanChanges) return true;
-		}
-
-		return false;
-	}, [systemMessage, updateSystemMessageRequest, currentClan, clanRequest]);
-
-	const handleReset = () => {};
+	const handleReset = () => {
+		setClanRequest({
+			banner: currentClan?.banner ?? '',
+			clan_name: currentClan?.clan_name ?? '',
+			creator_id: currentClan?.creator_id ?? '',
+			logo: currentClan?.logo ?? '',
+			is_onboarding: currentClan?.is_onboarding,
+			welcome_channel_id: currentClan?.welcome_channel_id ?? ''
+		});
+		setUpdateSystemMessageRequest(systemMessage);
+	};
 	return (
 		<div className="h-full pb-10">
 			<ClanLogoName onUpload={handleUploadLogo} onGetClanName={handleChangeName} />
-			<ClanBannerBackground onUpload={handleUploadBackground} />
+			<ClanBannerBackground onUpload={handleUploadBackground} urlImage={clanRequest?.banner} />
 			{systemMessage && (
 				<SystemMessagesManagement
 					updateSystem={updateSystemMessageRequest}
@@ -127,7 +147,7 @@ const ClanSettingOverview = () => {
 				/>
 			)}
 
-			{hasChanges && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
+			{(hasClanChanges || hasSystemMessageChanges) && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
 		</div>
 	);
 };

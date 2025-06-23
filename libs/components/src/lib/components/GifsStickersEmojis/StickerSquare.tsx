@@ -48,9 +48,9 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 
 function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const allStickers = useAppSelector(selectAllStickerSuggestion);
-	const clanStickers = allStickers.filter(sticker =>
+	const clanStickers = useMemo(() => allStickers.filter(sticker =>
 		(sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER
-	);
+	), [allStickers]);
 
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,

@@ -73,39 +73,27 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			<div
 				onClick={tokenClickAble}
 				style={{ textDecoration: 'none' }}
-				className={`font-medium px-0.1 rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
+				className={`font-medium rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
 			>
 				{channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
-					<Icons.Speaker
-						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
-						defaultFill="#3297FF"
-					/>
+					<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />
 				) : channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ? (
-					<Icons.Speaker
-						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
-						defaultFill="#3297FF"
-					/>
+					<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />
 				) : channel.type === ChannelType.CHANNEL_TYPE_STREAMING ? (
-					<Icons.Stream
-						defaultSize={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
-						defaultFill="#3297FF"
-					/>
+					<Icons.Stream defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />
 				) : channel.type === ChannelType.CHANNEL_TYPE_APP ? (
-					<Icons.AppChannelIcon
-						fill={theme}
-						className={`inline mt-[-0.2rem] w-4 h-4  ${isJumMessageEnabled ? 'mx-[-0.4rem]' : 'mr-0.5'} `}
-					/>
+					<Icons.AppChannelIcon fill={theme} className={`inline mt-[-0.2rem] w-4 h-4`} />
 				) : channel.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 					!channel.channel_private || channel.channel_private === 0 ? (
-						<Icons.Hashtag defaultSize={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''} `} />
+						<Icons.Hashtag defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
 					) : (
-						<Icons.HashtagLocked defaultSize={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''} `} />
+						<Icons.HashtagLocked defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
 					)
 				) : channel.type === ChannelType.CHANNEL_TYPE_THREAD ? (
 					!channel.channel_private || channel.channel_private === 0 ? (
-						<Icons.ThreadIcon defaultSize={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''} `} />
+						<Icons.ThreadIcon defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
 					) : (
-						<Icons.ThreadIconLocker className={`inline-block -mt-[0.2rem] w-4 h-4 ${isJumMessageEnabled ? 'mx-[-0.5rem]' : ''} `} />
+						<Icons.ThreadIconLocker className={`inline-block -mt-[0.2rem] w-4 h-4 `} />
 					)
 				) : null}
 				{channel.channel_label}

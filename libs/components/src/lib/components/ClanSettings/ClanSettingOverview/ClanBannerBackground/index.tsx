@@ -1,4 +1,4 @@
-import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { fileTypeImage } from '@mezon/utils';
@@ -8,16 +8,15 @@ import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanBannerBackgroundProps = {
 	onUpload: (urlImage: string) => void;
+	urlImage?: string;
 };
 
-const ClanBannerBackground = ({ onUpload }: ClanBannerBackgroundProps) => {
+const ClanBannerBackground = ({ onUpload, urlImage }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
-	const currentClan = useSelector(selectCurrentClan);
 
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
-	const [urlImage, setUrlImage] = useState<string | undefined>(currentClan?.banner ?? undefined);
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +38,6 @@ const ClanBannerBackground = ({ onUpload }: ClanBannerBackgroundProps) => {
 		}
 
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
-			setUrlImage(attachment.url ?? '');
 			onUpload(attachment.url ?? '');
 		});
 	};
@@ -53,7 +51,6 @@ const ClanBannerBackground = ({ onUpload }: ClanBannerBackgroundProps) => {
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		if (urlImage && fileInputRef.current) {
-			setUrlImage(undefined);
 			onUpload('');
 			fileInputRef.current.value = '';
 		}

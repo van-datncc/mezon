@@ -170,7 +170,6 @@ const Notifications = () => {
 	};
 
 	const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
-		store.dispatch(appActions.setLoadingMainMobile(true));
 		return new Promise<void>((resolve) => {
 			requestAnimationFrame(async () => {
 				const promises = [];

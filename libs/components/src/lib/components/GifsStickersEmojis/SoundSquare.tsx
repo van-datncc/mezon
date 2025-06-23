@@ -63,7 +63,10 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 	const currentClanId = useAppSelector(selectCurrentClanId) || '';
 
 	const allStickersInStore = useAppSelector(selectAllStickerSuggestion);
-	const allSoundsInStore = allStickersInStore.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO);
+	const allSoundsInStore = useMemo(() =>
+		allStickersInStore.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO),
+		[allStickersInStore]
+	);
 
 	useEffect(() => {
 		dispatch(soundEffectActions.fetchSoundByUserId({ noCache: false }));
