@@ -48,9 +48,10 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 
 function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const allStickers = useAppSelector(selectAllStickerSuggestion);
-	const clanStickers = useMemo(() => allStickers.filter(sticker =>
-		(sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER
-	), [allStickers]);
+	const clanStickers = useMemo(
+		() => allStickers.filter((sticker) => (sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER),
+		[allStickers]
+	);
 
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,
@@ -224,7 +225,7 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
 								<img
 									src={sticker.url}
 									alt="sticker"
-									className={`w-full h-full aspect-square object-cover dark:hover:bg-bgDisable hover:bg-bgLightModeButton border border-bgHoverMember rounded-lg ${sticker.id === '0' ? 'blur-sm cursor-not-allowed' : 'cursor-pointer'}`}
+									className={`w-full h-full aspect-square object-cover dark:hover:bg-bgDisable hover:bg-bgLightModeButton border border-bgHoverMember rounded-lg cursor-pointer ${sticker.id === '0' ? 'blur-sm' : ''}`}
 									onClick={() => (sticker.id !== '0' ? onClickSticker(sticker) : null)}
 									role="button"
 								/>
