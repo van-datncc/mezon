@@ -270,7 +270,7 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
 									onClick={() => (!sticker.forSale || sticker.url ? onClickSticker(sticker) : onOpenBuySticker(sticker))}
 									role="button"
 								/>
-								{sticker.forSale && (
+								{sticker.forSale && !sticker.url && (
 									<div className="absolute left-8 flex items-center justify-center aspect-square pointer-events-none">
 										<Icons.LockIcon defaultSize="w-16 h-16 text-white block group-hover:hidden" defaultFill="white" />
 										<Icons.UnLockIcon defaultSize="w-16 h-16 text-white hidden group-hover:block" defaultFill="white" />
