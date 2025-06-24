@@ -87,6 +87,16 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 		);
 	}, [dataReferences.message_ref_id]);
 
+	const handleBotSendMessage = useCallback(
+		(text: string) => {
+			const content: IMessageSendPayload = {
+				t: text
+			};
+			handleSend(content);
+		},
+		[handleSend]
+	);
+
 	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
 
 	return (

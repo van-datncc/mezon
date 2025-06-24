@@ -20,6 +20,8 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../constants/icon_cdn';
 import { MessageLineSystem } from './MessageLineSystem';
 import RenderMessageBlock from './RenderMessageBlock';
 import WelcomeMessage from './WelcomeMessage';
@@ -79,6 +81,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
 
+		const isEphemeralMessage = useMemo(() => message?.code === TypeMessage.Ephemeral, [message?.code]);
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		const isMessageCallLog = !!message?.content?.callLog;
 		const isGoogleMapsLink = Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
@@ -322,7 +325,8 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageReply,
-						isHighlight && styles.highlightMessageMention
+						isHighlight && styles.highlightMessageMention,
+						isEphemeralMessage && styles.ephemeralMessage
 					]}
 				>
 					{!isMessageSystem && (
@@ -434,6 +438,12 @@ const MessageItem = React.memo(
 											channelId={message?.channel_id}
 											onLongPressImage={onLongPressImage}
 										/>
+									)}
+									{isEphemeralMessage && (
+										<View style={styles.ephemeralIndicator}>
+											<MezonIconCDN icon={IconCDN.eyeSlashIcon} width={12} height={12} color={themeValue.textDisabled} />
+											<Text style={styles.ephemeralText}>{t('ephemeral.onlyVisibleToRecipient')}</Text>
+										</View>
 									)}
 								</View>
 							</View>

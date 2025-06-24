@@ -96,7 +96,7 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 			const value = event.target.value;
 			const words = value.split(' ');
 			const cleanedWords = words.filter((word) => {
-				const mentionPrefixes = ['from:', 'mention:', 'has:'];
+				const mentionPrefixes = ['from:', 'mention:', 'has:', '>', '~', '&'];
 				const isMentionStart = mentionPrefixes.some((prefix) => word.startsWith(prefix));
 				return !isMentionStart;
 			});
@@ -115,9 +115,11 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 
 			for (const mention of mentions) {
 				const convertMention = mention.display.split(':');
+				const mentionType = convertMention[0];
+				const mappedType = mentionType === '>' ? 'from' : mentionType === '~' ? 'mentions' : mentionType === '&' ? 'has' : mentionType;
 				filter.push({
-					field_name: searchFieldName?.[convertMention[0]],
-					field_value: convertMention?.[0] === 'mentions' ? `"user_id":"${mention.id}"` : convertMention?.[1]
+					field_name: searchFieldName?.[mappedType] || searchFieldName?.[mentionType],
+					field_value: mappedType === 'mentions' ? `"user_id":"${mention.id}"` : convertMention?.[1] || mention.id
 				});
 			}
 			const search: ApiSearchMessageRequest = { ...searchedRequest, filters: filter };

@@ -38,7 +38,7 @@ export const MessageAudioUI: React.FC<AudioUIProps> = ({ isPlaying, currentTime,
 				{formatTimeToMMSS(currentTime)} / {formatTimeToMMSS(duration)}
 			</span>
 			<button onClick={handleSaveImage}>
-				<Icons.Download />
+				<Icons.Download defaultFill='text-white' />
 			</button>
 		</div>
 	</>

@@ -32,9 +32,9 @@ export interface IUserMention {
 }
 
 export enum ITypeOptionSearch {
-	FROM = 'from:',
-	MENTIONS = 'mentions:',
-	HAS = 'has:',
+	FROM = '>',
+	MENTIONS = '~',
+	HAS = '&',
 	BEFORE = 'before',
 	DURING = 'during',
 	AFTER = 'after',

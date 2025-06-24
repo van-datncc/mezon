@@ -1,7 +1,15 @@
 import { debounce } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
-import { emojiSuggestionActions, selectAllChannels, selectAllEmojiSuggestion, selectAllHashtagDm, useAppDispatch } from '@mezon/store-mobile';
-import { MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
+import {
+	emojiSuggestionActions,
+	getStore,
+	selectAllChannels,
+	selectAllEmojiSuggestion,
+	selectAllHashtagDm,
+	selectCurrentUserId,
+	useAppDispatch
+} from '@mezon/store-mobile';
+import { ID_MENTION_HERE, MentionDataProps, compareObjects, normalizeString } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { FC, memo, useEffect, useMemo, useState } from 'react';
 import { LayoutAnimation, Pressable, View } from 'react-native';
@@ -13,9 +21,10 @@ export interface MentionSuggestionsProps {
 	keyword?: string;
 	onSelect: (user: MentionDataProps) => void;
 	listMentions: MentionDataProps[];
+	isEphemeralMode?: boolean;
 }
 
-const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, listMentions }) => {
+const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, listMentions, isEphemeralMode }) => {
 	const [listMentionData, setListMentionData] = useState([]);
 	const filterMentionList = debounce(() => {
 		if (!listMentions?.length) {
@@ -26,10 +35,17 @@ const Suggestions: FC<MentionSuggestionsProps> = memo(({ keyword, onSelect, list
 		const mentionSearchText = keyword?.toLocaleLowerCase();
 
 		const filterMatchedMentions = (mentionData: MentionDataProps) => {
-			return (
+			const matchesKeyword =
 				normalizeString(mentionData?.display)?.toLocaleLowerCase()?.includes(mentionSearchText) ||
-				normalizeString(mentionData?.username)?.toLocaleLowerCase()?.includes(mentionSearchText)
-			);
+				normalizeString(mentionData?.username)?.toLocaleLowerCase()?.includes(mentionSearchText);
+
+			if (isEphemeralMode) {
+				const store = getStore();
+				const currentUserId = selectCurrentUserId(store.getState());
+				return mentionData?.id !== ID_MENTION_HERE && !mentionData?.isRoleUser && mentionData?.id !== currentUserId && matchesKeyword;
+			}
+
+			return matchesKeyword;
 		};
 
 		const filteredUserMentions = listMentions
@@ -237,4 +253,3 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) 
 });
 
 export { EmojiSuggestion, HashtagSuggestions, Suggestions };
-

@@ -49,7 +49,7 @@ export const fetchListSearchMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.searchMessage(mezon.session, { filters, from, size, sorts });
-			const channelId = filters[1].field_value;
+			const channelId = filters.find((filter: { field_name: string }) => filter.field_name === 'channel_id')?.field_value;
 
 			if (!response.messages) {
 				thunkAPI.dispatch(searchMessagesActions.setTotalResults({ channelId, total: isMobile ? response.total || 0 : 0 }));
@@ -192,6 +192,7 @@ export const selectChannelSearchState = (channelId: string) =>
 
 export const selectAllMessageSearch = createSelector([getSearchMessageState, (_, channelId: string) => channelId], (state, channelId) => {
 	const channelState = state.byChannels[channelId];
+
 	if (!channelState) return [];
 
 	return selectAll(channelState.entities);

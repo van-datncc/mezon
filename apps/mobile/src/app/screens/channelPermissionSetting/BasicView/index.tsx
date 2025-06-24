@@ -76,28 +76,29 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		];
 	}, [availableMemberList, availableRoleList, t]);
 
-	const onPrivateChannelChange = useCallback(() => {
-		setIsChannelPublic(!isChannelPublic);
-		const data = {
-			children: (
-				<MezonConfirm
-					onConfirm={updateChannel}
-					title={
-						isChannelPublic
-							? t('channelPermission.warningModal.privateChannelTitle')
-							: t('channelPermission.warningModal.publicChannelTitle')
-					}
-					confirmText={t('channelPermission.warningModal.confirm')}
-					content={
-						isChannelPublic
-							? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
-							: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
-					}
-				/>
-			)
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, [isChannelPublic, t, channel?.channel_label]);
+	const onPrivateChannelChange = useCallback(
+		(value: boolean) => {
+			setIsChannelPublic(value);
+			const data = {
+				children: (
+					<MezonConfirm
+						onConfirm={updateChannel}
+						title={
+							!value ? t('channelPermission.warningModal.privateChannelTitle') : t('channelPermission.warningModal.publicChannelTitle')
+						}
+						confirmText={t('channelPermission.warningModal.confirm')}
+						content={
+							!value
+								? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
+								: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
+						}
+					/>
+				)
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+		},
+		[t, channel?.channel_label]
+	);
 
 	const openBottomSheet = () => {
 		bottomSheetRef.current?.present();
@@ -156,9 +157,13 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		[channel, themeValue]
 	);
 
+	const handlePressChangeChannelPrivate = useCallback(() => {
+		onPrivateChannelChange(!isChannelPublic);
+	}, [isChannelPublic, onPrivateChannelChange]);
+
 	return (
 		<View style={{ flex: 1 }}>
-			<TouchableOpacity onPress={() => onPrivateChannelChange()}>
+			<TouchableOpacity onPress={handlePressChangeChannelPrivate}>
 				<View
 					style={{
 						flexDirection: 'row',
