@@ -1,4 +1,4 @@
-import { debounce } from '@mezon/mobile-components';
+import { debounce, KEY_SLASH_COMMAND_EPHEMERAL } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: Slash
 	const { t } = useTranslation('message');
 	const slashCommands: SlashCommand[] = [
 		{
-			id: 'ephemeral',
+			id: KEY_SLASH_COMMAND_EPHEMERAL,
 			display: 'ephemeral',
 			description: t('ephemeral.description')
 		}

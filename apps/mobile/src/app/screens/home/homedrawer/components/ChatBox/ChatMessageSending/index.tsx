@@ -125,22 +125,6 @@ export const ChatMessageSending = memo(
 			mode,
 			channelOrDirect: channelOrDirect
 		});
-		const userProfile = useSelector(selectAllAccount);
-		const profileInTheClan = useAppSelector((state) => selectMemberClanByUserId2(state, userProfile?.user?.id ?? ''));
-		const priorityAvatar =
-			mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-				? profileInTheClan?.clan_avatar
-					? profileInTheClan?.clan_avatar
-					: userProfile?.user?.avatar_url
-				: userProfile?.user?.avatar_url;
-
-		const priorityDisplayName = userProfile?.user?.display_name ? userProfile?.user?.display_name : userProfile?.user?.username;
-		const priorityNameToShow =
-			mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
-				? profileInTheClan?.clan_nick
-					? profileInTheClan?.clan_nick
-					: priorityDisplayName
-				: priorityDisplayName;
 
 		const attachmentDataRef = useMemo(() => {
 			return attachmentFilteredByChannelId?.files || [];
@@ -233,6 +217,22 @@ export const ChatMessageSending = memo(
 				return;
 			}
 			if (isEphemeralMode && ephemeralTargetUserId) {
+				const userProfile = selectAllAccount(store.getState());
+				const profileInTheClan = selectMemberClanByUserId2(store.getState(), userProfile?.user?.id ?? '');
+				const priorityAvatar =
+					mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+						? profileInTheClan?.clan_avatar
+							? profileInTheClan?.clan_avatar
+							: userProfile?.user?.avatar_url
+						: userProfile?.user?.avatar_url;
+
+				const priorityDisplayName = userProfile?.user?.display_name ? userProfile?.user?.display_name : userProfile?.user?.username;
+				const priorityNameToShow =
+					mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+						? profileInTheClan?.clan_nick
+							? profileInTheClan?.clan_nick
+							: priorityDisplayName
+						: priorityDisplayName;
 				const payloadEphemeral = {
 					receiverId: ephemeralTargetUserId,
 					channelId: channelId,
