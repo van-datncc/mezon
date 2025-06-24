@@ -189,9 +189,9 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			height: size.s_40,
 			minWidth: size.s_50,
 			borderRadius: size.s_20,
-			maxWidth: '70%',
+			maxWidth: isTabletLandscape ? '40%' : '70%',
 			backgroundColor: colors.primary,
-			justifyContent: 'center',
+			justifyContent: 'flex-start',
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
 			overflow: 'visible'
