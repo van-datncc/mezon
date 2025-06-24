@@ -33,7 +33,7 @@ const SelectItem = ({ title, content, onClick, className }: SelectItemProps) => 
 			className={`flex flex-row justify-between items-center group w-full cursor-pointer rounded py-1 px-2 ${className} hover:bg-[#EBEBED] dark:hover:bg-[#282A2E]`} // Apply className
 		>
 			<div>
-				<span className="text-textPrimaryLight dark:text-textPrimary font-semibold">{title}</span>
+				<span className="text-textPrimaryLight dark:text-textPrimary font-semibold">{title} :</span>
 				<span className="text-textSecondary400 dark:text-textPrimary">{content}</span>
 			</div>
 			{className === 'bg-[#282A2E]' || className === 'bg-[#EBEBED]' || isHovered ? (
