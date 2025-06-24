@@ -14,7 +14,7 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
+import { IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, TextInput, View } from 'react-native';
@@ -137,7 +137,9 @@ export default function EmojiSelectorContainer({
 	);
 
 	const searchEmojis = useCallback((emojis: IEmoji[], searchTerm: string) => {
-		return emojis.filter((emoji) => emoji?.shortname?.toLowerCase().includes(searchTerm?.toLowerCase()));
+		return emojis.filter(
+			(emoji) => emoji?.shortname?.toLowerCase().includes(searchTerm?.toLowerCase()) && emoji?.category !== RECENT_EMOJI_CATEGORY
+		);
 	}, []);
 
 	const onSearchEmoji = useCallback(
