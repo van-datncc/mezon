@@ -1,4 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
+import { stickerSettingActions } from '@mezon/store';
 import { IEmojiRecent, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiClanEmoji } from 'mezon-js/dist/api.gen';
@@ -70,6 +71,16 @@ const buyItemForSale = createAsyncThunk('emoji/buyItemForSale', async ({ id, typ
 			item_id: id,
 			item_type: type
 		});
+		if (response && response.source && id) {
+			thunkAPI.dispatch(
+				stickerSettingActions.update({
+					id: id,
+					changes: {
+						source: response.source
+					}
+				})
+			);
+		}
 
 		return response;
 	} catch (error) {
@@ -118,6 +129,9 @@ export const emojiRecentSlice = createSlice({
 			})
 			.addCase(fetchEmojiRecent.rejected, (state: EmojiRecentState, action) => {
 				state.loadingStatus = 'error';
+			})
+			.addCase(buyItemForSale.pending, (state: EmojiRecentState) => {
+				state.loadingStatus = 'loading';
 			});
 	}
 });
