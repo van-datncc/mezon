@@ -64,7 +64,7 @@ const UserProfile = React.memo(
 	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel, directId }: userProfileProps) => {
 		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
-		const styles = style(themeValue);
+		const styles = style(themeValue, isTabletLandscape);
 		const { userProfile } = useAuth();
 		const { t } = useTranslation(['userProfile']);
 		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
@@ -342,7 +342,9 @@ const UserProfile = React.memo(
 							<View style={styles.badgeStatusTemp} />
 							<View style={styles.badgeStatus}>
 								<View style={styles.badgeStatusInside} />
-								<Text numberOfLines={2} style={styles.customStatusText}>{displayStatus}</Text>
+								<Text numberOfLines={3} style={styles.customStatusText}>
+									{displayStatus}
+								</Text>
 							</View>
 						</>
 					) : null}
