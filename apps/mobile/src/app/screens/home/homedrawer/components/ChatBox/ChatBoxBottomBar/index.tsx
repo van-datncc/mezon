@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import {
 	ActionEmitEvent,
+	KEY_SLASH_COMMAND_EPHEMERAL,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES,
 	convertMentionsToText,
 	formatContentEditMessage,
@@ -36,6 +37,8 @@ import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
+import { SlashCommandSuggestions } from '../../../../../../components/Suggestions/SlashCommandSuggestions';
+import { SlashCommandMessage } from '../../../../../../components/Suggestions/SlashCommandSuggestions/SlashCommandMessage';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import { resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
@@ -52,7 +55,7 @@ import { ChatBoxTyping } from './ChatBoxTyping';
 import { style } from './style';
 import useProcessedContent from './useProcessedContent';
 
-export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
+export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji' | 'slash'> = {
 	mention: {
 		trigger: '@',
 		allowedSpacesCount: Infinity,
@@ -71,6 +74,11 @@ export const triggersConfig: TriggersConfig<'mention' | 'hashtag' | 'emoji'> = {
 		trigger: ':',
 		allowedSpacesCount: 0,
 		isInsertSpaceAfterMention: true
+	},
+	slash: {
+		trigger: '/',
+		allowedSpacesCount: 0,
+		isInsertSpaceAfterMention: true
 	}
 };
 
@@ -84,6 +92,11 @@ interface IChatInputProps {
 	messageAction?: EMessageActionType;
 	onDeleteMessageActionNeedToResolve?: () => void;
 	isPublic: boolean;
+}
+
+interface IEphemeralTargetUserInfo {
+	id: string;
+	display: string;
 }
 
 export const ChatBoxBottomBar = memo(
@@ -108,6 +121,11 @@ export const ChatBoxBottomBar = memo(
 		const [isFocus, setIsFocus] = useState<boolean>(false);
 		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
 		const [textChange, setTextChange] = useState<string>('');
+		const [isEphemeralMode, setIsEphemeralMode] = useState<boolean>(false);
+		const [ephemeralTargetUserInfo, setEphemeralTargetUserInfo] = useState<IEphemeralTargetUserInfo>({
+			id: '',
+			display: ''
+		});
 
 		const anonymousMode = useSelector(selectAnonymousMode);
 
@@ -122,18 +140,27 @@ export const ChatBoxBottomBar = memo(
 
 		const inputTriggersConfig = useMemo(() => {
 			const isDM = [ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+			const newTriggersConfig = { ...triggersConfig };
 
 			if (isDM) {
-				const newTriggersConfig = { ...triggersConfig };
 				delete newTriggersConfig.hashtag;
-				return newTriggersConfig;
 			}
-			return triggersConfig;
-		}, [mode]);
+
+			if (isEphemeralMode) {
+				delete newTriggersConfig.slash;
+			}
+
+			return newTriggersConfig;
+		}, [mode, isEphemeralMode]);
 
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
-			onChange: (newValue) => handleTextInputChange(newValue),
+			onChange: (newValue) => {
+				handleTextInputChange(newValue);
+				if (isEphemeralMode && !ephemeralTargetUserInfo?.id) {
+					handleMentionSelectForEphemeral(newValue);
+				}
+			},
 			onSelectionChange: (position) => {
 				handleSelectionChange(position);
 			},
@@ -180,6 +207,11 @@ export const ChatBoxBottomBar = memo(
 			textValueInputRef.current = '';
 			setTextChange('');
 			setMentionTextValue('');
+			setIsEphemeralMode(false);
+			setEphemeralTargetUserInfo({
+				id: '',
+				display: ''
+			});
 			mentionsOnMessage.current = [];
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
@@ -294,6 +326,28 @@ export const ChatBoxBottomBar = memo(
 			textValueInputRef.current = convertedHashtag;
 			chatMessageLeftAreaRef?.current?.setAttachControlVisibility(false);
 		};
+
+		const handleMentionSelectForEphemeral = useCallback(
+			(text: string) => {
+				if (text?.includes('{@}[') && text?.includes('](') && text?.includes(')')) {
+					const startDisplayName = text.indexOf('{@}[') + 4;
+					const endDisplayName = text.indexOf('](', startDisplayName);
+					const startUserId = endDisplayName + 2;
+					const endUserId = text.indexOf(')', startUserId);
+
+					setEphemeralTargetUserInfo({
+						id: text.substring(startUserId, endUserId),
+						display: text.substring(startDisplayName, endDisplayName)
+					});
+
+					setTextChange('');
+					setMentionTextValue('');
+					textValueInputRef.current = '';
+					mentionsOnMessage.current = [];
+				}
+			},
+			[isEphemeralMode, ephemeralTargetUserInfo?.id]
+		);
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
 			cursorPositionRef.current = selection.start;
@@ -433,6 +487,14 @@ export const ChatBoxBottomBar = memo(
 			}
 		};
 
+		const cancelEphemeralMode = useCallback(() => {
+			setIsEphemeralMode(false);
+			setEphemeralTargetUserInfo({
+				id: '',
+				display: ''
+			});
+		}, []);
+
 		useEffect(() => {
 			if (channelId) {
 				setMessageFromCache();
@@ -471,9 +533,25 @@ export const ChatBoxBottomBar = memo(
 		return (
 			<View style={styles.container}>
 				<View style={[styles.suggestions]}>
-					{triggers?.mention?.keyword !== undefined && <Suggestions {...triggers.mention} listMentions={listMentions} />}
+					{triggers?.mention?.keyword !== undefined && (
+						<Suggestions {...triggers.mention} listMentions={listMentions} isEphemeralMode={isEphemeralMode} />
+					)}
 					{triggers?.hashtag?.keyword !== undefined && <HashtagSuggestions directMessageId={channelId} mode={mode} {...triggers.hashtag} />}
 					{triggers?.emoji?.keyword !== undefined && <EmojiSuggestion {...triggers.emoji} />}
+					{triggers?.slash?.keyword !== undefined && (
+						<SlashCommandSuggestions
+							keyword={triggers?.slash?.keyword}
+							onSelectCommand={(commandId) => {
+								if (commandId === KEY_SLASH_COMMAND_EPHEMERAL) {
+									setIsEphemeralMode(true);
+									setTextChange('@');
+									setMentionTextValue('@');
+									textValueInputRef.current = '@';
+									mentionsOnMessage.current = [];
+								}
+							}}
+						/>
+					)}
 				</View>
 				<AttachmentPreview channelId={channelId} />
 				<ChatBoxListener mode={mode} />
@@ -487,6 +565,16 @@ export const ChatBoxBottomBar = memo(
 					/>
 
 					<View style={styles.inputWrapper}>
+						{isEphemeralMode && (
+							<SlashCommandMessage
+								message={
+									ephemeralTargetUserInfo?.display
+										? t('ephemeral.headerText', { username: ephemeralTargetUserInfo?.display })
+										: t('ephemeral.selectUser')
+								}
+								onCancel={cancelEphemeralMode}
+							/>
+						)}
 						<View style={styles.input}>
 							<TextInput
 								ref={inputRef}
@@ -533,6 +621,7 @@ export const ChatBoxBottomBar = memo(
 							messageAction={messageAction}
 							clearInputAfterSendMessage={onSendSuccess}
 							anonymousMode={anonymousMode}
+							ephemeralTargetUserId={ephemeralTargetUserInfo?.id}
 						/>
 					</View>
 				</View>
