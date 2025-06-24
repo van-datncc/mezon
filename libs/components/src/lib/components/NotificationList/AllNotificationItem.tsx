@@ -146,7 +146,7 @@ function AllTabContent({ message, subject, category, senderId }: IMentionTabCont
 				</div>
 			)}
 
-			<div className="flex flex-row items-start p-1 w-full gap-4 rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+			<div className="flex flex-row items-start p-1 w-full gap-4 rounded-lg bg-[#f8f8f8] dark:bg-[#313338]">
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"
@@ -159,7 +159,7 @@ function AllTabContent({ message, subject, category, senderId }: IMentionTabCont
 					src={priorityAvatar ? priorityAvatar : message.avatar || user?.user?.avatar_url}
 				/>
 
-				<div className="h-full max-w-[360px]">
+				<div className="h-full w-full">
 					<div className="flex flex-col gap-[2px] text-[12px] font-bold uppercase">
 						{category === NotificationCategory.MENTIONS ? (
 							clan?.clan_name ? (
