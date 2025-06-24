@@ -142,20 +142,24 @@ export const ChatBoxBottomBar = memo(
 
 		const inputTriggersConfig = useMemo(() => {
 			const isDM = [ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+			const newTriggersConfig = { ...triggersConfig };
 
 			if (isDM) {
-				const newTriggersConfig = { ...triggersConfig };
 				delete newTriggersConfig.hashtag;
-				return newTriggersConfig;
 			}
-			return triggersConfig;
-		}, [mode]);
+
+			if (isEphemeralMode) {
+				delete newTriggersConfig.slash;
+			}
+
+			return newTriggersConfig;
+		}, [mode, isEphemeralMode]);
 
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
 			onChange: (newValue) => {
-				if (newValue) {
-					handleTextInputChange(newValue);
+				handleTextInputChange(newValue);
+				if (isEphemeralMode && !ephemeralTargetUserInfo?.id) {
 					handleMentionSelectForEphemeral(newValue);
 				}
 			},
@@ -324,7 +328,7 @@ export const ChatBoxBottomBar = memo(
 
 		const handleMentionSelectForEphemeral = useCallback(
 			(text: string) => {
-				if (text?.includes('{@}[') && text?.includes('](') && text?.includes(')') && isEphemeralMode && !ephemeralTargetUserInfo?.id) {
+				if (text?.includes('{@}[') && text?.includes('](') && text?.includes(')')) {
 					const startDisplayName = text.indexOf('{@}[') + 4;
 					const endDisplayName = text.indexOf('](', startDisplayName);
 					const startUserId = endDisplayName + 2;
@@ -611,7 +615,6 @@ export const ChatBoxBottomBar = memo(
 							messageAction={messageAction}
 							clearInputAfterSendMessage={onSendSuccess}
 							anonymousMode={anonymousMode}
-							isEphemeralMode={isEphemeralMode}
 							ephemeralTargetUserId={ephemeralTargetUserInfo?.id}
 						/>
 					</View>

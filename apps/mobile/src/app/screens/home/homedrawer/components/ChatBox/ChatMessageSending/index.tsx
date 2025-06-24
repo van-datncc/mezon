@@ -66,7 +66,6 @@ interface IChatMessageSendingProps {
 	markdownsOnMessage?: MutableRefObject<IMarkdownOnMessage[]>;
 	voiceLinkRoomOnMessage?: MutableRefObject<ILinkVoiceRoomOnMessage[]>;
 	anonymousMode?: boolean;
-	isEphemeralMode?: boolean;
 	ephemeralTargetUserId?: string;
 }
 const isPayloadEmpty = (payload: IMessageSendPayload): boolean => {
@@ -97,7 +96,6 @@ export const ChatMessageSending = memo(
 		markdownsOnMessage,
 		voiceLinkRoomOnMessage,
 		anonymousMode = false,
-		isEphemeralMode = false,
 		ephemeralTargetUserId
 	}: IChatMessageSendingProps) => {
 		const { themeValue } = useTheme();
@@ -216,7 +214,7 @@ export const ChatMessageSending = memo(
 				console.error('Message is empty, not sending');
 				return;
 			}
-			if (isEphemeralMode && ephemeralTargetUserId) {
+			if (ephemeralTargetUserId) {
 				const userProfile = selectAllAccount(store.getState());
 				const profileInTheClan = selectMemberClanByUserId2(store.getState(), userProfile?.user?.id ?? '');
 				const priorityAvatar =
