@@ -32,7 +32,6 @@ import { APP_SCREEN, MenuThreadScreenProps } from '../../../navigation/ScreenTyp
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
 import PanelKeyboard from '../../../screens/home/homedrawer/PanelKeyboard';
-import { IModeKeyboardPicker } from '../../../screens/home/homedrawer/components/BottomKeyboardPicker';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { style } from './CreateThreadForm.style';
 import HeaderLeftThreadForm from './HeaderLeftThreadForm';
@@ -52,7 +51,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const [nameValueThread, setNameValueThread] = useState('');
 	const [isPrivate, setIsPrivate] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
-	const formRef = useRef<{ nameValueThread: string; isPrivate: boolean }>({ nameValueThread: '', isPrivate: false });
 
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
@@ -61,7 +59,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		channelId: '',
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
 	});
-	const panelKeyboardRef = useRef(null);
 	const bottomPickerRef = useRef<BottomSheet>(null);
 
 	navigation.setOptions({
@@ -197,12 +194,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
 	};
 
-	const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
-		if (panelKeyboardRef?.current) {
-			panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
-		}
-	}, []);
-
 	const handleInputChange = (text: string) => {
 		setNameValueThread(text);
 		setErrorMessage(validateThreadName(text));
@@ -259,10 +250,9 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					hiddenIcon={{
 						threadIcon: true
 					}}
-					onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					isPublic={isPublicChannel(currentChannel)}
 				/>
-				<PanelKeyboard ref={panelKeyboardRef} currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
+				<PanelKeyboard currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 				<View style={{ height: Platform.OS === 'ios' ? size.s_40 : 0 }} />
 			</View>
 		</KeyboardAvoidingView>
