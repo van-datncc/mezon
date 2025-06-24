@@ -63,6 +63,20 @@ export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async
 	}
 });
 
+const buyItemForSale = createAsyncThunk('emoji/buyItemForSale', async ({ id, type }: { id?: string; type?: number }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.unlockItem(mezon.session, {
+			item_id: id,
+			item_type: type
+		});
+
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'emoji/fetchEmojiRecent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 export const initialEmojiRecentState: EmojiRecentState = emojiRecentAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	lastEmojiRecent: { emoji_recents_id: '0' }
@@ -112,7 +126,8 @@ export const emojiRecentReducer = emojiRecentSlice.reducer;
 
 export const emojiRecentActions = {
 	...emojiRecentSlice.actions,
-	fetchEmojiRecent
+	fetchEmojiRecent,
+	buyItemForSale
 };
 
 const { selectAll, selectEntities } = emojiRecentAdapter.getSelectors();
