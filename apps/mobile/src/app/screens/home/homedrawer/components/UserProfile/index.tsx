@@ -64,7 +64,7 @@ const UserProfile = React.memo(
 	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel, directId }: userProfileProps) => {
 		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
-		const styles = style(themeValue);
+		const styles = style(themeValue, isTabletLandscape);
 		const { userProfile } = useAuth();
 		const { t } = useTranslation(['userProfile']);
 		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
