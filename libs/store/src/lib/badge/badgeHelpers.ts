@@ -16,21 +16,20 @@ export interface ResetBadgeParams {
 }
 
 const processedMessagesCache = new Map<string, number>();
-
 const CACHE_DURATION = 5 * 60 * 60 * 1000;
 
 const cleanupOutdatedEntries = () => {
 	const now = Date.now();
-	for (const [messageId, timestamp] of processedMessagesCache.entries()) {
+	for (const [id, timestamp] of processedMessagesCache.entries()) {
 		if (now - timestamp > CACHE_DURATION) {
-			processedMessagesCache.delete(messageId);
+			processedMessagesCache.delete(id);
 		}
 	}
 };
 
-const isMessageAlreadyProcessed = (messageId: string): boolean => {
+const isMessageAlreadyProcessed = (id: string): boolean => {
 	const now = Date.now();
-	const lastProcessed = processedMessagesCache.get(messageId);
+	const lastProcessed = processedMessagesCache.get(id);
 
 	if (lastProcessed && now - lastProcessed < CACHE_DURATION) {
 		return true;
@@ -43,12 +42,15 @@ export const resetChannelBadgeCount = (dispatch: any, params: ResetBadgeParams) 
 
 	cleanupOutdatedEntries();
 
+	const id = channelId + messageId;
+
 	if (messageId) {
-		if (isMessageAlreadyProcessed(messageId)) {
+		if (isMessageAlreadyProcessed(id)) {
 			return;
 		}
-
-		processedMessagesCache.set(messageId, Date.now());
+		if (badgeCount && badgeCount > 0) {
+			processedMessagesCache.set(id, Date.now());
+		}
 	}
 
 	const now = timestamp || Date.now() / 1000;

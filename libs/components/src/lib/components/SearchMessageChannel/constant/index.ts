@@ -6,13 +6,16 @@ export const searchFieldName: Record<string, string> = {
 	after: 'after',
 	in: 'channel_label',
 	pinned: '',
-	content: 'content'
+	content: 'content',
+	'>': 'username',
+	'~': 'mention',
+	'&': 'has'
 };
 
 export const searchOptions = [
-	{ title: 'from:', content: 'user', value: 'username' },
-	{ title: 'mentions:', content: 'user', value: 'mentions' },
-	{ title: 'has:', content: 'link, embed or file', value: 'has' }
+	{ title: '>', content: 'user (from:)', value: 'username' },
+	{ title: '~', content: 'user (mentions:)', value: 'mentions' },
+	{ title: '&', content: 'link, embed or file (has:)', value: 'has' }
 	// { title: 'before:', content: 'specific data', value: 'before' },
 	// { title: 'after:', content: 'specific data', value: 'after' }
 	// { title: 'during:', content: 'specific data', value: 'username' },

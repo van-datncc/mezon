@@ -529,7 +529,8 @@ export const fetchChannelsCached = memoizeAndTrack(
 export const addThreadToChannels = createAsyncThunk(
 	'channels/addThreadToChannels',
 	async ({ clanId, channelId }: { clanId: string; channelId: string }, thunkAPI) => {
-		const channelData = selectChannelById2(getChannelsRootState(thunkAPI), channelId);
+		const channelData = selectChannelByIdAndClanId(thunkAPI.getState() as RootState, clanId, channelId);
+
 		if (channelId && !channelData) {
 			const data = await thunkAPI
 				.dispatch(
@@ -568,7 +569,7 @@ export const addThreadToChannels = createAsyncThunk(
 export const addThreadSocket = createAsyncThunk(
 	'channels/addThreadSocket',
 	async ({ clanId, channelId, channel }: { clanId: string; channelId: string; channel: Record<string, unknown> }, thunkAPI) => {
-		const channelData = selectChannelById2(getChannelsRootState(thunkAPI), channelId);
+		const channelData = selectChannelByIdAndClanId(thunkAPI.getState() as RootState, clanId, channelId);
 		if (channelId && !channelData) {
 			if (channel) {
 				thunkAPI.dispatch(
@@ -1461,7 +1462,18 @@ export const selectChannelsEntities = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => state.byClans[clanId]?.entities.entities ?? {}
 );
+
 export const selectChannelById2 = createSelector([selectChannelsEntities, (state, id) => id], (channelsEntities, id) => channelsEntities[id] || null);
+
+export const selectChannelsEntitiesByClanId = createSelector(
+	[getChannelsState, (state: RootState, clanId: string) => clanId],
+	(state, clanId) => state.byClans[clanId]?.entities.entities ?? {}
+);
+
+export const selectChannelByIdAndClanId = createSelector(
+	[selectChannelsEntitiesByClanId, (state: RootState, clanId: string, channelId: string) => channelId],
+	(channelsEntities, channelId) => channelsEntities[channelId] || null
+);
 
 export const selectCurrentChannelId = createSelector(
 	[getChannelsState, (state: RootState) => state.clans.currentClanId as string],
@@ -1516,8 +1528,8 @@ export const selectVoiceChannelAll = createSelector(selectAllChannels, (channels
 export const selectAllTextChannel = createSelector(selectAllChannels, (channels) =>
 	channels.filter(
 		(channel) =>
-			(channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && channel.channel_private) ||
-			(channel.type === ChannelType.CHANNEL_TYPE_THREAD && channel.channel_private)
+			(channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && channel.channel_private) ||
+			(channel?.type === ChannelType.CHANNEL_TYPE_THREAD && channel.channel_private)
 	)
 );
 
