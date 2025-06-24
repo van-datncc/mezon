@@ -21,13 +21,12 @@ import {
 import { Direction_Mode } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, DeviceEventEmitter, Platform, TouchableOpacity, UIManager, View } from 'react-native';
-import uuid from 'react-native-uuid';
+import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import MessageItem from './MessageItem';
-import ChannelMessageList from './components/ChannelMessageList';
+import ChannelMessageList, { ViewLoadMore } from './components/ChannelMessageList';
 import { ChannelMessageLoading } from './components/ChannelMessageLoading';
 import { MessageUserTyping } from './components/MessageUserTyping';
 import { style } from './styles';
@@ -47,22 +46,14 @@ const getEntitiesArray = (state: any) => {
 	return state.ids.map((id) => state?.entities?.[id])?.reverse();
 };
 
-if (Platform.OS === 'android') {
-	if (UIManager.setLayoutAnimationEnabledExperimental) {
-		UIManager.setLayoutAnimationEnabledExperimental(true);
-	}
-}
-
 const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, isPublic, topicChannelId }: ChannelMessagesProps) => {
 	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const selectMessagesByChannelMemoized = useAppSelector((state) => selectMessagesByChannel(state, channelId));
 	const messages = useMemo(() => getEntitiesArray(selectMessagesByChannelMemoized), [selectMessagesByChannelMemoized]);
-	const [isLoadingScrollBottom, setIsLoadingScrollBottom] = React.useState<boolean>(false);
 	const isLoadMore = useRef({});
-	const [, setTriggerRender] = useState<boolean | string>(false);
-	// check later
+	const [isDisableLoadMore, setIsDisableLoadMore] = useState<boolean | string>(false);
 	const isViewingOldMessage = useAppSelector((state) =>
 		selectIsViewingOlderMessagesByChannelId(state, topicChannelId ? (topicChannelId ?? '') : (channelId ?? ''))
 	);
@@ -70,7 +61,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const isLoadingJumpMessage = useSelector(selectIsLoadingJumpMessage);
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
-	const timeOutRef2 = useRef(null);
 	const [isShowJumpToPresent, setIsShowJumpToPresent] = useState(false);
 
 	const userId = useSelector(selectAllAccount)?.user?.id;
@@ -84,7 +74,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 
 		return () => {
 			if (timeOutRef?.current) clearTimeout(timeOutRef.current);
-			if (timeOutRef2?.current) clearTimeout(timeOutRef2.current);
 			event.remove();
 		};
 	}, [isViewingOldMessage]);
@@ -129,48 +118,76 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		};
 	}, [channelId, dispatch, idMessageToJump?.id, isLoadingJumpMessage, messages]);
 
+	const isCanLoadMore = useCallback(
+		async (direction: ELoadMoreDirection) => {
+			try {
+				setIsDisableLoadMore(true);
+				const store = getStore();
+				const isFetching = selectMessageIsLoading(store.getState());
+				if (isLoadMore?.current?.[direction] || isFetching) return false;
+				if (direction === ELoadMoreDirection.bottom) {
+					const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState(), channelId);
+					if (!hasMoreBottom) return false;
+				}
+				if (direction === ELoadMoreDirection.top) {
+					const hasMoreTop = selectHasMoreMessageByChannelId2(store.getState(), channelId);
+					if (!hasMoreTop) return false;
+				}
+
+				isLoadMore.current[direction] = true;
+				return true;
+			} catch (error) {
+				console.error('Error checking if can load more messages:', error);
+				return false;
+			}
+		},
+		[channelId]
+	);
+
 	const onLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
-			const store = getStore();
-			const isFetching = selectMessageIsLoading(store.getState());
-			if (isLoadMore?.current?.[direction] || isFetching) return;
-			if (direction === ELoadMoreDirection.bottom) {
-				const hasMoreBottom = selectHasMoreBottomByChannelId2(store.getState(), channelId);
-				if (!hasMoreBottom) return;
-			}
-			if (direction === ELoadMoreDirection.top) {
-				const hasMoreTop = selectHasMoreMessageByChannelId2(store.getState(), channelId);
-				if (!hasMoreTop) return;
-			}
-			isLoadMore.current[direction] = true;
-			if (direction === ELoadMoreDirection.bottom) {
+			try {
+				if (direction === ELoadMoreDirection.top) {
+					const canLoadMore = await isCanLoadMore(ELoadMoreDirection.top);
+					if (!canLoadMore) {
+						isLoadMore.current[direction] = false;
+						setIsDisableLoadMore(false);
+						return;
+					}
+				}
+				if (direction === ELoadMoreDirection.bottom) {
+					await dispatch(
+						messagesActions.loadMoreMessage({
+							clanId,
+							channelId: topicChannelId ? topicChannelId : channelId,
+							direction: Direction_Mode.AFTER_TIMESTAMP,
+							fromMobile: true,
+							topicId: topicId || ''
+						})
+					);
+					isLoadMore.current[direction] = false;
+					setIsDisableLoadMore(false);
+					return;
+				}
 				await dispatch(
 					messagesActions.loadMoreMessage({
 						clanId,
 						channelId: topicChannelId ? topicChannelId : channelId,
-						direction: Direction_Mode.AFTER_TIMESTAMP,
+						direction: Direction_Mode.BEFORE_TIMESTAMP,
 						fromMobile: true,
 						topicId: topicId || ''
 					})
 				);
 				isLoadMore.current[direction] = false;
-				setTriggerRender(uuid.v4());
+				setIsDisableLoadMore(false);
 				return;
+			} catch (error) {
+				isLoadMore.current[direction] = false;
+				setIsDisableLoadMore(false);
+				console.error('Error in onLoadMore:', error);
 			}
-			await dispatch(
-				messagesActions.loadMoreMessage({
-					clanId,
-					channelId: topicChannelId ? topicChannelId : channelId,
-					direction: Direction_Mode.BEFORE_TIMESTAMP,
-					fromMobile: true,
-					topicId: topicId || ''
-				})
-			);
-			isLoadMore.current[direction] = false;
-			setTriggerRender(uuid.v4());
-			return true;
 		},
-		[dispatch, clanId, topicChannelId, channelId, topicId]
+		[dispatch, clanId, topicChannelId, channelId, topicId, isCanLoadMore]
 	);
 
 	const renderItem = useCallback(
@@ -192,9 +209,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	);
 
 	const handleJumpToPresent = useCallback(async () => {
-		// Jump to present
-		setIsLoadingScrollBottom(true);
-		isLoadMore.current[ELoadMoreDirection.top] = true;
+		isLoadMore.current[ELoadMoreDirection.bottom] = true;
 		await dispatch(
 			messagesActions.fetchMessages({
 				clanId,
@@ -205,14 +220,11 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 				toPresent: true
 			})
 		);
+		isLoadMore.current[ELoadMoreDirection.bottom] = false;
 		dispatch(messagesActions.setIdMessageToJump(null));
 		timeOutRef.current = setTimeout(() => {
 			flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
-			setIsLoadingScrollBottom(false);
 		}, 300);
-		timeOutRef2.current = setTimeout(() => {
-			isLoadMore.current[ELoadMoreDirection.top] = false;
-		}, 800);
 	}, [clanId, channelId, dispatch, topicChannelId]);
 
 	const handleSetShowJumpLast = useCallback(
@@ -229,17 +241,23 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const handleScroll = useCallback(
 		async ({ nativeEvent }) => {
 			handleSetShowJumpLast(nativeEvent);
-			if (nativeEvent.contentOffset.y <= 0 && isShowJumpToPresent) {
+			if (nativeEvent.contentOffset.y <= 0 && !isLoadMore?.current?.[ELoadMoreDirection.bottom] && !isDisableLoadMore) {
+				const canLoadMore = await isCanLoadMore(ELoadMoreDirection.bottom);
+				if (!canLoadMore) {
+					setIsDisableLoadMore(false);
+					return;
+				}
+				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 20 });
 				await onLoadMore(ELoadMoreDirection.bottom);
 			}
 		},
-		[handleSetShowJumpLast, isShowJumpToPresent, onLoadMore]
+		[handleSetShowJumpLast, isDisableLoadMore, isCanLoadMore, onLoadMore]
 	);
 
 	return (
 		<View style={styles.wrapperChannelMessage}>
 			<ChannelMessageLoading channelId={channelId} isEmptyMsg={!messages?.length} />
-
+			{isLoadMore.current?.[ELoadMoreDirection.top] && <ViewLoadMore isLoadMoreTop={true} />}
 			{messages?.length ? (
 				<ChannelMessageList
 					flatListRef={flatListRef}
@@ -247,24 +265,19 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					handleScroll={handleScroll}
 					renderItem={renderItem}
 					onLoadMore={onLoadMore}
-					isLoadMoreTop={isLoadMore.current?.[ELoadMoreDirection.top]}
-					isLoadMoreBottom={isLoadMore.current?.[ELoadMoreDirection.bottom]}
 				/>
 			) : (
 				<View />
 			)}
+			{isLoadMore.current?.[ELoadMoreDirection.bottom] && <ViewLoadMore />}
 			<View
 				style={{
 					height: size.s_8
 				}}
 			/>
-			{isShowJumpToPresent && (
+			{isShowJumpToPresent && !isLoadMore.current?.[ELoadMoreDirection.bottom] && (
 				<TouchableOpacity style={styles.btnScrollDown} onPress={handleJumpToPresent} activeOpacity={0.8}>
-					{isLoadingScrollBottom ? (
-						<ActivityIndicator size="small" color={themeValue.textStrong} />
-					) : (
-						<MezonIconCDN icon={IconCDN.arrowLargeDownIcon} color={themeValue.textStrong} height={size.s_18} width={size.s_18} />
-					)}
+					<MezonIconCDN icon={IconCDN.arrowLargeDownIcon} color={themeValue.textStrong} height={size.s_18} width={size.s_18} />
 				</TouchableOpacity>
 			)}
 
