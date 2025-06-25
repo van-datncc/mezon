@@ -4,6 +4,7 @@ import { ActionEmitEvent, STORAGE_CLAN_ID, STORAGE_DATA_CLAN_CHANNEL_CACHE, getU
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	RootState,
+	appActions,
 	channelsActions,
 	createNewChannel,
 	getStoreAsync,
@@ -20,7 +21,7 @@ import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Platform, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, Platform, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -28,6 +29,7 @@ import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { IconCDN } from '../../../constants/icon_cdn';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
@@ -39,6 +41,7 @@ import HeaderLeftThreadForm from './HeaderLeftThreadForm';
 type CreateThreadFormScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL;
 
 export default function CreateThreadForm({ navigation, route }: MenuThreadScreenProps<CreateThreadFormScreen>) {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
@@ -117,39 +120,47 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		) => {
 			if (sessionUser) {
 				if (value?.nameValueThread) {
-					const thread = (await createThread(value)) as ApiChannelDescription;
-					if (thread) {
-						// sleep for waiting server check exist after insert
-						await sleep(100);
-						await dispatch(
-							channelsActions.joinChat({
-								clanId: currentClanId as string,
-								channelId: thread.channel_id as string,
-								channelType: thread.type as number,
-								isPublic: false
-							})
-						);
-						save(STORAGE_CLAN_ID, currentClanId);
-						if (messageCreate) {
-							await sendMessageThread(
-								{
-									t: messageCreate?.content?.t
-								},
-								messageCreate?.mentions,
-								messageCreate?.attachments,
-								undefined,
-								thread,
-								true
+					try {
+						Keyboard.dismiss();
+						dispatch(appActions.setLoadingMainMobile(true));
+						const thread = (await createThread(value)) as ApiChannelDescription;
+						if (thread) {
+							// sleep for waiting server check exist after insert
+							await sleep(100);
+							await dispatch(
+								channelsActions.joinChat({
+									clanId: currentClanId as string,
+									channelId: thread.channel_id as string,
+									channelType: thread.type as number,
+									isPublic: false
+								})
+							);
+							save(STORAGE_CLAN_ID, currentClanId);
+							if (messageCreate) {
+								await sendMessageThread(
+									{
+										t: messageCreate?.content?.t
+									},
+									messageCreate?.mentions,
+									messageCreate?.attachments,
+									undefined,
+									thread,
+									true
+								);
+							}
+							await sendMessageThread(content, mentions, attachments, references, thread, true);
+							await dispatch(
+								messagesActions.fetchMessages({
+									channelId: thread.channel_id as string,
+									isFetchingLatestMessages: true,
+									clanId: currentClanId
+								})
 							);
 						}
-						await sendMessageThread(content, mentions, attachments, references, thread, true);
-						await dispatch(
-							messagesActions.fetchMessages({
-								channelId: thread.channel_id as string,
-								isFetchingLatestMessages: true,
-								clanId: currentClanId
-							})
-						);
+					} catch (error) {
+						console.error('Error creating thread:', error);
+					} finally {
+						dispatch(appActions.setLoadingMainMobile(false));
 					}
 				} else {
 					await sendMessageThread(content, mentions, attachments, references, threadCurrentChannel);
@@ -186,12 +197,17 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME);
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id || currentClanId;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		await sleep(500);
+		if (isTabletLandscape) {
+			navigation.navigate(APP_SCREEN.HOME);
+		} else {
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+		}
 	};
 
 	const handleInputChange = (text: string) => {
@@ -204,7 +220,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	};
 
 	return (
-		<KeyboardAvoidingView style={styles.createChannelContent} behavior={'padding'} keyboardVerticalOffset={50}>
+		<KeyboardAvoidingView style={styles.createChannelContent} behavior={'padding'} keyboardVerticalOffset={size.s_80}>
 			<View style={styles.createChannelContent}>
 				<View style={{ margin: size.s_20, flex: 1 }}>
 					<View style={styles.iconContainer}>
