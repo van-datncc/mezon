@@ -1,9 +1,10 @@
 /* eslint-disable @nx/enforce-module-boundaries */
-import { ActionEmitEvent } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiRecentActions, useAppDispatch } from '@mezon/store-mobile';
 import { getSrcEmoji } from '@mezon/utils';
-import { memo } from 'react';
+import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
@@ -22,12 +23,14 @@ export interface IProductDetail {
 
 interface ProductDetailModalProps {
 	product: IProductDetail;
+	isHaveUnlock: boolean;
 }
 
-const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
+const ProductDetailModal = ({ product, isHaveUnlock }: ProductDetailModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
+	const { t } = useTranslation(['token']);
 
 	const closeModal = () => DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 
@@ -37,7 +40,13 @@ const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
 				const apiType = product?.type === 'emoji' ? 0 : 1;
 				const response = await dispatch(emojiRecentActions.buyItemForSale({ id: product?.id, type: apiType }));
 				if (!response?.type?.includes('rejected')) {
-					Toast.show({ type: 'success', text1: 'Buy item successfully!' });
+					Toast.show({
+						type: 'success',
+						props: {
+							text2: 'Buy item successfully!',
+							leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+						}
+					});
 					DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 				} else {
 					Toast.show({ type: 'error', text1: 'Failed to buy item.' });
@@ -51,7 +60,14 @@ const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
 
 	const handleBuy = () => {
 		const confirmData = {
-			children: <MezonConfirm title="..." content="..." confirmText="..." onConfirm={handleConfirmPurchase} />
+			children: (
+				<MezonConfirm
+					onConfirm={() => handleConfirmPurchase()}
+					title={t('unlockItemTitle')}
+					content={t('unlockItemDes')}
+					confirmText={t('confirmUnlock')}
+				/>
+			)
 		};
 
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data: confirmData });
@@ -64,9 +80,6 @@ const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
 			</TouchableWithoutFeedback>
 
 			<View style={styles.modal}>
-				<TouchableOpacity style={styles.closeBtn} onPress={closeModal}>
-					<Text style={styles.closeBtnText}>×</Text>
-				</TouchableOpacity>
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<View style={styles.imageContainer}>
 						<Image
@@ -84,27 +97,32 @@ const ProductDetailModal = ({ product }: ProductDetailModalProps) => {
 
 					<View style={styles.infoContainer}>
 						<Text style={styles.productName}>{product?.shortname}</Text>
-
 						<View style={styles.featuresContainer}>
-							<Text style={styles.featuresTitle}>Thông tin chi tiết:</Text>
-							<View style={styles.featureRow}>
-								<Text style={styles.featureLabel}>Mã sản phẩm:</Text>
-								<Text style={styles.featureValue}>{product?.id}</Text>
+							<Text style={styles.featuresTitle}>{t('detailTitle')}</Text>
+							<View style={[styles.featureRow]}>
+								<Text style={styles.featureLabel}>{t('code')}:</Text>
+								<Text style={styles.featureValue} numberOfLines={1}>
+									{product?.id}3 12312 3123 123 123 123 123{' '}
+								</Text>
 							</View>
 							<View style={styles.featureRow}>
-								<Text style={styles.featureLabel}>Tên sản phẩm:</Text>
-								<Text style={styles.featureValue}>{product?.shortname}</Text>
+								<Text style={styles.featureLabel}>{t('name')}:</Text>
+								<Text style={styles.featureValue} numberOfLines={1}>
+									{product?.shortname}
+								</Text>
 							</View>
 						</View>
 					</View>
 				</ScrollView>
 
-				<View style={styles.actionContainer}>
-					<TouchableOpacity style={styles.buyBtn} onPress={handleBuy}>
-						<MezonIconCDN icon={IconCDN.payingIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-						<Text style={styles.buyBtnText}>Mua ngay</Text>
-					</TouchableOpacity>
-				</View>
+				{!isHaveUnlock && (
+					<View style={styles.actionContainer}>
+						<TouchableOpacity style={styles.buyBtn} onPress={handleBuy}>
+							<MezonIconCDN icon={IconCDN.payingIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+							<Text style={styles.buyBtnText}>{t('unlockItemTitle')}</Text>
+						</TouchableOpacity>
+					</View>
+				)}
 			</View>
 		</View>
 	);

@@ -1,27 +1,39 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { getSrcEmoji } from '@mezon/utils';
 import { memo } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
-import { IProductDetail } from '../../ProductDetailModal';
+import ProductDetailModal, { IProductDetail } from '../../ProductDetailModal';
 import { style } from './styles';
 
 interface IProductItemProps {
 	product: IProductDetail;
 	type: string;
-	onPress?: (product: IProductDetail) => void;
 }
 
-const ProductItem = ({ product, type, onPress }: IProductItemProps) => {
+const ProductItem = ({ product, type }: IProductItemProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation(['token']);
+	const isHaveUnlock = type === 'emoji' ? !!product?.src : !!product?.source;
 
 	const handlePress = () => {
-		onPress?.({
-			...product,
-			type: product?.type || 'sticker'
-		});
+		const data = {
+			children: (
+				<ProductDetailModal
+					isHaveUnlock={isHaveUnlock}
+					product={{
+						...product,
+						type: type as 'emoji' | 'sticker'
+					}}
+				/>
+			)
+		};
+
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	return (
@@ -44,8 +56,8 @@ const ProductItem = ({ product, type, onPress }: IProductItemProps) => {
 					{product?.shortname}
 				</Text>
 				<View style={styles.buyBadge}>
-					<MezonIconCDN icon={IconCDN.payingIcon} color={themeValue.textStrong} width={size.s_16} height={size.s_16} />
-					<Text style={styles.buyBtnText}>Mua ngay</Text>
+					{!isHaveUnlock && <MezonIconCDN icon={IconCDN.payingIcon} color={themeValue.textStrong} width={size.s_16} height={size.s_16} />}
+					<Text style={styles.buyBtnText}>{isHaveUnlock ? t('haveUnlocked') : t('unlockItemTitle')}</Text>
 				</View>
 			</View>
 		</TouchableOpacity>

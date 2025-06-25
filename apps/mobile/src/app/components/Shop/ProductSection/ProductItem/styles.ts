@@ -6,13 +6,13 @@ export const style = (theme: any) =>
         container: {
             flex: 1,
             backgroundColor: theme.secondary,
-            borderRadius: size.s_8,
+            borderRadius: size.s_12,
             margin: size.s_6,
             minWidth: size.s_150,
             maxWidth: size.s_200,
         },
         imageContainer: {
-            marginTop: size.s_12,
+            padding: size.s_12,
             height: size.s_140,
             backgroundColor: theme.secondary,
         },

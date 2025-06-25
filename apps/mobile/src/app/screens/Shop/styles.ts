@@ -12,7 +12,7 @@ export const style = (theme: any) =>
             alignItems: 'center',
             justifyContent: 'flex-start',
             padding: size.s_8,
-            backgroundColor: theme.secondary,
+            backgroundColor: theme.primary,
         },
         title: {
             fontSize: size.s_20,

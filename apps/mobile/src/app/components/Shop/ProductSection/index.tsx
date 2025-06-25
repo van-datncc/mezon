@@ -9,12 +9,11 @@ interface IProductSectionProps {
 	title: string;
 	icon?: string;
 	type?: string;
-	data: IProductDetail[];
-	onProductPress?: (product: IProductDetail) => void;
+	data: IProductDetail[] | any;
 }
 
-const ProductSection = ({ title, icon, type = 'sticker', data, onProductPress }: IProductSectionProps) => {
-	const renderItem = ({ item }: { item: IProductDetail }) => <ProductItem product={item} type={type} onPress={() => onProductPress?.(item)} />;
+const ProductSection = ({ title, icon, type = 'sticker', data }: IProductSectionProps) => {
+	const renderItem = ({ item }: { item: IProductDetail }) => <ProductItem product={item} type={type} />;
 
 	return (
 		<View>
