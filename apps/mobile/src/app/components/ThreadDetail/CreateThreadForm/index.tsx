@@ -28,6 +28,7 @@ import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { IconCDN } from '../../../constants/icon_cdn';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN, MenuThreadScreenProps } from '../../../navigation/ScreenTypes';
 import { ChatBox } from '../../../screens/home/homedrawer/ChatBox';
 import MessageItem from '../../../screens/home/homedrawer/MessageItem';
@@ -39,6 +40,7 @@ import HeaderLeftThreadForm from './HeaderLeftThreadForm';
 type CreateThreadFormScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL;
 
 export default function CreateThreadForm({ navigation, route }: MenuThreadScreenProps<CreateThreadFormScreen>) {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
@@ -186,7 +188,12 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		navigation.navigate(APP_SCREEN.HOME);
+		if (isTabletLandscape) {
+			sleep(200);
+			navigation.navigate(APP_SCREEN.HOME);
+		} else {
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+		}
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id || currentClanId;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
