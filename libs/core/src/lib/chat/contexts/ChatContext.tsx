@@ -57,6 +57,7 @@ import {
 	selectAllThreads,
 	selectAllUserClans,
 	selectChannelById,
+	selectChannelByIdAndClanId,
 	selectChannelThreads,
 	selectChannelsByClanId,
 	selectClanView,
@@ -604,7 +605,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onlastseenupdated = useCallback(async (lastSeenMess: LastSeenMessageEvent) => {
-		const { clan_id, channel_id, badge_count, message_id } = lastSeenMess;
+		const { clan_id, channel_id, message_id } = lastSeenMess;
+		let badge_count = lastSeenMess.badge_count;
+
+		if (clan_id && clan_id !== '0') {
+			const store = getStore();
+			const channel = selectChannelByIdAndClanId(store.getState(), clan_id, channel_id);
+			badge_count = channel.count_mess_unread || 0;
+		}
+
 		resetChannelBadgeCount(dispatch, {
 			clanId: clan_id,
 			channelId: channel_id,
