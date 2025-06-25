@@ -205,7 +205,6 @@ const RootListener = () => {
 	};
 
 	const mapMessageNotificationToSlice = (notificationDataPushedParse: any) => {
-		console.log('log  => notificationDataPushedParse', notificationDataPushedParse);
 		if (notificationDataPushedParse.length > 0) {
 			for (const data of notificationDataPushedParse) {
 				const extraMessage = data?.message;

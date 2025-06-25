@@ -68,32 +68,34 @@ const RenderAudioChat = React.memo(
 		};
 
 		return (
-			<TouchableOpacity
-				onPress={isPlaying ? pauseSound : playSound}
-				activeOpacity={0.6}
-				style={{ ...styles.container, ...stylesContainerCustom }}
-			>
-				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
-					<View
-						style={{
-							backgroundColor: baseColor.white,
-							borderRadius: size.s_30,
-							padding: size.s_8,
-							alignItems: 'center',
-							gap: size.s_10,
-							justifyContent: 'center'
-						}}
-					>
-						{isPlaying ? (
-							<PauseIcon width={size.s_20} height={size.s_20} color={baseColor.bgDeepLavender} />
-						) : (
-							<PlayIcon width={size.s_20} height={size.s_20} color={baseColor.bgDeepLavender} />
-						)}
+			<View style={{ flex: 1, flexDirection: 'row' }}>
+				<TouchableOpacity
+					onPress={isPlaying ? pauseSound : playSound}
+					activeOpacity={0.6}
+					style={{ ...styles.container, ...stylesContainerCustom }}
+				>
+					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+						<View
+							style={{
+								backgroundColor: baseColor.white,
+								borderRadius: size.s_30,
+								padding: size.s_8,
+								alignItems: 'center',
+								gap: size.s_10,
+								justifyContent: 'center'
+							}}
+						>
+							{isPlaying ? (
+								<PauseIcon width={size.s_16} height={size.s_16} color={baseColor.bgDeepLavender} />
+							) : (
+								<PlayIcon width={size.s_16} height={size.s_16} color={baseColor.bgDeepLavender} />
+							)}
+						</View>
+						<LottieView source={WAY_AUDIO} ref={recordingWaveRef} resizeMode="cover" style={{ ...styles.soundLottie, ...styleLottie }} />
+						<Text style={[styles.currentTime, isPlaying && { opacity: 0 }]}>{`${formatTime(totalTime)}`}</Text>
 					</View>
-					<LottieView source={WAY_AUDIO} ref={recordingWaveRef} resizeMode="cover" style={{ ...styles.soundLottie, ...styleLottie }} />
-					{!isPlaying && <Text style={styles.currentTime}>{`${formatTime(totalTime)}`}</Text>}
-				</View>
-			</TouchableOpacity>
+				</TouchableOpacity>
+			</View>
 		);
 	}
 );

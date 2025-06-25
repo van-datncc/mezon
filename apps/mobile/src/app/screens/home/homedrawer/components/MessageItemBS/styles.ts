@@ -51,8 +51,7 @@ export const style = (colors: Attributes) =>
 		favouriteIconItem: {
 			backgroundColor: colors.secondary,
 			padding: size.s_10,
-			borderRadius: 50,
-			marginRight: size.s_16
+			borderRadius: 50
 		},
 		reactIcon: {
 			fontSize: size.h4,

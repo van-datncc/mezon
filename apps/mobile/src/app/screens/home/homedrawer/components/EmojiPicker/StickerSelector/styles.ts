@@ -12,7 +12,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		audioContent: {
-			width: (Metrics.screenWidth - size.s_30) / 2,
+			width: (Metrics.screenWidth - size.s_30) / 2.01,
 			borderRadius: 10,
 			overflow: 'hidden',
 			borderWidth: 1,
