@@ -8,11 +8,11 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			paddingHorizontal: size.s_20,
 			backgroundColor: colors.primary,
-			paddingVertical: size.s_10,
+			paddingVertical: size.s_6,
 			alignItems: 'center',
 			justifyContent: 'space-between',
 			gap: size.s_10,
-			height: size.s_60,
+			height: size.s_50,
 			flex: 1
 		},
 		rightItem: {
@@ -76,7 +76,8 @@ export const style = (colors: Attributes) =>
 		imgWrapper: {
 			width: size.s_30,
 			height: size.s_30,
-			borderRadius: size.s_30
+			borderRadius: size.s_30,
+			overflow: 'hidden',
 		},
 		user: {
 			flexDirection: 'row',

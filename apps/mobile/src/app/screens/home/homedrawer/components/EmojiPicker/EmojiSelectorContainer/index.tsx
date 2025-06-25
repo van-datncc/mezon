@@ -14,7 +14,7 @@ import {
 } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import { IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
+import { FOR_SALE_CATE, IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Keyboard, TextInput, View } from 'react-native';
@@ -64,6 +64,14 @@ export default function EmojiSelectorContainer({
 			if (emojis?.length === 0 || !categoryParam) {
 				return [];
 			}
+			if (categoryParam?.toLowerCase() === FOR_SALE_CATE) {
+				return emojis
+					?.filter((emoji) => emoji?.is_for_sale)
+					?.map((emoji) => ({
+						...emoji,
+						category: categoryParam
+					}));
+			}
 
 			return emojis
 				.filter((emoji) => !!emoji.id && emoji?.category?.includes(categoryParam))
@@ -88,6 +96,7 @@ export default function EmojiSelectorContainer({
 				)
 			: [];
 		return [
+			<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.starIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.clockIcon} color={themeValue.textStrong} />,
 			...clanEmojis,

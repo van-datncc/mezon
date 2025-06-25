@@ -94,17 +94,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		await Promise.all(promises);
 	};
 
-	const stickerLoader = useCallback(async () => {
-		const promises = [];
-		const store = await getStoreAsync();
-		promises.push(store.dispatch(settingClanStickerActions.fetchStickerByUserId({})));
-		await Promise.all(promises);
-	}, []);
-
-	useEffect(() => {
-		stickerLoader();
-	}, [clanId, currentDirectMessage?.channel_id, stickerLoader]);
-
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
 		channelOrDirect: currentDirectMessage || currentChannel
@@ -148,10 +137,11 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		if (type === 'gif') {
 			handleSend({ t: '' }, [], [{ url: data }], isEmpty(messageRef) ? [] : [messageRef]);
 		} else if (type === 'sticker') {
+			const imageUrl = data?.url ? data?.url : `${process.env.NX_BASE_IMG_URL}/stickers/${data?.id}.webp`;
 			handleSend(
 				{ t: '' },
 				[],
-				[{ url: data?.url, filetype: stickerMode === MediaType.STICKER ? 'image/gif' : 'audio/mpeg', filename: data?.id }],
+				[{ url: imageUrl, filetype: stickerMode === MediaType.STICKER ? 'image/gif' : 'audio/mpeg', filename: data?.id }],
 				isEmpty(messageRef) ? [] : [messageRef]
 			);
 		} else {
