@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useTheme } from '@mezon/mobile-ui';
-import React, { Ref, forwardRef, memo } from 'react';
+import React, { Ref, forwardRef, memo, useMemo } from 'react';
 import { View } from 'react-native';
 import { style } from './styles';
 
@@ -19,11 +19,12 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 ) {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
+	const snapPoints = useMemo(() => [height === 0 ? 1 : height, '100%'], [height]);
 
 	return (
 		<BottomSheet
 			ref={ref}
-			snapPoints={[height === 0 ? 1 : height, '100%']}
+			snapPoints={snapPoints}
 			animateOnMount
 			backgroundStyle={{
 				backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary

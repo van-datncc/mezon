@@ -17,7 +17,7 @@ import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroup
 import { IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, TextInput, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import MezonClanAvatar from '../../../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -121,6 +121,7 @@ export default function EmojiSelectorContainer({
 		async (emoji: IEmoji) => {
 			onSelected(emoji?.id, emoji?.shortname);
 			handleBottomSheetCollapse?.();
+			Keyboard.dismiss();
 			if (!isReactMessage) {
 				const emojiItemName = `:${emoji?.shortname?.split(':').join('')}:`;
 				DeviceEventEmitter.emit(ActionEmitEvent.ADD_EMOJI_PICKED, { shortName: emojiItemName, channelId });
@@ -275,11 +276,11 @@ export default function EmojiSelectorContainer({
 			maxToRenderPerBatch={1}
 			windowSize={10}
 			removeClippedSubviews={false}
+			keyboardShouldPersistTaps="handled"
 			disableVirtualization
 			style={{ marginBottom: -size.s_20 }}
 			contentContainerStyle={{ minHeight: '100%' }}
 			onScrollToIndexFailed={(info) => {
-				console.warn('onScrollToIndexFailed', info);
 				if (info?.highestMeasuredFrameIndex) {
 					const wait = new Promise((resolve) => setTimeout(resolve, 100));
 					if (info.highestMeasuredFrameIndex < info.index) {

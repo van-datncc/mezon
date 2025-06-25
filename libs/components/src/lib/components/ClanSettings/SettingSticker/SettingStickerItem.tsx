@@ -35,7 +35,11 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 			}
 		>
 			<div className="aspect-square h-[72px] overflow-hidden flex justify-center">
-				<img className={' w-auto h-full object-cover select-none'} src={sticker.source} alt="" />
+				<img
+					className={' w-auto h-full object-cover select-none'}
+					src={`${!sticker.source ? `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker.id + `.webp` : sticker.source}`}
+					alt=""
+				/>
 			</div>
 			<p className="font-semibold dark:text-white text-textPrimaryLight">{sticker.shortname}</p>
 			<div className="flex items-end justify-center gap-1">
