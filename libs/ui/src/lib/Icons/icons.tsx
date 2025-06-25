@@ -1569,21 +1569,14 @@ export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
 
 export function AddCircle(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-			<g id="Live area" clipPath="url(#clip0_2253_615)">
-				<path
-					id="Vector"
-					fillRule="evenodd"
-					clipRule="evenodd"
-					d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM10 4.75C10.6904 4.75 11.25 5.30964 11.25 6V8.75H14C14.6904 8.75 15.25 9.30964 15.25 10C15.25 10.6904 14.6904 11.25 14 11.25H11.25V14C11.25 14.6903 10.6904 15.25 10 15.25C9.30966 15.25 8.75001 14.6903 8.75001 14V11.25H6.00005C5.30969 11.25 4.75005 10.6904 4.75005 10C4.75005 9.30964 5.30969 8.75 6.00005 8.75H8.75001V6C8.75001 5.30964 9.30966 4.75 10 4.75Z"
-					fill="currentColor"
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_2253_615">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" {...props}>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm0-17a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 }
@@ -6988,7 +6981,6 @@ export function TrumPartyControl({ className = '', ...props }: { className?: str
 		</svg>
 	);
 }
-
 
 export function VoiceSoundControlIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (

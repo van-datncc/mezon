@@ -14,6 +14,7 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	MentionDataProps,
+	RECENT_EMOJI_CATEGORY,
 	TITLE_MENTION_HERE,
 	ThemeApp,
 	addMarkdownPrefix,
@@ -76,12 +77,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [message?.id]);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
-		callback(matches);
+		if (!query || emojis.length === 0) return;
+		const q = query.toLowerCase();
+		const matches: { id: string; display: string }[] = [];
+
+		for (const { id, shortname, category } of emojis) {
+			if (category === RECENT_EMOJI_CATEGORY || !shortname || !shortname.includes(q)) continue;
+			if (!id) continue;
+			matches.push({ id, display: shortname });
+			if (matches.length === 20) break;
+		}
+
+		if (matches.length) callback(matches);
 	};
 	const channels = useSelector(selectAllChannels);
 

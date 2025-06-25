@@ -355,6 +355,7 @@ export function ControlBar({
 				{visibleControls.microphone && (
 					<div className="relative rounded-full bg-gray-300 dark:bg-black">
 						<TrackToggle
+							key={+showMicrophone}
 							initialState={showMicrophone}
 							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Microphone}
@@ -372,6 +373,7 @@ export function ControlBar({
 				{visibleControls.camera && (
 					<div className="relative rounded-full ">
 						<TrackToggle
+							key={+showCamera}
 							initialState={showCamera}
 							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Camera}
@@ -395,6 +397,7 @@ export function ControlBar({
 					browserSupportsScreenSharing &&
 					(!isDesktop ? (
 						<TrackToggle
+							key={+showScreen}
 							initialState={showScreen}
 							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.ScreenShare}
