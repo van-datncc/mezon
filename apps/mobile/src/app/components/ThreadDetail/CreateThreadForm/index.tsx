@@ -188,17 +188,17 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 
 	const handleRouteData = async (thread?: IChannel) => {
 		const store = await getStoreAsync();
-		if (isTabletLandscape) {
-			sleep(200);
-			navigation.navigate(APP_SCREEN.HOME);
-		} else {
-			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
-		}
 		const channelId = thread?.channel_id;
 		const clanId = thread?.clan_id || currentClanId;
 		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		await sleep(500);
+		if (isTabletLandscape) {
+			navigation.navigate(APP_SCREEN.HOME);
+		} else {
+			navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+		}
 	};
 
 	const handleInputChange = (text: string) => {
