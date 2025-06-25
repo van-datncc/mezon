@@ -296,16 +296,16 @@ export const selectStickerSuggestionEntities = createSelector(getStickerSettingS
 export const selectOneStickerInfor = (stickerId: string) => createSelector(getStickerSettingState, (state) => selectById(state, stickerId));
 
 export const hasGrandchildModal = createSelector(getStickerSettingState, (state) => state.hasGrandchildModal);
-export const selectStickerByClanId = (clanId: string) =>
-	createSelector(selectAllStickerSuggestion, (stickers) => {
-		return stickers.filter((sticker) => sticker.clan_id === clanId);
-	});
+
 
 export const selectStickerByClanIdAndMediaType = (clanId: string, mediaType: MediaType) =>
 	createSelector(selectAllStickerSuggestion, (stickers) => {
 		return stickers.filter((sticker) => sticker.clan_id === clanId && (sticker as any).media_type === mediaType);
 	});
-
+export const selectStickerByClanId = (clanId: string) =>
+	createSelector(selectAllStickerSuggestion, (stickers) => {
+		return stickers.filter((sticker) => sticker.clan_id === clanId);
+	});
 export const selectStickersByClanId = (clanId: string) =>
 	createSelector(selectAllStickerSuggestion, (stickers) => {
 		return stickers.filter((sticker) => {
