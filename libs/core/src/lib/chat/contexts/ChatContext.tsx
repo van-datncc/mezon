@@ -611,7 +611,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		if (clan_id && clan_id !== '0') {
 			const store = getStore();
 			const channel = selectChannelByIdAndClanId(store.getState(), clan_id, channel_id);
-			badge_count = channel.count_mess_unread || 0;
+			badge_count = channel?.count_mess_unread || 0;
 		}
 
 		resetChannelBadgeCount(dispatch, {
