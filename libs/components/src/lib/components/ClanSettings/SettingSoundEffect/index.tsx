@@ -41,14 +41,11 @@ const SettingSoundEffect = () => {
 
     const sounds = useSelector(selectAudioByClanId(currentClanId));
 
-    // Kiểm tra xem người dùng hiện tại có phải là chủ clan không
     const isClanOwner = useMemo(() => {
         return currentClan?.creator_id === userProfile?.user?.id;
     }, [currentClan, userProfile]);
 
-    // Lưu ý: Chức năng kiểm tra quyền admin sẽ được đơn giản hóa
-    // Trong thực tế, bạn nên sử dụng usePermissionChecker hoặc cơ chế kiểm tra quyền
-    // của ứng dụng để kiểm tra quyền admin đầy đủ
+
 
     const soundList: SoundType[] = sounds.map(sound => ({
         id: sound.id || '',
@@ -81,7 +78,6 @@ const SettingSoundEffect = () => {
         }
     };
 
-    // Kiểm tra nếu người dùng có thể xóa sound (là admin hoặc người tạo sound)
     const canDeleteSound = (creatorId: string) => {
         return isClanOwner || creatorId === currentUserId;
     };
