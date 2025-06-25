@@ -5,7 +5,7 @@ import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
-import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ELimitSize, ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
@@ -131,25 +131,32 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			resizeFile = (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
 		}
 		const isForSale = isForSaleRef.current?.checked;
-		handleUploadEmoticon(client, session, path, resizeFile).then(async (attachment: ApiMessageAttachment) => {
-			const request: ApiClanStickerAddRequest = {
-				id: id,
-				category: category,
-				clan_id: currentClanId,
-				shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
-				source: attachment.url,
-				is_for_sale: isForSale
-			};
+		const realImage = await handleUploadEmoticon(client, session, path, resizeFile as File);
 
-			const requestData = {
-				...request,
-				media_type: 0
-			};
+		const request: ApiClanStickerAddRequest = {
+			id: id,
+			category: category,
+			clan_id: currentClanId,
+			source: realImage.url,
+			shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
+			is_for_sale: isForSale
+		};
+		if (isForSale) {
+			const idPreview = Snowflake.generate();
+			const fileBlur = await createBlurredImageFile(resizeFile);
+			const pathPreview = (isSticker ? 'stickers/' : 'emojis/') + idPreview + '.webp';
+			await handleUploadEmoticon(client, session, pathPreview, fileBlur as File);
+			request.id = idPreview;
+		}
 
-			isSticker
-				? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
-				: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
-		});
+		const requestData = {
+			...request,
+			media_type: 0
+		};
+
+		isSticker
+			? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
+			: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
 
 		handleCloseModal();
 	};
@@ -176,6 +183,37 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 	useEscapeKeyClose(modalRef, handleCloseModal);
 
 	const isForSaleRef = useRef<HTMLInputElement | null>(null);
+
+	function createBlurredImageFile(originalFile: File, blurAmount = 2) {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.src = URL.createObjectURL(originalFile);
+
+			img.onload = () => {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				if (!ctx) {
+					reject(new Error('Không thể tạo canvas context.'));
+					return;
+				}
+				canvas.width = img.width;
+				canvas.height = img.height;
+				ctx.filter = `blur(${blurAmount}px)`;
+				ctx.drawImage(img, 0, 0);
+
+				canvas.toBlob((blob) => {
+					if (blob) {
+						const newFile = new File([blob], 'blurred-image.png', { type: 'image/png' });
+						resolve(newFile); // trả về file có thể dùng tiếp
+					} else {
+						reject(new Error('Không thể chuyển canvas thành file.'));
+					}
+				}, 'image/png');
+			};
+
+			img.onerror = () => reject(new Error('Không thể load ảnh.'));
+		});
+	}
 
 	return (
 		<>
