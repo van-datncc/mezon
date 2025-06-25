@@ -251,25 +251,29 @@ export const ChatMessageSending = memo(
 				return;
 			}
 			const { targetMessage, type } = messageActionNeedToResolve || {};
-			const reference = targetMessage
-				? ([
-						{
-							message_id: '',
-							message_ref_id: targetMessage.id,
-							ref_type: 0,
-							message_sender_id: targetMessage?.sender_id,
-							message_sender_username: targetMessage?.username,
-							mesages_sender_avatar: targetMessage.clan_avatar ? targetMessage.clan_avatar : targetMessage.avatar,
-							message_sender_clan_nick: targetMessage?.clan_nick,
-							message_sender_display_name: targetMessage?.display_name,
-							content: JSON.stringify(targetMessage.content),
-							has_attachment: Boolean(targetMessage?.attachments?.length),
-							channel_id: targetMessage.channel_id ?? '',
-							mode: targetMessage.mode ?? 0,
-							channel_label: targetMessage.channel_label
-						}
-					] as Array<ApiMessageRef>)
-				: undefined;
+			const isCanSendReference = currentDmGroup
+				? currentDmGroup?.user_id?.includes?.(targetMessage?.sender_id) || targetMessage?.sender_id === userId
+				: true;
+			const reference =
+				targetMessage && isCanSendReference
+					? ([
+							{
+								message_id: '',
+								message_ref_id: targetMessage.id,
+								ref_type: 0,
+								message_sender_id: targetMessage?.sender_id,
+								message_sender_username: targetMessage?.username,
+								mesages_sender_avatar: targetMessage.clan_avatar ? targetMessage.clan_avatar : targetMessage.avatar,
+								message_sender_clan_nick: targetMessage?.clan_nick,
+								message_sender_display_name: targetMessage?.display_name,
+								content: JSON.stringify(targetMessage.content),
+								has_attachment: Boolean(targetMessage?.attachments?.length),
+								channel_id: targetMessage.channel_id ?? '',
+								mode: targetMessage.mode ?? 0,
+								channel_label: targetMessage.channel_label
+							}
+						] as Array<ApiMessageRef>)
+					: undefined;
 			dispatch(emojiSuggestionActions.setSuggestionEmojiPicked(''));
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({

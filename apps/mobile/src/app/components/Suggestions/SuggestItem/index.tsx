@@ -89,7 +89,7 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 						</View>
 					)
 				)}
-				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
+				{emojiSrc && <FastImage style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{!isChannelPrivate && isChannelText && !isThread && (
 					<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
 				)}

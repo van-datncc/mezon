@@ -16,10 +16,10 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			height: Platform.OS === 'ios' ? size.s_14 : size.s_4
 		},
 		container: {
-			width: isTabletLandscape ? '35%' : '65%',
 			backgroundColor: baseColor.bgDeepLavender,
 			padding: size.s_6,
 			borderRadius: size.s_30,
-			marginVertical: size.s_2
+			marginVertical: size.s_2,
+			paddingRight: size.s_12
 		}
 	});
