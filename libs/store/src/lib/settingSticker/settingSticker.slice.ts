@@ -296,31 +296,40 @@ export const selectStickerSuggestionEntities = createSelector(getStickerSettingS
 export const selectOneStickerInfor = (stickerId: string) => createSelector(getStickerSettingState, (state) => selectById(state, stickerId));
 
 export const hasGrandchildModal = createSelector(getStickerSettingState, (state) => state.hasGrandchildModal);
-export const selectStickerByClanId = (clanId: string) =>
-	createSelector(selectAllStickerSuggestion, (stickers) => {
-		return stickers.filter((sticker) => sticker.clan_id === clanId);
-	});
 
 export const selectStickerByClanIdAndMediaType = (clanId: string, mediaType: MediaType) =>
 	createSelector(selectAllStickerSuggestion, (stickers) => {
 		return stickers.filter((sticker) => sticker.clan_id === clanId && (sticker as any).media_type === mediaType);
 	});
 
-export const selectStickersByClanId = (clanId: string) =>
-	createSelector(selectAllStickerSuggestion, (stickers) => {
-		return stickers.filter((sticker) => {
-			return sticker.clan_id === clanId && ((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined);
-		});
-	});
+export const selectStickerByClanIdSelector = createSelector(
+	[selectAllStickerSuggestion, (_state: RootState, clanId: string) => clanId],
+	(stickers, clanId) => stickers.filter((sticker) => sticker.clan_id === clanId)
+);
 
-export const selectAudioByClanId = (clanId: string) =>
-	createSelector(selectAllStickerSuggestion, (stickers) => {
-		const sounds = stickers.filter((sticker) => {
-			return sticker.clan_id === clanId && (sticker as any).media_type === MediaType.AUDIO;
-		});
+export const selectStickerByClanId = (clanId: string) => (state: RootState) =>
+	selectStickerByClanIdSelector(state, clanId);
 
-		return sounds;
-	});
+export const selectStickersByClanIdSelector = createSelector(
+	[selectAllStickerSuggestion, (_state: RootState, clanId: string) => clanId],
+	(stickers, clanId) =>
+		stickers.filter((sticker) =>
+			sticker.clan_id === clanId &&
+			((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined)
+		)
+);
+
+export const selectStickersByClanId = (clanId: string) => (state: RootState) =>
+	selectStickersByClanIdSelector(state, clanId);
+
+export const selectAudioByClanIdSelector = createSelector(
+	[selectAllStickerSuggestion, (_state: RootState, clanId: string) => clanId],
+	(stickers, clanId) =>
+		stickers.filter((sticker) => sticker.clan_id === clanId && (sticker as any).media_type === MediaType.AUDIO)
+);
+
+export const selectAudioByClanId = (clanId: string) => (state: RootState) =>
+	selectAudioByClanIdSelector(state, clanId);
 
 export const selectStickersByCurrentUserSelector = createSelector(
 	[selectAllStickerSuggestion, (_state: RootState, clanId: string) => clanId, (_state: RootState, _clanId: string, userId: string) => userId],
