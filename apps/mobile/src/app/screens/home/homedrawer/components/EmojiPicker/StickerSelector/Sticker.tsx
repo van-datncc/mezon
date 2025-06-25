@@ -1,5 +1,5 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiRecentActions, selectCurrentClan, useAppSelector } from '@mezon/store-mobile';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,13 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 			if (sticker.id) {
 				const resp = await dispatch(emojiRecentActions.buyItemForSale({ id: sticker?.id, type: 1 }));
 				if (!resp?.type?.includes('rejected')) {
-					Toast.show({ type: 'success', text1: 'Buy item successfully!' });
+					Toast.show({
+						type: 'success',
+						props: {
+							text2: 'Buy item successfully!',
+							leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+						}
+					});
 					DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 				} else {
 					Toast.show({ type: 'error', text1: 'Failed to buy item.' });

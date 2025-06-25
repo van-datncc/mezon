@@ -1,5 +1,5 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiRecentActions, useAppDispatch } from '@mezon/store-mobile';
 import { IEmoji, getSrcEmoji } from '@mezon/utils';
 import React, { FC, memo } from 'react';
@@ -29,7 +29,13 @@ const EmojisPanel: FC<EmojisPanelProps> = ({ emojisData, onEmojiSelect }) => {
 			if (emoji.id) {
 				const resp = await dispatch(emojiRecentActions.buyItemForSale({ id: emoji?.id, type: 0 }));
 				if (!resp?.type?.includes('rejected')) {
-					Toast.show({ type: 'success', text1: 'Buy item successfully!' });
+					Toast.show({
+						type: 'success',
+						props: {
+							text2: 'Buy item successfully!',
+							leadingIcon: <CheckIcon color={Colors.green} width={30} height={17} />
+						}
+					});
 					DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 				} else {
 					Toast.show({ type: 'error', text1: 'Failed to buy item.' });

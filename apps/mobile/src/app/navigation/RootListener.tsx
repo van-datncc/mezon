@@ -12,6 +12,7 @@ import {
 	friendsActions,
 	getStore,
 	getStoreAsync,
+	gifsActions,
 	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
@@ -427,6 +428,8 @@ const RootListener = () => {
 			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
 			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({ noCache: true })));
 			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true })));
+			promises.push(dispatch(gifsActions.fetchGifCategories()));
+			promises.push(dispatch(gifsActions.fetchGifCategoryFeatured()));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
 			promises.push(dispatch(acitvitiesActions.listActivities()));
 			await Promise.allSettled(promises);

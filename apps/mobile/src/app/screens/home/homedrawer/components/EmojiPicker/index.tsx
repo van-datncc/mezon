@@ -3,20 +3,11 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { debounce, isEmpty } from '@mezon/mobile-components';
 import { Colors, Fonts, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	MediaType,
-	getStoreAsync,
-	gifsActions,
-	selectAnonymousMode,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectDmGroupCurrent,
-	settingClanStickerActions
-} from '@mezon/store-mobile';
+import { MediaType, selectAnonymousMode, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload, checkIsThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import React, { MutableRefObject, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Text, TextInput, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -69,7 +60,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const clanId = useSelector(selectCurrentClanId);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
@@ -81,18 +71,6 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const dmMode = currentDirectMessage
 		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
 		: '';
-
-	useEffect(() => {
-		initLoader();
-	}, []);
-
-	const initLoader = async () => {
-		const promises = [];
-		const store = await getStoreAsync();
-		promises.push(store.dispatch(gifsActions.fetchGifCategories()));
-		promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
-		await Promise.all(promises);
-	};
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
