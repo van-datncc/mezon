@@ -62,5 +62,16 @@ export const style = (colors: Attributes) =>
 			maxWidth: '80%',
 			marginTop: size.s_6,
 			textAlign: 'center'
+		},
+		wrapperIconLocked: {
+			backgroundColor: 'rgba(0, 0, 0, 0.7)',
+			position: 'absolute',
+			alignSelf: 'center',
+			justifyContent: 'center',
+			alignItems: 'center',
+			left: 0,
+			width: '100%',
+			height: '100%',
+			zIndex: 1
 		}
 	});

@@ -1,4 +1,4 @@
-import { Attributes, Colors, Fonts, Metrics } from '@mezon/mobile-ui';
+import { Attributes, Colors, Fonts, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes, isTabletLandscape: boolean) =>
@@ -12,9 +12,9 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 		},
 		container: {
 			backgroundColor: colors.secondary,
-			padding: Metrics.size.xl,
-			margin: Metrics.size.l,
-			borderRadius: 10,
+			padding: size.s_16,
+			margin: size.s_16,
+			borderRadius: size.s_16,
 			overflow: 'hidden',
 			width: '90%',
 			marginHorizontal: isTabletLandscape ? '30%' : 0,
@@ -23,12 +23,12 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 
 		title: {
 			color: colors.textStrong,
-			fontSize: Fonts.size.h7,
+			fontSize: size.h4,
 			fontWeight: 'bold'
 		},
 
 		header: {
-			paddingBottom: Metrics.size.m,
+			paddingBottom: size.s_12,
 			borderBottomColor: colors.border,
 			borderBottomWidth: 1,
 			marginBottom: Metrics.size.xl
@@ -36,18 +36,18 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 
 		btnWrapper: {
 			display: 'flex',
-			gap: Metrics.size.m,
-			paddingVertical: Metrics.size.m,
+			gap: size.s_12,
+			paddingVertical: size.s_12,
 			paddingTop: Metrics.size.xl
 		},
 
 		btn: {
-			borderRadius: 20,
-			padding: Metrics.size.m,
+			borderRadius: size.s_20,
+			padding: size.s_10,
 			backgroundColor: colors.primary
 		},
 		btnDanger: {
-			backgroundColor: Colors.red
+			backgroundColor: Colors.bgViolet
 		},
 		btnText: {
 			color: colors.textStrong,
@@ -57,7 +57,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 
 		contentText: {
 			color: colors.text,
-			fontSize: Fonts.size.h8,
+			fontSize: size.h6,
 			textAlign: 'center'
 		},
 		backdrop: {

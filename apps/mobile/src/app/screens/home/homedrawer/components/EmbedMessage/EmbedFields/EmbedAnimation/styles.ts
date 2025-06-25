@@ -1,7 +1,7 @@
 import { size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (isPortrait: boolean, isSlotGame: boolean) =>
+export const style = (isPortrait: boolean) =>
 	StyleSheet.create({
 		loading: {
 			flex: 1,
@@ -13,8 +13,7 @@ export const style = (isPortrait: boolean, isSlotGame: boolean) =>
 			alignItems: 'center',
 			justifyContent: 'center',
 			flexDirection: 'row',
-			gap: isSlotGame ? size.s_10 : 0,
-			paddingVertical: isPortrait ? 0 : size.s_40,
-			marginVertical: isSlotGame ? -size.s_10 : -size.s_80
+			gap: size.s_10,
+			paddingVertical: isPortrait ? 0 : size.s_40
 		}
 	});

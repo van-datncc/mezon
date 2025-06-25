@@ -282,6 +282,7 @@ const UserProfile = React.memo(
 				note: t('userAction.transferFunds'),
 				canEdit: true
 			});
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			navigation.push(APP_SCREEN.WALLET, {
 				activeScreen: 'transfer',
 				formValue: payload
