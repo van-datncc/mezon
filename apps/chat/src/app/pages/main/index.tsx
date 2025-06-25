@@ -342,9 +342,7 @@ const SidebarMenu = memo(
 								onClick={openCreateClanModal}
 							>
 								<div className="w-[40px] h-[40px] rounded-lg dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-									<Icons.AddCircle
-										className={`dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary`}
-									/>
+									<Icons.AddCircle className="dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
 								</div>
 							</div>
 						</NavLinkComponent>
