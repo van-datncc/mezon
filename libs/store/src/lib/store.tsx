@@ -65,6 +65,7 @@ import { ONBOARDING_FEATURE_KEY, onboardingReducer } from './onboarding/onboardi
 import { permissionRoleChannelReducer } from './permissionChannel/permissionRoleChannel.slice';
 import { pinMessageReducer } from './pinMessages/pinMessage.slice';
 import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './policies/overriddenPolicies.slice';
+import { QUICK_MENU_FEATURE_KEY, quickMenuReducer } from './quickMenu/quickMenu.slice';
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
@@ -402,7 +403,8 @@ const reducer = {
 	walletLedger: walletLedgerReducer,
 	[CHANNEL_LIST_RENDER]: listChannelRenderReducer,
 	[COMPOSE_FEATURE_KEY]: persistedCompose,
-	groupCall: groupCallReducer
+	groupCall: groupCallReducer,
+	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer
 };
 
 let storeInstance = configureStore({
