@@ -8,6 +8,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			alignItems: 'center',
 			backgroundColor: colors.primary,
+			paddingBottom: size.s_2,
+			marginBottom: size.s_10,
 			borderBottomColor: colors.border,
 			borderBottomWidth: 1,
 			paddingHorizontal: size.s_16
@@ -43,5 +45,20 @@ export const style = (colors: Attributes) =>
 			color: Colors.white,
 			fontWeight: 'bold',
 			fontSize: size.s_14
+		},
+		wrapperForSale: {
+			position: 'absolute',
+			alignItems: 'center',
+			justifyContent: 'center',
+			left: size.s_4,
+			bottom: 0,
+			transform: 'rotate(320deg)',
+			width: size.s_24,
+			borderWidth: 1,
+			borderColor: 'yellow',
+			borderRadius: size.s_20,
+			height: size.s_24,
+			zIndex: 1,
+			backgroundColor: colors.primary
 		}
 	});

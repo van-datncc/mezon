@@ -36,7 +36,8 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 		.map((sticker) => ({
 			id: sticker.clan_id,
 			type: sticker.clan_name,
-			url: sticker.logo
+			url: sticker.logo,
+			forSale: sticker?.is_for_sale
 		}))
 		.filter((sticker, index, self) => index === self.findIndex((s) => s.id === sticker.id));
 
@@ -47,7 +48,8 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 					id: sticker.id,
 					url: sticker.source,
 					type: sticker.clan_name,
-					name: sticker.shortname
+					name: sticker.shortname,
+					forSale: sticker?.is_for_sale
 				}))
 			].filter(Boolean),
 		[clanStickers]
