@@ -13,7 +13,9 @@ import notifee from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
 	AndroidCategory,
+	AndroidGroupAlertBehavior,
 	AndroidImportance,
+	AndroidStyle,
 	AndroidVisibility,
 	NotificationAndroid
 } from '@notifee/react-native/src/types/NotificationAndroid';
@@ -144,17 +146,18 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 	}
 
 	try {
-		const channelGroup = await getOrCreateChannelGroup(channel);
-		const channelId = await createNotificationChannel(channel, channelGroup?.groupId);
+		const groupId = await getOrCreateChannelGroup(channel);
+		const channelId = await createNotificationChannel(channel, groupId || '');
 
 		return {
 			...defaultConfig,
 			channelId,
 			tag: channelId,
-			sortKey: channelId,
+			sortKey: new Date().getTime().toString(),
 			category: AndroidCategory.MESSAGE,
-			groupId: channelGroup?.groupId,
-			groupSummary: channelGroup?.isGroupSummary
+			groupId: groupId,
+			groupSummary: false,
+			groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY
 		};
 	} catch (error) {
 		console.error('Error configuring Android notification:', error);
@@ -162,14 +165,12 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 	}
 };
 
-const getOrCreateChannelGroup = async (channelId: string): Promise<{ groupId: string; isGroupSummary: boolean } | null> => {
+const getOrCreateChannelGroup = async (channelId: string): Promise<string> => {
 	try {
 		if (!isValidString(channelId)) return null;
 
 		let groupId = '';
 		const group = await notifee.getChannelGroup(channelId);
-		const notifications = await notifee.getDisplayedNotifications();
-		const existInNotification = notifications?.some?.((item) => item?.notification?.android?.groupId === channelId);
 
 		if (group?.id) {
 			groupId = group.id;
@@ -180,13 +181,10 @@ const getOrCreateChannelGroup = async (channelId: string): Promise<{ groupId: st
 			});
 		}
 
-		return {
-			groupId,
-			isGroupSummary: group === null || !existInNotification
-		};
+		return groupId;
 	} catch (error) {
 		console.error('Error creating channel group:', error);
-		return null;
+		return '';
 	}
 };
 
@@ -206,7 +204,7 @@ const createNotificationChannel = async (channelId: string, groupId: string): Pr
 		});
 	} catch (error) {
 		console.error('Error creating notification channel:', error);
-		return 'default';
+		return channelId;
 	}
 };
 
@@ -260,30 +258,53 @@ export const createLocalNotification = async (title: string, body: string, data:
 		if (isAlreadyDisplayed) {
 			return;
 		}
-		if (configDisplayNotificationAndroid?.groupSummary && Platform.OS === 'android') {
-			await notifee.displayNotification({
-				title: '',
-				subtitle: '',
-				id: notificationId + `${new Date().getTime()}`,
-				android: {
-					...configDisplayNotificationAndroid,
-					groupSummary: true
-				},
-				ios: configDisplayNotificationIOS
-			});
-		}
+
+		// Display the individual notification
 		await notifee.displayNotification({
 			id: notificationId,
 			title: title.trim(),
 			body: body.trim(),
 			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',
 			data: data,
-			android: {
-				...configDisplayNotificationAndroid,
-				groupSummary: false
-			},
+			android: configDisplayNotificationAndroid,
 			ios: configDisplayNotificationIOS
 		});
+
+		// Create or update summary notification for Android
+		if (Platform.OS === 'android' && configDisplayNotificationAndroid.groupId) {
+			const displayedNotifications = await notifee.getDisplayedNotifications();
+			const groupNotifications = displayedNotifications.filter(
+				(n) => n.notification.android?.groupId === configDisplayNotificationAndroid.groupId
+			);
+
+			if (groupNotifications.length > 1) {
+				await notifee.displayNotification({
+					id: `summary_${configDisplayNotificationAndroid.groupId}`,
+					title: 'New Messages',
+					body: `${groupNotifications.length} new messages`,
+					data: data,
+					android: {
+						...configDisplayNotificationAndroid,
+						groupSummary: true,
+						groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY,
+						style: {
+							type: AndroidStyle.MESSAGING,
+							person: {
+								name: title
+							},
+							messages: groupNotifications.map((n) => ({
+								text: n.notification.body || '',
+								timestamp: n.notification.android?.timestamp || Date.now(),
+								person: {
+									name: '',
+									icon: n.notification?.data?.image as string
+								}
+							}))
+						}
+					}
+				});
+			}
+		}
 	} catch (err) {
 		console.error('Error creating local notification:', err);
 	}

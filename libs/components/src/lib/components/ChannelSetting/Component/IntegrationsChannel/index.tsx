@@ -7,7 +7,7 @@ interface IIntegrationsChannelProps {
 
 const IntegrationsChannel = ({ currentChannel }: IIntegrationsChannelProps) => {
 	return (
-		<div className="dark:bg-bgPrimary bg-bgLightModeSecond max-sm:px-0 px-[40px]  w-1/2 min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px]  overflow-y-auto hide-scrollbar">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<Integrations currentChannel={currentChannel} />
 		</div>
 	);

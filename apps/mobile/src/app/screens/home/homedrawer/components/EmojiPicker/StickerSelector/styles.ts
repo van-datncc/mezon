@@ -12,7 +12,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		audioContent: {
-			width: (Metrics.screenWidth - size.s_30) / 2,
+			width: (Metrics.screenWidth - size.s_30) / 2.01,
 			borderRadius: 10,
 			overflow: 'hidden',
 			borderWidth: 1,
@@ -62,5 +62,16 @@ export const style = (colors: Attributes) =>
 			maxWidth: '80%',
 			marginTop: size.s_6,
 			textAlign: 'center'
+		},
+		wrapperIconLocked: {
+			backgroundColor: 'rgba(0, 0, 0, 0.7)',
+			position: 'absolute',
+			alignSelf: 'center',
+			justifyContent: 'center',
+			alignItems: 'center',
+			left: 0,
+			width: '100%',
+			height: '100%',
+			zIndex: 1
 		}
 	});

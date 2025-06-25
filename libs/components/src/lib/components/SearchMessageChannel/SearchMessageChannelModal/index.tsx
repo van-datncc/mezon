@@ -74,6 +74,7 @@ const SearchMessageChannelModal = ({
 							<h3 className="text-xs font-medium text-textLightTheme dark:text-textPrimary uppercase mr-1 flex-shrink-0">
 								Search for:
 							</h3>
+
 							<p className="text-sm font-semibold text-textLightTheme dark:text-textPrimary w-full mr-[10px] whitespace-normal text-ellipsis overflow-x-hidden">
 								{valueDisplay}
 							</p>
@@ -84,7 +85,7 @@ const SearchMessageChannelModal = ({
 			)}
 
 			{!hasKeySearch && !isShowSearchOptions && (
-				<SelectGroup groupName="Search options">
+				<SelectGroup groupName="Search options" isSearch>
 					{searchOptions.map((searchItem, idx) => (
 						<SelectItem
 							key={idx}

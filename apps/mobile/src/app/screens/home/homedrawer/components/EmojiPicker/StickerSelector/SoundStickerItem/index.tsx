@@ -69,12 +69,12 @@ const RenderAudioItem = React.memo(({ audioURL }: { audioURL: string }) => {
 			<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
 				<View style={styles.playButton}>
 					{isPlaying ? (
-						<PauseIcon width={size.s_20} height={size.s_20} color={baseColor.bgDeepLavender} />
+						<PauseIcon width={size.s_16} height={size.s_16} color={baseColor.bgDeepLavender} />
 					) : (
-						<PlayIcon width={size.s_20} height={size.s_20} color={baseColor.bgDeepLavender} />
+						<PlayIcon width={size.s_16} height={size.s_16} color={baseColor.bgDeepLavender} />
 					)}
 				</View>
-				{!isPlaying && <Text style={styles.currentTime}>{`${formatTime(totalTime)}`}</Text>}
+				<Text style={styles.currentTime}>{`${formatTime(totalTime)}`}</Text>
 			</View>
 		</TouchableOpacity>
 	);

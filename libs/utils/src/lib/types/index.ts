@@ -48,7 +48,6 @@ import {
 } from './messageLine';
 
 export * from './base';
-export * from './bot-menu';
 export * from './config';
 export * from './htmlCanvas';
 export * from './media';
@@ -618,6 +617,7 @@ export type IEmoji = {
 	logo?: string;
 	clan_name?: string;
 	clan_id?: string;
+	is_for_sale?: boolean;
 };
 
 export type IEmojiRecent = {

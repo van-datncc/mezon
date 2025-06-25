@@ -14,7 +14,7 @@ import {
 	selectVoiceOpenPopOut,
 	usersClanActions
 } from '@mezon/store';
-import { IWithError, sleep } from '@mezon/utils';
+import { IWithError } from '@mezon/utils';
 import { CustomLoaderFunction } from './appLoader';
 
 export interface IAuthLoaderData {
@@ -37,13 +37,28 @@ function getRedirectTo(initialPath?: string): string {
 	return '';
 }
 
+const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
+	return new Promise((resolve) => {
+		const handleOnline = () => {
+			clearTimeout(timeoutId);
+			window.removeEventListener('online', handleOnline);
+			resolve();
+		};
+		window.addEventListener('online', handleOnline);
+		const timeoutId = setTimeout(() => {
+			window.removeEventListener('online', handleOnline);
+			resolve();
+		}, delayMs);
+	});
+};
+
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
-	let retries = 3;
+	let retries = 6;
+	let attempt = 0;
 	let isRedirectLogin = false;
 	const store = getStore();
 	const sessionUser = selectSession(store?.getState());
 
-	// Does not have token in session, cannot call refreshSession
 	if (!sessionUser?.token) {
 		return { isLogin: !isRedirectLogin } as IAuthLoaderData;
 	}
@@ -62,14 +77,19 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 				throw new Error('Session expired');
 			}
 		} catch (error) {
-			console.error(`Error in refreshSession, retrying... (${3 - retries}/3)`, error);
+			console.error(`Error in refreshSession, retrying... (${5 - retries + 1}/5)`, error);
 		}
+
 		retries -= 1;
+		attempt += 1;
+
 		if (retries > 0) {
-			console.error(`Session expired, retrying... (${3 - retries}/3)`);
-			await sleep(1000);
+			const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 16000);
+
+			console.error(`Session expired, retrying in ${delayMs}ms... (${6 - retries + 1}/6)`);
+			await sleepWithNetworkCheck(delayMs);
 		} else {
-			console.error('Session expired after 3 retries');
+			console.error('Session expired after 6 retries');
 			const redirectTo = getRedirectTo(initialPath);
 			dispatch(authActions.setLogout());
 			const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';

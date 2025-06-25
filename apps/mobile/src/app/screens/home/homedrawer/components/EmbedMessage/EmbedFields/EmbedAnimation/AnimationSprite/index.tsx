@@ -1,18 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import { isEqual } from '@mezon/mobile-components';
+import React, { memo, useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 
 function computeInputOutputRanges(frames) {
-	if (!frames || frames.length === 0) {
-		return { base: 0, inputRangeX: [], outputRangeX: [] };
-	}
-
+	if (!frames || frames.length === 0) return { base: 0, inputRangeX: [0], outputRangeX: [0] };
 	let base = 0;
-	const inputRangeX = [];
-	const outputRangeX = [];
-
-	inputRangeX.push(base);
-	outputRangeX.push(-frames[0].x);
-
+	const inputRangeX = [base];
+	const outputRangeX = [-frames[0].x];
 	for (let i = 1; i < frames.length; i++) {
 		if (frames[i].x !== frames[i - 1].x) {
 			base += 0.5;
@@ -31,12 +25,13 @@ function computeInputOutputRanges(frames) {
 	return { base, inputRangeX, outputRangeX };
 }
 
-const SpriteAnimation = ({
+const areEqual = (prevProps, nextProps) => isEqual(prevProps?.frames, nextProps?.frames);
+
+const SpriteAnimationComponent = ({
 	spriteUrl,
 	frameWidth,
 	frameHeight,
 	frames,
-	duration,
 	finalFrame,
 	repeat,
 	spriteWidth,
@@ -45,12 +40,12 @@ const SpriteAnimation = ({
 	sharedAnimation
 }) => {
 	const localAnimation = useRef(new Animated.Value(0)).current;
-	const animation = !repeat ? sharedAnimation : localAnimation;
+	const animation = repeat ? localAnimation : sharedAnimation;
 
 	const { base, inputRangeX, outputRangeX } = computeInputOutputRanges(frames);
 
-	const desiredIndex = frames.findIndex((frame) => frame.name === finalFrame);
-	const finalIndex = desiredIndex >= 0 ? desiredIndex : frames.length - 1;
+	const desiredIndex = frames?.findIndex((frame) => frame.name === finalFrame);
+	const finalIndex = desiredIndex >= 0 ? desiredIndex : frames?.length - 1;
 
 	const translateX = animation.interpolate({
 		inputRange: inputRangeX,
@@ -58,41 +53,48 @@ const SpriteAnimation = ({
 	});
 
 	const translateY = animation.interpolate({
-		inputRange: frames.map((_, i) => i),
-		outputRange: frames.map((frame) => -frame.y)
+		inputRange: frames?.map((_, i) => i),
+		outputRange: frames?.map((frame) => -frame.y)
 	});
 
-	useEffect(() => {
-		if (!isActive) {
-			let currentLoop = 0;
-			const runAnimation = () => {
-				Animated.timing(animation, {
-					toValue: base,
-					duration: repeat ? duration : frames?.length * 30 || duration,
-					useNativeDriver: true
-				}).start(({ finished }) => {
-					if (finished) {
-						currentLoop += 1;
-						if (currentLoop < repeat || !repeat) {
-							animation.setValue(0);
-							runAnimation();
-						} else {
-							animation.setValue(0);
-							Animated.timing(animation, {
-								toValue: finalIndex,
-								duration: duration * (finalIndex / base),
-								useNativeDriver: true
-							}).start();
-						}
+	const playAnimation = () => {
+		let currentLoop = 0;
+		const runAnimation = () => {
+			Animated.timing(animation, {
+				toValue: base,
+				duration: repeat ? 500 : frames?.length * 30 || 500,
+				useNativeDriver: true
+			}).start(({ finished }) => {
+				if (finished) {
+					currentLoop += 1;
+					if (currentLoop < repeat || !repeat) {
+						animation.setValue(0);
+						runAnimation();
+					} else {
+						animation.setValue(0);
+						Animated.timing(animation, {
+							toValue: finalIndex,
+							duration: 500 * (finalIndex / base),
+							useNativeDriver: true
+						}).start();
 					}
-				});
-			};
+				}
+			});
+		};
 
-			runAnimation();
-		} else {
+		runAnimation();
+	};
+
+	useEffect(() => {
+		if (!isActive) playAnimation();
+		else {
 			animation.setValue(finalIndex);
 		}
-	}, [animation, base, duration, finalIndex, repeat]);
+
+		return () => {
+			animation.stopAnimation();
+		};
+	}, []);
 
 	if (!repeat) {
 		return (
@@ -105,7 +107,7 @@ const SpriteAnimation = ({
 				}}
 				removeClippedSubviews={true}
 			>
-				{frames.map((frame, i) => (
+				{frames?.map((frame, i) => (
 					<Animated.Image
 						key={`frame-${i}`}
 						source={{ uri: spriteUrl }}
@@ -140,4 +142,4 @@ const SpriteAnimation = ({
 	);
 };
 
-export default SpriteAnimation;
+export const SpriteAnimation = memo(SpriteAnimationComponent, areEqual);

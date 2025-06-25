@@ -1,14 +1,17 @@
 import {
     MediaType,
-    selectAudioByCurrentUser,
+    selectAllAccount,
+    selectAudioByClanId,
+    selectCurrentClan,
     selectCurrentClanId,
     selectCurrentUserId,
+    selectMemberClanByUserId,
     soundEffectActions,
     useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalUploadSound from './ModalUploadSound';
 
@@ -20,6 +23,7 @@ export type SoundType = {
     id: string;
     name: string;
     url: string;
+    creator_id?: string;
 };
 
 
@@ -33,14 +37,22 @@ const SettingSoundEffect = () => {
     const dispatch = useAppDispatch();
     const currentClanId = useSelector(selectCurrentClanId) || '';
     const currentUserId = useSelector(selectCurrentUserId) || '';
+    const currentClan = useSelector(selectCurrentClan);
+    const userProfile = useSelector(selectAllAccount);
 
-    const sounds = useSelector(selectAudioByCurrentUser(currentClanId, currentUserId));
+    const sounds = useSelector(selectAudioByClanId(currentClanId));
+
+    const isClanOwner = useMemo(() => {
+        return currentClan?.creator_id === userProfile?.user?.id;
+    }, [currentClan, userProfile]);
+
 
 
     const soundList: SoundType[] = sounds.map(sound => ({
         id: sound.id || '',
         name: sound.shortname || '',
         url: sound.source || '',
+        creator_id: sound.creator_id || '',
     }));
 
     useEffect(() => {
@@ -65,6 +77,10 @@ const SettingSoundEffect = () => {
         } catch (error) {
             console.error("Error deleting sound:", error);
         }
+    };
+
+    const canDeleteSound = (creatorId: string) => {
+        return isClanOwner || creatorId === currentUserId;
     };
 
     return (
@@ -106,19 +122,41 @@ const SettingSoundEffect = () => {
                         <div key={sound.id} className="flex flex-col w-full p-4 border rounded-lg bg-white dark:bg-bgSecondary shadow-sm hover:shadow-md transition duration-200 dark:border-borderDivider border-gray-200">
                             <div className="flex items-center justify-between mb-3">
                                 <p className="font-semibold truncate w-full text-center dark:text-textPrimary text-textLightTheme">{sound.name}</p>
-                                <button
-                                    className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10"
-                                    onClick={() => handleDeleteSound(sound.id, sound.name)}
-                                >
-                                    <Icons.CircleClose className="w-4 h-4" />
-                                </button>
+                                {canDeleteSound(sound.creator_id || '') && (
+                                    <button
+                                        className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10"
+                                        onClick={() => handleDeleteSound(sound.id, sound.name)}
+                                    >
+                                        <Icons.CircleClose className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
-                            <audio controls src={sound.url} className="w-full rounded-full border dark:border-borderDivider border-gray-200" />
+                            <audio controls src={sound.url} className="w-full rounded-full border dark:border-borderDivider border-gray-200 mb-2" />
+                            {sound.creator_id && (
+                                <CreatorInfo creatorId={sound.creator_id} />
+                            )}
                         </div>
                     ))}
                 </div>
             </div>
             {showModal && <ModalUploadSound onSuccess={handleUploadSuccess} onClose={() => setShowModal(false)} />}
+        </div>
+    );
+};
+
+const CreatorInfo = ({ creatorId }: { creatorId: string }) => {
+    const creator = useSelector(selectMemberClanByUserId(creatorId));
+
+    if (!creator) return null;
+
+    return (
+        <div className="flex items-center justify-center gap-1 mt-1">
+            <img
+                className="w-4 h-4 rounded-full select-none object-cover"
+                src={creator?.user?.avatar_url ?? process.env.NX_LOGO_MEZON}
+                alt=""
+            />
+            <p className="text-xs dark:text-white text-textPrimaryLight max-w-20 truncate">{creator?.user?.username}</p>
         </div>
     );
 };
