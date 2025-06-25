@@ -1,3 +1,4 @@
+import { size } from '@mezon/mobile-ui';
 import React, { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 
@@ -92,7 +93,7 @@ const SpriteAnimation = ({
 		} else {
 			animation.setValue(finalIndex);
 		}
-	}, [animation, base, duration, finalIndex, repeat]);
+	}, [animation, base, finalIndex]);
 
 	if (!repeat) {
 		return (
@@ -127,7 +128,7 @@ const SpriteAnimation = ({
 	}
 
 	return (
-		<View style={{ overflow: 'hidden', width: frameWidth, height: frameHeight }}>
+		<View style={{ overflow: 'hidden', width: frameWidth, height: frameHeight, marginHorizontal: size.s_10 }}>
 			<Animated.Image
 				source={{ uri: spriteUrl }}
 				style={{

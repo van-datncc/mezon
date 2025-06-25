@@ -38,10 +38,8 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 	const [spriteWidth, setSpriteWidth] = useState(0);
 	const [spriteHeight, setSpriteHeight] = useState(0);
 	const isPortrait = height > width;
-	const SLOT_ITEM_FRAME_WIDTH = 133;
-	const isSlotGame = frameWidth === SLOT_ITEM_FRAME_WIDTH;
 	const duration = 500;
-	const styles = style(isPortrait, isSlotGame);
+	const styles = style(isPortrait);
 	const globalAnimation = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
@@ -72,16 +70,16 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 			const scaleFactor = isTabletLandscape ? 0.36 : 1;
 
 			if (isPortrait) {
-				horizontalPadding = isSlotGame ? size.s_110 : size.s_70;
+				horizontalPadding = size.s_100;
 			} else if (!isPortrait) {
-				horizontalPadding = isSlotGame ? size.s_210 : size.s_150;
+				horizontalPadding = size.s_150;
 			}
 
 			const fitScale = (width - horizontalPadding) / totalFrameWidth;
 			return fitScale * scaleFactor;
 		}
 		return 1;
-	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape, isPortrait, width, isSlotGame]);
+	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape, isPortrait, width]);
 
 	if (!frames) {
 		return (
@@ -92,7 +90,9 @@ export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationP
 	}
 
 	return (
-		<View style={[styles.pool, { transform: [{ scale: animationScale }] }]}>
+		<View
+			style={[styles.pool, { transform: [{ scale: animationScale }], marginVertical: (isPortrait ? -size.s_30 : -size.s_50) / animationScale }]}
+		>
 			{animationOptions?.pool?.length &&
 				animationOptions?.pool?.map((item, index) => {
 					return (
