@@ -10,12 +10,14 @@ export const QUICK_MENU_FEATURE_KEY = 'quickMenu';
 
 export interface QuickMenuState {
 	byChannels: Record<string, ApiQuickMenuAccess[]>;
+	timestamps: Record<string, number>;
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 }
 
 export const initialQuickMenuState: QuickMenuState = {
 	byChannels: {},
+	timestamps: {},
 	loadingStatus: 'not loaded',
 	error: null
 };
@@ -79,10 +81,22 @@ export const deleteQuickMenuAccess = createAsyncThunk(
 
 export const listQuickMenuAccess = createAsyncThunk('quickMenu/listQuickMenuAccess', async ({ channelId }: { channelId: string }, thunkAPI) => {
 	try {
+		const state = thunkAPI.getState() as RootState;
+		const quickMenuState = getQuickMenuState(state);
+
+		const cachedData = quickMenuState.byChannels[channelId];
+		const lastFetchTime = quickMenuState.timestamps[channelId];
+		const now = Date.now();
+		const CACHE_DURATION = 5 * 60 * 1000;
+
+		if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_DURATION) {
+			return { channelId, quickMenuItems: cachedData, fromCache: true };
+		}
+
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.listQuickMenuAccess(mezon.session, '0', channelId);
 
-		return { channelId, quickMenuItems: response.list_menus || [] };
+		return { channelId, quickMenuItems: response.list_menus || [], fromCache: false };
 	} catch (error) {
 		captureSentryError(error, 'quickMenu/listQuickMenuAccess');
 		return thunkAPI.rejectWithValue(error);
@@ -96,9 +110,11 @@ export const quickMenuSlice = createSlice({
 		clearQuickMenuByChannel: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
 			delete state.byChannels[channelId];
+			delete state.timestamps[channelId];
 		},
 		clearAllQuickMenu: (state) => {
 			state.byChannels = {};
+			state.timestamps = {};
 		}
 	},
 	extraReducers: (builder) => {
@@ -108,8 +124,12 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(listQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
-				const { channelId, quickMenuItems } = action.payload;
+				const { channelId, quickMenuItems, fromCache } = action.payload;
 				state.byChannels[channelId] = quickMenuItems;
+
+				if (!fromCache) {
+					state.timestamps[channelId] = Date.now();
+				}
 			})
 			.addCase(listQuickMenuAccess.rejected, (state, action) => {
 				state.loadingStatus = 'error';
@@ -120,6 +140,8 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(addQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
+				const { channelId } = action.payload;
+				delete state.timestamps[channelId];
 			})
 			.addCase(addQuickMenuAccess.rejected, (state, action) => {
 				state.loadingStatus = 'error';
@@ -130,6 +152,8 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(updateQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
+				const { channelId } = action.payload;
+				delete state.timestamps[channelId];
 			})
 			.addCase(updateQuickMenuAccess.rejected, (state, action) => {
 				state.loadingStatus = 'error';
