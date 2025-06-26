@@ -13,5 +13,13 @@ export const useSendReaction = ({ currentChannel }: UseSendReactionParams) => {
 		[socketRef, currentChannel]
 	);
 
-	return sendEmojiReaction;
+	const sendSoundReaction = useCallback(
+		(soundId: string) => {
+			if (!socketRef.current || !currentChannel?.channel_id) return;
+			socketRef.current.writeVoiceReaction([`sound:${soundId}`], currentChannel.channel_id);
+		},
+		[socketRef, currentChannel]
+	);
+
+	return { sendEmojiReaction, sendSoundReaction };
 };

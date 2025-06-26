@@ -13,22 +13,35 @@ export enum ReactionType {
 	VIDEO = 1
 }
 
-export type DisplayedEmoji = {
+export interface DisplayedEmoji {
 	id: string;
 	emoji: string;
 	emojiId: string;
 	timestamp: number;
 	position?: {
 		left: string;
-		bottom?: string;
-		duration?: string;
-		animation?: string;
-		animationName?: string;
+		bottom: string;
+		duration: string;
+		animationName: string;
 		delay?: string;
-		baseScale?: number;
 	};
-};
+}
+
+export interface DisplayedSound {
+	id: string;
+	soundId: string;
+	soundUrl: string;
+	timestamp: number;
+}
+
+export interface ActiveSoundReaction {
+	participantId: string;
+	soundId: string;
+	timestamp: number;
+	timeoutId: NodeJS.Timeout;
+}
 
 export interface ReactionCallHandlerProps {
 	currentChannel?: ReactionChannelInfo;
+	onSoundReaction?: (participantId: string, soundId: string) => void;
 }

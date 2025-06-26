@@ -382,6 +382,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
 			if (channelId) {
+				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				store.dispatch(
 					channelsActions.joinChannel({
@@ -394,9 +395,9 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				);
 			}
 			if (navigation) {
+				navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
-			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
 				const joinAndChangeClan = async (store: any, clanId: string) => {
 					await Promise.allSettled([
