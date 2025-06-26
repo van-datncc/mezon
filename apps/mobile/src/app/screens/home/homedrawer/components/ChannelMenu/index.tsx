@@ -108,7 +108,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 					color={themeValue.textStrong}
 					width={30}
 					height={30}
-					customStyle={{ marginLeft: -size.s_2 }}
+					customStyle={{ marginLeft: -size.s_2, marginBottom: size.s_2 }}
 				/>
 			),
 			textStyle: { marginLeft: -size.s_2 }
