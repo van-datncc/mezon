@@ -311,7 +311,6 @@ const RootListener = () => {
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
 			const store = getStore();
-			handleReconnect('Initial reconnect attempt timeout');
 			const isFromFCM = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 			// Note: if is DM
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
@@ -320,6 +319,7 @@ const RootListener = () => {
 				await activeAgainLoaderBackground();
 			}
 			if (state === 'active' && !currentDirectId) {
+				handleReconnect('Initial reconnect attempt timeout');
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 					/* empty */
 				} else {
@@ -360,7 +360,6 @@ const RootListener = () => {
 					await sleep(1000 * (MAX_RETRIES_SESSION - retries));
 					continue;
 				}
-				handleReconnect('Auth Loader');
 				const profileResponse = await dispatch(accountActions.getUserProfile());
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-expect-error
