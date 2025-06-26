@@ -4,6 +4,7 @@ import {
 	channelMembersActions,
 	emojiSuggestionActions,
 	getStore,
+	quickMenuActions,
 	referencesActions,
 	selectAddEmojiState,
 	selectAllAccount,
@@ -20,6 +21,7 @@ import {
 	selectIdMessageRefEdit,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
+	selectQuickMenuByChannelId,
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
@@ -690,14 +692,63 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		[isDm]
 	);
 
-	const handleSearchSlashCommands = useCallback((search: string, callback: any) => {
-		setValueHightlight(search);
-		const filteredCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
-		callback(filteredCommands);
-	}, []);
+	const generateCommandsList = useCallback(
+		(search: string) => {
+			const store = getStore();
+			const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+			const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
+
+			const quickMenuCommands = channelQuickMenuItems
+				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()))
+				.map((item) => ({
+					id: `quick_menu_${item.id}`,
+					display: item.menu_name || '',
+					description: item.action_msg || '',
+					action_msg: item.action_msg || ''
+				}));
+
+			return [...builtInCommands, ...quickMenuCommands];
+		},
+		[props.currentChannelId]
+	);
+
+	const handleSearchSlashCommands = useCallback(
+		async (search: string, callback: any) => {
+			setValueHightlight(search);
+
+			const store = getStore();
+			const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+			const hasExistingData = channelQuickMenuItems && channelQuickMenuItems.length > 0;
+
+			if (hasExistingData) {
+				callback(generateCommandsList(search));
+				if (props.currentChannelId) {
+					try {
+						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						callback(generateCommandsList(search));
+					} catch (error) {
+						console.error('Error fetching fresh commands:', error);
+					}
+				}
+			} else {
+				callback([{ id: 'loading', display: 'loading', description: 'Loading commands...', isLoading: true }]);
+				try {
+					if (props.currentChannelId) {
+						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+					}
+					callback(generateCommandsList(search));
+				} catch (error) {
+					console.error('Error fetching commands:', error);
+					const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
+					callback(builtInCommands);
+				}
+			}
+		},
+		[props.currentChannelId, generateCommandsList, dispatch]
+	);
 
 	const handleSlashCommandSelect = useCallback(
-		(commandId: string) => {
+		(commandId: string, suggestion?: any) => {
 			if (commandId === 'ephemeral') {
 				setIsEphemeralMode(true);
 				setTitleModalMention('Select user for ephemeral message');
@@ -706,9 +757,24 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					content: '@',
 					mentionRaw: []
 				});
+			} else if (commandId.startsWith('quick_menu_')) {
+				const quickMenuItemId = commandId.replace('quick_menu_', '');
+				const store = getStore();
+
+				const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+
+				const quickMenuItem = channelQuickMenuItems.find((item) => item.id === quickMenuItemId);
+
+				if (quickMenuItem && quickMenuItem.action_msg) {
+					updateDraft({
+						valueTextInput: quickMenuItem.action_msg,
+						content: quickMenuItem.action_msg,
+						mentionRaw: []
+					});
+				}
 			}
 		},
-		[updateDraft]
+		[updateDraft, props.currentChannelId]
 	);
 
 	useClickUpToEditMessage({
@@ -911,10 +977,28 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						displayTransform={(id: any, display: any) => {
 							return `/${display}`;
 						}}
-						onAdd={(id: string) => {
-							handleSlashCommandSelect(id);
+						onAdd={(id: string, display: string, startPos: number, endPos: number, suggestion: any) => {
+							handleSlashCommandSelect(id, suggestion);
 						}}
 						renderSuggestion={(suggestion: any) => {
+							if (suggestion.isLoading || suggestion.display === 'loading') {
+								return (
+									<div className="flex items-center gap-2 p-3 text-gray-400">
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
+											<circle
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeDasharray="30"
+												strokeDashoffset="30"
+											/>
+										</svg>
+										<span>Loading commands...</span>
+									</div>
+								);
+							}
 							return (
 								<SuggestItem
 									valueHightLight={valueHighlight}
@@ -924,7 +1008,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 								/>
 							);
 						}}
-						appendSpaceOnAdd={true}
+						appendSpaceOnAdd={false}
 					/>
 				</MentionsInput>
 			</div>

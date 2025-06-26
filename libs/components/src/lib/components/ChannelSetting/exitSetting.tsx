@@ -10,7 +10,7 @@ const ExitSetting = (props: ModalExitProps) => {
 	};
 
 	return (
-		<div className="dark:bg-bgSecondary bg-white w-1/12 xl:w-1/5 flex-grow hidden sbm:block">
+		<div className="dark:bg-bgPrimary bg-white w-1/12 xl:w-1/5 flex-grow hidden sbm:block">
 			<div className="w-1/4 text-black ml-5 pt-[94px]">
 				<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
 					<div
