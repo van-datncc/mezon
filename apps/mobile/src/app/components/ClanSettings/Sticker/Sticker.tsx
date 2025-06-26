@@ -92,9 +92,6 @@ export function StickerSetting({ navigation }) {
 	};
 
 	const handleUploadConfirm = async (croppedFile, name, isForSale) => {
-		console.log('log  => image', croppedFile);
-		console.log('log  => name', name);
-		console.log('log  => isForSale', isForSale);
 
 		const { id, url } = await handleUploadImage({
 			fileData: croppedFile?.data,
