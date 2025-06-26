@@ -250,6 +250,10 @@ export const getSrcEmoji = (id: string) => {
 	return process.env.NX_BASE_IMG_URL + '/emojis/' + id + '.webp';
 };
 
+export const getSrcSound = (id: string) => {
+	return process.env.NX_BASE_IMG_URL + '/sounds/' + id + '.mp3';
+};
+
 export const checkLastChar = (text: string) => {
 	if (
 		text.charAt(text.length - 1) === ';' ||

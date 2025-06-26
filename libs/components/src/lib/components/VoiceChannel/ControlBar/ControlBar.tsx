@@ -30,6 +30,7 @@ import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { usePopup } from '../../DraggablePopup/usePopup';
 import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
+import SoundSquare from '../../GifsStickersEmojis/SoundSquare';
 import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModal';
 import { ReactionChannelInfo } from '../MyVideoConference/Reaction/types';
 import { useSendReaction } from '../MyVideoConference/Reaction/useSendReaction';
@@ -69,7 +70,7 @@ export function ControlBar({
 
 	const isGroupCall = useSelector(selectGroupCallJoined);
 
-	const sendEmojiReaction = useSendReaction({ currentChannel: currentChannel });
+	const { sendEmojiReaction, sendSoundReaction } = useSendReaction({ currentChannel: currentChannel });
 
 	const screenTrackRef = useRef<LocalTrackPublication | null>(null);
 	const isDesktop = isElectron();
@@ -302,6 +303,7 @@ export function ControlBar({
 	}, [dispatch, isOpenPopOut, openVoicePopup, closeVoicePopup]);
 
 	const [showEmojiPanel, setShowEmojiPanel] = useState(false);
+	const [showSoundPanel, setShowSoundPanel] = useState(false);
 
 	useEffect(() => {
 		if (!showEmojiPanel) return;
@@ -314,6 +316,17 @@ export function ControlBar({
 		return () => window.removeEventListener('keydown', handleKeyDown);
 	}, [showEmojiPanel]);
 
+	useEffect(() => {
+		if (!showSoundPanel) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape' || e.key === 'Esc') {
+				setShowSoundPanel(false);
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [showSoundPanel]);
+
 	const handleEmojiSelect = useCallback(
 		(emoji: string, emojiId: string) => {
 			sendEmojiReaction(emoji, emojiId);
@@ -321,34 +334,66 @@ export function ControlBar({
 		[sendEmojiReaction]
 	);
 
+	const handleSoundSelect = useCallback(
+		(soundId: string, soundUrl: string) => {
+			sendSoundReaction(soundId);
+		},
+		[sendSoundReaction]
+	);
+
 	return (
 		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-sbm:!hidden max-md:flex-col">
 			<div className="flex justify-start gap-4 max-md:hidden">
 				{!isGroupCall && (
-					<Tooltip
-						placement="topLeft"
-						trigger={['click']}
-						overlayClassName="w-auto"
-						visible={showEmojiPanel}
-						onVisibleChange={setShowEmojiPanel}
-						overlay={
-							<EmojiSuggestionProvider>
-								<GifStickerEmojiPopup
-									showTabs={{ emojis: true }}
-									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-									emojiAction={EmojiPlaces.EMOJI_REACTION}
-									onEmojiSelect={handleEmojiSelect}
+					<>
+						<Tooltip
+							placement="topLeft"
+							trigger={['click']}
+							overlayClassName="w-auto"
+							visible={showEmojiPanel}
+							onVisibleChange={setShowEmojiPanel}
+							overlay={
+								<EmojiSuggestionProvider>
+									<GifStickerEmojiPopup
+										showTabs={{ emojis: true }}
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+										emojiAction={EmojiPlaces.EMOJI_REACTION}
+										onEmojiSelect={handleEmojiSelect}
+									/>
+								</EmojiSuggestionProvider>
+							}
+							destroyTooltipOnHide
+						>
+							<div>
+								<Icons.VoiceEmojiControlIcon
+									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
 								/>
-							</EmojiSuggestionProvider>
-						}
-						destroyTooltipOnHide
-					>
-						<div>
-							<Icons.VoiceEmojiControlIcon
-								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
-							/>
-						</div>
-					</Tooltip>
+							</div>
+						</Tooltip>
+
+						<Tooltip
+							placement="topLeft"
+							trigger={['click']}
+							overlayClassName="w-auto"
+							visible={showSoundPanel}
+							onVisibleChange={setShowSoundPanel}
+							overlay={
+								<SoundSquare
+									channel={currentChannel as any}
+									mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+									onClose={() => {}}
+									onSoundSelect={handleSoundSelect}
+								/>
+							}
+							destroyTooltipOnHide
+						>
+							<div>
+								<Icons.VoiceSoundControlIcon
+									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								/>
+							</div>
+						</Tooltip>
+					</>
 				)}
 			</div>
 			<div className="flex justify-center gap-3 flex-1">
