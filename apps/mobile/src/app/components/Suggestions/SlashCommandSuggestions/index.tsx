@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { style } from './styles';
+import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
 
 interface SlashCommandSuggestionsProps {
 	keyword: string;
 	onSelectCommand: (commandId: string) => void;
+	quickMenuList: ApiQuickMenuAccess[];
 }
 
 interface SlashCommand {
@@ -17,7 +19,7 @@ interface SlashCommand {
 	description?: string;
 }
 
-export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: SlashCommandSuggestionsProps) => {
+export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, quickMenuList }: SlashCommandSuggestionsProps) => {
 	const { t } = useTranslation('message');
 	const slashCommands: SlashCommand[] = [
 		{
@@ -27,6 +29,11 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: Slash
 		}
 	];
 
+	const allCommands: SlashCommand[] = [
+		...slashCommands,
+		...quickMenuList.map((item) => ({ id: item.id, display: item.menu_name, description: item.action_msg }))
+	];
+
 	const [filteredCommands, setFilteredCommands] = useState<SlashCommand[]>(slashCommands);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -34,12 +41,12 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: Slash
 	useEffect(() => {
 		const debounceFilter = debounce(() => {
 			if (slashCommands?.length === 0) return;
-			const suggestionCommands = slashCommands.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
+			const suggestionCommands = allCommands.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
 			setFilteredCommands(suggestionCommands);
 		}, 300);
 
 		debounceFilter();
-	}, [keyword]);
+	}, [keyword, quickMenuList]);
 
 	const renderCommands = ({ item }: { item: SlashCommand }) => {
 		if (!item?.display) return <View />;

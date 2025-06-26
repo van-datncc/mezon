@@ -20,6 +20,9 @@
             "permission": "Quyền hạn kênh",
             "description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với kênh này."
         },
+        "quickAction":{
+            "title": "Tác vụ"
+        },
         "privateChannelInvite": {
             "addMember": "Thêm thành viên"
         },
@@ -134,6 +137,16 @@
             "failed": "Lưu thất bại"
         },
         "roleAndMemberEmpty": "Chưa có vai trò và thành viên để thiết lập quyền riêng"
+    },
+    "quickAction":{
+        "title": "Cài đặt tác vụ",
+        "keyTitle": "Nhập từ khóa (VD: xinchao): ",
+        "valueTitle": "Nhập nội dung (VD: Chào buổi sáng, chúc bạn có một ngày mới tốt lành !)",
+        "save": "LƯU",
+        "cancel": "HỦY",
+        "deleteModal": "XÓA TÁC VỤ",
+        "deleteTitle": "Bạn có chắc chắn muốn xóa /{{key}} không ? Hành động này sẽ không thể hoàn tác được !"
+
     },
     "changeCategory": {
         "title": "Thay đổi danh mục",
