@@ -1,4 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
+import { sleep } from '@mezon/utils';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { ErrorInput } from '../../components/ErrorInput';
@@ -27,6 +28,7 @@ interface IMezonInputProps {
 	disabled?: boolean;
 	isValid?: boolean;
 	defaultValue?: string;
+	forcusInput?: boolean;
 }
 
 export default function MezonInput({
@@ -48,7 +50,8 @@ export default function MezonInput({
 	prefixIcon,
 	disabled = false,
 	isValid = true,
-	defaultValue = ''
+	defaultValue = '',
+	forcusInput = false
 }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -60,6 +63,18 @@ export default function MezonInput({
 	useEffect(() => {
 		setIsCheckValid(validInput(value));
 	}, [value]);
+
+	const focusInput = async () => {
+		await sleep(300);
+		ref.current.focus();
+		setFocus(true);
+	};
+
+	useEffect(() => {
+		if (forcusInput) {
+			focusInput();
+		}
+	}, []);
 
 	function handleClearBtn() {
 		ref && ref.current && ref.current.clear();

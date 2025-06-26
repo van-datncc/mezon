@@ -47,7 +47,7 @@ import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import EmojiSwitcher from '../../EmojiPicker/EmojiSwitcher';
-import { renderTextContent } from '../../RenderTextContent';
+import { RenderTextContent } from '../../RenderTextContent';
 import { ChatBoxListener } from '../ChatBoxListener';
 import { ChatMessageLeftArea, IChatMessageLeftAreaRef } from '../ChatMessageLeftArea';
 import { ChatMessageSending } from '../ChatMessageSending';
@@ -579,7 +579,7 @@ export const ChatBoxBottomBar = memo(
 								ref={inputRef}
 								multiline
 								onChangeText={
-									(mentionsOnMessage?.current || hashtagsOnMessage?.current)?.length
+									mentionsOnMessage?.current?.length || hashtagsOnMessage?.current?.length
 										? textInputProps?.onChangeText
 										: handleTextInputChange
 								}
@@ -592,7 +592,7 @@ export const ChatBoxBottomBar = memo(
 								numberOfLines={4}
 								textBreakStrategy="simple"
 								style={[styles.inputStyle, !textValueInputRef?.current && { height: size.s_40 }]}
-								children={renderTextContent(textValueInputRef?.current)}
+								children={RenderTextContent({ text: textValueInputRef?.current })}
 								onSelectionChange={textInputProps?.onSelectionChange}
 							/>
 							<View style={styles.iconEmoji}>
