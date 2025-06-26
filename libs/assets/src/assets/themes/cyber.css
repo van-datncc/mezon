@@ -1,103 +1,99 @@
 /* Cyber Theme CSS Variables */
 :root {
-  /* Primary Colors */
-  --color-primary: #00FF94;
-  --color-primary-hover: #00E085;
-  --color-primary-active: #00CC76;
-  --color-primary-disabled: #3D7A5C;
+	--bg-primary: linear-gradient(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.65)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(326.809 calc(1 * 41.964%) 43.922% / 1) 8.62%,
+				hsl(27.5 calc(1 * 44.86%) 58.039% / 1) 48.07%,
+				hsl(50.286 calc(1 * 46.256%) 44.51% / 1) 76.04%
+			)
+			fixed 0 0 / cover,
+		color-mix(in oklab, hsl(240 calc(1 * 4.348%) 95.49% /1) 100%, rgb(255, 247, 204) 50%);
+	--bg-secondary: linear-gradient(rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.85)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(326.809 calc(1 * 41.964%) 43.922% /1) 8.62%,
+				hsl(27.5 calc(1 * 44.86%) 58.039% /1) 48.07%,
+				hsl(50.286 calc(1 * 46.256%) 44.51% /1) 76.04%
+			)
+			fixed 0 0 / cover;
+	--bg-tertiary: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--bg-surface: color-mix(in oklab, hsl(0 calc(1 * 0%) 98.431% /1) 100%, #000 0%);
 
-  /* Background Colors */
-  --bg-primary: #0A0A0A;
-  --bg-secondary: #111111;
-  --bg-tertiary: #1A1A1A;
-  --bg-surface: #000000;
-  --bg-hover: #222222;
-  --bg-modal: rgba(0, 0, 0, 0.9);
+	--bg-accent: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--bg-hover: #dfe1e5;
+	--bg-modal: rgba(0, 0, 0, 0.54);
 
-  /* Text Colors */
-  --text-primary: #00FF94;
-  --text-secondary: #00E085;
-  --text-tertiary: #00CC76;
-  --text-muted: #007A47;
-  --text-disabled: #003D1F;
+	/*  */
 
-  /* Border Colors */
-  --border-primary: #00FF94;
-  --border-secondary: #00E085;
-  --border-focus: #00FFAA;
-  --border-divider: #003D1F;
-  --border-hover: #00CC76;
+	--theme-input: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--theme-border-input: color-mix(
+		in oklab,
+		hsl(240 calc(1 * 4%) 60.784% /0.2784313725490196) 100%,
+		hsl(50.588235294117645 100% 90% /0.2784313725490196) 50%
+	);
+	--theme-base-color: rgb(255, 255, 255);
+	--text-theme-primary: color-mix(in oklab, hsl(234.545 calc(1 * 5.473%) 39.412% /1) 100%, rgb(77, 0, 42) 38%);
+	--bg-active-friend-list: linear-gradient(rgb(255 255 255 / 0.65), rgb(255 255 255 / 0.65)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(326.809 calc(1 * 41.964%) 43.922% / 1) 8.62%,
+				hsl(27.5 calc(1 * 44.86%) 58.039% / 1) 48.07%,
+				hsl(50.286 calc(1 * 46.256%) 44.51% / 1) 76.04%
+			)
+			fixed 0 0 / cover,
+		color-mix(in oklab, hsl(240 calc(1 * 4.348%) 95.49% /1) 100%, rgb(255, 247, 204) 50%);
+	--bg-active-button: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--color-text-active-button: color-mix(in oklab, hsl(234.935 calc(1 * 85.556%) 64.706% /1) 100%, rgb(77, 0, 42) 38%);
+	--bg-button-add-friend: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+	--border-color-primary: color-mix(
+		in oklab,
+		color-mix(in oklab, #9f4175 50%, #a6953d 50%) 24%,
+		color-mix(in oklab, hsl(240 calc(1 * 4%) 60.784% /0.2784313725490196) 100%, hsl(50.588235294117645 100% 90% /0.2784313725490196) 50%) 100%
+	);
+	--bg-theme-direct-message: linear-gradient(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.7)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(326.809 calc(1 * 41.964%) 43.922% /1) 8.62%,
+				hsl(27.5 calc(1 * 44.86%) 58.039% /1) 48.07%,
+				hsl(50.286 calc(1 * 46.256%) 44.51% /1) 76.04%
+			)
+			fixed 0 0 / cover;
 
-  /* Status Colors */
-  --color-success: #00FF94;
-  --color-success-hover: #00E085;
-  --color-success-active: #00CC76;
-  --color-warning: #FFD700;
-  --color-warning-hover: #E6C200;
-  --color-warning-active: #CCAD00;
-  --color-error: #FF0040;
-  --color-error-hover: #E6003A;
-  --color-error-active: #CC0033;
-  --color-info: #00CCFF;
-  --color-info-hover: #00B8E6;
-  --color-info-active: #00A3CC;
+	--text-secondary: hsl(240 calc(1 * 7.692%) 5.098% /1);
+	--border-theme-primary: color-mix(in oklab, hsl(240 calc(1 * 4%) 60.784% /0.2) 100%, hsl(0 0% 0% /0.2) 0%);
+	--bg-button-secondary: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--bg-theme-input-primary: linear-gradient(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.7)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(326.809 calc(1 * 41.964%) 43.922% /1) 8.62%,
+				hsl(27.5 calc(1 * 44.86%) 58.039% /1) 48.07%,
+				hsl(50.286 calc(1 * 46.256%) 44.51% /1) 76.04%
+			)
+			fixed 0 0 / cover;
+	--text-theme-primary-hover: color-mix(in oklab, hsl(230 calc(1 * 6%) 19.608% /1) 100%, rgb(77, 0, 42) 38%);
+	--bg-item-hover: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
 
-  /* Button Colors */
-  --btn-primary: #00FF94;
-  --btn-primary-hover: #00E085;
-  --btn-primary-active: #00CC76;
-  --btn-primary-disabled: rgba(0, 255, 148, 0.3);
+	/* border */
+	--border-primary: color-mix(in oklab, hsl(240 calc(1 * 4%) 60.784% /0.2) 100%, hsl(50.588235294117645 100% 90% /0.2) 50%);
+	--border-secondary: #00e085;
+	--border-focus: #00ffaa;
+	--border-divider: #003d1f;
+	--border-hover: #00cc76;
 
-  --btn-secondary: #003D1F;
-  --btn-secondary-hover: #007A47;
-  --btn-secondary-active: #00B366;
-  --btn-secondary-disabled: rgba(0, 61, 31, 0.5);
+	/* mention */
+	--mention-primary: color-mix(
+		in oklab,
+		hsl(234.935 calc(1 * 85.556%) 64.706% /0.23921568627450981) 100%,
+		hsl(50.588235294117645 100% 90% /0.23921568627450981) 50%
+	);
+	--mention-color: color-mix(in oklab, hsl(230.769 calc(1 * 49.727%) 35.882% /1) 100%, rgb(77, 0, 42) 38%);
 
-  --btn-success: #00FF94;
-  --btn-success-hover: #00E085;
-  --btn-success-active: #00CC76;
-  --btn-success-disabled: rgba(0, 255, 148, 0.3);
+	/* highlight */
 
-  --btn-danger: #FF0040;
-  --btn-danger-hover: #E6003A;
-  --btn-danger-active: #CC0033;
-  --btn-danger-disabled: rgba(255, 0, 64, 0.3);
-
-  --btn-warning: #FFD700;
-  --btn-warning-hover: #E6C200;
-  --btn-warning-active: #CCAD00;
-  --btn-warning-disabled: rgba(255, 215, 0, 0.3);
-
-  --btn-ghost-hover: rgba(0, 255, 148, 0.1);
-  --btn-ghost-active: rgba(0, 255, 148, 0.2);
-
-  /* Input Colors */
-  --input-bg: #111111;
-  --input-bg-hover: #1A1A1A;
-  --input-bg-focus: #222222;
-  --input-border: #00FF94;
-  --input-border-hover: #00CC76;
-  --input-border-focus: #00FFAA;
-  --input-border-error: #FF0040;
-
-  /* Focus Ring Colors */
-  --focus-ring: rgba(0, 255, 170, 0.5);
-  --focus-ring-error: rgba(255, 0, 64, 0.5);
-  --focus-ring-success: rgba(0, 255, 148, 0.5);
-
-  /* Interactive States */
-  --interactive-normal: rgba(0, 255, 148, 0.1);
-  --interactive-hover: rgba(0, 255, 148, 0.15);
-  --interactive-active: rgba(0, 255, 148, 0.2);
-
-  /* Scrollbar Colors */
-  --scrollbar-track: #111111;
-  --scrollbar-thumb: #00FF94;
-  --scrollbar-thumb-hover: #00FFAA;
-
-  /* Shadow Colors */
-  --shadow-light: rgba(0, 255, 148, 0.1);
-  --shadow-medium: rgba(0, 255, 148, 0.2);
-  --shadow-heavy: rgba(0, 255, 148, 0.4);
-  --shadow-focus: 0 0 0 2px var(--focus-ring);
+	--bg-highlight: color-mix(
+		in oklab,
+		hsl(36.894 calc(1 * 100%) 31.569% /0.0784313725490196) 100%,
+		hsl(50.588235294117645 100% 90% /0.0784313725490196) 50%
+	);
 }

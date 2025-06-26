@@ -1,108 +1,31 @@
 .bg-theme-primary {
-	background: var(--bg-primary);
+	background-color: linear-gradient(hsl(0 calc(1 * 0%) 100% / 0.47843137254901963), hsl(0 calc(1 * 0%) 100% / 0.47843137254901963)),
+		linear-gradient(
+			180deg,
+			hsl(165.625 calc(1 * 39.669%) 52.549% / 1) 6.15%,
+			hsl(118.681 calc(1 * 40.444%) 55.882% / 1) 48.7%,
+			hsl(86.667 calc(1 * 48.293%) 59.804% / 1) 93.07%
+		);
 }
 
-.bg-theme-chat {
-	background: var(--bg-secondary);
+.bg-theme-secondary {
+	background-color: var(--bg-secondary);
 }
 
-/* text */
-.text-theme-primary {
-	color: var(--text-theme-primary);
+.bg-theme-tertiary {
+	background-color: var(--bg-tertiary);
 }
 
-.theme-base-color {
-	background: var(--theme-base-color);
-}
-
-.bg-input-theme {
-	background: var(--theme-input);
-}
-.border-color-theme {
-	border-color: var(--theme-border-input);
-}
-.bg-active-friend-list {
-	background: var(--bg-active-friend-list);
-}
-.bg-active-button {
-	background: var(--bg-active-button);
-}
-.color-text-active-button {
-	color: var(--color-text-active-button);
-}
-button.bg-button-add-friend {
-	background: var(--bg-button-add-friend);
-}
-
-.bg-active-button-hover:hover:not(:disabled) {
-	background: var(--bg-active-button);
-}
-.bg-theme-direct-message {
-	background: var(--bg-theme-direct-message);
-}
-.color-text-secondary::placeholder {
-	color: var(--text-secondary);
-}
-.bg-theme-input {
-	background: var(--bg-tertiary);
-}
-
-.border-theme-primary {
-	border-width: 1px;
-	border-style: solid;
-	border-color: var(--border-primary);
-}
-.border-t-theme-primary {
-	border-top-width: 1px;
-	border-top-style: solid;
-	border-top-color: var(--border-primary);
-}
-.bg-button-secondary {
-	background: var(--bg-button-secondary);
-}
-
-.bg-theme-input-primary {
-	background: var(--bg-primary);
-}
-input.bg-theme-input-primary::placeholder {
-	color: var(--text-theme-primary);
-}
-.text-theme-primary-hover:hover {
-	color: var(--text-theme-primary-hover);
-}
-
-.theme-base-color {
-	background: var(--theme-base-color);
-}
-.bg-item-hover:hover {
-	background: var(--bg-item-hover);
-}
-.bg-item-theme {
-	background: var(--bg-item-hover);
-}
 .bg-theme-surface {
 	background-color: var(--bg-surface);
 }
-.bg-add-clan-hover:hover,
-.bg-add-clan-hover:active p {
-	background: var(--bg-button-add-friend);
-	color: #ffffff;
-}
-
-.bg-mention {
-	background-color: var(--mention-primary);
-}
-.color-mention {
-	color: var(--mention-color);
-}
-.bg-highlight {
-	background: var(--bg-highlight);
-}
-
-/*  */
 
 .bg-theme-hover {
 	background-color: var(--bg-hover);
+}
+
+.text-theme-primary {
+	color: var(--text-primary);
 }
 
 .text-theme-secondary {
@@ -121,6 +44,10 @@ input.bg-theme-input-primary::placeholder {
 	color: var(--text-disabled);
 }
 
+.border-theme-primary {
+	border-color: var(--border-primary);
+}
+
 .border-theme-secondary {
 	border-color: var(--border-secondary);
 }
@@ -132,22 +59,16 @@ input.bg-theme-input-primary::placeholder {
 .border-theme-hover {
 	border-color: var(--border-hover);
 }
-.border-left-theme-primary {
-	border-left-width: 1px;
-	border-left-style: solid;
-	border-left-color: var(--border-color-primary);
-}
-.border-b-theme-primary {
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: var(--border-color-primary);
-}
 
 /* Button Variants */
 .btn-theme-primary {
 	background-color: var(--btn-primary);
 	color: white;
 	transition: all 0.2s ease-in-out;
+}
+
+.btn-theme-primary:hover:not(:disabled) {
+	background-color: var(--btn-primary-hover);
 }
 
 .btn-theme-primary:active:not(:disabled) {

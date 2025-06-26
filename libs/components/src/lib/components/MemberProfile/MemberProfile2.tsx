@@ -63,9 +63,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 
 				<div className="flex flex-col font-medium">
 					<ClanUserName userId={user?.id} name={username} isOwnerClan={isOwnerClan} />
-					<p className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">
-						{userCustomStatus}
-					</p>
+					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">{userCustomStatus}</p>
 				</div>
 			</div>
 		</div>

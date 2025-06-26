@@ -77,7 +77,6 @@ function ChannelList() {
 
 	return (
 		<div onContextMenu={(event) => event.preventDefault()} id="channelList" className="contain-strict h-full">
-			<hr className="h-[0.08px] w-full dark:border-borderDivider border-white mx-2" />
 			<div className={`flex-1 space-y-[21px] text-gray-300`}>
 				<RowVirtualizerDynamic permissions={permissions} />
 			</div>

@@ -80,7 +80,7 @@ const SearchInput = ({
 			value={valueInputSearch ?? ''}
 			style={appearanceTheme === 'light' ? lightMentionsInputStyle : darkMentionsInputStyle}
 			onChange={onChange}
-			className="none-draggable-area w-full mr-[10px] dark:bg-transparent bg-transparent dark:text-white text-colorTextLightMode rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
+			className="none-draggable-area w-full mr-[10px] dark:bg-transparent bg-transparent text-theme-primary rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
 			allowSpaceInQuery={true}
 			singleLine={true}
 			onClick={onInputClick}

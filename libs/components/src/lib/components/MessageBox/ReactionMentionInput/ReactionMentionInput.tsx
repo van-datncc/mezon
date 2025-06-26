@@ -744,7 +744,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		<div className="contain-layout relative" ref={containerRef}>
 			<div className="relative">
 				<span
-					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10 truncate transition-opacity duration-300 ${
+					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary pointer-events-none z-10 truncate transition-opacity duration-300 ${
 						draftRequest?.valueTextInput ? 'hidden' : 'opacity-100'
 					} sm:opacity-100 max-sm:opacity-100`}
 					style={{
@@ -810,7 +810,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							}
 						}
 					}}
-					className={`mentions min-h-11 dark:bg-channelTextarea  bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-lg ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
+					className={`mentions min-h-11 cursor-not-allowed text-theme-primary`}
 					allowSpaceInQuery={true}
 					onKeyDown={onKeyDown}
 					forceSuggestionsAboveCursor={true}
@@ -851,7 +851,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							);
 						}}
 						style={mentionStyle}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-mention"
 					/>
 					<Mention
 						markup="#[__display__](__id__)"
@@ -874,7 +874,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 								/>
 							) : null
 						}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-mention"
 					/>
 					<Mention
 						trigger=":"
@@ -902,7 +902,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						className="dark:!text-white !text-black"
+						className="color-mention"
 						style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: appearanceTheme === 'dark' ? 'white' : 'black' }}
 					/>
 					<Mention

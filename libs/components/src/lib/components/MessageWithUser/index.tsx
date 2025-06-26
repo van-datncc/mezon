@@ -184,11 +184,11 @@ function MessageWithUser({
 							'pt-3': !isCombine || (message.code !== TypeMessage.CreatePin && message.references?.[0]?.message_ref_id)
 						},
 						{
-							'dark:!bg-[#403D38] !bg-[#EAB3081A]':
+							'bg-highlight':
 								(hasIncludeMention || checkReplied) && !messageReplyHighlight && !checkMessageTargetToMoved && !isEphemeralMessage
 						},
 						{ '!bg-bgMessageReplyHighline': messageReplyHighlight },
-						{ 'dark:!bg-[#383B47] !bg-[#EAB3081A]': isHighlight },
+						{ 'bg-highlight': isHighlight },
 						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved },
 						{
 							'dark:!bg-[#2D2B3A] !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
@@ -347,7 +347,7 @@ const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
 	const messageDate = !message.create_time ? '' : convertDateString(message.create_time as string);
 	return (
 		<div className="mt-5 mb-2 dark:bg-borderDivider w-full h-px flex items-center justify-center">
-			<span className="px-4 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
+			<span className="px-4 bg-item text-zinc-400 text-xs font-semibold">{messageDate}</span>
 		</div>
 	);
 };
@@ -394,7 +394,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	};
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} bg-item-hover relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}

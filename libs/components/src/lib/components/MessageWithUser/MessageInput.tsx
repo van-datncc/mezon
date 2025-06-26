@@ -321,7 +321,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onFocus={handleFocus}
 					inputRef={textareaRef}
 					value={formatContentDraft ?? '{}'}
-					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
+					className={`w-full bg-theme-surface border-theme-primary  rounded-lg p-[10px] text-theme-primary customScrollLightMode mt-[5px]'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
 					rows={channelDraftMessage?.draftContent?.t?.split('\n').length}
@@ -356,7 +356,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 							);
 						}}
 						style={mentionStyle}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 					/>
 					<Mention
 						markup="#[__display__](__id__)"
@@ -377,7 +377,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								emojiId=""
 							/>
 						)}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 					/>
 					<Mention
 						trigger=":"
@@ -395,11 +395,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								/>
 							);
 						}}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 						appendSpaceOnAdd={true}
 					/>
 				</MentionsInput>
-				<div className="text-xs flex text-textLightTheme dark:text-textDarkTheme">
+				<div className="text-xs flex text-theme-primary">
 					<p className="pr-[3px]">escape to</p>
 					<p
 						className="pr-[3px] text-[#3297ff]"

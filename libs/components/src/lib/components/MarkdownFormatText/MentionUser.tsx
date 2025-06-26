@@ -154,7 +154,7 @@ const MentionUser = ({
 					style={{ textDecoration: 'none' }}
 					className={`outline-none font-medium px-0.1 rounded-sm
 				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+				 whitespace-nowrap bg-mention color-mention  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
 					{displayToken.display}
 				</button>

@@ -258,7 +258,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	return (
 		<div
-			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
+			className={`fixed bottom-3 left-[12px] border-theme-primary rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthProfile z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
@@ -267,13 +267,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 			<div
 				className={`flex items-center gap-2 pr-4 pl-2 py-2 font-title text-[15px]
-			 font-[500] text-white hover:bg-gray-550/[0.16]
-			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
-			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
+			 font-[500] 
+			  transition   
+			 w-full group focus-visible:outline-none footer-profile  `}
 			>
-				<div
-					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
-				>
+				<div className={`footer-profile h-10 flex-1 flex pl-2 items-center  text-theme-primary bg-item-hover rounded-md`}>
 					<div className="cursor-pointer flex items-center gap-3 relative flex-1" onClick={openProfileModal}>
 						<AvatarImage
 							alt={''}
@@ -286,18 +284,18 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						<div className="absolute bottom-1 left-6">
 							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
-						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode  ">
-							<p className="text-base font-medium max-w-40 truncate dark:text-contentSecondary text-black">{name}</p>
+						<div className="flex flex-col ">
+							<p className="text-base font-medium max-w-40 truncate ">{name}</p>
 							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-40">{customStatus}</p>
 						</div>
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
-					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
-					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
+					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] bg-item-hover hidden" />
+					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 text-theme-primary  bg-item-hover hidden" />
 					<div
 						onClick={openSetting}
-						className="cursor-pointer ml-auto p-1 group/setting opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md"
+						className="cursor-pointer ml-auto p-1 group/setting opacity-80  text-theme-primary bg-item-hover hover:rounded-md"
 					>
 						<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
 					</div>

@@ -434,7 +434,7 @@ export const MessageLine = ({
 			formattedContent.push(
 				<p
 					key={`edited-status-${lastindex}-end`}
-					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px] select-none"
+					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold text-theme-primary w-[50px] select-none"
 				>
 					(edited)
 				</p>
@@ -480,7 +480,7 @@ export const MessageLine = ({
 							minHeight: 30
 						}
 			}
-			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
+			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-theme-primary text-theme-primary-hover cursor-pointer' : 'text-theme-primary'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
 		>
 			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>

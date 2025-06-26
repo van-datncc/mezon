@@ -65,7 +65,7 @@ const ChannelSetting = () => {
 						value={searchFilter}
 						placeholder="Search"
 						onChange={handleSearchByNameChannel}
-						className="w-full h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex outline-none focus:outline-none"
+						className="w-full h-8 pl-2 pr-2 py-3 bg-theme-input-primary text-theme-primary rounded items-center inline-flex outline-none focus:outline-none"
 					/>
 				</div>
 			</div>

@@ -1092,16 +1092,9 @@ interface IconProps {
 	className?: string;
 }
 
-export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const ThreadIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			x="0"
-			y="0"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-			viewBox="0 0 24 24"
-		>
+		<svg x="0" y="0" role="img" xmlns="http://www.w3.org/2000/svg" className={` ${defaultSize} text-theme-primary`} viewBox="0 0 24 24">
 			<path
 				d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z"
 				fill="currentColor"
@@ -1222,7 +1215,7 @@ export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 	);
 };
 
-export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6' }) => {
+export const PinRight: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6' }) => {
 	return (
 		<svg
 			x="0"
@@ -1232,7 +1225,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6'
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`${defaultSize}  text-theme-primary text-theme-primary-hover`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1243,7 +1236,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6'
 	);
 };
 
-export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
+export const TalkPTT: React.FC<IconProps> = () => {
 	return (
 		<svg
 			x="0"
@@ -1253,7 +1246,7 @@ export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
 			xmlns="http://www.w3.org/2000/svg"
 			width="32"
 			height="32"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			viewBox="0 -4 24 24"
 		>
 			<path
@@ -1331,7 +1324,7 @@ export function LeaveSFU(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
+export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '' }) => {
 	return (
 		<svg
 			x="0"
@@ -1341,7 +1334,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
+			className={`${defaultFill ? defaultFill : `text-theme-primary text-theme-primary-hover`} ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1499,7 +1492,7 @@ export function Search(props: React.HTMLAttributes<SVGElement>) {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className="dark:text-[#949BA4] text-black"
+			className="text-theme-primary"
 			viewBox="0 0 24 24"
 			{...props}
 		>
@@ -1597,7 +1590,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1694,7 +1687,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 	);
 };
 
-export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false }) => {
+export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1703,7 +1696,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite 
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1878,7 +1871,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${defaultSize} ${'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`${defaultSize} text-theme-primary text-theme-primary-hover`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -1896,10 +1889,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4',
-	size = ''
-}) => {
+export const ArrowDown: React.FC<IconProps> = ({ defaultSize = 'w-4 h-4 text-theme-primary text-theme-primary-hover min-w-4', size = '' }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${size}`}>
 			<g id="Live area">
@@ -2083,7 +2073,7 @@ export function Plus(props: React.HTMLAttributes<SVGElement>) {
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`dark:text-white text-colorTextLightMode ${defaultSize}`}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`text-theme-primary ${defaultSize}`}>
 			<g id="Live area">
 				<path
 					fill="currentColor"
@@ -2938,7 +2928,7 @@ export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode' }) {
+export function IconEvents({ defaultSize = 'w-5 h-5 text-theme-primary text-theme-primary-hover' }) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -3106,10 +3096,10 @@ export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props 
 	);
 }
 
-export function IconAddFriendDM({ isWhite }: { isWhite?: boolean }) {
+export function IconAddFriendDM() {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -3129,10 +3119,10 @@ export function IconAddFriendDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconUserProfileDM({ isWhite }: { isWhite?: boolean }) {
+export function IconUserProfileDM() {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			x="0"
 			y="0"
 			aria-hidden="true"

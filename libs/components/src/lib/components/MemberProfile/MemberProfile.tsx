@@ -160,9 +160,9 @@ const MemberProfileCore = ({
 									${!isOwnerClanOrGroup && 'w-full'}
 									${isListFriend ? ' inline-flex justify-start' : ''}
 									${positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis group-hover/itemListDm:text-black dark:group-hover/itemListDm:text-white` : ''}
+									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis text-theme-primary-hover` : ''}
 									${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-									${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
+									${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium text-theme-primary '}
 								`}
 									title={name}
 								>
@@ -312,7 +312,7 @@ const DMUserName = ({
 		<span
 			className={`one-line text-start ${hideLongName && 'truncate !block'} ${
 				isOwnerClanOrGroup && 'max-w-[140px]'
-			} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+			} ${isListFriend ? 'text-theme-primary' : ''}`}
 		>
 			{!isHiddenAvatarPanel && name}
 		</span>

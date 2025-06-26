@@ -281,7 +281,7 @@ const DirectMessage = () => {
 							</div>
 						)}
 
-						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+						<div className="flex-shrink-0 flex flex-col bg-theme-chat  h-auto relative">
 							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (currentDmGroup.user_id?.length === 0 || isBlocked) ? (
 								<div
 									style={{ height: 44 }}
