@@ -1,6 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
-import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus } from '@mezon/utils';
+import { PermissionUserEntity, selectAllPermissionsDefaultEntities, selectEntitesUserClans } from '@mezon/store';
+import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { ApiUpdateRoleRequest } from 'mezon-js';
 import { ApiRole, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
@@ -212,7 +214,7 @@ export const updateRole = createAsyncThunk(
 	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const body = {
+			const body: ApiUpdateRoleRequest = {
 				role_id: roleId,
 				title: title ?? '',
 				color: color ?? '',
@@ -231,7 +233,16 @@ export const updateRole = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			return response;
+
+			const store = thunkAPI.getState() as RootState;
+			const roles = store.rolesclan.entities;
+			const permission = selectAllPermissionsDefaultEntities(store);
+			const listUserClan = selectEntitesUserClans(store);
+			const role = roles[roleId];
+
+			const updateRoleData = handleMapUpdateRole(role, body, permission, listUserClan);
+
+			return updateRoleData;
 		} catch (error) {
 			captureSentryError(error, 'UpdateRole/fetchUpdateRole');
 			return thunkAPI.rejectWithValue(error);
@@ -356,9 +367,16 @@ export const RolesClanSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
-		builder.addCase(fetchMembersRole.fulfilled, (state: RolesClanState, action: PayloadAction<FetchReturnMembersRole>) => {
-			state.roleMembers[action.payload.roleID] = action.payload.members;
-		});
+		builder
+			.addCase(fetchMembersRole.fulfilled, (state: RolesClanState, action: PayloadAction<FetchReturnMembersRole>) => {
+				state.roleMembers[action.payload.roleID] = action.payload.members;
+			})
+			.addCase(updateRole.fulfilled, (state: RolesClanState, action: PayloadAction<RolesClanEntity>) => {
+				RolesClanAdapter.updateOne(state, {
+					id: action.payload.id,
+					changes: action.payload
+				});
+			});
 	}
 });
 
@@ -517,3 +535,62 @@ export const selectMembersByRoleID = (roleID: string) => {
 	});
 };
 export const selectAllRoleIds = createSelector(selectAllRolesClan, (roles) => roles.map((role) => role.id));
+
+const handleMapUpdateRole = (
+	role: RolesClanEntity,
+	body: ApiUpdateRoleRequest,
+	permissions: Record<string, PermissionUserEntity>,
+	users: Record<string, UsersClanEntity>
+): RolesClanEntity => {
+	const {
+		active_permission_ids = [],
+		remove_permission_ids = [],
+		add_user_ids = [],
+		remove_user_ids = [],
+		title,
+		color,
+		role_icon,
+		description,
+		display_online,
+		allow_mention
+	} = body;
+
+	const removePermissionSet = new Set(remove_permission_ids);
+	// const activePermissionSet = new Set(active_permission_ids);
+
+	const permissionUpdate = (role.permission_list?.permissions || [])
+		.filter((p) => (p.id ? !removePermissionSet.has(p.id) : false))
+		.concat(active_permission_ids.map((id) => permissions[id]).filter((p): p is PermissionUserEntity => !!p && !removePermissionSet.has(p.id)));
+
+	const removeUserSet = new Set(remove_user_ids);
+	const existingUsers = role.role_user_list?.role_users || [];
+
+	const userUpdate = existingUsers.filter((u) => (u.id ? !removeUserSet.has(u.id) : false));
+	for (const id of add_user_ids) {
+		if (removeUserSet.has(id)) continue; // không thêm nếu đã nằm trong danh sách remove
+		const u = users[id];
+		if (!u) continue;
+
+		userUpdate.push({
+			id: u.id,
+			avatar_url: u.clan_avatar || u.user?.avatar_url,
+			display_name: u.prioritizeName,
+			username: u.user?.username,
+			lang_tag: u.user?.lang_tag,
+			location: u.user?.location,
+			online: u.user?.online
+		});
+	}
+
+	return {
+		...role,
+		title: title ?? role.title,
+		color: color ?? role.color,
+		role_icon: role_icon ?? role.role_icon,
+		description: description ?? role.description,
+		display_online: display_online ?? role.display_online,
+		allow_mention: allow_mention ?? role.allow_mention,
+		permission_list: { permissions: permissionUpdate },
+		role_user_list: { role_users: userUpdate }
+	};
+};
