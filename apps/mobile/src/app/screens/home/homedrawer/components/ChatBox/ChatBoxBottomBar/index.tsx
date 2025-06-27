@@ -579,13 +579,19 @@ export const ChatBoxBottomBar = memo(
 					{triggers?.slash?.keyword !== undefined && (
 						<SlashCommandSuggestions
 							keyword={triggers?.slash?.keyword}
-							onSelectCommand={(commandId) => {
-								if (commandId === KEY_SLASH_COMMAND_EPHEMERAL) {
+							channelId={channelId}
+							onSelectCommand={(command) => {
+								if (command.id === KEY_SLASH_COMMAND_EPHEMERAL) {
 									setIsEphemeralMode(true);
 									setTextChange('@');
 									setMentionTextValue('@');
 									textValueInputRef.current = '@';
 									mentionsOnMessage.current = [];
+								} else {
+									if (command.display && command.description) {
+										setTextChange(`/${command.display} `);
+										textValueInputRef.current = `${command.description}`;
+									}
 								}
 							}}
 						/>
