@@ -138,6 +138,22 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 						});
 					}
 				},
+
+				{
+					title: t('fields.quickAction.title'),
+					expandable: true,
+					icon: <MezonIconCDN icon={IconCDN.quickAction} color={themeValue.text} />,
+					isShow: isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.QUICK_ACTION,
+							params: {
+								channelId,
+							}
+						});
+					}
+				},
+
 				{
 					title: t('fields.privateChannelInvite.addMember'),
 					expandable: true,

@@ -287,19 +287,9 @@ class CustomFirebaseMessagingService : ReactNativeFirebaseMessagingService() {
     }
 
     private fun startVibration() {
-        val serviceIntent = Intent(this, VibrationService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent)
-        } else {
-            startService(serviceIntent)
-        }
     }
 
     internal fun stopVibration() {
-        removeNotificationData()
-        // Also stop the service (as a fallback)
-        val serviceIntent = Intent(this, VibrationService::class.java)
-        stopService(serviceIntent)
     }
 
     private fun isAppInForeground(): Boolean {

@@ -71,7 +71,7 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 				</Pressable>
 				<View style={styles.titlePanel}>
 					<Pressable>
-						<MezonIconCDN icon={IconCDN.discussionIcon} color={themeValue.text} height={size.s_16} width={size.s_16} />
+						<MezonIconCDN icon={IconCDN.discussionIcon} color={themeValue.text} height={size.s_20} width={size.s_16} />
 					</Pressable>
 					<Text style={styles.title}>Topic</Text>
 				</View>

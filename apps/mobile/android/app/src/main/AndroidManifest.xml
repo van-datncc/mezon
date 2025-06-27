@@ -84,11 +84,6 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".VibrationService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="phoneCall" />
-        <service
             android:name=".CustomFirebaseMessagingService"
             android:enabled="true"
             android:exported="true"

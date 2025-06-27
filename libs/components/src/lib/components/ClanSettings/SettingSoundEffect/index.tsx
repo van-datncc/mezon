@@ -34,6 +34,7 @@ const isAudioFile = (url: string): boolean => {
 
 const SettingSoundEffect = () => {
     const [showModal, setShowModal] = useState(false);
+    const [selectedSound, setSelectedSound] = useState<SoundType | null>(null);
     const dispatch = useAppDispatch();
     const currentClanId = useSelector(selectCurrentClanId) || '';
     const currentUserId = useSelector(selectCurrentUserId) || '';
@@ -61,8 +62,13 @@ const SettingSoundEffect = () => {
 
     const handleUploadSuccess = (newSound: SoundType) => {
         setShowModal(false);
-
+        setSelectedSound(null);
         dispatch(soundEffectActions.fetchSoundByUserId({ noCache: true }));
+    };
+
+    const handleEditSound = (sound: SoundType) => {
+        setSelectedSound(sound);
+        setShowModal(true);
     };
 
     const handleDeleteSound = async (soundId: string, soundName: string) => {
@@ -79,7 +85,7 @@ const SettingSoundEffect = () => {
         }
     };
 
-    const canDeleteSound = (creatorId: string) => {
+    const canManageSound = (creatorId: string) => {
         return isClanOwner || creatorId === currentUserId;
     };
 
@@ -100,7 +106,7 @@ const SettingSoundEffect = () => {
                     </div>
                     <p className="text-xs mt-1 dark:text-textSecondary text-textSecondary800">Personalize sound effects for your clan!</p>
                 </div>
-                <button className="bg-primary text-white rounded-lg py-2.5 px-4 font-semibold hover:bg-blue-600 transition duration-200 shadow-sm hover:shadow-md capitalize" onClick={() => setShowModal(true)}>
+                <button className="bg-primary text-white rounded-lg py-2.5 px-4 font-semibold hover:bg-blue-600 transition duration-200 shadow-sm hover:shadow-md capitalize" onClick={() => { setSelectedSound(null); setShowModal(true); }}>
                     <span className="flex items-center gap-2">
                         Upload sound
                     </span>
@@ -122,13 +128,21 @@ const SettingSoundEffect = () => {
                         <div key={sound.id} className="flex flex-col w-full p-4 border rounded-lg bg-white dark:bg-bgSecondary shadow-sm hover:shadow-md transition duration-200 dark:border-borderDivider border-gray-200">
                             <div className="flex items-center justify-between mb-3">
                                 <p className="font-semibold truncate w-full text-center dark:text-textPrimary text-textLightTheme">{sound.name}</p>
-                                {canDeleteSound(sound.creator_id || '') && (
-                                    <button
-                                        className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10"
-                                        onClick={() => handleDeleteSound(sound.id, sound.name)}
-                                    >
-                                        <Icons.CircleClose className="w-4 h-4" />
-                                    </button>
+                                {canManageSound(sound.creator_id || '') && (
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            className="aspect-square w-6 rounded-full text-textPrimaryLight dark:text-textPrimary bg-bgLightModeSecond hover:bg-bgLightModeThird dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center shadow-sm"
+                                            onClick={() => handleEditSound(sound)}
+                                        >
+                                            <Icons.EditMessageRightClick defaultSize="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            className="aspect-square w-6 text-sm rounded-full bg-bgLightModeSecond hover:bg-bgLightModeThird dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center mb-[1px] font-medium text-red-600 shadow-sm"
+                                            onClick={() => handleDeleteSound(sound.id, sound.name)}
+                                        >
+                                            x
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                             <audio controls src={sound.url} className="w-full rounded-full border dark:border-borderDivider border-gray-200 mb-2" />
@@ -139,7 +153,7 @@ const SettingSoundEffect = () => {
                     ))}
                 </div>
             </div>
-            {showModal && <ModalUploadSound onSuccess={handleUploadSuccess} onClose={() => setShowModal(false)} />}
+            {showModal && <ModalUploadSound sound={selectedSound} onSuccess={handleUploadSuccess} onClose={() => { setShowModal(false); setSelectedSound(null); }} />}
         </div>
     );
 };
