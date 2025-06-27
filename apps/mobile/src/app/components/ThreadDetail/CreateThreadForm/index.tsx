@@ -37,6 +37,7 @@ import PanelKeyboard from '../../../screens/home/homedrawer/PanelKeyboard';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { style } from './CreateThreadForm.style';
 import HeaderLeftThreadForm from './HeaderLeftThreadForm';
+import StatusBarHeight from "../../StatusBarHeight/StatusBarHeight";
 
 type CreateThreadFormScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL;
 
@@ -130,7 +131,14 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 							);
 							save(STORAGE_CLAN_ID, currentClanId);
 							if (messageCreate) {
-								await sendMessageThread(content, messageCreate?.mentions, messageCreate?.attachments, undefined, thread, true);
+								await sendMessageThread(
+									messageCreate?.content,
+									messageCreate?.mentions,
+									messageCreate?.attachments,
+									undefined,
+									thread,
+									true
+								);
 							}
 							await sendMessageThread(content, mentions, attachments, references, thread, true);
 							await dispatch(
@@ -209,6 +217,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 			behavior={'padding'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
 		>
+			<StatusBarHeight />
 			<View style={styles.createChannelContent}>
 				<HeaderLeftThreadForm currentChannel={channelThreads || currentChannel} />
 				<ScrollView contentContainerStyle={styles.scrollview} keyboardShouldPersistTaps="handled">
@@ -261,7 +270,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					isPublic={isPublicChannel(currentChannel)}
 				/>
 				<PanelKeyboard currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
-				<View style={{ height: Platform.OS === 'ios' ? size.s_40 : 0 }} />
 			</View>
 		</KeyboardAvoidingView>
 	);

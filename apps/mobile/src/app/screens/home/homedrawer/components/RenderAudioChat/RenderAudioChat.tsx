@@ -2,7 +2,7 @@ import { PauseIcon, PlayIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import LottieView from 'lottie-react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Platform, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
 import { WAY_AUDIO } from '../../../../../../assets/lottie';
@@ -26,8 +26,24 @@ const RenderAudioChat = React.memo(
 		const [totalTime, setTotalTime] = useState(0);
 
 		useEffect(() => {
-			InCallManager.setSpeakerphoneOn(true);
-			InCallManager.setForceSpeakerphoneOn(true);
+			recordingWaveRef?.current?.reset();
+			// Configure Sound for iOS
+			if (Platform.OS === 'ios') {
+				Sound.setCategory('Playback', false); // Allow mixing with other audio
+				Sound.setMode('Default');
+			} else {
+				// Only use InCallManager for Android
+				InCallManager.setSpeakerphoneOn(true);
+				InCallManager.setForceSpeakerphoneOn(true);
+			}
+
+			return () => {
+				// Cleanup
+				if (Platform.OS === 'android') {
+					InCallManager.setSpeakerphoneOn(false);
+					InCallManager.setForceSpeakerphoneOn(false);
+				}
+			};
 		}, []);
 
 		useEffect(() => {
@@ -37,11 +53,20 @@ const RenderAudioChat = React.memo(
 					return;
 				}
 				setTotalTime(newSound.getDuration() * 1000);
+
+				// Configure sound settings
+				if (Platform.OS === 'ios') {
+					newSound.setNumberOfLoops(0); // No looping
+					newSound.setVolume(1.0);
+				}
+
 				setSound(newSound);
 			});
 
 			return () => {
-				newSound.release();
+				if (newSound) {
+					newSound.release();
+				}
 			};
 		}, [audioURL]);
 
@@ -66,6 +91,16 @@ const RenderAudioChat = React.memo(
 				setIsPlaying(false);
 			}
 		};
+
+		useEffect(() => {
+			return () => {
+				// Cleanup on unmount
+				if (sound) {
+					sound.stop();
+					sound.release();
+				}
+			};
+		}, [sound]);
 
 		return (
 			<View style={{ flex: 1, flexDirection: 'row' }}>

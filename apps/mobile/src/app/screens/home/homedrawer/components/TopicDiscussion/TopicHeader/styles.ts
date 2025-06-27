@@ -21,7 +21,6 @@ export const style = (colors: Attributes) =>
 		title: {
 			fontSize: size.label,
 			color: colors.text,
-			marginRight: size.s_10,
 			fontWeight: '700'
 		},
 		titlePanel: {
@@ -29,7 +28,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'flex-end',
 			height: size.s_20,
-			gap: size.s_4
+			gap: size.s_6
 		},
 		userInfo: {
 			flexDirection: 'row',
