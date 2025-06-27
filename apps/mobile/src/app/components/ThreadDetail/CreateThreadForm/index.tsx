@@ -73,15 +73,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 		return channelThreads || channelCurrent;
 	}, [channelThreads, channelCurrent]);
 
-	navigation.setOptions({
-		headerShown: false,
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerStyle: {
-			backgroundColor: themeValue.primary
-		},
-		headerTintColor: themeValue.white
-	});
-
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
 
 	const createThread = useCallback(
