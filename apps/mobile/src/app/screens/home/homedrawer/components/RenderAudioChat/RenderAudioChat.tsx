@@ -29,7 +29,7 @@ const RenderAudioChat = React.memo(
 			recordingWaveRef?.current?.reset();
 			// Configure Sound for iOS
 			if (Platform.OS === 'ios') {
-				Sound.setCategory('Playback', false); // Allow mixing with other audio
+				Sound.setCategory('Playback', true); // Allow mixing with other audio
 				Sound.setMode('Default');
 			} else {
 				// Only use InCallManager for Android
