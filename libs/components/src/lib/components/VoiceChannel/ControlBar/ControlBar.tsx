@@ -218,15 +218,17 @@ export function ControlBar({
 			if (!stream) return;
 
 			const audioTrack = stream.getAudioTracks()[0];
-			try {
-				const audioPublication = await localParticipant.localParticipant.publishTrack(audioTrack, {
-					name: 'screen-share-audio',
-					source: Track.Source.ScreenShareAudio
-				});
+			if (audioTrack) {
+				try {
+					const audioPublication = await localParticipant.localParticipant.publishTrack(audioTrack, {
+						name: 'screen-share-audio',
+						source: Track.Source.ScreenShareAudio
+					});
 
-				audioScreenTrackRef.current = audioPublication;
-			} catch (error) {
-				console.error('Error publishing screen track:', error);
+					audioScreenTrackRef.current = audioPublication;
+				} catch (error) {
+					console.error('Error publishing audio track:', error);
+				}
 			}
 		};
 
@@ -251,6 +253,7 @@ export function ControlBar({
 			if (!showScreen) {
 				dispatch(voiceActions.setShowSelectScreenModal(true));
 			} else {
+				console.log(false);
 				dispatch(voiceActions.setShowScreen(false));
 			}
 		}
