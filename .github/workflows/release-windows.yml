@@ -64,22 +64,22 @@ jobs:
           echo NX_CHAT_APP_OAUTH2_RESPONSE_TYPE=${{ secrets.NX_CHAT_APP_OAUTH2_RESPONSE_TYPE }} >> apps/chat/.env
           echo NX_CHAT_APP_OAUTH2_SCOPE=${{ secrets.NX_CHAT_APP_OAUTH2_SCOPE }} >> apps/chat/.env
           echo NX_CHAT_APP_OAUTH2_CODE_CHALLENGE_METHOD=${{ secrets.NX_CHAT_APP_OAUTH2_CODE_CHALLENGE_METHOD }} >> apps/chat/.env
-          echo NX_CHAT_APP_API_TENOR_URL_CATEGORIES=https://tenor.googleapis.com/v2/categories?key=" >> apps/chat/.env
-          echo NX_CHAT_APP_API_TENOR_URL_SEARCH=https://tenor.googleapis.com/v2/search?q=" >> apps/chat/.env
-          echo NX_CHAT_APP_API_TENOR_URL_FEATURED=https://tenor.googleapis.com/v2/featured?key=" >> apps/chat/.env
-          echo "NX_MAX_LENGTH_NAME_ALLOWED=64" >> apps/chat/.env
-          echo "NX_LOGO_MEZON=https://cdn.mezon.ai/images/mezon_logo.png" >> apps/chat/.env
-          echo "NX_BASE_IMG_URL=https://cdn.mezon.ai" >> apps/chat/.env
-          echo NX_CHAT_APP_OAUTH2_LOG_OUT_CALLBACK=https://mezon.ai/logout/callback" >> apps/chat/.env
-          echo NX_CHAT_APP_OAUTH2_LOG_OUT=https://oauth2.mezon.ai/oauth2/sessions/logout" >> apps/chat/.env
-          echo "NX_CLI_SET=true" >> apps/chat/.env
-          echo "NX_LOAD_DOT_ENV_FILES=true" >> apps/chat/.env
-          echo "NX_TASK_TARGET_PROJECT=chat" >> apps/chat/.env
-          echo "NX_TASK_TARGET_TARGET=build" >> apps/chat/.env
-          echo "NX_TASK_TARGET_CONFIGURATION=production" >> apps/chat/.env
+          echo NX_CHAT_APP_API_TENOR_URL_CATEGORIES=https://tenor.googleapis.com/v2/categories?key= >> apps/chat/.env
+          echo NX_CHAT_APP_API_TENOR_URL_SEARCH=https://tenor.googleapis.com/v2/search?q= >> apps/chat/.env
+          echo NX_CHAT_APP_API_TENOR_URL_FEATURED=https://tenor.googleapis.com/v2/featured?key= >> apps/chat/.env
+          echo "NX_MAX_LENGTH_NAME_ALLOWED=64 >> apps/chat/.env
+          echo "NX_LOGO_MEZON=https://cdn.mezon.ai/images/mezon_logo.png >> apps/chat/.env
+          echo "NX_BASE_IMG_URL=https://cdn.mezon.ai >> apps/chat/.env
+          echo NX_CHAT_APP_OAUTH2_LOG_OUT_CALLBACK=https://mezon.ai/logout/callback >> apps/chat/.env
+          echo NX_CHAT_APP_OAUTH2_LOG_OUT=https://oauth2.mezon.ai/oauth2/sessions/logout >> apps/chat/.env
+          echo "NX_CLI_SET=true >> apps/chat/.env
+          echo "NX_LOAD_DOT_ENV_FILES=true >> apps/chat/.env
+          echo "NX_TASK_TARGET_PROJECT=chat >> apps/chat/.env
+          echo "NX_TASK_TARGET_TARGET=build >> apps/chat/.env
+          echo "NX_TASK_TARGET_CONFIGURATION=production >> apps/chat/.env
           echo NX_CHAT_APP_API_GW_HOST=${{ secrets.NX_CHAT_APP_API_GW_HOST }} >> apps/chat/.env
           echo NX_CHAT_APP_API_GW_PORT=${{ secrets.NX_CHAT_APP_API_GW_PORT }} >> apps/chat/.env
-          echo "NX_DOMAIN_URL=https://mezon.ai" >> apps/chat/.env
+          echo "NX_DOMAIN_URL=https://mezon.ai >> apps/chat/.env
 
       - name: Release Desktop
         run: |
