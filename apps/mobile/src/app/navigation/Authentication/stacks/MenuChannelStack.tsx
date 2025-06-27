@@ -11,6 +11,7 @@ import { ChannelPermissionSetting } from '../../../screens/channelPermissionSett
 import { AdvancedPermissionOverrides } from '../../../screens/channelPermissionSetting/AdvancedPermissionOverrides';
 import { DirectMessageCall } from '../../../screens/messages/DirectMessageCall';
 import { APP_SCREEN } from '../../ScreenTypes';
+import { QuickAction } from '../../../screens/channelPermissionSetting/QuickAction';
 
 type StackMenuChannelScreen = typeof APP_SCREEN.MENU_CHANNEL.STACK;
 // eslint-disable-next-line no-empty-pattern
@@ -78,6 +79,7 @@ export function MenuChannelStacks({}: any) {
 				}}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANNEL_PERMISSION} component={ChannelPermissionSetting} />
+			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.QUICK_ACTION} component={QuickAction} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.CHANGE_CATEGORY} component={ChangeCategory} />
 			<Stack.Screen name={APP_SCREEN.MENU_CHANNEL.ADVANCED_PERMISSION_OVERRIDES} component={AdvancedPermissionOverrides} />
 			<Stack.Screen

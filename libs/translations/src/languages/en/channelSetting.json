@@ -20,6 +20,9 @@
             "permission": "Channel Permission",
             "description": "Change privacy settings and customize how members can interact with this channel."
         },
+        "quickAction": {
+            "title": "Quick Action"
+        },
         "privateChannelInvite": {
             "addMember": "Add Member"
         },
@@ -136,6 +139,15 @@
             "failed": "Save Failed"
         },
         "roleAndMemberEmpty": "There are no roles and members to override permissions"
+    },
+    "quickAction":{
+        "title": "Quick Action Config",
+        "keyTitle": "Key (Example: hello)",
+        "valueTitle": "Content (Example: Good morning, Have a good day !)",
+        "save": "Save",
+        "cancel": "Cancel",
+        "deleteModal": "DELETE ACTION",
+        "deleteTitle": "Are you sure you want to delete /{{key}} ? This cannot be undone !"
     },
     "changeCategory": {
         "title": "Change Category",
