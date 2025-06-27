@@ -43,15 +43,15 @@ jobs:
           echo NX_CHAT_APP_FCM_VAPID_KEY=${{ secrets.NX_CHAT_APP_FCM_VAPID_KEY_DEV }} >> apps/chat/.env
           echo NX_CHAT_APP_API_TENOR_KEY=${{ secrets.NX_CHAT_APP_API_TENOR_KEY_DEV }} >> apps/chat/.env
           echo NX_CHAT_APP_API_CLIENT_KEY_CUSTOM=${{ secrets.NX_CHAT_APP_API_CLIENT_KEY_CUSTOM_DEV }} >> apps/chat/.env
-          echo "NX_CHAT_SENTRY_DNS=${{ secrets.NX_CHAT_SENTRY_DNS_DEV }} >> apps/chat/.env
+          echo NX_CHAT_SENTRY_DNS=${{ secrets.NX_CHAT_SENTRY_DNS_DEV }} >> apps/chat/.env
           echo NX_CHAT_APP_ANNONYMOUS_USER_ID=${{ secrets.NX_CHAT_APP_ANNONYMOUS_USER_ID_DEV }} >> apps/chat/.env
           echo NX_CHAT_APP_NOTIFICATION_WS_URL=${{ secrets.NX_CHAT_APP_NOTIFICATION_WS_URL_DEV }} >> apps/chat/.env
-          echo "NX_CHAT_SENTRY_DSN=${{ secrets.NX_CHAT_SENTRY_DSN_DEV }} >> apps/chat/.env
-          echo "NX_IMGPROXY_BASE_URL=${{ secrets.NX_IMGPROXY_BASE_URL }} >> apps/chat/.env
-          echo "NX_IMGPROXY_KEY=${{ secrets.NX_IMGPROXY_KEY }} >> apps/chat/.env
-          echo "NX_WEBRTC_ICESERVERS_URL=${{ secrets.NX_WEBRTC_ICESERVERS_URL_DEV }} >> apps/chat/.env
-          echo "NX_WEBRTC_ICESERVERS_USERNAME=${{ secrets.NX_WEBRTC_ICESERVERS_USERNAME_DEV }} >> apps/chat/.env
-          echo "NX_WEBRTC_ICESERVERS_CREDENTIAL=${{ secrets.NX_WEBRTC_ICESERVERS_CREDENTIAL_DEV }} >> apps/chat/.env
+          echo NX_CHAT_SENTRY_DSN=${{ secrets.NX_CHAT_SENTRY_DSN_DEV }} >> apps/chat/.env
+          echo NX_IMGPROXY_BASE_URL=${{ secrets.NX_IMGPROXY_BASE_URL }} >> apps/chat/.env
+          echo NX_IMGPROXY_KEY=${{ secrets.NX_IMGPROXY_KEY }} >> apps/chat/.env
+          echo NX_WEBRTC_ICESERVERS_URL=${{ secrets.NX_WEBRTC_ICESERVERS_URL_DEV }} >> apps/chat/.env
+          echo NX_WEBRTC_ICESERVERS_USERNAME=${{ secrets.NX_WEBRTC_ICESERVERS_USERNAME_DEV }} >> apps/chat/.env
+          echo NX_WEBRTC_ICESERVERS_CREDENTIAL=${{ secrets.NX_WEBRTC_ICESERVERS_CREDENTIAL_DEV }} >> apps/chat/.env
           echo NX_CHAT_APP_STREAM_WS_URL=${{ secrets.NX_CHAT_APP_STREAM_WS_URL }} >> apps/chat/.env
           echo NX_CHAT_APP_MEET_WS_URL=${{ secrets.NX_CHAT_APP_MEET_WS_URL }} >> apps/chat/.env
           echo NX_CHAT_APP_MEZON_TREASURY_URL=${{ secrets.NX_CHAT_APP_MEZON_TREASURY_URL }} >> apps/chat/.env
@@ -67,19 +67,19 @@ jobs:
           echo NX_CHAT_APP_API_TENOR_URL_CATEGORIES=https://tenor.googleapis.com/v2/categories?key= >> apps/chat/.env
           echo NX_CHAT_APP_API_TENOR_URL_SEARCH=https://tenor.googleapis.com/v2/search?q= >> apps/chat/.env
           echo NX_CHAT_APP_API_TENOR_URL_FEATURED=https://tenor.googleapis.com/v2/featured?key= >> apps/chat/.env
-          echo "NX_MAX_LENGTH_NAME_ALLOWED=64 >> apps/chat/.env
-          echo "NX_LOGO_MEZON=https://cdn.mezon.ai/images/mezon_logo.png >> apps/chat/.env
-          echo "NX_BASE_IMG_URL=https://cdn.mezon.ai >> apps/chat/.env
+          echo NX_MAX_LENGTH_NAME_ALLOWED=64 >> apps/chat/.env
+          echo NX_LOGO_MEZON=https://cdn.mezon.ai/images/mezon_logo.png >> apps/chat/.env
+          echo NX_BASE_IMG_URL=https://cdn.mezon.ai >> apps/chat/.env
           echo NX_CHAT_APP_OAUTH2_LOG_OUT_CALLBACK=https://mezon.ai/logout/callback >> apps/chat/.env
           echo NX_CHAT_APP_OAUTH2_LOG_OUT=https://oauth2.mezon.ai/oauth2/sessions/logout >> apps/chat/.env
-          echo "NX_CLI_SET=true >> apps/chat/.env
-          echo "NX_LOAD_DOT_ENV_FILES=true >> apps/chat/.env
-          echo "NX_TASK_TARGET_PROJECT=chat >> apps/chat/.env
-          echo "NX_TASK_TARGET_TARGET=build >> apps/chat/.env
-          echo "NX_TASK_TARGET_CONFIGURATION=production >> apps/chat/.env
+          echo NX_CLI_SET=true >> apps/chat/.env
+          echo NX_LOAD_DOT_ENV_FILES=true >> apps/chat/.env
+          echo NX_TASK_TARGET_PROJECT=chat >> apps/chat/.env
+          echo NX_TASK_TARGET_TARGET=build >> apps/chat/.env
+          echo NX_TASK_TARGET_CONFIGURATION=production >> apps/chat/.env
           echo NX_CHAT_APP_API_GW_HOST=${{ secrets.NX_CHAT_APP_API_GW_HOST }} >> apps/chat/.env
           echo NX_CHAT_APP_API_GW_PORT=${{ secrets.NX_CHAT_APP_API_GW_PORT }} >> apps/chat/.env
-          echo "NX_DOMAIN_URL=https://mezon.ai >> apps/chat/.env
+          echo NX_DOMAIN_URL=https://mezon.ai >> apps/chat/.env
 
       - name: Release Desktop
         run: |
