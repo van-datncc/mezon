@@ -30,10 +30,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 notificationManager.cancel(NOTIFICATION_ID)
 
                 // Remove stored notification data
-                val serviceIntent = Intent(context, VibrationService::class.java)
-                context.stopService(serviceIntent)
-
-                // Remove stored notification data
                 removeNotificationData(context)
             }
             "NOTIFICATION_DISMISSED" -> {
