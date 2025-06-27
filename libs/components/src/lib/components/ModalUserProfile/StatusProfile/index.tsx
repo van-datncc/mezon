@@ -158,7 +158,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 			<div className="max-md:relative">
 				<ItemStatus
 					children={`Balance: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
-					startIcon={<Icons.Check className="text-[#838383] dark:text-[#cecece]" />}
+					startIcon={<Icons.Check className="text-[#969696] dark:text-[#cecece]" />}
 					disabled={true}
 				/>
 				<ItemStatus

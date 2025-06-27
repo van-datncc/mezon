@@ -180,7 +180,7 @@ export function AddIcon({ fill, ...props }: ClassIconProps) {
 export function Check(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Check" viewBox="0 0 16 15.2" {...props}>
-			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" stroke="currentColor" />
+			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" stroke='currentColor' />
 		</svg>
 	);
 }
@@ -6687,9 +6687,9 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function History(props: React.HTMLAttributes<SVGAElement>) {
+export function History(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
 			<path d="M12 8V12L15 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 			<path
 				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
