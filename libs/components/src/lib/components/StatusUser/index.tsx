@@ -45,7 +45,7 @@ const DMStatusUser = (props: StatusUserProps) => {
 
 	return (
 		<span
-			className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${
+			className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm  text-theme-primary ${
 				checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'
 			}`}
 		>
@@ -56,7 +56,7 @@ const DMStatusUser = (props: StatusUserProps) => {
 
 const renderTypingIndicator = (checkTypingUser: boolean) => (
 	<span
-		className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode ${
+		className={`absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-theme-primary ${
 			checkTypingUser ? 'rounded-lg -right-2' : 'rounded-full right-[-4px]'
 		}`}
 	>

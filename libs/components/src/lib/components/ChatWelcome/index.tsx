@@ -119,7 +119,7 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 				)}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					Welcome to #{name}
 				</p>
 			</div>
@@ -151,12 +151,12 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 				)}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					{isShowCreateThread ? name : currentThread?.channel_label}
 				</p>
 			</div>
 			<p className={classNameSubtext}>
-				Started by <span className="dark:text-white text-black font-medium">{username}</span>
+				Started by <span className="text font-medium">{username}</span>
 			</p>
 		</>
 	);
@@ -190,11 +190,11 @@ const WelComeDm = (props: WelComeDmProps) => {
 				classNameText="!text-4xl font-semibold"
 			/>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					{name}
 				</p>
 			</div>
-			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{username}</p>}
+			{!isDmGroup && <p className="font-medium text-2xl text-theme-primary">{username}</p>}
 			<div className="text-base">
 				<p className={classNameSubtext}>
 					{isDmGroup ? (
@@ -303,7 +303,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			)}
 			{title.map((button, index) => (
 				<button
-					className={`rounded  px-4 py-0.5 hover:bg-opacity-85 font-medium text-white ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-bgModifierHover' : 'bg-bgSelectItem'}`}
+					className={`rounded-lg text-theme-primary-hover border border-theme-primary px-4 py-0.5 font-medium text-theme-primary ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-button-secondary' : 'bg-bgSelectItem'}`}
 					onClick={() => handleOnClickButtonFriend(index)}
 					key={button}
 				>
@@ -314,7 +314,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			{(isFriend || didIBlockUser) && (
 				<button
 					onClick={didIBlockUser ? handleUnblockFriend : handleBlockFriend}
-					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+					className="rounded-lg text-theme-primary-hover border border-theme-primary bg-button-secondary px-4 py-0.5 font-medium text-theme-primary"
 				>
 					{didIBlockUser ? 'Unblock' : 'Block'}
 				</button>

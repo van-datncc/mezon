@@ -51,7 +51,7 @@ const TempMemberItem = memo(({ id, creator_id }: TempMemberItemProps) => {
 
 			<div className="flex flex-col font-medium">
 				<ClanUserName userId={user.user?.id as string} name={username} isOwnerClan={isOwnerClan} />
-				<p className="dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">{userCustomStatus}</p>
+				<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">{userCustomStatus}</p>
 			</div>
 		</div>
 	);
@@ -199,11 +199,11 @@ const ListMember = () => {
 						>
 							<div className="flex items-center px-4 h-full">
 								{typeof user === 'object' && 'onlineSeparate' in user ? (
-									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+									<p className="text-theme-primary text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 										Member - {lisMembers.onlineCount}
 									</p>
 								) : typeof user === 'object' && 'offlineSeparate' in user ? (
-									<p className="dark:text-[#AEAEAE] text-black text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+									<p className="text-theme-primary text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 										Offline - {lisMembers.offlineCount}
 									</p>
 								) : (

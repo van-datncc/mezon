@@ -80,7 +80,8 @@ const ChannelTopbar = memo(() => {
 	return (
 		<div
 			onMouseDown={onMouseDownTopbar}
-			className={`draggable-area max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between flex-shrink dark:bg-bgPrimary bg-bgLightPrimary shadow-inner border-b-[1px] dark:border-bgTertiary border-bgLightTertiary ${closeMenu ? 'fixed top-0 w-screen' : ''} ${closeMenu && statusMenu ? 'max-sbm:left-0 max-sbm:z-30' : 'left-0'}`}
+
+			className={`draggable-area max-sbm:z-20 flex h-heightTopBar min-w-0 w-full items-center justify-between  flex-shrink   ${closeMenu && 'fixed top-0 w-screen'} ${closeMenu && statusMenu ? 'left-[100vw]' : 'left-0'}`}
 		>
 			<TopBarChannelText />
 		</div>
@@ -210,7 +211,8 @@ const TopBarChannelText = memo(() => {
 						) : (
 							<div
 								key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}_display`}
-										className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent outline-none leading-10 text-colorTextLightMode dark:text-contentPrimary max-w-[250px] min-w-0 max-sbm:max-w-[180px]`}
+
+								className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent outline-none leading-10 text-theme-primary max-w-[250px] min-w-0`}
 								onClick={handleStartEditing}
 								title={channelDmGroupLabel}
 							>
@@ -288,7 +290,7 @@ const ChannelTopbarLabel = memo(
 		};
 
 		return (
-			<div className="none-draggable-area flex items-center text-lg gap-1 dark:text-white text-black w-full" onClick={onClick}>
+			<div className="none-draggable-area flex items-center text-lg gap-1 " onClick={onClick}>
 				<div className="w-6">{renderIcon()}</div>
 				<p className="text-base font-semibold leading-5 truncate">{label}</p>
 			</div>
@@ -356,7 +358,7 @@ const ChannelTopbarTools = memo(
 							<FileButton isLightMode={appearanceTheme === 'light'} />
 							<MuteButton isLightMode={appearanceTheme === 'light'} />
 							<InboxButton isLightMode={appearanceTheme === 'light'} />
-							<PinButton mode={ChannelStreamMode.STREAM_MODE_CHANNEL} isLightMode={appearanceTheme === 'light'} />
+							<PinButton mode={ChannelStreamMode.STREAM_MODE_CHANNEL} styleCss={'text-theme-primary text-theme-primary-hover'} />
 							<div onClick={setTurnOffThreadMessage}>
 								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
 							</div>
@@ -386,7 +388,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 	return (
 		<div className="flex items-center justify-center ">
 			{avatar ? (
-				<img className="w-8 h-8 rounded-full object-cover" src={createImgproxyUrl(avatar)} alt="" />
+				<img className="w-8 h-8 rounded-full object-cover " src={createImgproxyUrl(avatar)} alt="" />
 			) : (
 				<div className="w-8 h-8 rounded-full uppercase flex items-center justify-center font-semibold dark:bg-bgAvatarDark bg-bgAvatarLight dark:text-bgAvatarLight text-bgAvatarDark">
 					{avatarName}
@@ -585,19 +587,19 @@ const DmTopbarTools = memo(() => {
 						title="Start voice call"
 						onClick={() => handleStartCall()}
 						disabled={isGroupCallDisabled}
-						className={isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+						className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
 					>
-						<Icons.IconPhoneDM className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`} />
+						<Icons.IconPhoneDM />
 					</button>
 					<button
 						title="Start Video Call"
 						onClick={() => handleStartCall(true)}
 						disabled={isGroupCallDisabled}
-						className={isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+						className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
 					>
-						<Icons.IconMeetDM className={`dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode`} />
+						<Icons.IconMeetDM />
 					</button>
-					<PinButton mode={mode} isLightMode={appearanceTheme === 'light'} />
+					<PinButton mode={mode} styleCss="text-theme-primary-hover" />
 
 					<AddMemberToGroupDm currentDmGroup={currentDmGroup} />
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
@@ -610,7 +612,7 @@ const DmTopbarTools = memo(() => {
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 						<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
 							<span>
-								<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+								<Icons.IconUserProfileDM />
 							</span>
 						</button>
 					)}
@@ -626,7 +628,7 @@ const DmTopbarTools = memo(() => {
 			{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 				<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
 					<span>
-						<Icons.IconUserProfileDM isWhite={isUseProfileDM} />
+						<Icons.IconUserProfileDM />
 					</span>
 				</button>
 			)}
@@ -763,7 +765,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number }) {
+function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 	const dispatch = useAppDispatch();
 	const isShowPinMessage = useSelector(selectIsPinModalVisible);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
@@ -791,14 +793,12 @@ function PinButton({ isLightMode, mode }: { isLightMode: boolean; mode?: number 
 		<div className="relative leading-5 h-5" ref={pinRef}>
 			<button
 				title="Pinned Messages"
-				className="focus-visible:outline-none relative"
+				className={`${styleCss} focus-visible:outline-none relative `}
 				onClick={handleTogglePinMessage}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.PinRight isWhite={isShowPinMessage} />
-				{isShowPinBadge && (
-					<div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px] dark:border-bgPrimary border-bgLightPrimary box-content" />
-				)}
+				<Icons.PinRight />
+				{isShowPinBadge && <div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px]  box-content" />}
 			</button>
 			{isShowPinMessage && <PinnedMessages mode={mode} rootRef={pinRef} onClose={handleTogglePinMessage} />}
 		</div>

@@ -174,11 +174,11 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	}, [friend?.user]);
 
 	return (
-		<div className="border-t-[1px] dark:border-[#3f4147] border-gray-300 group/list_friends">
+		<div className="border-t-theme-primary group/list_friends text-theme-primary">
 			<div
 				key={friend?.user?.id}
 				onClick={directMessageWithUser}
-				className="py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-[#393c41] hover:bg-[#eaebed] rounded-lg"
+				className="py-3 flex justify-between items-center px-[12px] cursor-pointer rounded-lg bg-item-hover"
 			>
 				<div key={friend?.user?.id} className={'flex-1'}>
 					<SimpleMemberProfile
@@ -202,18 +202,18 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				<div onClick={(e) => e.stopPropagation()}>
 					{friend?.state === 0 && (
 						<div className="flex gap-3 items-center">
-							<button onClick={directMessageWithUser} className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
-								<Icons.IconChat className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
+							<button onClick={directMessageWithUser} className=" bg-button-secondary rounded-full p-2 text-theme-primary-hover">
+								<Icons.IconChat className="text-theme-primary " />
 							</button>
-							<button onClick={handleMenuClick} className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
-								<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
+							<button onClick={handleMenuClick} className="bg-button-secondary rounded-full p-2 text-theme-primary-hover">
+								<Icons.IconEditThreeDot className="text-theme-primary" />
 							</button>
 						</div>
 					)}
 					{friend?.state === 1 && (
 						<div className="flex gap-3 items-center">
 							<button
-								className="dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentSecondary text-textLightTheme rounded-full w-8 h-8 flex items-center justify-center"
+								className=" rounded-full w-8 h-8 flex items-center justify-center"
 								onClick={() => handleDeleteFriend(friend?.user?.username as string, friend?.user?.id as string)}
 							>
 								✕
