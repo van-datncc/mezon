@@ -13,12 +13,12 @@ import {
 import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, FlatList, Modal, Platform, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, FlatList, Platform, TouchableOpacity, View } from 'react-native';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
-import MezonInput from '../../../componentUI/MezonInput';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import ModalQuickMenu from './ModalQuickMenu';
 import { style } from './quickAction.style';
 
 type QuickActionScreen = typeof APP_SCREEN.MENU_CHANNEL.QUICK_ACTION;
@@ -57,6 +57,16 @@ export function QuickAction({ navigation, route }) {
 		});
 	}, [navigation, listQuickActions]);
 
+	useEffect(() => {
+		const subscription = DeviceEventEmitter.addListener(ActionEmitEvent.ON_TRIGGER_MODAL, ({ isDismiss }) => {
+			setModalVisible(!isDismiss);
+		});
+
+		return () => {
+			subscription.remove();
+		};
+	}, []);
+
 	const openModal = (item: ApiQuickMenuAccess | null = null) => {
 		if (item) {
 			setFormKey(item.menu_name);
@@ -91,7 +101,7 @@ export function QuickAction({ navigation, route }) {
 					})
 				);
 				await dispatch(listQuickMenuAccess({ channelId }));
-				setModalVisible(false);
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 			} else {
 				await dispatch(
 					addQuickMenuAccess({
@@ -102,7 +112,7 @@ export function QuickAction({ navigation, route }) {
 					})
 				);
 				await dispatch(listQuickMenuAccess({ channelId }));
-				setModalVisible(false);
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 			}
 		} catch (error: any) {
 			console.error(error.message);
@@ -135,70 +145,43 @@ export function QuickAction({ navigation, route }) {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
+	const QuickActionItem = ({ item, themeValue, openModal, handleDelete }) => {
+		return (
+			<View style={styles.item}>
+				<View style={{ flex: 1 }}>
+					<View style={styles.keyContainer}>
+						<Text style={styles.keyText}>/{item.menu_name}</Text>
+					</View>
+					<Text numberOfLines={1} style={styles.valueText}>
+						{item.action_msg}
+					</Text>
+				</View>
+				<TouchableOpacity onPress={() => openModal(item)}>
+					<MezonIconCDN icon={IconCDN.editAction} height={size.s_20} width={size.s_30} color={themeValue.textStrong} />
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => handleDelete(item.id, item)}>
+					<MezonIconCDN icon={IconCDN.deleteAction} height={size.s_20} width={size.s_20} color={baseColor.red} />
+				</TouchableOpacity>
+			</View>
+		);
+	};
+
 	return (
 		<View style={{ flex: 1, backgroundColor: themeValue.primary, paddingHorizontal: size.s_12 }}>
 			<FlatList
 				data={listQuickActions}
-				keyExtractor={(item) => item.id}
+				keyExtractor={(item) => item?.id}
 				renderItem={({ item }) => (
-					<View style={styles.item}>
-						<View style={{ flex: 1 }}>
-							<View style={styles.keyContainer}>
-								<Text style={styles.keyText}>/{item.menu_name}</Text>
-							</View>
-							<Text numberOfLines={1} style={styles.valueText}>
-								{item.action_msg}
-							</Text>
-						</View>
-						<TouchableOpacity onPress={() => openModal(item)}>
-							<MezonIconCDN icon={IconCDN.editAction} height={size.s_20} width={size.s_30} color={themeValue.textStrong} />
-						</TouchableOpacity>
-						<TouchableOpacity onPress={() => handlePressDeleteCategory(item.id, item)}>
-							<MezonIconCDN icon={IconCDN.deleteAction} height={size.s_20} width={size.s_20} color={baseColor.red} />
-						</TouchableOpacity>
-					</View>
+					<QuickActionItem item={item} themeValue={themeValue} openModal={openModal} handleDelete={handlePressDeleteCategory} />
 				)}
 			/>
 
 			<TouchableOpacity style={styles.addButton} onPress={() => openModal(null)}>
 				<MezonIconCDN icon={IconCDN.addAction} height={size.s_40} width={size.s_40} color={themeValue.textStrong} />
 			</TouchableOpacity>
-
-			<Modal visible={modalVisible} transparent animationType="slide">
-				<View style={styles.modalContainer}>
-					<View style={styles.modalBox}>
-						<MezonInput placeHolder={t('quickAction.keyTitle')} value={formKey} onTextChange={setFormKey} />
-						<MezonInput placeHolder={t('quickAction.valueTitle')} value={formValue} onTextChange={setFormValue} textarea={true} />
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: size.s_10 }}>
-							<TouchableOpacity
-								style={{
-									flex: 1,
-									backgroundColor: baseColor.bgButtonPrimary,
-									padding: size.s_12,
-									borderRadius: size.s_6,
-									marginRight: size.s_6
-								}}
-								onPress={saveItem}
-							>
-								<Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>{t('quickAction.save')}</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={{
-									flex: 1,
-									backgroundColor: baseColor.bgButtonSecondary,
-									padding: size.s_12,
-									borderRadius: size.s_6,
-									marginLeft: size.s_6
-								}}
-								onPress={() => setModalVisible(false)}
-							>
-								<Text style={{ textAlign: 'center', color: 'white', fontWeight: 'bold' }}>{t('quickAction.cancel')}</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal>
+			{modalVisible && (
+				<ModalQuickMenu formKey={formKey} formValue={formValue} setFormKey={setFormKey} setFormValue={setFormValue} onSave={saveItem} />
+			)}
 		</View>
 	);
 }

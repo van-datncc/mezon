@@ -15,17 +15,14 @@ import {
 	RootState,
 	emojiSuggestionActions,
 	getStore,
-	listQuickMenuAccess,
 	referencesActions,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAnonymousMode,
 	selectCurrentChannelId,
 	selectCurrentDM,
-	selectQuickMenuByChannelId,
 	threadsActions,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataProps } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -118,14 +115,6 @@ export const ChatBoxBottomBar = memo(
 		const navigation = useNavigation<any>();
 		const { sessionRef, clientRef } = useMezon();
 		const styles = style(themeValue);
-
-		useEffect(() => {
-			if (channelId) {
-				dispatch(listQuickMenuAccess({ channelId }));
-			}
-		}, [channelId, dispatch]);
-
-		const quickMenuActions = useAppSelector((state) => selectQuickMenuByChannelId(state, channelId));
 
 		const [mentionTextValue, setMentionTextValue] = useState('');
 		const [listMentions, setListMentions] = useState<MentionDataProps[]>([]);
@@ -551,18 +540,19 @@ export const ChatBoxBottomBar = memo(
 					{triggers?.slash?.keyword !== undefined && (
 						<SlashCommandSuggestions
 							keyword={triggers?.slash?.keyword}
-							quickMenuList={quickMenuActions}
-							onSelectCommand={(commandId) => {
-								if (commandId === KEY_SLASH_COMMAND_EPHEMERAL) {
+							channelId={channelId}
+							onSelectCommand={(command) => {
+								if (command.id === KEY_SLASH_COMMAND_EPHEMERAL) {
 									setIsEphemeralMode(true);
 									setTextChange('@');
 									setMentionTextValue('@');
 									textValueInputRef.current = '@';
 									mentionsOnMessage.current = [];
-								} else if (commandId !== KEY_SLASH_COMMAND_EPHEMERAL) {
-									const quickMenu = quickMenuActions.find((item) => item.id === commandId);
-									setTextChange(`/${quickMenu.menu_name} `);
-									textValueInputRef.current = `${quickMenu.action_msg}`;
+								} else {
+									if (command.display && command.description) {
+										setTextChange(`/${command.display} `);
+										textValueInputRef.current = `${command.description}`;
+									}
 								}
 							}}
 						/>

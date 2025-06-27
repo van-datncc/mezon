@@ -1,17 +1,12 @@
 import { debounce, KEY_SLASH_COMMAND_EPHEMERAL } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { listQuickMenuAccess, selectQuickMenuByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { style } from './styles';
-import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
-
-interface SlashCommandSuggestionsProps {
-	keyword: string;
-	onSelectCommand: (commandId: string) => void;
-	quickMenuList: ApiQuickMenuAccess[];
-}
 
 interface SlashCommand {
 	id: string;
@@ -19,8 +14,15 @@ interface SlashCommand {
 	description?: string;
 }
 
-export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, quickMenuList }: SlashCommandSuggestionsProps) => {
+interface SlashCommandSuggestionsProps {
+	keyword: string;
+	onSelectCommand: (command: SlashCommand) => void;
+	channelId?: string;
+}
+
+export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, channelId }: SlashCommandSuggestionsProps) => {
 	const { t } = useTranslation('message');
+	const dispatch = useAppDispatch();
 	const slashCommands: SlashCommand[] = [
 		{
 			id: KEY_SLASH_COMMAND_EPHEMERAL,
@@ -28,6 +30,14 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, quickMe
 			description: t('ephemeral.description')
 		}
 	];
+
+	useEffect(() => {
+		if (channelId) {
+			dispatch(listQuickMenuAccess({ channelId }));
+		}
+	}, [channelId, dispatch]);
+
+	const quickMenuList: ApiQuickMenuAccess[] = useAppSelector((state) => selectQuickMenuByChannelId(state, channelId));
 
 	const allCommands: SlashCommand[] = [
 		...slashCommands,
@@ -51,7 +61,7 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, quickMe
 	const renderCommands = ({ item }: { item: SlashCommand }) => {
 		if (!item?.display) return <View />;
 		return (
-			<Pressable style={styles.commandItem} onPress={() => onSelectCommand(item?.id)}>
+			<Pressable style={styles.commandItem} onPress={() => onSelectCommand(item)}>
 				<Text style={styles.commandDisplay}>/{item?.display}</Text>
 				<Text style={styles.commandDescription}>{item?.description}</Text>
 			</Pressable>
