@@ -5,7 +5,7 @@ import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, convertTimeString } from '@
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Pressable, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -64,25 +64,30 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 	}, [userRolesClan.highestPermissionRoleColor]);
 
 	return (
-		<View style={{ paddingHorizontal: size.s_10, paddingBottom: size.s_14, borderBottomColor: themeValue.secondaryLight, borderBottomWidth: 1 }}>
-			<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+		<View style={styles.container}>
+			<View style={styles.headerPannel}>
 				<Pressable onPress={handleBack} style={styles.backButton}>
 					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.text} height={size.s_20} width={size.s_20} />
 				</Pressable>
-				<Text style={styles.title}>Topic</Text>
+				<View style={styles.titlePanel}>
+					<Pressable>
+						<MezonIconCDN icon={IconCDN.discussionIcon} color={themeValue.text} height={size.s_16} width={size.s_16} />
+					</Pressable>
+					<Text style={styles.title}>Topic</Text>
+				</View>
 				<View style={{ width: size.s_50 }} />
 			</View>
-			{!valueTopic ? null : (
+			<View style={styles.userInfo}>
+				<MezonAvatar avatarUrl={messageAvatar} username={senderDisplayName} />
 				<View>
-					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginVertical: size.s_10 }}>
-						<MezonAvatar avatarUrl={messageAvatar} username={senderDisplayName} />
-						<View>
-							<Text style={styles.name} color={colorSenderName}>
-								{senderDisplayName}
-							</Text>
-							<Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>
-						</View>
-					</View>
+					<Text style={styles.name} color={colorSenderName}>
+						{senderDisplayName}
+					</Text>
+					<Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>
+				</View>
+			</View>
+			{!valueTopic ? null : (
+				<ScrollView>
 					<RenderTextMarkdownContent
 						content={{
 							...(typeof valueTopic.content === 'object' ? valueTopic.content : {}),
@@ -100,7 +105,7 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 							channelId={valueTopic?.channel_id}
 						/>
 					)}
-				</View>
+				</ScrollView>
 			)}
 		</View>
 	);

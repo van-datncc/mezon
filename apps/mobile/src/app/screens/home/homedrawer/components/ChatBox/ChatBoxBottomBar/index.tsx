@@ -28,6 +28,7 @@ import { IHashtagOnMessage, IMentionOnMessage, MIN_THRESHOLD_CHARS, MentionDataP
 import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { useMezon } from '@mezon/transport';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +48,7 @@ import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import EmojiSwitcher from '../../EmojiPicker/EmojiSwitcher';
-import { renderTextContent } from '../../RenderTextContent';
+import { RenderTextContent } from '../../RenderTextContent';
 import { ChatBoxListener } from '../ChatBoxListener';
 import { ChatMessageLeftArea, IChatMessageLeftAreaRef } from '../ChatMessageLeftArea';
 import { ChatMessageSending } from '../ChatMessageSending';
@@ -202,6 +203,30 @@ export const ChatBoxBottomBar = memo(
 			[textChange]
 		);
 
+		const handlePasteImage = async (imageBase64: string) => {
+			try {
+				if (imageBase64) {
+					const now = Date.now();
+
+					const imageFile = {
+						filename: `pasted-image-${now}.png`,
+						filetype: 'image/png',
+						size: imageBase64?.length,
+						url: imageBase64
+					};
+
+					dispatch(
+						referencesActions.setAtachmentAfterUpload({
+							channelId,
+							files: [imageFile]
+						})
+					);
+				}
+			} catch (error) {
+				console.error('Error pasting image:', error);
+			}
+		};
+
 		const onSendSuccess = useCallback(() => {
 			textValueInputRef.current = '';
 			setTextChange('');
@@ -241,6 +266,30 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, []);
 		const handleTextInputChange = async (text: string) => {
+			if (text?.length > MIN_THRESHOLD_CHARS) {
+				try {
+					const imageBase64 = await Clipboard.getImage();
+
+					if (imageBase64) {
+						textValueInputRef.current = ' ';
+						setTextChange(' ');
+						await handlePasteImage(imageBase64);
+						return;
+					}
+				} catch (error) {
+					console.log('Error checking clipboard:', error);
+				}
+
+				if (convertRef.current) {
+					return;
+				}
+				convertRef.current = true;
+				await onConvertToFiles(text);
+				textValueInputRef.current = '';
+				setTextChange('');
+				return;
+			}
+
 			const store = getStore();
 			setTextChange(text);
 			textValueInputRef.current = text;
@@ -251,18 +300,8 @@ export const ChatBoxBottomBar = memo(
 			if (messageAction !== EMessageActionType.CreateThread) {
 				saveMessageToCache(text);
 			}
-			if (!text) return;
 
-			if (text?.length > MIN_THRESHOLD_CHARS) {
-				if (convertRef.current) {
-					return;
-				}
-				convertRef.current = true;
-				await onConvertToFiles(text);
-				textValueInputRef.current = '';
-				setTextChange('');
-				return;
-			}
+			if (!text) return;
 
 			const convertedHashtag = convertMentionsToText(text);
 			const words = convertedHashtag?.split?.(mentionRegexSplit);
@@ -585,7 +624,7 @@ export const ChatBoxBottomBar = memo(
 								ref={inputRef}
 								multiline
 								onChangeText={
-									(mentionsOnMessage?.current || hashtagsOnMessage?.current)?.length
+									mentionsOnMessage?.current?.length || hashtagsOnMessage?.current?.length
 										? textInputProps?.onChangeText
 										: handleTextInputChange
 								}
@@ -598,7 +637,7 @@ export const ChatBoxBottomBar = memo(
 								numberOfLines={4}
 								textBreakStrategy="simple"
 								style={[styles.inputStyle, !textValueInputRef?.current && { height: size.s_40 }]}
-								children={renderTextContent(textValueInputRef?.current)}
+								children={RenderTextContent({ text: textValueInputRef?.current })}
 								onSelectionChange={textInputProps?.onSelectionChange}
 							/>
 							<View style={styles.iconEmoji}>

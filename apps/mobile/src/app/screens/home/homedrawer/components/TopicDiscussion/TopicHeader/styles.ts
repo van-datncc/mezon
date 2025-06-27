@@ -2,6 +2,13 @@ import { Attributes, Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		container: {
+			paddingHorizontal: size.s_10,
+			paddingBottom: size.s_14,
+			borderBottomColor: colors.secondaryLight,
+			borderBottomWidth: 1,
+			maxHeight: '40%'
+		},
 		dateText: {
 			fontSize: size.small,
 			color: Colors.gray72
@@ -16,6 +23,24 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			marginRight: size.s_10,
 			fontWeight: '700'
+		},
+		titlePanel: {
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'flex-end',
+			height: size.s_20,
+			gap: size.s_4
+		},
+		userInfo: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_10,
+			marginVertical: size.s_10
+		},
+		headerPannel: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center'
 		},
 		backButton: {
 			width: size.s_50,

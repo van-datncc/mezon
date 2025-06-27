@@ -705,15 +705,21 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		}
 	}
 
-	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
+	async function sendWithRetry(retryCount: number, fakeMess: MessagesEntity): ReturnType<typeof doSend> {
 		try {
 			const res = await doSend();
 			return res;
 		} catch (error) {
 			if (retryCount > 0) {
-				const r = await sendWithRetry(retryCount - 1);
+				const r = await sendWithRetry(retryCount - 1, fakeMess);
 				return r;
 			} else {
+				thunkAPI.dispatch(
+					messagesActions.newMessage({
+						...fakeMess,
+						isSending: undefined
+					})
+				);
 				throw error;
 			}
 		}
@@ -747,7 +753,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			thunkAPI.dispatch(messagesActions.addNewMessage(fakeMess));
 		}
 
-		const res = await sendWithRetry(1);
+		const res = await sendWithRetry(1, fakeMess);
 
 		if (!isViewingOlderMessages) {
 			const timestamp = Date.now() / 1000;

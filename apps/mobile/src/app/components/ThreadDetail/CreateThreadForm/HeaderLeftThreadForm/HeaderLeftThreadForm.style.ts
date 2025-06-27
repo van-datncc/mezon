@@ -5,7 +5,8 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		headerLeft: {
 			flexDirection: 'row',
-			alignItems: 'center'
+			alignItems: 'center',
+			height: size.s_50
 		},
 		btnBack: {
 			paddingLeft: size.s_16,

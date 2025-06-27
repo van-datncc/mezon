@@ -1,12 +1,13 @@
 import { useMezon } from '@mezon/transport';
-import { getSrcEmoji } from '@mezon/utils';
+import { getSrcEmoji, getSrcSound } from '@mezon/utils';
 import { VoiceReactionSend } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { DisplayedEmoji, ReactionCallHandlerProps } from './types';
 
-export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ currentChannel }) => {
+export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ currentChannel, onSoundReaction }) => {
 	const [displayedEmojis, setDisplayedEmojis] = useState<DisplayedEmoji[]>([]);
 	const { socketRef } = useMezon();
+	const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
 
 	const generatePosition = useCallback(() => {
 		const horizontalOffset = (Math.random() - 0.5) * 40;
@@ -25,6 +26,30 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 		};
 	}, []);
 
+	const playSound = useCallback((soundUrl: string, soundId: string) => {
+		try {
+			const currentAudio = audioRefs.current.get(soundId);
+			if (currentAudio) {
+				currentAudio.pause();
+				currentAudio.currentTime = 0;
+			}
+
+			const audio = new Audio(soundUrl);
+			audio.volume = 0.3;
+			audioRefs.current.set(soundId, audio);
+
+			audio.play().catch((error) => {
+				console.error('Failed to play sound reaction:', error);
+			});
+
+			audio.addEventListener('ended', () => {
+				audioRefs.current.delete(soundId);
+			});
+		} catch (error) {
+			console.error('Error playing sound reaction:', error);
+		}
+	}, []);
+
 	useEffect(() => {
 		if (!socketRef.current || !currentChannel?.channel_id) return;
 
@@ -35,32 +60,43 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 				try {
 					const emojis = message.emojis || [];
 					const firstEmojiId = emojis[0];
+					const senderId = message.sender_id;
 
 					if (firstEmojiId) {
-						Array.from({ length: 1 }).forEach((_, index) => {
-							const position = generatePosition();
-							const delay = index * 300;
+						if (firstEmojiId.startsWith('sound:')) {
+							const soundId = firstEmojiId.replace('sound:', '');
+							const soundUrl = getSrcSound(soundId);
 
-							const newEmoji = {
-								id: `${Date.now()}-${firstEmojiId}-${index}-${Math.random()}`,
-								emoji: '',
-								emojiId: firstEmojiId,
-								timestamp: Date.now(),
-								position: {
-									...position,
-									delay: `${delay}ms`
-								}
-							};
+							playSound(soundUrl, soundId);
+							if (onSoundReaction && senderId) {
+								onSoundReaction(senderId, soundId);
+							}
+						} else {
+							Array.from({ length: 1 }).forEach((_, index) => {
+								const position = generatePosition();
+								const delay = index * 300;
 
-							setTimeout(() => {
-								setDisplayedEmojis((prev) => [...prev, newEmoji]);
-							}, delay);
+								const newEmoji = {
+									id: `${Date.now()}-${firstEmojiId}-${index}-${Math.random()}`,
+									emoji: '',
+									emojiId: firstEmojiId,
+									timestamp: Date.now(),
+									position: {
+										...position,
+										delay: `${delay}ms`
+									}
+								};
 
-							const durationMs = parseFloat(position.duration) * 1000 + delay + 500;
-							setTimeout(() => {
-								setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
-							}, durationMs);
-						});
+								setTimeout(() => {
+									setDisplayedEmojis((prev) => [...prev, newEmoji]);
+								}, delay);
+
+								const durationMs = parseFloat(position.duration) * 1000 + delay + 500;
+								setTimeout(() => {
+									setDisplayedEmojis((prev) => prev.filter((item) => item.id !== newEmoji.id));
+								}, durationMs);
+							});
+						}
 					}
 				} catch (error) {
 					console.error(error);
@@ -72,8 +108,12 @@ export const ReactionCallHandler: React.FC<ReactionCallHandlerProps> = memo(({ c
 			if (currentSocket) {
 				currentSocket.onvoicereactionmessage = () => {};
 			}
+			audioRefs.current.forEach((audio) => {
+				audio.pause();
+			});
+			audioRefs.current?.clear();
 		};
-	}, [socketRef, currentChannel, generatePosition]);
+	}, [socketRef, currentChannel, generatePosition, playSound, onSoundReaction]);
 
 	if (displayedEmojis.length === 0) {
 		return null;

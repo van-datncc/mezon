@@ -145,5 +145,6 @@ export enum IconCDN {
 	quickAction = require('./iconPNG/flash.png'),
 	addAction = require('./iconPNG/addition.png'),
 	deleteAction = require('./iconPNG/remove.png'),
-	editAction = require('./iconPNG/edit.png')
+	editAction = require('./iconPNG/edit.png'),
+	closeDMIcon = require('./iconPNG/closeDMIcon.png')
 }

@@ -25,6 +25,7 @@ import { ConnectionQuality, Track } from 'livekit-client';
 import { safeJSONParse } from 'mezon-js';
 import React, { PropsWithChildren, forwardRef, useCallback, useMemo, useState } from 'react';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
+import { ActiveSoundReaction } from '../Reaction/types';
 import { FocusToggle } from './FocusToggle';
 
 export function ParticipantContextIfNeeded(
@@ -59,12 +60,13 @@ export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElemen
 	onParticipantClick?: (event: ParticipantClickEvent) => void;
 	isExtCalling?: boolean;
 	isConnectingScreen?: boolean;
+	activeSoundReactions?: Map<string, ActiveSoundReaction>;
 }
 export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes<HTMLDivElement>) => React.ReactNode = forwardRef<
 	HTMLDivElement,
 	ParticipantTileProps
 >(function ParticipantTile(
-	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, isExtCalling, ...htmlProps }: ParticipantTileProps,
+	{ trackRef, children, onParticipantClick, disableSpeakingIndicator, isExtCalling, activeSoundReactions, ...htmlProps }: ParticipantTileProps,
 	ref
 ) {
 	const trackReference = useEnsureTrackRef(trackRef);
@@ -113,6 +115,9 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 	const resolvedAvatar = extAvatar ?? avatar;
 	const isAvatarResolved = parsedUsername !== undefined || member !== undefined;
 
+	const activeSoundReaction = activeSoundReactions?.get(usernameString);
+	const hasActiveSoundReaction = Boolean(activeSoundReaction);
+
 	const avatarToRender = resolvedAvatar ? (
 		<AvatarImage
 			alt={usernameString || ''}
@@ -157,6 +162,15 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								)
 							)}
 							<div className="lk-participant-placeholder !bg-bgIconLight">{avatarToRender}</div>
+
+							{hasActiveSoundReaction && (
+								<div className="absolute top-2 right-2 pointer-events-none z-40 transition-all duration-300 ease-in-out">
+									<div className="bg-[#5865f2] rounded-full p-1.5 shadow-lg border border-white/20 animate-in fade-in-0 zoom-in-95 duration-200">
+										<Icons.VoiceSoundControlIcon className="w-4 h-4 text-white" />
+									</div>
+								</div>
+							)}
+
 							<div className="lk-participant-metadata overflow-hidden">
 								<div className="lk-participant-metadata-item flex w-full justify-between gap-1 !bg-transparent">
 									{trackReference.source === Track.Source.Camera ? (
