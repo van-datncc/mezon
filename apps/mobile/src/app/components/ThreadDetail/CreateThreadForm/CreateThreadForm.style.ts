@@ -80,7 +80,12 @@ export const style = (colors: Attributes) =>
 			borderTopWidth: 0.5,
 			borderBottomWidth: 0.5,
 			paddingTop: size.s_20,
-			paddingBottom: size.s_20
+			paddingBottom: size.s_20,
+			backgroundColor: colors.primary
 		},
-		errorMessage: { paddingRight: size.s_20 }
+		errorMessage: { paddingRight: size.s_20 },
+		scrollview: {
+			flexGrow: 1,
+			justifyContent: 'space-between'
+		}
 	});
