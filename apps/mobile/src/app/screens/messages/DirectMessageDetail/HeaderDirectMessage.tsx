@@ -40,15 +40,12 @@ interface HeaderProps {
 	themeValue: any;
 	directMessageId: string;
 }
-export const ChannelSeen = memo(({ channelId, currentDmGroup }: { channelId: string; currentDmGroup: any }) => {
+export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string; streamMode: number }) => {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
 	const { markAsReadSeen } = useSeenMessagePool();
-
 	const isMounted = useRef(false);
-
-	const streamMode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 
 	const markMessageAsRead = useCallback(() => {
 		if (!lastMessage) return;
@@ -75,10 +72,9 @@ export const ChannelSeen = memo(({ channelId, currentDmGroup }: { channelId: str
 	useEffect(() => {
 		if (lastMessage) {
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
-			updateChannelSeenState(channelId);
 			markMessageAsRead();
 		}
-	}, [lastMessage, markMessageAsRead, dispatch, updateChannelSeenState, channelId]);
+	}, [lastMessage, markMessageAsRead, dispatch, channelId]);
 
 	useEffect(() => {
 		if (isMounted.current || !lastMessage) return;
@@ -116,6 +112,10 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const dmAvatar = useMemo(() => {
 		return currentDmGroup?.channel_avatar?.[0];
 	}, [currentDmGroup?.channel_avatar?.[0]]);
+
+	const streamMode = useMemo(() => {
+		return currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+	}, [currentDmGroup?.type]);
 
 	const userStatus = useMemberStatus(isModeDM ? currentDmGroup?.user_id?.[0] : '');
 
@@ -233,7 +233,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 
 	return (
 		<View style={styles.headerWrapper}>
-			<ChannelSeen channelId={directMessageId || ''} currentDmGroup={currentDmGroup} />
+			<ChannelSeen channelId={directMessageId || ''} streamMode={streamMode} />
 			{!isTabletLandscape && (
 				<Pressable onPress={handleBack} style={styles.backButton}>
 					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.text} height={size.s_20} width={size.s_20} />

@@ -305,19 +305,19 @@ const RoomView = ({
 			>
 				<View style={{ gap: size.s_10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 					<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
-						{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
+						<MezonIconCDN icon={isCameraEnabled ? IconCDN.videoIcon : IconCDN.videoSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
-						{isMicrophoneEnabled ? <MezonIconCDN icon={IconCDN.microphoneIcon} /> : <MezonIconCDN icon={IconCDN.microphoneSlashIcon} />}
+						 <MezonIconCDN icon={isMicrophoneEnabled ? IconCDN.microphoneIcon : IconCDN.microphoneSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
 					{!isGroupCall && (
 						<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-							<MezonIconCDN icon={IconCDN.chatIcon} />
+							<MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.textStrong}/>
 						</TouchableOpacity>
 					)}
 					{!isGroupCall && (
 						<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
-							{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
+							{isScreenShareEnabled ? <Icons.ShareScreenIcon color={themeValue.textStrong}/> : <Icons.ShareScreenSlashIcon color={themeValue.textStrong}/>}
 						</TouchableOpacity>
 					)}
 					<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
