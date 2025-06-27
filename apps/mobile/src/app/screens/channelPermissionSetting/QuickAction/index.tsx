@@ -1,17 +1,15 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, size, Text, useTheme } from '@mezon/mobile-ui';
 import {
-	addQuickMenuAccess,
 	deleteQuickMenuAccess,
 	listQuickMenuAccess,
 	selectChannelById,
 	selectQuickMenuByChannelId,
-	updateQuickMenuAccess,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
 import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, FlatList, Platform, TouchableOpacity, View } from 'react-native';
 import MezonConfirm from '../../../componentUI/MezonConfirm';
@@ -25,10 +23,7 @@ type QuickActionScreen = typeof APP_SCREEN.MENU_CHANNEL.QUICK_ACTION;
 
 export function QuickAction({ navigation, route }) {
 	const { channelId } = route.params;
-	const [modalVisible, setModalVisible] = useState(false);
-	const [editKey, setEditKey] = useState<string | null>(null);
-	const [formKey, setFormKey] = useState('');
-	const [formValue, setFormValue] = useState('');
+
 	const { t } = useTranslation('channelSetting');
 
 	const dispatch = useAppDispatch();
@@ -41,7 +36,6 @@ export function QuickAction({ navigation, route }) {
 
 	useEffect(() => {
 		dispatch(listQuickMenuAccess({ channelId }));
-		console.log(listQuickActions);
 	}, [channelId, dispatch]);
 
 	useEffect(() => {
@@ -50,73 +44,26 @@ export function QuickAction({ navigation, route }) {
 			headerTitle: () => (
 				<View>
 					<Text bold h3 color={themeValue?.white}>
-						{t('quickAction.title')} - {listQuickActions.length}
+						{t('quickAction.title')}
 					</Text>
 				</View>
 			)
 		});
 	}, [navigation, listQuickActions]);
 
-	useEffect(() => {
-		const subscription = DeviceEventEmitter.addListener(ActionEmitEvent.ON_TRIGGER_MODAL, ({ isDismiss }) => {
-			setModalVisible(!isDismiss);
-		});
-
-		return () => {
-			subscription.remove();
-		};
-	}, []);
-
 	const openModal = (item: ApiQuickMenuAccess | null = null) => {
-		if (item) {
-			setFormKey(item.menu_name);
-			setFormValue(item.action_msg);
-			setEditKey(item.id);
-		} else {
-			setFormKey('');
-			setFormValue('');
-			setEditKey(null);
-		}
-		setModalVisible(true);
-	};
-
-	const saveItem = async () => {
-		if (!formKey || !formValue || !clanId) return;
-		try {
-			if (editKey) {
-				console.log('Update payload:', {
-					id: editKey,
-					channelId,
-					clanId,
-					menu_name: formKey,
-					action_msg: formValue
-				});
-				await dispatch(
-					updateQuickMenuAccess({
-						id: editKey,
-						channelId,
-						clanId,
-						menu_name: formKey,
-						action_msg: formValue
-					})
-				);
-				await dispatch(listQuickMenuAccess({ channelId }));
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-			} else {
-				await dispatch(
-					addQuickMenuAccess({
-						channelId,
-						clanId,
-						menu_name: formKey,
-						action_msg: formValue
-					})
-				);
-				await dispatch(listQuickMenuAccess({ channelId }));
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-			}
-		} catch (error: any) {
-			console.error(error.message);
-		}
+		const data = {
+			children: (
+				<ModalQuickMenu
+					initialFormKey={item?.menu_name || ''}
+					initialFormValue={item?.action_msg || ''}
+					editKey={item?.id}
+					channelId={channelId}
+					clanId={clanId}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const deleteItem = async (id: string) => {
@@ -179,9 +126,6 @@ export function QuickAction({ navigation, route }) {
 			<TouchableOpacity style={styles.addButton} onPress={() => openModal(null)}>
 				<MezonIconCDN icon={IconCDN.addAction} height={size.s_40} width={size.s_40} color={themeValue.textStrong} />
 			</TouchableOpacity>
-			{modalVisible && (
-				<ModalQuickMenu formKey={formKey} formValue={formValue} setFormKey={setFormKey} setFormValue={setFormValue} onSave={saveItem} />
-			)}
 		</View>
 	);
 }
