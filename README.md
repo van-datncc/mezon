@@ -3,6 +3,15 @@ Mezon is great for playing games and chilling with friends,
 or even building a worldwide community.
 Customize your own space to talk, play, and hang out.
 
+# Bug report community
+https://mezon.ai/invite/1840696977034055680
+
+# Funny game community
+https://mezon.ai/invite/1840680133686464512
+
+# Mezon Monthly Bot Challenge
+https://mezon.ai/invite/1840677412925345792
+
 ## Installing Nx Globally
 
 `npm install --global nx@latest`
