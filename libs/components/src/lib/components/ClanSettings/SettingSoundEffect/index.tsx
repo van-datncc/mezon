@@ -131,16 +131,16 @@ const SettingSoundEffect = () => {
                                 {canManageSound(sound.creator_id || '') && (
                                     <div className="flex items-center gap-1">
                                         <button
-                                            className="text-blue-500 hover:text-blue-600 transition duration-200 p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/10"
+                                            className="aspect-square w-6 rounded-full text-textPrimaryLight dark:text-textPrimary bg-bgLightModeSecond hover:bg-bgLightModeThird dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center shadow-sm"
                                             onClick={() => handleEditSound(sound)}
                                         >
                                             <Icons.EditMessageRightClick defaultSize="w-3 h-3" />
                                         </button>
                                         <button
-                                            className="text-red-500 hover:text-red-600 transition duration-200 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/10"
+                                            className="aspect-square w-6 text-sm rounded-full bg-bgLightModeSecond hover:bg-bgLightModeThird dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center mb-[1px] font-medium text-red-600 shadow-sm"
                                             onClick={() => handleDeleteSound(sound.id, sound.name)}
                                         >
-                                            <Icons.CircleClose className="w-4 h-4" />
+                                            x
                                         </button>
                                     </div>
                                 )}
