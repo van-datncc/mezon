@@ -41,7 +41,7 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, channel
 
 	const allCommands: SlashCommand[] = [
 		...slashCommands,
-		...quickMenuList.map((item) => ({ id: item.id, display: item.menu_name, description: item.action_msg }))
+		...(quickMenuList ?? []).map((item) => ({ id: item.id, display: item.menu_name, description: item.action_msg }))
 	];
 
 	const [filteredCommands, setFilteredCommands] = useState<SlashCommand[]>(slashCommands);
@@ -51,7 +51,7 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, channel
 	useEffect(() => {
 		const debounceFilter = debounce(() => {
 			if (slashCommands?.length === 0) return;
-			const suggestionCommands = allCommands.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
+			const suggestionCommands = allCommands?.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
 			setFilteredCommands(suggestionCommands);
 		}, 300);
 

@@ -96,10 +96,6 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	const { sendMessage } = useChatSending({ mode, channelOrDirect: currentDmGroup });
-	const isModeDM = useMemo(() => {
-		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_DM;
-	}, [currentDmGroup?.type]);
-
 	const isTypeDMGroup = useMemo(() => {
 		return Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP;
 	}, [currentDmGroup?.type]);
@@ -116,8 +112,6 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const streamMode = useMemo(() => {
 		return currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
 	}, [currentDmGroup?.type]);
-
-	const userStatus = useMemberStatus(isModeDM ? currentDmGroup?.user_id?.[0] : '');
 
 	const navigateToThreadDetail = useCallback(() => {
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
@@ -259,7 +253,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
 							</View>
 						)}
-						<UserStatus status={userStatus} customStatus={status} />
+						<UserStatus status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }} customStatus={status} />
 					</View>
 				)}
 				<Text style={styles.titleText} numberOfLines={1}>
