@@ -129,7 +129,6 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 		smallIcon: 'ic_notification',
 		color: '#000000',
 		sound: 'default',
-		largeIcon: isValidString(data?.image) ? (data.image as string) : undefined,
 		smallIconLevel: 10,
 		importance: AndroidImportance.HIGH,
 		showTimestamp: true,
@@ -139,6 +138,10 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 			launchActivity: 'com.mezon.mobile.MainActivity'
 		}
 	};
+
+	if (isValidString(data?.image) && data?.image) {
+		defaultConfig.largeIcon = data.image as string;
+	}
 
 	const channel = safeGetChannelFromData(data);
 	if (!channel) {
@@ -157,7 +160,7 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 			category: AndroidCategory.MESSAGE,
 			groupId: groupId,
 			groupSummary: false,
-			groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY
+			groupAlertBehavior: AndroidGroupAlertBehavior.ALL
 		};
 	} catch (error) {
 		console.error('Error configuring Android notification:', error);
@@ -290,13 +293,15 @@ export const createLocalNotification = async (title: string, body: string, data:
 						style: {
 							type: AndroidStyle.MESSAGING,
 							person: {
-								name: title
+								name: title,
+								icon: (configDisplayNotificationAndroid?.largeIcon || '') as string
 							},
+							group: true,
 							messages: groupNotifications.map((n) => ({
 								text: n.notification.body || '',
 								timestamp: n.notification.android?.timestamp || Date.now(),
 								person: {
-									name: '',
+									name: (n?.notification?.data?.title || '') as string,
 									icon: n.notification?.data?.image as string
 								}
 							}))

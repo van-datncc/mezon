@@ -19,9 +19,9 @@ import {
 import { IChannel, IMessageSendPayload, IMessageWithUser, ThreadValue, checkIsThread, isPublicChannel } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiChannelDescription, ApiCreateChannelDescRequest, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Keyboard, Platform, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Keyboard, Platform, ScrollView, StatusBar, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -37,6 +37,7 @@ import PanelKeyboard from '../../../screens/home/homedrawer/PanelKeyboard';
 import { EMessageActionType } from '../../../screens/home/homedrawer/enums';
 import { style } from './CreateThreadForm.style';
 import HeaderLeftThreadForm from './HeaderLeftThreadForm';
+import StatusBarHeight from "../../StatusBarHeight/StatusBarHeight";
 
 type CreateThreadFormScreen = typeof APP_SCREEN.MENU_THREAD.CREATE_THREAD_FORM_MODAL;
 
@@ -48,12 +49,17 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	const { channelThreads } = route.params || {};
 	const { t } = useTranslation(['createThread']);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const currentChannel = useSelector(selectCurrentChannel);
+	const channelCurrent = useSelector(selectCurrentChannel);
 	const currentChannelId = useSelector(selectCurrentChannelId);
+
+	const validateThreadName = (name: string) => {
+		if (!name || name.trim().length === 0 || name?.length > 64) return t('errorMessage');
+		return '';
+	};
 
 	const [nameValueThread, setNameValueThread] = useState('');
 	const [isPrivate, setIsPrivate] = useState(false);
-	const [errorMessage, setErrorMessage] = useState('');
+	const [errorMessage, setErrorMessage] = useState(validateThreadName(''));
 
 	const openThreadMessageState = useSelector(selectOpenThreadMessageState);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
@@ -64,23 +70,11 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	});
 	const bottomPickerRef = useRef<BottomSheet>(null);
 
-	navigation.setOptions({
-		headerShown: true,
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerStyle: {
-			backgroundColor: themeValue.primary
-		},
-		headerTitle: () => <Text></Text>,
-		headerLeft: () => <HeaderLeftThreadForm currentChannel={channelThreads || currentChannel} />,
-		headerTintColor: themeValue.white
-	});
+	const currentChannel = useMemo(() => {
+		return channelThreads || channelCurrent;
+	}, [channelThreads, channelCurrent]);
 
 	const sessionUser = useSelector((state: RootState) => state.auth.session);
-
-	const validateThreadName = (name: string) => {
-		if (!name || name.trim().length === 0 || name?.length > 64) return t('errorMessage');
-		return '';
-	};
 
 	const createThread = useCallback(
 		async (value: ThreadValue) => {
@@ -138,9 +132,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 							save(STORAGE_CLAN_ID, currentClanId);
 							if (messageCreate) {
 								await sendMessageThread(
-									{
-										t: messageCreate?.content?.t
-									},
+									messageCreate?.content,
 									messageCreate?.mentions,
 									messageCreate?.attachments,
 									undefined,
@@ -175,7 +167,7 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	useEffect(() => {
 		const sendMessage = DeviceEventEmitter.addListener(ActionEmitEvent.SEND_MESSAGE, ({ content, mentions, attachments }) => {
 			const valueForm = { isPrivate: Number(isPrivate), nameValueThread };
-			const contentMessage = { t: content?.t };
+			const contentMessage = content;
 			const mentionMessage = mentions;
 
 			const error = validateThreadName(nameValueThread);
@@ -220,45 +212,54 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 	};
 
 	return (
-		<KeyboardAvoidingView style={styles.createChannelContent} behavior={'padding'} keyboardVerticalOffset={size.s_80}>
+		<KeyboardAvoidingView
+			style={styles.createChannelContent}
+			behavior={'padding'}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
+		>
+			<StatusBarHeight />
 			<View style={styles.createChannelContent}>
-				<View style={{ margin: size.s_20, flex: 1 }}>
-					<View style={styles.iconContainer}>
-						<MezonIconCDN icon={IconCDN.threadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />
-					</View>
-					<MezonInput
-						label={t('threadName')}
-						onTextChange={handleInputChange}
-						onFocus={() => {
-							bottomPickerRef.current?.close();
-						}}
-						value={nameValueThread}
-						placeHolder="New Thread"
-						maxCharacter={64}
-						errorMessage={errorMessage}
-					/>
-				</View>
-				{!openThreadMessageState && (
-					<View style={styles.threadPolicy}>
-						<View style={styles.threadPolicyInfo}>
-							<Text style={styles.threadPolicyTitle}>{t('privateThread')}</Text>
-							<Text style={styles.threadPolicyContent}>{t('onlyPeopleInviteThread')}</Text>
+				<HeaderLeftThreadForm currentChannel={channelThreads || currentChannel} />
+				<ScrollView contentContainerStyle={styles.scrollview} keyboardShouldPersistTaps="handled">
+					<View style={{ margin: size.s_20, flex: 1 }}>
+						<View style={styles.iconContainer}>
+							<MezonIconCDN icon={IconCDN.threadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />
 						</View>
-						<MezonSwitch value={isPrivate} onValueChange={handleSwitchChange} />
-					</View>
-				)}
-				{valueThread && openThreadMessageState && (
-					<View style={styles.messageBox}>
-						<MessageItem
-							messageId={valueThread?.id}
-							message={valueThread}
-							showUserInformation
-							mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-							channelId={currentChannel?.channel_id}
-							preventAction
+						<MezonInput
+							label={t('threadName')}
+							onTextChange={handleInputChange}
+							onFocus={() => {
+								bottomPickerRef.current?.close();
+							}}
+							value={nameValueThread}
+							placeHolder="New Thread"
+							maxCharacter={64}
+							errorMessage={errorMessage}
+							forcusInput
 						/>
 					</View>
-				)}
+					{!openThreadMessageState && (
+						<View style={styles.threadPolicy}>
+							<View style={styles.threadPolicyInfo}>
+								<Text style={styles.threadPolicyTitle}>{t('privateThread')}</Text>
+								<Text style={styles.threadPolicyContent}>{t('onlyPeopleInviteThread')}</Text>
+							</View>
+							<MezonSwitch value={isPrivate} onValueChange={handleSwitchChange} />
+						</View>
+					)}
+					{valueThread && openThreadMessageState && (
+						<View style={styles.messageBox}>
+							<MessageItem
+								messageId={valueThread?.id}
+								message={valueThread}
+								showUserInformation
+								mode={checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+								channelId={currentChannel?.channel_id}
+								preventAction
+							/>
+						</View>
+					)}
+				</ScrollView>
 				<ChatBox
 					messageAction={EMessageActionType.CreateThread}
 					channelId={currentChannel?.channel_id}
@@ -269,7 +270,6 @@ export default function CreateThreadForm({ navigation, route }: MenuThreadScreen
 					isPublic={isPublicChannel(currentChannel)}
 				/>
 				<PanelKeyboard currentChannelId={currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
-				<View style={{ height: Platform.OS === 'ios' ? size.s_40 : 0 }} />
 			</View>
 		</KeyboardAvoidingView>
 	);

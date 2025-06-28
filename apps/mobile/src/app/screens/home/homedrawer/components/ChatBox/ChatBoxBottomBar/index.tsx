@@ -48,7 +48,7 @@ import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
 import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import EmojiSwitcher from '../../EmojiPicker/EmojiSwitcher';
-import { renderTextContent } from '../../RenderTextContent';
+import { RenderTextContent } from '../../RenderTextContent';
 import { ChatBoxListener } from '../ChatBoxListener';
 import { ChatMessageLeftArea, IChatMessageLeftAreaRef } from '../ChatMessageLeftArea';
 import { ChatMessageSending } from '../ChatMessageSending';
@@ -579,13 +579,19 @@ export const ChatBoxBottomBar = memo(
 					{triggers?.slash?.keyword !== undefined && (
 						<SlashCommandSuggestions
 							keyword={triggers?.slash?.keyword}
-							onSelectCommand={(commandId) => {
-								if (commandId === KEY_SLASH_COMMAND_EPHEMERAL) {
+							channelId={channelId}
+							onSelectCommand={(command) => {
+								if (command.id === KEY_SLASH_COMMAND_EPHEMERAL) {
 									setIsEphemeralMode(true);
 									setTextChange('@');
 									setMentionTextValue('@');
 									textValueInputRef.current = '@';
 									mentionsOnMessage.current = [];
+								} else {
+									if (command.display && command.description) {
+										setTextChange(`/${command.display} `);
+										textValueInputRef.current = `${command.description}`;
+									}
 								}
 							}}
 						/>
@@ -618,7 +624,7 @@ export const ChatBoxBottomBar = memo(
 								ref={inputRef}
 								multiline
 								onChangeText={
-									(mentionsOnMessage?.current || hashtagsOnMessage?.current)?.length
+									mentionsOnMessage?.current?.length || hashtagsOnMessage?.current?.length
 										? textInputProps?.onChangeText
 										: handleTextInputChange
 								}
@@ -631,7 +637,7 @@ export const ChatBoxBottomBar = memo(
 								numberOfLines={4}
 								textBreakStrategy="simple"
 								style={[styles.inputStyle, !textValueInputRef?.current && { height: size.s_40 }]}
-								children={renderTextContent(textValueInputRef?.current)}
+								children={RenderTextContent({ text: textValueInputRef?.current })}
 								onSelectionChange={textInputProps?.onSelectionChange}
 							/>
 							<View style={styles.iconEmoji}>
