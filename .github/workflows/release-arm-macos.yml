@@ -84,7 +84,8 @@ jobs:
       - name: Release Desktop
         run: |
           security unlock-keychain -p $KEYCHAIN_PASSWORD login.keychain
-          yarn release:desktop
+          cat apps/chat/.env
+          #yarn release:desktop
         env:
           USE_HARD_LINKS: false
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
