@@ -155,7 +155,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				lastSentTimeStamp: '0',
 				idDM: findFilterDm(user?.id),
 				typeChat: TypeSearch.Dm_Type,
-				type: ChannelType.CHANNEL_TYPE_DM
+				type: ChannelType.CHANNEL_TYPE_DM,
+				searchName: (user.list_nick_names || []).join('.')
 			});
 		}
 		return list as SearchItemProps[];
