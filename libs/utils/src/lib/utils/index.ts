@@ -438,15 +438,26 @@ export function filterListByName(listSearch: SearchItemProps[], searchText: stri
 			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
 			const itemPrioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
-
-			return itemName.includes(searchName) || itemDisplayName.includes(searchName) || itemPrioritizeName.includes(searchName);
+			const searchNameAllClan = item.searchName ? normalizeString(item.searchName) : '';
+			return (
+				itemName.includes(searchName) ||
+				itemDisplayName.includes(searchName) ||
+				itemPrioritizeName.includes(searchName) ||
+				searchNameAllClan.includes(searchName)
+			);
 		} else {
 			const searchUpper = normalizeString(searchText.startsWith('#') ? searchText.substring(1) : searchText);
 			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
 			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
+			const searchNameAllClan = item.searchName ? normalizeString(item.searchName) : '';
 
-			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper) || itemDisplayName.includes(searchUpper);
+			return (
+				prioritizeName.includes(searchUpper) ||
+				itemName.includes(searchUpper) ||
+				itemDisplayName.includes(searchUpper) ||
+				searchNameAllClan.includes(searchUpper)
+			);
 		}
 	});
 
