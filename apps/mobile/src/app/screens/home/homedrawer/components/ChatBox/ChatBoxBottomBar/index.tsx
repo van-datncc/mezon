@@ -589,7 +589,8 @@ export const ChatBoxBottomBar = memo(
 									mentionsOnMessage.current = [];
 								} else {
 									if (command.display && command.description) {
-										setTextChange(`/${command.display} `);
+										setTextChange(`${command.display} `);
+										setMentionTextValue('');
 										textValueInputRef.current = `${command.description}`;
 									}
 								}

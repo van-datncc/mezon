@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			bottom: size.s_30,
 			padding: size.s_12,
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		item: {
 			flexDirection: 'row',
@@ -52,14 +52,15 @@ export const style = (colors: Attributes) =>
 			left: 0,
 			right: 0,
 			bottom: 0,
-			backgroundColor: 'rgba(0,0,0,0.4)',
 			justifyContent: 'center',
-			alignItems: 'center',
+			alignItems: 'center'
 		},
 		modalBox: {
 			backgroundColor: colors.secondary,
 			padding: size.s_20,
 			borderRadius: size.s_10,
+			top: -size.s_50,
+			zIndex: 10,
 			width: '90%'
 		},
 		input: {
@@ -70,5 +71,13 @@ export const style = (colors: Attributes) =>
 			padding: size.s_10,
 			color: colors.text,
 			marginBottom: size.s_12
+		},
+		backdrop: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			width: '100%',
+			height: '100%',
+			backgroundColor: 'rgba(0,0,0,0.5)'
 		}
 	});
