@@ -128,7 +128,7 @@ export const policiesDefaultReducer = policiesDefaultSlice.reducer;
 
 export const policiesActions = { ...policiesSlice.actions, fetchPermissionsUser, fetchPermission };
 
-const { selectAll } = policiesAdapter.getSelectors();
+const { selectAll, selectEntities } = policiesAdapter.getSelectors();
 
 export const getPoliciesState = (rootState: { [POLICIES_FEATURE_KEY]: PoliciesState }): PoliciesState => rootState[POLICIES_FEATURE_KEY];
 
@@ -149,6 +149,7 @@ export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsU
 });
 
 export const selectAllPermissionsDefault = createSelector(getPoliciesDefaultState, selectAll);
+export const selectAllPermissionsDefaultEntities = createSelector(getPoliciesDefaultState, selectEntities);
 
 export const selectPermissionChannel = createSelector(selectAllPermissionsDefault, (permissions) => {
 	return permissions.filter((permission) => permission.scope === 2);
