@@ -10,7 +10,6 @@ jobs:
     name: Release Mezon App for Windows
     environment: production
     steps:
-      - shell: pwsh
       - name: Checkout
         uses: actions/checkout@v3
 
