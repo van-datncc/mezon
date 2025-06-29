@@ -15,7 +15,7 @@ jobs:
 
       - name: Install package
         run: |
-          export nv="$(node -v)
+          export nv=$(node -v)
           echo "Node version: $nv"
           echo "Installing dependencies"
           yarn config set nodedir ~/.cache/node-gyp/"${nv:1}"
