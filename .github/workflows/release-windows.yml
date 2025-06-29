@@ -28,6 +28,7 @@ jobs:
           del apps/desktop/src/assets/linux-icon.icns
           del apps/desktop/src/assets/mac-icon.png
           del apps/chat/.env
+
       - name: Create ENV
         uses: SpicyPizza/create-envfile@v2.0
         with:
@@ -88,7 +89,6 @@ jobs:
 
       - name: Release Desktop
         run: |
-          cat apps/chat/.env
           yarn release:desktop
 
       - name: Push to MinIO
