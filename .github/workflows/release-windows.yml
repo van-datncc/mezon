@@ -16,12 +16,12 @@ jobs:
       - name: Install package
         run: |
           echo "yarn"
-          #yarn
+          yarn
 
       - name: Reset Nx cache
         run: |
           echo "Resetting Nx cache"
-          #yarn nx reset
+          yarn nx reset
 
       - name: Change prod environment
         run: |
@@ -84,7 +84,6 @@ jobs:
 
       - name: Release Desktop
         run: |
-          cat apps/chat/.env
           yarn release:desktop
 
       - name: Push to MinIO
