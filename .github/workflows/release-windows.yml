@@ -28,10 +28,7 @@ jobs:
           del apps/desktop/src/assets/linux-icon.icns
           del apps/desktop/src/assets/mac-icon.png
           # del apps/chat/.env
-          echo NX_CHAT_APP_API_GW_HOST="gw.mezon.ai" >> apps/chat/.env
-          echo NX_CHAT_APP_API_GW_PORT="443" >> apps/chat/.env
-          echo NX_DOMAIN_URL="https://mezon.ai" >> apps/chat/.env
-          echo NX_CHAT_APP_API_HOST="${{ secrets.NX_CHAT_APP_API_HOST_PROD }}" >> apps/chat/.env
+          echo NX_CHAT_APP_API_HOST="${{ secrets.NX_CHAT_APP_API_HOST_PROD }}" > apps/chat/.env
           echo NX_CHAT_APP_API_PORT="${{ secrets.NX_CHAT_APP_API_PORT_PROD }}" >> apps/chat/.env
           echo NX_CHAT_APP_API_KEY="${{ secrets.NX_CHAT_APP_API_KEY_PROD }}" >> apps/chat/.env
           echo NX_CHAT_APP_API_SECURE="${{ secrets.NX_CHAT_APP_API_SECURE_PROD }}" >> apps/chat/.env
@@ -81,6 +78,9 @@ jobs:
           echo NX_TASK_TARGET_PROJECT="chat" >> apps/chat/.env
           echo NX_TASK_TARGET_TARGET="build" >> apps/chat/.env
           echo NX_TASK_TARGET_CONFIGURATION="production" >> apps/chat/.env
+          echo NX_CHAT_APP_API_GW_HOST="${{ secrets.NX_CHAT_APP_API_GW_HOST }}" >> apps/chat/.env
+          echo NX_CHAT_APP_API_GW_PORT="${{ secrets.NX_CHAT_APP_API_GW_PORT }}" >> apps/chat/.env
+          echo NX_DOMAIN_URL="https://mezon.ai" >> apps/chat/.env
 
       - name: Release Desktop
         run: |
