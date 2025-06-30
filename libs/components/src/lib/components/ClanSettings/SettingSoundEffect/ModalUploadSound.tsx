@@ -122,7 +122,7 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
     return (
         <Modal showModal={true} onClose={onClose} title="" classNameBox="max-w-[550px] w-full !p-0 overflow-hidden">
             <div className="relative">
-                <div className="absolute inset-0 bg-gray-100 dark:bg-[#36393f]"></div>
+                <div className="absolute rounded-md inset-0 bg-gray-100 dark:bg-[#36393f]"></div>
 
                 <div className="relative">
                     <div className="relative px-4 pt-4 pb-3 border-b border-gray-300 dark:border-[#42464d]">

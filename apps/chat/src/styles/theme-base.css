@@ -106,7 +106,10 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-item-hover);
 }
 .bg-theme-surface {
-	background-color: var(--bg-surface);
+	background: var(--bg-surface);
+}
+.bg-ping-member {
+	background: var(--bg-ping-member);
 }
 .bg-add-clan-hover:hover,
 .bg-add-clan-hover:active p {

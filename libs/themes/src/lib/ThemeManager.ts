@@ -71,10 +71,10 @@ export const AVAILABLE_THEMES: ThemeConfig[] = [
 		cssFile: 'assets/themes/purple_haze.css'
 	},
 	{
-		name: 'sky_blue',
-		displayName: 'Sky Blue',
+		name: 'redDark',
+		displayName: 'Red Dark',
 		color: 'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-		cssFile: 'assets/themes/sky_blue.css'
+		cssFile: 'assets/themes/redDark.css'
 	},
 	{
 		name: 'sunset_gold',

@@ -1,0 +1,90 @@
+/* Cyber Chroma Glow Dark Theme */
+:root {
+	--bg-primary: linear-gradient(rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.7)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(183.39 86% 40%) 8%,
+				hsl(258.11 90% 46%) 32%,
+				hsl(298.49 91% 34%) 54%,
+				hsl(264.76 100% 66%) 78%,
+				hsl(206.7 75% 50%) 100%
+			)
+			fixed 0 0 / cover,
+		color-mix(in oklab, hsl(240 4.3% 15%) 100%, rgb(0, 255, 255) 15%);
+
+	--bg-secondary: linear-gradient(rgb(0 0 0 / 0.8), rgb(0 0 0 / 0.8)) fixed 0 0 / cover,
+		linear-gradient(
+				154.19deg,
+				hsl(183, 44%, 51%) 8%,
+				hsl(258.11 90% 46%) 32%,
+				hsl(298, 86%, 61%) 54%,
+				hsl(264.76 100% 66%) 78%,
+				hsl(207, 82%, 58%) 100%
+			)
+			fixed 0 0 / cover;
+	/* màu ping member */
+	--bg-ping-member: rgb(36, 43, 52);
+	--bg-tertiary: hsl(240 4% 30% / 0.2);
+	--bg-surface: linear-gradient(rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.65)) fixed 0 0 / cover,
+		linear-gradient(
+				128.92deg,
+				hsl(183.39 86.341% 40.196%) 3.94%,
+				hsl(258.113 89.831% 46.275%) 26.1%,
+				hsl(298.491 90.857% 34.314%) 39.82%,
+				hsl(264.767 100% 66.275%) 56.89%,
+				hsl(206.702 75.494% 50.392%) 76.45%
+			)
+			fixed 0 0 / cover;
+	--bg-accent: hsl(258 50% 40% / 0.25);
+	--bg-hover: #23272a;
+	--bg-modal: rgba(0, 0, 0, 0.8);
+
+	--theme-input: hsl(240 4% 30% / 0.2);
+	--theme-border-input: color-mix(in oklab, hsl(240 4% 60% / 0.4) 100%, hsl(183 100% 80% / 0.3) 50%);
+
+	--theme-base-color: rgb(0, 14, 26);
+	--theme-text-color-dark: rgb(229, 254, 255);
+	--theme-setting-primary: rgb(27, 28, 32);
+	--theme-setting-nav: rgb(21, 22, 24);
+	--private-theme: rgb(0, 214, 172);
+
+	--text-theme-primary: color-mix(in oklab, hsl(0, 0%, 100%) 100%);
+	--text-theme-primary-hover: color-mix(in oklab, hsl(240 4% 95%) 40%, #b9dada 60%);
+
+	--bg-active-friend-list: linear-gradient(rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.75)) fixed 0 0 / cover,
+		linear-gradient(154.19deg, hsl(183.39 86% 40%) 8.62%, hsl(258.11 90% 46%) 48.07%, hsl(298.49 91% 34%) 76.04%) fixed 0 0 / cover;
+
+	--bg-active-button: hsl(258 50% 40% / 0.25);
+	--color-text-active-button: color-mix(in oklab, hsl(234.9 85% 64%) 100%, hsl(326 100% 50%) 50%);
+	--bg-button-add-friend: hsl(264 100% 60% / 1);
+
+	--border-color-primary: color-mix(
+		in oklab,
+		color-mix(in oklab, #0eb5bf 50%, #218be0 50%) 30%,
+		color-mix(in oklab, hsl(240 4% 40% / 0.3) 100%, hsl(50 100% 90% / 0.3) 50%) 100%
+	);
+
+	--bg-theme-direct-message: linear-gradient(rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.65)) fixed 0 0 / cover,
+		linear-gradient(154.19deg, hsl(202, 100%, 27%) 8.62%, hsl(298, 67%, 55%) 32%, hsl(258, 86%, 59%) 48.07%, hsl(298, 86%, 39%) 76.04%) fixed 0 0 /
+			cover;
+
+	--text-secondary: color-mix(in oklab, hsl(230 6% 80%) 100%, #00ffff 20%);
+	--bg-item-hover: hsl(258 50% 40% / 0.1);
+
+	--bg-theme-input-primary: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5)) fixed 0 0 / cover,
+		linear-gradient(154.19deg, hsl(183.39 86% 40%) 8.62%, hsl(258.11 90% 46%) 48.07%, hsl(298.49 91% 34%) 76.04%) fixed 0 0 / cover;
+
+	--border-theme-primary: color-mix(in oklab, hsl(264 100% 66%) 100%, hsl(206 75% 50%) 30%);
+	--border-primary: hsl(240 4% 30% / 0.4);
+	--border-secondary: #00ffaa;
+	--border-focus: #00d4ff;
+	--border-divider: #00475e;
+	--border-hover: #00ccff;
+
+	--mention-primary: color-mix(in oklab, hsl(264 100% 66% / 0.25) 100%, hsl(206 75% 50% / 0.25) 50%);
+	--mention-color: color-mix(in oklab, hsl(230 50% 90% / 1) 100%, #00ffff 30%);
+
+	--bg-highlight: color-mix(in oklab, hsl(36 100% 30% / 0.08) 100%, hsl(60 100% 50% / 0.08) 50%);
+
+	--bg-secondary-button-hover: hsl(258 50% 40% / 0.3);
+}
