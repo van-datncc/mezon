@@ -132,7 +132,6 @@ const NavigationMain = memo(
 					backgroundColor={themeValue.primary}
 					barStyle={themeBasic === ThemeModeBase.DARK ? 'light-content' : 'dark-content'}
 				/>
-				<RootListener />
 				<SafeAreaProvider>
 					<SafeAreaView
 						edges={Platform.OS === 'android' ? (isThreeButtonNav ? ['top', 'bottom'] : ['top']) : []}
@@ -141,6 +140,7 @@ const NavigationMain = memo(
 						<RootStack {...props} />
 					</SafeAreaView>
 				</SafeAreaProvider>
+				<RootListener />
 			</NavigationContainer>
 		);
 	},
