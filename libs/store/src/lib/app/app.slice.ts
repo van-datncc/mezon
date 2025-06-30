@@ -1,4 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
+import { listChannelRenderAction } from '@mezon/store';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
@@ -80,6 +81,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 		}
 
 		clearAllMemoizedFunctions();
+		thunkAPI.dispatch(listChannelRenderAction.clearListChannelRender());
 
 		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
 		const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
