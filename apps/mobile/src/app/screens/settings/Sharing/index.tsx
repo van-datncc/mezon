@@ -86,8 +86,12 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 	useEffect(() => {
 		if (data) {
-			if (data?.length === 1 && data?.[0]?.weblink) {
-				setDataText(data?.[0]?.weblink);
+			if (data?.length === 1 && (data?.[0]?.weblink || data?.[0]?.text)) {
+				if (data?.[0]?.weblink) {
+					setDataText(data?.[0]?.weblink);
+				} else {
+					setDataText(data?.[0]?.text);
+				}
 			}
 		}
 	}, [data]);
