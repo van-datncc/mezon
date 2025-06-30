@@ -42,7 +42,7 @@ import { SlashCommandSuggestions } from '../../../../../../components/Suggestion
 import { SlashCommandMessage } from '../../../../../../components/Suggestions/SlashCommandSuggestions/SlashCommandMessage';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
-import { resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
+import { resetCachedChatbox, resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
@@ -183,13 +183,6 @@ export const ChatBoxBottomBar = memo(
 			textValueInputRef.current = convertMentionsToText(allCachedMessage?.[channelId] || '');
 		};
 
-		const resetCachedText = useCallback(async () => {
-			const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
-			if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
-
-			save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
-		}, [channelId]);
-
 		const handleEventAfterEmojiPicked = useCallback(
 			async (shortName: string) => {
 				let textFormat;
@@ -239,7 +232,7 @@ export const ChatBoxBottomBar = memo(
 			mentionsOnMessage.current = [];
 			hashtagsOnMessage.current = [];
 			onDeleteMessageActionNeedToResolve();
-			resetCachedText();
+			resetCachedChatbox(channelId);
 			resetCachedMessageActionNeedToResolve(channelId);
 			dispatch(
 				emojiSuggestionActions.setSuggestionEmojiObjPicked({
@@ -248,7 +241,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
-		}, [dispatch, onDeleteMessageActionNeedToResolve, resetCachedText, channelId]);
+		}, [dispatch, onDeleteMessageActionNeedToResolve, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback((mode: IModeKeyboardPicker) => {
 			setModeKeyBoardBottomSheet(mode);

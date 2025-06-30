@@ -66,15 +66,23 @@ export const validTextInputRegex = /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}_\-\s]{1,64}
 export const linkGoogleMeet = 'https://meet.google.com/';
 
 export const resetCachedMessageActionNeedToResolve = (channelId: string) => {
-	const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
-	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
-	save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+	try {
+		const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+		if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
+		save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+	} catch (error) {
+		console.error('Failed to reset cached message action need to resolve:', error);
+	}
 };
 
 export const resetCachedChatbox = (channelId: string) => {
-	const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
-	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
-	save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
+	try {
+		const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
+		if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
+	} catch (error) {
+		console.error('Failed to reset cached chatbox:', error);
+	}
 };
 
 export const getUserStatusByMetadata = (metadata: string | { status: string; user_status: string }) => {
