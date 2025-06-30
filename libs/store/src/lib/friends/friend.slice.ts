@@ -1,17 +1,17 @@
-/* eslint-disable prefer-const */
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { selectCurrentUserId } from '@mezon/store';
 import { LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Friend } from 'mezon-js';
 import { toast } from 'react-toastify';
+import { selectCurrentUserId } from '../account/account.slice';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { StatusUserArgs } from '../channelmembers/channel.members';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
-
 export const FRIEND_FEATURE_KEY = 'friends';
-const LIST_FRIEND_CACHED_TIME = 1000 * 60 * 60;
 const LIMIT_FRIEND = 1000;
+
+interface RootState {
+	[FRIEND_FEATURE_KEY]: FriendsState;
+}
 
 export interface FriendsEntity extends Friend {
 	key: string;
@@ -48,23 +48,51 @@ export interface FriendsState extends EntityState<FriendsEntity, string> {
 	error?: string | null;
 	currentTabStatus: string;
 	statusSentMobile: IStatusSentMobile | null;
+	cache?: CacheMetadata;
 }
 
 export const friendsAdapter = createEntityAdapter({
 	selectId: (friend: FriendsEntity) => friend.key || ''
 });
 
-export const fetchListFriendsCached = memoizeAndTrack(
-	(mezon: MezonValueContext, state: number, limit: number, cursor: string) =>
-		mezon.client.listFriends(mezon.session, state === -1 ? undefined : state, limit, cursor),
-	{
-		promise: true,
-		maxAge: LIST_FRIEND_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.username;
-		}
+const selectAllFriendsEntities = friendsAdapter.getSelectors().selectAll;
+
+const selectCachedFriends = createSelector([(state: RootState) => state[FRIEND_FEATURE_KEY]], (friendsState) => {
+	return selectAllFriendsEntities(friendsState);
+});
+
+export const fetchListFriendsCached = async (
+	getState: () => RootState,
+	ensuredMezon: MezonValueContext,
+	state: number,
+	limit: number,
+	cursor: string,
+	noCache = false
+) => {
+	const currentState = getState();
+	const friendsState = currentState[FRIEND_FEATURE_KEY];
+
+	const apiKey = createApiKey('fetchFriends', state, limit, cursor, ensuredMezon.session.username || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, friendsState?.cache, noCache);
+
+	if (!shouldForceCall && friendsState?.ids.length > 0) {
+		const friends = selectCachedFriends(currentState);
+		return {
+			friends: friends,
+			fromCache: true
+		};
 	}
-);
+
+	const response = await ensuredMezon.client.listFriends(ensuredMezon.session, state === -1 ? undefined : state, limit, cursor);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
 
 type fetchListFriendsArgs = {
 	noCache?: boolean;
@@ -72,15 +100,12 @@ type fetchListFriendsArgs = {
 
 export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', async ({ noCache }: fetchListFriendsArgs, thunkAPI) => {
 	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchListFriendsCached.delete(mezon, -1, LIMIT_FRIEND, '');
-	}
-	const response = await fetchListFriendsCached(mezon, -1, LIMIT_FRIEND, '');
+	const response = await fetchListFriendsCached(thunkAPI.getState as () => RootState, mezon, -1, LIMIT_FRIEND, '', noCache);
 	if (!response.friends) {
-		return [];
+		return { friends: [], fromCache: response.fromCache };
 	}
 	const listFriends = response.friends.map(mapFriendToEntity);
-	return listFriends;
+	return { friends: listFriends, fromCache: response.fromCache };
 });
 
 export type requestAddFriendParam = {
@@ -141,7 +166,8 @@ export const initialFriendsState: FriendsState = friendsAdapter.getInitialState(
 	friends: [],
 	error: null,
 	currentTabStatus: 'all',
-	statusSentMobile: null
+	statusSentMobile: null,
+	cache: undefined
 });
 
 export const friendsSlice = createSlice({
@@ -206,8 +232,13 @@ export const friendsSlice = createSlice({
 			.addCase(fetchListFriends.pending, (state: FriendsState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchListFriends.fulfilled, (state: FriendsState, action: PayloadAction<IFriend[]>) => {
-				friendsAdapter.setAll(state, action.payload);
+			.addCase(fetchListFriends.fulfilled, (state: FriendsState, action: PayloadAction<{ friends: IFriend[]; fromCache: boolean }>) => {
+				const { friends, fromCache } = action.payload;
+				if (!fromCache) {
+					friendsAdapter.setAll(state, friends);
+					state.cache = createCacheMetadata();
+				}
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchListFriends.rejected, (state: FriendsState, action) => {

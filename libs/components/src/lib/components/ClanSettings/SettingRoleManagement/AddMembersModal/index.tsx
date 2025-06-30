@@ -92,7 +92,12 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 				currentRoleIcon
 			);
 		}
-		dispatch(usersClanActions.updateManyRoleIds(userIds.map((id) => ({ userId: id, roleId: selectedRoleId }))));
+		dispatch(
+			usersClanActions.updateManyRoleIds({
+				clanId: currentClan?.id as string,
+				updates: userIds.map((id) => ({ userId: id, roleId: selectedRoleId, clanId: currentClan?.id }))
+			})
+		);
 	}, [selectedRoleId, currentClan, selectedRole, selectedUserIds]);
 
 	useEffect(() => {

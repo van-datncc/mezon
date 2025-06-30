@@ -3,6 +3,7 @@ import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
+import { clearApiCallTracker } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
@@ -80,6 +81,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 		}
 
 		clearAllMemoizedFunctions();
+		clearApiCallTracker();
 
 		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
 		const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;

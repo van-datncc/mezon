@@ -57,6 +57,8 @@ export const listChannelRenderSlice = createSlice({
 			// Prioritize moving channel forward thread
 			const listChannelPriority = prioritizeChannel(listChannel);
 			if (!state.listChannelRender[clanId] || isMobile) {
+				console.log(state.listChannelRender, 'state.listChannelRender');
+
 				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 				const listFavorChannel: IChannel[] = [];
 				listCategory.map((category) => {
@@ -89,6 +91,8 @@ export const listChannelRenderSlice = createSlice({
 					category_order: 1,
 					isFavor: true
 				};
+
+				console.log('12344');
 
 				state.listChannelRender[clanId] = [favorCate, ...listFavorChannel, ...listChannelRender];
 			}
@@ -494,7 +498,7 @@ function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 				if (thread.parent_id === channel.id) {
 					sortedChannels.push(thread);
 					if (channel.threadIds) {
-						channel.threadIds.push(thread.id);
+						channel.threadIds = [...channel.threadIds, thread.id];
 					} else {
 						channel.threadIds = [thread.id];
 					}

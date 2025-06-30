@@ -2,9 +2,9 @@ import { usePermissionChecker, useRoles, UserRestrictionZone } from '@mezon/core
 import {
 	RolesClanEntity,
 	selectAllRolesClan,
-	selectCurrentChannelId,
 	selectCurrentClan,
-	selectMemberClanByUserId,
+	selectCurrentClanId,
+	selectMemberClanByUserId2,
 	selectRolesClanEntities,
 	selectTheme,
 	selectUserMaxPermissionLevel,
@@ -23,8 +23,8 @@ type RoleUserProfileProps = {
 };
 
 const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
-	const currentChannelId = useSelector(selectCurrentChannelId);
-	const userById = useAppSelector(selectMemberClanByUserId(userID || currentChannelId || ''));
+	const currentClanId = useSelector(selectCurrentClanId);
+	const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userID || ''));
 	const { updateRole } = useRoles();
 	const RolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
@@ -66,8 +66,8 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: roleId,
-				channelId: currentChannelId,
-				userId: userById?.user?.id
+				userId: userById?.user?.id as string,
+				clanId: currentClanId as string
 			})
 		);
 	};
@@ -78,9 +78,9 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 		await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', activeRole?.color ?? '', [], [], userIDArray || [], []);
 		await dispatch(
 			usersClanActions.removeRoleIdUser({
+				clanId: currentClanId as string,
 				id: roleId,
-				channelId: currentChannelId,
-				userId: userById?.user?.id
+				userId: userById?.user?.id as string
 			})
 		);
 	};

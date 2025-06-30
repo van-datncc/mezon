@@ -1,11 +1,12 @@
 import { captureSentryError } from '@mezon/logger';
-import { PermissionUserEntity, selectAllPermissionsDefaultEntities, selectEntitesUserClans } from '@mezon/store';
 import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateRoleRequest } from 'mezon-js';
 import { ApiRole, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
+import { selectEntitesUserClans } from '../clanMembers/clan.members';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
+import { PermissionUserEntity, selectAllPermissionsDefaultEntities } from '../policies/policies.slice';
 import { RootState } from '../store';
 
 export const ROLES_CLAN_FEATURE_KEY = 'rolesclan';
