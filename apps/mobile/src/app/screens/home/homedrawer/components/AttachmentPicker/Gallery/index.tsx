@@ -395,10 +395,10 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				numColumns={3}
 				renderItem={renderItem}
 				keyExtractor={(item, index) => `${index.toString()}_gallery_${item?.node?.id}`}
-				initialNumToRender={10}
-				maxToRenderPerBatch={10}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				updateCellsBatchingPeriod={50}
-				windowSize={10}
 				scrollEventThrottle={16}
 				removeClippedSubviews={true}
 				viewabilityConfig={{

@@ -44,7 +44,6 @@ import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
-import { FCMNotificationLoader } from './FCMNotificationLoader';
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -360,7 +359,6 @@ export const AuthenticationLoader = () => {
 	return (
 		<>
 			<LoadingModal isVisible={isLoadingMain} />
-			<FCMNotificationLoader />
 			{!!fileShared && !isLoadingMain && <Sharing data={fileShared} onClose={onCloseFileShare} />}
 		</>
 	);

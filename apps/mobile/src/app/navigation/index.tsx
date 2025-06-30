@@ -5,8 +5,6 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 // import codePush from 'react-native-code-push';
 import { load, STORAGE_SESSION_KEY } from '@mezon/mobile-components';
-import 'react-native-get-random-values';
-import 'react-native-svg';
 import RootNavigation from './RootNavigator';
 const reactNavigationIntegration = Sentry.reactNavigationIntegration();
 

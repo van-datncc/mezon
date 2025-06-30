@@ -213,6 +213,9 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 									data={filteredMemberList}
 									keyExtractor={(item) => item?.id}
 									ItemSeparatorComponent={SeparatorWithLine}
+									initialNumToRender={1}
+									maxToRenderPerBatch={1}
+									windowSize={2}
 									renderItem={({ item }) => {
 										return (
 											<MemberItem
