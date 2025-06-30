@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, View } from 'react-native';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
-import { resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
+import { resetCachedChatbox, resetCachedMessageActionNeedToResolve } from '../../../../../../utils/helpers';
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 
@@ -23,6 +23,7 @@ export const ActionMessageSelected = memo(({ messageActionNeedToResolve, onClose
 			case EMessageActionType.EditMessage:
 				onClose();
 				resetCachedMessageActionNeedToResolve(messageActionNeedToResolve?.targetMessage?.channel_id);
+				resetCachedChatbox(messageActionNeedToResolve?.targetMessage?.channel_id);
 				DeviceEventEmitter.emit(ActionEmitEvent.CLEAR_TEXT_INPUT);
 				break;
 			case EMessageActionType.Reply:

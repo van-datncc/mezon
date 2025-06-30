@@ -4,15 +4,14 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ChannelPresenceEvent, ChannelType, StatusPresenceEvent } from 'mezon-js';
 import { ChannelUserListChannelUser } from 'mezon-js/dist/api.gen';
 import { accountActions, selectAllAccount } from '../account/account.slice';
-import { USERS_CLANS_FEATURE_KEY, UsersClanState, selectEntitesUserClans } from '../clanMembers/clan.members';
+import { CacheMetadata, clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { selectAllUserClans, selectEntitesUserClans } from '../clanMembers/clan.members';
 import { selectClanView } from '../clans/clans.slice';
 import { selectDirectMembersMetaEntities } from '../direct/direct.members.meta';
 import { DirectEntity, selectDirectById, selectDirectMessageEntities } from '../direct/direct.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
 import { RootState } from '../store';
-const CHANNEL_MEMBERS_CACHED_TIME = 1000 * 60 * 60;
 export const CHANNEL_MEMBERS_FEATURE_KEY = 'channelMembers';
 
 /*
@@ -41,6 +40,7 @@ export interface ChannelMembersState extends EntityState<ChannelMembersEntity, s
 		string,
 		EntityState<ChannelMembersEntity, string> & {
 			id: string;
+			cache?: CacheMetadata;
 		}
 	>;
 	dmGroupUsers?: ChannelUserListChannelUser[];
@@ -56,19 +56,40 @@ export interface ChannelMemberRootState {
 
 export const channelMembersAdapter = createEntityAdapter<ChannelMembersEntity>();
 
-const fetchChannelMembersCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string, channelId: string, channelType: ChannelType) => {
-		const response = await mezon.client.listChannelUsers(mezon.session, clanId, channelId, channelType, 1, 2000, '');
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: CHANNEL_MEMBERS_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1] + args[2] + args[3] + args[0].session.username;
-		}
+export const fetchChannelMembersCached = async (
+	getState: () => RootState,
+	ensuredMezon: MezonValueContext,
+	clanId: string,
+	channelId: string,
+	channelType: ChannelType,
+	noCache = false
+) => {
+	const currentState = getState();
+	const channelMembersState = currentState[CHANNEL_MEMBERS_FEATURE_KEY];
+
+	const apiKey = createApiKey('fetchChannelMembers', clanId, channelId, channelType, ensuredMezon.session.username || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, channelMembersState?.memberChannels?.[channelId]?.cache, noCache);
+
+	if (!shouldForceCall && channelMembersState?.memberChannels?.[channelId]?.ids?.length > 0) {
+		// const cachedChannelData = channelMembersState.memberChannels[channelId];
+		return {
+			channel_users: [],
+			time: Date.now(),
+			fromCache: true
+		};
 	}
-);
+
+	const response = await ensuredMezon.client.listChannelUsers(ensuredMezon.session, clanId, channelId, channelType, 1, 2000, '');
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		time: Date.now(),
+		fromCache: false
+	};
+};
 
 type fetchChannelMembersPayload = {
 	clanId: string;
@@ -85,37 +106,50 @@ export const fetchChannelMembers = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			if (noCache) {
-				fetchChannelMembersCached.delete(mezon, clanId, channelId, channelType);
+				const apiKey = createApiKey('fetchChannelMembers', clanId, channelId, channelType, mezon.session.username || '');
+				clearApiCallTracker(apiKey);
+				thunkAPI.dispatch(channelMembersActions.invalidateChannelCache(channelId));
 			}
 
 			const state = thunkAPI.getState() as RootState;
 			const currentChannel = state?.channels?.byClans?.[clanId as string]?.entities?.entities[channelId] || {};
 
 			if (currentChannel?.parent_id && currentChannel.parent_id !== '0' && !state?.channelMembers?.entities?.[currentChannel.parent_id]) {
-				const response = await fetchChannelMembersCached(mezon, clanId, currentChannel.parent_id, channelType);
+				const response = await fetchChannelMembersCached(
+					thunkAPI.getState as () => RootState,
+					mezon,
+					clanId,
+					currentChannel.parent_id,
+					channelType
+				);
 
-				if (!(Date.now() - response.time > 100)) {
+				if (!response.fromCache && !(Date.now() - response.time > 100)) {
 					thunkAPI.dispatch(
 						channelMembersActions.setMemberChannels({ channelId: currentChannel.parent_id, members: response.channel_users ?? [] })
 					);
 				}
 			}
 
-			const response = await fetchChannelMembersCached(mezon, clanId, channelId, channelType);
+			const response = await fetchChannelMembersCached(thunkAPI.getState as () => RootState, mezon, clanId, channelId, channelType, noCache);
+
+			if (response.fromCache) {
+				return { channel_users: [], fromCache: true, channelId };
+			}
 
 			if (Date.now() - response.time > 100) {
-				return response.channel_users || [];
+				return { channel_users: response.channel_users || [], fromCache: false, channelId };
 			}
 
 			if (!response.channel_users) {
-				return [];
+				return { channel_users: [], fromCache: false, channelId };
 			}
+
 			if (repace) {
 				thunkAPI.dispatch(channelMembersActions.removeUserByChannel(channelId));
 			}
 
 			thunkAPI.dispatch(channelMembersActions.setMemberChannels({ channelId: channelId, members: response.channel_users }));
-			return response.channel_users;
+			return { channel_users: response.channel_users, fromCache: false, channelId };
 		} catch (error) {
 			captureSentryError(error, 'channelMembers/fetchChannelMembers');
 			return thunkAPI.rejectWithValue(error);
@@ -306,6 +340,12 @@ export const channelMembers = createSlice({
 					channelEntity.ids = channelEntity.ids.filter((id) => id !== userId);
 				}
 			});
+		},
+		invalidateChannelCache: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			if (state.memberChannels[channelId]?.cache) {
+				delete state.memberChannels[channelId].cache;
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -313,13 +353,25 @@ export const channelMembers = createSlice({
 			.addCase(fetchChannelMembers.pending, (state: ChannelMembersState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchChannelMembers.fulfilled, (state: ChannelMembersState, action: PayloadAction<ChannelUserListChannelUser[] | null>) => {
-				if (action.payload !== null) {
-					state.loadingStatus = 'loaded';
-				} else {
-					state.loadingStatus = 'not loaded';
+			.addCase(
+				fetchChannelMembers.fulfilled,
+				(
+					state: ChannelMembersState,
+					action: PayloadAction<{ channel_users: ChannelUserListChannelUser[]; fromCache: boolean; channelId: string }>
+				) => {
+					const { channel_users, fromCache, channelId } = action.payload;
+
+					if (channel_users !== null) {
+						state.loadingStatus = 'loaded';
+
+						if (!fromCache && state.memberChannels[channelId]) {
+							state.memberChannels[channelId].cache = createCacheMetadata();
+						}
+					} else {
+						state.loadingStatus = 'not loaded';
+					}
 				}
-			})
+			)
 			.addCase(fetchChannelMembers.rejected, (state: ChannelMembersState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
@@ -380,8 +432,6 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 	return rootState[CHANNEL_MEMBERS_FEATURE_KEY];
 };
 
-const getUsersClanState = (rootState: { [USERS_CLANS_FEATURE_KEY]: UsersClanState }): UsersClanState => rootState[USERS_CLANS_FEATURE_KEY];
-
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
 
 export const selectMemberIdsByChannelId = createSelector(
@@ -393,16 +443,16 @@ export const selectMemberIdsByChannelId = createSelector(
 
 export const selectMemberCustomStatusById = createSelector(
 	[
-		getUsersClanState,
+		selectEntitesUserClans,
 		selectDirectMembersMetaEntities,
 		(state: RootState, userId: string, isDM?: boolean) => {
 			//DO NOT EDIT UNLESS YOU KNOW WHAT ARE YOU DOING: thanh.levan
 			return `${userId},${isDM}`;
 		}
 	],
-	(usersClanState, statusList, payload) => {
+	(usersClanEntities, statusList, payload) => {
 		const [userId, isDM] = payload.split(',');
-		const userClan = usersClanState.entities[userId];
+		const userClan = usersClanEntities[userId];
 		if (statusList?.[userId]) {
 			return statusList?.[userId].user?.metadata?.status || false;
 		}
@@ -414,13 +464,13 @@ export const selectMemberCustomStatusById = createSelector(
 
 export const selectMemberCustomStatusById2 = createSelector(
 	[
-		getUsersClanState,
+		selectEntitesUserClans,
 		(state: RootState, userId: string) => {
 			return userId;
 		}
 	],
-	(usersClanState, userId) => {
-		const userClan = usersClanState.entities[userId];
+	(usersClanEntities, userId) => {
+		const userClan = usersClanEntities[userId];
 		return (userClan?.user?.metadata as any)?.status || '';
 	}
 );
@@ -478,16 +528,16 @@ export const selectMembeGroupByUserId = createSelector([selectGrouplMembers, (st
 
 export const selectMemberStatusById = createSelector(
 	[
-		getUsersClanState,
+		selectEntitesUserClans,
 		selectDirectMessageEntities,
 		selectClanView,
 		(state, userId: string) => {
 			return `${userId},${state?.direct.currentDirectMessageId}`;
 		}
 	],
-	(usersClanState, directs, isClanView, payload) => {
+	(usersClanEntities, directs, isClanView, payload) => {
 		const [userId, currentDirectMessageId] = payload.split(',');
-		const userClan = usersClanState.entities[userId];
+		const userClan = usersClanEntities[userId];
 		const userGroup = directs?.[currentDirectMessageId];
 		if (userClan && isClanView) {
 			return { status: userClan.user?.online, isMobile: userClan.user?.is_mobile };
@@ -503,7 +553,8 @@ export const selectMemberStatusById = createSelector(
 export const selectAllChannelMembers = createSelector(
 	[
 		selectMemberIdsByChannelId,
-		getUsersClanState,
+		selectAllUserClans,
+		selectEntitesUserClans,
 		selectGrouplMembers,
 		(state: RootState, channelId: string) => {
 			const currentClanId = state.clans?.currentClanId;
@@ -514,25 +565,24 @@ export const selectAllChannelMembers = createSelector(
 			return `${channelId},${isPrivate},${isDm},${parentId}`;
 		}
 	],
-	(channelMembers, usersClanState, directs, payload) => {
+	(channelMembers, allUserClans, usersClanEntities, directs, payload) => {
 		const [channelId, isPrivate, isDm, parentId] = payload.split(',');
 
 		const membersOfChannel: ChannelMembersEntity[] = [];
 		if (isDm) return directs || [];
 
-		if (!usersClanState?.ids?.length) return membersOfChannel;
+		if (!allUserClans?.length) return membersOfChannel;
 
-		const members = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? { ids: channelMembers } : usersClanState;
+		const ids = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? channelMembers : allUserClans.map((u: any) => u.id);
 
-		if (!members?.ids) return membersOfChannel;
-		const ids = members.ids || [];
+		if (!ids?.length) return membersOfChannel;
 
 		const result: ChannelMembersEntity[] = [];
 
-		ids.map((id) => {
-			if (usersClanState.entities[id]) {
+		ids.map((id: string) => {
+			if (usersClanEntities[id]) {
 				result.push({
-					...usersClanState.entities[id],
+					...usersClanEntities[id],
 					channelId,
 					userChannelId: channelId
 				});
@@ -544,7 +594,8 @@ export const selectAllChannelMembers = createSelector(
 export const selectAllChannelMembers2 = createSelector(
 	[
 		selectMemberIdsByChannelId,
-		getUsersClanState,
+		selectAllUserClans,
+		selectEntitesUserClans,
 		(state: RootState, channelId: string) => {
 			const currentClanId = state.clans?.currentClanId;
 			const channel = state?.channels?.byClans?.[currentClanId as string]?.entities?.entities?.[channelId];
@@ -553,19 +604,18 @@ export const selectAllChannelMembers2 = createSelector(
 			return `${channelId},${isPrivate},${parentId}`;
 		}
 	],
-	(channelMembers, usersClanState, payload) => {
+	(channelMembers, allUserClans, usersClanEntities, payload) => {
 		const [channelId, isPrivate, parentId] = payload.split(',');
 		const membersOfChannel: ChannelMembersEntity[] = [];
 
-		if (!usersClanState?.ids?.length) return membersOfChannel;
+		if (!allUserClans?.length) return membersOfChannel;
 
-		const members = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? { ids: channelMembers } : usersClanState;
+		const ids = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? channelMembers : allUserClans.map((u: any) => u.id);
 
-		if (!members?.ids) return membersOfChannel;
-		const ids = members.ids || [];
+		if (!ids?.length) return membersOfChannel;
 
-		return ids.map((id) => ({
-			...usersClanState.entities[id],
+		return ids.map((id: string) => ({
+			...usersClanEntities[id],
 			channelId,
 			userChannelId: channelId
 		}));
@@ -575,7 +625,8 @@ export const selectAllChannelMembers2 = createSelector(
 export const selectMemberByUsername = createSelector(
 	[
 		selectMemberIdsByChannelId,
-		getUsersClanState,
+		selectAllUserClans,
+		selectEntitesUserClans,
 		(state: RootState, channelId: string, username: string) => {
 			const currentClanId = state.clans?.currentClanId;
 			const channel = state.channels?.byClans[currentClanId as string]?.entities?.entities?.[channelId];
@@ -584,15 +635,14 @@ export const selectMemberByUsername = createSelector(
 			return `${channelId},${isPrivate},${parentId},${username}`;
 		}
 	],
-	(channelMembers, usersClanState, payload) => {
+	(channelMembers, allUserClans, usersClanEntities, payload) => {
 		const [channelId, isPrivate, parentId, username] = payload.split(',');
-		if (!usersClanState?.ids?.length) return null;
-		const members = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? { ids: channelMembers } : usersClanState;
-		if (!members?.ids) return null;
-		const ids = members.ids || [];
+		if (!allUserClans?.length) return null;
+		const ids = isPrivate === '1' || (parentId !== '0' && parentId !== '') ? channelMembers : allUserClans.map((u: any) => u.id);
+		if (!ids?.length) return null;
 		for (const id of ids) {
 			const member = {
-				...usersClanState.entities[id],
+				...usersClanEntities[id],
 				channelId,
 				userChannelId: channelId
 			};
@@ -608,7 +658,7 @@ export const selectMemberByUsername = createSelector(
 export const selectAllChannelMemberIds = createSelector(
 	[
 		getChannelMembersState,
-		getUsersClanState,
+		selectAllUserClans,
 		selectGrouplMembers,
 		(state: RootState, channelId: string, isDm?: boolean) => {
 			const currentClanId = state.clans?.currentClanId;
@@ -618,13 +668,13 @@ export const selectAllChannelMemberIds = createSelector(
 			return `${channelId},${isPrivate},${isDm ? 1 : ''},${parentId}`;
 		}
 	],
-	(channelMembersState, usersClanState, directs, payload) => {
+	(channelMembersState, allUserClans, directs, payload) => {
 		const [channelId, isPrivate, isDm, parentId] = payload.split(',');
 		if (isDm) return directs;
 		const memberIds =
 			isPrivate === '1' || (parentId !== '0' && parentId !== '')
 				? channelMembersState.memberChannels[channelId]?.ids || []
-				: usersClanState.ids;
+				: allUserClans.map((u: any) => u.id);
 		return memberIds;
 	}
 );
@@ -639,10 +689,10 @@ export const selectChannelMemberByUserIds = createSelector(
 			return `${channelId},${userIds},${isDm}`;
 		}
 	],
-	(usersClanState, directs, currentUser, dmMembers, payload) => {
+	(usersClanEntities, directs, currentUser, dmMembers, payload) => {
 		const [channelId, userIds, isDm] = payload.split(',');
 
-		const users = isDm ? directs : usersClanState;
+		const users = isDm ? directs : usersClanEntities;
 		if (!userIds.trim() || !users) return [];
 		const members: ChannelMembersEntity[] = [];
 		userIds.split('/')?.forEach((userId) => {
@@ -685,7 +735,6 @@ export const selectChannelMemberByUserIds = createSelector(
 	}
 );
 
-export const selectAllMembersInClan = createSelector([getUsersClanState], (usersClanState) => {
-	if (!usersClanState?.entities) return [];
-	return Object.values(usersClanState.entities);
+export const selectAllMembersInClan = createSelector([selectAllUserClans], (allUserClans) => {
+	return allUserClans;
 });

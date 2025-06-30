@@ -93,6 +93,9 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 								data={dmGroupChatList}
 								showsVerticalScrollIndicator={false}
 								keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
+								initialNumToRender={1}
+								maxToRenderPerBatch={1}
+								windowSize={2}
 								renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
 							/>
 						)}

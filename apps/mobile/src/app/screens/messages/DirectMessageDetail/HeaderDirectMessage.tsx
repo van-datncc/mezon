@@ -1,5 +1,5 @@
 import { CallSignalingData } from '@mezon/components';
-import { useChatSending, useMemberStatus, useSeenMessagePool } from '@mezon/core';
+import { useChatSending, useSeenMessagePool } from '@mezon/core';
 import { ActionEmitEvent, IOption } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import {

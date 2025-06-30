@@ -121,6 +121,9 @@ export const ReportMessageModal = memo((props: IReportMessageModalProps) => {
 								data={reportOptionList}
 								keyExtractor={(item) => item.type}
 								ItemSeparatorComponent={SeparatorWithSpace}
+								initialNumToRender={1}
+								maxToRenderPerBatch={1}
+								windowSize={2}
 								renderItem={({ item }) => {
 									return (
 										<TouchableOpacity onPress={() => setReportSelected(item)} style={styles.reportItem}>

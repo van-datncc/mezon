@@ -93,6 +93,9 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 								scrollEnabled
 								showsVerticalScrollIndicator={false}
 								keyExtractor={(item) => item.id}
+								initialNumToRender={1}
+								maxToRenderPerBatch={1}
+								windowSize={2}
 								renderItem={({ item, index }) => {
 									if (item.slug === 'everyone') return null;
 									return (

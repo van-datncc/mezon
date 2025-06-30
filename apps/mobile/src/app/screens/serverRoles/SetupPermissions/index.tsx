@@ -229,6 +229,9 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 								data={filteredPermissionList}
 								keyExtractor={(item) => item.id}
 								ItemSeparatorComponent={SeparatorWithLine}
+								initialNumToRender={1}
+								maxToRenderPerBatch={1}
+								windowSize={2}
 								renderItem={({ item }) => {
 									return (
 										<TouchableOpacity

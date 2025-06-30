@@ -232,7 +232,6 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			borderColor: colors.secondaryLight
 		},
 		placeholderSearchBox: {
-			textTransform: 'capitalize',
 			color: colors.text,
 			fontSize: size.s_14,
 			lineHeight: size.s_18

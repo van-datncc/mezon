@@ -243,7 +243,14 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 
 	return (
 		<View style={styles.albumPanel}>
-			<FlatList data={albums} keyExtractor={(item, index) => `album_item_${item?.id}_${index}`} renderItem={renderItem} />
+			<FlatList
+				data={albums}
+				keyExtractor={(item, index) => `album_item_${item?.id}_${index}`}
+				renderItem={renderItem}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
+			/>
 		</View>
 	);
 };

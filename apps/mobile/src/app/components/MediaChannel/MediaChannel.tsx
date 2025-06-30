@@ -47,9 +47,9 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 					contentContainerStyle={styles.contentContainer}
 					removeClippedSubviews={true}
 					showsVerticalScrollIndicator={true}
-					initialNumToRender={10}
-					maxToRenderPerBatch={10}
-					windowSize={5}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 					ListEmptyComponent={<EmptySearchPage />}
 				/>
 			)}

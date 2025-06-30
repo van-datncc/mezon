@@ -3,6 +3,7 @@ import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@r
 import { safeJSONParse } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { authActions } from '../auth/auth.slice';
+import { clearApiCallTracker } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { clearAllMemoizedFunctions, memoizeAndTrack } from '../memoize';
 
@@ -56,6 +57,7 @@ export const deleteAccount = createAsyncThunk('account/deleteaccount', async (_,
 		const response = await mezon.client.deleteAccount(mezon.session);
 		thunkAPI.dispatch(authActions.setLogout());
 		clearAllMemoizedFunctions();
+		clearApiCallTracker();
 		return response;
 	} catch (error) {
 		//Todo: check clan owner before deleting account

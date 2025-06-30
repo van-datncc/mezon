@@ -3,9 +3,8 @@ import {
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectFormOnboarding,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	selectOnboardingByClan,
-	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -24,19 +23,26 @@ interface ClanGuideSettingProps {
 }
 
 function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {}) {
-	const dispatch = useAppDispatch();
 	const [openModalAddTask, closeModalAddTask] = useModal(() => {
-		return <ModalAddMission onClose={() => {
-			closeModalAddTask();
-			if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
-		}} />;
+		return (
+			<ModalAddMission
+				onClose={() => {
+					closeModalAddTask();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+			/>
+		);
 	});
 
 	const [openModalAddRules, closeModalAddRule] = useModal(() => {
-		return <ModalAddRules onClose={() => {
-			closeModalAddRule();
-			if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
-		}} />;
+		return (
+			<ModalAddRules
+				onClose={() => {
+					closeModalAddRule();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+			/>
+		);
 	});
 
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -82,28 +88,21 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 
 				<div className="flex flex-col gap-3">
 					{onboardingByClan.mission.map((mission) => (
-						<MissionItem
-							mission={mission}
-							key={mission.title}
-							setOpenModalSaveChanges={setOpenModalSaveChanges}
-						/>
+						<MissionItem mission={mission} key={mission.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					{onboardingTemp.task.map((mission, index) => (
-						<MissionItem
-							mission={mission}
-							key={mission.title}
-							temp={index}
-							setOpenModalSaveChanges={setOpenModalSaveChanges}
-						/>
+						<MissionItem mission={mission} key={mission.title} temp={index} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					<GuideItemLayout
 						hightLightIcon={true}
 						gap={16}
-						icon={<Icons.RuleIcon defaultFill='#ffffff' />}
+						icon={<Icons.RuleIcon defaultFill="#ffffff" />}
 						className="px-3"
-						description={<div className="h-full flex items-center text-base text-gray-800 dark:text-white font-bold">Read the Rules </div>}
+						description={
+							<div className="h-full flex items-center text-base text-gray-800 dark:text-white font-bold">Read the Rules </div>
+						}
 					/>
 
 					<button
@@ -134,20 +133,11 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 
 				<div className="flex flex-col gap-3">
 					{onboardingByClan.rule.map((rule) => (
-						<RuleItem
-							rule={rule}
-							key={rule.title}
-							setOpenModalSaveChanges={setOpenModalSaveChanges}
-						/>
+						<RuleItem rule={rule} key={rule.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					{onboardingTemp.rules.map((rule, index) => (
-						<RuleItem
-							rule={rule}
-							temp={index}
-							key={rule.title}
-							setOpenModalSaveChanges={setOpenModalSaveChanges}
-						/>
+						<RuleItem rule={rule} temp={index} key={rule.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					<button
@@ -177,7 +167,7 @@ const SectionDescription = ({ title, description }: { title: string; description
 };
 const OwnerGreeting = () => {
 	const currenClan = useSelector(selectCurrentClan);
-	const clanOwner = useSelector(selectMemberClanByUserId(currenClan?.creator_id as string));
+	const clanOwner = useAppSelector((state) => selectMemberClanByUserId2(state, currenClan?.creator_id as string));
 	return (
 		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-indigo-300 to-purple-300 dark:from-[#9e9e9e] dark:to-[#494949]">
 			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-[#3d3f3d] dark:via-[#2d2f2e] dark:to-[#1a1d1e] rounded-md">
@@ -210,10 +200,16 @@ const MissionItem = ({ mission, temp, setOpenModalSaveChanges }: MissionItemProp
 	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
 
 	const [openEditModal, closeEditModal] = useModal(() => {
-		return <ModalAddMission onClose={() => {
-			closeEditModal();
-			if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
-		}} missionEdit={mission} tempId={temp} />;
+		return (
+			<ModalAddMission
+				onClose={() => {
+					closeEditModal();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+				missionEdit={mission}
+				tempId={temp}
+			/>
+		);
 	});
 
 	return (
@@ -232,7 +228,10 @@ const MissionItem = ({ mission, temp, setOpenModalSaveChanges }: MissionItemProp
 				</span>
 			}
 			action={
-				<button className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors" onClick={openEditModal}>
+				<button
+					className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors"
+					onClick={openEditModal}
+				>
 					{' '}
 					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
 				</button>
@@ -249,10 +248,16 @@ interface RuleItemProps {
 
 const RuleItem = ({ rule, temp, setOpenModalSaveChanges }: RuleItemProps) => {
 	const [openEditModal, closeEditModal] = useModal(() => {
-		return <ModalAddRules onClose={() => {
-			closeEditModal();
-			if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
-		}} ruleEdit={rule} tempId={temp} />;
+		return (
+			<ModalAddRules
+				onClose={() => {
+					closeEditModal();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+				ruleEdit={rule}
+				tempId={temp}
+			/>
+		);
 	});
 
 	return (
@@ -264,7 +269,10 @@ const RuleItem = ({ rule, temp, setOpenModalSaveChanges }: RuleItemProps) => {
 			description={rule.content}
 			title={rule.title}
 			action={
-				<button className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors" onClick={openEditModal}>
+				<button
+					className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors"
+					onClick={openEditModal}
+				>
 					{' '}
 					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
 				</button>

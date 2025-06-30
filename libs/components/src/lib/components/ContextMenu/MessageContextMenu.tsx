@@ -519,8 +519,8 @@ function MessageContextMenu({
 	}, [checkElementIsImage, isClickedEmoji, isClickedSticker]);
 
 	const sendTransactionMessage = useCallback(
-		async (userId: string, username?: string, avatar?: string) => {
-			const response = await createDirectMessageWithUser(userId, username, avatar);
+		async (userId: string, display_name?: string, username?: string, avatar?: string) => {
+			const response = await createDirectMessageWithUser(userId, display_name, username, avatar);
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
@@ -584,7 +584,12 @@ function MessageContextMenu({
 									channelIdOnMessage: message?.channel_id
 								});
 
-								await sendTransactionMessage(message.sender_id || '', message.user?.name || message.user?.username, message.avatar);
+								await sendTransactionMessage(
+									message.sender_id || '',
+									message.user?.name,
+									message.user?.name || message.user?.username,
+									message.avatar
+								);
 							}
 						} catch (error) {
 							console.error('Failed to give cofffee message', error);

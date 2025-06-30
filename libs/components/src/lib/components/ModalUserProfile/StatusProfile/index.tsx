@@ -6,6 +6,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clearAllMemoizedFunctions,
+	clearApiCallTracker,
 	giveCoffeeActions,
 	selectOthersSession,
 	selectUserStatus,
@@ -129,6 +130,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			clearAllMemoizedFunctions();
+			clearApiCallTracker();
 			localStorage.removeItem('remember_channel');
 
 			dispatch(clansActions.setCurrentClanId('0'));
@@ -209,7 +211,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
 					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />
 					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
-					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				</Dropdown>
 			</div>
 			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>

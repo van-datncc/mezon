@@ -69,6 +69,9 @@ export const BlockedUsers = ({ navigation }: SettingScreenProps<BlockedUsersScre
 					keyExtractor={(item) => item?.id}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={styles.listContent}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 				/>
 			) : (
 				<View style={styles.emptyContainer}>
