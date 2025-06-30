@@ -625,7 +625,7 @@ export const ChatBoxBottomBar = memo(
 						)}
 
 						{imageBase64 && (
-							<Pressable style={{ position: 'absolute', top: -size.s_102 }} onPress={handlePasteImageFromClipboard}>
+							<Pressable style={{ position: 'absolute', bottom: '100%' }} onPress={handlePasteImageFromClipboard}>
 								<ClipboardImagePreview imageBase64={imageBase64} message={t('pasteImage')} onCancel={cancelPasteImage} />
 							</Pressable>
 						)}
