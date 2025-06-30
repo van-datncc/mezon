@@ -5,16 +5,17 @@ import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import Modal from 'libs/ui/src/lib/Modal';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { SoundType } from './index';
 
 interface ModalUploadSoundProps {
+	sound?: SoundType | null;
 	onSuccess: (sound: SoundType) => void;
 	onClose: () => void;
 }
 
-const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
+const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) => {
 	const [file, setFile] = useState<File | null>(null);
 	const [name, setName] = useState('');
 	const [error, setError] = useState('');
@@ -26,6 +27,13 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
+
+	useEffect(() => {
+		if (sound) {
+			setName(sound.name);
+			setPreviewUrl(sound.url);
+		}
+	}, [sound]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const f = e.target.files?.[0];
@@ -65,7 +73,7 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 	};
 
 	const handleUpload = async () => {
-		if (!file || !name.trim()) return;
+		if (!name.trim()) return;
 
 		setIsUploading(true);
 
@@ -76,8 +84,34 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 			if (!client || !session) {
 				throw new Error('Client or session is not initialized');
 			}
+			if (sound && !file) {
+				const request = {
+					id: sound.id,
+					clan_id: currentClanId,
+					shortname: name.trim(),
+					source: sound.url,
+					media_type: MediaType.AUDIO
+				};
 
-			const id = Snowflake.generate();
+				await dispatch(
+					soundEffectActions.updateSound({
+						soundId: sound.id,
+						request
+					})
+				);
+
+				onSuccess({
+					id: sound.id,
+					name: name.trim(),
+					url: sound.url,
+					creator_id: sound.creator_id
+				});
+				return;
+			}
+
+			if (!file) return;
+
+			const id = sound?.id || Snowflake.generate();
 			const path = 'sounds/' + id + '.' + file.name.split('.').pop();
 
 			const attachment = await handleUploadEmoticon(client, session, path, file);
@@ -92,12 +126,22 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 					media_type: MediaType.AUDIO
 				};
 
-				await dispatch(soundEffectActions.createSound({ request, clanId: currentClanId }));
+				if (sound) {
+					await dispatch(
+						soundEffectActions.updateSound({
+							soundId: id,
+							request
+						})
+					);
+				} else {
+					await dispatch(soundEffectActions.createSound({ request, clanId: currentClanId }));
+				}
 
 				onSuccess({
 					id: id,
 					name: name.trim(),
-					url: attachment.url
+					url: attachment.url,
+					creator_id: sound?.creator_id
 				});
 			}
 		} catch (error) {
@@ -124,11 +168,13 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 			<div className="relative">
 				<div className="absolute inset-0"></div>
 
-				<div className="relative bg-theme-setting-nav">
-					<div className="relative px-4 pt-4 pb-3 border-b-theme-primary">
+				<div className="relative">
+					<div className="relative px-4 pt-4 pb-3 border-b border-gray-300 dark:border-[#42464d]">
 						<div className="text-center">
-							<h2 className="text-lg font-bold ">Upload Sound Effect</h2>
-							<p className="text-xs">Supports MP3, WAV formats • Max 1MB</p>
+							<h2 className="text-lg font-bold text-colorTextLightMode dark:text-white">
+								{sound ? 'Edit Sound Effect' : 'Upload Sound Effect'}
+							</h2>
+							<p className="text-gray-500 dark:text-[#b9bbbe] text-xs">Supports MP3, WAV formats • Max 1MB</p>
 						</div>
 					</div>
 
@@ -268,13 +314,15 @@ const ModalUploadSound = ({ onSuccess, onClose }: ModalUploadSoundProps) => {
 							<button
 								className="px-3 py-1.5 bg-[#5865f2] hover:bg-[#4752c4] text-white rounded-md text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
 								onClick={handleUpload}
-								disabled={!file || !name.trim() || isUploading}
+								disabled={(!file && !sound) || !name.trim() || isUploading}
 							>
 								{isUploading ? (
 									<span className="flex items-center gap-1.5">
-										<div className="w-3.5 h-3.5 border-2 border-color-primary border-t-white rounded-full animate-spin"></div>
+										<div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
 										Uploading...
 									</span>
+								) : sound ? (
+									'Update'
 								) : (
 									'Upload'
 								)}

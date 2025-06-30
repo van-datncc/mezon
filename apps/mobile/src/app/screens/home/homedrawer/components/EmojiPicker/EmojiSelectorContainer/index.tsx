@@ -292,7 +292,7 @@ export default function EmojiSelectorContainer({
 			stickyHeaderIndices={[0]}
 			initialNumToRender={1}
 			maxToRenderPerBatch={1}
-			windowSize={10}
+			windowSize={2}
 			removeClippedSubviews={false}
 			keyboardShouldPersistTaps="handled"
 			disableVirtualization

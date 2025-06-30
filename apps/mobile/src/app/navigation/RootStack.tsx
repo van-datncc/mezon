@@ -3,6 +3,8 @@ import { selectIsLogin } from '@mezon/store-mobile';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { Platform } from 'react-native';
+import 'react-native-get-random-values';
+import 'react-native-svg';
 import { useSelector } from 'react-redux';
 import IncomingHomeScreen from '../screens/customIncomingCall/IncomingHomeScreen';
 import { Authentication } from './Authentication';

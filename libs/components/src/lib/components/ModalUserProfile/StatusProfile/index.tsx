@@ -6,6 +6,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clearAllMemoizedFunctions,
+	clearApiCallTracker,
 	giveCoffeeActions,
 	selectOthersSession,
 	selectUserStatus,
@@ -129,6 +130,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			clearAllMemoizedFunctions();
+			clearApiCallTracker();
 			localStorage.removeItem('remember_channel');
 
 			dispatch(clansActions.setCurrentClanId('0'));
@@ -158,25 +160,39 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 			<div className="max-md:relative">
 				<ItemStatus
 					children={`Balance: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
-					startIcon={<Icons.Check />}
+					startIcon={<Icons.Check className="text-[#969696] dark:text-[#cecece]" />}
 					disabled={true}
 				/>
-				<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney />} />
+				<ItemStatus
+					onClick={handleSendToken}
+					children="Transfer Funds"
+					startIcon={<Icons.SendMoney className="text-[#838383] dark:text-[#cecece]" />}
+				/>
 				{/* <ItemStatus
 					onClick={handleOpenWithdrawModal}
 					children="Withdraw"
 					startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
 				/> */}
-				<ItemStatus onClick={handleOpenHistoryModal} children="History Transaction" startIcon={<Icons.History className="bg-green-500" />} />
+				<ItemStatus
+					onClick={handleOpenHistoryModal}
+					children="History Transaction"
+					startIcon={<Icons.History className="text-[#838383] dark:text-[#cecece]" />}
+				/>
 				<ItemStatus
 					onClick={handleWalletManagement}
 					children="Manage Wallet"
 					startIcon={
-						<span className="w-5 h-5 flex items-center justify-center">
+						<span className="w-5 h-5 flex items-center justify-center text-[#838383] dark:text-[#cecece]">
 							{' '}
 							<WalletIcon />{' '}
 						</span>
 					}
+				/>
+
+				<ItemStatus
+					onClick={handleCustomStatus}
+					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
+					startIcon={<Icons.SmilingFace className="text-[#838383] dark:text-[#cecece]" />}
 				/>
 				<Dropdown
 					trigger="click"
@@ -197,11 +213,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
 					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 				</Dropdown>
-				<ItemStatus
-					onClick={handleCustomStatus}
-					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
-					startIcon={<Icons.SmilingFace />}
-				/>
 			</div>
 			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
 			{isElectron() && (
@@ -225,7 +236,11 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				</Dropdown>
 			)}
 
-			<ButtonCopy copyText={userProfile?.user?.id || ''} title="Copy User ID" className="py-[6px] hover:!bg-[#E6EFFE] dark:hover:!bg-[#3F3F46]" />
+			<ButtonCopy
+				copyText={userProfile?.user?.id || ''}
+				title="Copy User ID"
+				className="px-2 py-[6px] hover:!bg-[#E6EFFE] dark:hover:!bg-[#3F3F46]"
+			/>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 

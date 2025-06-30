@@ -16,6 +16,7 @@ import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
+import { FCMNotificationLoader } from './FCMNotificationLoader';
 import { ListenerLoader } from './ListenerLoader';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
@@ -34,6 +35,7 @@ export const Authentication = memo(() => {
 	return (
 		<BottomSheetModalProvider>
 			<ColorRoleProvider>
+				<FCMNotificationLoader />
 				<RootStack.Navigator
 					initialRouteName={APP_SCREEN.BOTTOM_BAR}
 					screenOptions={{

@@ -1,15 +1,12 @@
 import { debounce, KEY_SLASH_COMMAND_EPHEMERAL } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
+import { listQuickMenuAccess, selectQuickMenuByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { ApiQuickMenuAccess } from 'mezon-js/api.gen';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { style } from './styles';
-
-interface SlashCommandSuggestionsProps {
-	keyword: string;
-	onSelectCommand: (commandId: string) => void;
-}
 
 interface SlashCommand {
 	id: string;
@@ -17,14 +14,34 @@ interface SlashCommand {
 	description?: string;
 }
 
-export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: SlashCommandSuggestionsProps) => {
+interface SlashCommandSuggestionsProps {
+	keyword: string;
+	onSelectCommand: (command: SlashCommand) => void;
+	channelId?: string;
+}
+
+export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, channelId }: SlashCommandSuggestionsProps) => {
 	const { t } = useTranslation('message');
+	const dispatch = useAppDispatch();
 	const slashCommands: SlashCommand[] = [
 		{
 			id: KEY_SLASH_COMMAND_EPHEMERAL,
 			display: 'ephemeral',
 			description: t('ephemeral.description')
 		}
+	];
+
+	useEffect(() => {
+		if (channelId) {
+			dispatch(listQuickMenuAccess({ channelId }));
+		}
+	}, [channelId, dispatch]);
+
+	const quickMenuList: ApiQuickMenuAccess[] = useAppSelector((state) => selectQuickMenuByChannelId(state, channelId));
+
+	const allCommands: SlashCommand[] = [
+		...slashCommands,
+		...(quickMenuList ?? []).map((item) => ({ id: item.id, display: item.menu_name, description: item.action_msg }))
 	];
 
 	const [filteredCommands, setFilteredCommands] = useState<SlashCommand[]>(slashCommands);
@@ -34,17 +51,17 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: Slash
 	useEffect(() => {
 		const debounceFilter = debounce(() => {
 			if (slashCommands?.length === 0) return;
-			const suggestionCommands = slashCommands.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
+			const suggestionCommands = allCommands?.filter((command) => command?.display?.toLowerCase().includes(keyword?.toLowerCase()));
 			setFilteredCommands(suggestionCommands);
 		}, 300);
 
 		debounceFilter();
-	}, [keyword]);
+	}, [keyword, quickMenuList]);
 
 	const renderCommands = ({ item }: { item: SlashCommand }) => {
 		if (!item?.display) return <View />;
 		return (
-			<Pressable style={styles.commandItem} onPress={() => onSelectCommand(item?.id)}>
+			<Pressable style={styles.commandItem} onPress={() => onSelectCommand(item)}>
 				<Text style={styles.commandDisplay}>/{item?.display}</Text>
 				<Text style={styles.commandDescription}>{item?.description}</Text>
 			</Pressable>
@@ -64,8 +81,9 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand }: Slash
 				renderItem={renderCommands}
 				keyExtractor={(item, index) => `${item?.id}_${index}_slash_command`}
 				keyboardShouldPersistTaps="handled"
-				windowSize={4}
-				initialNumToRender={4}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				disableVirtualization
 				removeClippedSubviews={true}
 				getItemLayout={(_, index) => ({

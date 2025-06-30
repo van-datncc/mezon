@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { CheckIcon, Icons } from '@mezon/mobile-components';
+import { CheckIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,7 @@ const NotificationOption = memo(({ selectedTabs, onChangeTab }: INotificationOpt
 				},
 				{
 					title: t('tabNotify.topics'),
-					icon: <Icons.DiscussionIcon color={themeValue.textStrong} />,
+					icon: <MezonIconCDN icon={IconCDN.discussionIcon} color={themeValue.textStrong} />,
 					onPress: () => handleTabChange(InboxType.TOPICS),
 					component: selectedTabs === InboxType.TOPICS ? <CheckIcon color={themeValue.textStrong} /> : null
 				}

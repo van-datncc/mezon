@@ -37,6 +37,7 @@ export type Attributes = {
 	bgBrown: HexColor;
 	textWarning: HexColor;
 	borderWarning: HexColor;
+	darkJade: HexColor;
 };
 
 type ThemeColor = Record<ThemeModeBase, Attributes>;
@@ -99,7 +100,8 @@ export const themeColors: ThemeColor = {
 		badgeHighlight: '#2e2f34',
 		bgBrown: '#713F1233',
 		textWarning: '#FEF08A',
-		borderWarning: '#EAB308'
+		borderWarning: '#EAB308',
+		darkJade: '#174033'
 	},
 	light: {
 		primary: '#f2f3f5',
@@ -135,6 +137,7 @@ export const themeColors: ThemeColor = {
 		badgeHighlight: '#fff',
 		bgBrown: '#876E4B',
 		textWarning: '#FEF08A',
-		borderWarning: '#EAB308'
+		borderWarning: '#EAB308',
+		darkJade: '#50f5c0'
 	}
 };

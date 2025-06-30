@@ -10,6 +10,9 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
+const packageJson = require('../../package.json');
+const APP_VERSION = packageJson.version;
+
 const envFile = process.env.ENV_FILE || '.env';
 const envPath = path.resolve(__dirname, envFile);
 let envVars = {};
@@ -25,8 +28,8 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-
 envVars['process.env.NODE_ENV'] = JSON.stringify(process.env.NODE_ENV || 'development');
+envVars['process.env.APP_VERSION'] = JSON.stringify(APP_VERSION);
 
 const EXTERNALS_SCRIPTS = [];
 
@@ -60,6 +63,22 @@ module.exports = composePlugins(
 
     config.resolve = config.resolve || {};
     config.resolve.fallback = { "fs": false };
+
+    if (config.output) {
+      config.output.filename = config.output.filename || '[name].[contenthash].js';
+      config.output.chunkFilename = config.output.chunkFilename || '[name].[contenthash].chunk.js';
+      config.optimization = config.optimization || {};
+      config.optimization.moduleIds = 'deterministic';
+      config.optimization.chunkIds = 'deterministic';
+
+      const versionHash = require('crypto').createHash('md5').update(APP_VERSION + Date.now().toString()).digest('hex').substring(0, 8);
+
+      if (process.env.NODE_ENV === 'production') {
+        config.output.filename = `[name].${versionHash}.[contenthash].js`;
+        config.output.chunkFilename = `[name].${versionHash}.[contenthash].chunk.js`;
+        config.output.assetModuleFilename = `assets/[name].${versionHash}.[contenthash][ext]`;
+      }
+    }
 
     config.plugins.push(
       new CopyWebpackPlugin({

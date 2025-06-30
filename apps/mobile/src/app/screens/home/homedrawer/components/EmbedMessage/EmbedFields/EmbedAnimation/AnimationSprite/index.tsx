@@ -132,7 +132,7 @@ const SpriteAnimationComponent = ({
 	return (
 		<View style={{ overflow: 'hidden', width: frameWidth, height: frameHeight }}>
 			<Animated.Image
-				source={{ uri: createImgproxyUrl(spriteUrl ?? '', { width: 300, height: 300, resizeType: 'fit' }) }}
+				source={{ uri: spriteUrl }}
 				style={{
 					width: spriteWidth,
 					height: spriteHeight,

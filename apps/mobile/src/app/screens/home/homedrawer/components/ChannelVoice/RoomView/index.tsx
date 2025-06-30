@@ -172,7 +172,7 @@ const RoomView = ({
 							console.error('Error creating audio track with device:', deviceError);
 							Toast.show({
 								type: 'error',
-								text1: `Error creating audio device: ${deviceError}`
+								text1: `Error creating audio device: ${JSON.stringify(deviceError)}`
 							});
 						}
 					}

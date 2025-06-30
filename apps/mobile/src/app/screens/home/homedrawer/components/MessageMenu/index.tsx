@@ -200,9 +200,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 				infoFriend?.state !== EStateFriend.OTHER_PENDING,
 			icon:
 				infoFriend?.state === EStateFriend.FRIEND ? (
-					<MezonIconCDN icon={IconCDN.removeFriend} color={themeValue.textStrong} />
+					<MezonIconCDN icon={IconCDN.removeFriend} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
 				) : (
-					<MezonIconCDN icon={IconCDN.userPlusIcon} color={themeValue.textStrong} />
+					<MezonIconCDN icon={IconCDN.userPlusIcon} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
 				)
 		},
 		{

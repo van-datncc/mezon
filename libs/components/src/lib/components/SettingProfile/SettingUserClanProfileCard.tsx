@@ -43,7 +43,7 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 				</div>
 			)}
 
-			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px] bg-private-theme "></div>
+			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px] !bg-indigo-400" style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={profiles.urlImage}
 				username={userProfile?.user?.username}

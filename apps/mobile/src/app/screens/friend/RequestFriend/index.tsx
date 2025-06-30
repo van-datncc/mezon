@@ -87,6 +87,9 @@ export const RequestFriendScreen = () => {
 						ItemSeparatorComponent={SeparatorWithLine}
 						keyExtractor={(friend) => friend.id.toString()}
 						renderItem={({ item }) => <FriendItem friend={item} handleFriendAction={handleFriendAction} />}
+						initialNumToRender={1}
+						maxToRenderPerBatch={1}
+						windowSize={2}
 					/>
 				</View>
 			</View>
