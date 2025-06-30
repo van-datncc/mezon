@@ -2,9 +2,8 @@ import type React from 'react';
 
 import { MediaType, selectCurrentClanId, soundEffectActions, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { Icons } from '@mezon/ui';
+import { Icons, Modal } from '@mezon/ui';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import Modal from 'libs/ui/src/lib/Modal';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { SoundType } from './index';
@@ -103,8 +102,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 				onSuccess({
 					id: sound.id,
 					name: name.trim(),
-					url: sound.url,
-					creator_id: sound.creator_id
+					url: sound.url
 				});
 				return;
 			}
@@ -140,8 +138,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 				onSuccess({
 					id: id,
 					name: name.trim(),
-					url: attachment.url,
-					creator_id: sound?.creator_id
+					url: attachment.url
 				});
 			}
 		} catch (error) {
