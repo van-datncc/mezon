@@ -1,15 +1,15 @@
 import { captureSentryError } from '@mezon/logger';
-import { FOR_24_HOURS, IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
+import { IClan, LIMIT_CLAN_ITEM, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType, ClanUpdatedEvent } from 'mezon-js';
 import { ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
 import { batch } from 'react-redux';
 import { accountActions } from '../account/account.slice';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import { MezonValueContext, ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
@@ -74,6 +74,7 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	// Add clan groups state
 	clanGroups: EntityState<ClanGroup, string>;
 	clanGroupOrder: ClanGroupItem[];
+	cache?: CacheMetadata;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -122,37 +123,64 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 	}
 );
 
-const fetchClansCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, limit?: number, state?: number, cursor?: string) => {
-		const response = await mezon.client.listClanDescs(mezon.session, limit, state, '');
-		return response;
-	},
-	{
-		promise: true,
-		maxAge: FOR_24_HOURS,
-		normalizer: (args) => {
-			return args[0]?.session?.username || '' + args[2] + args[1];
-		}
+const selectCachedClans = createSelector([(state: RootState) => state[CLANS_FEATURE_KEY]], (clansState) => {
+	return clansAdapter.getSelectors().selectAll(clansState);
+});
+
+export const fetchClansCached = async (
+	getState: () => RootState,
+	ensuredMezon: MezonValueContext,
+	limit?: number,
+	state?: number,
+	cursor?: string,
+	noCache = false
+) => {
+	const rootState = getState();
+	const clansState = rootState[CLANS_FEATURE_KEY];
+
+	const apiKey = createApiKey('fetchClans', limit?.toString() || '', state?.toString() || '', cursor || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, clansState.cache, noCache);
+
+	if (!shouldForceCall && clansState.ids.length > 0) {
+		const clans = selectCachedClans(rootState);
+		return {
+			clandesc: clans,
+			fromCache: true
+		};
 	}
-);
+
+	const response = await ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || '');
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
+
+export type FetchClansPayload = {
+	clans: IClan[];
+	fromCache?: boolean;
+};
 
 export const fetchClans = createAsyncThunk('clans/fetchClans', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-		if (noCache) {
-			fetchClansCached.clear();
-		}
-
-		const response = await fetchClansCached(mezon, LIMIT_CLAN_ITEM, 1, '');
+		const response = await fetchClansCached(thunkAPI.getState as () => RootState, mezon, LIMIT_CLAN_ITEM, 1, '', noCache);
 
 		if (!response.clandesc) {
-			return [];
+			return { clans: [], fromCache: response.fromCache };
 		}
 		const clans = response.clandesc.map(mapClanToEntity);
-		const meta = clans.map((clan) => extractClanMeta(clan));
+		const meta = clans.map((clan: ClansEntity) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
-		return clans;
+		const payload: FetchClansPayload = {
+			clans,
+			fromCache: response.fromCache
+		};
+		return payload;
 	} catch (error) {
 		captureSentryError(error, 'clans/fetchClans');
 		return thunkAPI.rejectWithValue(error);
@@ -573,6 +601,11 @@ export const clansSlice = createSlice({
 					welcome_channel_id: dataUpdate.welcome_channel_id !== '-1' ? dataUpdate.welcome_channel_id : currentClanData.welcome_channel_id
 				}
 			});
+		},
+		invalidateCache: (state) => {
+			if (state.cache) {
+				state.cache = undefined;
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -580,10 +613,14 @@ export const clansSlice = createSlice({
 			.addCase(fetchClans.pending, (state: ClansState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchClans.fulfilled, (state: ClansState, action: PayloadAction<IClan[]>) => {
-				clansAdapter.setAll(state, action.payload);
-
+			.addCase(fetchClans.fulfilled, (state: ClansState, action: PayloadAction<FetchClansPayload>) => {
+				const { clans, fromCache } = action.payload;
 				state.loadingStatus = 'loaded';
+
+				if (fromCache) return;
+
+				clansAdapter.setAll(state, clans);
+				state.cache = createCacheMetadata();
 			})
 			.addCase(fetchClans.rejected, (state: ClansState, action) => {
 				state.loadingStatus = 'error';
