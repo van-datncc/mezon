@@ -29,10 +29,11 @@ import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { ClipboardImagePreview } from 'apps/mobile/src/app/components/ClipboardImagePreview';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Platform, Pressable, TextInput, View } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -128,6 +129,8 @@ export const ChatBoxBottomBar = memo(
 			display: ''
 		});
 
+		const [imageBase64, setImageBase64] = useState<string | null>(null);
+
 		const anonymousMode = useSelector(selectAnonymousMode);
 
 		const inputRef = useRef<TextInput>(null);
@@ -202,9 +205,8 @@ export const ChatBoxBottomBar = memo(
 					const now = Date.now();
 
 					const imageFile = {
-						filename: `pasted-image-${now}.png`,
+						filename: `paste_image_${now}.png`,
 						filetype: 'image/png',
-						size: imageBase64?.length,
 						url: imageBase64
 					};
 
@@ -259,30 +261,6 @@ export const ChatBoxBottomBar = memo(
 			}
 		}, []);
 		const handleTextInputChange = async (text: string) => {
-			if (text?.length > MIN_THRESHOLD_CHARS) {
-				try {
-					const imageBase64 = await Clipboard.getImage();
-
-					if (imageBase64) {
-						textValueInputRef.current = ' ';
-						setTextChange(' ');
-						await handlePasteImage(imageBase64);
-						return;
-					}
-				} catch (error) {
-					console.log('Error checking clipboard:', error);
-				}
-
-				if (convertRef.current) {
-					return;
-				}
-				convertRef.current = true;
-				await onConvertToFiles(text);
-				textValueInputRef.current = '';
-				setTextChange('');
-				return;
-			}
-
 			const store = getStore();
 			setTextChange(text);
 			textValueInputRef.current = text;
@@ -295,6 +273,17 @@ export const ChatBoxBottomBar = memo(
 			}
 
 			if (!text) return;
+
+			if (text?.length > MIN_THRESHOLD_CHARS) {
+				if (convertRef.current) {
+					return;
+				}
+				convertRef.current = true;
+				await onConvertToFiles(text);
+				textValueInputRef.current = '';
+				setTextChange('');
+				return;
+			}
 
 			const convertedHashtag = convertMentionsToText(text);
 			const words = convertedHashtag?.split?.(mentionRegexSplit);
@@ -358,27 +347,24 @@ export const ChatBoxBottomBar = memo(
 			chatMessageLeftAreaRef?.current?.setAttachControlVisibility(false);
 		};
 
-		const handleMentionSelectForEphemeral = useCallback(
-			(text: string) => {
-				if (text?.includes('{@}[') && text?.includes('](') && text?.includes(')')) {
-					const startDisplayName = text.indexOf('{@}[') + 4;
-					const endDisplayName = text.indexOf('](', startDisplayName);
-					const startUserId = endDisplayName + 2;
-					const endUserId = text.indexOf(')', startUserId);
+		const handleMentionSelectForEphemeral = useCallback((text: string) => {
+			if (text?.includes('{@}[') && text?.includes('](') && text?.includes(')')) {
+				const startDisplayName = text.indexOf('{@}[') + 4;
+				const endDisplayName = text.indexOf('](', startDisplayName);
+				const startUserId = endDisplayName + 2;
+				const endUserId = text.indexOf(')', startUserId);
 
-					setEphemeralTargetUserInfo({
-						id: text.substring(startUserId, endUserId),
-						display: text.substring(startDisplayName, endDisplayName)
-					});
+				setEphemeralTargetUserInfo({
+					id: text.substring(startUserId, endUserId),
+					display: text.substring(startDisplayName, endDisplayName)
+				});
 
-					setTextChange('');
-					setMentionTextValue('');
-					textValueInputRef.current = '';
-					mentionsOnMessage.current = [];
-				}
-			},
-			[isEphemeralMode, ephemeralTargetUserInfo?.id]
-		);
+				setTextChange('');
+				setMentionTextValue('');
+				textValueInputRef.current = '';
+				mentionsOnMessage.current = [];
+			}
+		}, []);
 
 		const handleSelectionChange = (selection: { start: number; end: number }) => {
 			cursorPositionRef.current = selection.start;
@@ -500,12 +486,36 @@ export const ChatBoxBottomBar = memo(
 			}, 300);
 		};
 
-		const handleInputFocus = () => {
+		const checkPasteImage = async () => {
+			const imageUri = await Clipboard.getImage();
+
+			if (imageUri) {
+				setImageBase64(imageUri);
+			}
+		};
+
+		const handlePasteImageFromClipboard = async () => {
+			if (imageBase64) {
+				await handlePasteImage(imageBase64);
+				cancelPasteImage();
+			}
+		};
+		const cancelPasteImage = useCallback(() => {
+			if (Platform.OS === 'ios') {
+				Clipboard.setImage('');
+			} else if (Platform.OS === 'android') {
+				Clipboard.setString('');
+			}
+			setImageBase64(null);
+		}, []);
+
+		const handleInputFocus = async () => {
 			setModeKeyBoardBottomSheet('text');
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
 				isShow: false,
 				mode: ''
 			});
+			await checkPasteImage();
 		};
 
 		const handleInputBlur = () => {
@@ -613,6 +623,13 @@ export const ChatBoxBottomBar = memo(
 								onCancel={cancelEphemeralMode}
 							/>
 						)}
+
+						{imageBase64 && (
+							<Pressable style={{ position: 'absolute', bottom: '100%' }} onPress={handlePasteImageFromClipboard}>
+								<ClipboardImagePreview imageBase64={imageBase64} message={t('pasteImage')} onCancel={cancelPasteImage} />
+							</Pressable>
+						)}
+
 						<View style={styles.input}>
 							<TextInput
 								ref={inputRef}

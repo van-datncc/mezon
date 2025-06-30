@@ -176,9 +176,9 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
 				<View style={styles.tabContainer}>
-					<TextTab title="Emoji" selected={mode === 'emoji'} onPress={() => setMode('emoji')} />
-					<TextTab title="GIFs" selected={mode === 'gif'} onPress={() => setMode('gif')} />
-					<TextTab title="Stickers" selected={mode === 'sticker'} onPress={() => setMode('sticker')} />
+					<TextTab title={t('tab.emoji')} selected={mode === 'emoji'} onPress={() => setMode('emoji')} />
+					<TextTab title={t('tab.gif')} selected={mode === 'gif'} onPress={() => setMode('gif')} />
+					<TextTab title={t('tab.sticker')} selected={mode === 'sticker'} onPress={() => setMode('sticker')} />
 				</View>
 
 				{mode !== 'emoji' && (
@@ -198,7 +198,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 						<View style={styles.textInputWrapper}>
 							<MezonIconCDN icon={IconCDN.magnifyingIcon} height={18} width={18} color={themeValue.text} />
 							<TextInput
-								placeholder={mode === 'sticker' ? t('findThePerfectSticker') : 'search'}
+								placeholder={mode === 'sticker' ? t('findThePerfectSticker') : t('findThePerfectGif')}
 								placeholderTextColor={themeValue.text}
 								style={styles.textInput}
 								onFocus={handleInputSearchFocus}
