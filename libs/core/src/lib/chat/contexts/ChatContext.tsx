@@ -73,7 +73,7 @@ import {
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
-	selectVoiceChannelMembersByChannelId,
+	selectVoiceInfo,
 	stickerSettingActions,
 	threadsActions,
 	toastActions,
@@ -202,9 +202,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const store = getStore();
 				const state = store.getState();
 				const voiceChannel = selectChannelById(state, voice.voice_channel_id);
-				const memberList = selectVoiceChannelMembersByChannelId(state, voice.voice_channel_id);
+				const voiceOfMe = selectVoiceInfo(state);
 				const currentUserId = selectCurrentUserId(state);
-				const hasJoinSoundEffect = memberList.some((member) => member.user_id === currentUserId) || currentUserId === voice.user_id;
+				const hasJoinSoundEffect = voiceOfMe?.channelId === voice.voice_channel_id || currentUserId === voice.user_id;
 
 				if (voiceChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
 					const joinSoundElement = document.createElement('audio');
