@@ -5,7 +5,7 @@ export const ThemeDemo: React.FC = () => {
 	const { currentTheme, themes, changeTheme, isLoading } = useTheme();
 
 	return (
-		<div className="p-6 space-y-6">
+		<div className="p-6 space-y-6 ">
 			<div className="bg-theme-secondary p-4 rounded-lg border border-theme-primary">
 				<h2 className="text-lg font-semibold text-theme-primary mb-3">Current Theme: {currentTheme}</h2>
 				<div className="flex flex-wrap gap-2">

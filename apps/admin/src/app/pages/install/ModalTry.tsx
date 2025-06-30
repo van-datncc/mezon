@@ -25,7 +25,7 @@ const ModalTry = (props: ModalTryProps) => {
 
 	return !openModalSuccess ? (
 		<div
-			className={`rounded max-w-[440px] w-full pt-4 flex flex-col text-center gap-y-2 bg-white text-black shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:bg-bgSecondary dark:text-white`}
+			className={`rounded max-w-[440px] w-full pt-4 flex flex-col text-center gap-y-2 shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:bg-bgSecondary dark:text-white`}
 		>
 			<HeaderModal name={nameApp} username={account?.user?.username} />
 			<FooterModal name={nameApp} />

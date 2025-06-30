@@ -84,7 +84,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		<div
 			ref={ref}
 			style={{ height: 42 }}
-			className={`flex items-center group/itemListDm relative cursor-pointer bg-item-hover h-fit px-2 rounded-[6px] w-full ${isActive ? 'bg-item-theme' : ''}`}
+			className={`flex items-center group/itemListDm relative cursor-pointer bg-item-hover h-fit px-2 rounded-[6px] w-full ${isActive ? 'bg-item-theme text-theme-secondary' : 'text-theme-primary'}`}
 			onClick={() => {
 				joinToChatAndNavigate(id, directMessage?.type as number);
 			}}

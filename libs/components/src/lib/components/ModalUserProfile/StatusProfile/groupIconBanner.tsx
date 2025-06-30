@@ -47,32 +47,32 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Friend',
-						icon: <Icons.IconFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IconFriend className="size-4" />
 					}
 				];
 			case EStateFriend.OTHER_PENDING:
 				return [
 					{
 						title: 'Pending',
-						icon: <Icons.PendingFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.PendingFriend className="size-4" />
 					}
 				];
 			case EStateFriend.MY_PENDING:
 				return [
 					{
 						title: 'Accept',
-						icon: <Icons.IConAcceptFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IConAcceptFriend className="size-4" />
 					},
 					{
 						title: 'Ignore',
-						icon: <Icons.IConIgnoreFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IConIgnoreFriend className="size-4" />
 					}
 				];
 			default:
 				return [
 					{
 						title: 'Add friend',
-						icon: <Icons.AddPerson className="iconWhiteImportant size-4" />
+						icon: <Icons.AddPerson className="size-4" />
 					}
 				];
 		}
@@ -137,19 +137,19 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 			{!isMe && (
 				<>
 					<div
-						className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
+						className="p-2 rounded-full bg-button-secondary text-theme-primary text-theme-primary-hover relative h-fit cursor-pointer"
 						onClick={(e) => {
 							handleDefault(e);
 							handleOpenTransferModal();
 						}}
 					>
 						<span title="Transfer">
-							<Icons.Transaction className="size-4 iconWhiteImportant" />
+							<Icons.Transaction className="size-4 " />
 						</span>
 					</div>
 					{buttonFriendProps.map((button, index) => (
 						<div
-							className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
+							className={`p-2 rounded-full bg-button-secondary bg-item-hover text-theme-primary text-theme-primary-hover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-button-secondary relative h-fit` : ''}`}
 							onClick={(e) => handleOnClickButtonFriend(e, index)}
 							key={button.title}
 						>

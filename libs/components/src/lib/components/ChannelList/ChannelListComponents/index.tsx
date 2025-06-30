@@ -101,53 +101,53 @@ export const Events = memo(() => {
 			)}
 
 			<div
-				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded-lg h-[34px] bg-item-hover bg-button-secondary text-theme-primary text-theme-primary-hover"
+				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded-lg h-[34px] bg-item-hover  text-theme-primary text-theme-primary-hover"
 				onClick={openModal}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
-					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+					<div className="h-5 relative flex justify-center gap-2  items-center">
+						<div className="w-5 h-5">
 							<Icons.IconEvents />
 						</div>
-					</div>
-					<div className="w-[99px] text-base font-medium">
-						{numberEventManagement === 0 && 'Events'}
-						{numberEventManagement === 1 && '1 Event'}
-						{numberEventManagement > 1 && `${numberEventManagement} Events`}
+						<div className="w-[99px] text-base font-medium">
+							{numberEventManagement === 0 && 'Events'}
+							{numberEventManagement === 1 && '1 Event'}
+							{numberEventManagement > 1 && `${numberEventManagement} Events`}
+						</div>
 					</div>
 				</div>
 				{eventLoading === 'loaded' && numberEventUpcoming > 0 && (
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
-						<div className="text-white text-xs font-medium">{numberEventUpcoming}</div>
+						<div className="text-theme-primary text-xs font-medium">{numberEventUpcoming}</div>
 					</div>
 				)}
 			</div>
 
 			<Link
 				to={memberPath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isMemberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isMemberPath ? 'bg-button-secondary border-theme-primary text-theme-secondary' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 			>
-				<div className="grow w-5 flex-row items-center gap-2 flex bg-item-hover text-theme-primary text-theme-primary-hover">
+				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+						<div className="w-5 h-5 ">
 							<Icons.MemberList defaultSize="w-5 h-5" />
 						</div>
 					</div>
-					<div className="w-[99px]  text-base font-medium">Members</div>
+					<div className="text-base font-medium">Members</div>
 				</div>
 			</Link>
 			{checkAdminPermission ? (
 				<Link
 					to={channelSettingPath}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isSettingPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-secondary' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
 							<div className="w-5 h-5">
-								<Icons.SettingProfile className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
+								<Icons.SettingProfile className="w-5 h-5 " />
 							</div>
 						</div>
-						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channels</div>
+						<div className="w-full text-base font-medium">Channels</div>
 					</div>
 				</Link>
 			) : null}

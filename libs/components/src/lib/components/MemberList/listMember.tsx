@@ -44,7 +44,7 @@ const TempMemberItem = memo(({ id, creator_id }: TempMemberItemProps) => {
 					srcImgProxy={createImgproxyUrl(avatar ?? '')}
 					src={avatar}
 				/>
-				<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode">
+				<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm ">
 					<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
 				</div>
 			</div>
@@ -170,7 +170,7 @@ const ListMember = () => {
 	return (
 		<div
 			ref={parentRef}
-			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} ${!!isElectron() ? 'scroll-big' : ''} `}
+			className={`custom-member-list ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} ${isElectron() ? 'scroll-big' : ''} `}
 			style={{
 				height: height,
 				overflow: 'auto'

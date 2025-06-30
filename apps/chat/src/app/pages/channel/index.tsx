@@ -199,11 +199,11 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	};
 
 	return (
-		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
+		<div className={`flex-shrink flex flex-col bg-theme-chat h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
 			{currentChannel && <ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />}
 			{isAppChannel && (
-				<div className="flex gap-2 px-3 pt-2 dark:text-channelTextLabel text-colorTextLightMode">
+				<div className="flex gap-2 px-3 pt-2 text-theme-primary">
 					<div
 						onClick={handleLaunchApp}
 						className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black"
@@ -357,7 +357,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							className={`bg-active-friend-list text-theme-primary relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>
 							<MemberList />

@@ -611,8 +611,13 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={fileRef}>
-			<button title="Files" className="focus-visible:outline-none" onClick={handleShowFile} onContextMenu={(e) => e.preventDefault()}>
-				<Icons.FileIcon isWhite={isShowFile} defaultSize="size-6" />
+			<button
+				title="Files"
+				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
+				onClick={handleShowFile}
+				onContextMenu={(e) => e.preventDefault()}
+			>
+				<Icons.FileIcon defaultSize="size-6" />
 			</button>
 			{isShowFile && <FileModal onClose={handleClose} rootRef={fileRef} />}
 		</div>
@@ -634,8 +639,13 @@ function CanvasButton({ onClick }: { onClick?: () => void }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={canvasRef}>
-			<button content="Canvas" className="focus-visible:outline-none" onClick={handleShowCanvas} onContextMenu={(e) => e.preventDefault()}>
-				<Icons.CanvasIcon isWhite={isShowCanvas} defaultSize="size-6" />
+			<button
+				content="Canvas"
+				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
+				onClick={handleShowCanvas}
+				onContextMenu={(e) => e.preventDefault()}
+			>
+				<Icons.CanvasIcon defaultSize="size-6" />
 			</button>
 			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
@@ -655,8 +665,13 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 
 	return (
 		<div className="relative leading-5 h-5" ref={threadRef}>
-			<button title="Threads" className="focus-visible:outline-none" onClick={handleToggleThreads} onContextMenu={(e) => e.preventDefault()}>
-				<Icons.ThreadIcon isWhite={isShowThread} defaultSize="size-6" />
+			<button
+				title="Threads"
+				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
+				onClick={handleToggleThreads}
+				onContextMenu={(e) => e.preventDefault()}
+			>
+				<Icons.ThreadIcon defaultSize="size-6" />
 			</button>
 			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>
@@ -710,15 +725,11 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 		<div className="relative leading-5 h-5" ref={notiRef}>
 			<button
 				title="Notification Settings"
-				className="focus-visible:outline-none"
+				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
 				onClick={handleShowNotificationSetting}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				{isMuteBell ? (
-					<Icons.MuteBell isWhite={isShowNotificationSetting} />
-				) : (
-					<Icons.UnMuteBell isWhite={isShowNotificationSetting} defaultSize="size-6" />
-				)}
+				{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell defaultSize="size-6" />}
 			</button>
 			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
@@ -753,7 +764,7 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 		<div className="relative leading-5 h-5" ref={pinRef}>
 			<button
 				title="Pinned Messages"
-				className={`${styleCss} focus-visible:outline-none relative `}
+				className={`${styleCss} focus-visible:outline-none relative text-theme-primary text-theme-primary-hover`}
 				onClick={handleTogglePinMessage}
 				onContextMenu={(e) => e.preventDefault()}
 			>
@@ -783,8 +794,13 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 
 	return (
 		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<button title="Inbox" className="focus-visible:outline-none" onClick={handleShowInbox} onContextMenu={(e) => e.preventDefault()}>
-				<Icons.Inbox isWhite={isShowInbox} defaultFill={isVoiceChannel ? 'text-contentTertiary' : ''} />
+			<button
+				title="Inbox"
+				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
+				onClick={handleShowInbox}
+				onContextMenu={(e) => e.preventDefault()}
+			>
+				<Icons.Inbox />
 				{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 			</button>
 			{isShowInbox && <NotificationList rootRef={inboxRef} />}
@@ -815,7 +831,7 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<button title="Members" onClick={handleClick}>
+			<button title="Members" onClick={handleClick} className="text-theme-primary text-theme-primary-hover">
 				<Icons.MemberList isWhite={isActive} />
 			</button>
 		</div>
@@ -829,7 +845,7 @@ function ChatButton({ isLightMode }: { isLightMode?: boolean }) {
 	};
 	return (
 		<div className="relative leading-5 h-5">
-			<button title="Show Chat" onClick={handleClick}>
+			<button title="Show Chat" onClick={handleClick} className="text-theme-primary text-theme-primary-hover">
 				<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
 			</button>
 		</div>

@@ -453,7 +453,7 @@ function useEditMenuBuilder(message: IMessageWithUser) {
 					'edit',
 					'edit',
 					handleItemClick,
-					<Icons.PenEdit className={`w-5 h-5 dark:hover:text-white hover:text-black dark:text-textSecondary text-colorTextLightMode`} />
+					<Icons.PenEdit className={`w-5 h-5 text-theme-primary text-theme-primary-hover`} />
 				);
 			}
 		);

@@ -56,7 +56,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 						srcImgProxy={createImgproxyUrl(avatar ?? '')}
 						src={avatar}
 					/>
-					<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-white dark:bg-bgSecondary bg-bgLightMode">
+					<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-theme-primary">
 						<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
 					</div>
 				</div>
@@ -74,7 +74,7 @@ export function ClanUserName({ name, userId, isOwnerClan }: { name: string; user
 	const userRolesClan = useColorsRoleById(userId || '');
 
 	return (
-		<span className="one-line text-start" style={{ color: userRolesClan.highestPermissionRoleColor }}>
+		<span className="one-line text-start " style={{ color: userRolesClan.highestPermissionRoleColor }}>
 			{name}
 
 			{isOwnerClan && (

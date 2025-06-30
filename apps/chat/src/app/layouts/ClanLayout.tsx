@@ -110,7 +110,7 @@ const ClanLayout = () => {
 				<ChannelList />
 			</div>
 			<div
-				className={`flex flex-1 shrink min-w-0 gap-2 h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}
+				className={`flex flex-1 shrink min-w-0 gap-2 h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'bg-theme-secondary' : ''}`}
 			>
 				<div
 					className={`flex flex-col flex-1 shrink ${isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'max-sm:hidden' : ''} min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'group' : ''}`}
