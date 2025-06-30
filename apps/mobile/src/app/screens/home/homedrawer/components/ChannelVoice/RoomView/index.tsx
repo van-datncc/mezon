@@ -305,19 +305,19 @@ const RoomView = ({
 			>
 				<View style={{ gap: size.s_10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 					<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
-						{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
+						<MezonIconCDN icon={isCameraEnabled ? IconCDN.videoIcon : IconCDN.videoSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
-						{isMicrophoneEnabled ? <MezonIconCDN icon={IconCDN.microphoneIcon} /> : <MezonIconCDN icon={IconCDN.microphoneSlashIcon} />}
+						 <MezonIconCDN icon={isMicrophoneEnabled ? IconCDN.microphoneIcon : IconCDN.microphoneSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
 					{!isGroupCall && (
 						<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-							<MezonIconCDN icon={IconCDN.chatIcon} />
+							<MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.textStrong}/>
 						</TouchableOpacity>
 					)}
 					{!isGroupCall && (
 						<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
-							{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
+							{isScreenShareEnabled ? <Icons.ShareScreenIcon color={themeValue.textStrong}/> : <Icons.ShareScreenSlashIcon color={themeValue.textStrong}/>}
 						</TouchableOpacity>
 					)}
 					<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
@@ -330,31 +330,33 @@ const RoomView = ({
 
 	if (focusedScreenShare) {
 		return (
-			<View style={isPiPMode ? { width: '100%', flex: 1, alignItems: 'flex-start' } : { width: '100%', flex: 1, alignItems: 'center' }}>
-				<View style={{ height: isPiPMode ? 2 * 100 : '100%', width: '100%' }}>
+			<View style={{ width: '100%', flex: 1, alignItems: 'center' }}>
+				<View style={{ height: '100%', width: '100%' }}>
 					<ResumableZoom onTap={() => setIsHiddenControl((prevState) => !prevState)}>
-						<View style={{ height: isPiPMode ? 2 * 100 : '100%', width: marginWidth }}>
+						<View style={{ height: '100%', width: marginWidth }}>
 							<VideoTrack
 								trackRef={focusedScreenShare}
-								objectFit={isPiPMode ? 'cover' : 'contain'}
-								style={{ height: isPiPMode ? 2 * 100 : '100%', width: '100%' }}
+								objectFit={'contain'}
+								style={{
+									height: isPiPMode ? size.s_100 : '100%',
+									width: isPiPMode ? size.s_200 + size.s_10 : '100%',
+									alignSelf: 'center'
+								}}
 								iosPIP={{ enabled: true, startAutomatically: true, preferredSize: { width: 12, height: 8 } }}
 							/>
 						</View>
 					</ResumableZoom>
 				</View>
-				<View style={[styles.wrapperHeaderFocusSharing]}>
-					{!isPiPMode && (
+				{!isPiPMode && (
+					<View style={[styles.wrapperHeaderFocusSharing]}>
 						<TouchableOpacity style={[styles.focusIcon]} onPress={() => handleOpenEmojiPicker()}>
 							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_16} width={size.s_24} color={'white'} />
 						</TouchableOpacity>
-					)}
-					{!isPiPMode && (
 						<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
 							<Icons.ArrowShrinkIcon height={size.s_16} />
 						</TouchableOpacity>
-					)}
-				</View>
+					</View>
+				)}
 
 				{isPiPMode || isHiddenControl ? <View /> : <RenderControlBar />}
 			</View>

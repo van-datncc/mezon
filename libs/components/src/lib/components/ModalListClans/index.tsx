@@ -78,7 +78,7 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 						/>
 					) : (
 						option?.clan_name && (
-							<div className="w-[40px] h-[40px] dark:bg-bgSecondary bg-bgLightMode rounded-lg flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
+							<div className="w-[40px] h-[40px] bg-add-clan-hover theme-base-color rounded-xl flex justify-center items-center text-theme-primary text-theme-primary-hover text-[20px] clan">
 								{(option?.clan_name || '').charAt(0).toUpperCase()}
 							</div>
 						)

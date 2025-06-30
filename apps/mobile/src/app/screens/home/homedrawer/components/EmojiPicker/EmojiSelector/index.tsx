@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import EmojiSelectorContainer from '../EmojiSelectorContainer';
 
 type EmojiSelectorProps = {
@@ -14,6 +15,16 @@ export default function EmojiSelector({
 	handleBottomSheetExpand,
 	handleBottomSheetCollapse
 }: EmojiSelectorProps) {
+	const [isReadyForUse, setIsReadyForUse] = useState<boolean>(false);
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setIsReadyForUse(true);
+		}, 200);
+		return () => timer && clearTimeout(timer);
+	}, []);
+	if (!isReadyForUse) {
+		return null;
+	}
 	return (
 		<EmojiSelectorContainer
 			handleBottomSheetExpand={handleBottomSheetExpand}

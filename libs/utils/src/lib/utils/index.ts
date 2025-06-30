@@ -250,6 +250,10 @@ export const getSrcEmoji = (id: string) => {
 	return process.env.NX_BASE_IMG_URL + '/emojis/' + id + '.webp';
 };
 
+export const getSrcSound = (id: string) => {
+	return process.env.NX_BASE_IMG_URL + '/sounds/' + id + '.mp3';
+};
+
 export const checkLastChar = (text: string) => {
 	if (
 		text.charAt(text.length - 1) === ';' ||
@@ -1209,14 +1213,17 @@ export const getMentionPositions = (value: string, plainValue: string, mention: 
 export const updateMentionPositions = (mentions: MentionItem[], newValue: string, newPlainTextValue: string) => {
 	const mentionAppearancesCount: Record<string, number> = {};
 
-	const newMentions: MentionItem[] = mentions.map((mention) => {
+	const newMentions: MentionItem[] = [];
+	mentions.map((mention) => {
 		mentionAppearancesCount[mention.id] = (mentionAppearancesCount[mention.id] || 0) + 1;
 		const newMentionStartIndex = getMentionPositions(newValue, newPlainTextValue, mention, mentionAppearancesCount?.[mention.id]);
-		return {
-			...mention,
-			index: newMentionStartIndex.valueStartIndex,
-			plainTextIndex: newMentionStartIndex.plainValueStartIndex
-		};
+		if (newMentionStartIndex.plainValueStartIndex !== -1) {
+			newMentions.push({
+				...mention,
+				index: newMentionStartIndex.valueStartIndex,
+				plainTextIndex: newMentionStartIndex.plainValueStartIndex
+			});
+		}
 	});
 
 	return newMentions;

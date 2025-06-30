@@ -27,6 +27,12 @@
       "replyingTo": "Đang trả lời",
       "editingMessage": "Đang chỉnh sửa tin nhắn"
   },
+  "ephemeral": {
+    "headerText": "Tin nhắn riêng tư gửi {{username}}",
+    "selectUser": "Chọn người nhận tin nhắn riêng tư",
+    "description": "Gửi tin nhắn riêng tư (chỉ người được chọn mới thấy)",
+    "onlyVisibleToRecipient": "Chỉ người nhận mới thấy được"
+},
   "toast": {
       "copyText": "Đã sao chép văn bản tin nhắn",
       "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi một chút",

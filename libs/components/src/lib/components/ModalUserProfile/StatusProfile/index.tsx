@@ -225,8 +225,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				</Dropdown>
 			)}
 
-			<ButtonCopy copyText={userProfile?.user?.id || ''} title="Copy User ID" className="py-[6px]" />
-
+			<ButtonCopy copyText={userProfile?.user?.id || ''} title="Copy User ID" className="py-[6px] hover:!bg-[#E6EFFE] dark:hover:!bg-[#3F3F46]" />
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 

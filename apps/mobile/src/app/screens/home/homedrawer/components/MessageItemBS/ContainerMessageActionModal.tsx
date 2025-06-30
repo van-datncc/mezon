@@ -1,4 +1,6 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 /* eslint-disable no-console */
+import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useChannelMembers, useChatSending, useDirect, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
@@ -38,7 +40,7 @@ import {
 	sleep
 } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -58,11 +60,6 @@ import { IReactionMessageProps } from '../MessageReaction';
 import { ReportMessageModal } from '../ReportMessageModal';
 import { RecentEmojiMessageAction } from './RecentEmojiMessageAction';
 import { style } from './styles';
-
-enum ReactionType {
-	NONE = 0,
-	VIDEO = 1
-}
 
 export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet) => {
 	const { themeValue } = useTheme();
@@ -89,9 +86,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		message?.code === TypeMessage.CreatePin ||
 		message?.code === TypeMessage.AuditLog;
 	const isAnonymous = message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID;
-	const onClose = () => {
+	const onClose = useCallback(() => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-	};
+	}, []);
 
 	const onCloseModalConfirm = useCallback(() => {
 		setCurrentMessageActionType(null);
@@ -159,20 +156,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
-	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
+	const convertedAllMessagesEntities = useMemo(() => {
+		return allMessagesEntities ? (Object.values(allMessagesEntities) as MessagesEntity[]) : [];
+	}, [allMessagesEntities]);
 	const messagePosition = useMemo(() => {
 		return convertedAllMessagesEntities?.findIndex((value: MessagesEntity) => value.id === message?.id);
 	}, [convertedAllMessagesEntities, message?.id]);
 	const { joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: mode ?? 0 });
-
-	const isShowForwardAll = () => {
-		if (messagePosition === -1) return false;
-		return (
-			message?.isStartedMessageGroup &&
-			messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
-			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
-		);
-	};
 
 	const handleActionEditMessage = () => {
 		onClose();
@@ -504,6 +494,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
+		const isShowForwardAll = () => {
+			if (messagePosition === -1) return false;
+			return (
+				message?.isStartedMessageGroup &&
+				messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
+				!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
+			);
+		};
+
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
@@ -546,13 +545,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		};
 	}, [
 		userId,
-		message?.user?.id,
-		message?.isError,
-		message?.topic_id,
-		message?.code,
-		message?.channel_id,
-		message?.attachments,
-		message?.id,
+		message,
 		listPinMessages,
 		isDM,
 		isCanManageThread,
@@ -562,7 +555,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		canSendMessage,
 		currentChannelId,
 		isMessageSystem,
-		isShowForwardAll,
+		isAnonymous,
+		messagePosition,
+		convertedAllMessagesEntities,
 		t
 	]);
 
@@ -652,9 +647,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	);
 
 	return (
-		<View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
+		<BottomSheetView focusHook={useFocusEffect} style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
 			{isShowEmojiPicker || isOnlyEmojiPicker ? (
-				<View style={{ padding: size.s_10 }}>
+				<View style={{ padding: size.s_10, minHeight: '100%' }}>
 					<EmojiSelector onSelected={onSelectEmoji} isReactMessage />
 				</View>
 			) : (
@@ -671,6 +666,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					type={currentMessageActionType}
 				/>
 			)}
-		</View>
+		</BottomSheetView>
 	);
 });

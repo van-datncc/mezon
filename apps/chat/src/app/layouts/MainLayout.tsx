@@ -131,7 +131,7 @@ const MainLayout = memo(
 		return (
 			<div
 				id="main-layout"
-				className={`${isWindowsDesktop || isLinuxDesktop ? 'top-[21px] fixed' : ''} w-full`}
+				className={`${isWindowsDesktop || isLinuxDesktop ? 'top-[21px] fixed' : ''} w-full bg-theme-primary`}
 				onClick={handleClickingOutside}
 				onContextMenu={(event: React.MouseEvent) => {
 					event.preventDefault();

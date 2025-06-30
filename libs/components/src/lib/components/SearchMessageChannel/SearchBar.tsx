@@ -26,7 +26,7 @@ const SearchBar = ({
 			<div
 				className={`transition-all duration-300 ${
 					expanded ? 'w-80' : 'w-40'
-				} h-8 pl-2 pr-2 py-3 dark:bg-bgTertiary bg-bgLightTertiary rounded items-center inline-flex`}
+				} h-8 pl-2 pr-2 py-3 bg-theme-input-primary text-theme-primary rounded-lg items-center inline-flex`}
 			>
 				<SearchInput
 					channelId={channelId}
@@ -50,7 +50,7 @@ const SearchBar = ({
 					onClick={onInputClick}
 					className={`${valueInputSearch ? 'z-0 opacity-0 rotate-0' : 'z-10 opacity-100 rotate-90'} w-4 h-4 absolute transition-transform`}
 				>
-					<Icons.Search className="w-4 h-4 dark:text-white text-colorTextLightMode" />
+					<Icons.Search className="w-4 h-4 text-theme-primary" />
 				</button>
 				<button
 					onClick={onClose}

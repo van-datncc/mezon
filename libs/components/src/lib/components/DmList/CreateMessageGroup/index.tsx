@@ -251,7 +251,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 								key={friend.id}
 								onMouseEnter={() => setIdActive(friend.id ?? '')}
 								onMouseLeave={() => setIdActive(friend.id ?? '')}
-								className={`${idActive === friend.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-[6px] cursor-pointer`}
+								className={`${idActive === friend.id ? 'bg-item-theme ' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-lg cursor-pointer`}
 							>
 								<label className="flex flex-row items-center justify-between w-full gap-2 py-[3px] cursor-pointer">
 									<div className="flex flex-row items-center gap-2">
@@ -267,10 +267,8 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 											className="size-8"
 											classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 										/>
-										<span className={`text-base font-medium dark:text-white text-textLightTheme one-line`}>
-											{friend.user?.display_name}
-										</span>
-										<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{friend.user?.username}</span>
+										<span className={`text-base font-medium  one-line`}>{friend.user?.display_name}</span>
+										<span className="  font-medium">{friend.user?.username}</span>
 									</div>
 									<div className="relative flex flex-row justify-center">
 										<input

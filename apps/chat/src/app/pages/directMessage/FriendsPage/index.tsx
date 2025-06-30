@@ -136,81 +136,76 @@ const FriendsPage = () => {
 	}, [appearanceTheme]);
 
 	return (
-		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
-			<div
-				className={`draggable-area flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader`}
-			>
+		<div className="flex flex-col flex-1 shrink min-w-0  h-[100%]">
+			<div className={`draggable-area flex min-w-0 items-center bg-theme-chat  px-6 py-3 justify-start h-heightHeader border-b-theme-primary`}>
 				{closeMenuMobile && (
 					<div onClick={() => setStatusMenu(true)}>
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
 				)}
 				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
-					<div className="flex flex-row gap-2 items-center dark:text-white text-black">
+					<div className="flex flex-row gap-2 items-center text-theme-primary">
 						<Icons.IconFriends />
 						Friend
 					</div>
-					<div className="flex flex-row gap-4 border-l-[1px] pl-6 dark:border-bgModifierHover border-[#bbb]">
+					<div className="flex flex-row gap-4 border-l-[1px] pl-6 ">
 						{tabData.map((tab, index) => (
 							<div key={index} className="relative flex items-center justify-center">
 								<button
-									className={`px-3 py-[6px] rounded-[4px] dark:text-white text-black ${currentTabStatus === tab.value && !openModalAddFriend ? 'dark:bg-[#151C2B] bg-[#cfdefd]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
+									className={`px-3 py-[6px] rounded-lg text-theme-primary text-theme-primary-hover shadow-none border-none bg-button-hover ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-active-button' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 									tabIndex={index}
 									onClick={() => handleChangeTab(tab.value)}
 								>
 									{tab.title}
 								</button>
 								{tab.value === 'pending' && quantityPendingRequest !== 0 && (
-									<div className="absolute grid place-items-center w-[20px] h-[20px] rounded-full bg-colorDanger text-white text-[10px] font-medium top-[2px] right-3">
+									<div className="absolute grid place-items-center w-[20px] h-[20px] rounded-full bg-colorDanger text-[10px] font-medium top-[2px] right-3">
 										{quantityPendingRequest}
 									</div>
 								)}
 							</div>
 						))}
 					</div>
-					<Button variant={'primary'} size="sm" onClick={handleOpenRequestFriend} className="whitespace-nowrap">
+					<Button variant={'primary'} size="sm" onClick={handleOpenRequestFriend} className="whitespace-nowrap bg-button-add-friend ">
 						Add Friend
 					</Button>
 				</div>
 			</div>
-			<div className={`contain-strict flex-1 flex w-full h-full`}>
-				<div className=" flex-1 dark:bg-bgPrimary bg-[#F0F0F0] flex flex-col">
+			<div className={`contain-strict flex-1 flex w-full h-full `}>
+				<div className=" flex-1 flex flex-col bg-theme-chat">
 					{!openModalAddFriend && (
 						<>
-							<div className="flex flex-col text-[#AEAEAE] px-8 pt-6">
+							<div className="flex flex-col text-theme-primary px-8 pt-6">
 								<div className="relative">
 									<InputField
 										type="text"
 										onChange={(e) => setTextSearch(e.target.value)}
 										placeholder="Search"
-										className="mb-6 py-[10px] dark:bg-bgTertiary bg-white text-[16px] font-normal h-[44px] dark:text-textDarkTheme text-textLightTheme placeholder-textPrimary"
+										className="mb-6 py-[10px] rounded-lg border-theme-primary bg-theme-input-primary text-[16px] font-normal h-[44px] "
 									/>
-									<div className="absolute top-3 right-5">
+									<div className="absolute top-3 right-5 text-theme-primary">
 										<Icons.Search />
 									</div>
 								</div>
-								<span className="text-[14px] dark:text-contentSecondary text-black mb-4 font-bold px-[14px]">
+								<span className="text-[14px]  mb-4 font-bold px-[14px]">
 									{currentTabStatus.toUpperCase()} - {listFriendFilter.length}
 								</span>
 							</div>
-							<div className="pl-8 overflow-hidden flex flex-1 pb-4">
+							<div className="px-8 overflow-hidden flex flex-1 pb-4">
 								<FriendList listFriendFilter={listFriendFilter} />
 							</div>
 						</>
 					)}
 					{openModalAddFriend && (
 						<div className="p-8">
-							<div className="w-full flex flex-col gap-3 border-b dark:border-[#3f4147]">
-								<span className="font-[700] dark:text-white text-black">ADD FRIEND</span>
-								<span className="font-[400] text-[14px] dark:text-contentTertiary text-black">
-									You can add friends with their Mezon usernames
-								</span>
-
+							<div className="w-full flex flex-col gap-3 border-b ">
+								<span className="font-[700] text-theme-primary">ADD FRIEND</span>
+								<span className="font-[400] text-theme-primary text-[14px]">You can add friends with their Mezon usernames</span>
 								<div className="relative">
 									<InputField
 										onChange={(e) => handleChange('username', e.target.value)}
 										type="text"
-										className={`dark:bg-bgSurface bg-bgLightMode mb-2 mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
+										className={` mb-2 mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
 										value={requestAddFriend.usernames}
 										placeholder="You can add friends with their Mezon usernames"
 										needOutline={true}
@@ -229,14 +224,12 @@ const FriendsPage = () => {
 							</div>
 							<div className="flex flex-col items-center gap-7">
 								<Image src={`assets/images/${addFriendImg}`} width={48} height={48} className="object-cover w-[376px]" />
-								<div className="dark:text-contentTertiary text-textLightTheme">
-									Komuu is waiting on friends. You don't have to, though!
-								</div>
+								<div className="bg-theme-input">Komuu is waiting on friends. You don't have to, though!</div>
 							</div>
 						</div>
 					)}
 				</div>
-				<div className="contain-strict w-[416px] max-w-2/5 dark:bg-bgTertiary bg-bgLightMode lg:flex hidden">
+				<div className="contain-strict w-[416px] max-w-2/5  lg:flex hidden bg-active-friend-list">
 					<ActivityList listFriend={friends} />
 				</div>
 			</div>

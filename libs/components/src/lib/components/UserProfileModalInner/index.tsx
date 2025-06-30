@@ -194,10 +194,10 @@ const UserProfileModalInner = ({
 							<div className="flex items-end pr-4">
 								<button
 									onClick={handleOpenEditOption}
-									className="relative flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
+									className="relative flex items-center h-8 px-4 rounded-[3px] text-theme-primary text-theme-primary-hover"
 								>
-									<Icons.PenEdit className="text-bgLightPrimary" />
-									<span className="text-sm text-bgLightPrimary font-semibold one-line">Edit Profile</span>
+									<Icons.PenEdit />
+									<span className="text-sm font-semibold one-line">Edit Profile</span>
 								</button>
 								{isOPenEditOption && (
 									<div

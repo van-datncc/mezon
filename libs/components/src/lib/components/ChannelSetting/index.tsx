@@ -4,6 +4,7 @@ import { Icons } from '@mezon/ui';
 import { EPermission, IChannel } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import QuickMenuAccessManager from '../ClanSettings/SettingChannel/QuickMenuAccessManager';
 import SettingCategoryChannel from './Component/CategoryChannel';
 import IntegrationsChannel from './Component/IntegrationsChannel';
 import InvitesChannel from './Component/InvitesChannel';
@@ -21,10 +22,12 @@ export enum EChannelSettingTab {
 	PREMISSIONS = 'Permissions',
 	INVITES = 'Invites',
 	INTEGRATIONS = 'Integrations',
-	CATEGORY = 'Category'
+	CATEGORY = 'Category',
+	QUICK_MENU = 'Quick Menu'
 }
 const SettingChannel = (props: ModalSettingProps) => {
 	const { onClose, channel } = props;
+
 	const [currentSetting, setCurrentSetting] = useState<string>(EChannelSettingTab.OVERVIEW);
 	const [menu, setMenu] = useState(true);
 
@@ -102,6 +105,11 @@ const SettingChannel = (props: ModalSettingProps) => {
 				{currentSetting === EChannelSettingTab.INVITES && <InvitesChannel />}
 				{currentSetting === EChannelSettingTab.INTEGRATIONS && <IntegrationsChannel currentChannel={channel} />}
 				{currentSetting === EChannelSettingTab.CATEGORY && <SettingCategoryChannel channel={channel} />}
+				{currentSetting === EChannelSettingTab.QUICK_MENU && (
+					<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+						<QuickMenuAccessManager channelId={channel.channel_id || ''} clanId={channel.clan_id || ''} />
+					</div>
+				)}
 
 				<ExitSetting onClose={onClose} />
 			</div>

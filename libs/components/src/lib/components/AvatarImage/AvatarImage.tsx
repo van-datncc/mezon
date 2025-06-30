@@ -46,7 +46,7 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 
 		return (
 			<div
-				className={`size-10 dark:bg-bgAvatarDark bg-bgAvatarLight rounded-full flex justify-center items-center dark:text-bgAvatarLight text-bgAvatarDark text-[16px] ${className} ${classNameText}`}
+				className={`size-10 bg-bgAvatarDark  rounded-full flex justify-center items-center text-bgAvatarLight text-[16px] ${className} ${classNameText}`}
 			>
 				{avatarChar}
 			</div>

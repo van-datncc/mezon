@@ -7,7 +7,7 @@ import {
 	selectMemberByUsername,
 	useAppSelector
 } from '@mezon/store';
-import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, getNameForPrioritize } from '@mezon/utils';
+import { HEIGHT_PANEL_PROFILE, HEIGHT_PANEL_PROFILE_DM, TITLE_MENTION_HERE, getNameForPrioritize } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { RefObject, memo, useCallback, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -61,14 +61,14 @@ const MentionUser = ({
 			};
 		}
 
-		if (tagUserName === '@here') {
+		if (tagUserName === TITLE_MENTION_HERE) {
 			return {
-				display: '@here',
+				display: TITLE_MENTION_HERE,
 				type: MentionType.HERE
 			};
 		}
 
-		if (tagUserId && tagUserName !== '@here') {
+		if (tagUserId && tagUserName !== TITLE_MENTION_HERE) {
 			return {
 				display: tagUserName,
 				type: MentionType.USER_EXIST
@@ -154,7 +154,7 @@ const MentionUser = ({
 					style={{ textDecoration: 'none' }}
 					className={`outline-none font-medium px-0.1 rounded-sm
 				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-				 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+				 whitespace-nowrap bg-mention color-mention  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
 				>
 					{displayToken.display}
 				</button>

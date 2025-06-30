@@ -45,28 +45,24 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 		}
 	};
 	return (
-		<div
-			className={
-				'border-t dark:border-borderDivider border-borderDividerLight mt-10 pt-10 flex flex-col dark:text-textSecondary text-textSecondary800'
-			}
-		>
+		<div className={'border-t-theme-primary mt-10 pt-10 flex flex-col '}>
 			<h3 className="text-sm font-bold uppercase mb-2">System Messages Channel</h3>
 			<Dropdown
 				placement={'bottom-start'}
 				label={''}
 				renderTrigger={() => (
-					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
-						<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
-							<Icons.Hashtag defaultSize="w-4 h-4 dark:text-channelTextLabel" />
+					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm border border-theme-primary bg-theme-input ">
+						<div className={' flex flex-row items-center'}>
+							<Icons.Hashtag defaultSize="w-4 h-4 " />
 							<p>{selectedChannel?.channel_label}</p>
-							<p className={'uppercase dark:text-textThreadPrimary ml-5 font-semibold'}>{selectedChannel?.category_name}</p>
+							<p className={'uppercase ml-5 font-semibold'}>{selectedChannel?.category_name}</p>
 						</div>
 						<div>
 							<Icons.ArrowDownFill />
 						</div>
 					</div>
 				)}
-				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'}
+				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode bg-theme-input px-2 z-20'}
 			>
 				{channelsList
 					.filter(
@@ -79,7 +75,7 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 						channel.channel_id !== selectedChannel?.channel_id ? (
 							<Dropdown.Item
 								key={channel.id}
-								className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
+								className="flex flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer"
 								onClick={() => handleToggleSetting(true, ETypeUpdateSystemMessage.CHANNEL, channel.id)}
 							>
 								{channel?.channel_private ? (
@@ -88,14 +84,12 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 									<Icons.Hashtag defaultSize="w-4 h-4 dark:text-channelTextLabel" />
 								)}
 								<p>{channel.channel_label ?? ''}</p>
-								<p className="uppercase dark:text-textSecondary text-textSecondary800 ml-5 font-semibold">{channel.category_name}</p>
+								<p className="uppercase ml-5 font-semibold">{channel.category_name}</p>
 							</Dropdown.Item>
 						) : null
 					)}
 			</Dropdown>
-			<p className={'text-xs dark:text-textPrimary text-textPrimaryLight py-2'}>
-				This is the channel we send system event messages to. These can be turned off at any time
-			</p>
+			<p className={'text-xs py-2'}>This is the channel we send system event messages to. These can be turned off at any time</p>
 			<ToggleItem
 				label={'Send a random welcome message when someone joins this server.'}
 				value={updateSystem?.welcome_random === '1'}

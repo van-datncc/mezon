@@ -4,6 +4,7 @@ import {
 	channelMembersActions,
 	emojiSuggestionActions,
 	getStore,
+	quickMenuActions,
 	referencesActions,
 	selectAddEmojiState,
 	selectAllAccount,
@@ -20,6 +21,7 @@ import {
 	selectIdMessageRefEdit,
 	selectOpenEditMessageState,
 	selectOpenThreadMessageState,
+	selectQuickMenuByChannelId,
 	selectReactionRightState,
 	selectStatusMenu,
 	selectTheme,
@@ -652,7 +654,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			callback(
 				searchMentionsHashtag(
 					search,
-					!isEphemeralMode ? props.listMentions || [] : props.listMentions?.filter((item) => item.display !== '@here') || []
+					!isEphemeralMode ? props.listMentions || [] : props.listMentions?.filter((item) => item.display !== TITLE_MENTION_HERE) || []
 				)
 			);
 		},
@@ -690,14 +692,63 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		[isDm]
 	);
 
-	const handleSearchSlashCommands = useCallback((search: string, callback: any) => {
-		setValueHightlight(search);
-		const filteredCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
-		callback(filteredCommands);
-	}, []);
+	const generateCommandsList = useCallback(
+		(search: string) => {
+			const store = getStore();
+			const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+			const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
+
+			const quickMenuCommands = channelQuickMenuItems
+				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()))
+				.map((item) => ({
+					id: `quick_menu_${item.id}`,
+					display: item.menu_name || '',
+					description: item.action_msg || '',
+					action_msg: item.action_msg || ''
+				}));
+
+			return [...builtInCommands, ...quickMenuCommands];
+		},
+		[props.currentChannelId]
+	);
+
+	const handleSearchSlashCommands = useCallback(
+		async (search: string, callback: any) => {
+			setValueHightlight(search);
+
+			const store = getStore();
+			const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+			const hasExistingData = channelQuickMenuItems && channelQuickMenuItems.length > 0;
+
+			if (hasExistingData) {
+				callback(generateCommandsList(search));
+				if (props.currentChannelId) {
+					try {
+						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						callback(generateCommandsList(search));
+					} catch (error) {
+						console.error('Error fetching fresh commands:', error);
+					}
+				}
+			} else {
+				callback([{ id: 'loading', display: 'loading', description: 'Loading commands...', isLoading: true }]);
+				try {
+					if (props.currentChannelId) {
+						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+					}
+					callback(generateCommandsList(search));
+				} catch (error) {
+					console.error('Error fetching commands:', error);
+					const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
+					callback(builtInCommands);
+				}
+			}
+		},
+		[props.currentChannelId, generateCommandsList, dispatch]
+	);
 
 	const handleSlashCommandSelect = useCallback(
-		(commandId: string) => {
+		(commandId: string, suggestion?: any) => {
 			if (commandId === 'ephemeral') {
 				setIsEphemeralMode(true);
 				setTitleModalMention('Select user for ephemeral message');
@@ -706,9 +757,24 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					content: '@',
 					mentionRaw: []
 				});
+			} else if (commandId.startsWith('quick_menu_')) {
+				const quickMenuItemId = commandId.replace('quick_menu_', '');
+				const store = getStore();
+
+				const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
+
+				const quickMenuItem = channelQuickMenuItems.find((item) => item.id === quickMenuItemId);
+
+				if (quickMenuItem && quickMenuItem.action_msg) {
+					updateDraft({
+						valueTextInput: quickMenuItem.action_msg,
+						content: quickMenuItem.action_msg,
+						mentionRaw: []
+					});
+				}
 			}
 		},
-		[updateDraft]
+		[updateDraft, props.currentChannelId]
 	);
 
 	useClickUpToEditMessage({
@@ -744,7 +810,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		<div className="contain-layout relative" ref={containerRef}>
 			<div className="relative">
 				<span
-					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10 truncate transition-opacity duration-300 ${
+					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary pointer-events-none z-10 truncate transition-opacity duration-300 ${
 						draftRequest?.valueTextInput ? 'hidden' : 'opacity-100'
 					} sm:opacity-100 max-sm:opacity-100`}
 					style={{
@@ -810,7 +876,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							}
 						}
 					}}
-					className={`mentions min-h-11 dark:bg-channelTextarea  bg-channelTextareaLight dark:text-white text-colorTextLightMode rounded-lg ${appearanceTheme === 'light' ? 'lightMode lightModeScrollBarMention' : 'darkMode'} cursor-not-allowed`}
+					className={`mentions min-h-11 cursor-not-allowed text-theme-primary`}
 					allowSpaceInQuery={true}
 					onKeyDown={onKeyDown}
 					forceSuggestionsAboveCursor={true}
@@ -830,7 +896,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						data={handleSearchUserMention}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
-							return display === '@here' ? `${display}` : `@${display}`;
+							return display === TITLE_MENTION_HERE ? `${display}` : `@${display}`;
 						}}
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
@@ -838,12 +904,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 									valueHightLight={valueHighlight}
 									avatarUrl={suggestion.avatarUrl}
 									subText={
-										suggestion.display === '@here'
+										suggestion.display === TITLE_MENTION_HERE
 											? 'Notify everyone who has permission to see this channel'
 											: (suggestion.username ?? '')
 									}
-									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-									showAvatar={suggestion.display !== '@here'}
+									subTextStyle={(suggestion.display === TITLE_MENTION_HERE ? 'normal-case' : 'lowercase') + ' text-xs'}
+									showAvatar={suggestion.display !== TITLE_MENTION_HERE}
 									display={suggestion.display}
 									emojiId=""
 									color={suggestion.color}
@@ -851,7 +917,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							);
 						}}
 						style={mentionStyle}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-mention"
 					/>
 					<Mention
 						markup="#[__display__](__id__)"
@@ -874,7 +940,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 								/>
 							) : null
 						}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-mention"
 					/>
 					<Mention
 						trigger=":"
@@ -902,7 +968,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
-						className="dark:!text-white !text-black"
+						className="color-mention"
 						style={{ WebkitTextStroke: 1, WebkitTextStrokeColor: appearanceTheme === 'dark' ? 'white' : 'black' }}
 					/>
 					<Mention
@@ -911,10 +977,28 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						displayTransform={(id: any, display: any) => {
 							return `/${display}`;
 						}}
-						onAdd={(id: string) => {
-							handleSlashCommandSelect(id);
+						onAdd={(id: string, display: string, startPos: number, endPos: number, suggestion: any) => {
+							handleSlashCommandSelect(id, suggestion);
 						}}
 						renderSuggestion={(suggestion: any) => {
+							if (suggestion.isLoading || suggestion.display === 'loading') {
+								return (
+									<div className="flex items-center gap-2 p-3 text-gray-400">
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
+											<circle
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeDasharray="30"
+												strokeDashoffset="30"
+											/>
+										</svg>
+										<span>Loading commands...</span>
+									</div>
+								);
+							}
 							return (
 								<SuggestItem
 									valueHightLight={valueHighlight}
@@ -924,7 +1008,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 								/>
 							);
 						}}
-						appendSpaceOnAdd={true}
+						appendSpaceOnAdd={false}
 					/>
 				</MentionsInput>
 			</div>

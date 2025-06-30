@@ -3,28 +3,28 @@ import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '
 import { Text, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
+	MessagesEntity,
 	getStore,
 	getStoreAsync,
-	MessagesEntity,
 	selectBlockedUsersForMessage,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	selectMemberClanByUserId2,
+	setSelectedMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import React, { useCallback, useMemo } from 'react';
-import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
-import { EMessageActionType, EMessageBSToShow } from './enums';
-import { style } from './styles';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { setSelectedMessage } from '@mezon/store-mobile';
-import { ETypeLinkMedia, ID_MENTION_HERE, isValidEmojiData, TypeMessage } from '@mezon/utils';
+import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
-import { useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../constants/icon_cdn';
+import { MessageLineSystem } from './MessageLineSystem';
+import RenderMessageBlock from './RenderMessageBlock';
+import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { EmbedMessage } from './components/EmbedMessage';
@@ -39,10 +39,9 @@ import MessageWithBlocked from './components/MessageWithBlocked';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { RenderTextMarkdownContent } from './components/RenderTextMarkdown';
 import UserProfile from './components/UserProfile';
-import { MessageLineSystem } from './MessageLineSystem';
-import RenderMessageBlock from './RenderMessageBlock';
+import { EMessageActionType, EMessageBSToShow } from './enums';
+import { style } from './styles';
 import { IMessageActionNeedToResolve } from './types';
-import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -82,6 +81,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
 
+		const isEphemeralMessage = useMemo(() => message?.code === TypeMessage.Ephemeral, [message?.code]);
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		const isMessageCallLog = !!message?.content?.callLog;
 		const isGoogleMapsLink = Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
@@ -166,27 +166,6 @@ const MessageItem = React.memo(
 		const usernameMessage = isDM ? message?.display_name || message?.user?.username : checkAnonymous ? 'Anonymous' : message?.user?.username;
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
-		const isMessageFromBlockedUser = useMemo(() => {
-			const store = getStore();
-			const blockedUsers = selectBlockedUsersForMessage(store.getState());
-			if (props.mode === ChannelStreamMode.STREAM_MODE_DM) return false;
-
-			const senderId = message?.sender_id;
-			if (!blockedUsers?.length || !userId || !senderId) return false;
-
-			return blockedUsers.some(
-				(blockedUser) =>
-					(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
-					(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
-			);
-		}, [props.mode, userId, message?.sender_id]);
-
-		if (isMessageFromBlockedUser) {
-			if (previousMessage?.sender_id !== message?.sender_id) {
-				return <MessageWithBlocked />;
-			}
-			return null;
-		}
 
 		const onLongPressImage = useCallback(() => {
 			if (preventAction) return;
@@ -261,6 +240,28 @@ const MessageItem = React.memo(
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		}, [dispatch, message, mode, preventAction, senderDisplayName]);
 
+		const isMessageFromBlockedUser = useMemo(() => {
+			const store = getStore();
+			const blockedUsers = selectBlockedUsersForMessage(store.getState());
+			if (props.mode === ChannelStreamMode.STREAM_MODE_DM) return false;
+
+			const senderId = message?.sender_id;
+			if (!blockedUsers?.length || !userId || !senderId) return false;
+
+			return blockedUsers.some(
+				(blockedUser) =>
+					(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
+					(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
+			);
+		}, [props.mode, userId, message?.sender_id]);
+
+		if (isMessageFromBlockedUser) {
+			if (previousMessage?.sender_id !== message?.sender_id) {
+				return <MessageWithBlocked />;
+			}
+			return null;
+		}
+
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t && message?.username?.toLowerCase() === 'system') {
 			return <WelcomeMessage channelId={props.channelId} />;
@@ -324,7 +325,8 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageReply,
-						isHighlight && styles.highlightMessageMention
+						isHighlight && styles.highlightMessageMention,
+						isEphemeralMessage && styles.ephemeralMessage
 					]}
 				>
 					{!isMessageSystem && (
@@ -436,6 +438,12 @@ const MessageItem = React.memo(
 											channelId={message?.channel_id}
 											onLongPressImage={onLongPressImage}
 										/>
+									)}
+									{isEphemeralMessage && (
+										<View style={styles.ephemeralIndicator}>
+											<MezonIconCDN icon={IconCDN.eyeSlashIcon} width={12} height={12} color={themeValue.textDisabled} />
+											<Text style={styles.ephemeralText}>{t('ephemeral.onlyVisibleToRecipient')}</Text>
+										</View>
 									)}
 								</View>
 							</View>

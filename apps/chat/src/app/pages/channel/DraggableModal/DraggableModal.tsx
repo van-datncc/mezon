@@ -4,6 +4,7 @@ import {
 	channelAppActions,
 	channelsActions,
 	getStore,
+	handleParticipantVoiceState,
 	selectAppChannelsList,
 	selectAppFocusedChannel,
 	selectChannelById,
@@ -19,7 +20,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
+import {
+	ApiChannelAppResponseExtend,
+	COLLAPSED_SIZE,
+	DEFAULT_POSITION,
+	INIT_SIZE,
+	MIN_POSITION,
+	ParticipantMeetState,
+	useWindowSize
+} from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,11 +55,19 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 }) => {
 	const dispatch = useAppDispatch();
 	const store = getStore();
-
+	const userProfile = useAppSelector((state) => state.account.userProfile);
 	const handleOnCloseCallback = useCallback(
-		(event: React.MouseEvent, clanId: string, channelId: string) => {
+		async (event: React.MouseEvent, clanId: string, channelId: string) => {
 			event.stopPropagation();
 
+			await dispatch(
+				handleParticipantVoiceState({
+					clan_id: clanId,
+					channel_id: channelId,
+					display_name: userProfile?.user?.display_name ?? '',
+					state: ParticipantMeetState.LEAVE
+				})
+			);
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
 					clanId,

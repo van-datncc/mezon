@@ -17,9 +17,9 @@ const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize, dataM
 	}, [currentPage, pageSize, dataMember]);
 
 	return (
-		<div className="flex flex-col flex-1 min-h-[48px]">
+		<div className="flex flex-col gap-2 flex-1 min-h-[48px]">
 			<TableMemberHeader />
-			<div className="flex flex-col overflow-y-auto px-4 py-2 shadow border-b-[1px] dark:border-bgTertiary border-t-[textSecondary]">
+			<div className="flex flex-col overflow-y-auto px-4 py-2 border-b-theme-primary">
 				{displayUsersClan.map((user) => (
 					<TableMemberItem
 						key={user.id}

@@ -139,7 +139,7 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 								whiteSpace: 'pre-line'
 							}
 				}
-				className={` ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 hover:text-[#060607] hover:dark:text-[#E6F3F5] text-[#4E5057] dark:text-[#B4BAC0] flex items-center  cursor-pointer' : 'text-[#4E5057] dark:text-[#DFDFE0]'}`}
+				className={` ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-theme-primary text-theme-primary-hover flex items-center  cursor-pointer' : 'text-theme-primary'}`}
 			>
 				{content}{' '}
 				{message.code === TypeMessage.CreatePin && (
@@ -171,7 +171,7 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 						<>{threadContent}</>
 					))}
 			</div>
-			<div className="ml-1 max-2xl:ml-0 pt-[5px]  max-2xl:pt-0 dark:text-zinc-400 text-colorTextLightMode text-[10px] cursor-default">
+			<div className="ml-1 max-2xl:ml-0 pt-[5px]  max-2xl:pt-0 text-theme-primary text-[10px] cursor-default">
 				{convertTimeString(message?.create_time as string)}
 			</div>
 		</div>

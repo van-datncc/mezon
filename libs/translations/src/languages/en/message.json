@@ -27,6 +27,12 @@
         "replyingTo": "Replying to",
         "editingMessage": "Editing Message"
     },
+    "ephemeral": {
+        "headerText": "Ephemeral message to {{username}}",
+        "selectUser": "Select user for ephemeral message",
+        "description": "Send an ephemeral message (only visible to selected user)",
+        "onlyVisibleToRecipient": "Only visible to recipient"
+    },
     "toast": {
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment",

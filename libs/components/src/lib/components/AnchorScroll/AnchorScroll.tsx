@@ -98,7 +98,6 @@ export const AnchorScroll = React.forwardRef<AnchorScrollRef, AnchorScrollProps>
 				className={classNames([
 					'absolute top-0 left-0 bottom-0 right-0',
 					'overflow-y-scroll overflow-x-hidden',
-					'dark:bg-bgPrimary bg-bgLightPrimary',
 					{
 						customScrollLightMode: appearanceTheme === 'light'
 					},

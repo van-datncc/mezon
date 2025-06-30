@@ -2,20 +2,12 @@ import { TouchableWithoutFeedback } from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { debounce, isEmpty } from '@mezon/mobile-components';
-import { Colors, Fonts, size, useTheme } from '@mezon/mobile-ui';
-import {
-	getStoreAsync,
-	gifsActions,
-	selectAnonymousMode,
-	selectCurrentChannel,
-	selectCurrentClanId,
-	selectDmGroupCurrent,
-	settingClanStickerActions
-} from '@mezon/store-mobile';
+import { Colors, Fonts, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { MediaType, selectAnonymousMode, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload, checkIsThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import React, { MutableRefObject, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Text, TextInput, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -68,40 +60,17 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const clanId = useSelector(selectCurrentClanId);
 	const currentDirectMessage = useSelector(selectDmGroupCurrent(directMessageId)); //Note: prioritize DM first
 	const anonymousMode = useSelector(selectAnonymousMode);
 	const { valueInputToCheckHandleSearch, setValueInputSearch } = useGifsStickersEmoji();
 	const [mode, setMode] = useState<ExpressionType>('emoji');
 	const [searchText, setSearchText] = useState<string>('');
 	const { t } = useTranslation('message');
+	const [stickerMode, setStickerMode] = useState<MediaType>(MediaType.STICKER);
 
 	const dmMode = currentDirectMessage
 		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
 		: '';
-
-	useEffect(() => {
-		initLoader();
-	}, []);
-
-	const initLoader = async () => {
-		const promises = [];
-		const store = await getStoreAsync();
-		promises.push(store.dispatch(gifsActions.fetchGifCategories()));
-		promises.push(store.dispatch(gifsActions.fetchGifCategoryFeatured()));
-		await Promise.all(promises);
-	};
-
-	const stickerLoader = useCallback(async () => {
-		const promises = [];
-		const store = await getStoreAsync();
-		promises.push(store.dispatch(settingClanStickerActions.fetchStickerByUserId({})));
-		await Promise.all(promises);
-	}, []);
-
-	useEffect(() => {
-		stickerLoader();
-	}, [clanId, currentDirectMessage?.channel_id, stickerLoader]);
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -146,7 +115,13 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		if (type === 'gif') {
 			handleSend({ t: '' }, [], [{ url: data }], isEmpty(messageRef) ? [] : [messageRef]);
 		} else if (type === 'sticker') {
-			handleSend({ t: '' }, [], [{ url: data?.url, filetype: 'image/gif', filename: data?.id }], isEmpty(messageRef) ? [] : [messageRef]);
+			const imageUrl = data?.url ? data?.url : `${process.env.NX_BASE_IMG_URL}/stickers/${data?.id}.webp`;
+			handleSend(
+				{ t: '' },
+				[],
+				[{ url: imageUrl, filetype: stickerMode === MediaType.STICKER ? 'image/gif' : 'audio/mpeg', filename: data?.id }],
+				isEmpty(messageRef) ? [] : [messageRef]
+			);
 		} else {
 			/* empty */
 		}
@@ -189,6 +164,14 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		handleSelected('emoji', url);
 	}, []);
 
+	const changeStickerMode = useCallback(() => {
+		if (stickerMode === MediaType.STICKER) {
+			setStickerMode(MediaType.AUDIO);
+		} else {
+			setStickerMode(MediaType.STICKER);
+		}
+	}, [stickerMode]);
+
 	return (
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
@@ -222,6 +205,22 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 								onChangeText={debouncedSetSearchText}
 							/>
 						</View>
+
+						{mode === 'sticker' && (
+							<Pressable
+								style={[
+									{ paddingVertical: size.s_10, backgroundColor: baseColor.blurple, padding: size.s_10, borderRadius: size.s_4 },
+									stickerMode === MediaType.STICKER && { backgroundColor: themeValue.secondaryLight }
+								]}
+								onPress={() => {
+									setSearchText('');
+									setValueInputSearch('');
+									changeStickerMode();
+								}}
+							>
+								<MezonIconCDN icon={IconCDN.channelVoice} height={20} width={20} color={themeValue.text} />
+							</Pressable>
+						)}
 					</View>
 				)}
 
@@ -235,7 +234,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 				) : mode === 'gif' ? (
 					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
 				) : (
-					<StickerSelector onScroll={onScroll} onSelected={(sticker) => handleSelected('sticker', sticker)} />
+					<StickerSelector onScroll={onScroll} onSelected={(sticker) => handleSelected('sticker', sticker)} mediaType={stickerMode} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>

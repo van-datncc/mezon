@@ -1,9 +1,9 @@
 import { size } from '@mezon/mobile-ui';
 import { IMessageAnimation } from '@mezon/utils';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, View, useWindowDimensions } from 'react-native';
 import useTabletLandscape from '../../../../../../../hooks/useTabletLandscape';
-import SpriteAnimation from './AnimationSprite';
+import { SpriteAnimation } from './AnimationSprite';
 import { style } from './styles';
 
 type EmbedAnimationProps = {
@@ -28,90 +28,105 @@ const extractFrames = (data, repeat) => {
 	return framesArray;
 };
 
-export const EmbedAnimation = ({ animationOptions, themeValue }: EmbedAnimationProps) => {
-	const isTabletLandscape = useTabletLandscape();
-	const { width, height } = useWindowDimensions();
+export const EmbedAnimation = memo(
+	({ animationOptions, themeValue }: EmbedAnimationProps) => {
+		const isTabletLandscape = useTabletLandscape();
+		const { width, height } = useWindowDimensions();
 
-	const [frames, setFrames] = useState(null);
-	const [frameWidth, setFrameWidth] = useState(0);
-	const [frameHeight, setFrameHeight] = useState(0);
-	const [spriteWidth, setSpriteWidth] = useState(0);
-	const [spriteHeight, setSpriteHeight] = useState(0);
-	const isPortrait = height > width;
-	const SLOT_ITEM_FRAME_WIDTH = 133;
-	const isSlotGame = frameWidth === SLOT_ITEM_FRAME_WIDTH;
-	const duration = 500;
-	const styles = style(isPortrait, isSlotGame);
-	const globalAnimation = useRef(new Animated.Value(0)).current;
+		const isFetch = useRef(false);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await fetch(animationOptions.url_position);
-				const data = await response.json();
+		const [frames, setFrames] = useState(null);
+		const [spriteMeta, setSpriteMeta] = useState({
+			frameWidth: 0,
+			frameHeight: 0,
+			spriteWidth: 0,
+			spriteHeight: 0
+		});
+		const isPortrait = height > width;
+		const styles = style(isPortrait);
+		const globalAnimation = useRef(new Animated.Value(0)).current;
 
-				const frameArray = extractFrames(data, animationOptions?.repeat);
-				if (frameArray) {
-					setFrames(frameArray);
-					setFrameHeight(frameArray?.[0]?.h || 0);
-					setFrameWidth(frameArray?.[0]?.w || 0);
-					setSpriteWidth(data?.meta?.size?.w || 0);
-					setSpriteHeight(data?.meta?.size?.h || 0);
+		useEffect(() => {
+			const fetchData = async () => {
+				try {
+					isFetch.current = true;
+					const response = await fetch(animationOptions.url_position);
+					const data = await response.json();
+
+					const frameArray = extractFrames(data, animationOptions?.repeat);
+					if (frameArray) {
+						setFrames(frameArray);
+						setSpriteMeta({
+							frameWidth: frameArray?.[0]?.w || 0,
+							frameHeight: frameArray?.[0]?.h || 0,
+							spriteWidth: data?.meta?.size?.w || 0,
+							spriteHeight: data?.meta?.size?.h || 0
+						});
+					}
+					isFetch.current = false;
+				} catch (error) {
+					console.error('Error fetching JSON data:', error);
 				}
-			} catch (error) {
-				console.error('Error fetching JSON data:', error);
+			};
+			fetchData();
+		}, []);
+
+		const animationScale = useMemo(() => {
+			if (animationOptions?.pool?.length > 0 && spriteMeta.frameWidth > 0) {
+				let horizontalPadding: number;
+				const totalFrameWidth = animationOptions?.pool?.length * spriteMeta.frameWidth;
+				const scaleFactor = isTabletLandscape ? 0.36 : 1;
+
+				if (isPortrait) {
+					horizontalPadding = size.s_100;
+				} else {
+					horizontalPadding = size.s_150;
+				}
+
+				const fitScale = (width - horizontalPadding) / totalFrameWidth;
+				return fitScale * scaleFactor;
 			}
-		};
-		fetchData();
-	}, []);
+			return 1;
+		}, [spriteMeta?.frameWidth, width]);
 
-	const animationScale = useMemo(() => {
-		if (animationOptions?.pool?.length > 0 && frameWidth > 0) {
-			let horizontalPadding: number;
-			const totalFrameWidth = animationOptions?.pool?.length * frameWidth;
-			const scaleFactor = isTabletLandscape ? 0.36 : 1;
-
-			if (isPortrait) {
-				horizontalPadding = isSlotGame ? size.s_110 : size.s_70;
-			} else if (!isPortrait) {
-				horizontalPadding = isSlotGame ? size.s_210 : size.s_150;
-			}
-
-			const fitScale = (width - horizontalPadding) / totalFrameWidth;
-			return fitScale * scaleFactor;
+		if (!frames || isFetch?.current) {
+			return (
+				<View style={styles.loading}>
+					<ActivityIndicator size="large" color={themeValue.text} />
+				</View>
+			);
 		}
-		return 1;
-	}, [animationOptions?.pool?.length, frameWidth, isTabletLandscape, isPortrait, width, isSlotGame]);
 
-	if (!frames) {
 		return (
-			<View style={styles.loading}>
-				<ActivityIndicator size="large" color={themeValue.text} />
-			</View>
-		);
-	}
-
-	return (
-		<View style={[styles.pool, { transform: [{ scale: animationScale }] }]}>
-			{animationOptions?.pool?.length &&
-				animationOptions?.pool?.map((item, index) => {
-					return (
+			<View
+				style={[
+					styles.pool,
+					{ transform: [{ scale: animationScale }], marginVertical: (isPortrait ? -size.s_40 : -size.s_70) / animationScale + size.s_50 }
+				]}
+			>
+				{animationOptions?.pool?.length &&
+					animationOptions?.pool?.map((item, index) => (
 						<SpriteAnimation
-							key={`animation_${index}`}
+							key={`animation_${new Date().getTime()}_${index}`}
 							spriteUrl={animationOptions?.url_image}
-							frameWidth={frameWidth}
-							frameHeight={frameHeight}
+							frameWidth={spriteMeta?.frameWidth}
+							frameHeight={spriteMeta?.frameHeight}
 							frames={frames}
-							duration={duration}
 							finalFrame={item?.at?.(item?.length - 1 || 0)}
 							repeat={animationOptions?.repeat ? animationOptions?.repeat + index : 0}
 							isActive={animationOptions?.isResult}
-							spriteHeight={spriteHeight}
-							spriteWidth={spriteWidth}
+							spriteHeight={spriteMeta?.spriteHeight}
+							spriteWidth={spriteMeta?.spriteWidth}
 							sharedAnimation={globalAnimation}
 						/>
-					);
-				})}
-		</View>
-	);
-};
+					))}
+			</View>
+		);
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.animationOptions?.url_image === nextProps.animationOptions?.url_image &&
+			prevProps.animationOptions?.url_position === nextProps.animationOptions?.url_position
+		);
+	}
+);

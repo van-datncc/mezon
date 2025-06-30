@@ -208,7 +208,7 @@ const DirectMessage = () => {
 		<>
 			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? ''} />}
 			<div
-				className={` flex flex-col flex-1 shrink min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible relative mt-[50px]`}
+				className={` flex flex-col flex-1 shrink min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible relative mt-[50px] bg-theme-chat text-theme-text`}
 				onDragEnter={handleDragEnter}
 			>
 				<div
@@ -281,7 +281,7 @@ const DirectMessage = () => {
 							</div>
 						)}
 
-						<div className="flex-shrink-0 flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative">
+						<div className="flex-shrink-0 flex flex-col bg-theme-chat  h-auto relative">
 							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (currentDmGroup.user_id?.length === 0 || isBlocked) ? (
 								<div
 									style={{ height: 44 }}
@@ -329,9 +329,7 @@ const DirectMessage = () => {
 					)}
 
 					{Number(type) === ChannelType.CHANNEL_TYPE_DM && isUseProfileDM && (
-						<div
-							className={`dark:bg-bgTertiary bg-bgLightSecondary ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}
-						>
+						<div className={`bg-active-friend-list ${isUseProfileDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-widthDmProfile'}`}>
 							<ModalUserProfile
 								onClose={handleClose}
 								userID={Array.isArray(currentDmGroup?.user_id) ? currentDmGroup?.user_id[0] : currentDmGroup?.user_id}

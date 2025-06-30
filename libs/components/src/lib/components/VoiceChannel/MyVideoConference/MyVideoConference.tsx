@@ -23,6 +23,7 @@ import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutCont
 import { GridLayout } from './GridLayout/GridLayout';
 import { ParticipantTile } from './ParticipantTile/ParticipantTile';
 import { ReactionCallHandler } from './Reaction';
+import { useSoundReactions } from './Reaction/useSoundReactions';
 
 interface MyVideoConferenceProps {
 	channelLabel?: string;
@@ -47,6 +48,7 @@ export function MyVideoConference({
 }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
+	const { activeSoundReactions, handleSoundReaction } = useSoundReactions();
 
 	const tracksFromHook = useTracks(
 		[
@@ -180,9 +182,10 @@ export function MyVideoConference({
 			onToggleChat?.();
 		}
 	};
+
 	return (
 		<div className="lk-video-conference flex-1">
-			<ReactionCallHandler currentChannel={currentChannel} />
+			<ReactionCallHandler currentChannel={currentChannel} onSoundReaction={handleSoundReaction} />
 			<LayoutContextProvider value={layoutContext}>
 				<div
 					className="lk-video-conference-inner relative bg-gray-100 dark:bg-black"
@@ -192,7 +195,7 @@ export function MyVideoConference({
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper bg-gray-300 dark:bg-black !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
-								<ParticipantTile isExtCalling={isExternalCalling} />
+								<ParticipantTile isExtCalling={isExternalCalling} activeSoundReactions={activeSoundReactions} />
 							</GridLayout>
 						</div>
 					) : (
@@ -201,7 +204,7 @@ export function MyVideoConference({
 								{focusTrack && <FocusLayout trackRef={focusTrack} isExtCalling={isExternalCalling} />}
 								{isShowMember && (
 									<CarouselLayout tracks={tracks}>
-										<ParticipantTile isExtCalling={isExternalCalling} />
+										<ParticipantTile isExtCalling={isExternalCalling} activeSoundReactions={activeSoundReactions} />
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>
@@ -315,7 +318,7 @@ export function MyVideoConference({
 									style={{ marginLeft: 8 }}
 								>
 									<Icons.Chat
-										defaultFill={isShowMember ? 'text-colorTextLightMode' : 'text-white'}
+										defaultFill={isShowMember ? 'text-colorTextLightMode dark:text-[#B5BAC1]' : 'text-white'}
 										className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'}
 									/>
 								</button>

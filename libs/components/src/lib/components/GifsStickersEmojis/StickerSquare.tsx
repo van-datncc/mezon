@@ -1,10 +1,21 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifsStickersEmoji } from '@mezon/core';
-import { MediaType, referencesActions, selectAllStickerSuggestion, selectCurrentClan, selectDataReferences, useAppDispatch, useAppSelector } from '@mezon/store';
+import {
+	MediaType,
+	emojiRecentActions,
+	referencesActions,
+	selectAllStickerSuggestion,
+	selectCurrentClan,
+	selectDataReferences,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { FOR_SALE_CATE, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
 import { ApiChannelDescription, ApiMessageRef } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useModal } from 'react-modal-hook';
+import ModalBuyItem from './ModalBuyItem';
 
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
@@ -18,17 +29,22 @@ interface ICategorizedStickerProps {
 	categoryName: string;
 	onClickSticker: (stickerUrl: StickerPanel) => void;
 	valueInputToCheckHandleSearch?: string;
+	onOpenBuySticker: (sticker: StickerPanel) => void;
 }
 
 interface IStickerPanelProps {
 	stickerList: StickerPanel[];
 	onClickSticker: (stickerUrl: StickerPanel) => void;
+	onOpenBuySticker: (sticker: StickerPanel) => void;
 }
 
 type StickerPanel = {
 	type?: string;
 	url?: string;
 	id?: string;
+	forSale?: boolean;
+	clanName?: string;
+	clanId?: string;
 };
 
 const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
@@ -39,8 +55,9 @@ const searchStickers = (stickers: ClanSticker[], searchTerm: string) => {
 
 function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
 	const allStickers = useAppSelector(selectAllStickerSuggestion);
-	const clanStickers = allStickers.filter(sticker =>
-		(sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER
+	const clanStickers = useMemo(
+		() => allStickers.filter((sticker) => (sticker as any).media_type === undefined || (sticker as any).media_type === MediaType.STICKER),
+		[allStickers]
 	);
 
 	const { sendMessage } = useChatSending({
@@ -60,20 +77,30 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 		setSearchStickers(result);
 	}, [valueInputToCheckHandleSearch, subPanelActive, clanStickers]);
 
-	const categoryLogo = clanStickers
-		.map((sticker) => ({
-			id: sticker.clan_id,
-			type: sticker.clan_name,
-			url: sticker.logo
-		}))
-		.filter((sticker, index, self) => index === self.findIndex((s) => s.id === sticker.id));
-
+	const categoryLogo = useMemo(() => {
+		const categorizedStickers = clanStickers
+			.filter((sticker) => sticker.clan_name !== FOR_SALE_CATE)
+			.reduce((acc: { id?: string; type?: string; url?: string }[], sticker) => {
+				if (!acc.some((item) => item.id === sticker.clan_id)) {
+					acc.push({
+						id: sticker.clan_id,
+						type: sticker.clan_name,
+						url: sticker.logo
+					});
+				}
+				return acc;
+			}, []);
+		return [{ id: FOR_SALE_CATE, type: FOR_SALE_CATE, url: '' }, ...categorizedStickers];
+	}, [clanStickers]);
 	const stickers = useMemo(() => {
 		return [
 			...searchedStickers.map((sticker) => ({
 				id: sticker.id,
 				url: sticker.source,
-				type: sticker.clan_name
+				type: sticker.clan_name,
+				clanName: sticker.category,
+				clanId: sticker.clan_id,
+				forSale: sticker.is_for_sale
 			}))
 		].filter(Boolean);
 	}, [searchedStickers]);
@@ -84,8 +111,9 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const handleClickImage = (image: StickerPanel) => {
+		const imageUrl = image.url ? image.url : `${process.env.NX_BASE_IMG_URL}/stickers/${image.id}.webp`;
 		if (isReplyAction) {
-			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [dataReferences], undefined);
+			sendMessage({ t: '' }, [], [{ url: imageUrl, filetype: 'image/gif', filename: image.id }], [dataReferences], undefined);
 
 			dispatch(
 				referencesActions.setDataReferences({
@@ -94,7 +122,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 				})
 			);
 		} else {
-			sendMessage({ t: '' }, [], [{ url: image.url, filetype: 'image/gif', filename: image.id }], [], undefined);
+			sendMessage({ t: '' }, [], [{ url: imageUrl, filetype: 'image/gif', filename: image.id }], [], undefined);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};
@@ -116,6 +144,20 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
 
+	const [stickerBuy, setStickerBuy] = useState<StickerPanel | null>(null);
+	const handleOpenBuySticker = (sticker: StickerPanel) => {
+		setStickerBuy(sticker);
+		openModalListBuy();
+	};
+	const [openModalListBuy, closeModalListBuy] = useModal(() => {
+		const handleConfirmBuyItem = async () => {
+			if (stickerBuy) {
+				await dispatch(emojiRecentActions.buyItemForSale({ id: stickerBuy.id, type: 1 }));
+			}
+		};
+		return <ModalBuyItem onConfirm={handleConfirmBuyItem} onCancel={closeModalListBuy} />;
+	}, [stickerBuy]);
+
 	return (
 		<div ref={modalRef} tabIndex={-1} className="outline-none flex h-full w-full md:w-[500px] max-sm:ml-1">
 			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2 ">
@@ -132,15 +174,26 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 							onClick={(e) => scrollToCategory(e, avt.type || '')}
 							className="flex justify-center items-center max-sm:px-1 w-9 h-9 rounded-lg hover:bg-[#41434A]"
 						>
-							{avt.url !== '' ? (
-								<img
-									src={avt.url}
-									alt={`avt ${avt.id}`}
-									className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
-									role="button"
-								/>
+							{avt.type === FOR_SALE_CATE ? (
+								<div
+									onClick={(e) => scrollToCategory(e, FOR_SALE_CATE)}
+									className="w-9 h-9 py-2 dark:text-textPrimary max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md"
+								>
+									<Icons.MarketIcons />
+								</div>
 							) : (
-								<div className="dark:text-textDarkTheme text-textLightTheme">{avt?.type?.charAt(0).toUpperCase()}</div>
+								<>
+									{avt.url !== '' ? (
+										<img
+											src={avt.url}
+											alt={`avt ${avt.id}`}
+											className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
+											role="button"
+										/>
+									) : (
+										<div className="dark:text-textDarkTheme text-textLightTheme">{avt?.type?.charAt(0).toUpperCase()}</div>
+									)}
+								</>
 							)}
 						</button>
 					))}
@@ -148,7 +201,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 			</div>
 			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar" ref={containerRef}>
 				{valueInputToCheckHandleSearch ? (
-					<StickerPanel stickerList={stickers} onClickSticker={handleClickImage} />
+					<StickerPanel stickerList={stickers} onClickSticker={handleClickImage} onOpenBuySticker={handleOpenBuySticker} />
 				) : (
 					<>
 						{categoryLogo.map((avt) => (
@@ -158,6 +211,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 									stickerList={stickers}
 									onClickSticker={handleClickImage}
 									categoryName={avt.type || ''}
+									onOpenBuySticker={handleOpenBuySticker}
 								/>
 							</div>
 						))}
@@ -169,7 +223,13 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 }
 export default StickerSquare;
 
-const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({ stickerList, categoryName, onClickSticker, valueInputToCheckHandleSearch }) => {
+const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({
+	stickerList,
+	categoryName,
+	onClickSticker,
+	valueInputToCheckHandleSearch,
+	onOpenBuySticker
+}) => {
 	const stickersListByCategoryName = stickerList.filter((sticker) => sticker.type === categoryName);
 	const [isShowStickerList, setIsShowStickerList] = useState(true);
 	const currentClan = useAppSelector(selectCurrentClan);
@@ -189,27 +249,39 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({ stickerList, 
 					<Icons.ArrowRight />
 				</span>
 			</button>
-			{isShowStickerList && <StickerPanel stickerList={stickersListByCategoryName} onClickSticker={onClickSticker} />}
+			{isShowStickerList && (
+				<StickerPanel stickerList={stickersListByCategoryName} onClickSticker={onClickSticker} onOpenBuySticker={onOpenBuySticker} />
+			)}
 		</div>
 	);
 };
 
-const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticker }) => {
+const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticker, onOpenBuySticker }) => {
 	return (
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{stickerList.length > 0 && (
-				<div className="w-auto pb-2 px-2">
+				<div key={stickerList[0].id} className="w-auto pb-2 px-2">
 					<div className="grid grid-cols-3 gap-4">
 						{stickerList.map((sticker: StickerPanel) => (
-							<img
+							<div
+								className="group relative w-full h-full border border-bgHoverMember aspect-square overflow-hidden flex items-center rounded-lg cursor-pointer"
 								key={sticker.id}
-								src={sticker.url}
-								alt="sticker"
-								className="w-full h-full aspect-square object-cover cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton hover:rounded-lg border border-bgHoverMember rounded-lg"
-								onClick={() => onClickSticker(sticker)}
-								role="button"
-							/>
+							>
+								<img
+									src={sticker.url ? sticker.url : `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker.id + `.webp`}
+									alt="sticker"
+									className={`w-full h-full aspect-square object-cover dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${sticker.id === '0' ? 'blur-sm' : ''}`}
+									onClick={() => (!sticker.forSale || sticker.url ? onClickSticker(sticker) : onOpenBuySticker(sticker))}
+									role="button"
+								/>
+								{sticker.forSale && !sticker.url && (
+									<div className="absolute left-8 flex items-center justify-center aspect-square pointer-events-none">
+										<Icons.LockIcon defaultSize="w-16 h-16 text-white block group-hover:hidden" defaultFill="white" />
+										<Icons.UnLockIcon defaultSize="w-16 h-16 text-white hidden group-hover:block" defaultFill="white" />
+									</div>
+								)}
+							</div>
 						))}
 					</div>
 				</div>

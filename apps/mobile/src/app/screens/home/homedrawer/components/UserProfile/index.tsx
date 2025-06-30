@@ -1,14 +1,15 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useAuth, useDirect, useFriends, useMemberCustomStatus, useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
+	EStateFriend,
 	RolesClanEntity,
 	directActions,
 	selectAccountCustomStatus,
 	selectAllRolesClan,
 	selectDirectsOpenlist,
+	selectFriendById,
 	selectMemberClanByUserId2,
 	useAppDispatch,
 	useAppSelector
@@ -63,7 +64,7 @@ const UserProfile = React.memo(
 	({ userId, user, onClose, checkAnonymous, message, showAction = true, showRole = true, currentChannel, directId }: userProfileProps) => {
 		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
-		const styles = style(themeValue);
+		const styles = style(themeValue, isTabletLandscape);
 		const { userProfile } = useAuth();
 		const { t } = useTranslation(['userProfile']);
 		const userById = useAppSelector((state) => selectMemberClanByUserId2(state, userId || user?.id));
@@ -81,7 +82,6 @@ const UserProfile = React.memo(
 		const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
 		const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
-		const { dismiss } = useBottomSheetModal();
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 		const dispatch = useAppDispatch();
 		const dmChannel = useMemo(() => {
@@ -94,6 +94,10 @@ const UserProfile = React.memo(
 		const isDM = useMemo(() => {
 			return currentChannel?.type === ChannelType.CHANNEL_TYPE_DM || currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP;
 		}, [currentChannel?.type]);
+		const infoFriend = useAppSelector((state) => selectFriendById(state, userId || user?.id));
+		const isBlocked = useMemo(() => {
+			return infoFriend?.state === EStateFriend.BLOCK;
+		}, [infoFriend?.state]);
 
 		const status = getUserStatusByMetadata(user?.user?.metadata);
 
@@ -176,7 +180,6 @@ const UserProfile = React.memo(
 				onClose();
 			}
 			directMessageWithUser(userId || user?.id);
-			dismiss();
 		};
 
 		const actionList = [
@@ -231,7 +234,7 @@ const UserProfile = React.memo(
 						});
 					}
 				},
-				isShow: !targetUser,
+				isShow: !targetUser && !isBlocked,
 				textStyles: {
 					color: Colors.green
 				}
@@ -279,6 +282,7 @@ const UserProfile = React.memo(
 				note: t('userAction.transferFunds'),
 				canEdit: true
 			});
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			navigation.push(APP_SCREEN.WALLET, {
 				activeScreen: 'transfer',
 				formValue: payload
@@ -286,7 +290,6 @@ const UserProfile = React.memo(
 			if (onClose && typeof onClose === 'function') {
 				onClose();
 			}
-			dismiss();
 		};
 
 		if (isShowPendingContent) {
@@ -335,7 +338,19 @@ const UserProfile = React.memo(
 							statusUserStyles={styles.statusUser}
 						/>
 					</View>
+					{displayStatus ? (
+						<>
+							<View style={styles.badgeStatusTemp} />
+							<View style={styles.badgeStatus}>
+								<View style={styles.badgeStatusInside} />
+								<Text numberOfLines={3} style={styles.customStatusText}>
+									{displayStatus}
+								</Text>
+							</View>
+						</>
+					) : null}
 				</View>
+
 				<View style={[styles.container]}>
 					<View style={[styles.userInfo]}>
 						<Text style={[styles.username]}>
@@ -358,7 +373,6 @@ const UserProfile = React.memo(
 								? userById?.user?.username
 								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
-						{displayStatus ? <Text style={styles.customStatusText}>{displayStatus}</Text> : null}
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
 							<View style={[styles.userAction]}>

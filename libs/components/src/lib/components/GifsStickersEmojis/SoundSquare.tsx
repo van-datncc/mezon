@@ -15,13 +15,13 @@ import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { MessageAudio } from '../MessageWithUser/MessageAudio/MessageAudio';
 
 type ChannelMessageBoxProps = {
 	channel: ApiChannelDescription | undefined;
 	mode: number;
 	onClose: () => void;
 	isTopic?: boolean;
+	onSoundSelect?: (soundId: string, soundUrl: string) => void;
 };
 
 type SoundPanel = {
@@ -48,7 +48,7 @@ const searchSounds = (sounds: ExtendedApiMessageAttachment[], searchTerm: string
 	return sounds.filter((item) => item?.filename?.toLowerCase().includes(lowerCaseSearchTerm));
 };
 
-function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessageBoxProps) {
+function SoundSquare({ channel, mode, onClose, isTopic = false, onSoundSelect }: ChannelMessageBoxProps) {
 	const dispatch = useAppDispatch();
 	const { sendMessage } = useChatSending({
 		channelOrDirect: channel,
@@ -63,7 +63,10 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 	const currentClanId = useAppSelector(selectCurrentClanId) || '';
 
 	const allStickersInStore = useAppSelector(selectAllStickerSuggestion);
-	const allSoundsInStore = allStickersInStore.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO);
+	const allSoundsInStore = useMemo(
+		() => allStickersInStore.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO),
+		[allStickersInStore]
+	);
 
 	useEffect(() => {
 		dispatch(soundEffectActions.fetchSoundByUserId({ noCache: false }));
@@ -125,6 +128,12 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 
 	const onClickSendSound = useCallback(
 		(sound: ExtendedApiMessageAttachment) => {
+			if (onSoundSelect) {
+				onSoundSelect(sound.id || '', sound.url || '');
+				onClose();
+				return;
+			}
+
 			if (isReplyAction) {
 				handleSend({ t: '' }, [], [sound], [dataReferences]);
 				dispatch(
@@ -138,7 +147,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 			}
 			setSubPanelActive(SubPanelName.NONE);
 		},
-		[isReplyAction, handleSend, dispatch, currentId, dataReferences, blankReferenceObj, setSubPanelActive]
+		[onSoundSelect, onClose, isReplyAction, handleSend, dispatch, currentId, dataReferences, blankReferenceObj, setSubPanelActive]
 	);
 
 	const scrollToClanSidebar = useCallback(
@@ -162,29 +171,39 @@ function SoundSquare({ channel, mode, onClose, isTopic = false }: ChannelMessage
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="outline-none flex h-full w-full md:w-[500px] max-sm:ml-1">
-			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2 ">
-				<div className="w-11 flex flex-col gap-y-1 dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1 px-1 md:items-start pb-1 rounded items-center min-h-[25rem]">
+			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2">
+				<div className="w-16 flex flex-col gap-y-2 dark:bg-[#2f3136] bg-[#f2f3f5] pt-3 px-1.5 md:items-start pb-3 rounded-l-lg items-center min-h-[25rem] shadow-sm">
 					{categoryLogo.map((cat) => (
 						<button
 							title={cat.type}
 							key={cat.id}
 							onClick={(e) => scrollToClanSidebar(e, cat.type)}
-							className="flex justify-center items-center w-9 h-9 rounded-lg hover:bg-[#41434A]"
+							className={`flex justify-center items-center w-11 h-11 rounded-full hover:bg-[#4f545c] transition-all duration-200 ${
+								selectedType === cat.type ? 'bg-[#5865f2] dark:shadow-md' : 'dark:bg-[#36393f] bg-[#e3e5e8]'
+							}`}
 						>
 							{cat.url !== '' ? (
 								<img
 									src={cat.url}
 									alt={cat.type}
-									className="w-7 h-7 object-cover aspect-square cursor-pointer border border-bgHoverMember rounded-full"
+									className={`w-8 h-8 object-cover aspect-square cursor-pointer rounded-full ${
+										selectedType === cat.type ? 'border-2 border-white' : ''
+									}`}
 								/>
 							) : (
-								<div className="dark:text-textDarkTheme text-textLightTheme">{cat?.type?.charAt(0).toUpperCase()}</div>
+								<div
+									className={`${
+										selectedType === cat.type ? 'text-white' : 'dark:text-[#dcddde] text-[#2e3338]'
+									} font-semibold text-sm`}
+								>
+									{cat?.type?.charAt(0).toUpperCase()}
+								</div>
 							)}
 						</button>
 					))}
 				</div>
 			</div>
-			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar" ref={containerRef}>
+			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar dark:bg-[#36393f] bg-[#ffffff]" ref={containerRef}>
 				{valueInputToCheckHandleSearch ? (
 					<SoundPanel soundList={searchedSounds} onClickSendSound={onClickSendSound} />
 				) : (
@@ -228,14 +247,16 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 		}, []);
 
 		return (
-			<div>
+			<div className="mb-3">
 				<button
 					onClick={handleToggleButton}
-					className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black max-h-full"
+					className="w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2f3136] bg-[#f2f3f5] z-10 dark:text-[#ffffff] text-[#060607] max-h-full"
 				>
-					<p className="uppercase">{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
-					<span className={`${isShowSoundList ? ' rotate-90' : ''}`}>
-						<Icons.ArrowRight />
+					<p className="uppercase font-semibold text-xs tracking-wider">
+						{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}
+					</p>
+					<span className={`transition-transform duration-200 ${isShowSoundList ? 'rotate-90' : ''}`}>
+						<Icons.ArrowRight defaultFill="currentColor" className="w-3.5 h-3.5 opacity-70" />
 					</span>
 				</button>
 				{isShowSoundList && <SoundPanel soundList={soundListByCategoryName} onClickSendSound={onClickSendSound} />}
@@ -250,20 +271,35 @@ interface ISoundPanelProps {
 
 export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, onClickSendSound }) => {
 	return (
-		<div className="w-auto pb-2 px-2">
-			<div className="grid grid-cols-2 gap-4">
-				{soundList.map((sound, index) => (
-					<div key={sound.id} className="relative flex flex-col items-start rounded-md w-full">
-						<MessageAudio audioUrl={sound.url || ''} posInPopUp={true} />
-						<div className="border border-gray-600 flex flex-col items-start w-48 rounded-b-md">
-							<div className="flex justify-center w-full mt-1" onClick={() => onClickSendSound(sound)} title="Send the sound">
-								<Icons.SoundIcon className="w-4 h-4 text-[#2B2D31] dark:text-bgLightModeSecond dark:bg-bgLightModeSecond rounded-md" />
-							</div>
-
-							<span title={sound.filename} className="text-xs mx-1 w-full truncate cursor-text dark:text-white">
+		<div className="w-full pb-3 px-3 pt-1">
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				{soundList.length === 0 && (
+					<div className="col-span-full flex flex-col items-center justify-center py-10 border-2 border-dashed dark:border-borderDivider border-gray-300 rounded-lg bg-gray-50 dark:bg-bgPrimary text-center">
+						<Icons.Speaker className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2" />
+						<p className="text-gray-500 dark:text-gray-400 text-sm">No sound effects found.</p>
+					</div>
+				)}
+				{soundList.map((sound) => (
+					<div
+						key={sound.id}
+						className="flex flex-col w-full p-2 border rounded-lg bg-white dark:bg-bgSecondary shadow-sm hover:shadow-md transition duration-200 dark:border-borderDivider border-gray-200 items-center"
+					>
+						<div className="flex items-center justify-between mb-3">
+							<p
+								title={sound.filename}
+								className="font-medium truncate w-full text-center dark:text-gray-300 text-gray-600 text-ellipsis whitespace-nowrap overflow-hidden max-w-20 px-2 rounded py-1 hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
+							>
 								{sound.filename}
-							</span>
+							</p>
 						</div>
+						<audio controls src={sound.url} className="w-full h-8 rounded-full border dark:border-borderDivider border-gray-200 mb-2" />
+						<button
+							onClick={() => onClickSendSound(sound)}
+							title="Send sound"
+							className="flex items-center gap-2 px-4 py-1.5 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 mt-2"
+						>
+							<Icons.ArrowRight defaultFill="white" className="w-4 h-4" />
+						</button>
 					</div>
 				))}
 			</div>

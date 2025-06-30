@@ -1,11 +1,11 @@
 import { useEscapeKeyClose } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { Button, Icons, InputField } from '@mezon/ui';
+import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
-import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ELimitSize, ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
@@ -130,25 +130,33 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 		if (!file.name.endsWith('.gif')) {
 			resizeFile = (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
 		}
+		const isForSale = isForSaleRef.current?.checked;
+		const realImage = await handleUploadEmoticon(client, session, path, resizeFile as File);
 
-		handleUploadEmoticon(client, session, path, resizeFile).then(async (attachment: ApiMessageAttachment) => {
-			const request: ApiClanStickerAddRequest = {
-				id: id,
-				category: category,
-				clan_id: currentClanId,
-				shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
-				source: attachment.url
-			};
+		const request: ApiClanStickerAddRequest = {
+			id: id,
+			category: category,
+			clan_id: currentClanId,
+			source: realImage.url,
+			shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
+			is_for_sale: isForSale
+		};
+		if (isForSale) {
+			const idPreview = Snowflake.generate();
+			const fileBlur = await createBlurredImageFile(resizeFile);
+			const pathPreview = (isSticker ? 'stickers/' : 'emojis/') + idPreview + '.webp';
+			await handleUploadEmoticon(client, session, pathPreview, fileBlur as File);
+			request.id = idPreview;
+		}
 
-			const requestData = {
-				...request,
-				media_type: 0
-			};
+		const requestData = {
+			...request,
+			media_type: 0
+		};
 
-			isSticker
-				? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
-				: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
-		});
+		isSticker
+			? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
+			: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
 
 		handleCloseModal();
 	};
@@ -174,42 +182,71 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, handleCloseModal);
 
+	const isForSaleRef = useRef<HTMLInputElement | null>(null);
+
+	function createBlurredImageFile(originalFile: File, blurAmount = 7) {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.src = URL.createObjectURL(originalFile);
+
+			img.onload = () => {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				if (!ctx) {
+					reject(new Error('Cannot create canvas context.'));
+					return;
+				}
+				canvas.width = img.width;
+				canvas.height = img.height;
+				ctx.filter = `blur(${blurAmount}px)`;
+				ctx.drawImage(img, 0, 0);
+
+				canvas.toBlob((blob) => {
+					if (blob) {
+						const newFile = new File([blob], 'blurred-image.png', { type: 'image/png' });
+						resolve(newFile); // trả về file có thể dùng tiếp
+					} else {
+						reject(new Error('Không thể chuyển canvas thành file.'));
+					}
+				}, 'image/png');
+			};
+
+			img.onerror = () => reject(new Error('Không thể load ảnh.'));
+		});
+	}
+
 	return (
 		<>
-			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
+			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col  '}>
 				<div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>
-					<div className={`flex flex-col gap-2 items-center select-none dark:text-textPrimary text-textPrimaryLight`}>
-						<p className="text-2xl font-semibold dark:text-bgTextarea text-textPrimaryLight">Upload a file</p>
+					<div className={`flex flex-col gap-2 items-center select-none `}>
+						<p className="text-2xl font-semibold ">Upload a file</p>
 						<p className="text-base">File should be APNG, PNG, or GIF (512KB max)</p>
 					</div>
-					<div className={'flex flex-col select-none dark:text-textPrimary text-textPrimaryLight'}>
+					<div className={'flex flex-col select-none '}>
 						<p className="text-xs font-bold h-6 uppercase">PREVIEW</p>
-						<div
-							className={
-								'flex items-center justify-center rounded-lg border-[0.08px] dark:border-borderDivider border-borderLightTabs overflow-hidden'
-							}
-						>
-							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-bgPrimary'}>
+						<div className={'flex items-center justify-center rounded-lg border-theme-primary overflow-hidden'}>
+							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-item-theme '}>
 								{editingGraphic.source ? (
 									<PreviewStickerBox preview={editingGraphic.source} />
 								) : (
-									<Icons.UploadImage className="w-16 h-16 text-bgLightModeSecond" />
+									<Icons.UploadImage className="w-16 h-16 " />
 								)}
 							</div>
-							<div className={'h-56 w-[50%] flex items-center justify-center bg-bgLightModeSecond'}>
+							<div className={'h-56 w-[50%] flex items-center justify-center '}>
 								{editingGraphic.source ? (
 									<PreviewStickerBox preview={editingGraphic.source} />
 								) : (
-									<Icons.UploadImage className="w-16 h-16 text-bgPrimary" />
+									<Icons.UploadImage className="w-16 h-16" />
 								)}
 							</div>
 						</div>
 					</div>
-					<div className={'flex flex-row gap-4 dark:text-textPrimary text-textPrimaryLight'}>
+					<div className={'flex flex-row gap-4 '}>
 						<div className={'w-1/2 flex flex-col gap-2'}>
 							<p className={`text-xs font-bold uppercase select-none`}>FILE {graphic && ' (THIS CANNOT BE EDITED)'}</p>
 							<div
-								className={`dark:bg-bgSecondary bg-bgLightSecondary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center py-[6px] px-3 dark:text-textPrimary box-border ${editingGraphic.fileName && 'cursor-not-allowed'}`}
+								className={` border-theme-primary flex flex-row rounded justify-between items-center py-[6px] px-3  ${editingGraphic.fileName && 'cursor-not-allowed'}`}
 							>
 								<p className="select-none flex-1 truncate">{editingGraphic.fileName ?? 'Choose a file'}</p>
 								{!graphic && (
@@ -233,13 +270,13 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							<p className={`text-xs font-bold uppercase select-none`}>Sticker Name</p>
 							<div
 								className={
-									'bg-bgLightSearchHover dark:bg-bgTertiary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center p-2 pl-3 dark:text-textPrimary box-border overflow-hidden'
+									'border-theme-primary flex flex-row rounded justify-between items-center p-2 pl-3  box-border overflow-hidden'
 								}
 							>
 								<InputField
 									type="string"
 									placeholder="ex. cat hug"
-									className={'px-[8px] bg-bgLightSearchHover dark:bg-bgTertiary'}
+									className={'px-[8px] bg-theme-input'}
 									value={editingGraphic.shortname}
 									onChange={handleChangeShortName}
 									onKeyDown={handleOnEnter}
@@ -248,10 +285,16 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						</div>
 					</div>
 				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none`}>
+				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none gap-2`}>
+					<div className="flex items-center flex-1 h-full gap-2">
+						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
+						<label htmlFor="sale_item" className="!text-textPrimaryLight dark:!text-textPrimary">
+							This is for sale
+						</label>
+					</div>
 					<Button
 						label="Never Mind"
-						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
+						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
 					/>
 					<Button

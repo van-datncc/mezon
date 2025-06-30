@@ -4,20 +4,20 @@ import {
 	ActionEmitEvent,
 	BicycleIcon,
 	BowlIcon,
+	debounce,
 	HeartIcon,
 	LeafIcon,
 	ObjectIcon,
 	PenIcon,
 	RibbonIcon,
-	SmilingFaceIcon,
-	debounce
+	SmilingFaceIcon
 } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import { IEmoji } from '@mezon/utils';
+import { FOR_SALE_CATE, IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, TextInput, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import MezonClanAvatar from '../../../../../../componentUI/MezonClanAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -64,6 +64,14 @@ export default function EmojiSelectorContainer({
 			if (emojis?.length === 0 || !categoryParam) {
 				return [];
 			}
+			if (categoryParam?.toLowerCase() === FOR_SALE_CATE) {
+				return emojis
+					?.filter((emoji) => emoji?.is_for_sale)
+					?.map((emoji) => ({
+						...emoji,
+						category: categoryParam
+					}));
+			}
 
 			return emojis
 				.filter((emoji) => !!emoji.id && emoji?.category?.includes(categoryParam))
@@ -88,6 +96,7 @@ export default function EmojiSelectorContainer({
 				)
 			: [];
 		return [
+			<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.starIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.clockIcon} color={themeValue.textStrong} />,
 			...clanEmojis,
@@ -117,10 +126,20 @@ export default function EmojiSelectorContainer({
 		}, {})
 	);
 
+	const getEmojiIdFromSrc = (src) => {
+		try {
+			if (!src) return '';
+			return src?.split('/')?.pop().split('.')[0];
+		} catch (e) {
+			return '';
+		}
+	};
 	const handleEmojiSelect = useCallback(
 		async (emoji: IEmoji) => {
-			onSelected(emoji?.id, emoji?.shortname);
+			const emojiId = getEmojiIdFromSrc(emoji?.src) || emoji?.id;
+			onSelected(emojiId, emoji?.shortname);
 			handleBottomSheetCollapse?.();
+			Keyboard.dismiss();
 			if (!isReactMessage) {
 				const emojiItemName = `:${emoji?.shortname?.split(':').join('')}:`;
 				DeviceEventEmitter.emit(ActionEmitEvent.ADD_EMOJI_PICKED, { shortName: emojiItemName, channelId });
@@ -128,7 +147,7 @@ export default function EmojiSelectorContainer({
 				dispatch(
 					emojiSuggestionActions.setSuggestionEmojiObjPicked({
 						shortName: emojiItemName,
-						id: emoji?.id
+						id: emojiId
 					})
 				);
 			}
@@ -137,7 +156,9 @@ export default function EmojiSelectorContainer({
 	);
 
 	const searchEmojis = useCallback((emojis: IEmoji[], searchTerm: string) => {
-		return emojis.filter((emoji) => emoji?.shortname?.toLowerCase().includes(searchTerm?.toLowerCase()));
+		return emojis.filter(
+			(emoji) => emoji?.shortname?.toLowerCase().includes(searchTerm?.toLowerCase()) && emoji?.category !== RECENT_EMOJI_CATEGORY
+		);
 	}, []);
 
 	const onSearchEmoji = useCallback(
@@ -273,11 +294,11 @@ export default function EmojiSelectorContainer({
 			maxToRenderPerBatch={1}
 			windowSize={10}
 			removeClippedSubviews={false}
+			keyboardShouldPersistTaps="handled"
 			disableVirtualization
 			style={{ marginBottom: -size.s_20 }}
 			contentContainerStyle={{ minHeight: '100%' }}
 			onScrollToIndexFailed={(info) => {
-				console.warn('onScrollToIndexFailed', info);
 				if (info?.highestMeasuredFrameIndex) {
 					const wait = new Promise((resolve) => setTimeout(resolve, 100));
 					if (info.highestMeasuredFrameIndex < info.index) {

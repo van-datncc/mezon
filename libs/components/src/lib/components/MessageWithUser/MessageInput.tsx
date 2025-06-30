@@ -14,6 +14,8 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	MentionDataProps,
+	RECENT_EMOJI_CATEGORY,
+	TITLE_MENTION_HERE,
 	ThemeApp,
 	addMarkdownPrefix,
 	addMention,
@@ -75,12 +77,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [message?.id]);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
-		callback(matches);
+		if (!query || emojis.length === 0) return;
+		const q = query.toLowerCase();
+		const matches: { id: string; display: string }[] = [];
+
+		for (const { id, shortname, category } of emojis) {
+			if (category === RECENT_EMOJI_CATEGORY || !shortname || !shortname.includes(q)) continue;
+			if (!id) continue;
+			matches.push({ id, display: shortname });
+			if (matches.length === 20) break;
+		}
+
+		if (matches.length) callback(matches);
 	};
 	const channels = useSelector(selectAllChannels);
 
@@ -321,7 +329,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onFocus={handleFocus}
 					inputRef={textareaRef}
 					value={formatContentDraft ?? '{}'}
-					className={`w-full dark:bg-black bg-white border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode mt-[5px] ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
+					className={`w-full bg-theme-surface border-theme-primary  rounded-lg p-[10px] text-theme-primary customScrollLightMode mt-[5px]'}`}
 					onKeyDown={onSend}
 					onChange={handleChange}
 					rows={channelDraftMessage?.draftContent?.t?.split('\n').length}
@@ -336,7 +344,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						data={handleSearchUserMention}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
-							return display === '@here' ? `${display}` : `@${display}`;
+							return display === TITLE_MENTION_HERE ? `${display}` : `@${display}`;
 						}}
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
@@ -344,19 +352,19 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									valueHightLight={valueHighlight}
 									avatarUrl={suggestion.avatarUrl}
 									subText={
-										suggestion.display === '@here'
+										suggestion.display === TITLE_MENTION_HERE
 											? 'Notify everyone who has permission to see this channel'
 											: (suggestion.username ?? '')
 									}
-									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-									showAvatar={suggestion.display !== '@here'}
+									subTextStyle={(suggestion.display === TITLE_MENTION_HERE ? 'normal-case' : 'lowercase') + ' text-xs'}
+									showAvatar={suggestion.display !== TITLE_MENTION_HERE}
 									emojiId=""
 									display={suggestion.display}
 								/>
 							);
 						}}
 						style={mentionStyle}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 					/>
 					<Mention
 						markup="#[__display__](__id__)"
@@ -377,7 +385,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								emojiId=""
 							/>
 						)}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 					/>
 					<Mention
 						trigger=":"
@@ -395,11 +403,11 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 								/>
 							);
 						}}
-						className="dark:bg-[#3B416B] bg-bgLightModeButton"
+						className="bg-theme-surface"
 						appendSpaceOnAdd={true}
 					/>
 				</MentionsInput>
-				<div className="text-xs flex text-textLightTheme dark:text-textDarkTheme">
+				<div className="text-xs flex text-theme-primary">
 					<p className="pr-[3px]">escape to</p>
 					<p
 						className="pr-[3px] text-[#3297ff]"

@@ -115,7 +115,7 @@ const ModalInvite = (props: ModalParam) => {
 						</p>
 						<input
 							type="text"
-							className="w-full h-11 border border-solid dark:border-none dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
+							className="w-full h-11 border-theme-primary bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 							value={urlInvite}
 							readOnly
 						/>
@@ -132,9 +132,9 @@ const ModalInvite = (props: ModalParam) => {
 							Copy
 						</button>
 					</div>
-					<p className="pt-1 text-[14px] mb-12px text-[#AEAEAE] inline-flex gap-x-2">
-						<span className="cursor-default dark:text-white text-black">Your invite link expires in {expire} </span>
-						<span className="dark:text-blue-300 text-blue-600 cursor-pointer hover:underline" onClick={() => setModalEdit(true)}>
+					<p className="pt-1 text-[14px] mb-12px inline-flex gap-x-2">
+						<span className="cursor-default ">Your invite link expires in {expire} </span>
+						<span className=" text-blue-600 cursor-pointer hover:underline" onClick={() => setModalEdit(true)}>
 							Edit invite link.
 						</span>
 					</p>
@@ -148,7 +148,7 @@ const ModalInvite = (props: ModalParam) => {
 						</p>
 						<input
 							type="text"
-							className="w-full h-11 border border-solid dark:border-none dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
+							className="w-full h-11 border-theme-primary bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 							value={props.privateRoomLink as string}
 							readOnly
 						/>

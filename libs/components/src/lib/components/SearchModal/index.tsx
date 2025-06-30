@@ -322,18 +322,13 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 	);
 
 	return (
-		<Modal
-			show={open}
-			dismissible={true}
-			onClose={onClose}
-			className="bg-[#111111] text-contentPrimary bg-opacity-90 focus-visible:[&>*]:outline-none"
-		>
-			<Modal.Body className="dark:bg-[#36393e] bg-bgLightMode px-6 py-4 rounded-[6px] h-[200px] w-full">
+		<Modal show={open} dismissible={true} onClose={onClose} className="bg-[#111111] bg-opacity-90 focus-visible:[&>*]:outline-none">
+			<Modal.Body className="theme-base-color px-6 py-4 rounded-[6px] h-[200px] w-full">
 				<div className="flex flex-col">
 					<InputField
 						type="text"
 						placeholder="Where would you like to go?"
-						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
+						className="py-[18px] text-[16px] mt-2 mb-[15px]"
 						onChange={(e) => debouncedSetSearchText(e.target.value)}
 					/>
 				</div>

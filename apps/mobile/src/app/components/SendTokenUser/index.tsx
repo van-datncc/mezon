@@ -26,8 +26,13 @@ export const SendTokenUser = forwardRef(() => {
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} color={baseColor.gray} />
 			},
 			{
-				onPress: () => dismiss(),
-				title: t('settingStack.withdrawToken'),
+				onPress: () => {
+					navigation.push(APP_SCREEN.WALLET, {
+						activeScreen: 'manage'
+					});
+					dismiss();
+				},
+				title: t('settingStack.walletManagement'),
 				isShow: true,
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} rotate={-1} color={baseColor.gray} />
 			},

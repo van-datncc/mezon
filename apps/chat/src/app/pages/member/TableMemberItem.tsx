@@ -149,7 +149,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 	return (
 		<>
 			<div
-				className="flex flex-row justify-between items-center h-[48px] border-b-[1px] dark:border-borderDivider border-buttonLightTertiary last:border-b-0"
+				className="flex flex-row justify-between items-center h-[48px] border-b-theme-primary last:border-b-0"
 				onContextMenu={handleContextMenu}
 				ref={itemRef}
 			>
@@ -171,17 +171,15 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 							>
 								{HighlightMatchBold(displayName, searchQuery)}
 							</p>
-							<p className="text-[11px] dark:text-textDarkTheme text-textLightTheme">{HighlightMatchBold(username, searchQuery)}</p>
+							<p className="text-[11px]">{HighlightMatchBold(username, searchQuery)}</p>
 						</div>
 					</div>
 				</div>
 				<div className="flex-1 p-1 text-center">
-					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">{clanJoinTime ?? '-'}</span>
+					<span className="text-xs font-medium uppercase">{clanJoinTime ?? '-'}</span>
 				</div>
 				<div className="flex-1 p-1 text-center">
-					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">
-						{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}
-					</span>
+					<span className="text-xs font-medium uppercase">{mezonJoinTime ? mezonJoinTime + ' ago' : '-'}</span>
 				</div>
 				<div className="flex-2 p-1 text-center">
 					<span className={'inline-flex items-center'}>
@@ -193,14 +191,10 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 									roleIcon={userRolesClan.sortedRoles[0].role_icon || ''}
 								/>
 								{userRolesClan.length > 1 && (
-									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-opacity-50 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+									<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-opacity-50 hoverIconBlackImportant ml-1">
 										<Tooltip
 											overlay={
-												<div
-													className={
-														'rounded p-1 dark:bg-bgSecondary600 bg-bgLightMode dark:!text-white !text-black flex flex-col items-start'
-													}
-												>
+												<div className={'rounded p-1 flex flex-col items-start'}>
 													{userRolesClan.sortedRoles.slice(1).map((userRole) => (
 														<div className={'my-0.5'} key={userRole.id}>
 															<RoleNameCard
@@ -226,7 +220,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 						{hasClanPermission && (
 							<Tooltip
 								overlay={
-									<div className="rounded p-1 dark:bg-bgSecondary600 bg-bgLightMode max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+									<div className="rounded p-1  max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide bg-theme-input-primary">
 										<div className="flex flex-col gap-1 max-w-72">
 											{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
 										</div>
@@ -237,7 +231,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 							>
 								<span
 									title="Add Role"
-									className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1 text-base"
+									className="inline-flex justify-center gap-x-1 w-6 aspect-square items-center rounded hoverIconBlackImportant ml-1 text-base"
 								>
 									+
 								</span>
@@ -246,7 +240,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					</span>
 				</div>
 				<div className="flex-1 p-1 text-center">
-					<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">Signals</span>
+					<span className="text-xs font-medium uppercase">Signals</span>
 				</div>
 			</div>
 			{openModalRemoveMember && (

@@ -6,7 +6,7 @@ export const PopupFriend = ({ user, showPopupLeft }: { user: ChannelMembersEntit
 	const { deleteFriend } = useFriends();
 	return (
 		<div
-			className={`absolute top-0 dark:bg-bgProfileBody bg-gray-100 rounded-sm shadow w-[165px] p-2 z-[1] ${showPopupLeft ? 'right-9' : 'sbm:left-9 right-9'}`}
+			className={`absolute top-0  rounded-lg bg-theme-surface shadow w-[165px] p-2 z-[1] ${showPopupLeft ? 'right-9' : 'sbm:left-9 right-9'}`}
 			onClick={() => {
 				if (user) {
 					deleteFriend(user?.user?.username || '', user?.user?.id || '');

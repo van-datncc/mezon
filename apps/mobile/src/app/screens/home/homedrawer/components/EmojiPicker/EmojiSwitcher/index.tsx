@@ -16,7 +16,6 @@ function EmojiSwitcher({ mode: _mode, onChange }: IProps) {
 
 	const onPickerPress = () => {
 		if (mode !== 'emoji') {
-			Keyboard.dismiss();
 			onChange && onChange('emoji');
 			setMode('emoji');
 		} else {

@@ -38,8 +38,8 @@ const SettingEmoji = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> }) =
 
 	return (
 		<>
-			<div className="flex flex-col gap-3 pb-[40px] dark:text-textSecondary text-textSecondary800 text-sm">
-				<div className={'dark:text-textSecondary flex flex-col gap-2 text-textSecondary800'}>
+			<div className="flex flex-col gap-3 pb-[40px] 0 text-sm">
+				<div className={'flex flex-col gap-2'}>
 					<p className={''}>
 						Add up to 250 custom emoji that anyone can use in this server. Animated GIF emoji may be used by members with Mezon Nitro
 					</p>

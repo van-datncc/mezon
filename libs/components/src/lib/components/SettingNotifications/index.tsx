@@ -22,10 +22,10 @@ const SettingNotifications = ({ menuIsOpen }: SettingNotificationsProps) => {
 
 	return (
 		<div
-			className={`overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-white w-1/2 pt-[94px] pb-7 pr-[10px] sbm:pl-[40px] pl-[10px] overflow-x-hidden ${menuIsOpen ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar dark:text-white text-colorTextLightMode text-sm`}
+			className={`overflow-y-auto flex flex-col flex-1 shrink  w-1/2 pt-[94px] pb-7 pr-[10px] sbm:pl-[40px] pl-[10px] overflow-x-hidden ${menuIsOpen ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar text-theme-primary text-sm`}
 		>
 			<h1 className="text-xl font-semibold tracking-wider mb-8">Notifications</h1>
-			<div className="rounded-md dark:bg-bgSecondary bg-bgLightModeSecond m-4 p-4">
+			<div className="rounded-lg bg-theme-setting-nav  m-4 p-4">
 				<div className="flex items-center mb-4">
 					<input
 						type="checkbox"

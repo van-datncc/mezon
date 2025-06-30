@@ -57,10 +57,15 @@ interface ModalProps {
 export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => {
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50">
-			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 dark:bg-bgPrimary bg-bgLightModeSecond p-6 rounded-[5px] text-center">
-				<h2 className="text-[30px] font-semibold mb-4 dark:text-white text-black">Log Out</h2>
-				<p className="dark:text-white-600 dark:text-textDarkTheme text-textLightTheme mb-6 text-[16px]">Are you sure you want to log out?</p>
+			<div className="fixed inset-0 bg-black opacity-50"></div>
+			<div className="relative z-10 theme-base-color p-6 rounded-[5px] text-center">
+				<h2 className="text-[30px] font-semibold mb-4 ">Log Out</h2>
+				<p
+					className="dark:text-white-600 
+				 mb-6 text-[16px]"
+				>
+					Are you sure you want to log out?
+				</p>
 				<div className="flex justify-center mt-10 text-[14px]">
 					<button
 						color="gray"
@@ -86,9 +91,12 @@ export const DeleteAccountModal: React.FC<ModalProps> = ({ handleLogOut, onClose
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 dark:bg-bgPrimary bg-bgLightModeSecond p-6 rounded-[5px] text-center">
-				<h2 className="text-[30px] font-semibold mb-4 dark:text-white text-black">Delete Account</h2>
-				<p className="dark:text-white-600 dark:text-textDarkTheme text-textLightTheme mb-6 text-[16px]">
+			<div className="relative z-10 theme-base-color p-6 rounded-lg text-center">
+				<h2 className="text-[30px] font-semibold mb-4 ">Delete Account</h2>
+				<p
+					className="dark:text-white-600 
+				 mb-6 text-[16px]"
+				>
 					Are you sure that you want to delete your account? This will immediately log you out of your account and you will not be able to
 					log in again.
 				</p>

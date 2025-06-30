@@ -1,10 +1,11 @@
 import { captureSentryError } from '@mezon/logger';
+import { stickerSettingActions } from '@mezon/store';
 import { IEmojiRecent, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiClanEmoji } from 'mezon-js/dist/api.gen';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { memoizeAndTrack } from '../memoize';
-import { selectAllEmojiSuggestion } from './emojiSuggestion.slice';
+import { emojiSuggestionActions, selectAllEmojiSuggestion } from './emojiSuggestion.slice';
 
 export const EMOJI_RECENT_FEATURE_KEY = 'emojiRecent';
 
@@ -63,6 +64,41 @@ export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async
 	}
 });
 
+const buyItemForSale = createAsyncThunk('emoji/buyItemForSale', async ({ id, type }: { id?: string; type?: number }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.unlockItem(mezon.session, {
+			item_id: id,
+			item_type: type
+		});
+		if (response && response.source && id) {
+			if (type) {
+				thunkAPI.dispatch(
+					stickerSettingActions.update({
+						id: id,
+						changes: {
+							source: response.source
+						}
+					})
+				);
+			} else {
+				thunkAPI.dispatch(
+					emojiSuggestionActions.update({
+						id: id,
+						changes: {
+							src: response.source
+						}
+					})
+				);
+			}
+		}
+
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'emoji/fetchEmojiRecent');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
 export const initialEmojiRecentState: EmojiRecentState = emojiRecentAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	lastEmojiRecent: { emoji_recents_id: '0' }
@@ -104,6 +140,9 @@ export const emojiRecentSlice = createSlice({
 			})
 			.addCase(fetchEmojiRecent.rejected, (state: EmojiRecentState, action) => {
 				state.loadingStatus = 'error';
+			})
+			.addCase(buyItemForSale.pending, (state: EmojiRecentState) => {
+				state.loadingStatus = 'loading';
 			});
 	}
 });
@@ -112,7 +151,8 @@ export const emojiRecentReducer = emojiRecentSlice.reducer;
 
 export const emojiRecentActions = {
 	...emojiRecentSlice.actions,
-	fetchEmojiRecent
+	fetchEmojiRecent,
+	buyItemForSale
 };
 
 const { selectAll, selectEntities } = emojiRecentAdapter.getSelectors();

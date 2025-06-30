@@ -133,7 +133,7 @@
             "success": "Lưu thành công",
             "failed": "Lưu thất bại"
         },
-        "roleAndMemberEmpty": "không có vai trò và thành viên nào để ghi đè quyền"
+        "roleAndMemberEmpty": "Chưa có vai trò và thành viên để thiết lập quyền riêng"
     },
     "changeCategory": {
         "title": "Thay đổi danh mục",

@@ -8,12 +8,14 @@ import {
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_MY_USER_ID
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions, usersClanActions } from '@mezon/store-mobile';
-import notifee, { EventType } from '@notifee/react-native';
+import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import notifee from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
 	AndroidCategory,
+	AndroidGroupAlertBehavior,
 	AndroidImportance,
+	AndroidStyle,
 	AndroidVisibility,
 	NotificationAndroid
 } from '@notifee/react-native/src/types/NotificationAndroid';
@@ -40,10 +42,9 @@ const isNotificationAlreadyDisplayed = async (data: Record<string, any>): Promis
 		if (displayedNotifications?.length === 0) {
 			return false;
 		}
-		const isAlreadyDisplayed = displayedNotifications.some((notification) => {
+		return displayedNotifications?.some?.((notification) => {
 			return JSON.stringify(notification.notification?.data?.message) == JSON.stringify(data?.message);
 		});
-		return isAlreadyDisplayed;
 	} catch (error) {
 		console.error('Error checking displayed notifications:', error);
 		return false;
@@ -145,17 +146,18 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 	}
 
 	try {
-		const channelGroup = await getOrCreateChannelGroup(channel);
-		const channelId = await createNotificationChannel(channel, channelGroup?.groupId);
+		const groupId = await getOrCreateChannelGroup(channel);
+		const channelId = await createNotificationChannel(channel, groupId || '');
 
 		return {
 			...defaultConfig,
 			channelId,
 			tag: channelId,
-			sortKey: channelId,
+			sortKey: new Date().getTime().toString(),
 			category: AndroidCategory.MESSAGE,
-			groupId: channelGroup?.groupId,
-			groupSummary: channelGroup?.isGroupSummary
+			groupId: groupId,
+			groupSummary: false,
+			groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY
 		};
 	} catch (error) {
 		console.error('Error configuring Android notification:', error);
@@ -163,14 +165,12 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 	}
 };
 
-const getOrCreateChannelGroup = async (channelId: string): Promise<{ groupId: string; isGroupSummary: boolean } | null> => {
+const getOrCreateChannelGroup = async (channelId: string): Promise<string> => {
 	try {
 		if (!isValidString(channelId)) return null;
 
 		let groupId = '';
 		const group = await notifee.getChannelGroup(channelId);
-		const notifications = await notifee.getDisplayedNotifications();
-		const existInNotification = notifications?.some?.((item) => item?.notification?.android?.groupId === channelId);
 
 		if (group?.id) {
 			groupId = group.id;
@@ -181,13 +181,10 @@ const getOrCreateChannelGroup = async (channelId: string): Promise<{ groupId: st
 			});
 		}
 
-		return {
-			groupId,
-			isGroupSummary: group === null || !existInNotification
-		};
+		return groupId;
 	} catch (error) {
 		console.error('Error creating channel group:', error);
-		return null;
+		return '';
 	}
 };
 
@@ -207,7 +204,7 @@ const createNotificationChannel = async (channelId: string, groupId: string): Pr
 		});
 	} catch (error) {
 		console.error('Error creating notification channel:', error);
-		return 'default';
+		return channelId;
 	}
 };
 
@@ -256,11 +253,13 @@ export const createLocalNotification = async (title: string, body: string, data:
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
 		const configDisplayNotificationIOS: NotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
 
-		const notificationId = `${data?.sender || 'unknown'}_${data?.link || 'nolink'}_${Date.now()}`;
+		const notificationId = `${data?.sender || 'unknown'}_${data?.body}_${new Date().getMilliseconds()}`;
 		const isAlreadyDisplayed = await isNotificationAlreadyDisplayed(data);
 		if (isAlreadyDisplayed) {
 			return;
 		}
+
+		// Display the individual notification
 		await notifee.displayNotification({
 			id: notificationId,
 			title: title.trim(),
@@ -270,6 +269,42 @@ export const createLocalNotification = async (title: string, body: string, data:
 			android: configDisplayNotificationAndroid,
 			ios: configDisplayNotificationIOS
 		});
+
+		// Create or update summary notification for Android
+		if (Platform.OS === 'android' && configDisplayNotificationAndroid.groupId) {
+			const displayedNotifications = await notifee.getDisplayedNotifications();
+			const groupNotifications = displayedNotifications.filter(
+				(n) => n.notification.android?.groupId === configDisplayNotificationAndroid.groupId
+			);
+
+			if (groupNotifications.length > 1) {
+				await notifee.displayNotification({
+					id: `summary_${configDisplayNotificationAndroid.groupId}`,
+					title: 'New Messages',
+					body: `${groupNotifications.length} new messages`,
+					data: data,
+					android: {
+						...configDisplayNotificationAndroid,
+						groupSummary: true,
+						groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY,
+						style: {
+							type: AndroidStyle.MESSAGING,
+							person: {
+								name: title
+							},
+							messages: groupNotifications.map((n) => ({
+								text: n.notification.body || '',
+								timestamp: n.notification.android?.timestamp || Date.now(),
+								person: {
+									name: '',
+									icon: n.notification?.data?.image as string
+								}
+							}))
+						}
+					}
+				});
+			}
+		}
 	} catch (err) {
 		console.error('Error creating local notification:', err);
 	}
@@ -346,36 +381,36 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
+			if (channelId) {
+				store.dispatch(directActions.setDmGroupCurrentId(''));
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+				store.dispatch(
+					channelsActions.joinChannel({
+						clanId: clanId ?? '',
+						channelId: channelId,
+						noFetchMembers: false,
+						isClearMessage: true,
+						noCache: true
+					})
+				);
+			}
 			if (navigation) {
+				navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
-			store.dispatch(directActions.setDmGroupCurrentId(''));
 			if (clanId && channelId) {
 				const joinAndChangeClan = async (store: any, clanId: string) => {
 					await Promise.allSettled([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
 					]);
 				};
 
 				await joinAndChangeClan(store, clanId);
-				if (channelId) {
-					store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
-					store.dispatch(
-						channelsActions.joinChannel({
-							clanId: clanId ?? '',
-							channelId: channelId,
-							noFetchMembers: false,
-							isClearMessage: true,
-							noCache: true
-						})
-					);
-				}
 				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 				save(STORAGE_CLAN_ID, clanId);
 			}
-			store.dispatch(appActions.setLoadingMainMobile(false));
 			if (topicId && topicId !== '0' && !!topicId) {
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
@@ -397,13 +432,11 @@ export const navigateToNotification = async (store: any, notification: any, navi
 						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: messageId });
 					}
 				}
-				store.dispatch(appActions.setLoadingMainMobile(false));
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
 				}, 4000);
 			} else {
-				store.dispatch(appActions.setLoadingMainMobile(false));
 				setTimeout(() => {
 					store.dispatch(appActions.setIsFromFCMMobile(false));
 					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -411,7 +444,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 		}
 	} else {
-		store.dispatch(appActions.setLoadingMainMobile(false));
 		setTimeout(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
 			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
@@ -434,10 +466,9 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 	}
 };
 
-const processNotification = async ({ notification, navigation, time = 0, isTabletLandscape = false }) => {
+export const processNotification = async ({ notification, navigation, time = 0, isTabletLandscape = false }) => {
 	const store = await getStoreAsync();
 	save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-	store.dispatch(appActions.setLoadingMainMobile(true));
 	store.dispatch(appActions.setIsFromFCMMobile(true));
 	if (time) {
 		setTimeout(() => {
@@ -446,82 +477,6 @@ const processNotification = async ({ notification, navigation, time = 0, isTable
 	} else {
 		navigateToNotification(store, notification, navigation, isTabletLandscape);
 	}
-};
-
-export const setupNotificationListeners = async (navigation, isTabletLandscape = false) => {
-	messaging()
-		.getInitialNotification()
-		.then(async (remoteMessage) => {
-			notifee
-				.getInitialNotification()
-				.then(async (resp) => {
-					if (resp) {
-						const store = await getStoreAsync();
-						save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-						store.dispatch(appActions.setIsFromFCMMobile(true));
-						if (resp) {
-							processNotification({
-								notification: { ...resp?.notification, data: resp?.notification?.data },
-								navigation,
-								time: 1,
-								isTabletLandscape
-							});
-						}
-					}
-				})
-				.catch((err) => {
-					console.error('*** err getInitialNotification', err);
-				});
-			if (remoteMessage) {
-				const store = await getStoreAsync();
-				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-				store.dispatch(appActions.setIsFromFCMMobile(true));
-				if (remoteMessage?.notification?.title) {
-					processNotification({
-						notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
-						navigation,
-						time: 1,
-						isTabletLandscape
-					});
-				}
-			}
-		});
-
-	messaging().onNotificationOpenedApp(async (remoteMessage) => {
-		processNotification({
-			notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
-			navigation,
-			time: 0,
-			isTabletLandscape
-		});
-	});
-
-	notifee.onBackgroundEvent(async ({ type, detail }) => {
-		// const { notification, pressAction, input } = detail;
-		if (type === EventType.PRESS && detail) {
-			processNotification({
-				notification: detail.notification,
-				navigation,
-				time: 1,
-				isTabletLandscape
-			});
-		}
-	});
-
-	return notifee.onForegroundEvent(({ type, detail }) => {
-		switch (type) {
-			case EventType.DISMISSED:
-				break;
-			case EventType.PRESS:
-				processNotification({
-					notification: detail.notification,
-					navigation,
-					time: 1,
-					isTabletLandscape
-				});
-				break;
-		}
-	});
 };
 
 export const setupCallKeep = async () => {

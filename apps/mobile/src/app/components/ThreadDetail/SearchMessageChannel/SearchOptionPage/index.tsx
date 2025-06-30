@@ -50,12 +50,11 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 		return userListDataSearchByMention;
 	}, [searchText, userListDataSearchByMention]);
 	return (
-		<View style={{ paddingHorizontal: size.s_20, marginVertical: size.s_20, width: '100%', height: '100%' }}>
+		<View style={{ paddingHorizontal: size.s_20, width: '100%', height: '100%' }}>
 			{[ITypeOptionSearch.MENTIONS, ITypeOptionSearch.FROM].includes(optionFilter?.title as ITypeOptionSearch) && (
 				<View style={{ height: '100%', width: '100%', paddingBottom: size.s_100 }}>
 					{searchUserListByMention?.length ? (
 						<FlashList
-							scrollEnabled={false}
 							showsVerticalScrollIndicator={false}
 							data={searchUserListByMention}
 							renderItem={({ item }) => <UserInfoSearch userData={item} onSelectUserInfo={onSelect} />}

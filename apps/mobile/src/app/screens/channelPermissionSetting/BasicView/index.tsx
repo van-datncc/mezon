@@ -14,7 +14,6 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { isPublicChannel } from '@mezon/utils';
-import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +33,6 @@ import { IBasicViewProps } from '../types/channelPermission.type';
 export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const { themeValue } = useTheme();
 	const { userId } = useAuth();
-	const navigation = useNavigation<any>();
 	const [checkClanOwner] = useCheckOwnerForUser();
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
@@ -49,7 +47,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	useEffect(() => {
 		dispatch(rolesClanActions.fetchRolesClan({ clanId: channel?.clan_id }));
 		dispatch(fetchUserChannels({ channelId: channel?.channel_id }));
-	}, [channel?.channel_id]);
+	}, [channel?.channel_id, channel?.clan_id]);
 
 	const clanOwner = useMemo(() => {
 		return allClanMembers?.find((member) => checkClanOwner(member?.user?.id));
@@ -78,28 +76,29 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		];
 	}, [availableMemberList, availableRoleList, t]);
 
-	const onPrivateChannelChange = useCallback(() => {
-		setIsChannelPublic(!isChannelPublic);
-		const data = {
-			children: (
-				<MezonConfirm
-					onConfirm={updateChannel}
-					title={
-						isChannelPublic
-							? t('channelPermission.warningModal.privateChannelTitle')
-							: t('channelPermission.warningModal.publicChannelTitle')
-					}
-					confirmText={t('channelPermission.warningModal.confirm')}
-					content={
-						isChannelPublic
-							? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
-							: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
-					}
-				/>
-			)
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	}, [isChannelPublic, channel]);
+	const onPrivateChannelChange = useCallback(
+		(value: boolean) => {
+			setIsChannelPublic(value);
+			const data = {
+				children: (
+					<MezonConfirm
+						onConfirm={updateChannel}
+						title={
+							!value ? t('channelPermission.warningModal.privateChannelTitle') : t('channelPermission.warningModal.publicChannelTitle')
+						}
+						confirmText={t('channelPermission.warningModal.confirm')}
+						content={
+							!value
+								? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
+								: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
+						}
+					/>
+				)
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+		},
+		[t, channel?.channel_label]
+	);
 
 	const openBottomSheet = () => {
 		bottomSheetRef.current?.present();
@@ -107,8 +106,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 
 	const updateChannel = useCallback(async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-
-		console.log('updateChannel', isChannelPublic);
 
 		const response = await dispatch(
 			channelsActions.updateChannelPrivate({
@@ -133,7 +130,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 				)
 			}
 		});
-	}, [dispatch, channel, isChannelPublic, userId]);
+	}, [isChannelPublic, channel, userId, t]);
 
 	const renderWhoCanAccessItem = useCallback(
 		({ item }) => {
@@ -160,9 +157,13 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		[channel, themeValue]
 	);
 
+	const handlePressChangeChannelPrivate = useCallback(() => {
+		onPrivateChannelChange(!isChannelPublic);
+	}, [isChannelPublic, onPrivateChannelChange]);
+
 	return (
 		<View style={{ flex: 1 }}>
-			<TouchableOpacity onPress={() => onPrivateChannelChange()}>
+			<TouchableOpacity onPress={handlePressChangeChannelPrivate}>
 				<View
 					style={{
 						flexDirection: 'row',

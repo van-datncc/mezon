@@ -2,7 +2,6 @@ import { size } from '@mezon/mobile-ui';
 import { FlashList } from '@shopify/flash-list';
 import { ClanSticker } from 'mezon-js';
 import { useCallback } from 'react';
-import { View } from 'react-native';
 import { StickerSettingItem } from '../StickerItem';
 
 type StickerListProps = {
@@ -38,8 +37,12 @@ export const StickerList = ({ listSticker, clanID }: StickerListProps) => {
 	};
 
 	return (
-		<View>
-			<FlashList data={listSticker} keyExtractor={(item) => item.id} renderItem={renderItem} estimatedItemSize={size.s_60} />
-		</View>
+		<FlashList
+			data={listSticker}
+			keyExtractor={(item) => item.id}
+			renderItem={renderItem}
+			estimatedItemSize={size.s_60}
+			removeClippedSubviews={true}
+		/>
 	);
 };

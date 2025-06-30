@@ -967,7 +967,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 		return (
-			<div className="w-full h-full relative messages-container select-text dark:bg-bgPrimary bg-bgLightPrimary">
+			<div className="w-full h-full relative messages-container select-text bg-theme-chat ">
 				<div
 					onScroll={handleScroll}
 					onWheelCapture={() => {

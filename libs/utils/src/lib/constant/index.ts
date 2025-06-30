@@ -27,6 +27,7 @@ export const FOR_24_HOURS = 24 * 60 * 60 * 1000;
 export const MAX_LENGTH_MESSAGE_BUZZ = 160;
 export const ONE_MINUTE = 60000;
 export const GUEST_NAME = 'guest';
+export const FOR_SALE_CATE = 'forsale';
 
 export const MUTE = 0;
 export const ACTIVE = 1;
@@ -91,7 +92,7 @@ export const ACTIVITY_PANEL_HEIGHT = 73;
 export const WIDTH_CLAN_SIDE_BAR = 72;
 export const WIDTH_CHANNEL_LIST_BOX = 272;
 
-export const DEFAULT_ROLE_COLOR = '#99aab5';
+export const DEFAULT_ROLE_COLOR = 'text-theme-primary';
 export const DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR = '#17ac86';
 
 export const CHANNEL_INPUT_ID = 'editorReactMentionChannel';

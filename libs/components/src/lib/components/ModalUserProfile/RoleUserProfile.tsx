@@ -110,15 +110,10 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 					/>
 				))}
 				{userRolesClan.length > 6 && (
-					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-bgSecondary600 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode hoverIconBlackImportant ml-1">
+					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-theme-input-primary hoverIconBlackImportant ml-1">
 						<Tooltip
 							overlay={
-								<div
-									className={
-										'flex flex-col items-start gap-1 dark:!text-white !text-black' +
-										`${isLightMode ? 'tooltipLightMode' : 'tooltip'}`
-									}
-								>
+								<div className={'flex flex-col items-start gap-1 ' + `${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
 									{userRolesClan.slice(6, userRolesClan.length).map((userRole, index) => (
 										<RoleClanItem
 											key={`${userRole.id}_role`}
@@ -145,11 +140,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 								<AddRolesComp addRole={addRole} filteredListRoleBySearch={filteredListRoleBySearch} setSearchTerm={setSearchTerm} />
 							</div>
 						) : null}
-						<button
-							title="Add roles"
-							onClick={handleOpenAddRoleModal}
-							className="flex gap-x-1 dark:text-[#AEAEAE] text-colorTextLightMode rounded p-1 dark:bg-slate-800 bg-slate-300 items-center"
-						>
+						<button title="Add roles" onClick={handleOpenAddRoleModal} className="flex gap-x-1 rounded p-1 items-center">
 							<Icons.Plus className="size-5 select-none" />
 							<p className="text-xs m-0 font-medium select-none">Add Role</p>
 						</button>

@@ -1,7 +1,7 @@
 import { Attributes, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		wrapper: {
 			width: '100%',
@@ -122,5 +122,45 @@ export const style = (colors: Attributes) =>
 		statusUser: { right: size.s_8, bottom: size.s_4 },
 		memberSince: {
 			marginVertical: size.s_8
+		},
+
+		textStatus: {
+			color: colors.text,
+			fontSize: isTabletLandscape ? size.label : size.s_14
+		},
+		badgeStatusTemp: {
+			position: 'absolute',
+			left: size.s_100,
+			bottom: size.s_30,
+			width: size.s_12,
+			height: size.s_12,
+			borderRadius: size.s_12,
+			backgroundColor: colors.badgeHighlight
+		},
+		badgeStatus: {
+			position: 'absolute',
+			gap: size.s_6,
+			flexDirection: 'row',
+			left: size.s_100,
+			top: isTabletLandscape ? size.s_100 : size.s_80,
+			minHeight: size.s_40,
+			minWidth: size.s_50,
+			borderRadius: size.s_16,
+			maxWidth: '70%',
+			backgroundColor: colors.badgeHighlight,
+			justifyContent: 'center',
+			alignItems: 'center',
+			paddingHorizontal: size.s_12,
+			paddingVertical: size.s_8,
+			overflow: 'visible'
+		},
+		badgeStatusInside: {
+			position: 'absolute',
+			left: size.s_16,
+			top: -size.s_8,
+			width: size.s_20,
+			height: size.s_20,
+			borderRadius: size.s_20,
+			backgroundColor: colors.badgeHighlight
 		}
 	});

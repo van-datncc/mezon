@@ -20,13 +20,13 @@ const Integrations = ({ currentChannel, isClanSetting }: IIntegrationsProps) => 
 	const allClanWebhooks = useSelector(selectAllClanWebhooks);
 	return (
 		<div className="mt-[60px]">
-			<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme flex">
+			<h2 className="text-xl font-semibold mb-5 flex">
 				<div
 					onClick={() => {
 						setIsOpenWebhooks(false);
 						setIsOpenClanWebhooks(false);
 					}}
-					className={`${isOpenWebhooks || isOpenClanWebhooks ? 'text-[#b5bac1] hover:dark:text-textDarkTheme hover:text-textLightTheme cursor-pointer' : ''}`}
+					className={`${isOpenWebhooks || isOpenClanWebhooks ? ' cursor-pointer' : ''}`}
 				>
 					Integrations
 				</div>{' '}

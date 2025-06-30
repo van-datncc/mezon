@@ -49,7 +49,7 @@ export default {
 			margin: '0 8px',
 			padding: '8px',
 			'&focused': {
-				backgroundColor: '#35373C',
+				backgroundColor: 'hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039)',
 				borderRadius: 3
 			}
 		}
