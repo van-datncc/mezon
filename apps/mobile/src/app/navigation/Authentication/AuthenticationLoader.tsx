@@ -42,8 +42,9 @@ import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
-import { checkNotificationPermission, isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
+import { isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
+import { FCMNotificationLoader } from './FCMNotificationLoader';
 
 export const AuthenticationLoader = () => {
 	const navigation = useNavigation<any>();
@@ -232,8 +233,6 @@ export const AuthenticationLoader = () => {
 	}, [dispatch, navigation, userProfile?.user?.id]);
 
 	useEffect(() => {
-		checkPermission();
-
 		const unsubscribe = messaging().onMessage((remoteMessage) => {
 			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 				// Case: FCM start call
@@ -284,10 +283,6 @@ export const AuthenticationLoader = () => {
 			unsubscribe();
 		};
 	}, []);
-
-	const checkPermission = async () => {
-		await checkNotificationPermission();
-	};
 
 	const playBuzzSound = () => {
 		Sound.setCategory('Playback');
@@ -365,6 +360,7 @@ export const AuthenticationLoader = () => {
 	return (
 		<>
 			<LoadingModal isVisible={isLoadingMain} />
+			<FCMNotificationLoader />
 			{!!fileShared && !isLoadingMain && <Sharing data={fileShared} onClose={onCloseFileShare} />}
 		</>
 	);
