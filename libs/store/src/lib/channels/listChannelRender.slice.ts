@@ -57,8 +57,6 @@ export const listChannelRenderSlice = createSlice({
 			// Prioritize moving channel forward thread
 			const listChannelPriority = prioritizeChannel(listChannel);
 			if (!state.listChannelRender[clanId] || isMobile) {
-				console.log(state.listChannelRender, 'state.listChannelRender');
-
 				const listChannelRender: (ICategoryChannel | IChannel)[] = [];
 				const listFavorChannel: IChannel[] = [];
 				listCategory.map((category) => {
