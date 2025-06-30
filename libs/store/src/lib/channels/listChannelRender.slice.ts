@@ -90,8 +90,6 @@ export const listChannelRenderSlice = createSlice({
 					isFavor: true
 				};
 
-				console.log('12344');
-
 				state.listChannelRender[clanId] = [favorCate, ...listFavorChannel, ...listChannelRender];
 			}
 		},
