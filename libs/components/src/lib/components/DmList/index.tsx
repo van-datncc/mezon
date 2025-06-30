@@ -91,7 +91,7 @@ const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean })
 
 	return (
 		<button
-			className={`py-2 px-3 rounded-lg text-theme-primary bg-button-secondary w-full flex gap-4 items-center ${pathname.includes('friends') ? '' : ''}`}
+			className={`py-2 px-3 rounded-lg text-theme-primary-hover w-full flex gap-4 items-center ${pathname.includes('friends') ? 'text-theme-secondary bg-button-secondary' : 'text-theme-primary'}`}
 			onClick={handleOpenFriendList}
 		>
 			<Icons.IconFriends />

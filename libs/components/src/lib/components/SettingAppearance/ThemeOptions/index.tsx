@@ -39,14 +39,14 @@ const ThemeOptions = () => {
 
 	return (
 		<div className="pt-10 flex flex-col gap-2">
-			<div className="dark:text-white text-black ">Theme</div>
+			<div>Theme</div>
 			<div className="theme-container flex gap-[30px] mt-3">
 				<div
 					className={`light-theme aspect-square bg-white w-[60px] rounded-full border dark:border-white border-black border-solid cursor-pointer relative ${themeChosen === 'light' ? 'border-indigo-600 border-2' : ''}`}
 					onClick={() => setThemeChosen('light')}
 				>
 					<div
-						className={` w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'light' ? 'block' : 'hidden'}`}
+						className={` w-fit p-[2px] bg-indigo-600 absolute text-white top-0 right-0 rounded-full ${themeChosen === 'light' ? 'block' : 'hidden'}`}
 					>
 						<Icons.CheckIcon />
 					</div>
@@ -68,7 +68,7 @@ const ThemeOptions = () => {
 				>
 					<Icons.SpinArrowIcon />
 					<div
-						className={` w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'system' ? 'block' : 'hidden'}`}
+						className={` w-fit p-[2px] bg-indigo-600 absolute text-white top-0 right-0 rounded-full ${themeChosen === 'system' ? 'block' : 'hidden'}`}
 					>
 						<Icons.CheckIcon />
 					</div>
@@ -76,10 +76,10 @@ const ThemeOptions = () => {
 			</div>
 
 			{/* add theme */}
-			<div className="mt-3 flex flex-col border-2 border-solid border-purple-600  p-5">
-				<div className="dark:text-white text-black">Theme Colors</div>
+			<div className="mt-3 flex flex-col">
+				<div className="">Theme Colors</div>
 				<div className="flex items-center justify-between">
-					<p className="text-xs dark:text-white text-black">
+					<p className="text-xs ">
 						Unlock more themes with <span className="text-blue-500">Nitro</span>.
 					</p>
 					<div className="flex gap-2">

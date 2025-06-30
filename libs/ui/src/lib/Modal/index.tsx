@@ -45,11 +45,11 @@ const Modal = (props: ModalProps) => {
 				<div
 					ref={modalRef}
 					tabIndex={-1}
-					className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden"
+					className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none base-theme-color bg-opacity-80  text-theme-primary hide-scrollbar overflow-hidden"
 				>
 					<div className={`relative w-full ${isInviteModal ? 'max-w-[480px]' : 'max-w-[684px]'} sm:h-auto ${classNameBox}`}>
-						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full dark:bg-bgPrimary bg-bgLightModeSecond  outline-none focus:outline-none h-full sm:h-auto">
-							<div className={`flex items-start justify-between p-4 border-solid dark:border-borderDefault border-b rounded-t`}>
+						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full theme-base-color outline-none focus:outline-none h-full sm:h-auto">
+							<div className={`flex items-start justify-between p-4 border-b-theme-primary rounded-t`}>
 								<div>
 									<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
 									{hasChannel && (

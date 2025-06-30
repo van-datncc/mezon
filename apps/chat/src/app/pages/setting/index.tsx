@@ -34,7 +34,7 @@ const SettingContent = ({ isDM, isShowSettingFooter }: { isDM: boolean; isShowSe
 	useEscapeKeyClose(modalRef, closeSetting);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="z-20 flex fixed inset-0 w-screen">
+		<div ref={modalRef} tabIndex={-1} className="z-20 flex fixed inset-0 w-screen bg-theme-setting-primary text-theme-primary">
 			<div className="flex text-gray- w-screen relative">
 				<div className={`${!menuIsOpen ? 'hidden' : 'flex'} text-gray- w-1/6 xl:w-1/4 min-w-56 relative`}>
 					<SettingItem onItemClick={handleSettingItemClick} initSetting={currentSetting} />
@@ -47,18 +47,18 @@ const SettingContent = ({ isDM, isShowSettingFooter }: { isDM: boolean; isShowSe
 
 				{menuIsOpen ? (
 					<Icons.ArrowLeftCircleActive
-						className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50"
+						className="flex sbm:hidden absolute left-4 top-4 text-theme-primary w-[30px] h-[30px] text-theme-primary-hover z-50"
 						onClick={handleMenuBtn}
 					/>
 				) : (
 					<Icons.ArrowLeftCircle
-						className="flex sbm:hidden absolute left-4 top-4 dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50"
+						className="flex sbm:hidden absolute left-4 top-4 text-theme-primary w-[30px] h-[30px] text-theme-primary-hover z-50"
 						onClick={handleMenuBtn}
 					/>
 				)}
 
 				<div className="flex sbm:hidden absolute right-4 top-4" onClick={closeSetting}>
-					<Icons.CloseIcon className="dark:text-[#AEAEAE] text-gray-500 w-[30px] h-[30px] hover:text-slate-400 z-50" />
+					<Icons.CloseIcon className="text-theme-primary w-[30px] h-[30px] text-theme-primary-hover z-50" />
 				</div>
 			</div>
 		</div>

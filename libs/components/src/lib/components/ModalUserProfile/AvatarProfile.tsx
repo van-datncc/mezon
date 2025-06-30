@@ -59,7 +59,7 @@ const AvatarProfile = ({
 				<AvatarImage
 					alt={username || ''}
 					username={username}
-					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-solid dark:border-bgSecondary600 border-white object-cover my-0 ${styleAvatar}`}
+					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px]  border-theme-primary object-cover my-0 ${styleAvatar}`}
 					srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 					src={avatar}
 					isAnonymous={isAnonymous}
@@ -69,12 +69,12 @@ const AvatarProfile = ({
 
 			{(customStatus || (userStatus?.status && activityByUserId)) && (
 				<div className="flex flex-col gap-[12px] mt-[30px] relative w-full h-[85px]">
-					<div className="dark:bg-bgPrimary bg-white w-[12px] h-[12px] rounded-full shadow-md"></div>
+					<div className="bg-theme-primary w-[12px] h-[12px] rounded-full shadow-md"></div>
 					<div className="relative flex-1">
-						<div className="dark:bg-bgPrimary bg-white w-[20px] h-[20px] rounded-full absolute top-[-11px] left-[16px] shadow-md"></div>
+						<div className=" w-[20px] h-[20px] rounded-full absolute top-[-11px] left-[16px] shadow-md"></div>
 						<div className="absolute w-fit max-w-full shadow-lg rounded-[12px] group">
-							<div className="relative dark:bg-bgPrimary bg-white px-[16px] py-[12px] w-fit max-w-full rounded-[12px] flex items-center justify-center">
-								<span className="text-left font-medium text-[14px] dark:text-white text-black w-full break-words overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
+							<div className="relative bg-theme-surface px-[16px] py-[12px] w-fit max-w-full rounded-[12px] flex items-center justify-center">
+								<span className="text-left font-medium text-[14px] text-theme-primary w-full break-words overflow-hidden transition-all duration-300 hover:line-clamp-none line-clamp-2">
 									{activityStatus}
 								</span>
 								{isFooterProfile && (

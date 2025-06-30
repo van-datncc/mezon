@@ -152,7 +152,7 @@ const FriendsPage = () => {
 						{tabData.map((tab, index) => (
 							<div key={index} className="relative flex items-center justify-center">
 								<button
-									className={`px-3 py-[6px] rounded-lg text-theme-primary bg-active-button-hover ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-active-button' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
+									className={`px-3 py-[6px] rounded-lg text-theme-primary text-theme-primary-hover shadow-none border-none bg-button-hover ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-active-button' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 									tabIndex={index}
 									onClick={() => handleChangeTab(tab.value)}
 								>

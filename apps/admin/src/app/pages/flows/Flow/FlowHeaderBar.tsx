@@ -58,7 +58,7 @@ const FlowHeaderBar = ({ isExampleFlow, onSaveFlow, flowData, changeOpenModalSav
 	}, [applicationId, flowId, navigate]);
 
 	return (
-		<div className="top-1 left-3 right-3 z-10 bg-gray-50 dark:bg-gray-600 h-[50px] flex items-center justify-between px-3 my-1 rounded-full">
+		<div className="top-1 left-3 right-3 z-10 bg-red-500 h-[50px] flex items-center justify-between px-3 my-1 rounded-full">
 			<div className="flex items-center gap-2">
 				<button
 					onClick={handleClickBackButton}

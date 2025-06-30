@@ -31,7 +31,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 					ref={(element) => item?.id && itemRefs && (itemRefs[item.id] = element)}
 					onClick={() => onItemClick(item)}
 					onMouseEnter={() => onMouseEnter(item)}
-					className={`${focusItemId === item.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+					className={`${focusItemId === item.id ? 'bg-item-theme ' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 				>
 					{isChannel ? (
 						<SuggestItem

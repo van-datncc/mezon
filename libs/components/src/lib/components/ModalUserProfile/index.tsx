@@ -220,7 +220,7 @@ const ModalUserProfile = ({
 				statusOnline={statusOnline}
 			/>
 			<div className="px-[16px]">
-				<div className="dark:bg-bgPrimary bg-white w-full p-2 my-[16px] dark:text-white text-black rounded-[10px] flex flex-col text-justify">
+				<div className="theme-base-color w-full border-theme-primary p-2 my-[16px] text-theme-primary text-theme-primary-hover shadow rounded-[10px] flex flex-col text-justify">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{isUserRemoved
@@ -274,7 +274,7 @@ const ModalUserProfile = ({
 					) : null}
 					{showNote && (
 						<>
-							<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 p-2"></div>
+							<div className="w-full border-b-theme-primary"></div>
 							<NoteUserProfile />
 						</>
 					)}

@@ -45,9 +45,9 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
-			className="dark:bg-bgProfileBody bg-white p-2 rounded w-[250px] absolute left-1/2 top-[58px] z-[9999] transform translate-x-[-50%] shadow-xl"
+			className="theme-base-color p-2 rounded w-[250px] absolute left-1/2 top-[58px] z-[9999] transform translate-x-[-50%] shadow-xl"
 		>
-			<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-[#6A6A6A] last:border-b-0 last:mb-0 last:pb-0">
+			<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0">
 				{canManageClan && <ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
 				<ItemModal
 					onClick={statusMarkAsReadClan === 'pending' ? undefined : () => handleMarkAsReadClan(currentClanId as string)}
@@ -56,11 +56,7 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 					{statusMarkAsReadClan === 'pending' ? 'Processing...' : 'Mark As Read'}
 				</ItemModal>
 
-				<ItemModal
-					onClick={handleShowInviteClanModal}
-					children="Invite People"
-					endIcon={<Icons.AddPerson className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
-				/>
+				<ItemModal onClick={handleShowInviteClanModal} children="Invite People" endIcon={<Icons.AddPerson />} />
 				<ItemModal
 					onClick={handleShowServerSettings}
 					children="Clan Settings"

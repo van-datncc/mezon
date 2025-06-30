@@ -61,8 +61,8 @@ enum StatusVoiceChannel {
 
 export const classes = {
 	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
-	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton',
-	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton'
+	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 bg-item-hover text-theme-primary-hover',
+	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 bg-item-hover text-theme-primary-hover'
 };
 
 export type ChannelLinkRef = {
@@ -238,7 +238,7 @@ const ChannelLinkComponent = ({
 			role="button"
 			onDragStart={(e) => dragStart(e)}
 			onDragEnd={(e) => dragEnter(e)}
-			className={`relative group z-10 mt-[2px] dark:bg-bgSecondary bg-bgLightSecondary ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+			className={`relative group z-10   ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 				<span
@@ -256,7 +256,7 @@ const ChannelLinkComponent = ({
 						{!isPrivate && <Icons.Speaker defaultSize="w-5 5-5 " />}
 					</div>
 					<p
-						className={`ml-2 w-full pointer-events-none dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${highLightVoiceChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+						className={`ml-2 w-full pointer-events-none text-theme-primary-hover text-base focus:bg-bgModifierHover ${highLightVoiceChannel ? 'text-theme-primary dark:font-medium font-semibold' : 'font-medium text-theme-primary'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -270,40 +270,30 @@ const ChannelLinkComponent = ({
 					to={channelPath}
 					id={`${channel.category_id}-${channel.id}`}
 					onClick={handleClick}
-					className={`channel-link block ${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}
+					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : 'text-theme-primary'}`}
 					draggable="false"
 				>
 					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 
-						<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
+						<div className={`relative text-theme-primary ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-								<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+								<Icons.SpeakerLocked defaultSize="w-5 h-5 " />
 							)}
 							{channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel && (
-								<Icons.HashtagWarning className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode" />
+								<Icons.HashtagWarning className="w-5 h-5 " />
 							)}
 							{isPrivate === ChannelStatusEnum.isPrivate &&
 								channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
-								!isAgeRestrictedChannel && <Icons.HashtagLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />}
-							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
-								<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-							)}
+								!isAgeRestrictedChannel && <Icons.HashtagLocked defaultSize="w-5 h-5" />}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && <Icons.Speaker defaultSize="w-5 h-5 " />}
 							{channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
-								<>
-									{isPrivate ? (
-										<Icons.SpeakerLocked defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-									) : (
-										<Icons.Speaker defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-									)}
-								</>
+								<>{isPrivate ? <Icons.SpeakerLocked defaultSize="w-5 h-5 " /> : <Icons.Speaker defaultSize="w-5 h-5 " />}</>
 							)}
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && !isAgeRestrictedChannel && (
-								<Icons.Hashtag defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+								<Icons.Hashtag defaultSize="w-5 h-5 " />
 							)}
-							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && (
-								<Icons.Stream defaultSize="w-5 h-5 dark:text-channelTextLabel" />
-							)}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 h-5 " />}
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && (
 								<Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />
 							)}
@@ -313,7 +303,7 @@ const ChannelLinkComponent = ({
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white pointer-events-none group-hover:text-black text-base focus:bg-bgModifierHover ${hightLightTextChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+							className={`ml-2 w-full pointer-events-none text-theme-primary text-base focus:bg-bgModifierHover ${hightLightTextChannel ? ' font-semibold' : 'font-medium '}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
@@ -341,7 +331,7 @@ const ChannelLinkComponent = ({
 							onClick={handleCreateLinkInvite}
 						/> */}
 						<Icons.SettingProfile
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block dark:text-white text-black `}
+							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block text-theme-primary `}
 							onClick={handleOpenCreate}
 						/>
 						<div
@@ -357,7 +347,7 @@ const ChannelLinkComponent = ({
 							onClick={handleCreateLinkInvite}
 						/> */}
 						<Icons.SettingProfile
-							className={`absolute ml-auto w-4 h-4 top-[6px] right-3 ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden group-hover:block dark:group-hover:text-white group-hover:text-black cursor-pointer`}
+							className={`absolute ml-auto w-5 h-5 top-2 right-3 ${isActive ? 'text-theme-primary-active' : 'text-transparent'} hidden group-hover:block text-theme-primary-hover cursor-pointer`}
 							onClick={handleOpenCreate}
 						/>
 					</>

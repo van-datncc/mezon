@@ -203,10 +203,10 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					{friend?.state === 0 && (
 						<div className="flex gap-3 items-center">
 							<button onClick={directMessageWithUser} className=" bg-button-secondary rounded-full p-2 text-theme-primary-hover">
-								<Icons.IconChat className="text-theme-primary " />
+								<Icons.IconChat />
 							</button>
 							<button onClick={handleMenuClick} className="bg-button-secondary rounded-full p-2 text-theme-primary-hover">
-								<Icons.IconEditThreeDot className="text-theme-primary" />
+								<Icons.IconEditThreeDot />
 							</button>
 						</div>
 					)}

@@ -126,7 +126,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 						</td>
 						<td className="  flex h-14 justify-center items-center">
 							<div className="flex gap-x-2">
-								<div className="text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full opacity-0 group-hover:opacity-100">
+								<div className="text-[15px] cursor-pointer bg-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100">
 									{hasPermissionEdit ? (
 										<span title="Edit">
 											<Icons.PenEdit className="size-5" />
@@ -139,7 +139,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								</div>
 								{hasPermissionEdit && (
 									<div
-										className={`text-[15px] cursor-pointer dark:hover:bg-slate-800 hover:bg-bgModifierHoverLight dark:bg-bgTertiary bg-bgLightModeThird p-2 rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
+										className={`text-[15px] cursor-pointer bg-red-500 p-2 rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
 										onClick={(e) => handleOpenDeleteRoleModal(e, role.id)}
 									>
 										<span title="Delete">

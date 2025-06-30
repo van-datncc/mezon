@@ -171,7 +171,7 @@ export const CreateNewChannelModal = () => {
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
 			<div
-				className={`z-60 w-full h-full sm:w-4/5 sm:max-h-[630px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
+				className={`z-60 w-full h-full sm:w-4/5 sm:max-h-[630px] md:w-[684px] theme-base-color rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
 			>
 				<div className="self-stretch flex-col justify-start items-start flex">
 					<div className="self-stretch px-5 pt-8 flex-col justify-start items-start gap-3 flex">
@@ -190,7 +190,7 @@ export const CreateNewChannelModal = () => {
 								</div>
 							</div>
 
-							<div className=" dark:text-zinc-400 text-colorTextLightMode text-sm">Kindly set up a channel of your choice.</div>
+							<div className=" text-sm">Kindly set up a channel of your choice.</div>
 						</div>
 						<div
 							className={`flex flex-col gap-3 w-full max-h-[430px] pr-2 overflow-y-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
