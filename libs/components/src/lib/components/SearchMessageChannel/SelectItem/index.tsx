@@ -1,7 +1,5 @@
-import { selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 
 type SelectItemProps = {
 	title?: string;
@@ -11,19 +9,7 @@ type SelectItemProps = {
 };
 
 const SelectItem = ({ title, content, onClick, className }: SelectItemProps) => {
-	const appearanceTheme = useSelector(selectTheme);
 	const [isHovered, setIsHovered] = useState(false);
-
-	const iconColorClass =
-		className === 'bg-[#EBEBED]'
-			? 'text-black'
-			: className === 'bg-[#282A2E]'
-				? 'text-white'
-				: isHovered
-					? appearanceTheme === 'light'
-						? 'text-black'
-						: 'text-white'
-					: '';
 
 	return (
 		<button
@@ -37,7 +23,7 @@ const SelectItem = ({ title, content, onClick, className }: SelectItemProps) => 
 				<span className="">{content}</span>
 			</div>
 			{className === 'bg-item-theme' || className === 'bg-item-theme' || isHovered ? (
-				<div className={`${iconColorClass} transition-colors duration-300`}>
+				<div className={` transition-colors duration-300`}>
 					<Icons.Plus />
 				</div>
 			) : null}

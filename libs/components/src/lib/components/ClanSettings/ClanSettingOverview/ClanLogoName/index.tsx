@@ -85,10 +85,10 @@ const ClanLogoName = ({ onUpload, onGetClanName }: ClanLogoNameProps) => {
 
 	return (
 		<div className="flex sbm:flex-row flex-col gap-[10px]">
-			<div className="flex flex-row flex-1 text-textSecondary gap-x-[10px]">
+			<div className="flex flex-row flex-1 gap-x-[10px]">
 				<div className="flex flex-2 gap-x-[10px]">
 					<div className="flex flex-col">
-						<div className="relative flex items-center justify-center w-[100px] h-[100px] rounded-full shadow-lg shadow-neutral-800">
+						<div className="relative flex items-center justify-center w-[100px] h-[100px] rounded-full shadow border-theme-primary ">
 							<label className="w-full h-full">
 								<div
 									style={{ backgroundImage: `url(${urlLogo})` }}
@@ -98,7 +98,7 @@ const ClanLogoName = ({ onUpload, onGetClanName }: ClanLogoNameProps) => {
 								</div>
 								<input ref={fileInputRef} id="upload_logo" onChange={(e) => handleFile(e)} type="file" className="hidden" />
 							</label>
-							<div className="absolute right-[-10px] top-0 p-[5px] bg-[#ffffff] rounded-full z-50 shadow-xl border">
+							<div className="absolute right-[-10px] top-0 p-[5px] text-theme-primary rounded-full z-50 shadow-xl border-theme-primary">
 								<Icons.SelectFileIcon />
 							</div>
 						</div>
@@ -109,20 +109,20 @@ const ClanLogoName = ({ onUpload, onGetClanName }: ClanLogoNameProps) => {
 					<p className="text-sm mb-2">We recommend an image of at least 512x512 for the clan.</p>
 					<button
 						onClick={handleOpenFile}
-						className="h-10 text-sm w-fit flex items-center px-2 justify-center mt-2 rounded bg-bgLightModeThird text-textLightTheme dark:text-textDarkTheme border dark:border-buttonProfile hover:!bg-[#9e9e9e] dark:bg-transparent dark:hover:!bg-buttonProfile focus:!ring-transparent"
+						className="h-10 text-sm w-fit flex items-center px-2 justify-center mt-2 rounded-lg border-theme-primary bg-theme-input text-theme-primary-hover bg-secondary-button-hover  focus:!ring-transparent"
 					>
 						Upload Image
 					</button>
 				</div>
 			</div>
 			<div className="flex flex-1 flex-col">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Clan Name</h3>
+				<h3 className="text-xs font-bold uppercase mb-2">Clan Name</h3>
 				<div className="w-full">
 					<input
 						type="text"
 						value={clanName}
 						onChange={(e) => handleChangeClanName(e.target.value)}
-						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
+						className=" outline-none w-full h-10 p-[10px] bg-theme-input text-base rounded placeholder:text-sm"
 						placeholder="Support has arrived!"
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>

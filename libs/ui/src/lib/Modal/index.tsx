@@ -48,7 +48,7 @@ const Modal = (props: ModalProps) => {
 					className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none base-theme-color bg-opacity-80  text-theme-primary hide-scrollbar overflow-hidden"
 				>
 					<div className={`relative w-full ${isInviteModal ? 'max-w-[480px]' : 'max-w-[684px]'} sm:h-auto ${classNameBox}`}>
-						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full theme-base-color outline-none focus:outline-none h-full sm:h-auto">
+						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-theme-setting-primary outline-none focus:outline-none h-full sm:h-auto">
 							<div className={`flex items-start justify-between p-4 border-b-theme-primary rounded-t`}>
 								<div>
 									<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
@@ -70,24 +70,22 @@ const Modal = (props: ModalProps) => {
 									<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 								</div>
 								<button
-									className="flex items-center justify-center opacity-50"
+									className="flex items-center justify-center opacity-50 text-theme-primary-hover"
 									onClick={() => {
 										onClose();
 									}}
 								>
-									<span className="text-5xl leading-3 dark:hover:text-white hover:text-black">×</span>
+									<span className="text-5xl leading-3">×</span>
 								</button>
 							</div>
 
 							{/*body*/}
-							<div className="relative px-5 py-4 flex-auto bg-transparent max-h-[500px] overflow-auto hide-scrollbar">
-								<div className={`dark:bg-[#323232] bg-bgLightModeSecond rounded-[5px] bg-transparent ${classNameWrapperChild}`}>
-									{children}
-								</div>
+							<div className="relative px-5 pb-4 flex-auto  max-h-[500px] overflow-auto hide-scrollbar">
+								<div className={`bg-theme-setting-nav rounded-[5px] p-3 ${classNameWrapperChild}`}>{children}</div>
 							</div>
 							{/*footer*/}
 							{confirmButton && title !== 'Invite friends to KOMU' && (
-								<div className="flex items-center p-4 border-t border-solid dark:border-borderDefault rounded-b justify-between">
+								<div className="flex items-center p-4 border-b-theme-primary rounded-b justify-between">
 									<button
 										className="text-contentBrandLight background-transparent font-semibold px-4 py-2
 										text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all

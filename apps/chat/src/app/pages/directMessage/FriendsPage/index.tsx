@@ -224,9 +224,7 @@ const FriendsPage = () => {
 							</div>
 							<div className="flex flex-col items-center gap-7">
 								<Image src={`assets/images/${addFriendImg}`} width={48} height={48} className="object-cover w-[376px]" />
-								<div className="dark:text-contentTertiary text-textLightTheme">
-									Komuu is waiting on friends. You don't have to, though!
-								</div>
+								<div className="bg-theme-input">Komuu is waiting on friends. You don't have to, though!</div>
 							</div>
 						</div>
 					)}

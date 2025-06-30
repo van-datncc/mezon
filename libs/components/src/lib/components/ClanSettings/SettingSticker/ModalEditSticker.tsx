@@ -217,40 +217,36 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	return (
 		<>
-			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col dark:bg-bgPrimary text-textPrimary '}>
+			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col  '}>
 				<div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>
-					<div className={`flex flex-col gap-2 items-center select-none dark:text-textPrimary text-textPrimaryLight`}>
-						<p className="text-2xl font-semibold dark:text-bgTextarea text-textPrimaryLight">Upload a file</p>
+					<div className={`flex flex-col gap-2 items-center select-none `}>
+						<p className="text-2xl font-semibold ">Upload a file</p>
 						<p className="text-base">File should be APNG, PNG, or GIF (512KB max)</p>
 					</div>
-					<div className={'flex flex-col select-none dark:text-textPrimary text-textPrimaryLight'}>
+					<div className={'flex flex-col select-none '}>
 						<p className="text-xs font-bold h-6 uppercase">PREVIEW</p>
-						<div
-							className={
-								'flex items-center justify-center rounded-lg border-[0.08px] dark:border-borderDivider border-borderLightTabs overflow-hidden'
-							}
-						>
-							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-bgPrimary'}>
+						<div className={'flex items-center justify-center rounded-lg border-theme-primary overflow-hidden'}>
+							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-item-theme '}>
 								{editingGraphic.source ? (
 									<PreviewStickerBox preview={editingGraphic.source} />
 								) : (
-									<Icons.UploadImage className="w-16 h-16 text-bgLightModeSecond" />
+									<Icons.UploadImage className="w-16 h-16 " />
 								)}
 							</div>
-							<div className={'h-56 w-[50%] flex items-center justify-center bg-bgLightModeSecond'}>
+							<div className={'h-56 w-[50%] flex items-center justify-center '}>
 								{editingGraphic.source ? (
 									<PreviewStickerBox preview={editingGraphic.source} />
 								) : (
-									<Icons.UploadImage className="w-16 h-16 text-bgPrimary" />
+									<Icons.UploadImage className="w-16 h-16" />
 								)}
 							</div>
 						</div>
 					</div>
-					<div className={'flex flex-row gap-4 dark:text-textPrimary text-textPrimaryLight'}>
+					<div className={'flex flex-row gap-4 '}>
 						<div className={'w-1/2 flex flex-col gap-2'}>
 							<p className={`text-xs font-bold uppercase select-none`}>FILE {graphic && ' (THIS CANNOT BE EDITED)'}</p>
 							<div
-								className={`dark:bg-bgSecondary bg-bgLightSecondary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center py-[6px] px-3 dark:text-textPrimary box-border ${editingGraphic.fileName && 'cursor-not-allowed'}`}
+								className={` border-theme-primary flex flex-row rounded justify-between items-center py-[6px] px-3  ${editingGraphic.fileName && 'cursor-not-allowed'}`}
 							>
 								<p className="select-none flex-1 truncate">{editingGraphic.fileName ?? 'Choose a file'}</p>
 								{!graphic && (
@@ -274,13 +270,13 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							<p className={`text-xs font-bold uppercase select-none`}>Sticker Name</p>
 							<div
 								className={
-									'bg-bgLightSearchHover dark:bg-bgTertiary border-[0.08px] dark:border-textLightTheme border-borderLightTabs flex flex-row rounded justify-between items-center p-2 pl-3 dark:text-textPrimary box-border overflow-hidden'
+									'border-theme-primary flex flex-row rounded justify-between items-center p-2 pl-3  box-border overflow-hidden'
 								}
 							>
 								<InputField
 									type="string"
 									placeholder="ex. cat hug"
-									className={'px-[8px] bg-bgLightSearchHover dark:bg-bgTertiary'}
+									className={'px-[8px] bg-theme-input'}
 									value={editingGraphic.shortname}
 									onChange={handleChangeShortName}
 									onKeyDown={handleOnEnter}

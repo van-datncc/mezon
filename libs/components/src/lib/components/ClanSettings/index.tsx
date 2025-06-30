@@ -86,10 +86,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 		<div ref={modalRef} tabIndex={-1} className="  flex fixed inset-0  w-screen z-30">
 			<div className="flex flex-row w-screen">
 				<div className="z-50 h-fit absolute top-5 right-5 block sbm:hidden">
-					<div
-						onClick={() => onClose()}
-						className="rounded-full p-[10px] border-2 dark:border-[#a8a6a6] border-black cursor-pointer dark:text-[#a8a6a6] text-black"
-					>
+					<div onClick={() => onClose()} className="rounded-full p-[10px] border-theme-primary">
 						<Icons.CloseButton className="w-4" />
 					</div>
 				</div>
@@ -101,7 +98,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 						<Icons.ArrowDown defaultFill="white" defaultSize="w-[20px] h-[30px]" />
 					</button>
 				</div>
-				<div className={`flex-col flex-1 dark:bg-bgSecondary bg-bgLightSecondary ${closeMenu && !menu ? 'hidden' : 'flex'}`}>
+				<div className={`flex-col flex-1 bg-theme-setting-nav text-theme-primary ${closeMenu && !menu ? 'hidden' : 'flex'}`}>
 					<SettingSidebar
 						onClickItem={handleSettingItemClick}
 						handleMenu={(value: boolean) => setMenu(value)}
@@ -110,14 +107,12 @@ const ClanSetting = (props: ModalSettingProps) => {
 					/>
 				</div>
 
-				<div className="flex-3 bg-white dark:bg-bgPrimary overflow-y-auto hide-scrollbar">
+				<div className="flex-3 bg-theme-setting-primary text-theme-primary overflow-y-auto hide-scrollbar">
 					<div className="flex flex-row flex-1 justify-start h-full">
 						<div className="w-[740px] pl-7 sbm:pl-10 pr-7">
-							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile">
+							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile text-theme-primary">
 								{!(currentSetting?.id === ItemSetting.INTEGRATIONS) ? (
-									<h2 className="text-xl font-semibold mb-5 dark:text-textDarkTheme text-textLightTheme sbm:mt-[60px] mt-[10px]">
-										{currentSetting?.name}
-									</h2>
+									<h2 className="text-xl font-semibold mb-5 sbm:mt-[60px] mt-[10px]">{currentSetting?.name}</h2>
 								) : (
 									''
 								)}
@@ -128,7 +123,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 						<ExitSetting onClose={onClose} />
 					</div>
 				</div>
-				<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightModeSecond"></div>
+				<div className="w-1 h-full"></div>
 			</div>
 		</div>
 	);

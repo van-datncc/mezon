@@ -48,14 +48,14 @@ const MainAuditLog = ({ pageSize, setPageSize, currentPage, setCurrentPage, sele
 
 	return (
 		<div className="flex flex-col">
-			<div className="border-b-[1px] dark:border-[#616161] my-[32px]" />
+			<div className="border-b-theme-primary my-[32px]" />
 			{auditLogData && auditLogData.length > 0 ? (
 				auditLogData.map((log) => <AuditLogItem key={log.id} logItem={log} />)
 			) : (
 				<div className="flex flex-col items-center justify-center text-center py-10 max-w-[440px] mx-auto">
 					<div className="flex flex-col items-center justify-center text-center max-w-[300px]">
-						<div className="text-lg font-semibold text-gray-300">NO LOGS YET</div>
-						<p className="text-gray-500 mt-2">Once moderators begin moderating, you can moderate the moderation here.</p>
+						<div className="text-lg font-semibold">NO LOGS YET</div>
+						<p className=" mt-2">Once moderators begin moderating, you can moderate the moderation here.</p>
 					</div>
 				</div>
 			)}

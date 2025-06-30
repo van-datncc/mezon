@@ -91,7 +91,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 				return (
 					<tr
 						key={role.id}
-						className={`h-14 dark:text-white text-black group dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton cursor-grab
+						className={`h-14 group bg-item-hover text-theme-primary-hover group cursor-grab
 						${
 							hoveredIndex === index
 								? dragBorderPosition === EDragBorderPosition.BOTTOM
@@ -107,7 +107,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 						onDragEnter={() => handleDragEnter(index)}
 					>
 						<td>
-							<p className="inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5">
+							<p className="px-2 inline-flex gap-1 items-center text-[15px] break-all whitespace-break-spaces overflow-hidden line-clamp-2 font-medium mt-1.5">
 								{role.role_icon ? (
 									<img src={role.role_icon} alt="" className={'size-5'} />
 								) : (
@@ -119,14 +119,14 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 							</p>
 						</td>
 						<td className="text-[15px] text-center">
-							<p className="inline-flex gap-x-2 items-center dark:text-textThreadPrimary text-gray-500">
+							<p className="inline-flex gap-x-2 items-center ">
 								{role.role_user_list?.role_users?.length ?? 0}
 								<Icons.MemberIcon defaultSize="w-5 h-[30px] min-w-5" />
 							</p>
 						</td>
 						<td className="  flex h-14 justify-center items-center">
 							<div className="flex gap-x-2">
-								<div className="text-[15px] cursor-pointer bg-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100">
+								<div className="text-[15px] cursor-pointer bg-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 group-hover:text-white">
 									{hasPermissionEdit ? (
 										<span title="Edit">
 											<Icons.PenEdit className="size-5" />
@@ -139,7 +139,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								</div>
 								{hasPermissionEdit && (
 									<div
-										className={`text-[15px] cursor-pointer bg-red-500 p-2 rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
+										className={`text-[15px] cursor-pointer bg-red-500 p-2 text-white rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
 										onClick={(e) => handleOpenDeleteRoleModal(e, role.id)}
 									>
 										<span title="Delete">
