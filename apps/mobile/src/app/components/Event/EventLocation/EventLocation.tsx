@@ -7,6 +7,7 @@ import { ChannelType } from 'mezon-js';
 import { DeviceEventEmitter, Linking, Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
+import JoinChannelVoiceBS from '../../../screens/home/homedrawer/components/ChannelVoice/JoinChannelVoiceBS';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { style } from './styles';
 
@@ -28,7 +29,13 @@ export function EventLocation({ event }: IEventLocation) {
 			await Linking.openURL(urlVoice);
 		} else if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
 			dismiss();
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_MENTION_MESSAGE_ITEM, channelVoice);
+			setTimeout(() => {
+				const data = {
+					snapPoints: ['45%'],
+					children: <JoinChannelVoiceBS channel={channelVoice} />
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+			}, 300);
 		} else {
 			const urlPrivateVoice = `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
 			await Linking.openURL(urlPrivateVoice);
