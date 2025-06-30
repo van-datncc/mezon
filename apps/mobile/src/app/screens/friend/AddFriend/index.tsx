@@ -71,6 +71,9 @@ export const AddFriendScreen = () => {
 							<Text style={styles.addFriendText}>{item.title}</Text>
 						</TouchableOpacity>
 					)}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 				/>
 			</View>
 			<Text style={styles.whiteText}>{t('addFriend.incomingFriendRequest')}</Text>
@@ -80,6 +83,9 @@ export const AddFriendScreen = () => {
 				ItemSeparatorComponent={SeparatorWithLine}
 				keyExtractor={(friend) => friend.id.toString()}
 				renderItem={({ item }) => <FriendItem friend={item} handleFriendAction={handleFriendAction} />}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 			/>
 
 			<AddFriendModal type={currentAddFriendType} onClose={() => setCurrentAddFriendType(null)} />

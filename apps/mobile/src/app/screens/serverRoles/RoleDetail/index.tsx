@@ -233,6 +233,9 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 							showsVerticalScrollIndicator={false}
 							keyExtractor={(item) => item.id.toString()}
 							ItemSeparatorComponent={SeparatorWithLine}
+							initialNumToRender={1}
+							maxToRenderPerBatch={1}
+							windowSize={2}
 							renderItem={({ item }) => {
 								return (
 									<TouchableOpacity onPress={() => handleAction(item.type)}>

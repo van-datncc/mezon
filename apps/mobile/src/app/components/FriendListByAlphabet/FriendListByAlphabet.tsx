@@ -77,6 +77,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 						scrollEventThrottle={100}
 						keyboardShouldPersistTaps="handled"
 						onScrollBeginDrag={() => Keyboard.dismiss()}
+						initialNumToRender={1}
+						maxToRenderPerBatch={1}
+						windowSize={2}
 						renderItem={({ item }) => (
 							<FriendItem
 								friend={item}
@@ -104,6 +107,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 							keyExtractor={(friend) => friend.id.toString()}
 							ItemSeparatorComponent={SeparatorWithLine}
 							scrollEventThrottle={100}
+							initialNumToRender={1}
+							maxToRenderPerBatch={1}
+							windowSize={2}
 							keyboardShouldPersistTaps="handled"
 							onScrollBeginDrag={() => Keyboard.dismiss()}
 							renderItem={({ item }) => (
@@ -126,6 +132,9 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 					keyExtractor={(item) => item.character}
 					ItemSeparatorComponent={SeparatorWithSpace}
 					renderItem={renderListFriendGroupByAlphabet}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 				/>
 			)}
 		</View>

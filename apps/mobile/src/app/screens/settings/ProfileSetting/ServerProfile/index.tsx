@@ -135,6 +135,9 @@ const ServerProfile = forwardRef(function ServerProfile({ navigation }: IServerP
 						data={clans}
 						keyExtractor={(item) => item?.id}
 						ItemSeparatorComponent={SeparatorWithLine}
+						initialNumToRender={1}
+						maxToRenderPerBatch={1}
+						windowSize={2}
 						renderItem={({ item }) => {
 							return (
 								<TouchableOpacity style={styles.clanItem} onPress={() => switchClan(item)}>

@@ -48,6 +48,9 @@ const ChannelsMessageSystem = ({ onSelectChannel, listChannelWithoutVoice }: Cha
 			<FlatList
 				data={listChannelWithoutVoice}
 				keyExtractor={(item, index) => `channel_system:${item?.channel_id}_${index}`}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				renderItem={renderItem}
 			/>
 		</View>

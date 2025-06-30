@@ -118,6 +118,9 @@ export function QuickAction({ navigation, route }) {
 				renderItem={({ item }) => (
 					<QuickActionItem item={item} themeValue={themeValue} openModal={openModal} handleDelete={handlePressDeleteCategory} />
 				)}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 			/>
 
 			<TouchableOpacity style={styles.addButton} onPress={() => openModal(null)}>

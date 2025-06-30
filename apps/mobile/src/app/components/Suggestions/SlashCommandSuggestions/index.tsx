@@ -81,8 +81,9 @@ export const SlashCommandSuggestions = memo(({ keyword, onSelectCommand, channel
 				renderItem={renderCommands}
 				keyExtractor={(item, index) => `${item?.id}_${index}_slash_command`}
 				keyboardShouldPersistTaps="handled"
-				windowSize={4}
-				initialNumToRender={4}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				disableVirtualization
 				removeClippedSubviews={true}
 				getItemLayout={(_, index) => ({

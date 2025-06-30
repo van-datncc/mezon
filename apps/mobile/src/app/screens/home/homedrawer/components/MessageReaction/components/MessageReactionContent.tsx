@@ -101,6 +101,9 @@ export const MessageReactionContent = memo((props: IMessageReactionContentProps)
 				showsHorizontalScrollIndicator={false}
 				data={allReactionDataOnOneMessage}
 				keyExtractor={(item) => `${item.emojiId}_TabHeaderEmoji`}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				renderItem={({ item }) => (
 					<Pressable
 						onPress={() => selectEmoji(item.emojiId)}
