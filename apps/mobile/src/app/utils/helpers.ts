@@ -1,4 +1,4 @@
-import { load, save, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
+import { load, save, STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
 import { EmojiDataOptionals } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { Platform } from 'react-native';
@@ -69,6 +69,12 @@ export const resetCachedMessageActionNeedToResolve = (channelId: string) => {
 	const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
 	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
 	save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+};
+
+export const resetCachedChatbox = (channelId: string) => {
+	const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
+	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
+	save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
 };
 
 export const getUserStatusByMetadata = (metadata: string | { status: string; user_status: string }) => {
