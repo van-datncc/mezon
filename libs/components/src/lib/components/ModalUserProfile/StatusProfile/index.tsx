@@ -6,6 +6,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clearAllMemoizedFunctions,
+	clearApiCallTracker,
 	giveCoffeeActions,
 	selectOthersSession,
 	selectUserStatus,
@@ -129,6 +130,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
 			clearAllMemoizedFunctions();
+			clearApiCallTracker();
 			localStorage.removeItem('remember_channel');
 
 			dispatch(clansActions.setCurrentClanId('0'));

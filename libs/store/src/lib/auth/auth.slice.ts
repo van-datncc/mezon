@@ -2,6 +2,7 @@ import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from 'mezon-js';
+import { clearApiCallTracker } from '../cache-metadata';
 import { ensureClientAsync, ensureSession, getMezonCtx, restoreLocalStorage } from '../helpers';
 import { clearAllMemoizedFunctions } from '../memoize';
 export const AUTH_FEATURE_KEY = 'auth';
@@ -144,6 +145,7 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
+	clearApiCallTracker();
 	const restoreKey = ['persist:apps', 'persist:categories', 'persist:clans'];
 	if (sessionState) {
 		restoreKey.push('mezon_session');

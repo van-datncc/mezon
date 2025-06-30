@@ -497,7 +497,7 @@ function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 				if (thread.parent_id === channel.id) {
 					sortedChannels.push(thread);
 					if (channel.threadIds) {
-						channel.threadIds.push(thread.id);
+						channel.threadIds = [...channel.threadIds, thread.id];
 					} else {
 						channel.threadIds = [thread.id];
 					}

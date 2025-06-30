@@ -277,6 +277,7 @@ const ListOptionRole = ({
 	const { updateRole } = useRoles();
 	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
 		if (userRolesClan.usersRole[role.id]) {
@@ -287,7 +288,8 @@ const ListOptionRole = ({
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: role.id,
-				userId: userId
+				userId: userId,
+				clanId: currentClanId as string
 			})
 		);
 	};

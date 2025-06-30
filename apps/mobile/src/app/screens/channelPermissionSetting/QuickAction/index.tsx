@@ -15,11 +15,8 @@ import { DeviceEventEmitter, FlatList, Platform, TouchableOpacity, View } from '
 import MezonConfirm from '../../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
-import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ModalQuickMenu from './ModalQuickMenu';
 import { style } from './quickAction.style';
-
-type QuickActionScreen = typeof APP_SCREEN.MENU_CHANNEL.QUICK_ACTION;
 
 export function QuickAction({ navigation, route }) {
 	const { channelId } = route.params;

@@ -73,7 +73,7 @@ import {
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
-	selectVoiceChannelMembersByChannelId,
+	selectVoiceInfo,
 	stickerSettingActions,
 	threadsActions,
 	toastActions,
@@ -202,9 +202,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const store = getStore();
 				const state = store.getState();
 				const voiceChannel = selectChannelById(state, voice.voice_channel_id);
-				const memberList = selectVoiceChannelMembersByChannelId(state, voice.voice_channel_id);
+				const voiceOfMe = selectVoiceInfo(state);
 				const currentUserId = selectCurrentUserId(state);
-				const hasJoinSoundEffect = memberList.some((member) => member.user_id === currentUserId) || currentUserId === voice.user_id;
+				const hasJoinSoundEffect = voiceOfMe?.channelId === voice.voice_channel_id || currentUserId === voice.user_id;
 
 				if (voiceChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && hasJoinSoundEffect) {
 					const joinSoundElement = document.createElement('audio');
@@ -811,7 +811,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						}
 					}));
 
-				dispatch(usersClanActions.upsertMany(members));
+				dispatch(usersClanActions.upsertMany({ users: members, clanId: clan_id }));
 
 				dispatch(
 					channelMembersActions.addNewMember({
@@ -836,8 +836,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			return;
 		}
 
-		const currentClanId = selectCurrentClanId(store.getState());
-		if (userJoinClan?.user && currentClanId === userJoinClan.clan_id) {
+		if (userJoinClan?.user) {
 			const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
 			dispatch(
 				usersClanActions.add({
@@ -852,8 +851,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						metadata: userJoinClan.user.custom_status,
 						username: userJoinClan.user.username,
 						create_time: createTime
-					}
-				})
+					},
+					clanId: userJoinClan.clan_id
+				} as any)
 			);
 		}
 	}, []);
@@ -962,7 +962,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				usersClanActions.updateUserClan({
 					userId: ClanProfileUpdates.user_id,
 					clanNick: ClanProfileUpdates.clan_nick,
-					clanAvt: ClanProfileUpdates.clan_avatar
+					clanAvt: ClanProfileUpdates.clan_avatar,
+					clanId: ClanProfileUpdates.clan_id
 				})
 			);
 		},
@@ -1598,11 +1599,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			// Handle role assignments/removals
 			if (user_add_ids.length) {
-				dispatch(usersClanActions.updateManyRoleIds(user_add_ids.map((id) => ({ userId: id, roleId: role.id as string }))));
+				dispatch(
+					usersClanActions.updateManyRoleIds({
+						clanId: role.clan_id as string,
+						updates: user_add_ids.map((id) => ({ userId: id, roleId: role.id as string }))
+					})
+				);
 			}
 
 			if (user_remove_ids.length) {
-				dispatch(usersClanActions.removeManyRoleIds(user_remove_ids.map((id) => ({ userId: id, roleId: role.id as string }))));
+				dispatch(
+					usersClanActions.removeManyRoleIds({
+						clanId: role.clan_id as string,
+						updates: user_remove_ids.map((id) => ({ userId: id, roleId: role.id as string }))
+					})
+				);
 			}
 
 			// Handle new role creation

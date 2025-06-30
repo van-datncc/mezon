@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { addQuickMenuAccess, listQuickMenuAccess, updateQuickMenuAccess, useAppDispatch } from '@mezon/store-mobile';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -65,7 +65,13 @@ export default function ModalQuickMenu({ initialFormKey, initialFormValue, editK
 		<View style={styles.modalContainer}>
 			<View style={styles.modalBox}>
 				<MezonInput placeHolder={t('quickAction.keyTitle')} value={formKey} onTextChange={setFormKey} />
-				<MezonInput placeHolder={t('quickAction.valueTitle')} value={formValue} onTextChange={setFormValue} textarea={true} />
+				<MezonInput
+					placeHolder={t('quickAction.valueTitle')}
+					value={formValue}
+					onTextChange={setFormValue}
+					textarea={true}
+					maxCharacter={300}
+				/>
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: size.s_10 }}>
 					<TouchableOpacity
 						style={{
@@ -94,6 +100,7 @@ export default function ModalQuickMenu({ initialFormKey, initialFormValue, editK
 					</TouchableOpacity>
 				</View>
 			</View>
+			<TouchableOpacity style={styles.backdrop} onPress={onCancel} />
 		</View>
 	);
 }
