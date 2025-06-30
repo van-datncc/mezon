@@ -93,6 +93,9 @@ export const listChannelRenderSlice = createSlice({
 				state.listChannelRender[clanId] = [favorCate, ...listFavorChannel, ...listChannelRender];
 			}
 		},
+		clearListChannelRender: (state) => {
+			state.listChannelRender = {};
+		},
 		addChannelToListRender: (state, action: PayloadAction<ApiChannelDescription>) => {
 			const channelData: IChannel = {
 				...(action.payload as IChannel),
