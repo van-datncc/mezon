@@ -571,7 +571,7 @@ menu.addEventListener('click', async (e) => {
 
 				switch (action) {
 					case 'copyImage': {
-						window.electron.handleActionShowImage(action,currentImageUrl.realUrl );
+						window.electron.handleActionShowImage(action, window.currentImageUrl.realUrl );
 						break;
 					}
           default :
