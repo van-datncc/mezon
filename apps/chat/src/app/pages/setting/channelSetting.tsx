@@ -58,14 +58,14 @@ const ChannelSetting = () => {
 
 	return (
 		<div className="p-8 h-[calc(100vh_-_56px)] flex flex-col">
-			<div className="p-2 flex items-center justify-between text-textLightTheme dark:text-textDarkTheme">
+			<div className="p-2 flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<input
 						type="text"
 						value={searchFilter}
 						placeholder="Search"
 						onChange={handleSearchByNameChannel}
-						className="w-full h-8 pl-2 pr-2 py-3 bg-theme-input-primary text-theme-primary rounded items-center inline-flex outline-none focus:outline-none"
+						className="w-full h-8 pl-2 pr-2 py-3 bg-theme-input text-theme-primary rounded items-center inline-flex outline-none focus:outline-none"
 					/>
 				</div>
 			</div>

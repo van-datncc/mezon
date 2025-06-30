@@ -73,7 +73,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 						<AvatarImage
 							alt={userProfile?.user?.username || ''}
 							username={userProfile?.user?.username}
-							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] p-2 border-solid border-user object-cover"
+							className="w-[90px] h-[90px] xl:w-[100px] xl:h-[100px] rounded-[50px] border-[6px] border-solid border-user object-cover"
 							srcImgProxy={createImgproxyUrl(urlImg ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 							src={urlImg}
 							classNameText="!text-5xl"

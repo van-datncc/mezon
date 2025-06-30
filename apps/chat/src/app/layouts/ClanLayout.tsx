@@ -110,7 +110,7 @@ const ClanLayout = () => {
 				<ChannelList />
 			</div>
 			<div
-				className={`flex flex-1 shrink min-w-0 gap-2 h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'bg-theme-secondary' : ''}`}
+				className={`flex flex-1 shrink min-w-0 gap-2 bg-theme-chat h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'bg-theme-secondary' : ''}`}
 			>
 				<div
 					className={`flex flex-col flex-1 shrink ${isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'max-sm:hidden' : ''} min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'group' : ''}`}
@@ -119,19 +119,19 @@ const ClanLayout = () => {
 				</div>
 
 				{isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL && (
-					<div ref={chatStreamRef} className="flex flex-col flex-1 max-w-[480px] min-w-60 dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+					<div ref={chatStreamRef} className="flex flex-col flex-1 max-w-[480px] min-w-60 rounded-l-lg">
 						<ChatStream currentChannel={currentChannel} />
 					</div>
 				)}
 			</div>
 			{isShowCreateThread && !isShowCreateTopic && (
-				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] rounded-l-lg">
 					<ThreadsMain />
 				</div>
 			)}
 
 			{isShowCreateTopic && !isShowCreateThread && (
-				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] rounded-l-lg">
 					<TopicDiscussionMain />
 				</div>
 			)}

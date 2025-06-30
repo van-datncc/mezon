@@ -153,15 +153,12 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 			dismissOnClick={!checkMultipleSelect}
 			label=""
 			renderTrigger={() => (
-				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
+				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm ">
 					<div>
 						{selectedOptions.length > 0 && (
 							<div className="flex flex-wrap gap-2 mb-2">
 								{selectedOptions.map((option) => (
-									<div
-										key={option.value}
-										className="flex items-center px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-md text-xs dark:text-textPrimary text-textPrimaryLight"
-									>
+									<div key={option.value} className="flex items-center px-2 py-1 ">
 										<span>{option.label}</span>
 										<button
 											className="ml-2 text-red-500 hover:text-red-700"

@@ -49,19 +49,17 @@ const SoundItem: React.FC<ISoundItemProps> = ({ sound, isSelected, onPlay, onSel
 	return (
 		<>
 			<div
-				className={`flex items-center dark:hover:bg-bgHover hover:bg-[#f9f9f9] ${isSelected ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight dark:text-white text-textSecondary400' : ''} px-2 py-3 h-fit cursor-pointer`}
+				className={`flex items-center bg-item-hover ${isSelected ? 'bg-item-theme text-theme-primary-active' : ''} px-2 py-3 h-fit cursor-pointer`}
 				onClick={onSelect}
 			>
-				<p className={`dark:text-textSecondary text-textSecondary800 ${isSelected && 'font-semibold dark:text-white text-black'} w-1/2`}>
-					{sound.fileName}
-				</p>
+				<p className={`${isSelected && 'font-semibold text-theme-primary-active'} w-1/2`}>{sound.fileName}</p>
 				<audio className="flex-grow bg-transparent" src={sound.src} ref={audioRef} onLoadedMetadata={handleLoadedMetadata} />
-				<p className={'dark:text-textSecondary text-textSecondary800 w-1/3'}>{formatTimeToMMSS(duration)}</p>
+				<p className={' w-1/3'}>{formatTimeToMMSS(duration)}</p>
 				<button onClick={handleOnClickPlay} className={'ml-auto flex justify-center'}>
 					<Icons.Speaker />
 				</button>
 			</div>
-			<div className={'dark:bg-bgModifierHover bg-bgModifierHoverLight h-[1px]'}></div>
+			<div className={' h-[1px] border-t-theme-primary'}></div>
 		</>
 	);
 };

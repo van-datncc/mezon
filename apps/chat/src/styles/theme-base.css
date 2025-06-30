@@ -63,6 +63,9 @@ button.bg-button-add-friend {
 .bg-theme-input {
 	background: var(--bg-tertiary);
 }
+.border-color-primary {
+	border-color: var(--border-primary);
+}
 
 .border-theme-primary {
 	border-width: 1px;
@@ -86,6 +89,8 @@ button.bg-button-add-friend {
 .bg-theme-input-primary {
 	background: var(--bg-primary);
 }
+input.bg-input-theme,
+input.bg-theme-input,
 input.bg-theme-input-primary::placeholder {
 	color: var(--text-theme-primary);
 }
@@ -125,6 +130,10 @@ input.bg-theme-input-primary::placeholder {
 }
 .border-user {
 	border-color: var(--theme-setting-primary);
+}
+.btn-theme-primary {
+	color: var(--text-theme-primary);
+	transition: all 0.2s ease-in-out;
 }
 
 /*  */
@@ -172,11 +181,6 @@ input.bg-theme-input-primary::placeholder {
 }
 
 /* Button Variants */
-.btn-theme-primary {
-	background-color: var(--btn-primary);
-	color: white;
-	transition: all 0.2s ease-in-out;
-}
 
 .btn-theme-primary:active:not(:disabled) {
 	background-color: var(--btn-primary-active);

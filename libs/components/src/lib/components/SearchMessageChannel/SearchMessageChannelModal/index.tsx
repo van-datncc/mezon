@@ -89,7 +89,7 @@ const SearchMessageChannelModal = ({
 							onClick={() => onClickSearchOptions(searchItem.title ?? '')}
 							title={searchItem.title}
 							content={searchItem.content}
-							className={`${index === idx && theme === 'light' ? 'bg-[#EBEBED]' : index === idx && theme === 'dark' ? 'bg-[#282A2E]' : ''}`}
+							className={`${index === idx ? 'bg-button-secondary' : ''}`}
 						/>
 					))}
 				</SelectGroup>

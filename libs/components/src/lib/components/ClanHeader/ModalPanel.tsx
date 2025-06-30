@@ -45,7 +45,7 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 	return (
 		<div
 			onClick={(e) => e.stopPropagation()}
-			className="theme-base-color p-2 rounded w-[250px] absolute left-1/2 top-[58px] z-[9999] transform translate-x-[-50%] shadow-xl"
+			className="theme-base-color p-2 text-theme-primary rounded w-[250px] absolute left-1/2 top-[58px] z-[9999] transform translate-x-[-50%] shadow-xl"
 		>
 			<div className="flex flex-col pb-1 mb-1 border-b-[0.08px] border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0">
 				{canManageClan && <ItemModal onClick={handleShowCreateCategory} children="Create Category" endIcon={<Icons.CreateCategoryIcon />} />}
@@ -60,20 +60,18 @@ const ModalPanel: React.FC<ModalPanelProps> = ({
 				<ItemModal
 					onClick={handleShowServerSettings}
 					children="Clan Settings"
-					endIcon={<Icons.SettingProfile className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
+					endIcon={<Icons.SettingProfile className="text-theme-primary-hover" />}
 				/>
 				<ItemModal
 					onClick={handleShowNotificationSetting}
 					children="Notification Settings"
-					endIcon={<Icons.Bell className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white" />}
+					endIcon={<Icons.Bell className=" text-theme-primary-hover" />}
 				/>
 				<button
 					onClick={toggleShowEmptyCategory}
-					className="flex items-center w-full justify-between rounded-sm hover:text-white group pr-2 hover:bg-bgSelectItem group"
+					className="flex items-center w-full justify-between rounded-sm  text-theme-primary-hover bg-item-hover"
 				>
-					<li className="text-[14px] dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
-						Show Empty Categories
-					</li>
+					<li className="text-[14px]  font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">Show Empty Categories</li>
 					<input
 						className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
                             bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full

@@ -67,7 +67,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 
 	return (
 		<div className="h-full w-full flex flex-col gap-1 flex-1">
-			<div className="w-full flex pl-12 pr-12 justify-between items-center h-[48px] shadow border-b-[1px] dark:border-bgTertiary text-xs dark:text-textDarkTheme text-textLightTheme font-bold uppercase">
+			<div className="w-full flex pl-12 pr-12 justify-between items-center h-[48px] shadow text-xs font-bold uppercase border-b-theme-primary text-theme-primary">
 				<span className="flex-1">Name</span>
 				<span className="flex-1">Members</span>
 				<span className="flex-1">Messages count</span>
@@ -85,39 +85,26 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 						searchFilter={searchFilter}
 					/>
 				))}
-				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-[1px] dark:border-borderDivider border-buttonLightTertiary mt-0">
-					<div className={'flex flex-row items-center text-colorTextLightMode dark:text-textDarkTheme'}>
+				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-theme-primary mt-0">
+					<div className={'flex flex-row items-center '}>
 						Show
 						<Dropdown
 							value={pageSize}
 							renderTrigger={() => (
-								<div
-									className={
-										'flex flex-row items-center justify-center text-center dark:bg-slate-800 bg-slate-300 dark:text-contentTertiary text-colorTextLightMode border-[1px] dark:border-borderDivider border-buttonLightTertiary rounded mx-1 px-3 w-12'
-									}
-								>
+								<div className={'flex flex-row items-center justify-center text-center border-theme-primary rounded mx-1 px-3 w-12'}>
 									<span className="mr-1">{pageSize}</span>
 									<Icons.ArrowDown />
 								</div>
 							)}
 							label={''}
 						>
-							<Dropdown.Item
-								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-								onClick={() => handleChangePageSize(10)}
-							>
+							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(10)}>
 								10
 							</Dropdown.Item>
-							<Dropdown.Item
-								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-								onClick={() => handleChangePageSize(20)}
-							>
+							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(20)}>
 								20
 							</Dropdown.Item>
-							<Dropdown.Item
-								className={'dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight'}
-								onClick={() => handleChangePageSize(30)}
-							>
+							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(30)}>
 								30
 							</Dropdown.Item>
 						</Dropdown>
@@ -210,7 +197,7 @@ const RenderChannelAndThread = ({ channelParent, clanId, currentPage, pageSize, 
 						))
 					) : (
 						<div
-							className={`w-full py-4 relative before:content-[" "] before:w-full before:h-[0.08px] dark:before:bg-borderDivider before:bg-bgLightSecondary before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
+							className={`w-full py-4 relative before:content-[" "] before:w-full before:h-[0.08px]  before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
 						>
 							There is no threads in this channel
 						</div>
@@ -298,15 +285,15 @@ const ItemInfor = ({
 
 	return (
 		<div
-			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px] dark:before:bg-borderDivider before:bg-bgLightSecondary before:absolute before:top-0 before:left-0 group text-textPrimaryLight dark:text-textPrimary`}
+			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px]  before:absolute before:top-0 before:left-0 group `}
 			onContextMenu={handleCopyChannelId}
 		>
-			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full dark:hover:bg-bgHover hover:bg-bgLightModeThird">
+			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full bg-item-hover">
 				<div className="h-6 w-6">
 					{!isVoice &&
 						(isThread ? (
 							privateChannel ? (
-								<Icons.ThreadIconLocker className="w-5 h-5 fill-textPrimary" />
+								<Icons.ThreadIconLocker className="w-5 h-5 " />
 							) : (
 								<Icons.ThreadIcon />
 							)
@@ -371,11 +358,7 @@ export const AvatarUserShort = ({ id, showName = false }: { id: string; showName
 				src={createImgproxyUrl(avatarUrl, { width: 24, height: 24, resizeType: 'fit' })}
 				className="rounded-full h-6 aspect-square object-cover"
 			/>
-			{showName ? (
-				<div className="text-textLightTheme dark:text-channelTextareaLight">
-					{member?.clan_nick || member?.user?.display_name || member?.user?.username}
-				</div>
-			) : null}
+			{showName ? <div className="">{member?.clan_nick || member?.user?.display_name || member?.user?.username}</div> : null}
 		</div>
 	);
 };

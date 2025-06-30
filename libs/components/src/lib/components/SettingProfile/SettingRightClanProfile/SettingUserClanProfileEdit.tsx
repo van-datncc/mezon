@@ -209,9 +209,9 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 	return (
 		<>
 			<div className="flex-1 flex mt-[10px] gap-x-8 sbm:flex-row flex-col">
-				<div className="flex-1 dark:text-white text-black">
+				<div className="flex-1 ">
 					<div className="mt-[20px]">
-						<label htmlFor="inputField" className="dark:text-[#CCCCCC] text-black font-bold tracking-wide text-sm">
+						<label htmlFor="inputField" className=" font-bold tracking-wide text-sm">
 							CLAN NICKNAME
 						</label>
 						<br />
@@ -219,7 +219,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-[3px] w-full dark:text-white text-black border dark:border-white border-slate-200 px-4 py-2 mt-2 outline-none  dark:bg-black bg-[#f0f0f0] font-normal text-sm tracking-wide"
+							className="rounded-lg w-full border-theme-primary px-4 py-2 mt-2 outline-none bg-item-theme font-normal text-sm tracking-wide"
 							placeholder={userProfile?.user?.display_name || userProfile?.user?.username}
 							value={displayName}
 							maxLength={32}

@@ -31,32 +31,32 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 	return (
 		<div
 			className={
-				'group relative text-xs w-[116px] h-[140px] rounded-lg flex flex-col items-center p-3 dark:hover:bg-bgTertiary dark:bg-bgSecondary bg-bgLightSecondary justify-between'
+				'group relative text-xs w-[116px] h-[140px] rounded-lg flex flex-col items-center p-3 bg-item-theme bg-item-hover justify-between'
 			}
 		>
 			<div className="aspect-square h-[72px] overflow-hidden flex justify-center">
 				<img className={' w-auto h-full object-cover select-none'} src={sticker.source} alt="" />
 			</div>
-			<p className="font-semibold dark:text-white text-textPrimaryLight">{sticker.shortname}</p>
+			<p className="font-semibold ">{sticker.shortname}</p>
 			<div className="flex items-end justify-center gap-1">
 				<img
 					className="w-4 h-4 rounded-full select-none object-cover"
 					src={dataAuthor?.user?.avatar_url ?? process.env.NX_LOGO_MEZON}
 					alt=""
 				/>
-				<p className="dark:text-white text-textPrimaryLight max-w-20 truncate">{dataAuthor?.user?.username}</p>
+				<p className=" max-w-20 truncate">{dataAuthor?.user?.username}</p>
 			</div>
 			{hasDeleteOrEditPermission && (
 				<div className="group-hover:flex absolute flex-col right-[-12px] top-[-12px] gap-1 hidden select-none">
 					<button
 						onClick={handleUpdateSticker}
-						className="aspect-square w-6 rounded-full text-textPrimaryLight dark:text-textPrimary bg-bgLightModeSecond hover:bg-bgLightModeThird  dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center shadow-sm"
+						className="aspect-square w-6 rounded-full bg-input-theme flex items-center justify-center shadow-sm"
 					>
 						<Icons.EditMessageRightClick defaultSize="w-3 h-3" />
 					</button>
 					<button
 						onClick={handleDeleteSticker}
-						className="aspect-square w-6 text-sm rounded-full bg-bgLightModeSecond hover:bg-bgLightModeThird dark:bg-bgSecondary600 dark:hover:bg-bgSurface flex items-center justify-center mb-[1px] font-medium text-red-600 shadow-sm"
+						className="aspect-square w-6 text-sm rounded-full bg-input-theme  flex items-center justify-center mb-[1px] font-medium text-red-600 shadow-sm"
 					>
 						x
 					</button>
