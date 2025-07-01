@@ -5,7 +5,7 @@ import { captureSentryError } from '@mezon/logger';
 import { ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanStickerByIdBody } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, fetchDataWithSocketFallback, getMezonCtx, MezonValueContext } from '../helpers';
 import { RootState } from '../store';
 
 export const SETTING_CLAN_STICKER = 'settingSticker';
@@ -78,7 +78,15 @@ export const fetchStickerByUserIdCached = async (getState: () => RootState, ensu
 			fromCache: true
 		};
 	}
-	const response = await ensuredMezon.client.getListStickersByUserId(ensuredMezon.session);
+
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'GetListStickersByUserId'
+		},
+		() => ensuredMezon.client.getListStickersByUserId(ensuredMezon.session),
+		'sticker_list'
+	);
 
 	markApiFirstCalled(apiKey);
 

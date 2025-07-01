@@ -2,10 +2,10 @@ import { captureSentryError } from '@mezon/logger';
 import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus, UsersClanEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateRoleRequest } from 'mezon-js';
-import { ApiRole, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
+import { ApiRole, ApiRoleListEventResponse, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { selectEntitesUserClans } from '../clanMembers/clan.members';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { PermissionUserEntity, selectAllPermissionsDefaultEntities } from '../policies/policies.slice';
 import { RootState } from '../store';
 
@@ -83,7 +83,19 @@ export const fetchRolesClanCached = async (getState: () => RootState, ensuredMez
 		};
 	}
 
-	const response = await ensuredMezon.client.listRoles(ensuredMezon.session, clanId, 500, 1, '');
+	const response = (await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListRoles',
+			role_list_event_req: {
+				limit: 500,
+				state: 1,
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.listRoles(ensuredMezon.session, clanId, 500, 1, ''),
+		'emoji_list'
+	)) as ApiRoleListEventResponse;
 
 	markApiFirstCalled(apiKey);
 

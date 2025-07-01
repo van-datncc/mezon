@@ -6,7 +6,7 @@ import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, s
 import { channelsActions } from '../channels/channels.slice';
 import { directActions } from '../direct/direct.slice';
 import { directMetaActions } from '../direct/directmeta.slice';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 import { defaultNotificationCategoryActions } from './notificationSettingCategory.slice';
 
@@ -45,12 +45,13 @@ type FetchNotificationSettingsArgs = {
 };
 
 export const fetchNotificationSettingCached = async (getState: () => RootState, mezon: MezonValueContext, channelId: string, noCache = false) => {
-	const socket = mezon.socketRef?.current;
 	const currentState = getState();
-	const channelData = currentState[NOTIFICATION_SETTING_FEATURE_KEY].byChannels[channelId];
-	const apiKey = createApiKey('fetchNotificationSetting', channelId);
+	const notiSettingState = currentState[NOTIFICATION_SETTING_FEATURE_KEY];
+	const channelData = notiSettingState.byChannels[channelId] || getInitialChannelState();
 
-	const shouldForceCall = shouldForceApiCall(apiKey, channelData?.cache, noCache);
+	const apiKey = createApiKey('fetchNotificationSetting', channelId, mezon.session.username || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, channelData.cache, noCache);
 
 	if (!shouldForceCall) {
 		return {
@@ -60,25 +61,17 @@ export const fetchNotificationSettingCached = async (getState: () => RootState, 
 		};
 	}
 
-	let response;
-
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'GetNotificationChannel',
-				notification_channel: {
-					channel_id: channelId
-				}
-			});
-			response = data?.notificaion_user_channel;
-		} catch (err) {
-			// ignore
-		}
-	}
-
-	if (!response) {
-		response = await mezon.client.getNotificationChannel(mezon.session, channelId);
-	}
+	const response = await fetchDataWithSocketFallback(
+		mezon,
+		{
+			api_name: 'GetNotificationChannel',
+			notification_channel: {
+				channel_id: channelId
+			}
+		},
+		() => mezon.client.getNotificationChannel(mezon.session, channelId),
+		'notificaion_user_channel'
+	);
 
 	markApiFirstCalled(apiKey);
 
