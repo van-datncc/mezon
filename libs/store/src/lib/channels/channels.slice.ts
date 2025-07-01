@@ -28,7 +28,6 @@ import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
 	ApiChannelAppResponse,
-	ApiChannelDescList,
 	ApiChannelDescription,
 	ApiCreateChannelDescRequest,
 	ApiMarkAsReadRequest
@@ -37,7 +36,7 @@ import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, s
 import { FetchCategoriesPayload, categoriesActions } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
@@ -194,6 +193,8 @@ export const fetchChannelsCached = async (
 	noCache = false
 ) => {
 	const socket = ensuredMezon.socketRef?.current;
+	console.log(clanId, 'clanId');
+
 	const currentState = getState();
 	const clanData = currentState[CHANNELS_FEATURE_KEY].byClans[clanId];
 	const apiKey = createApiKey('fetchChannels', clanId, channelType);
@@ -209,27 +210,20 @@ export const fetchChannelsCached = async (
 		};
 	}
 
-	let response;
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'ListChannelDescs',
-				list_channel_req: {
-					limit,
-					state: { value: 1 },
-					channel_type: channelType,
-					clan_id: clanId
-				}
-			});
-			response = data?.channel_desc_list as ApiChannelDescList;
-		} catch (err) {
-			// ignore
-		}
-	}
-
-	if (!response) {
-		response = await ensuredMezon.client.listChannelDescs(ensuredMezon.session, limit, state, '', clanId, channelType);
-	}
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListChannelDescs',
+			list_channel_req: {
+				limit,
+				state: { value: 1 },
+				channel_type: channelType,
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.listChannelDescs(ensuredMezon.session, limit, state, '', clanId, channelType),
+		'channel_desc_list'
+	);
 
 	markApiFirstCalled(apiKey);
 

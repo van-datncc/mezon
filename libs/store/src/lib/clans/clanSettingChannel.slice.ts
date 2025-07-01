@@ -79,8 +79,6 @@ export const fetchChannelSettingInClanCached = async (
 		channel_label // keyword search
 	);
 
-	console.log(response, apiKey);
-
 	markApiFirstCalled(apiKey);
 
 	return {

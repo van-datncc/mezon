@@ -4,7 +4,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ApiNotificationChannelCategorySetting } from 'mezon-js/dist/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
@@ -60,24 +60,17 @@ export const fetchDefaultNotificationCategoryCached = async (
 		};
 	}
 
-	let response;
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'GetNotificationCategory',
-				notification_category: {
-					category_id: categoryId
-				}
-			});
-			response = data?.notificaion_user_channel;
-		} catch (err) {
-			// ignore
-		}
-	}
-
-	if (!response) {
-		response = await mezon.client.getNotificationCategory(mezon.session, categoryId);
-	}
+	const response = await fetchDataWithSocketFallback(
+		mezon,
+		{
+			api_name: 'GetNotificationCategory',
+			notification_category: {
+				category_id: categoryId
+			}
+		},
+		() => mezon.client.getNotificationCategory(mezon.session, categoryId),
+		'notificaion_user_channel'
+	);
 
 	markApiFirstCalled(apiKey);
 
@@ -290,7 +283,6 @@ type fetchChannelCategorySettingPayload = {
 const CHANNEL_CATEGORY_SETTING_CACHE_TIME = 1000 * 60 * 60;
 
 export const fetchChannelCategorySettingCached = async (getState: () => RootState, mezon: MezonValueContext, clanId: string, noCache = false) => {
-	const socket = mezon.socketRef?.current;
 	const currentState = getState();
 	const clanData = currentState['notichannelcategorysetting'].byClans[clanId];
 	const apiKey = createApiKey('fetchChannelCategorySetting', clanId);
@@ -304,25 +296,17 @@ export const fetchChannelCategorySettingCached = async (getState: () => RootStat
 		};
 	}
 
-	let response;
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'GetChannelCategoryNotiSettingsList',
-				notification_clan: {
-					clan_id: clanId
-				}
-			});
-			response = data?.noti_channel_cat_setting_list;
-		} catch (err) {
-			console.log(err, 'GetChannelCategoryNotiSettingsList');
-
-			// ignore
-		}
-	}
-	if (!response) {
-		response = await mezon.client.getChannelCategoryNotiSettingsList(mezon.session, clanId);
-	}
+	const response = await fetchDataWithSocketFallback(
+		mezon,
+		{
+			api_name: 'getChannelCategoryNotiSettingsList',
+			notification_category: {
+				clan_id: clanId
+			}
+		},
+		() => mezon.client.getChannelCategoryNotiSettingsList(mezon.session, clanId),
+		'notificaion_category_list'
+	);
 
 	markApiFirstCalled(apiKey);
 
