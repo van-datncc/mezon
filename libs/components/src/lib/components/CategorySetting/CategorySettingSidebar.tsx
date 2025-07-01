@@ -3,6 +3,7 @@ import { selectCurrentChannel, selectWelcomeChannelByClanId } from '@mezon/store
 import { ICategoryChannel, IChannel } from '@mezon/utils';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { ItemObjProps, categorySettingList } from '../ClanSettings/ItemObj';
 import SettingItem from '../ClanSettings/SettingItem';
 import ModalConfirm from '../ModalConfirm';
@@ -25,6 +26,7 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({ onClic
 
 	const openModalDeleteCategory = () => {
 		if (hasWelcomeChannel) {
+			toast.error('This category has welcome channel');
 			return;
 		}
 		setShowModal(true);
@@ -57,16 +59,13 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({ onClic
 						handleMenu={handleMenu}
 					/>
 				))}
-				{!hasWelcomeChannel && (
-					<div className={'border-t-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}>
-						<button
-							className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight `}
-							onClick={openModalDeleteCategory}
-						>
-							Delete Category
-						</button>
-					</div>
-				)}
+				<div className={'border-t-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}></div>
+				<button
+					className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight ${hasWelcomeChannel ? '!text-bgTertiary' : ''}`}
+					onClick={openModalDeleteCategory}
+				>
+					Delete Category
+				</button>
 				{showModal && (
 					<ModalConfirm
 						handleCancel={() => setShowModal(false)}
