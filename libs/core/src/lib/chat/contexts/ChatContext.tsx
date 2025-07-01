@@ -902,7 +902,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				};
 
 				dispatch(emojiSuggestionActions.add(newEmoji));
-				dispatch(emojiSuggestionActions.updateEmojiCache([newEmoji, ...emojiList]));
 			} else if (eventEmoji.action === EEventAction.UPDATE) {
 				dispatch(
 					emojiSuggestionActions.update({

@@ -77,7 +77,7 @@ export const fetchCategoriesCached = async (getState: () => RootState, ensuredMe
 	const apiKey = createApiKey('fetchCategories', clanId);
 	const shouldForceCall = shouldForceApiCall(apiKey, clanData?.cache, noCache);
 
-	if (!shouldForceCall && clanData?.entities.ids.length > 0) {
+	if (!shouldForceCall) {
 		const categories = selectCachedCategoriesByClan(state, clanId);
 		return {
 			categorydesc: categories,

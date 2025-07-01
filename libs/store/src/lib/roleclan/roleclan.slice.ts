@@ -3,9 +3,9 @@ import { EVERYONE_ROLE_ID, IRolesClan, LoadingStatus, UsersClanEntity } from '@m
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUpdateRoleRequest } from 'mezon-js';
 import { ApiRole, ApiUpdateRoleOrderRequest, RoleUserListRoleUser } from 'mezon-js/api.gen';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { selectEntitesUserClans } from '../clanMembers/clan.members';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
 import { PermissionUserEntity, selectAllPermissionsDefaultEntities } from '../policies/policies.slice';
 import { RootState } from '../store';
 
@@ -31,6 +31,12 @@ export interface RolesClanState extends EntityState<RolesClanEntity, string> {
 	currentRoleId?: string | null;
 	roleMembers: Record<string, RoleUserListRoleUser[]>;
 	roles: IRolesClan[];
+	cacheByClans: Record<
+		string,
+		{
+			cache?: CacheMetadata;
+		}
+	>;
 }
 
 export const RolesClanAdapter = createEntityAdapter({
@@ -44,37 +50,66 @@ type GetRolePayload = {
 	noCache?: boolean;
 };
 
-export const fetchRolesClanCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string) => {
-		const response = await mezon.client.listRoles(mezon.session, clanId, 500, 1, '');
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: 1000 * 60 * 60,
-		normalizer: (args) => {
-			const username = args[0]?.session?.username || '';
-			return args[1] + username;
-		}
+type FetchRoleClanPayload = {
+	roles: IRolesClan[];
+	clanId: string;
+	fromCache?: boolean;
+};
+
+const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
+
+const selectCachedRolesClanByClan = createSelector(
+	[(state: RootState) => state[ROLES_CLAN_FEATURE_KEY].entities, (state: RootState, clanId: string) => clanId],
+	(entities, clanId) => {
+		const roles = Object.values(entities ?? {});
+		return roles.filter((role) => role?.clan_id === clanId);
 	}
 );
+
+export const fetchRolesClanCached = async (getState: () => RootState, ensuredMezon: MezonValueContext, clanId: string, noCache = false) => {
+	const state = getState();
+	const roleClanData = state[ROLES_CLAN_FEATURE_KEY].cacheByClans[clanId];
+	const apiKey = createApiKey('fetchRolesClan', clanId);
+	const shouldForceCall = shouldForceApiCall(apiKey, roleClanData?.cache, noCache);
+	const roles = selectCachedRolesClanByClan(state, clanId);
+
+	if (!shouldForceCall) {
+		return {
+			clan_id: clanId,
+			roles: {
+				roles: roles || []
+			},
+			fromCache: true
+		};
+	}
+
+	const response = await ensuredMezon.client.listRoles(ensuredMezon.session, clanId, 500, 1, '');
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
 
 export const fetchRolesClan = createAsyncThunk(
 	'RolesClan/fetchRolesClan',
 	async ({ clanId, repace = false, channelId, noCache }: GetRolePayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			if (noCache) {
-				fetchRolesClanCached.delete(mezon, clanId || '');
-			}
-			const response = await fetchRolesClanCached(mezon, clanId || '');
+			const response = await fetchRolesClanCached(thunkAPI.getState as () => RootState, mezon, clanId || '', noCache);
 			if (!response?.roles?.roles) {
-				return [];
+				return {
+					roles: [],
+					clanId: clanId || '',
+					fromCache: !!response?.fromCache
+				};
 			}
 			if (repace) {
 				thunkAPI.dispatch(rolesClanActions.removeRoleByChannel(channelId ?? ''));
 			}
-			const roles = response?.roles.roles
+			const roles: IRolesClan[] = response?.roles.roles
 				.filter((role) => role?.active)
 				.map((role, index) => ({ ...role, originalIndex: index }))
 				.sort((role_1, role_2) => {
@@ -93,7 +128,12 @@ export const fetchRolesClan = createAsyncThunk(
 				})
 				.map(mapRolesClanToEntity);
 
-			return roles;
+			const payload: FetchRoleClanPayload = {
+				roles: roles,
+				clanId: clanId || '',
+				fromCache: !!response?.fromCache
+			};
+			return payload;
 		} catch (error) {
 			captureSentryError(error, 'RolesClan/fetchRolesClan');
 			return thunkAPI.rejectWithValue(error);
@@ -289,7 +329,8 @@ export const initialRolesClanState: RolesClanState = RolesClanAdapter.getInitial
 	RolesClan: [],
 	roleMembers: {},
 	roles: [],
-	error: null
+	error: null,
+	cacheByClans: {}
 });
 
 export const RolesClanSlice = createSlice({
@@ -359,8 +400,16 @@ export const RolesClanSlice = createSlice({
 			.addCase(fetchRolesClan.pending, (state: RolesClanState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchRolesClan.fulfilled, (state: RolesClanState, action: PayloadAction<IRolesClan[]>) => {
-				RolesClanAdapter.setAll(state, action.payload);
+			.addCase(fetchRolesClan.fulfilled, (state: RolesClanState, action: PayloadAction<FetchRoleClanPayload>) => {
+				const { roles, clanId, fromCache } = action.payload;
+				if (!fromCache) {
+					if (!state.cacheByClans[clanId]) {
+						state.cacheByClans[clanId] = {};
+					}
+
+					state.cacheByClans[clanId].cache = createCacheMetadata();
+				}
+				RolesClanAdapter.setMany(state, roles);
 				state.loadingStatus = 'loaded';
 			})
 
@@ -507,8 +556,6 @@ export const rolesClanActions = {
 	updatePermissionUserByRoleId,
 	updateRoleOrder
 };
-
-const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
 
 export const getRolesClanState = (rootState: { [ROLES_CLAN_FEATURE_KEY]: RolesClanState }): RolesClanState => rootState[ROLES_CLAN_FEATURE_KEY];
 

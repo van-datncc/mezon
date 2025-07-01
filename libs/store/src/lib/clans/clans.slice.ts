@@ -137,12 +137,12 @@ export const fetchClansCached = async (
 ) => {
 	const rootState = getState();
 	const clansState = rootState[CLANS_FEATURE_KEY];
-
+	const socket = ensuredMezon.socketRef.current;
 	const apiKey = createApiKey('fetchClans', limit?.toString() || '', state?.toString() || '', cursor || '');
 
 	const shouldForceCall = shouldForceApiCall(apiKey, clansState.cache, noCache);
 
-	if (!shouldForceCall && clansState.ids.length > 0) {
+	if (!shouldForceCall) {
 		const clans = selectCachedClans(rootState);
 		return {
 			clandesc: clans,
@@ -150,7 +150,25 @@ export const fetchClansCached = async (
 		};
 	}
 
-	const response = await ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || '');
+	let response;
+	if (socket) {
+		try {
+			const data = await socket.listDataSocket({
+				api_name: 'ListClanDescs',
+				list_clan_req: {
+					limit: { value: limit },
+					state: { value: 1 }
+				}
+			});
+			response = data?.clan_desc_list;
+		} catch (error) {
+			// ignore
+		}
+	}
+
+	if (!response) {
+		response = await ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || '');
+	}
 
 	markApiFirstCalled(apiKey);
 
