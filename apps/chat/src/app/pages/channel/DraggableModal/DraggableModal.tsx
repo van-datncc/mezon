@@ -92,7 +92,7 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 
 			const curClanId = selectCurrentClanId(store.getState());
 			dispatch(channelsActions.resetAppChannelsListShowOnPopUp({ clanId: curClanId as string }));
-			appChannelList.map(async (item) => handleOnCloseCallback(event, curClanId as string, item.channel_id as string));
+			appChannelList.forEach((item) => handleOnCloseCallback(event, curClanId as string, item.channel_id as string));
 		},
 		[dispatch, handleOnCloseCallback, appChannelList]
 	);
