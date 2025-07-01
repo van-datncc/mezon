@@ -233,7 +233,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 		};
 
 		joinRoom();
-	}, [appChannel, participantMeetState]);
+	}, [appChannel]);
 
 	return appChannel?.app_url ? (
 		<div className="relative w-full h-full rounded-b-lg">
