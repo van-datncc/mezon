@@ -174,7 +174,7 @@ const TopBarChannelText = memo(() => {
 					) : (
 						<>
 							{channelParent && (
-									<div className="flex gap-1 items-center truncate max-sbm:hidden" onClick={handleNavigateToParent}>
+								<div className="flex gap-1 items-center truncate max-sbm:hidden" onClick={handleNavigateToParent}>
 									<ChannelTopbarLabel
 										isPrivate={!!channelParent?.channel_private}
 										label={channelParent?.channel_label || ''}
@@ -192,7 +192,7 @@ const TopBarChannelText = memo(() => {
 						</>
 					)
 				) : (
-						<div className="flex items-center gap-3 flex-1 overflow-hidden">
+					<div className="flex items-center gap-3 flex-1 overflow-hidden">
 						<DmTopbarAvatar
 							isGroup={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP}
 							avatar={currentDmGroup?.channel_avatar?.[0]}
@@ -210,7 +210,7 @@ const TopBarChannelText = memo(() => {
 						) : (
 							<div
 								key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}_display`}
-										className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent outline-none leading-10 text-colorTextLightMode dark:text-contentPrimary max-w-[250px] min-w-0 max-sbm:max-w-[180px]`}
+								className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent outline-none leading-10 text-colorTextLightMode dark:text-contentPrimary max-w-[250px] min-w-0 max-sbm:max-w-[180px]`}
 								onClick={handleStartEditing}
 								title={channelDmGroupLabel}
 							>
@@ -368,7 +368,7 @@ const ChannelTopbarTools = memo(
 						</div>
 					</div>
 				) : (
-						<>{isShowChatStream && <ChatButton isLightMode={appearanceTheme === 'light'} closeMenuOnMobile={closeMenuOnMobile} />}</>
+					<>{isShowChatStream && <ChatButton isLightMode={appearanceTheme === 'light'} closeMenuOnMobile={closeMenuOnMobile} />}</>
 				)}
 			</div>
 		);
@@ -704,8 +704,8 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.id || ''));
-	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
+	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, currentChannel?.id || ''));
+	const defaultNotificationCategory = useAppSelector((state) => selectDefaultNotificationCategory(state, currentChannel?.category_id as string));
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 
 	useEffect(() => {

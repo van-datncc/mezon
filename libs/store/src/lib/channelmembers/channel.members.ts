@@ -71,7 +71,7 @@ export const fetchChannelMembersCached = async (
 
 	const shouldForceCall = shouldForceApiCall(apiKey, channelMembersState?.memberChannels?.[channelId]?.cache, noCache);
 
-	if (!shouldForceCall && channelMembersState?.memberChannels?.[channelId]?.ids?.length > 0) {
+	if (!shouldForceCall) {
 		// const cachedChannelData = channelMembersState.memberChannels[channelId];
 		return {
 			channel_users: [],
@@ -79,6 +79,8 @@ export const fetchChannelMembersCached = async (
 			fromCache: true
 		};
 	}
+
+	// check
 
 	const response = await ensuredMezon.client.listChannelUsers(ensuredMezon.session, clanId, channelId, channelType, 1, 2000, '');
 
