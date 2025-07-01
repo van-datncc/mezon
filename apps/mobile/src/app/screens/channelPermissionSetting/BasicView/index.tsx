@@ -10,8 +10,7 @@ import {
 	selectAllUserClans,
 	selectEveryoneRole,
 	selectRolesByChannelId,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { isPublicChannel } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
@@ -42,7 +41,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const [isChannelPublic, setIsChannelPublic] = useState<boolean>(isPublicChannel(channel));
 
 	const listOfChannelRole = useSelector(selectRolesByChannelId(channel?.channel_id));
-	const listOfChannelMember = useAppSelector(selectAllUserChannel(channel?.channel_id));
+	const listOfChannelMember = useSelector(selectAllUserChannel(channel?.channel_id));
 
 	useEffect(() => {
 		dispatch(rolesClanActions.fetchRolesClan({ clanId: channel?.clan_id }));
@@ -78,17 +77,17 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 
 	const onPrivateChannelChange = useCallback(
 		(value: boolean) => {
-			setIsChannelPublic(value);
+			setIsChannelPublic(!value);
 			const data = {
 				children: (
 					<MezonConfirm
-						onConfirm={updateChannel}
+						onConfirm={() => updateChannel(!value)}
 						title={
-							!value ? t('channelPermission.warningModal.privateChannelTitle') : t('channelPermission.warningModal.publicChannelTitle')
+							value ? t('channelPermission.warningModal.privateChannelTitle') : t('channelPermission.warningModal.publicChannelTitle')
 						}
 						confirmText={t('channelPermission.warningModal.confirm')}
 						content={
-							!value
+							value
 								? t('channelPermission.warningModal.privateChannelContent', { channelLabel: channel?.channel_label })
 								: t('channelPermission.warningModal.publicChannelContent', { channelLabel: channel?.channel_label })
 						}
@@ -104,33 +103,36 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		bottomSheetRef.current?.present();
 	};
 
-	const updateChannel = useCallback(async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+	const updateChannel = useCallback(
+		async (privateChannel: boolean) => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 
-		const response = await dispatch(
-			channelsActions.updateChannelPrivate({
-				channel_id: channel.id,
-				channel_private: isChannelPublic ? 0 : 1,
-				user_ids: [userId],
-				role_ids: []
-			})
-		);
-		const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
-		if (isError) {
-			setIsChannelPublic(isPublicChannel(channel));
-		}
-		Toast.show({
-			type: 'success',
-			props: {
-				text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
-				leadingIcon: isError ? (
-					<MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} />
-				) : (
-					<MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
-				)
+			const response = await dispatch(
+				channelsActions.updateChannelPrivate({
+					channel_id: channel.id,
+					channel_private: privateChannel ? 1 : 0,
+					user_ids: [userId],
+					role_ids: []
+				})
+			);
+			const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
+			if (isError) {
+				setIsChannelPublic(isPublicChannel(channel));
 			}
-		});
-	}, [isChannelPublic, channel, userId, t]);
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: isError ? t('channelPermission.toast.failed') : t('channelPermission.toast.success'),
+					leadingIcon: isError ? (
+						<MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} />
+					) : (
+						<MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
+					)
+				}
+			});
+		},
+		[channel, userId, t]
+	);
 
 	const renderWhoCanAccessItem = useCallback(
 		({ item }) => {
@@ -158,7 +160,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	);
 
 	const handlePressChangeChannelPrivate = useCallback(() => {
-		onPrivateChannelChange(!isChannelPublic);
+		onPrivateChannelChange(isChannelPublic);
 	}, [isChannelPublic, onPrivateChannelChange]);
 
 	return (
