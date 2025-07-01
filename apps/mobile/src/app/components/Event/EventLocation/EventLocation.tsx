@@ -28,14 +28,11 @@ export function EventLocation({ event }: IEventLocation) {
 			const urlVoice = `${linkGoogleMeet}${channelVoice?.meeting_code}`;
 			await Linking.openURL(urlVoice);
 		} else if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-			dismiss();
-			setTimeout(() => {
-				const data = {
-					snapPoints: ['45%'],
-					children: <JoinChannelVoiceBS channel={channelVoice} />
-				};
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-			}, 300);
+			const data = {
+				snapPoints: ['45%', '45%'],
+				children: <JoinChannelVoiceBS channel={channelVoice} />
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		} else {
 			const urlPrivateVoice = `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
 			await Linking.openURL(urlPrivateVoice);
