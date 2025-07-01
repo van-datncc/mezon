@@ -1,7 +1,7 @@
 import { useCategory } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectWelcomeChannelByClanId } from '@mezon/store';
 import { ICategoryChannel, IChannel } from '@mezon/utils';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ItemObjProps, categorySettingList } from '../ClanSettings/ItemObj';
 import SettingItem from '../ClanSettings/SettingItem';
@@ -21,8 +21,12 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({ onClic
 	const handleClickButtonSidebar = (setting: ItemObjProps) => {
 		onClickItem(setting);
 	};
+	const welcomeChannel = useSelector((state) => selectWelcomeChannelByClanId(state, category.clan_id as string));
 
 	const openModalDeleteCategory = () => {
+		if (hasWelcomeChannel) {
+			return;
+		}
 		setShowModal(true);
 	};
 
@@ -30,6 +34,15 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({ onClic
 		handleDeleteCategory({ category, currenChannel: currenChannel as IChannel });
 		setShowModal(false);
 	};
+	const hasWelcomeChannel = useMemo(() => {
+		if (!category?.channels || !category?.channels?.length) {
+			return false;
+		}
+		if (!welcomeChannel) {
+			return false;
+		}
+		return (category.channels as string[]).includes(welcomeChannel);
+	}, [category?.channels, welcomeChannel]);
 
 	return (
 		<div className="flex flex-row flex-1 justify-end">
@@ -44,14 +57,16 @@ const CategorySettingSidebar: React.FC<ICategorySettingSidebarProps> = ({ onClic
 						handleMenu={handleMenu}
 					/>
 				))}
-				<div className={'border-t-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}>
-					<button
-						className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight `}
-						onClick={openModalDeleteCategory}
-					>
-						Delete Category
-					</button>
-				</div>
+				{!hasWelcomeChannel && (
+					<div className={'border-t-[0.08px] dark:border-borderDividerLight border-bgModifierHoverLight'}>
+						<button
+							className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left dark:hover:bg-bgHover hover:bg-bgModifierHoverLight `}
+							onClick={openModalDeleteCategory}
+						>
+							Delete Category
+						</button>
+					</div>
+				)}
 				{showModal && (
 					<ModalConfirm
 						handleCancel={() => setShowModal(false)}
