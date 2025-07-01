@@ -248,9 +248,12 @@ export const selectEmojiObjSuggestion = createSelector(getEmojiSuggestionState, 
 
 export const selectEmojiFromTopic = createSelector(getEmojiSuggestionState, (emojisState) => emojisState.fromTopic);
 
-export const selectEmojiByClanId = (clanId: string) =>
-	createSelector(selectAllEmojiSuggestion, (emojis) => {
+export const selectEmojiByClanId = createSelector(
+	[(state: RootState) => state[EMOJI_SUGGESTION_FEATURE_KEY], (state: RootState, clanId: string) => clanId],
+	(emojisState, clanId) => {
+		const emojis = selectAll(emojisState);
 		return emojis.filter((emoji) => emoji.clan_id === clanId);
-	});
+	}
+);
 
 export const selectEmojiOnSale = createSelector([selectAllEmojiSuggestion], (emojis) => emojis?.filter((emoji) => emoji?.is_for_sale === true));
