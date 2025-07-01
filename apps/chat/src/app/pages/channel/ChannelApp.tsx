@@ -215,7 +215,7 @@ export const ChannelApps = React.memo(({ appChannel }: { appChannel: ApiChannelA
 				console.error('Failed to update participant state:', err);
 			}
 		},
-		[dispatch, appChannel, userProfile]
+		[dispatch, appChannel, userProfile?.user?.display_name]
 	);
 
 	useEffect(() => {
