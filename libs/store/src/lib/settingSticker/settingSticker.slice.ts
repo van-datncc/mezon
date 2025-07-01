@@ -70,7 +70,7 @@ export const fetchStickerByUserIdCached = async (getState: () => RootState, ensu
 	const apiKey = createApiKey('fetchStickerByUserId');
 	const shouldForceCall = shouldForceApiCall(apiKey, stickerData?.cache, noCache);
 
-	if (!shouldForceCall && stickerData?.ids?.length > 0) {
+	if (!shouldForceCall) {
 		const sticker = selectCachedSticker(state);
 		return {
 			stickers: sticker,
@@ -112,7 +112,10 @@ export const fetchStickerByUserId = createAsyncThunk(
 					};
 				});
 
-				return processedStickers;
+				return {
+					stickers: processedStickers || [],
+					fromCache: !!response?.fromCache
+				};
 			}
 			throw new Error('Emoji list is undefined or null');
 		} catch (error) {
@@ -281,10 +284,11 @@ export const settingClanStickerSlice = createSlice({
 	},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchStickerByUserId.fulfilled, (state: SettingClanStickerState, actions) => {
+			.addCase(fetchStickerByUserId.fulfilled, (state: SettingClanStickerState, actions: any) => {
+				if (!actions?.payload?.fromCache) state.cache = createCacheMetadata();
+
+				if (actions?.payload?.stickers) stickerAdapter.setAll(state, actions?.payload?.stickers);
 				state.loadingStatus = 'loaded';
-				state.cache = createCacheMetadata();
-				stickerAdapter.setAll(state, actions.payload);
 			})
 			.addCase(fetchStickerByUserId.pending, (state: SettingClanStickerState) => {
 				state.loadingStatus = 'loading';

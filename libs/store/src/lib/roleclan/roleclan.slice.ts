@@ -53,6 +53,7 @@ type GetRolePayload = {
 type FetchRoleClanPayload = {
 	roles: IRolesClan[];
 	clanId: string;
+	fromCache?: boolean;
 };
 
 const { selectAll, selectEntities } = RolesClanAdapter.getSelectors();
@@ -72,11 +73,11 @@ export const fetchRolesClanCached = async (getState: () => RootState, ensuredMez
 	const shouldForceCall = shouldForceApiCall(apiKey, roleClanData?.cache, noCache);
 	const roles = selectCachedRolesClanByClan(state, clanId);
 
-	if (!shouldForceCall && roles.length > 0) {
+	if (!shouldForceCall) {
 		return {
 			clan_id: clanId,
 			roles: {
-				roles
+				roles: roles || []
 			},
 			fromCache: true
 		};
@@ -101,7 +102,8 @@ export const fetchRolesClan = createAsyncThunk(
 			if (!response?.roles?.roles) {
 				return {
 					roles: [],
-					clanId: clanId || ''
+					clanId: clanId || '',
+					fromCache: !!response?.fromCache
 				};
 			}
 			if (repace) {
@@ -128,7 +130,8 @@ export const fetchRolesClan = createAsyncThunk(
 
 			const payload: FetchRoleClanPayload = {
 				roles: roles,
-				clanId: clanId || ''
+				clanId: clanId || '',
+				fromCache: !!response?.fromCache
 			};
 			return payload;
 		} catch (error) {
@@ -398,12 +401,14 @@ export const RolesClanSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchRolesClan.fulfilled, (state: RolesClanState, action: PayloadAction<FetchRoleClanPayload>) => {
-				const { roles, clanId } = action.payload;
-				if (!state.cacheByClans[clanId]) {
-					state.cacheByClans[clanId] = {};
-				}
+				const { roles, clanId, fromCache } = action.payload;
+				if (!fromCache) {
+					if (!state.cacheByClans[clanId]) {
+						state.cacheByClans[clanId] = {};
+					}
 
-				state.cacheByClans[clanId].cache = createCacheMetadata();
+					state.cacheByClans[clanId].cache = createCacheMetadata();
+				}
 				RolesClanAdapter.setMany(state, roles);
 				state.loadingStatus = 'loaded';
 			})

@@ -55,7 +55,7 @@ export const fetchEmojiCached = async (getState: () => RootState, ensuredMezon: 
 	const apiKey = createApiKey('fetchEmoji');
 	const shouldForceCall = shouldForceApiCall(apiKey, emojiData?.cache, noCache);
 
-	if (!shouldForceCall && emojiData?.ids?.length > 0) {
+	if (!shouldForceCall) {
 		const emojis = selectCachedEmoji(state);
 		return {
 			emoji_list: emojis,
@@ -82,7 +82,10 @@ export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache 
 		if (!response?.emoji_list) {
 			throw new Error('Emoji list is undefined or null');
 		}
-		return response.emoji_list;
+		return {
+			emojis: response.emoji_list,
+			fromCache: response?.fromCache
+		};
 	} catch (error) {
 		captureSentryError(error, 'emoji/fetchEmoji');
 		return thunkAPI.rejectWithValue(error);
@@ -192,10 +195,11 @@ export const emojiSuggestionSlice = createSlice({
 			.addCase(fetchEmoji.pending, (state: EmojiSuggestionState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
-				emojiSuggestionAdapter.setAll(state, action.payload);
+			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any>) => {
+				if (!action.payload?.fromCache) state.cache = createCacheMetadata();
 
-				state.cache = createCacheMetadata();
+				if (action.payload?.emojis) emojiSuggestionAdapter.setAll(state, action.payload?.emojis);
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {

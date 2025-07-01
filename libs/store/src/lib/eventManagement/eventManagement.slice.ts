@@ -30,7 +30,7 @@ export const fetchEventManagementCached = async (getState: () => RootState, ensu
 	const apiKey = createApiKey('fetchEventManagement', clanId);
 	const shouldForceCall = shouldForceApiCall(apiKey, eventData?.cache, noCache);
 
-	if (!shouldForceCall && eventData?.entities?.ids?.length > 0) {
+	if (!shouldForceCall) {
 		const events = selectCachedEventManagementByClan(state, clanId);
 		return {
 			events: events,
@@ -72,7 +72,7 @@ export const fetchEventManagement = createAsyncThunk(
 			const response = await fetchEventManagementCached(thunkAPI.getState as () => RootState, mezon, clanId, noCache);
 
 			if (!response.events) {
-				return { events: [], clanId };
+				return { events: [], clanId, fromCache: response?.fromCache };
 			}
 			if (Date.now() - response.time > 1000) {
 				return {
@@ -82,7 +82,7 @@ export const fetchEventManagement = createAsyncThunk(
 				};
 			}
 			const events = response.events.map((eventRes) => mapEventManagementToEntity(eventRes, clanId));
-			return { events, clanId };
+			return { events, clanId, fromCache: response?.fromCache };
 		} catch (error) {
 			captureSentryError(error, 'eventManagement/fetchEventManagement');
 			return thunkAPI.rejectWithValue(error);
@@ -416,7 +416,7 @@ export const eventManagementSlice = createSlice({
 							entities: eventManagementAdapter.getInitialState()
 						};
 					}
-					if (state?.byClans?.[action?.payload?.clanId]) {
+					if (state?.byClans?.[action?.payload?.clanId] && !action?.payload?.fromCache) {
 						state.byClans[action.payload.clanId].cache = createCacheMetadata();
 					}
 					if (action.payload.fromCache) return;

@@ -42,7 +42,7 @@ export const fetchEmojiRecentCached = async (getState: () => RootState, ensuredM
 	const apiKey = createApiKey('fetchEmojiRecent');
 	const shouldForceCall = shouldForceApiCall(apiKey, emojiData?.cache, noCache);
 
-	if (!shouldForceCall && emojiData?.ids?.length > 0) {
+	if (!shouldForceCall) {
 		const emojis = selectCachedEmojiRecent(state);
 		return {
 			emoji_recents: emojis,
@@ -68,7 +68,10 @@ export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async
 
 		if (!response?.emoji_recents) {
 			thunkAPI.dispatch(emojiRecentActions.setLastEmojiRecent({ emoji_recents_id: '0', emoji_id: '' }));
-			return [];
+			return {
+				emojis: [],
+				fromCache: response?.fromCache
+			};
 		}
 		thunkAPI.dispatch(
 			emojiRecentActions.setLastEmojiRecent({
@@ -76,7 +79,10 @@ export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async
 				emoji_id: response.emoji_recents[0].emoji_id
 			})
 		);
-		return response.emoji_recents;
+		return {
+			emojis: response.emoji_recents,
+			fromCache: response?.fromCache
+		};
 	} catch (error) {
 		captureSentryError(error, 'emoji/fetchEmojiRecent');
 		return thunkAPI.rejectWithValue(error);
@@ -152,9 +158,10 @@ export const emojiRecentSlice = createSlice({
 			.addCase(fetchEmojiRecent.pending, (state: EmojiRecentState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchEmojiRecent.fulfilled, (state, action: PayloadAction<any[]>) => {
-				emojiRecentAdapter.setAll(state, action.payload);
-				state.cache = createCacheMetadata();
+			.addCase(fetchEmojiRecent.fulfilled, (state, action: PayloadAction<any>) => {
+				if (!action?.payload?.fromCache) state.cache = createCacheMetadata();
+				if (action?.payload?.emojis) emojiRecentAdapter.setAll(state, action.payload.emojis);
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmojiRecent.rejected, (state: EmojiRecentState, action) => {
