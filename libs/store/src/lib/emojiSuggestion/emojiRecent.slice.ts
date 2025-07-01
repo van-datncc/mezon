@@ -1,15 +1,20 @@
 import { captureSentryError } from '@mezon/logger';
-import { stickerSettingActions } from '@mezon/store';
+import {
+	CacheMetadata,
+	createApiKey,
+	createCacheMetadata,
+	markApiFirstCalled,
+	RootState,
+	shouldForceApiCall,
+	stickerSettingActions
+} from '@mezon/store';
 import { IEmojiRecent, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ApiClanEmoji } from 'mezon-js/dist/api.gen';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
+import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from './emojiSuggestion.slice';
 
 export const EMOJI_RECENT_FEATURE_KEY = 'emojiRecent';
-
-const EMOJI_RECENT_CACHE_TIME = 1000 * 60 * 60;
 
 export interface EmojiRecentEntity extends IEmojiRecent {
 	id: string;
@@ -18,34 +23,48 @@ export interface EmojiRecentEntity extends IEmojiRecent {
 export interface EmojiRecentState extends EntityState<EmojiRecentEntity, string> {
 	loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
 	lastEmojiRecent: { emoji_recents_id: string; emoji_id?: string };
+	cache?: CacheMetadata;
 }
 
 export const emojiRecentAdapter = createEntityAdapter({
 	selectId: (emo: EmojiRecentEntity) => emo.emoji_id || ''
 });
 
-export const fetchEmojiRecentCached = memoizeAndTrack(
-	async (mezon: MezonValueContext) => {
-		const response = await mezon.client.emojiRecentList(mezon.session);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: EMOJI_RECENT_CACHE_TIME,
-		normalizer: (args) => {
-			return args[0]?.session?.username || '';
-		}
+const { selectAll: selectAllEmojiRecentEntities } = emojiRecentAdapter.getSelectors();
+
+const selectCachedEmojiRecent = createSelector([(state: RootState) => state[EMOJI_RECENT_FEATURE_KEY]], (entitiesState) => {
+	return entitiesState ? selectAllEmojiRecentEntities(entitiesState) : [];
+});
+
+export const fetchEmojiRecentCached = async (getState: () => RootState, ensuredMezon: MezonValueContext, noCache = false) => {
+	const state = getState();
+	const emojiData = state[EMOJI_RECENT_FEATURE_KEY];
+	const apiKey = createApiKey('fetchEmojiRecent');
+	const shouldForceCall = shouldForceApiCall(apiKey, emojiData?.cache, noCache);
+
+	if (!shouldForceCall && emojiData?.ids?.length > 0) {
+		const emojis = selectCachedEmojiRecent(state);
+		return {
+			emoji_recents: emojis,
+			time: Date.now(),
+			fromCache: true
+		};
 	}
-);
+	const response = await ensuredMezon.client.emojiRecentList(ensuredMezon.session);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		time: Date.now(),
+		fromCache: false
+	};
+};
 
 export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-		if (noCache) {
-			fetchEmojiRecentCached.delete(mezon);
-		}
-		const response = await fetchEmojiRecentCached(mezon);
+		const response = await fetchEmojiRecentCached(thunkAPI.getState as () => RootState, mezon, noCache);
 
 		if (!response?.emoji_recents) {
 			thunkAPI.dispatch(emojiRecentActions.setLastEmojiRecent({ emoji_recents_id: '0', emoji_id: '' }));
@@ -135,7 +154,7 @@ export const emojiRecentSlice = createSlice({
 			})
 			.addCase(fetchEmojiRecent.fulfilled, (state, action: PayloadAction<any[]>) => {
 				emojiRecentAdapter.setAll(state, action.payload);
-
+				state.cache = createCacheMetadata();
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmojiRecent.rejected, (state: EmojiRecentState, action) => {
@@ -154,8 +173,6 @@ export const emojiRecentActions = {
 	fetchEmojiRecent,
 	buyItemForSale
 };
-
-const { selectAll, selectEntities } = emojiRecentAdapter.getSelectors();
 
 export const getEmojiRecentState = (rootState: { [EMOJI_RECENT_FEATURE_KEY]: EmojiRecentState }): EmojiRecentState =>
 	rootState[EMOJI_RECENT_FEATURE_KEY];

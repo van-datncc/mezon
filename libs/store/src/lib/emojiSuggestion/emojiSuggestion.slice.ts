@@ -3,13 +3,11 @@ import { IEmoji } from '@mezon/utils';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
-import { ApiClanEmoji } from 'mezon-js/dist/api.gen';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
+import { RootState } from '../store';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
-
-const EMOJI_SUGGESTION_CACHE_TIME = 1000 * 60 * 60;
 
 export interface EmojiSuggestionEntity extends IEmoji {
 	id: string;
@@ -26,6 +24,7 @@ export interface EmojiSuggestionState extends EntityState<EmojiSuggestionEntity,
 	addEmojiAction: boolean;
 	shiftPressed: boolean;
 	fromTopic?: boolean;
+	cache?: CacheMetadata;
 }
 
 type UpdateEmojiRequest = {
@@ -44,42 +43,41 @@ type EmojiObjPickedArgs = {
 	fromTopic?: boolean;
 };
 
-export const fetchEmojiCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, defaultResponse?: Array<ApiClanEmoji>) => {
-		if (defaultResponse) {
-			return {
-				emoji_list: defaultResponse,
-				time: Date.now()
-			};
-		}
+const { selectAll, selectEntities } = emojiSuggestionAdapter.getSelectors();
 
-		const response = await mezon.client.getListEmojisByUserId(mezon.session);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: EMOJI_SUGGESTION_CACHE_TIME,
-		normalizer: (args) => {
-			return args[0]?.session?.username || '';
-		}
-	}
-);
-
-export const updateEmojiCache = createAsyncThunk('emoji/updateCache', async (emojiList: Array<ApiClanEmoji>, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	fetchEmojiCached.clear();
-
-	await fetchEmojiCached(mezon, emojiList);
+const selectCachedEmoji = createSelector([(state: RootState) => state[EMOJI_SUGGESTION_FEATURE_KEY]], (entitiesState) => {
+	return entitiesState ? selectAll(entitiesState) : [];
 });
+
+export const fetchEmojiCached = async (getState: () => RootState, ensuredMezon: MezonValueContext, noCache = false) => {
+	const state = getState();
+	const emojiData = state[EMOJI_SUGGESTION_FEATURE_KEY];
+	const apiKey = createApiKey('fetchEmoji');
+	const shouldForceCall = shouldForceApiCall(apiKey, emojiData?.cache, noCache);
+
+	if (!shouldForceCall && emojiData?.ids?.length > 0) {
+		const emojis = selectCachedEmoji(state);
+		return {
+			emoji_list: emojis,
+			time: Date.now(),
+			fromCache: true
+		};
+	}
+	const response = await ensuredMezon.client.getListEmojisByUserId(ensuredMezon.session);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		time: Date.now(),
+		fromCache: false
+	};
+};
 
 export const fetchEmoji = createAsyncThunk('emoji/fetchEmoji', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-		if (noCache) {
-			fetchEmojiCached.delete(mezon);
-		}
-		const response = await fetchEmojiCached(mezon);
+		const response = await fetchEmojiCached(thunkAPI.getState as () => RootState, mezon, noCache);
 
 		if (!response?.emoji_list) {
 			throw new Error('Emoji list is undefined or null');
@@ -197,6 +195,7 @@ export const emojiSuggestionSlice = createSlice({
 			.addCase(fetchEmoji.fulfilled, (state, action: PayloadAction<any[]>) => {
 				emojiSuggestionAdapter.setAll(state, action.payload);
 
+				state.cache = createCacheMetadata();
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchEmoji.rejected, (state: EmojiSuggestionState, action) => {
@@ -225,11 +224,8 @@ export const emojiSuggestionActions = {
 	fetchEmoji,
 	updateEmojiSetting,
 	deleteEmojiSetting,
-	createEmojiSetting,
-	updateEmojiCache
+	createEmojiSetting
 };
-
-const { selectAll, selectEntities } = emojiSuggestionAdapter.getSelectors();
 
 export const getEmojiSuggestionState = (rootState: { [EMOJI_SUGGESTION_FEATURE_KEY]: EmojiSuggestionState }): EmojiSuggestionState =>
 	rootState[EMOJI_SUGGESTION_FEATURE_KEY];
