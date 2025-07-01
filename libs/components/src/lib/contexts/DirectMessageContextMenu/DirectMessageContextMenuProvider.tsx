@@ -83,7 +83,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		isLastOne
 	});
 
-	const notificationSettings = useAppSelector(selectNotifiSettingsEntitiesById(channelId || ''));
+	const notificationSettings = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, channelId || ''));
 
 	const { mutedUntilText, nameChildren, muteOrUnMuteChannel, handleScheduleMute, getNotificationSetting } = useNotificationSettings({
 		channelId,

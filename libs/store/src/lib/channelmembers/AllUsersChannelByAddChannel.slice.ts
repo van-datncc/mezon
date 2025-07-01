@@ -33,11 +33,12 @@ export const fetchUserChannelsCached = async (
 	limit: number,
 	noCache = false
 ) => {
+	const socket = ensuredMezon.socketRef?.current;
 	const currentState = getState();
 	const userChannelsState = currentState[ALL_USERS_BY_ADD_CHANNEL];
 	const apiKey = createApiKey('fetchUserChannels', channelId, limit, ensuredMezon.session.username || '');
 	const shouldForceCall = shouldForceApiCall(apiKey, userChannelsState?.cacheByChannels?.[channelId], noCache);
-	if (!shouldForceCall && userChannelsState?.entities?.[channelId]) {
+	if (!shouldForceCall) {
 		const cachedData = userChannelsState.entities[channelId];
 		return {
 			...cachedData,
@@ -45,7 +46,29 @@ export const fetchUserChannelsCached = async (
 			fromCache: true
 		};
 	}
-	const response = await ensuredMezon.client.listChannelUsersUC(ensuredMezon.session, channelId, limit);
+
+	let response;
+	if (socket) {
+		try {
+			const data = await socket.listDataSocket({
+				api_name: 'listChannelUsersUC',
+				list_channel_users_uc_req: {
+					channel_id: channelId,
+					limit
+				}
+			});
+			response = data?.channel_users_uc_list;
+			console.log(data, 'selectAllUserChannel');
+		} catch (err) {
+			// ignore
+			console.log(err, 'selectAllUserChannel');
+		}
+	}
+
+	if (!response) {
+		response = await ensuredMezon.client.listChannelUsersUC(ensuredMezon.session, channelId, limit);
+	}
+
 	markApiFirstCalled(apiKey);
 
 	return {

@@ -29,7 +29,7 @@ import {
 	weakMapMemoize
 } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import { ChannelMessage } from 'mezon-js';
+import { ChannelMessage, ChannelMessageList, safeJSONParse } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { MessageButtonClicked } from 'mezon-js/socket';
 import { accountActions, selectAllAccount } from '../account/account.slice';
@@ -194,12 +194,14 @@ export const fetchMessagesCached = async (
 	topicId?: string,
 	noCache = false
 ) => {
+	const socket = ensuredMezon.socketRef.current;
+
 	const state = getState();
 	const channelData = state[MESSAGES_FEATURE_KEY].channelMessages[channelId];
 	const apiKey = createApiKey('fetchMessages', clanId, channelId, messageId || '', direction || 1, topicId || '');
 	const shouldForceCall = shouldForceApiCall(apiKey, channelData?.cache, noCache);
 
-	if (!shouldForceCall && channelData?.ids.length > 0) {
+	if (!shouldForceCall && channelData?.ids?.length > 0) {
 		const cachedMessages = channelData.ids.map((id) => channelData.entities[id]).filter(Boolean);
 		return {
 			messages: cachedMessages,
@@ -207,15 +209,43 @@ export const fetchMessagesCached = async (
 		};
 	}
 
-	const response = await ensuredMezon.client.listChannelMessages(
-		ensuredMezon.session,
-		clanId,
-		channelId,
-		messageId,
-		direction,
-		LIMIT_MESSAGE,
-		topicId
-	);
+	let response;
+
+	if (socket) {
+		try {
+			const data = await socket.listDataSocket({
+				api_name: 'ListChannelMessages',
+				list_channel_message_req: {
+					channel_id: channelId,
+					message_id: messageId,
+					direction,
+					clan_id: clanId,
+					topic_id: topicId,
+					limit: LIMIT_MESSAGE
+				}
+			});
+			response = data?.channel_message_list as ChannelMessageList;
+			response.messages =
+				response.messages?.map((item) => ({
+					...item,
+					attachments: safeJSONParse(item.attachments as any),
+					content: safeJSONParse(item.content as any),
+					mentions: safeJSONParse(item.mentions as any),
+					references: safeJSONParse(item.references as any)
+				})) || [];
+			// TODO: recheck
+		} catch (err) {
+			response = await ensuredMezon.client.listChannelMessages(
+				ensuredMezon.session,
+				clanId,
+				channelId,
+				messageId,
+				direction,
+				LIMIT_MESSAGE,
+				topicId
+			);
+		}
+	}
 
 	markApiFirstCalled(apiKey);
 

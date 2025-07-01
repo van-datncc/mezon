@@ -76,7 +76,7 @@ export const fetchListFriendsCached = async (
 
 	const shouldForceCall = shouldForceApiCall(apiKey, friendsState?.cache, noCache);
 
-	if (!shouldForceCall && friendsState?.ids.length > 0) {
+	if (!shouldForceCall) {
 		const friends = selectCachedFriends(currentState);
 		return {
 			friends: friends,
