@@ -1,12 +1,11 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, Text } from '@mezon/mobile-ui';
 import { AttachmentEntity, selectAllListAttachmentByChannel } from '@mezon/store-mobile';
-import { sleep } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, View } from 'react-native';
+import { DeviceEventEmitter, useWindowDimensions, View } from 'react-native';
 import GalleryAwesome, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
@@ -29,6 +28,7 @@ const TIME_TO_HIDE_THUMBNAIL = 5000;
 const TIME_TO_SHOW_SAVE_IMAGE_SUCCESS = 3000;
 
 export const ImageListModal = React.memo((props: IImageListModalProps) => {
+	const { width, height } = useWindowDimensions();
 	const { imageSelected, channelId } = props;
 	const { t } = useTranslation('common');
 	const [currentImage, setCurrentImage] = useState<AttachmentEntity | null>(null);
@@ -40,8 +40,6 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	const ref = useRef<GalleryRef>(null);
 	const footerTimeoutRef = useRef<NodeJS.Timeout>(null);
 	const imageSavedTimeoutRef = useRef<NodeJS.Timeout>(null);
-	const [dims, setDims] = useState(Dimensions.get('window'));
-	const [ready, setReady] = useState(true);
 
 	const initialIndex = useMemo(() => {
 		if (attachments?.length) {
@@ -142,15 +140,9 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		[formattedImageList, setTimeoutHideFooter, visibleToolbarConfig?.showFooter]
 	);
 
-	const renderItem = useCallback(
-		({ item, index, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
-			if (!ready) {
-				return <View />;
-			}
-			return <ItemImageModal index={index} item={item} setImageDimensions={setImageDimensions} />;
-		},
-		[ready]
-	);
+	const renderItem = ({ item, index, setImageDimensions }: RenderItemInfo<ApiMessageAttachment>) => {
+		return <ItemImageModal index={index} item={item} setImageDimensions={setImageDimensions} />;
+	};
 
 	const onImageSaved = useCallback(() => {
 		setShowSavedImage(true);
@@ -177,16 +169,6 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		const sub = Dimensions.addEventListener('change', async ({ window }) => {
-			setReady(false);
-			setDims(window);
-			await sleep(100);
-			setReady(true);
-		});
-		return () => sub.remove();
-	}, []);
-
 	const setScaleDebounced = useThrottledCallback(setCurrentScale, 300);
 
 	return (
@@ -197,7 +179,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			<GalleryAwesome
 				ref={ref}
 				style={{ flex: 1 }}
-				containerDimensions={{ height: dims.height, width: dims.width }}
+				containerDimensions={{ height, width }}
 				initialIndex={initialIndex === -1 ? 0 : initialIndex}
 				data={formattedImageList}
 				keyExtractor={(item, index) => `${item?.filename}_${index}`}
