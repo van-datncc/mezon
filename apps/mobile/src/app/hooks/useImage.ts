@@ -1,4 +1,4 @@
-import { appActions, useAppDispatch } from '@mezon/store';
+import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { useCallback } from 'react';
 import { Platform } from 'react-native';

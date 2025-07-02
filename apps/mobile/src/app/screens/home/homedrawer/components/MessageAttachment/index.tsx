@@ -1,7 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { attachmentActions } from '@mezon/store';
-import { useAppDispatch } from '@mezon/store-mobile';
+import { attachmentActions, useAppDispatch } from '@mezon/store-mobile';
 import { fileTypeImage, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,7 +23,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	const images: ApiMessageAttachment[] = [];
 	const documents: ApiMessageAttachment[] = [];
 
-	attachments.forEach((attachment) => {
+	(attachments || [])?.forEach?.((attachment) => {
 		if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
 			videos.push(attachment);
 		} else if (fileTypeImage.includes(attachment?.filetype)) {
