@@ -52,7 +52,6 @@ import {
 	policiesActions,
 	resetChannelBadgeCount,
 	rolesClanActions,
-	selectAllEmojiSuggestion,
 	selectAllTextChannel,
 	selectAllThreads,
 	selectAllUserClans,
@@ -885,10 +884,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oneventemoji = useCallback(
 		async (eventEmoji: EventEmoji) => {
-			const store = await getStoreAsync();
-			const state = store.getState() as RootState;
-			const emojiList = selectAllEmojiSuggestion(state) as ApiClanEmoji[];
-
 			if (eventEmoji.action === EEventAction.CREATED) {
 				const newEmoji: ApiClanEmoji = {
 					category: eventEmoji.clan_name,
@@ -896,7 +891,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					creator_id: eventEmoji.user_id,
 					id: eventEmoji.id,
 					shortname: eventEmoji.short_name,
-					src: eventEmoji.source,
+					src: eventEmoji.user_id === userId || !eventEmoji.is_for_sale ? eventEmoji.source : undefined,
 					logo: eventEmoji.logo,
 					clan_name: eventEmoji.clan_name
 				};
