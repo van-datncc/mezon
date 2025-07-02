@@ -252,49 +252,49 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	]);
 
 	return (
-		<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
-			<div className="dark:text-white text-black text-[15px]">
+		<div className="overflow-y-auto flex flex-col flex-1 shrink  w-1/2 pt-[94px] sbm:pb-7 sbm:pr-[10px] sbm:pl-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
+			<div className=" text-[15px]">
 				<h3 className="mb-4 font-bold text-xl">Overview</h3>
-				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">{label} name</p>
+				<p className="text-xs font-bold uppercase mb-2">{label} name</p>
 				<InputField
 					type="text"
 					placeholder={channelLabel}
 					value={channelLabel}
 					onChange={handleDisplayChannelLabel}
-					className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
+					className="pl-3 py-2 w-full border-0 outline-none rounded"
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 				/>
 				{checkValidate && <p className="text-[#e44141] text-xs italic font-thin">{checkValidate}</p>}
 
 				{channel.type === ChannelType.CHANNEL_TYPE_APP && (
 					<>
-						<hr className="border-t border-solid dark:border-borderDivider my-10" />
-						<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">App URL</p>
+						<hr className="border-t-theme-primary my-10" />
+						<p className="text-xs font-bold uppercase mb-2">App URL</p>
 						<InputField
 							disabled={true}
 							type="text"
 							placeholder={appUrl}
 							value={appUrl}
 							onChange={handleDisplayAppUrl}
-							className="dark:bg-black bg-white pl-3 py-2 w-full border-0 outline-none rounded"
+							className="pl-3 py-2 w-full border-0 outline-none rounded"
 						/>
 						{checkValidateUrl && <p className="text-[#e44141] text-xs italic font-thin">{messages.INVALID_URL}</p>}
 					</>
 				)}
 
-				<hr className="border-t border-solid dark:border-borderDivider my-10" />
-				<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">{label} Topic</p>
+				<hr className="border-t-theme-primary my-10" />
+				<p className="text-xs font-bold  uppercase mb-2">{label} Topic</p>
 				<div className="relative">
 					<TextArea
 						placeholder={`Let everyone know how to use this ${label}!`}
-						className="resize-none h-auto min-h-[87px] w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black overflow-y-hidden outline-none py-2 pl-3 pr-5 dark:border-none"
+						className="resize-none bg-theme-input h-auto min-h-[87px] w-full overflow-y-hidden outline-none py-2 pl-3 pr-5 border-theme-primary"
 						value={topic}
 						onChange={handleChangeTextArea}
 						rows={1}
 						refTextArea={textAreaRef}
 						maxLength={1024}
 					></TextArea>
-					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterTopic}</p>
+					<p className="absolute bottom-2 right-2 ">{countCharacterTopic}</p>
 				</div>
 				<BottomBlock
 					slowModeDropdown={slowModeDropdown}

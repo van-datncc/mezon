@@ -168,10 +168,8 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 				<div className="relative">
 					<div className="relative px-4 pt-4 pb-3 border-b border-gray-300 dark:border-[#42464d]">
 						<div className="text-center">
-							<h2 className="text-lg font-bold text-colorTextLightMode dark:text-white">
-								{sound ? 'Edit Sound Effect' : 'Upload Sound Effect'}
-							</h2>
-							<p className="text-gray-500 dark:text-[#b9bbbe] text-xs">Supports MP3, WAV formats • Max 1MB</p>
+							<h2 className="text-lg font-bold">{sound ? 'Edit Sound Effect' : 'Upload Sound Effect'}</h2>
+							<p className=" text-xs">Supports MP3, WAV formats • Max 1MB</p>
 						</div>
 					</div>
 

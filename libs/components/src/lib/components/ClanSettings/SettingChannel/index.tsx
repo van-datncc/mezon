@@ -85,7 +85,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 						searchFilter={searchFilter}
 					/>
 				))}
-				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-theme-primary mt-0">
+				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-theme-primary mt-0 text-theme-primary">
 					<div className={'flex flex-row items-center '}>
 						Show
 						<Dropdown
@@ -259,10 +259,10 @@ const ItemInfor = ({
 				onClick={closeModalAllMember}
 			>
 				<div
-					className="w-450 max-h-[80vh] min-h-250 dark:bg-bgTertiary bg-bgLightMode rounded-lg flex flex-col gap-2 p-4 overflow-y-auto hide-scrollbar"
+					className="w-450 max-h-[80vh] min-h-250  rounded-lg flex flex-col gap-2 p-4 overflow-y-auto hide-scrollbar"
 					onClick={(e) => e.stopPropagation()}
 				>
-					<div className="font-semibold pb-3 text-channelActiveLightColor dark:text-channelTextareaLight">List Member</div>
+					<div className="font-semibold pb-3 ">List Member</div>
 					{userIds.map((member) => (
 						<div className="flex gap-3">
 							<AvatarUserShort id={member} key={member} showName={true} />
@@ -285,7 +285,7 @@ const ItemInfor = ({
 
 	return (
 		<div
-			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px]  before:absolute before:top-0 before:left-0 group `}
+			className={`w-full py-1 relative before:content-[" "] before:w-full before:h-[0.08px]  before:absolute before:top-0 before:left-0 group text-theme-primary `}
 			onContextMenu={handleCopyChannelId}
 		>
 			<div className="cursor-pointer px-3 py-2 pr-12 flex gap-3 items-center w-full bg-item-hover">

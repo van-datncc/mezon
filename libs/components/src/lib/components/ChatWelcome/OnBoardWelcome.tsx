@@ -44,7 +44,7 @@ export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 					{currentClan?.banner ? (
 						<img src={currentClan?.banner} />
 					) : (
-							<div className="w-full h-28 font-bold text-2xl text-[#929292] dark:text-[#b4b4b4]  rounded-lg flex items-center justify-center">
+						<div className="w-full h-28 font-bold text-2xl text-[#929292] dark:text-[#b4b4b4]  rounded-lg flex items-center justify-center">
 							<p className="[text-shadow:_0_1px_2px_#ffffff]">Click Launch App To Start</p>
 						</div>
 					)}
@@ -69,7 +69,7 @@ const Onboarditem = ({ icon, title, tick, onClick }: { icon: ReactNode; title: s
 	};
 	return (
 		<div
-			className="w-[400px] gap-4 h-[72px] items-center flex p-4 text-sm font-semibold text-theme-primary text-theme-primary-hover bg-item-hover bg-button-secondary rounded-lg hover:cursor-pointer"
+			className="w-[400px] gap-4 h-[72px] items-center flex p-4 text-sm font-semibold text-theme-primary text-theme-primary-hover bg-item-hover bg-item-theme rounded-lg hover:cursor-pointer"
 			onClick={handleOnClickItem}
 		>
 			{icon}

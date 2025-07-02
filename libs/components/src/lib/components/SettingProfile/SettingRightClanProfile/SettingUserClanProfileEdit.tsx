@@ -219,7 +219,7 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="rounded-lg w-full border-theme-primary px-4 py-2 mt-2 outline-none bg-item-theme font-normal text-sm tracking-wide"
+							className="rounded-lg w-full border-theme-primary px-4 py-2 mt-2 outline-none font-normal text-sm tracking-wide"
 							placeholder={userProfile?.user?.display_name || userProfile?.user?.username}
 							value={displayName}
 							maxLength={32}
@@ -231,16 +231,16 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 						)}
 					</div>
 					<div className="mt-[20px]">
-						<p className="dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">AVATAR</p>
+						<p className="font-bold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
-								<div className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-white">
+								<div className="text-[14px] font-medium bg-[#155EEF] hover:bg-blue-500 rounded-lg p-[8px] pr-[10px] pl-[10px] cursor-pointer text-white">
 									Change avatar
 								</div>
 								<input type="file" onChange={handleFile} className="hidden" />
 							</label>
 							<button
-								className="bg-[#1E1E1E] rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px] font-medium text-white"
+								className="border-theme-primary rounded-lg p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px] font-medium "
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -248,8 +248,8 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 						</div>
 					</div>
 				</div>
-				<div className="flex-1 text-white">
-					<p className="mt-[20px] dark:text-[#CCCCCC] text-textLightTheme font-bold tracking-wide text-sm">PREVIEW</p>
+				<div className="flex-1">
+					<p className="mt-[20px] font-bold tracking-wide text-sm">PREVIEW</p>
 					<PreviewSetting
 						profiles={editProfile}
 						currentDisplayName={!displayName ? userProfile?.user?.display_name : ''}

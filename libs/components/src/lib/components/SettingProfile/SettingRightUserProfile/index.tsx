@@ -327,7 +327,7 @@ const SettingRightUser = ({
 									name="logo"
 									id="logo"
 									onChange={handleChangeLogo}
-									className="w-full absolute top-0 left-0 h-full text-sm text-slate-500 hidden"
+									className="w-full absolute top-0 left-0 h-full text-sm hidden"
 								/>
 							</label>
 						</div>
@@ -352,13 +352,13 @@ const SettingRightUser = ({
 			(valueDisplayName !== currentDisplayName && flags) ||
 			(flagsRemoveAvartar !== false && flags) ||
 			(editAboutUser !== aboutMe && flags) ? (
-				<div className="flex flex-row gap-2 dark:bg-bgTertiary bg-white shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
+				<div className="flex flex-row gap-2 shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p className="text-[15px] dark:text-bgLightPrimary text-bgPrimary">Careful - you have unsaved changes!</p>
+						<p className="text-[15px] ">Careful - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
-							className="text-[15px] bg-gray-600 rounded-[4px] p-[8px]"
+							className="text-[15px] rounded-[4px] p-[8px]"
 							onClick={() => {
 								handleClose();
 							}}

@@ -288,13 +288,13 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none gap-2`}>
 					<div className="flex items-center flex-1 h-full gap-2">
 						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
-						<label htmlFor="sale_item" className="!text-textPrimaryLight dark:!text-textPrimary">
+						<label htmlFor="sale_item" className="">
 							This is for sale
 						</label>
 					</div>
 					<Button
 						label="Never Mind"
-						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
+						className="rounded border-theme-primary px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
 					/>
 					<Button

@@ -143,7 +143,7 @@ function MessageWithUser({
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
 			<div
-				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
+				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9  w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
 				style={{
 					top: `${positionShortUser.current?.top}px`,
 					left: `${positionShortUser.current?.left}px`
@@ -191,7 +191,7 @@ function MessageWithUser({
 						{ 'bg-highlight': isHighlight },
 						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved },
 						{
-							'dark:!bg-[#2D2B3A] !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
+							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
 						}
 					)}
 					create_time={message.create_time}
@@ -248,11 +248,11 @@ function MessageWithUser({
 						{!!message?.content?.fwd && (
 							<div
 								style={{ height: `${!isCombine ? 'calc(100% - 50px)' : '100%'}` }}
-								className="border-l-4 dark:border-[#414348] border-[#ebebeb] rounded absolute left-[45px] bottom-0"
+								className="border-l-4  rounded absolute left-[45px] bottom-0"
 							></div>
 						)}
 						{!!message?.content?.fwd && (
-							<div className="flex gap-1 items-center italic text-[#5e6068] dark:text-[#949ba4] font-medium w-full">
+							<div className="flex gap-1 items-center italic font-medium w-full">
 								<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 								<p>Forwarded</p>
 							</div>
