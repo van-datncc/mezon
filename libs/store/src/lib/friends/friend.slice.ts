@@ -90,7 +90,7 @@ export const fetchListFriendsCached = async (
 			api_name: 'ListFriends',
 			list_friend_req: {
 				limit,
-				state,
+				state: state === -1 ? undefined : state,
 				cursor
 			}
 		},
