@@ -1,8 +1,7 @@
 import { channelsActions, getStore, inviteActions, selectAppChannelById, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EBacktickType, getYouTubeEmbedSize, getYouTubeEmbedUrl, isYouTubeLink } from '@mezon/utils';
-import { useCallback, useEffect, useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,6 +32,14 @@ const extractChannelParams = (url: string) => {
 	}
 
 	return null;
+};
+
+const isGoogleMapsLink = (url?: string) => {
+	return (
+		url?.startsWith('https://www.google.com/maps?') ||
+		url?.startsWith('https://maps.google.com/maps?') ||
+		url?.startsWith('https://www.google.com/maps?q=')
+	);
 };
 
 export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
@@ -95,15 +102,26 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 
 	return (
 		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
-			{isLink && (
-				// eslint-disable-next-line jsx-a11y/anchor-is-valid
+			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
-					onClick={() => onClickLink(content ?? '')}
+					onClick={() => onClickLink(content)}
 					rel="noopener noreferrer"
 					className="text-blue-500 cursor-pointer break-words underline tagLink"
+					target="_blank"
 				>
-					{content}
+					<span>A location was shared with you. Tap to open the map</span>
 				</a>
+			) : (
+				isLink && (
+					<a
+						onClick={() => onClickLink(content ?? '')}
+						rel="noopener noreferrer"
+						className="text-blue-500 cursor-pointer break-words underline tagLink"
+						target="_blank"
+					>
+						{content}
+					</a>
+				)
 			)}
 			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} isSearchMessage={isSearchMessage} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
@@ -171,17 +189,21 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 		return () => clearTimeout(timer);
 	}, [copied]);
 
+	// TODO: continue test
+	const handleCopyClick = () => {
+		navigator.clipboard
+			.writeText(contentBacktick)
+			.then(() => setCopied(true))
+			.catch((err) => console.error('Failed to copy text: ', err));
+	};
+
 	return (
 		<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
 			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
-				<CopyToClipboard text={`${contentBacktick}`} onCopy={() => setCopied(true)}>
-					<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `}>
-						{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
-					</button>
-				</CopyToClipboard>
-				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>
-					{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
-				</code>
+				<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `} onClick={handleCopyClick}>
+					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
+				</button>
+				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
 			</pre>
 		</div>
 	);

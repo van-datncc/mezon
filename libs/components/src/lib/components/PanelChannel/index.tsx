@@ -90,7 +90,9 @@ export const getNotificationLabel = (value: NotificationType) => {
 };
 
 const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onDeleteChannel, rootRef, selectedChannel, isUnread }: PanelChannel) => {
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(channel.id));
+	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
+
+	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, channel?.id || ''));
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClan = useSelector(selectCurrentClan);
@@ -100,11 +102,11 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	const [nameChildren, setNameChildren] = useState('');
 	const [mutedUntil, setmutedUntil] = useState('');
 	const [defaultNotifiName, setDefaultNotifiName] = useState('');
-	const defaultNotificationCategory = useSelector(selectDefaultNotificationCategory);
+
+	const defaultNotificationCategory = useAppSelector((state) => selectDefaultNotificationCategory(state, channel?.category_id as string));
+
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const isThread = !!channel?.parent_id && channel?.parent_id !== '0';
-
-	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
 
 	const currentUserId = useSelector(selectCurrentUserId);
 	const currentCategory = useAppSelector((state) => selectCategoryById(state, channel?.category_id as string));
@@ -322,12 +324,18 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			setIsShowPanelChannel(false);
 		}
 	}, [statusMarkAsReadChannel]);
+
+	const shouldShowNotificationSettings =
+		channel &&
+		channel.type !== undefined &&
+		(channel.type === typeChannel.text || channel.type === typeChannel.thread || (isThread && channel.parent_id && channel.parent_id !== '0'));
+
 	return (
 		<div
 			ref={panelRef}
 			tabIndex={-1}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-20 w-[200px] py-[10px] px-[10px]"
+			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm shadow z-30 w-[200px] py-[10px] px-[10px]"
 		>
 			<GroupPanels>
 				<ItemPanel
@@ -386,7 +394,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
-						{channel?.type === typeChannel.text && (
+						{shouldShowNotificationSettings && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}
@@ -468,7 +476,8 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 						) : (
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
-						{(channel.type === typeChannel.text || channel.type === typeChannel.thread) && (
+
+						{shouldShowNotificationSettings && (
 							<Dropdown
 								trigger="hover"
 								dismissOnClick={false}

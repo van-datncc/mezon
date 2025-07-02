@@ -27,6 +27,13 @@
         "replyingTo": "Replying to",
         "editingMessage": "Editing Message"
     },
+    "ephemeral": {
+        "headerText": "Ephemeral message to {{username}}",
+        "selectUser": "Select user for ephemeral message",
+        "description": "Send an ephemeral message (only visible to selected user)",
+        "onlyVisibleToRecipient": "Only visible to recipient"
+    },
+    "pasteImage": "Paste Image",
     "toast": {
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment",
@@ -68,6 +75,7 @@
     },
     "tapToSeeAttachment": "Tap to see attachment",
     "findThePerfectReaction": "Find the perfect reaction",
+    "findThePerfectGif": "Find the perfect GIF",
     "findThePerfectSticker": "Find the perfect sticker",
     "pinMessage": "Pin Message",
     "unpinMessage": "Unpin Message",
@@ -86,6 +94,7 @@
     },
     "newMessages": "NEW MESSAGES",
     "noSendMessagePermission": "You don't have permission to send message",
+    "blockedUserMessage": "You can't reply to this conversation",
     "messageInputPlaceHolder": "Write message...",
     "shareLocationModal": {
       "sendThisLocation": "Send this location to",
@@ -108,5 +117,10 @@
         "confirmText": "Send",
         "description": "Enter your message Buzz!!",
         "cancel": "Cancel"
+    },
+    "tab": {
+        "emoji": "Emojis",
+        "gif": "GIFs",
+        "sticker": "Stickers"
     }
 }

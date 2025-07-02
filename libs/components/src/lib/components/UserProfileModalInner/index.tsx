@@ -213,13 +213,13 @@ const UserProfileModalInner = ({
 							</div>
 						) : (
 							<div className="flex items-end pr-4">
-								<button
+								{/* <button
 									onClick={() => directMessageWithUser(userId || '')}
 									className="flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
 								>
 									<Icons.MessageIcon className="text-bgLightPrimary" />
 									<span className="text-sm text-bgLightPrimary font-semibold">Message</span>
-								</button>
+								</button> */}
 							</div>
 						)}
 					</div>

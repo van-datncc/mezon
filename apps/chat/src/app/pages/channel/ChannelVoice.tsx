@@ -1,14 +1,16 @@
 import { LiveKitRoom } from '@livekit/components-react';
-
 import '@livekit/components-styles';
+
 import { MyVideoConference, PreJoinVoiceChannel } from '@mezon/components';
-import { useAppParams, useAuth } from '@mezon/core';
+import { EmojiSuggestionProvider, useAppParams, useAuth } from '@mezon/core';
 import {
+	appActions,
 	generateMeetToken,
 	getStoreAsync,
 	handleParticipantVoiceState,
 	selectCurrentChannel,
 	selectCurrentClan,
+	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
 	selectShowCamera,
 	selectShowMicrophone,
@@ -22,11 +24,12 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import { ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 
+import { ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import ChatStream from '../chatStream';
 
 const ChannelVoice = memo(
 	() => {
@@ -39,11 +42,11 @@ const ChannelVoice = memo(
 		const showMicrophone = useSelector(selectShowMicrophone);
 		const showCamera = useSelector(selectShowCamera);
 		const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
-		const { userProfile } = useAuth();
+		const isShowChatVoice = useSelector(selectIsShowChatVoice);
 		const currentChannel = useSelector(selectCurrentChannel);
 		const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 		const containerRef = useRef<HTMLDivElement | null>(null);
-
+		const { userProfile } = useAuth();
 		const participantMeetState = async (state: ParticipantMeetState, clanId?: string, channelId?: string): Promise<void> => {
 			if (!clanId || !channelId || !userProfile?.user?.id) return;
 
@@ -56,7 +59,6 @@ const ChannelVoice = memo(
 				})
 			);
 		};
-
 		const handleJoinRoom = async () => {
 			dispatch(voiceActions.setOpenPopOut(false));
 			const store = await getStoreAsync();
@@ -76,6 +78,7 @@ const ChannelVoice = memo(
 					if (isJoined && voiceInfo) {
 						handleLeaveRoom();
 					}
+
 					await participantMeetState(ParticipantMeetState.JOIN, currentChannel?.clan_id as string, currentChannel?.channel_id as string);
 					dispatch(voiceActions.setJoined(true));
 					dispatch(voiceActions.setToken(result));
@@ -84,7 +87,8 @@ const ChannelVoice = memo(
 							clanId: currentClan?.clan_id as string,
 							clanName: currentClan?.clan_name as string,
 							channelId: currentChannel?.channel_id as string,
-							channelLabel: currentChannel?.channel_label as string
+							channelLabel: currentChannel?.channel_label as string,
+							channelPrivate: currentChannel?.channel_private as number
 						})
 					);
 				} else {
@@ -97,41 +101,18 @@ const ChannelVoice = memo(
 				setLoading(false);
 			}
 		};
-
 		const handleLeaveRoom = useCallback(async () => {
 			if (!voiceInfo?.clanId || !voiceInfo?.channelId) return;
 			dispatch(voiceActions.resetVoiceSettings());
 			await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo.clanId, voiceInfo.channelId);
 		}, [dispatch, voiceInfo]);
-
 		const handleFullScreen = useCallback(() => {
-			if (!containerRef.current) return;
-
-			if (!document.fullscreenElement) {
-				containerRef.current
-					.requestFullscreen()
-					.then(() => dispatch(voiceActions.setFullScreen(true)))
-					.catch((err) => {
-						console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-					});
-			} else {
-				document.exitFullscreen().then(() => dispatch(voiceActions.setFullScreen(false)));
-			}
-		}, [dispatch]);
-
-		useEffect(() => {
-			const handleFullscreenChange = () => {
-				if (!document.fullscreenElement) {
-					dispatch(voiceActions.setFullScreen(false));
-				}
-			};
-
-			document.addEventListener('fullscreenchange', handleFullscreenChange);
-			return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-		}, [dispatch]);
-
+			dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
+		}, [dispatch, isVoiceFullScreen]);
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
-
+		const toggleChat = () => {
+			dispatch(appActions.setIsShowChatVoice(!isShowChatVoice));
+		};
 		const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
 		const showModalEvent = useSelector(selectShowModelEvent);
 		const { channelId } = useAppParams();
@@ -139,10 +120,15 @@ const ChannelVoice = memo(
 		const isOnMenu = useSelector(selectStatusMenu);
 		return (
 			<div
-				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'}  right-0 ${!isOnMenu ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''} z-30`}
-				style={{ width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }}
+				className={`${!isChannelMezonVoice || showModalEvent || isShowSettingFooter?.status || !channelId ? 'hidden' : ''} ${isVoiceFullScreen ? 'fixed inset-0 z-[100]' : `absolute ${isWindowsDesktop || isLinuxDesktop ? 'bottom-[21px]' : 'bottom-0'} right-0 ${isOnMenu ? 'max-sbm:z-1 z-30' : 'z-30'}`} ${!isOnMenu && !isVoiceFullScreen ? ' max-sbm:left-0 max-sbm:!w-full max-sbm:!h-[calc(100%_-_50px)]' : ''}`}
+				style={
+					!isVoiceFullScreen
+						? { width: 'calc(100% - 72px - 272px)', height: isWindowsDesktop || isLinuxDesktop ? 'calc(100% - 21px)' : '100%' }
+						: { width: '100vw', height: '100vh' }
+				}
 			>
-				{token === '' || !serverUrl ? (
+				{/* voiceInfo?.clanId = 0 is group call */}
+				{token === '' || !serverUrl || voiceInfo?.clanId === '0' ? (
 					<PreJoinVoiceChannel
 						channel={currentChannel || undefined}
 						roomName={currentChannel?.meeting_code}
@@ -161,22 +147,33 @@ const ChannelVoice = memo(
 
 						<LiveKitRoom
 							ref={containerRef}
-							id="livekitRoom"
+							id="livekitRoom11"
 							key={token}
-							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} ${isVoiceFullScreen ? '!fixed !inset-0 !z-50 !w-screen !h-screen' : ''}`}
+							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
 							audio={showMicrophone}
 							video={showCamera}
 							token={token}
 							serverUrl={serverUrl}
 							data-lk-theme="default"
 						>
-							<MyVideoConference
-								channelLabel={currentChannel?.channel_label as string}
-								onLeaveRoom={handleLeaveRoom}
-								onFullScreen={handleFullScreen}
-							/>
+							<div className="flex-1 relative flex overflow-hidden">
+								<MyVideoConference
+									channelLabel={currentChannel?.channel_label as string}
+									onLeaveRoom={handleLeaveRoom}
+									onFullScreen={handleFullScreen}
+									isShowChatVoice={isShowChatVoice}
+									onToggleChat={toggleChat}
+									currentChannel={currentChannel}
+								/>
+								<EmojiSuggestionProvider>
+									{isShowChatVoice && (
+										<div className=" w-[500px] border-l border-border dark:border-bgTertiary z-40 bg-bgPrimary flex-shrink-0">
+											<ChatStream currentChannel={currentChannel} />
+										</div>
+									)}
+								</EmojiSuggestionProvider>
+							</div>
 						</LiveKitRoom>
-
 						{isOpenPopOut && (
 							<div className="flex items-center justify-center h-full w-full text-center text-lg font-semibold text-gray-500">
 								You are currently in the popout window

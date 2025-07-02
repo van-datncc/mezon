@@ -1,6 +1,6 @@
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
 import { Text, size, useTheme } from '@mezon/mobile-ui';
-import { MessagesEntity, messagesActions, selectAllChannelMemberIds, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { MessagesEntity, channelsActions, messagesActions, selectAllChannelMemberIds, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ETokenMessage, TypeMessage, convertTimeString, parseThreadInfo } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -101,6 +101,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 				channel_id: threadInfo?.threadId,
 				clan_id: message?.clan_id
 			};
+			await dispatch(channelsActions.addThreadToChannels({ channelId: threadInfo?.threadId, clanId: message?.clan_id }));
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_MENTION_MESSAGE_ITEM, payloadThread);
 		}
 	};
@@ -119,7 +120,7 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 					if (element?.user_id) {
 						formattedContent.push(
 							allUserIdsInChannel?.includes(element?.user_id) || contentInElement === '@here' ? (
-								<Text>
+								<Text key={`plain-${index}`}>
 									<Text style={styles.textMention} key={`mention-${index}`} onPress={() => onMention(`@${element?.username}`)}>
 										{contentInElement?.trim()}
 									</Text>{' '}

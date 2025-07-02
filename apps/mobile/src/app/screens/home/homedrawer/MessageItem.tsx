@@ -3,27 +3,28 @@ import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '
 import { Text, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
+	MessagesEntity,
 	getStore,
 	getStoreAsync,
-	MessagesEntity,
+	selectBlockedUsersForMessage,
 	selectCurrentChannel,
 	selectDmGroupCurrent,
 	selectMemberClanByUserId2,
+	setSelectedMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import React, { useCallback } from 'react';
-import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
-import { EMessageActionType, EMessageBSToShow } from './enums';
-import { style } from './styles';
-// eslint-disable-next-line @nx/enforce-module-boundaries
-// eslint-disable-next-line @nx/enforce-module-boundaries
-import { setSelectedMessage } from '@mezon/store-mobile';
-import { ETypeLinkMedia, ID_MENTION_HERE, isValidEmojiData, TypeMessage } from '@mezon/utils';
+import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
-import { useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, View } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../constants/icon_cdn';
+import { MessageLineSystem } from './MessageLineSystem';
+import RenderMessageBlock from './RenderMessageBlock';
+import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { EmbedMessage } from './components/EmbedMessage';
@@ -34,13 +35,13 @@ import { ContainerMessageActionModal } from './components/MessageItemBS/Containe
 import { MessageAction } from './components/MessageReaction';
 import MessageSendTokenLog from './components/MessageSendTokenLog';
 import MessageTopic from './components/MessageTopic/MessageTopic';
+import MessageWithBlocked from './components/MessageWithBlocked';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { RenderTextMarkdownContent } from './components/RenderTextMarkdown';
 import UserProfile from './components/UserProfile';
-import { MessageLineSystem } from './MessageLineSystem';
-import RenderMessageBlock from './RenderMessageBlock';
+import { EMessageActionType, EMessageBSToShow } from './enums';
+import { style } from './styles';
 import { IMessageActionNeedToResolve } from './types';
-import WelcomeMessage from './WelcomeMessage';
 
 const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
 
@@ -80,6 +81,7 @@ const MessageItem = React.memo(
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
 
+		const isEphemeralMessage = useMemo(() => message?.code === TypeMessage.Ephemeral, [message?.code]);
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
 		const isMessageCallLog = !!message?.content?.callLog;
 		const isGoogleMapsLink = Array.isArray(lk) && validLinkGoogleMapRegex.test(contentMessage);
@@ -121,7 +123,9 @@ const MessageItem = React.memo(
 			const userIdMention = userId;
 			const includesUser = message?.mentions?.some((mention) => mention?.user_id === userIdMention);
 			const includesRole = message?.mentions?.some((item) => currentClanUser?.role_id?.includes(item?.role_id as string));
-			return includesUser || includesRole;
+			const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
+
+			return includesUser || includesRole || checkReplied;
 		})();
 
 		const isSameUser = message?.user?.id === previousMessage?.user?.id;
@@ -142,10 +146,11 @@ const MessageItem = React.memo(
 				? message?.clan_avatar || message?.avatar
 				: message?.avatar;
 
+		const firstAttachment = Array.isArray(message?.attachments) && message.attachments.length > 0 ? message.attachments[0] : null;
 		const checkOneLinkImage =
 			message?.attachments?.length === 1 &&
-			message?.attachments[0].filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
-			message?.attachments[0].url === message?.content?.t?.trim();
+			firstAttachment?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX) &&
+			firstAttachment?.url === message?.content?.t?.trim();
 
 		const isOnlyContainEmoji = isValidEmojiData(message.content);
 
@@ -166,7 +171,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				snapPoints: ['60%', '85%'],
+				heightFitContent: true,
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -222,7 +227,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				snapPoints: ['60%', '85%'],
+				heightFitContent: true,
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -234,6 +239,28 @@ const MessageItem = React.memo(
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		}, [dispatch, message, mode, preventAction, senderDisplayName]);
+
+		const isMessageFromBlockedUser = useMemo(() => {
+			const store = getStore();
+			const blockedUsers = selectBlockedUsersForMessage(store.getState());
+			if (props.mode === ChannelStreamMode.STREAM_MODE_DM) return false;
+
+			const senderId = message?.sender_id;
+			if (!blockedUsers?.length || !userId || !senderId) return false;
+
+			return blockedUsers.some(
+				(blockedUser) =>
+					(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
+					(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
+			);
+		}, [props.mode, userId, message?.sender_id]);
+
+		if (isMessageFromBlockedUser) {
+			if (previousMessage?.sender_id !== message?.sender_id) {
+				return <MessageWithBlocked />;
+			}
+			return null;
+		}
 
 		// Message welcome
 		if (message?.sender_id === '0' && !message?.content?.t && message?.username?.toLowerCase() === 'system') {
@@ -298,7 +325,8 @@ const MessageItem = React.memo(
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageReply,
-						isHighlight && styles.highlightMessageMention
+						isHighlight && styles.highlightMessageMention,
+						isEphemeralMessage && styles.ephemeralMessage
 					]}
 				>
 					{!isMessageSystem && (
@@ -318,6 +346,7 @@ const MessageItem = React.memo(
 								avatar={messageAvatar}
 								username={usernameMessage}
 								isShow={!isCombine || !!message?.references?.length || showUserInformation}
+								isAnonymous={checkAnonymous}
 							/>
 						)}
 
@@ -375,7 +404,13 @@ const MessageItem = React.memo(
 										) : null}
 										{!!message?.content?.embed?.length &&
 											message?.content?.embed?.map((embed, index) => (
-												<EmbedMessage message_id={message?.id} embed={embed} key={`message_embed_${message?.id}_${index}`} />
+												<EmbedMessage
+													message_id={message?.id}
+													channel_id={message?.channel_id}
+													embed={embed}
+													key={`message_embed_${message?.id}_${index}`}
+													onLongPress={handleLongPressMessage}
+												/>
 											))}
 										{!!message?.content?.components?.length &&
 											message?.content.components?.map((component, index) => (
@@ -403,6 +438,12 @@ const MessageItem = React.memo(
 											channelId={message?.channel_id}
 											onLongPressImage={onLongPressImage}
 										/>
+									)}
+									{isEphemeralMessage && (
+										<View style={styles.ephemeralIndicator}>
+											<MezonIconCDN icon={IconCDN.eyeSlashIcon} width={12} height={12} color={themeValue.textDisabled} />
+											<Text style={styles.ephemeralText}>{t('ephemeral.onlyVisibleToRecipient')}</Text>
+										</View>
 									)}
 								</View>
 							</View>

@@ -9,9 +9,8 @@ import {
 	listChannelsByUserActions,
 	markAsReadProcessing,
 	RootState,
-	selectChannelsByClanId,
+	selectAllChannels,
 	selectChannelThreads,
-	selectCurrentClanId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -24,8 +23,7 @@ export function useMarkAsRead() {
 	const [statusMarkAsReadChannel, setStatusMarkAsReadChannel] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const [statusMarkAsReadCategory, setStatusMarkAsReadCategory] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 	const [statusMarkAsReadClan, setStatusMarkAsReadClan] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
-	const currentClanId = useAppSelector(selectCurrentClanId);
-	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClanId ?? ''));
+	const channelsInClan = useAppSelector(selectAllChannels);
 
 	const actionMarkAsRead = useCallback(
 		async (body: ApiMarkAsReadRequest) => {
@@ -160,22 +158,6 @@ export function useMarkAsRead() {
 			try {
 				await actionMarkAsRead(body);
 				setStatusMarkAsReadClan('success');
-				const channelIds = channelsInClan.map((item) => item.id);
-				dispatch(channelMetaActions.setChannelsLastSeenTimestamp(channelIds));
-				dispatch(
-					channelsActions.resetChannelsCount({
-						clanId,
-						channelIds
-					})
-				);
-				dispatch(clansActions.updateClanBadgeCount({ clanId: clanId ?? '', count: 0, isReset: true }));
-				dispatch(
-					listChannelRenderAction.handleMarkAsReadListRender({
-						type: EMarkAsReadType.CLAN,
-						clanId: clanId
-					})
-				);
-				dispatch(listChannelsByUserActions.markAsReadChannel(channelIds));
 			} catch (error) {
 				console.error('Failed to mark as read:', error);
 				setStatusMarkAsReadClan('error');

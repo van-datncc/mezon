@@ -4,9 +4,11 @@ import React, { useContext } from 'react';
 import { usePermissionChecker } from '@mezon/core';
 import { ENotificationActive, ETypeSearch } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { notificationSettingActions, useAppDispatch } from '@mezon/store-mobile';
 import { EOverriddenPermission, EPermission } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -24,6 +26,7 @@ enum EActionRow {
 export const ActionRow = React.memo(() => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation(['common']);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
 	const [isChannel, setIsChannel] = useState<boolean>();
@@ -32,6 +35,7 @@ export const ActionRow = React.memo(() => {
 		currentChannel?.channel_id ?? ''
 	);
 	const { statusMute } = useStatusMuteChannel();
+	const dispatch = useAppDispatch();
 	const isChannelDm = useMemo(() => {
 		return [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type);
 	}, [currentChannel]);
@@ -39,9 +43,14 @@ export const ActionRow = React.memo(() => {
 	useEffect(() => {
 		setIsChannel(!!currentChannel?.channel_label && !Number(currentChannel?.parent_id));
 	}, [currentChannel]);
+
+	useEffect(() => {
+		dispatch(notificationSettingActions.getNotificationSetting({ channelId: currentChannel?.channel_id }));
+	}, []);
+
 	const actionList = [
 		{
-			title: 'Search',
+			title: t('search'),
 			action: () => {
 				if (isChannelDm) {
 					navigation.push(APP_SCREEN.MENU_CHANNEL.STACK, {
@@ -65,7 +74,7 @@ export const ActionRow = React.memo(() => {
 			type: EActionRow.Search
 		},
 		{
-			title: 'Threads',
+			title: t('thread'),
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.CREATE_THREAD });
 			},
@@ -74,7 +83,7 @@ export const ActionRow = React.memo(() => {
 			type: EActionRow.Threads
 		},
 		{
-			title: 'Mute',
+			title: t('muteNotification'),
 			action: () => {
 				navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, {
 					screen: APP_SCREEN.MENU_THREAD.MUTE_THREAD_DETAIL_CHANNEL,
@@ -85,7 +94,7 @@ export const ActionRow = React.memo(() => {
 			type: EActionRow.Mute
 		},
 		{
-			title: 'Settings',
+			title: t('settings'),
 			action: () => {
 				navigation.push(APP_SCREEN.MENU_CHANNEL.STACK, {
 					screen: APP_SCREEN.MENU_CHANNEL.SETTINGS,
@@ -102,7 +111,7 @@ export const ActionRow = React.memo(() => {
 
 	const filteredActionList = useMemo(() => {
 		if (currentChannel?.clan_id === '0') {
-			return actionList.filter((item) => ['Mute', 'Search'].includes(item.title));
+			return actionList.filter((item) => [t('muteNotification'), t('search')].includes(item.title));
 		}
 		return actionList;
 	}, [currentChannel, isChannel]);
@@ -123,7 +132,13 @@ export const ActionRow = React.memo(() => {
 									action.icon
 								)}
 							</View>
-							<Text style={styles.optionText}>{action.title}</Text>
+							<Text style={styles.optionText}>
+								{[EActionRow.Mute].includes(action.type)
+									? statusMute === ENotificationActive.ON
+										? t('muteNotification')
+										: t('unmuteNotification')
+									: action.title}
+							</Text>
 						</View>
 					</Pressable>
 				) : null

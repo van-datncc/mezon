@@ -1,15 +1,18 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 /* eslint-disable no-console */
+import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useChannelMembers, useChatSending, useDirect, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	MessagesEntity,
 	appActions,
+	clansActions,
+	directActions,
 	getStore,
 	giveCoffeeActions,
 	messagesActions,
 	notificationActions,
-	selectAllAccount,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -37,11 +40,11 @@ import {
 	sleep
 } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useNavigation } from '@react-navigation/native';
-import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Dimensions, Pressable, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
@@ -51,7 +54,6 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { getMessageActions } from '../../constants';
 import { EMessageActionType } from '../../enums';
 import { IConfirmActionPayload, IMessageAction, IMessageActionNeedToResolve, IReplyBottomSheet } from '../../types/message.interface';
-import { ConfirmBuzzMessageModal } from '../ConfirmBuzzMessage';
 import { ConfirmPinMessageModal } from '../ConfirmPinMessageModal';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import { IReactionMessageProps } from '../MessageReaction';
@@ -63,7 +65,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', handleBottomSheetExpand } = props;
+	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', channelId, clanId } = props;
 	const { socketRef } = useMezon();
 	const store = getStore();
 
@@ -83,9 +85,10 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		message?.code === TypeMessage.CreateThread ||
 		message?.code === TypeMessage.CreatePin ||
 		message?.code === TypeMessage.AuditLog;
-	const onClose = () => {
+	const isAnonymous = message?.sender_id === process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID;
+	const onClose = useCallback(() => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-	};
+	}, []);
 
 	const onCloseModalConfirm = useCallback(() => {
 		setCurrentMessageActionType(null);
@@ -153,20 +156,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
-	const convertedAllMessagesEntities: MessagesEntity[] = allMessagesEntities ? Object.values(allMessagesEntities) : [];
+	const convertedAllMessagesEntities = useMemo(() => {
+		return allMessagesEntities ? (Object.values(allMessagesEntities) as MessagesEntity[]) : [];
+	}, [allMessagesEntities]);
 	const messagePosition = useMemo(() => {
 		return convertedAllMessagesEntities?.findIndex((value: MessagesEntity) => value.id === message?.id);
 	}, [convertedAllMessagesEntities, message?.id]);
 	const { joinningToThread } = useChannelMembers({ channelId: currentChannelId, mode: mode ?? 0 });
-
-	const isShowForwardAll = () => {
-		if (messagePosition === -1) return false;
-		return (
-			message?.isStartedMessageGroup &&
-			messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
-			!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
-		);
-	};
 
 	const handleActionEditMessage = () => {
 		onClose();
@@ -181,16 +177,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const handleActionGiveACoffee = async () => {
 		onClose();
 		try {
-			const userProfile = selectAllAccount(store.getState());
-			const tokenInWallet = userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
-			if (TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10 > tokenInWallet) {
-				Toast.show({
-					type: 'error',
-					text1: 'Your amount exceeds wallet balance'
-				});
-				return;
-			}
 			if (userId !== message.sender_id) {
+				const currentClanId = selectCurrentClanId(store.getState());
 				const coffeeEvent = {
 					channel_id: message.channel_id,
 					clan_id: message.clan_id,
@@ -199,13 +187,16 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					sender_id: userId,
 					token_count: AMOUNT_TOKEN.TEN_TOKENS
 				};
-				await dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
+				const res = await dispatch(giveCoffeeActions.updateGiveCoffee(coffeeEvent));
+				if (res?.meta?.requestStatus === 'rejected' || !res) {
+					Toast.show({
+						type: 'error',
+						text1: 'An error occurred, please try again'
+					});
+					return;
+				}
 				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
-				const response = await createDirectMessageWithUser(
-					message?.sender_id,
-					message?.user?.name || message?.user?.username,
-					message?.avatar
-				);
+				const response = await createDirectMessageWithUser(message?.sender_id, message?.user?.name, message?.user?.username, message?.avatar);
 				if (response?.channel_id) {
 					sendInviteMessage(
 						`Funds Transferred: ${formatMoney(TOKEN_TO_AMOUNT.ONE_THOUNSAND * 10)}₫ | Give coffee action`,
@@ -214,6 +205,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 						TypeMessage.SendToken
 					);
 				}
+				await dispatch(directActions.setDmGroupCurrentId(''));
+				await dispatch(clansActions.joinClan({ clanId: currentClanId }));
 			}
 		} catch (error) {
 			console.error('Failed to give cofffee message', error);
@@ -346,8 +339,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.FORWARD_MESSAGE,
 			params: {
-				message: message,
-				isPublic: isPublicChannel(currentChannel)
+				message: message
 			}
 		});
 	};
@@ -366,20 +358,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
 		});
 		onClose();
-	};
-
-	const handleBuzzMessage = useCallback((text: string) => {
-		onClose();
-		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
-	}, []);
-
-	const handleActionBuzzMessage = async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-		await sleep(500);
-		const data = {
-			children: <ConfirmBuzzMessageModal onSubmit={handleBuzzMessage} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
 	const handleActionMarkMessage = async () => {
@@ -451,9 +429,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
-			case EMessageActionType.Buzz:
-				handleActionBuzzMessage();
-				break;
 			default:
 				break;
 		}
@@ -495,8 +470,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.markUnreadIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.TopicDiscussion:
 				return <MezonIconCDN icon={IconCDN.discussionIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
-			case EMessageActionType.Buzz:
-				return <MezonIconCDN icon={IconCDN.buzz} width={size.s_18} height={size.s_18} color={baseColor.red} />;
 			case EMessageActionType.MarkMessage:
 				return <MezonIconCDN icon={IconCDN.starIcon} width={size.s_20} height={size.s_18} color={themeValue.text} />;
 			default:
@@ -521,13 +494,22 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
 
+		const isShowForwardAll = () => {
+			if (messagePosition === -1) return false;
+			return (
+				message?.isStartedMessageGroup &&
+				messagePosition < (convertedAllMessagesEntities?.length || 0 - 1) &&
+				!convertedAllMessagesEntities?.[messagePosition + 1]?.isStartedMessageGroup
+			);
+		};
+
 		const listOfActionShouldHide = [
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
-			(isMyMessage || isMessageSystem) && EMessageActionType.GiveACoffee,
+			(isMyMessage || isMessageSystem || isAnonymous) && EMessageActionType.GiveACoffee,
 			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
 		];
 
@@ -556,25 +538,14 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		];
 		const warningActionList = [EMessageActionType.Report, EMessageActionType.DeleteMessage];
 
-		const attractActionList = [EMessageActionType.Buzz];
-
 		return {
-			attract: availableMessageActions.filter((action) => attractActionList.includes(action.type)),
 			frequent: availableMessageActions.filter((action) => frequentActionList.includes(action.type)),
-			normal: availableMessageActions.filter(
-				(action) => ![...frequentActionList, ...warningActionList, ...mediaList, ...attractActionList].includes(action.type)
-			),
+			normal: availableMessageActions.filter((action) => ![...frequentActionList, ...warningActionList, ...mediaList].includes(action.type)),
 			warning: availableMessageActions.filter((action) => warningActionList.includes(action.type))
 		};
 	}, [
 		userId,
-		message?.user?.id,
-		message?.isError,
-		message?.topic_id,
-		message?.code,
-		message?.channel_id,
-		message?.attachments,
-		message?.id,
+		message,
 		listPinMessages,
 		isDM,
 		isCanManageThread,
@@ -584,7 +555,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		canSendMessage,
 		currentChannelId,
 		isMessageSystem,
-		isShowForwardAll,
+		isAnonymous,
+		messagePosition,
+		convertedAllMessagesEntities,
 		t
 	]);
 
@@ -648,16 +621,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					})}
 				</View>
 				<View style={styles.messageActionGroup}>
-					{messageActionList.attract.map((action) => {
-						return (
-							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
-								<View style={styles.warningIcon}>{getActionMessageIcon(action.type)}</View>
-								<Text style={styles.warningActionText}>{action.title}</Text>
-							</Pressable>
-						);
-					})}
-				</View>
-				<View style={styles.messageActionGroup}>
 					{messageActionList.warning.map((action) => {
 						return (
 							<Pressable key={action.id} style={styles.actionItem} onPress={() => implementAction(action.type)}>
@@ -673,16 +636,21 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 
 	const onSelectEmoji = useCallback(
 		async (emoji_id: string, emoij: string) => {
+			if (!message && isOnlyEmojiPicker) {
+				if (!socketRef.current || !channelId) return;
+				await socketRef.current.writeVoiceReaction([emoji_id], channelId);
+				return;
+			}
 			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userId);
 		},
-		[handleReact, message?.id, mode, userId]
+		[channelId, handleReact, isOnlyEmojiPicker, message, mode, socketRef, userId]
 	);
 
 	return (
-		<View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
+		<BottomSheetView focusHook={useFocusEffect} style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
 			{isShowEmojiPicker || isOnlyEmojiPicker ? (
-				<View style={{ padding: size.s_10, height: Dimensions.get('window').height * 0.8 }}>
-					<EmojiSelector onSelected={onSelectEmoji} isReactMessage handleBottomSheetExpand={handleBottomSheetExpand} />
+				<View style={{ padding: size.s_10, minHeight: '100%' }}>
+					<EmojiSelector onSelected={onSelectEmoji} isReactMessage />
 				</View>
 			) : (
 				renderMessageItemActions()
@@ -698,6 +666,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					type={currentMessageActionType}
 				/>
 			)}
-		</View>
+		</BottomSheetView>
 	);
 });

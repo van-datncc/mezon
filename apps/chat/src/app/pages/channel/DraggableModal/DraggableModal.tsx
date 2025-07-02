@@ -4,6 +4,7 @@ import {
 	channelAppActions,
 	channelsActions,
 	getStore,
+	handleParticipantVoiceState,
 	selectAppChannelsList,
 	selectAppFocusedChannel,
 	selectChannelById,
@@ -19,7 +20,15 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ApiChannelAppResponseExtend, COLLAPSED_SIZE, DEFAULT_POSITION, INIT_SIZE, MIN_POSITION, useWindowSize } from '@mezon/utils';
+import {
+	ApiChannelAppResponseExtend,
+	COLLAPSED_SIZE,
+	DEFAULT_POSITION,
+	INIT_SIZE,
+	MIN_POSITION,
+	ParticipantMeetState,
+	useWindowSize
+} from '@mezon/utils';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,11 +55,19 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 }) => {
 	const dispatch = useAppDispatch();
 	const store = getStore();
-
+	const userProfile = useAppSelector((state) => state.account.userProfile);
 	const handleOnCloseCallback = useCallback(
-		(event: React.MouseEvent, clanId: string, channelId: string) => {
+		async (event: React.MouseEvent, clanId: string, channelId: string) => {
 			event.stopPropagation();
 
+			await dispatch(
+				handleParticipantVoiceState({
+					clan_id: clanId,
+					channel_id: channelId,
+					display_name: userProfile?.user?.display_name ?? '',
+					state: ParticipantMeetState.LEAVE
+				})
+			);
 			dispatch(
 				channelsActions.removeAppChannelsListShowOnPopUp({
 					clanId,
@@ -70,13 +87,14 @@ const DraggableModalTabs: React.FC<DraggableModalTabsProps> = ({
 	);
 
 	const handleCloseAllTabs = useCallback(
-		(event: React.MouseEvent) => {
+		async (event: React.MouseEvent) => {
 			event.stopPropagation();
 
 			const curClanId = selectCurrentClanId(store.getState());
 			dispatch(channelsActions.resetAppChannelsListShowOnPopUp({ clanId: curClanId as string }));
+			appChannelList.forEach((item) => handleOnCloseCallback(event, curClanId as string, item.channel_id as string));
 		},
-		[dispatch]
+		[dispatch, handleOnCloseCallback, appChannelList]
 	);
 
 	const handlePlusClick = useCallback(
@@ -204,9 +222,9 @@ const DraggableModalTabItem: React.FC<DraggableModalTabItemProps> = ({ app, hand
 								{isJoinVoice && (
 									<button onClick={() => dispatch(channelAppActions.setEnableVoice(!isTalking))}>
 										{isTalking ? (
-											<Icons.MicDisable className="size-4 text-red-600" />
-										) : (
 											<Icons.MicEnable className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+										) : (
+											<Icons.MicDisable className="size-4 text-red-600" />
 										)}
 									</button>
 								)}

@@ -1,11 +1,12 @@
 import {
-	DmCalling,
+	ClanGroup,
+	DmCallManager,
 	FirstJoinPopup,
 	FooterProfile,
 	ForwardMessageModal,
+	GroupCallManager,
 	MessageContextMenuProvider,
 	MessageModalImage,
-	ModalCall,
 	ModalCreateClan,
 	ModalUnknowChannel,
 	MultiStepModalE2ee,
@@ -13,55 +14,44 @@ import {
 	SearchModal,
 	SidebarClanItem,
 	SidebarLogoItem,
-	Topbar
+	Topbar,
+	useWebRTCStream
 } from '@mezon/components';
-import { useAppParams, useAuth, useClanDragAndDrop, useMenu, useReference } from '@mezon/core';
+import { useAppParams, useAuth, useClanGroupDragAndDrop, useMenu, useReference } from '@mezon/core';
 import {
-	DMCallActions,
+	ClanGroupItem,
 	accountActions,
-	audioCallActions,
+	clansActions,
 	e2eeActions,
 	fetchDirectMessage,
 	getIsShowPopupForward,
-	listChannelsByUserActions,
 	onboardingActions,
 	selectAllAppChannelsListShowOnPopUp,
-	selectAudioBusyTone,
-	selectAudioDialTone,
-	selectAudioEndTone,
-	selectAudioRingTone,
 	selectChatStreamWidth,
 	selectClanNumber,
 	selectClanView,
+	selectClansEntities,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClanId,
-	selectCurrentStartDmCall,
 	selectCurrentStreamInfo,
 	selectDirectsUnreadlist,
-	selectGroupCallId,
 	selectHasKeyE2ee,
-	selectIsInCall,
 	selectIsShowChatStream,
 	selectIsShowPopupQuickMess,
-	selectJoinedCall,
 	selectOnboardingMode,
 	selectOpenModalAttachment,
 	selectOpenModalE2ee,
-	selectOrderedClans,
-	selectSignalingDataByUserId,
+	selectOrderedClansWithGroups,
 	selectStatusMenu,
 	selectTheme,
 	selectToastErrors,
-	useAppDispatch,
-	useAppSelector
+	useAppDispatch
 } from '@mezon/store';
-
-import { useWebRTCStream } from '@mezon/components';
 import { Icons } from '@mezon/ui';
 import { PLATFORM_ENV, Platform, TIME_OF_SHOWING_FIRST_POPUP, isLinuxDesktop, isMacDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
-import { ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
@@ -100,7 +90,6 @@ function MyApp() {
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
-
 	const { userProfile } = useAuth();
 	const calculateJoinedTime = new Date().getTime() - new Date(userProfile?.user?.create_time ?? '').getTime();
 	const isNewGuy = calculateJoinedTime <= TIME_OF_SHOWING_FIRST_POPUP;
@@ -109,121 +98,6 @@ function MyApp() {
 
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
-	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
-	const dataCall = useMemo(() => {
-		return signalingData?.[signalingData?.length - 1]?.signalingData;
-	}, [signalingData]);
-
-	const isInCall = useSelector(selectIsInCall);
-	const isPlayDialTone = useSelector(selectAudioDialTone);
-	const isPlayRingTone = useSelector(selectAudioRingTone);
-	const isPlayEndTone = useSelector(selectAudioEndTone);
-	const isPlayBusyTone = useSelector(selectAudioBusyTone);
-	const groupCallId = useSelector(selectGroupCallId);
-	const isJoinedCall = useSelector(selectJoinedCall);
-	const dialTone = useRef(new Audio('assets/audio/dialtone.mp3'));
-	const ringTone = useRef(new Audio('assets/audio/ringing.mp3'));
-	const endTone = useRef(new Audio('assets/audio/endcall.mp3'));
-	const busyTone = useRef(new Audio('assets/audio/busytone.mp3'));
-
-	const isDmCallInfo = useSelector(selectCurrentStartDmCall);
-	const dmCallingRef = useRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }>(null);
-
-	useEffect(() => {
-		if (isDmCallInfo?.groupId) {
-			dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo);
-		}
-	}, [isDmCallInfo?.groupId, isDmCallInfo?.isVideo]);
-
-	useEffect(() => {
-		if (dataCall?.channel_id) {
-			dispatch(audioCallActions.setGroupCallId(dataCall?.channel_id));
-		}
-	}, [dataCall?.channel_id, dispatch]);
-
-	const triggerCall = (isVideoCall = false) => {
-		dmCallingRef.current?.triggerCall(isDmCallInfo?.isVideo, true);
-	};
-
-	const playAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
-		if (audioRef.current) {
-			audioRef.current.currentTime = 0;
-			audioRef.current.play().catch((error) => console.error('Audio playback error:', error));
-			audioRef.current.loop = true;
-		}
-	};
-
-	const stopAudio = (audioRef: React.RefObject<HTMLAudioElement>) => {
-		if (audioRef.current) {
-			audioRef.current.pause();
-			audioRef.current.currentTime = 0;
-		}
-	};
-
-	useEffect(() => {
-		if (!signalingData?.[signalingData?.length - 1] && !isInCall) {
-			dispatch(audioCallActions.setIsDialTone(false));
-			return;
-		}
-		switch (signalingData?.[signalingData?.length - 1]?.signalingData.data_type) {
-			case WebrtcSignalingType.WEBRTC_SDP_OFFER:
-				if (!isPlayDialTone && !isInCall && !isJoinedCall) {
-					dispatch(audioCallActions.setIsRingTone(true));
-					dispatch(audioCallActions.setIsBusyTone(false));
-					dispatch(audioCallActions.setIsEndTone(false));
-				} else {
-					dispatch(audioCallActions.setIsDialTone(false));
-				}
-
-				break;
-			case WebrtcSignalingType.WEBRTC_SDP_ANSWER:
-				break;
-			case WebrtcSignalingType.WEBRTC_ICE_CANDIDATE:
-				dispatch(audioCallActions.setIsRingTone(false));
-				dispatch(audioCallActions.setIsDialTone(false));
-				break;
-			// 	CANCEL CALL
-			case 4:
-				dispatch(DMCallActions.removeAll());
-				dispatch(audioCallActions.setIsRingTone(false));
-				dispatch(audioCallActions.setIsDialTone(false));
-				break;
-			default:
-				break;
-		}
-	}, [dispatch, isInCall, isPlayDialTone, signalingData]);
-
-	useEffect(() => {
-		if (isPlayDialTone) {
-			playAudio(dialTone);
-		} else {
-			stopAudio(dialTone);
-		}
-	}, [isPlayDialTone]);
-
-	useEffect(() => {
-		if (isPlayRingTone) {
-			playAudio(ringTone);
-		} else {
-			stopAudio(ringTone);
-		}
-	}, [isPlayRingTone]);
-
-	useEffect(() => {
-		if (isPlayEndTone) {
-			endTone.current.play().catch((error) => console.error('Audio playback error:', error));
-		} else {
-			endTone.current.pause();
-		}
-	}, [isPlayEndTone]);
-
-	useEffect(() => {
-		if (isPlayBusyTone) {
-			busyTone.current.play().catch((error) => console.error('Audio playback error:', error));
-		} else {
-			busyTone.current.pause();
-		}
-	}, [isPlayBusyTone]);
 
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
@@ -231,7 +105,6 @@ function MyApp() {
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
 				dispatch(fetchDirectMessage({}));
-				dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 				openSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
@@ -347,15 +220,9 @@ function MyApp() {
 					) : null}
 				</div>
 
-				{isPlayRingTone &&
-					!!dataCall &&
-					!isInCall &&
-					directId !== dataCall?.channel_id &&
-					dataCall?.data_type === WebrtcSignalingType.WEBRTC_SDP_OFFER && (
-						<ModalCall dataCall={dataCall} userId={userProfile?.user?.id || ''} triggerCall={triggerCall} />
-					)}
+				<DmCallManager userId={userProfile?.user?.id || ''} directId={directId} />
+				<GroupCallManager />
 
-				<DmCalling ref={dmCallingRef} dmGroupId={groupCallId} directId={directId || ''} />
 				{openModalE2ee && !hasKeyE2ee && <MultiStepModalE2ee onClose={handleClose} />}
 				{openModalAttachment && <MessageModalImageWrapper />}
 				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
@@ -459,13 +326,12 @@ const SidebarMenu = memo(
 				id="menu"
 			>
 				<div
-					className={`top-0 left-0 right-0 flex flex-col items-center py-4 px-3 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
+					className={`top-0 left-0 right-0 flex flex-col items-center py-4 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
 				>
 					<div className="flex flex-col items-center">
 						<SidebarLogoItem />
 						<DirectUnreadList />
 					</div>
-					<div className="border-t-2 my-2 dark:border-t-borderDividerLight border-t-buttonLightTertiary"></div>
 
 					<ClansList />
 
@@ -476,7 +342,7 @@ const SidebarMenu = memo(
 								onClick={openCreateClanModal}
 							>
 								<div className="w-[40px] h-[40px] rounded-lg dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-									<p className="text-2xl dark:text-contentSecondary text-textLightTheme">+</p>
+									<Icons.AddCircle className="dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
 								</div>
 							</div>
 						</NavLinkComponent>
@@ -489,48 +355,217 @@ const SidebarMenu = memo(
 );
 
 const ClansList = memo(() => {
-	const clans = useSelector(selectOrderedClans);
+	const dispatch = useAppDispatch();
+	const orderedClansWithGroups = useSelector(selectOrderedClansWithGroups);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const isClanView = useSelector(selectClanView);
+	const allClansEntities = useSelector(selectClansEntities);
 
-	const [items, setItems] = useState<string[]>([]);
-	const { draggingState, handleMouseDown, handleMouseEnter } = useClanDragAndDrop(items, setItems);
+	const [items, setItems] = useState<ClanGroupItem[]>([]);
+	const { draggingState, handleMouseDown, handleMouseEnter } = useClanGroupDragAndDrop(items, setItems);
 
 	useEffect(() => {
-		setItems(clans.map((c) => c.id));
-	}, [clans]);
+		dispatch(clansActions.initializeClanGroupOrder());
+	}, [dispatch]);
 
-	const { isDragging, draggedItem, dragPosition, dragOffset } = draggingState;
-	const isActive = (clanId: string) => isClanView && currentClanId === clans.find((c) => c.id === clanId)?.clan_id;
+	useEffect(() => {
+		setItems(
+			orderedClansWithGroups
+				.filter((item): item is NonNullable<typeof item> => item != null)
+				.map((item) => ({
+					type: item.type,
+					id: item.id,
+					clanId: item.type === 'clan' ? item.clan?.id : undefined,
+					groupId: item.type === 'group' && 'group' in item ? item.group?.id : undefined
+				}))
+		);
+	}, [orderedClansWithGroups]);
+
+	const { isDragging, draggedItem, dragPosition, dragOffset, overItem, dropZone, groupIntent, draggedFromGroup } = draggingState;
+
+	const isActive = (clanId: string) => isClanView && currentClanId === clanId;
+
+	const handleItemMouseEnter = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
+		if (isDragging) {
+			const rect = e.currentTarget.getBoundingClientRect();
+			const mouseY = e.pageY || e.clientY;
+			handleMouseEnter(id, mouseY, rect);
+		}
+	};
+
+	const handleClanMouseDown = (e: React.MouseEvent<HTMLDivElement>, clanId: string, fromGroup: { groupId: string; clanId: string }) => {
+		handleMouseDown(e, clanId, fromGroup);
+	};
 
 	return (
-		<div className="flex flex-col gap-3 relative">
-			{items.map((id) => {
-				const clan = clans.find((c) => c.id === id)!;
-				const draggingThis = isDragging && draggedItem === clan.id;
+		<div className="flex flex-col gap-1 relative">
+			{orderedClansWithGroups
+				.filter((item): item is NonNullable<typeof item> => item != null)
+				.map((item, index) => {
+					const draggingThis = isDragging && draggedItem === item.id;
+					const isOverThis = isDragging && overItem === item.id;
+					const isGroupIntentTarget = groupIntent?.targetId === item.id;
 
-				return (
-					<div
-						key={clan.id}
-						className={`relative transition-all duration-200 ${draggingThis ? 'opacity-0 h-0 overflow-hidden my-0' : isDragging && draggingState.overItem === clan.id ? 'my-8' : 'my-0'
-							}`}
-						onMouseEnter={() => handleMouseEnter(clan.id)}
-						onMouseDown={(e) => handleMouseDown(e, clan.id)}
-					>
-						<SidebarClanItem option={clan} active={isActive(clan.id)} className={`${draggingThis ? 'opacity-0' : ''}`} />
-					</div>
-				);
-			})}
+					let hoverEffect = '';
+					let dropIndicator = null;
 
+					if (isOverThis && dropZone) {
+						switch (dropZone) {
+							case 'top':
+								hoverEffect = 'border-t-4 border-blue-500';
+								dropIndicator = (
+									<div className="absolute -top-2 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse shadow-md" />
+								);
+								break;
+							case 'bottom':
+								hoverEffect = 'border-b-4 border-blue-500';
+								dropIndicator = (
+									<div className="absolute -bottom-2 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse shadow-md" />
+								);
+								break;
+							case 'center':
+								if (isGroupIntentTarget) {
+									hoverEffect = 'ring-4 ring-green-400 ring-opacity-90 bg-green-200 dark:bg-green-700/50 transform scale-105';
+								} else {
+									hoverEffect = 'ring-2 ring-green-300 ring-opacity-70 bg-green-100 dark:bg-green-800/30';
+								}
+								break;
+						}
+					}
+
+					const gapId = `gap-${index}`;
+					const isOverGap = isDragging && overItem === gapId;
+
+					const draggedFromGroupStyling = draggedFromGroup && draggedFromGroup.clanId === item.id ? 'opacity-50 transform scale-95' : '';
+
+					return (
+						<div key={item.id}>
+							{index === 0 && (
+								<div
+									className={`h-3 w-full relative transition-all duration-200 ${isOverGap ? 'bg-blue-100 dark:bg-blue-900/30' : ''}`}
+									onMouseEnter={(e) => {
+										if (isDragging) {
+											const rect = e.currentTarget.getBoundingClientRect();
+											const mouseY = e.pageY || e.clientY;
+											handleMouseEnter(gapId, mouseY, rect);
+										}
+									}}
+									onMouseMove={(e) => {
+										if (isDragging) {
+											const rect = e.currentTarget.getBoundingClientRect();
+											const mouseY = e.pageY || e.clientY;
+											handleMouseEnter(gapId, mouseY, rect);
+										}
+									}}
+								>
+									{isOverGap && (
+										<div className="absolute top-1/2 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse shadow-md transform -translate-y-1/2" />
+									)}
+								</div>
+							)}
+
+							<div
+								className={`${item.type === 'group' && item.group.isExpanded ? '' : 'px-2'} relative transition-all duration-200 ${draggedFromGroupStyling}`}
+								onMouseEnter={(e) => handleItemMouseEnter(e, item.id)}
+								onMouseMove={(e) => handleItemMouseEnter(e, item.id)}
+								onMouseDown={(e) => handleMouseDown(e, item.id)}
+							>
+								{item.type === 'clan' && item.clan ? (
+									<SidebarClanItem
+										option={item.clan}
+										active={isActive(item.clan.clan_id || '')}
+										className={`transition-all duration-200 ${draggingThis ? 'opacity-30' : ''} ${
+											isGroupIntentTarget && dropZone === 'center' ? 'animate-pulse' : ''
+										}`}
+									/>
+								) : item.type === 'group' && 'group' in item && item.group ? (
+									<div onMouseEnter={(e) => handleItemMouseEnter(e, item.id)} onMouseMove={(e) => handleItemMouseEnter(e, item.id)}>
+										<ClanGroup
+											group={item.group}
+											className={`transition-all duration-200 ${draggingThis ? 'opacity-30' : ''} ${
+												isGroupIntentTarget ? 'animate-pulse' : ''
+											}`}
+											isGroupIntent={isGroupIntentTarget}
+											onMouseDown={(e) => handleMouseDown(e, item.id)}
+											onClanMouseDown={handleClanMouseDown}
+										/>
+									</div>
+								) : null}
+
+								{dropIndicator}
+
+								{isOverThis && dropZone === 'center' && isGroupIntentTarget && (
+									<div className="absolute inset-0 pointer-events-none">
+										<div className="absolute top-[15%] bottom-[15%] left-0 right-0 border-2 border-dashed border-green-400 rounded bg-green-200/20 dark:bg-green-400/10" />
+									</div>
+								)}
+							</div>
+
+							{(() => {
+								const nextGapId = `gap-${index + 1}`;
+								const isOverNextGap = isDragging && overItem === nextGapId;
+
+								return (
+									<div
+										className={`h-3 w-full relative transition-all duration-200 ${isOverNextGap ? 'bg-blue-100 dark:bg-blue-900/30' : ''}`}
+										onMouseEnter={(e) => {
+											if (isDragging) {
+												const rect = e.currentTarget.getBoundingClientRect();
+												const mouseY = e.pageY || e.clientY;
+												handleMouseEnter(nextGapId, mouseY, rect);
+											}
+										}}
+										onMouseMove={(e) => {
+											if (isDragging) {
+												const rect = e.currentTarget.getBoundingClientRect();
+												const mouseY = e.pageY || e.clientY;
+												handleMouseEnter(nextGapId, mouseY, rect);
+											}
+										}}
+									>
+										{isOverNextGap && (
+											<div className="absolute top-1/2 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse shadow-md transform -translate-y-1/2" />
+										)}
+									</div>
+								);
+							})()}
+						</div>
+					);
+				})}
+
+			{/* Floating dragged item */}
 			{isDragging && draggedItem && dragPosition && (
 				<div
-					className="fixed pointer-events-none z-50 w-[40px] h-[40px]"
+					className="fixed pointer-events-none z-50 w-[40px] h-[40px] transform rotate-3 shadow-lg"
 					style={{
 						left: `${dragPosition.x - dragOffset.x}px`,
 						top: `${dragPosition.y - dragOffset.y}px`
 					}}
 				>
-					<SidebarClanItem option={clans.find((c) => c.id === draggedItem)!} active={false} />
+					{(() => {
+						if (draggedFromGroup) {
+							const draggedClan = orderedClansWithGroups
+								.filter((item): item is NonNullable<typeof item> => item != null)
+								.find((item) => item.type === 'group' && 'group' in item && item.group?.clanIds.includes(draggedFromGroup.clanId));
+
+							if (draggedClan && draggedClan.type === 'group' && 'group' in draggedClan) {
+								const clan = allClansEntities[draggedFromGroup.clanId];
+								if (clan) {
+									return <SidebarClanItem option={clan} active={false} className="opacity-80" />;
+								}
+							}
+						} else {
+							const draggedItemData = orderedClansWithGroups
+								.filter((item): item is NonNullable<typeof item> => item != null)
+								.find((item) => item.id === draggedItem);
+							if (draggedItemData?.type === 'clan' && draggedItemData.clan) {
+								return <SidebarClanItem option={draggedItemData.clan} active={false} className="opacity-80" />;
+							} else if (draggedItemData?.type === 'group' && 'group' in draggedItemData && draggedItemData.group) {
+								return <ClanGroup group={draggedItemData.group} className="opacity-80" />;
+							}
+						}
+						return null;
+					})()}
 				</div>
 			)}
 		</div>

@@ -5,10 +5,11 @@ import { ChannelType, ClanUpdatedEvent } from 'mezon-js';
 import { ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api.gen';
 import { batch } from 'react-redux';
 import { accountActions } from '../account/account.slice';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
-import { ensureClient, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureClient, ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { defaultNotificationCategoryActions } from '../notificationSetting/notificationSettingCategory.slice';
 import { defaultNotificationActions } from '../notificationSetting/notificationSettingClan.slice';
 import { policiesActions } from '../policies/policies.slice';
@@ -36,7 +37,23 @@ interface ClanMeta {
 	showNumEvent: boolean;
 }
 
+export interface ClanGroup {
+	id: string;
+	name?: string;
+	clanIds: string[];
+	isExpanded: boolean;
+	createdAt: number;
+}
+
+export interface ClanGroupItem {
+	type: 'clan' | 'group';
+	id: string;
+	clanId?: string;
+	groupId?: string;
+}
+
 const clanMetaAdapter = createEntityAdapter<ClanMeta>();
+const clanGroupAdapter = createEntityAdapter<ClanGroup>();
 
 function extractClanMeta(clan: ClansEntity): ClanMeta {
 	return {
@@ -54,6 +71,10 @@ export interface ClansState extends EntityState<ClansEntity, string> {
 	inviteChannelId?: string;
 	inviteClanId?: string;
 	clansOrder?: string[];
+	// Add clan groups state
+	clanGroups: EntityState<ClanGroup, string>;
+	clanGroupOrder: ClanGroupItem[];
+	cache?: CacheMetadata;
 }
 
 export const clansAdapter = createEntityAdapter<ClansEntity>();
@@ -102,17 +123,74 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 	}
 );
 
-export const fetchClans = createAsyncThunk<ClansEntity[]>('clans/fetchClans', async (_, thunkAPI) => {
+const selectCachedClans = createSelector([(state: RootState) => state[CLANS_FEATURE_KEY]], (clansState) => {
+	return clansAdapter.getSelectors().selectAll(clansState);
+});
+
+export const fetchClansCached = async (
+	getState: () => RootState,
+	ensuredMezon: MezonValueContext,
+	limit?: number,
+	state?: number,
+	cursor?: string,
+	noCache = false
+) => {
+	const rootState = getState();
+	const clansState = rootState[CLANS_FEATURE_KEY];
+	const apiKey = createApiKey('fetchClans', limit?.toString() || '', state?.toString() || '', cursor || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, clansState.cache, noCache);
+
+	if (!shouldForceCall) {
+		const clans = selectCachedClans(rootState);
+		return {
+			clandesc: clans,
+			fromCache: true
+		};
+	}
+
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListClanDescs',
+			list_clan_req: {
+				limit: { value: limit },
+				state: { value: 1 }
+			}
+		},
+		() => ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || ''),
+		'clan_desc_list'
+	);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
+
+export type FetchClansPayload = {
+	clans: IClan[];
+	fromCache?: boolean;
+};
+
+export const fetchClans = createAsyncThunk('clans/fetchClans', async ({ noCache = false }: { noCache?: boolean }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listClanDescs(mezon.session, LIMIT_CLAN_ITEM, 1, '');
+		const response = await fetchClansCached(thunkAPI.getState as () => RootState, mezon, LIMIT_CLAN_ITEM, 1, '', noCache);
+
 		if (!response.clandesc) {
-			return [];
+			return { clans: [], fromCache: response.fromCache };
 		}
 		const clans = response.clandesc.map(mapClanToEntity);
-		const meta = clans.map((clan) => extractClanMeta(clan));
+		const meta = clans.map((clan: ClansEntity) => extractClanMeta(clan));
 		thunkAPI.dispatch(clansActions.updateBulkClanMetadata(meta));
-		return clans;
+		const payload: FetchClansPayload = {
+			clans,
+			fromCache: response.fromCache
+		};
+		return payload;
 	} catch (error) {
 		captureSentryError(error, 'clans/fetchClans');
 		return thunkAPI.rejectWithValue(error);
@@ -164,7 +242,7 @@ export const deleteClan = createAsyncThunk('clans/deleteClans', async (body: Cha
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await mezon.client.deleteClanDesc(mezon.session, body.clanId);
 		if (response) {
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({ noCache: true }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'clans/deleteClans');
@@ -184,7 +262,7 @@ export const removeClanUsers = createAsyncThunk('clans/removeClanUsers', async (
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
 		}
-		thunkAPI.dispatch(fetchClans());
+		thunkAPI.dispatch(fetchClans({ noCache: true }));
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'clans/removeClanUsers');
@@ -204,22 +282,10 @@ export const updateClan = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			thunkAPI.dispatch(fetchClans());
+			thunkAPI.dispatch(fetchClans({ noCache: true }));
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'clans/updateClans');
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
-
-export const updateBageClanWS = createAsyncThunk(
-	'clans/updateBageClanWS',
-	async ({ clan_id, badge_count }: { clan_id: string; badge_count: number }, thunkAPI) => {
-		try {
-			await thunkAPI.dispatch(clansActions.setBadgeClanSync({ clanId: clan_id, count: badge_count }));
-		} catch (error) {
-			captureSentryError(error, 'clans/updateBageClanWS');
 			return thunkAPI.rejectWithValue(error);
 		}
 	}
@@ -240,20 +306,46 @@ export const updateUser = createAsyncThunk(
 	'clans/updateUser',
 	async ({ user_name, avatar_url, display_name, about_me, logo, noCache = false, dob, encrypt_private_key }: UpdateLinkUser, thunkAPI) => {
 		try {
+			const state = thunkAPI.getState() as RootState;
+			const currentUser = state.account?.userProfile;
+
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
-			const body: ApiUpdateAccountRequest = {
-				avatar_url: avatar_url || '',
-				display_name: display_name || '',
-				lang_tag: 'en',
-				location: '',
-				timezone: '',
-				username: user_name,
-				about_me: about_me,
-				dob: dob,
-				logo: logo,
-				encrypt_private_key
-			};
-			const response = await mezon.client.updateAccount(mezon.session, body);
+
+			const body: Partial<ApiUpdateAccountRequest> = {};
+
+			if (user_name && user_name !== currentUser?.user?.username) {
+				body.username = user_name;
+			}
+
+			if (avatar_url && avatar_url !== currentUser?.user?.avatar_url) {
+				body.avatar_url = avatar_url || '';
+			}
+
+			if (display_name && display_name !== currentUser?.user?.display_name) {
+				body.display_name = display_name || '';
+			}
+
+			if (about_me && about_me !== currentUser?.user?.about_me) {
+				body.about_me = about_me;
+			}
+
+			if (dob && dob !== currentUser?.user?.dob) {
+				body.dob = dob;
+			}
+
+			if (logo && logo !== currentUser?.logo) {
+				body.logo = logo;
+			}
+
+			if (encrypt_private_key && encrypt_private_key !== currentUser?.encrypt_private_key) {
+				body.encrypt_private_key = encrypt_private_key;
+			}
+
+			if (Object.keys(body).length === 0) {
+				return true;
+			}
+
+			const response = await mezon.client.updateAccount(mezon.session, body as ApiUpdateAccountRequest);
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
@@ -283,9 +375,11 @@ export const updateUser = createAsyncThunk(
 		}
 	}
 );
+
 interface JoinClanPayload {
 	clanId: string;
 }
+
 export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
@@ -304,7 +398,9 @@ export const initialClansState: ClansState = clansAdapter.getInitialState({
 	invitePeople: false,
 	inviteChannelId: undefined,
 	inviteClanId: undefined,
-	clansOrder: []
+	clansOrder: [],
+	clanGroups: clanGroupAdapter.getInitialState(),
+	clanGroupOrder: []
 });
 
 type UpdateClanBadgeCountPayload = {
@@ -327,6 +423,118 @@ export const clansSlice = createSlice({
 		},
 		updateClansOrder: (state, action: PayloadAction<string[]>) => {
 			state.clansOrder = action.payload;
+		},
+
+		createClanGroup: (state, action: PayloadAction<{ clanIds: string[]; name?: string }>) => {
+			const { clanIds, name } = action.payload;
+			const groupId = `group_${Date.now()}`;
+
+			const newGroup: ClanGroup = {
+				id: groupId,
+				name,
+				clanIds,
+				isExpanded: false,
+				createdAt: Date.now()
+			};
+
+			clanGroupAdapter.addOne(state.clanGroups, newGroup);
+
+			const newOrder: ClanGroupItem[] = [];
+			const processedClanIds = new Set<string>();
+
+			newOrder.push({
+				type: 'group',
+				id: groupId,
+				groupId
+			});
+
+			clanIds.forEach((id) => processedClanIds.add(id));
+
+			state.clanGroupOrder.forEach((item) => {
+				if (item.type === 'clan' && item.clanId && !processedClanIds.has(item.clanId)) {
+					newOrder.push(item);
+				} else if (item.type === 'group') {
+					newOrder.push(item);
+				}
+			});
+
+			state.clanGroupOrder = newOrder;
+		},
+
+		addClanToGroup: (state, action: PayloadAction<{ groupId: string; clanId: string }>) => {
+			const { groupId, clanId } = action.payload;
+			const group = state.clanGroups.entities[groupId];
+
+			if (group && !group.clanIds.includes(clanId)) {
+				group.clanIds.push(clanId);
+
+				state.clanGroupOrder = state.clanGroupOrder.filter((item) => !(item.type === 'clan' && item.clanId === clanId));
+			}
+		},
+
+		removeClanFromGroup: (state, action: PayloadAction<{ groupId: string; clanId: string }>) => {
+			const { groupId, clanId } = action.payload;
+			const group = state.clanGroups.entities[groupId];
+
+			if (group) {
+				group.clanIds = group.clanIds.filter((id) => id !== clanId);
+
+				if (group.clanIds.length === 0) {
+					clanGroupAdapter.removeOne(state.clanGroups, groupId);
+					state.clanGroupOrder = state.clanGroupOrder.filter((item) => !(item.type === 'group' && item.groupId === groupId));
+				} else {
+					const groupIndex = state.clanGroupOrder.findIndex((item) => item.type === 'group' && item.groupId === groupId);
+
+					if (groupIndex !== -1) {
+						state.clanGroupOrder.splice(groupIndex + 1, 0, {
+							type: 'clan',
+							id: clanId,
+							clanId
+						});
+					}
+				}
+			}
+		},
+
+		reorderClansInGroup: (state, action: PayloadAction<{ groupId: string; clanIds: string[] }>) => {
+			const { groupId, clanIds } = action.payload;
+			const group = state.clanGroups.entities[groupId];
+
+			if (group) {
+				group.clanIds = clanIds;
+			}
+		},
+
+		toggleGroupExpanded: (state, action: PayloadAction<string>) => {
+			const groupId = action.payload;
+			const group = state.clanGroups.entities[groupId];
+
+			if (group) {
+				group.isExpanded = !group.isExpanded;
+			}
+		},
+
+		collapseAllGroups: (state) => {
+			Object.values(state.clanGroups.entities).forEach((group) => {
+				if (group && group.isExpanded) {
+					group.isExpanded = false;
+				}
+			});
+		},
+
+		updateClanGroupOrder: (state, action: PayloadAction<ClanGroupItem[]>) => {
+			state.clanGroupOrder = action.payload;
+		},
+
+		initializeClanGroupOrder: (state) => {
+			if (state.clanGroupOrder.length === 0) {
+				const order = state.clansOrder || state.ids;
+				state.clanGroupOrder = order.map((clanId) => ({
+					type: 'clan' as const,
+					id: clanId,
+					clanId
+				}));
+			}
 		},
 
 		toggleInvitePeople: (state, action: PayloadAction<{ status: boolean; clanId?: string; channelId?: string }>) => {
@@ -390,6 +598,8 @@ export const clansSlice = createSlice({
 		},
 		update: (state, action: PayloadAction<{ dataUpdate: ClanUpdatedEvent }>) => {
 			const { dataUpdate } = action.payload;
+
+			const currentClanData = clansAdapter.getSelectors().selectById(state, dataUpdate.clan_id);
 			clansAdapter.updateOne(state, {
 				id: dataUpdate.clan_id as string,
 				changes: {
@@ -398,24 +608,13 @@ export const clansSlice = createSlice({
 					logo: dataUpdate.logo,
 					banner: dataUpdate.banner,
 					is_onboarding: dataUpdate.is_onboarding,
-					welcome_channel_id: dataUpdate.welcome_channel_id
+					welcome_channel_id: dataUpdate.welcome_channel_id !== '-1' ? dataUpdate.welcome_channel_id : currentClanData.welcome_channel_id
 				}
 			});
 		},
-		setBadgeClanSync: (state: ClansState, action: PayloadAction<{ clanId: string; count: number }>) => {
-			const { clanId, count } = action.payload;
-			const entity = state.entities[clanId];
-			if (entity) {
-				const newBadgeCount = count;
-				if (!entity.badge_count && newBadgeCount === 0) return;
-				if (entity.badge_count !== newBadgeCount) {
-					clansAdapter.updateOne(state, {
-						id: clanId,
-						changes: {
-							badge_count: newBadgeCount
-						}
-					});
-				}
+		invalidateCache: (state) => {
+			if (state.cache) {
+				state.cache = undefined;
 			}
 		}
 	},
@@ -424,9 +623,14 @@ export const clansSlice = createSlice({
 			.addCase(fetchClans.pending, (state: ClansState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(fetchClans.fulfilled, (state: ClansState, action: PayloadAction<IClan[]>) => {
-				clansAdapter.setAll(state, action.payload);
+			.addCase(fetchClans.fulfilled, (state: ClansState, action: PayloadAction<FetchClansPayload>) => {
+				const { clans, fromCache } = action.payload;
 				state.loadingStatus = 'loaded';
+
+				if (fromCache) return;
+
+				clansAdapter.setAll(state, clans);
+				state.cache = createCacheMetadata();
 			})
 			.addCase(fetchClans.rejected, (state: ClansState, action) => {
 				state.loadingStatus = 'error';
@@ -490,8 +694,7 @@ export const clansActions = {
 	changeCurrentClan,
 	updateUser,
 	deleteClan,
-	joinClan,
-	updateBageClanWS
+	joinClan
 };
 
 /*
@@ -551,7 +754,7 @@ export const selectBadgeCountAllClan = createSelector(selectAllClans, (clan) => 
 export const selectBadgeCountByClanId = (clanId: string) =>
 	createSelector(getClansState, (state) => {
 		const clan = state.entities[clanId];
-		return clan?.badge_count;
+		return clan?.badge_count || 0;
 	});
 
 export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
@@ -559,4 +762,60 @@ export const selectInviteChannelId = createSelector(getClansState, (state) => st
 export const selectInviteClanId = createSelector(getClansState, (state) => state.inviteClanId);
 export const selectWelcomeChannelByClanId = createSelector([getClansState, (state, clanId: string) => clanId], (state, clanId) => {
 	return selectById(state, clanId)?.welcome_channel_id || null;
+});
+
+export const selectClanGroups = createSelector(getClansState, (state) => clanGroupAdapter.getSelectors().selectAll(state.clanGroups));
+
+export const selectClanGroupEntities = createSelector(getClansState, (state) => clanGroupAdapter.getSelectors().selectEntities(state.clanGroups));
+
+export const selectClanGroupById = (groupId: string) => createSelector(selectClanGroupEntities, (entities) => entities[groupId]);
+
+export const selectClanGroupOrder = createSelector(getClansState, (state) => state?.clanGroupOrder || []);
+
+export const selectOrderedClansWithGroups = createSelector([selectAllClans, selectClanGroups, selectClanGroupOrder], (clans, groups, order) => {
+	if (!order || order.length === 0) {
+		return clans.map((clan) => ({
+			type: 'clan' as const,
+			id: clan.id,
+			clan
+		}));
+	}
+
+	const clanMap = Object.fromEntries(clans.map((clan) => [clan.id, clan]));
+	const groupMap = Object.fromEntries(groups.map((group) => [group.id, group]));
+
+	const clansInGroups = new Set<string>();
+	groups.forEach((group) => {
+		group.clanIds.forEach((clanId) => clansInGroups.add(clanId));
+	});
+
+	const orderedItems = order
+		.map((item) => {
+			if (item.type === 'clan' && item.clanId) {
+				const clan = clanMap[item.clanId];
+				return clan ? { type: 'clan' as const, id: item.id, clan } : null;
+			} else if (item.type === 'group' && item.groupId) {
+				const group = groupMap[item.groupId];
+				return group ? { type: 'group' as const, id: item.id, group } : null;
+			}
+			return null;
+		})
+		.filter(Boolean);
+
+	const orderedClanIds = new Set(
+		order
+			.filter((item) => item.type === 'clan')
+			.map((item) => item.clanId)
+			.filter(Boolean)
+	);
+
+	const remainingClans = clans
+		.filter((clan) => !clansInGroups.has(clan.id) && !orderedClanIds.has(clan.id))
+		.map((clan) => ({
+			type: 'clan' as const,
+			id: clan.id,
+			clan
+		}));
+
+	return [...orderedItems, ...remainingClans];
 });

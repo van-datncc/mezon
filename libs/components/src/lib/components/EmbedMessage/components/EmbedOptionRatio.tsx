@@ -10,9 +10,11 @@ interface EmbedOptionRatioProps {
 	options: IMessageRatioOption[];
 	message_id: string;
 	idRadio: string;
+	max_options?: number;
+	disabled?: boolean;
 }
 
-export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRatioProps) {
+export function EmbedOptionRatio({ options, message_id, idRadio, max_options }: EmbedOptionRatioProps) {
 	const [checked, setChecked] = useState<number[]>([]);
 	const handleCheckedOption = (index: number) => {
 		if (!options[index].name) {
@@ -25,8 +27,11 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 			handleAddEmbedRadioValue(index);
 			return;
 		}
-		setChecked([...checked, index]);
-		handleAddEmbedRadioValue(index);
+
+		if (!max_options || checked.length < max_options) {
+			setChecked([...checked, index]);
+			handleAddEmbedRadioValue(index);
+		}
 	};
 
 	const dispatch = useDispatch();
@@ -68,6 +73,7 @@ export function EmbedOptionRatio({ options, message_id, idRadio }: EmbedOptionRa
 							onCheckRatio={() => handleCheckedOption(index)}
 							checked={checked.includes(index)}
 							color={option.style}
+							disabled={option.disabled}
 						/>
 					</div>
 				))}

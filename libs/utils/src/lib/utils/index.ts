@@ -54,6 +54,7 @@ export * from './buildClassName';
 export * from './buildStyle';
 export * from './calculateAlbumLayout';
 export * from './callbacks';
+export * from './canvasLink';
 export * from './detectTokenMessage';
 export * from './file';
 export * from './forceReflow';
@@ -66,6 +67,7 @@ export * from './resetScroll';
 export * from './schedulers';
 export * from './select';
 export * from './signals';
+export * from './toggleSelection';
 export * from './transform';
 export * from './windowEnvironment';
 export * from './windowSize';
@@ -207,8 +209,10 @@ export const removeDuplicatesById = (array: any) => {
 	}, []);
 };
 export const getTimeDifferenceDate = (dateString: string) => {
-	const now = new Date();
+	if (!dateString) return '-';
 	const codeTime = new Date(dateString);
+	if (isNaN(codeTime.getTime())) return '-';
+	const now = new Date();
 	const hoursDifference = differenceInHours(now, codeTime);
 	const daysDifference = differenceInDays(now, codeTime);
 	const monthsDifference = differenceInMonths(now, codeTime);
@@ -244,6 +248,10 @@ export const convertMarkdown = (markdown: string, type: EBacktickType): string =
 
 export const getSrcEmoji = (id: string) => {
 	return process.env.NX_BASE_IMG_URL + '/emojis/' + id + '.webp';
+};
+
+export const getSrcSound = (id: string) => {
+	return process.env.NX_BASE_IMG_URL + '/sounds/' + id + '.mp3';
 };
 
 export const checkLastChar = (text: string) => {
@@ -430,15 +438,26 @@ export function filterListByName(listSearch: SearchItemProps[], searchText: stri
 			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
 			const itemPrioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
-
-			return itemName.includes(searchName) || itemDisplayName.includes(searchName) || itemPrioritizeName.includes(searchName);
+			const searchNameAllClan = item.searchName ? normalizeString(item.searchName) : '';
+			return (
+				itemName.includes(searchName) ||
+				itemDisplayName.includes(searchName) ||
+				itemPrioritizeName.includes(searchName) ||
+				searchNameAllClan.includes(searchName)
+			);
 		} else {
 			const searchUpper = normalizeString(searchText.startsWith('#') ? searchText.substring(1) : searchText);
 			const prioritizeName = item.prioritizeName ? normalizeString(item.prioritizeName) : '';
 			const itemName = item.name ? normalizeString(item.name) : '';
 			const itemDisplayName = item.displayName ? normalizeString(item.displayName) : '';
+			const searchNameAllClan = item.searchName ? normalizeString(item.searchName) : '';
 
-			return prioritizeName.includes(searchUpper) || itemName.includes(searchUpper) || itemDisplayName.includes(searchUpper);
+			return (
+				prioritizeName.includes(searchUpper) ||
+				itemName.includes(searchUpper) ||
+				itemDisplayName.includes(searchUpper) ||
+				searchNameAllClan.includes(searchUpper)
+			);
 		}
 	});
 
@@ -1205,14 +1224,17 @@ export const getMentionPositions = (value: string, plainValue: string, mention: 
 export const updateMentionPositions = (mentions: MentionItem[], newValue: string, newPlainTextValue: string) => {
 	const mentionAppearancesCount: Record<string, number> = {};
 
-	const newMentions: MentionItem[] = mentions.map((mention) => {
+	const newMentions: MentionItem[] = [];
+	mentions.map((mention) => {
 		mentionAppearancesCount[mention.id] = (mentionAppearancesCount[mention.id] || 0) + 1;
 		const newMentionStartIndex = getMentionPositions(newValue, newPlainTextValue, mention, mentionAppearancesCount?.[mention.id]);
-		return {
-			...mention,
-			index: newMentionStartIndex.valueStartIndex,
-			plainTextIndex: newMentionStartIndex.plainValueStartIndex
-		};
+		if (newMentionStartIndex.plainValueStartIndex !== -1) {
+			newMentions.push({
+				...mention,
+				index: newMentionStartIndex.valueStartIndex,
+				plainTextIndex: newMentionStartIndex.plainValueStartIndex
+			});
+		}
 	});
 
 	return newMentions;

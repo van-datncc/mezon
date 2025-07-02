@@ -44,10 +44,10 @@ export const AddFriendScreen = () => {
 
 	const waysToAddFriendList = useMemo(() => {
 		return [
-			{
-				title: t('addFriend.findYourFriend'),
-				type: EAddFriendWays.FindFriend
-			},
+			// {
+			// 	title: t('addFriend.findYourFriend'),
+			// 	type: EAddFriendWays.FindFriend
+			// },
 			{
 				title: t('addFriend.addByUserName'),
 				type: EAddFriendWays.UserName
@@ -71,17 +71,22 @@ export const AddFriendScreen = () => {
 							<Text style={styles.addFriendText}>{item.title}</Text>
 						</TouchableOpacity>
 					)}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 				/>
 			</View>
 			<Text style={styles.whiteText}>{t('addFriend.incomingFriendRequest')}</Text>
-			<View style={styles.groupWrapper}>
-				<FlatList
-					data={receivedFriendRequestList}
-					ItemSeparatorComponent={SeparatorWithLine}
-					keyExtractor={(friend) => friend.id.toString()}
-					renderItem={({ item }) => <FriendItem friend={item} handleFriendAction={handleFriendAction} />}
-				/>
-			</View>
+			<FlatList
+				style={{ flex: 1 }}
+				data={receivedFriendRequestList}
+				ItemSeparatorComponent={SeparatorWithLine}
+				keyExtractor={(friend) => friend.id.toString()}
+				renderItem={({ item }) => <FriendItem friend={item} handleFriendAction={handleFriendAction} />}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
+			/>
 
 			<AddFriendModal type={currentAddFriendType} onClose={() => setCurrentAddFriendType(null)} />
 			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />

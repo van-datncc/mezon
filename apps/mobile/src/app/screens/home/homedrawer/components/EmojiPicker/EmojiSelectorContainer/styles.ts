@@ -55,5 +55,17 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			width: size.s_24,
 			borderRadius: size.s_12,
 			overflow: 'hidden'
-		}
+		},
+		wrapperIconEmojiLocked: {
+			backgroundColor: 'rgba(0, 0, 0, 0.7)',
+			position: 'absolute',
+			alignSelf: 'center',
+			justifyContent: 'center',
+			alignItems: 'center',
+			left: 0,
+			top: size.s_10,
+			width: (isTabletLandscape ? Metrics.screenWidth * 0.7 - size.s_20 : Metrics.screenWidth - size.s_20) / 9 - size.s_6,
+			height: size.s_30,
+			zIndex: 1
+		},
 	});

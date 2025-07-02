@@ -1,7 +1,9 @@
 package com.mezon.mobile
-import android.os.Bundle;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -9,6 +11,9 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.mezon.mobile.CustomClientFactory;
 import com.zoontek.rnbootsplash.RNBootSplash;
+import android.app.NotificationManager
+import android.content.Context;
+import android.util.DisplayMetrics;
 
 class MainActivity : ReactActivity() {
 
@@ -18,14 +23,36 @@ class MainActivity : ReactActivity() {
    */
   override fun getMainComponentName(): String = "Mobile"
 
- override fun onCreate(savedInstanceState: Bundle?) {
-   RNBootSplash.init(this, R.style.BootTheme)
-   super.onCreate(null);
- }
+  fun isTablet(context: Context): Boolean {
+    val metrics = context.resources.displayMetrics
+    val widthInches = metrics.widthPixels / metrics.xdpi
+    val heightInches = metrics.heightPixels / metrics.ydpi
+    val screenSize =
+        Math.sqrt(
+            (widthInches.toDouble() * widthInches.toDouble()) +
+                (heightInches.toDouble() * heightInches.toDouble())
+        )
+    return screenSize >= 7.0
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    RNBootSplash.init(this, R.style.BootTheme)
+    super.onCreate(null);
+
+    if (isTablet(this)) {
+      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    } else {
+      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+    }
+  }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent);
     setIntent(intent);
+    if (intent?.action == "ANSWER_CALL_ACTION") {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(1001)
+    }
   }
 
   /**

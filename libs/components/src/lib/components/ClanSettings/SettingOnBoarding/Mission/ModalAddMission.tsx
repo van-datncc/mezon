@@ -3,7 +3,7 @@ import {
 	EGuideType,
 	ETypeMission,
 	onboardingActions,
-	selectChannelsByClanId,
+	selectAllChannels,
 	selectCurrentClanId,
 	useAppDispatch,
 	useAppSelector
@@ -38,7 +38,7 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 		}
 	];
 	const currentClanId = useSelector(selectCurrentClanId);
-	const allChannel = useAppSelector((state) => selectChannelsByClanId(state, currentClanId as string));
+	const allChannel = useAppSelector(selectAllChannels);
 	const listMissionChannel = useMemo(() => {
 		return allChannel.filter((channel) => channel.channel_private !== ChannelStatusEnum.isPrivate);
 	}, [allChannel]);
@@ -128,15 +128,15 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 					value={title}
 					required
 				/>
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-6 bg-gray-300 dark:bg-channelTextLabel"></div>
 
 				<div className="flex flex-col gap-2">
-					<h1 className="text-base font-semibold text-white">
+					<h1 className="text-base font-semibold text-gray-800 dark:text-white">
 						Where should they do it? <span className="text-red-500">*</span>
 					</h1>
 					<div className="flex flex-col">
 						<select
-							className="w-full p-[10px] outline-none rounded bg-borderDefault"
+							className="w-full p-[10px] outline-none rounded bg-gray-100 dark:bg-borderDefault text-gray-800 dark:text-white border border-gray-200 dark:border-transparent"
 							onChange={handleSetChannelMission}
 							value={missionChannel}
 						>
@@ -147,11 +147,11 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 							))}
 						</select>
 
-						<span className="text-xs mt-1">Channels must be viewable by @everyone (public channel)</span>
+						<span className="text-xs mt-1 text-gray-500 dark:text-gray-400">Channels must be viewable by @everyone (public channel)</span>
 					</div>
 				</div>
 
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-6 bg-gray-300 dark:bg-channelTextLabel"></div>
 
 				<GuideItemLayout
 					className="!p-0"
@@ -160,10 +160,10 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 					description="72x72 minimum. 1:1 aspect ratio. PNG, JPG"
 				/>
 
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-6 bg-gray-300 dark:bg-channelTextLabel"></div>
 
 				<div className="flex flex-col">
-					<h1 className="text-base font-semibold text-white">
+					<h1 className="text-base font-semibold text-gray-800 dark:text-white">
 						This task is complete when: <span className="text-red-500">*</span>
 					</h1>
 
@@ -173,11 +173,11 @@ const ModalAddMission = ({ onClose, missionEdit, tempId }: { onClose: () => void
 								id={missions.name}
 								onChange={(e) => handleSetMission(missions.id)}
 								type="radio"
-								className={`appearance-none text-white w-5 h-5 bg-transparent relative rounded-full accent-white border-2  border-channelTextLabel checked:after:absolute checked:after:w-3 checked:after:h-3 checked:after:top-[2.4px] checked:after:left-[2.4px] checked:after:bg-white checked:after:content-[""] checked:after:rounded-full ${mission === missions.id ? 'border-white' : ''} `}
+								className={`appearance-none w-5 h-5 bg-transparent relative rounded-full accent-indigo-500 border-2 border-gray-400 dark:border-channelTextLabel checked:after:absolute checked:after:w-3 checked:after:h-3 checked:after:top-[2.4px] checked:after:left-[2.4px] checked:after:bg-indigo-500 dark:checked:after:bg-white checked:after:content-[""] checked:after:rounded-full ${mission === missions.id ? 'border-indigo-500 dark:border-white' : ''} `}
 								name="mission"
 								checked={mission === missions.id}
 							/>
-							<label htmlFor={missions.name} className={`text-base font-medium ${mission === missions.id ? 'text-white' : ''}`}>
+							<label htmlFor={missions.name} className={`text-base font-medium ${mission === missions.id ? 'text-indigo-600 dark:text-white' : 'text-gray-700 dark:text-gray-400'}`}>
 								{missions.description}
 							</label>
 						</div>

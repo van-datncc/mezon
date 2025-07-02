@@ -1,8 +1,9 @@
 import { captureSentryError } from '@mezon/logger';
-import { LoadingStatus, UserStatus } from '@mezon/utils';
+import { FOR_24_HOURS, LoadingStatus, UserStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiUserStatus, ApiUserStatusUpdate } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { memoizeAndTrack } from '../memoize';
 
 export const USER_STATUS_API_FEATURE_KEY = 'userstatusapi';
 
@@ -23,11 +24,25 @@ export const userStatusAdapter = createEntityAdapter({
 	selectId: (status: UserStatusEntity) => status.id || ''
 });
 
+export const getUserStatusCached = memoizeAndTrack(
+	async (mezon: MezonValueContext) => {
+		const response = await mezon.client.getUserStatus(mezon.session);
+		return response;
+	},
+	{
+		promise: true,
+		maxAge: FOR_24_HOURS,
+		normalizer: (args) => {
+			return args[0]?.session?.token || '';
+		}
+	}
+);
+
 export const getUserStatus = createAsyncThunk('userstatusapi/getUserStatus', async (_, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.getUserStatus(mezon.session);
+		const response = await getUserStatusCached(mezon);
 		// if (!response.user_id) {
 		// 	return [];
 		// }

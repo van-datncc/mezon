@@ -10,31 +10,53 @@ import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 const widthMedia = Metrics.screenWidth - 150;
 export const RenderVideoChat = React.memo(
 	({ videoURL, onLongPress }: { videoURL: string; onLongPress: () => void }) => {
-		const [loading, setLoading] = useState(true);
 		const navigation = useNavigation<any>();
 		const [thumbPath, setThumbPath] = useState('');
 
 		const handlePlayVideo = () => {
-			navigation.push(APP_SCREEN.VIDEO_DETAIL, { videoURL });
+			navigation.navigate(APP_SCREEN.VIDEO_DETAIL, { videoURL });
 		};
 
 		useEffect(() => {
 			if (videoURL) {
-				setLoading(true);
 				if (Platform.OS === 'android') {
-					NativeModules.VideoThumbnail.getThumbnail(videoURL)
-						.then((path) => {
-							setThumbPath(path);
-						})
-						.catch((err) => console.error(err))
-						.finally(() => setLoading(false));
+					// Safe native module call with error handling
+					try {
+						if (NativeModules?.VideoThumbnail?.getThumbnail) {
+							NativeModules.VideoThumbnail.getThumbnail(videoURL)
+								.then((path) => {
+									if (path && typeof path === 'string') {
+										setThumbPath(path);
+									} else {
+										console.warn('Invalid thumbnail path returned');
+										setThumbPath('');
+									}
+								})
+								.catch((err) => {
+									console.error('VideoThumbnail native module error:', err);
+									setThumbPath('');
+								});
+						} else {
+							console.warn('VideoThumbnail native module not available');
+							setThumbPath('');
+						}
+					} catch (error) {
+						console.error('Error accessing VideoThumbnail native module:', error);
+						setThumbPath('');
+					}
 				} else {
 					createThumbnail({ url: videoURL, timeStamp: 1000 })
-						.then((response) => setThumbPath(response.path))
-						.catch(() => {
-							setThumbPath(null);
+						.then((response) => {
+							if (response?.path) {
+								setThumbPath(response.path);
+							} else {
+								setThumbPath('');
+							}
 						})
-						.finally(() => setLoading(false));
+						.catch((error) => {
+							console.error('Error creating thumbnail:', error);
+							setThumbPath('');
+						})
 				}
 			}
 		}, [videoURL]);
@@ -44,7 +66,7 @@ export const RenderVideoChat = React.memo(
 
 		return (
 			<View style={{ marginTop: size.s_10, marginBottom: size.s_6, opacity: isUploading ? 0.5 : 1 }}>
-				{loading || isUploading ? (
+				{isUploading ? (
 					<View
 						style={{
 							width: Math.max(widthMedia, Metrics.screenWidth - size.s_60 * 2),

@@ -1,20 +1,13 @@
 import { RTCView } from '@livekit/react-native-webrtc';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import {
-	DMCallActions,
-	selectAllAccount,
-	selectIsInCall,
-	selectRemoteVideo,
-	selectSignalingDataByUserId,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store-mobile';
+import { DMCallActions, selectAllAccount, selectRemoteVideo, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { WebrtcSignalingType } from 'mezon-js';
 import React, { memo, useEffect, useState } from 'react';
-import { BackHandler, DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
+import RNCallKeep from 'react-native-callkeep';
 import FastImage from 'react-native-fast-image';
 import InCallManager from 'react-native-incall-manager';
 import Toast from 'react-native-toast-message';
@@ -65,6 +58,47 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		callerName: userProfile?.user?.username,
 		callerAvatar: userProfile?.user?.avatar_url
 	});
+
+	const initSpeakerConfig = async () => {
+		if (Platform.OS === 'android') {
+			const { CustomAudioModule } = NativeModules;
+			await CustomAudioModule.setSpeaker(false, null);
+			InCallManager.setSpeakerphoneOn(false);
+		} else {
+			InCallManager.setSpeakerphoneOn(false);
+			InCallManager.setForceSpeakerphoneOn(false);
+		}
+	};
+
+	const toggleControl = async () => {
+		setIsShowControl(!isShowControl);
+	};
+
+	const onCancelCall = async () => {
+		try {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+			if (Platform.OS === 'ios') {
+				RNCallKeep.endAllCalls();
+			}
+			await handleEndCall({ isCancelGoBack: false });
+			if (!timeStartConnected?.current) {
+				await dispatch(
+					DMCallActions.updateCallLog({
+						channelId: directMessageId,
+						content: {
+							t: '',
+							callLog: {
+								isVideo: isVideoCall,
+								callLogType: IMessageTypeCallLog.CANCELCALL
+							}
+						}
+					})
+				);
+			}
+		} catch (err) {
+			/* empty */
+		}
+	};
 
 	useEffect(() => {
 		const lastSignalingData = signalingData?.[signalingData.length - 1]?.signalingData;
@@ -120,32 +154,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		};
 	}, [isAnswerCall, isVideoCall]);
 
-	const toggleControl = async () => {
-		setIsShowControl(!isShowControl);
-	};
-
-	const onCancelCall = async () => {
-		try {
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-			await handleEndCall({ isCancelGoBack: false });
-			if (!timeStartConnected?.current) {
-				await dispatch(
-					DMCallActions.updateCallLog({
-						channelId: directMessageId,
-						content: {
-							t: '',
-							callLog: {
-								isVideo: isVideoCall,
-								callLogType: IMessageTypeCallLog.CANCELCALL
-							}
-						}
-					})
-				);
-			}
-		} catch (err) {
-			/* empty */
-		}
-	};
+	useEffect(() => {
+		initSpeakerConfig();
+	}, []);
 
 	return (
 		<View style={styles.container}>

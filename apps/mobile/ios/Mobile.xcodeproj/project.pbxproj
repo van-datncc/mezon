@@ -21,13 +21,13 @@
 		E925D79F2DB8D6A700C10D69 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E925D79E2DB8D69E00C10D69 /* AppDelegate.swift */; };
 		E943F9ED2DB9D70200B81261 /* DeviceUtilsIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E943F9EC2DB9D70000B81261 /* DeviceUtilsIOS.swift */; };
 		E943F9F12DBA144700B81261 /* DeviceUtilsIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = E943F9F02DBA144700B81261 /* DeviceUtilsIOS.m */; };
+		E9443C732DDF8CA7002A97D3 /* VoIPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9443C722DDF8CA7002A97D3 /* VoIPManager.swift */; };
+		E9443C752DDF8CCB002A97D3 /* VoIPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E9443C742DDF8CCB002A97D3 /* VoIPManager.m */; };
 		E94D0A432DA66F2700D84EF2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E94CBA5D2DA65548005C0A98 /* ReplayKit.framework */; };
 		E967E05F2C6B20060050124F /* MezonSharing in Resources */ = {isa = PBXBuildFile; fileRef = E967E05E2C6B20060050124F /* MezonSharing */; };
 		E967E0672C6B20290050124F /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E967E0662C6B20290050124F /* ShareViewController.swift */; };
 		E967E06A2C6B20290050124F /* Base in Resources */ = {isa = PBXBuildFile; fileRef = E967E0692C6B20290050124F /* Base */; };
 		E967E06E2C6B20290050124F /* MezonSharing.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E967E0642C6B20290050124F /* MezonSharing.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		E98DC52D2DBF8B2D00A76EC5 /* BluetoothModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98DC52C2DBF8B2D00A76EC5 /* BluetoothModule.swift */; };
-		E98DC52F2DBF8B5C00A76EC5 /* BluetoothModule.m in Sources */ = {isa = PBXBuildFile; fileRef = E98DC52E2DBF8B5C00A76EC5 /* BluetoothModule.m */; };
 		E99B89652D0ECA2100D60E91 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E99B89642D0ECA2100D60E91 /* GoogleService-Info.plist */; };
 		E9A25DD52DBA416B0056281D /* KeepAwakeIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A25DD42DBA416B0056281D /* KeepAwakeIOS.swift */; };
 		E9A25DD72DBA41D00056281D /* KeepAwakeIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = E9A25DD62DBA41D00056281D /* KeepAwakeIOS.m */; };
@@ -102,6 +102,8 @@
 		E94005A02C17F0A300D5CF58 /* Mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Mobile.entitlements; path = Mobile/Mobile.entitlements; sourceTree = "<group>"; };
 		E943F9EC2DB9D70000B81261 /* DeviceUtilsIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceUtilsIOS.swift; sourceTree = "<group>"; };
 		E943F9F02DBA144700B81261 /* DeviceUtilsIOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceUtilsIOS.m; sourceTree = "<group>"; };
+		E9443C722DDF8CA7002A97D3 /* VoIPManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoIPManager.swift; sourceTree = "<group>"; };
+		E9443C742DDF8CCB002A97D3 /* VoIPManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VoIPManager.m; sourceTree = "<group>"; };
 		E94CBA5D2DA65548005C0A98 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		E94D0A422DA66F2700D84EF2 /* ScreenBroadcast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenBroadcast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E967E05E2C6B20060050124F /* MezonSharing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MezonSharing; sourceTree = "<group>"; };
@@ -110,8 +112,6 @@
 		E967E0692C6B20290050124F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		E967E06B2C6B20290050124F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E967E0722C6B203C0050124F /* MezonSharing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MezonSharing.entitlements; sourceTree = "<group>"; };
-		E98DC52C2DBF8B2D00A76EC5 /* BluetoothModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothModule.swift; sourceTree = "<group>"; };
-		E98DC52E2DBF8B5C00A76EC5 /* BluetoothModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BluetoothModule.m; sourceTree = "<group>"; };
 		E99B89642D0ECA2100D60E91 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../NCC/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E9A25DD42DBA416B0056281D /* KeepAwakeIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepAwakeIOS.swift; sourceTree = "<group>"; };
 		E9A25DD62DBA41D00056281D /* KeepAwakeIOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeepAwakeIOS.m; sourceTree = "<group>"; };
@@ -204,8 +204,8 @@
 				E943F9F02DBA144700B81261 /* DeviceUtilsIOS.m */,
 				E9A25DD42DBA416B0056281D /* KeepAwakeIOS.swift */,
 				E9A25DD62DBA41D00056281D /* KeepAwakeIOS.m */,
-				E98DC52C2DBF8B2D00A76EC5 /* BluetoothModule.swift */,
-				E98DC52E2DBF8B5C00A76EC5 /* BluetoothModule.m */,
+				E9443C722DDF8CA7002A97D3 /* VoIPManager.swift */,
+				E9443C742DDF8CCB002A97D3 /* VoIPManager.m */,
 			);
 			name = Mobile;
 			sourceTree = "<group>";
@@ -607,14 +607,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				E925D79F2DB8D6A700C10D69 /* AppDelegate.swift in Sources */,
+				E9443C732DDF8CA7002A97D3 /* VoIPManager.swift in Sources */,
 				E943F9F12DBA144700B81261 /* DeviceUtilsIOS.m in Sources */,
+				E9443C752DDF8CCB002A97D3 /* VoIPManager.m in Sources */,
 				E9A25DD72DBA41D00056281D /* KeepAwakeIOS.m in Sources */,
 				E943F9ED2DB9D70200B81261 /* DeviceUtilsIOS.swift in Sources */,
 				E9A25DD52DBA416B0056281D /* KeepAwakeIOS.swift in Sources */,
 				E908EBB32D76A95200571976 /* CustomImageViewIOS.swift in Sources */,
 				E908EBB72D76A98C00571976 /* CustomImageViewIOSManager.swift in Sources */,
-				E98DC52D2DBF8B2D00A76EC5 /* BluetoothModule.swift in Sources */,
-				E98DC52F2DBF8B5C00A76EC5 /* BluetoothModule.m in Sources */,
 				E908EBB52D76A97400571976 /* CustomImageViewIOS.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -877,7 +877,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.38;
+				MARKETING_VERSION = 1.2.44;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1057,7 +1057,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.38;
+				MARKETING_VERSION = 1.2.44;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

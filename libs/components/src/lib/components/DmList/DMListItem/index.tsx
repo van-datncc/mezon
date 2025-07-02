@@ -79,13 +79,6 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		}
 	};
 
-	const directMessageValue: directMessageValueProps = {
-		type: directMessage.type,
-		userId: directMessage.user_id ?? [],
-		dmID: directMessage.id,
-		e2ee: directMessage.e2ee
-	};
-
 	const ref = useRef<HTMLDivElement>(null);
 	return (
 		<div
@@ -99,13 +92,12 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			<MemberProfile
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
 				name={directMessage?.channel_label ?? ''}
-				usernameAva={directMessage?.channel_label ?? ''}
+				usernameAva={directMessage?.channel_label ?? 'Deleted Account'}
 				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
 				isHideStatus={true}
 				isHideIconStatus={false}
 				key={directMessage.channel_id}
 				isUnReadDirect={isUnReadChannel}
-				directMessageValue={directMessageValue}
 				isHideAnimation={true}
 				positionType={MemberProfileType.DM_LIST}
 				countMember={(directMessage?.user_id?.length || 0) + 1}

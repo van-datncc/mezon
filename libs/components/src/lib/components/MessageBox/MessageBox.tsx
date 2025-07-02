@@ -49,7 +49,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const { setOverUploadingState } = useDragAndDrop();
 
 	const onConvertToFiles = useCallback(
-		async (content: string) => {
+		async (content: string, anonymousMessage?: boolean) => {
 			const fileContent = new Blob([content], { type: 'text/plain' });
 			const now = Date.now();
 			const filename = now + '.txt';
@@ -78,7 +78,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	);
 
 	const onPastedFiles = useCallback(
-		async (event: React.ClipboardEvent<HTMLDivElement>) => {
+		async (event: React.ClipboardEvent<HTMLDivElement>, anonymousMessage?: boolean) => {
 			const items = (event.clipboardData || (window as any).clipboardData).items;
 			const files: File[] = [];
 			if (items) {

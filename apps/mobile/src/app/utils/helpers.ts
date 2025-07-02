@@ -1,4 +1,4 @@
-import { load, save, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
+import { load, save, STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE } from '@mezon/mobile-components';
 import { EmojiDataOptionals } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { Platform } from 'react-native';
@@ -26,6 +26,8 @@ export const isImage = (url?: string) => {
 	return /\.(jpg|jpeg|png|webp|avif|gif|svg|heic|PNG)/.test(url);
 };
 
+export const checkFileTypeImage = (type: string) => type?.startsWith('image/');
+
 export const isVideo = (url?: string) => {
 	return /\.(mp4|webm|mov|mkv)/.test(url);
 };
@@ -42,7 +44,7 @@ export const normalizeString = (str: string) => {
 	return normalizedStr?.toLowerCase?.();
 };
 export const urlPattern = /((?:https?:\/\/|www\.)[^\s]+|(?<![.])\b[^\s]+\.(?:[a-zA-Z]{2,}|[a-zA-Z]{2}\.[a-zA-Z]{2}))/g;
-export const highlightEmojiRegex = /(:\b[^:\s]*\b:)/g;
+export const highlightEmojiRegex = /(:[^:]+:)/g;
 export const urlRegex = /(https?:\/\/[^\s]+)/g;
 export const markdownDefaultUrlRegex = /^\[.*?\]\(https?:\/\/[^\s]+\)$/;
 export const emojiRegex = /:[a-zA-Z0-9_]+:/g;
@@ -64,9 +66,23 @@ export const validTextInputRegex = /^(?![_\-\s])[a-zA-Z0-9\p{L}\p{N}_\-\s]{1,64}
 export const linkGoogleMeet = 'https://meet.google.com/';
 
 export const resetCachedMessageActionNeedToResolve = (channelId: string) => {
-	const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
-	if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
-	save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+	try {
+		const allCachedMessage = load(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE) || {};
+		if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = null;
+		save(STORAGE_MESSAGE_ACTION_NEED_TO_RESOLVE, allCachedMessage);
+	} catch (error) {
+		console.error('Failed to reset cached message action need to resolve:', error);
+	}
+};
+
+export const resetCachedChatbox = (channelId: string) => {
+	try {
+		const allCachedMessage = load(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES) || {};
+		if (allCachedMessage?.[channelId]) allCachedMessage[channelId] = '';
+		save(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES, allCachedMessage);
+	} catch (error) {
+		console.error('Failed to reset cached chatbox:', error);
+	}
 };
 
 export const getUserStatusByMetadata = (metadata: string | { status: string; user_status: string }) => {
@@ -114,4 +130,14 @@ export function combineMessageReactions(reactions: any[], message_id: string): a
 	const dataCombinedArray = Object.values(dataCombined);
 
 	return dataCombinedArray;
+}
+
+export function isEqualStringArrayUnordered(a: string[], b: string[]): boolean {
+	try {
+		if (a.length !== b.length) return false;
+		return JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
+	} catch (error) {
+		console.error('Error comparing string arrays:', error);
+		return false;
+	}
 }

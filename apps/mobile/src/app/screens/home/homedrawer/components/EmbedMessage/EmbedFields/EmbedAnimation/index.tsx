@@ -1,18 +1,17 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { size } from '@mezon/mobile-ui';
 import { IMessageAnimation } from '@mezon/utils';
-import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, View } from 'react-native';
-import SpriteAnimation from './AnimationSprite';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, View, useWindowDimensions } from 'react-native';
+import useTabletLandscape from '../../../../../../../hooks/useTabletLandscape';
+import { SpriteAnimation } from './AnimationSprite';
 import { style } from './styles';
 
 type EmbedAnimationProps = {
 	animationOptions: IMessageAnimation;
-	isVeltical?: boolean;
+	themeValue?: any;
 };
 
-const screenWith = Dimensions?.get('window').width;
-
-const extractFrames = (data, isVeltical = false) => {
+const extractFrames = (data, repeat) => {
 	if (!data?.frames) return [];
 
 	const framesArray = Object.entries(data.frames).map(([key, frameData]) => {
@@ -20,90 +19,114 @@ const extractFrames = (data, isVeltical = false) => {
 		return { name: key, x, y, w, h };
 	});
 
-	if (isVeltical) {
-		framesArray.sort((a, b) => {
-			if (a.y !== b.y) return a.y - b.y;
-			return a.x - b.x;
-		});
-	} else {
+	if (repeat) {
 		framesArray.sort((a, b) => {
 			if (a.x !== b.x) return a.x - b.x;
 			return a.y - b.y;
 		});
 	}
-
 	return framesArray;
 };
 
-export const EmbedAnimation = ({ animationOptions, isVeltical }: EmbedAnimationProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const [frames, setFrames] = useState(null);
-	const [frameWidth, setFrameWidth] = useState(0);
-	const [frameHeight, setFrameHeight] = useState(0);
-	const [spriteWidth, setSpriteWidth] = useState(0);
-	const [spriteHeight, setSpriteHeight] = useState(0);
-	const duration = 500;
+export const EmbedAnimation = memo(
+	({ animationOptions, themeValue }: EmbedAnimationProps) => {
+		const isTabletLandscape = useTabletLandscape();
+		const { width, height } = useWindowDimensions();
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await fetch(animationOptions.url_position);
-				const data = await response.json();
+		const isFetch = useRef(false);
 
-				const frameArray = extractFrames(data, isVeltical);
-				if (frameArray) {
-					setFrames(frameArray);
-					setFrameHeight(frameArray?.[0]?.h || 0);
-					setFrameWidth(frameArray?.[0]?.w || 0);
-					setSpriteWidth(data?.meta?.size?.w || 0);
-					setSpriteHeight(data?.meta?.size?.h || 0);
+		const [frames, setFrames] = useState(null);
+		const [spriteMeta, setSpriteMeta] = useState({
+			frameWidth: 0,
+			frameHeight: 0,
+			spriteWidth: 0,
+			spriteHeight: 0
+		});
+		const isPortrait = height > width;
+		const styles = style(isPortrait);
+		const globalAnimation = useRef(new Animated.Value(0)).current;
+
+		useEffect(() => {
+			const fetchData = async () => {
+				try {
+					isFetch.current = true;
+					const response = await fetch(animationOptions.url_position);
+					const data = await response.json();
+
+					const frameArray = extractFrames(data, animationOptions?.repeat);
+					if (frameArray) {
+						setFrames(frameArray);
+						setSpriteMeta({
+							frameWidth: frameArray?.[0]?.w || 0,
+							frameHeight: frameArray?.[0]?.h || 0,
+							spriteWidth: data?.meta?.size?.w || 0,
+							spriteHeight: data?.meta?.size?.h || 0
+						});
+					}
+					isFetch.current = false;
+				} catch (error) {
+					console.error('Error fetching JSON data:', error);
 				}
-			} catch (error) {
-				console.error('Error fetching JSON data:', error);
-			}
-		};
-		fetchData();
-	}, []);
+			};
+			fetchData();
+		}, []);
 
-	const animationScale = useMemo(() => {
-		if (isVeltical) return 1;
-		if (animationOptions?.pool?.length) {
-			if (animationOptions?.pool?.length * frameWidth >= screenWith - size.s_100) {
-				return (screenWith - size.s_100 * 1.3) / screenWith;
+		const animationScale = useMemo(() => {
+			if (animationOptions?.pool?.length > 0 && spriteMeta.frameWidth > 0) {
+				let horizontalPadding: number;
+				const totalFrameWidth = animationOptions?.pool?.length * spriteMeta.frameWidth;
+				const scaleFactor = isTabletLandscape ? 0.36 : 1;
+
+				if (isPortrait) {
+					horizontalPadding = size.s_100;
+				} else {
+					horizontalPadding = size.s_150;
+				}
+
+				const fitScale = (width - horizontalPadding) / totalFrameWidth;
+				return fitScale * scaleFactor;
 			}
+			return 1;
+		}, [spriteMeta?.frameWidth, width]);
+
+		if (!frames || isFetch?.current) {
+			return (
+				<View style={styles.loading}>
+					<ActivityIndicator size="large" color={themeValue.text} />
+				</View>
+			);
 		}
-		return 1;
-	}, [animationOptions?.pool?.length, frameWidth, isVeltical]);
 
-	if (!frames) {
 		return (
-			<View style={styles.loading}>
-				<ActivityIndicator size="large" color={themeValue.text} />
+			<View
+				style={[
+					styles.pool,
+					{ transform: [{ scale: animationScale }], marginVertical: (isPortrait ? -size.s_40 : -size.s_70) / animationScale + size.s_50 }
+				]}
+			>
+				{animationOptions?.pool?.length &&
+					animationOptions?.pool?.map((item, index) => (
+						<SpriteAnimation
+							key={`animation_${new Date().getTime()}_${index}`}
+							spriteUrl={animationOptions?.url_image}
+							frameWidth={spriteMeta?.frameWidth}
+							frameHeight={spriteMeta?.frameHeight}
+							frames={frames}
+							finalFrame={item?.at?.(item?.length - 1 || 0)}
+							repeat={animationOptions?.repeat ? animationOptions?.repeat + index : 0}
+							isActive={animationOptions?.isResult}
+							spriteHeight={spriteMeta?.spriteHeight}
+							spriteWidth={spriteMeta?.spriteWidth}
+							sharedAnimation={globalAnimation}
+						/>
+					))}
 			</View>
 		);
+	},
+	(prevProps, nextProps) => {
+		return (
+			prevProps.animationOptions?.url_image === nextProps.animationOptions?.url_image &&
+			prevProps.animationOptions?.url_position === nextProps.animationOptions?.url_position
+		);
 	}
-
-	return (
-		<View style={[styles.pool, { transform: [{ scale: animationScale }] }]}>
-			{animationOptions?.pool?.length &&
-				animationOptions?.pool?.map((item, index) => {
-					return (
-						<SpriteAnimation
-							key={`animation_${index}`}
-							spriteUrl={animationOptions?.url_image}
-							frameWidth={frameWidth}
-							frameHeight={frameHeight}
-							frames={frames}
-							duration={duration}
-							finalFrame={item?.at?.(item?.length - 1 || 0)}
-							repeat={animationOptions?.repeat + index}
-							isActive={animationOptions?.isResult}
-							spriteHeight={spriteHeight}
-							spriteWidth={spriteWidth}
-						/>
-					);
-				})}
-		</View>
-	);
-};
+);

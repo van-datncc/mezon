@@ -1,25 +1,16 @@
-import { ChatContext } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	STORAGE_CLAN_ID,
-	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
-	STORAGE_IS_LAST_ACTIVE_TAB_DM,
-	load,
-	save
-} from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, channelsActions, clansActions, directActions, messagesActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
-import { useFocusEffect } from '@react-navigation/native';
+import { directActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { ChatMessageWrapper } from '../ChatMessageWrapper';
+import { DirectMessageDetailListener } from './DirectMessageDetailListener';
 import HeaderDirectMessage from './HeaderDirectMessage';
 import { style } from './styles';
 
-export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: any; route: any }) => {
+export const DirectMessageDetailScreen = ({ route }: { route: any }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const directMessageId = route.params?.directMessageId as string;
@@ -27,158 +18,30 @@ export const DirectMessageDetailScreen = ({ navigation, route }: { navigation: a
 
 	const from = route.params?.from;
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
-	const isFetchMemberChannelDmRef = useRef(false);
-	const { handleReconnect } = useContext(ChatContext);
-	const appStateRef = useRef(AppState.currentState);
 
 	useEffect(() => {
 		// When the screen is focused, socket disconnect or some case, we want to fetch the DM group if it is not already available
-		if (!currentDmGroup) {
+		if (!currentDmGroup?.channel_id) {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		}
-	}, [currentDmGroup, dispatch]);
+	}, [currentDmGroup?.channel_id, dispatch]);
 
 	const dmType = useMemo(() => {
 		return currentDmGroup?.type;
 	}, [currentDmGroup?.type]);
 
-	const fetchMemberChannel = async () => {
-		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
-		const currentClanIdCached = await load(STORAGE_CLAN_ID);
-		if (!currentClanIdCached) {
-			return;
-		}
-		dispatch(clansActions.setCurrentClanId(currentClanIdCached));
-		// Rejoin previous clan (other than 0) when exiting the DM detail screen
-		dispatch(clansActions.joinClan({ clanId: currentClanIdCached }));
-	};
-
-	const directMessageLoader = async () => {
-		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'true');
-		await Promise.all([
-			// dispatch(clansActions.setCurrentClanId('0')),
-			dispatch(
-				directActions.joinDirectMessage({
-					directMessageId: directMessageId,
-					type: dmType,
-					noCache: true,
-					isFetchingLatestMessages: true,
-					isClearMessage: true
-				})
-			)
-		]);
-	};
-
-	useFocusEffect(() => {
-		if (Platform.OS === 'android') {
-			StatusBar.setBackgroundColor(themeValue.primary);
-		}
-	});
-
-	useEffect(() => {
-		const blurListener = navigation.addListener('blur', () => {
-			if (Platform.OS === 'android') {
-				StatusBar.setBackgroundColor(themeValue.secondary);
-			}
-		});
-		return () => {
-			blurListener();
-		};
-	}, [navigation, themeValue.secondary]);
-
-	useEffect(() => {
-		const onMentionHashtagDM = DeviceEventEmitter.addListener(ActionEmitEvent.FETCH_MEMBER_CHANNEL_DM, ({ isFetchMemberChannelDM }) => {
-			isFetchMemberChannelDmRef.current = isFetchMemberChannelDM;
-		});
-		return () => {
-			onMentionHashtagDM.remove();
-		};
-	}, []);
-
-	useEffect(() => {
-		return () => {
-			save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'false');
-			dispatch(directActions.setDmGroupCurrentId(''));
-			if (!isFetchMemberChannelDmRef.current) {
-				requestAnimationFrame(async () => {
-					await fetchMemberChannel();
-				});
-			}
-		};
-	}, [isFetchMemberChannelDmRef]);
-
-	useEffect(() => {
-		let timeout: NodeJS.Timeout;
-		if (directMessageId) {
-			timeout = setTimeout(() => {
-				requestAnimationFrame(async () => {
-					await directMessageLoader();
-				});
-			}, 100);
-		}
-
-		return () => {
-			timeout && clearTimeout(timeout);
-		};
-	}, [directMessageId]);
-
-	const handleAppStateChange = useCallback(
-		async (state: string) => {
-			if (state === 'active') {
-				try {
-					handleReconnect('DM detail reconnect attempt');
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-					dispatch(
-						channelsActions.joinChat({
-							clanId: '0',
-							channelId: directMessageId,
-							channelType: dmType ?? 0,
-							isPublic: false
-						})
-					);
-					dispatch(
-						messagesActions.fetchMessages({
-							channelId: directMessageId,
-							noCache: true,
-							isFetchingLatestMessages: true,
-							isClearMessage: true,
-							clanId: '0'
-						})
-					);
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-				} catch (error) {
-					dispatch(appActions.setIsFromFCMMobile(false));
-					save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-				}
-			}
-		},
-		[directMessageId, dispatch, dmType, handleReconnect]
-	);
-
-	useEffect(() => {
-		const appStateSubscription = AppState.addEventListener('change', handleAppStateChangeListener);
-		return () => {
-			appStateSubscription.remove();
-		};
-	}, []);
-
-	const handleAppStateChangeListener = useCallback(
-		(nextAppState: typeof AppState.currentState) => {
-			if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-				handleAppStateChange(nextAppState);
-			}
-
-			appStateRef.current = nextAppState;
-		},
-		[handleAppStateChange]
-	);
-
 	return (
 		<View style={{ flex: 1 }}>
 			<StatusBarHeight />
+			<DirectMessageDetailListener dmType={dmType} directMessageId={directMessageId} />
 			<HeaderDirectMessage from={from} styles={styles} themeValue={themeValue} directMessageId={directMessageId} />
 			{directMessageId && (
-				<ChatMessageWrapper directMessageId={directMessageId} isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM} currentClanId={'0'} />
+				<ChatMessageWrapper
+					directMessageId={directMessageId}
+					isModeDM={Number(dmType) === ChannelType.CHANNEL_TYPE_DM}
+					currentClanId={'0'}
+					targetUserId={currentDmGroup?.user_id?.[0]}
+				/>
 			)}
 		</View>
 	);

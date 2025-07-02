@@ -1,25 +1,22 @@
-import { selectCurrentChannelId, selectCurrentClan, selectCurrentClanId } from '@mezon/store';
+import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { fileTypeImage } from '@mezon/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
 
 type ClanBannerBackgroundProps = {
-	hasChanges: boolean;
 	onUpload: (urlImage: string) => void;
-	onHasChanges: (hasChanges: boolean) => void;
+	urlImage?: string;
 };
 
-const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBannerBackgroundProps) => {
+const ClanBannerBackground = ({ onUpload, urlImage }: ClanBannerBackgroundProps) => {
 	const { sessionRef, clientRef } = useMezon();
-	const currentClan = useSelector(selectCurrentClan);
 
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 
-	const [urlImage, setUrlImage] = useState<string | undefined>(currentClan?.banner ?? undefined);
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +38,6 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 		}
 
 		handleUploadFile(client, session, currentClanId, currentChannelId, file?.name, file).then((attachment: any) => {
-			setUrlImage(attachment.url ?? '');
 			onUpload(attachment.url ?? '');
 		});
 	};
@@ -55,7 +51,6 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 	const handleCloseFile = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
 		if (urlImage && fileInputRef.current) {
-			setUrlImage(undefined);
 			onUpload('');
 			fileInputRef.current.value = '';
 		}
@@ -64,21 +59,6 @@ const ClanBannerBackground = ({ hasChanges, onUpload, onHasChanges }: ClanBanner
 			fileInputRef.current.click();
 		}
 	};
-
-	useEffect(() => {
-		if (urlImage !== currentClan?.banner) {
-			onHasChanges(true);
-		} else {
-			onHasChanges(false);
-		}
-	}, [urlImage, currentClan?.banner]);
-
-	useEffect(() => {
-		if (!hasChanges && fileInputRef.current) {
-			setUrlImage(currentClan?.banner ?? undefined);
-			fileInputRef.current.value = '';
-		}
-	}, [hasChanges]);
 
 	return (
 		<div className="flex sbm:flex-row flex-col pt-10 mt-10 border-t gap-x-5 gap-y-[10px]  dark:border-borderDivider border-borderDividerLight">

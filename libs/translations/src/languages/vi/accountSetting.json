@@ -7,5 +7,35 @@
     "disableAccount": "Vô hiệu hóa tài khoản",
     "deleteAccount": "Xóa tài khoản",
     "accountInformation": "Thông tin tài khoản",
-    "doNotHaveBlockedUser": "Bạn không có người dùng nào bị chặn"
+    "doNotHaveBlockedUser": "Không có người dùng nào bị chặn",
+    "setPassword": "Đặt mật khẩu",
+    "disableAccountAlert": {
+        "title": "Vô hiệu hoá tài khoản",
+        "description": "Bạn có chắn chắn muốn vô hiệu hoá tài khoản?",
+        "noConfirm": "Không",
+        "yesConfirm": "Có"
+    },
+    "deleteAccountAlert": {
+        "title": "Xoá tài khoản",
+        "description": "Bạn có chắn chắn muốn xoá tài khoản?",
+        "noConfirm": "Không",
+        "yesConfirm": "Có"
+    },
+    "setPasswordAccount": {
+        "title": "Đặt Mật Khẩu",
+        "email": "Email",
+        "password": "Mật Khẩu",
+        "confirmPassword": "Xác Nhận Mật Khẩu",
+        "confirm": "Xác Nhận",
+        "description": "Mật khẩu của bạn phải có ít nhất 8 ký tự và bao gồm ít nhất một chữ cái viết hoa, một chữ cái viết thường, một chữ số và một ký tự đặc biệt (ví dụ: !@#$%^&*).",
+        "error": {
+            "characters": "Mật khẩu phải có ít nhất 8 ký tự",
+            "uppercase": "Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa",
+            "lowercase": "Mật khẩu phải chứa ít nhất 1 chữ cái viết thường",
+            "number": "Mật khẩu phải chứa ít nhất 1 chữ số",
+            "symbol": "Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt",
+            "notEqual": "Mật khẩu xác nhận không khớp"
+        },
+        "notification": "Đặt mật khẩu thành công"
+    }
 }

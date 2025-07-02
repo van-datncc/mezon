@@ -16,6 +16,7 @@ import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingOnBoarding from './SettingOnBoarding';
 import SettingSidebar from './SettingSidebar';
+import SettingSoundEffect from './SettingSoundEffect';
 import SettingSticker from './SettingSticker';
 
 export type ModalSettingProps = {
@@ -30,11 +31,16 @@ const ClanSetting = (props: ModalSettingProps) => {
 		return listItemSetting.find((item) => item.id === currentSettingId);
 	}, [currentSettingId]);
 
+	const dispatch = useAppDispatch();
+	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
+
 	const handleSettingItemClick = (settingItem: ItemObjProps) => {
 		setCurrentSettingId(settingItem.id);
+		if (settingItem.id === ItemSetting.INTEGRATIONS && canManageClan) {
+			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
+			dispatch(fetchClanWebhooks({ clanId: currentClanId }));
+		}
 	};
-
-	const [canManageClan] = usePermissionChecker([EPermission.manageClan]);
 
 	const [menu, setMenu] = useState(true);
 	const closeMenu = useSelector(selectCloseMenu);
@@ -54,8 +60,10 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingEmoji parentRef={modalRef} />;
 			case ItemSetting.NOTIFICATION_SOUND:
 				return <NotificationSoundSetting />;
-			case ItemSetting.STICKERS:
+			case ItemSetting.IMAGE_STICKERS:
 				return <SettingSticker parentRef={modalRef} />;
+			case ItemSetting.VOIDE_STICKERS:
+				return <SettingSoundEffect />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
 			case ItemSetting.AUDIT_LOG:
@@ -64,13 +72,6 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <SettingOnBoarding onClose={onClose} />;
 		}
 	};
-	const dispatch = useAppDispatch();
-	useEffect(() => {
-		if (canManageClan) {
-			dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
-			dispatch(fetchClanWebhooks({ clanId: currentClanId }));
-		}
-	}, [canManageClan, currentClanId, dispatch]);
 
 	useEffect(() => {
 		if (currentSettingId === ItemSetting.DELETE_SERVER) {

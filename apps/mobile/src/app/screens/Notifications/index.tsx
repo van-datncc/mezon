@@ -17,9 +17,10 @@ import {
 	selectNotificationMentions,
 	selectTopicsSort,
 	topicsActions,
-	useAppDispatch
+	useAppDispatch,
+	usersClanActions
 } from '@mezon/store-mobile';
-import { INotification, NotificationCategory, NotificationEntity, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
@@ -169,7 +170,6 @@ const Notifications = () => {
 	};
 
 	const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
-		store.dispatch(appActions.setLoadingMainMobile(true));
 		return new Promise<void>((resolve) => {
 			requestAnimationFrame(async () => {
 				const promises = [];
@@ -185,7 +185,6 @@ const Notifications = () => {
 					if (notify?.content?.clan_id !== currentClanId) {
 						promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: notify?.content?.clan_id })));
 					}
-
 					promises.push(
 						store.dispatch(
 							channelsActions.joinChannel({
@@ -201,7 +200,12 @@ const Notifications = () => {
 				await Promise.all(promises);
 
 				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
-					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: notify?.content?.channel_id });
+					if (isTabletLandscape) {
+						await dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id));
+						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+					} else {
+						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: notify?.content?.channel_id });
+					}
 				} else if (Number(notify?.content?.topic_id) !== 0) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
@@ -210,7 +214,12 @@ const Notifications = () => {
 					const dataSave = getUpdateOrAddClanChannelCache(notify?.content?.clan_id, notify?.content?.channel_id);
 					save(STORAGE_CLAN_ID, notify?.content?.clan_id);
 					save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-					navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+					if (isTabletLandscape) {
+						await sleep(1000);
+						navigation.goBack();
+					} else {
+						navigation.navigate(APP_SCREEN.HOME_DEFAULT);
+					}
 				}
 				timeoutRef.current = setTimeout(() => {
 					store.dispatch(

@@ -1,6 +1,7 @@
 import { attachmentActions, channelMembersActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import Canvas from '../../Canvas';
@@ -12,37 +13,34 @@ import AssetsHeader from '../AssetsHeader';
 import { threadDetailContext } from '../MenuThreadDetail';
 import styles from './style';
 
-const TabList = [
-	{
-		title: 'Members'
-	},
-	{
-		title: 'Media'
-	},
-	{
-		title: 'Files'
-	},
-	{
-		title: 'Pins'
-	},
-	{
-		title: 'Canvas'
-	}
-];
-
 export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) => {
 	const ref = useRef<ScrollView>();
+	const { t } = useTranslation(['common']);
 	const currentChannel = useContext(threadDetailContext);
 	const [tabActive, setTabActive] = useState<number>(0);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 
+	const TabList = [
+		{
+			title: t('members')
+		},
+		{
+			title: t('media')
+		},
+		{
+			title: t('files')
+		},
+		{
+			title: t('pins')
+		},
+		{
+			title: 'Canvas'
+		}
+	];
+
 	const headerTablist = useMemo(() => {
-		if (
-			currentChannel?.parent_id === '0' &&
-			currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM &&
-			currentChannel?.type !== ChannelType.CHANNEL_TYPE_GROUP
-		) {
+		if (currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM && currentChannel?.type !== ChannelType.CHANNEL_TYPE_GROUP) {
 			return TabList;
 		}
 		const resultArray = TabList.slice(0, -1);
@@ -63,7 +61,7 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 	);
 
 	return (
-		<>
+		<View style={styles.wrapper}>
 			<AssetsHeader tabActive={tabActive} onChange={handelHeaderTabChange} tabList={headerTablist} />
 			<View style={styles.container}>
 				<ScrollView horizontal pagingEnabled ref={ref} scrollEventThrottle={100}>
@@ -71,7 +69,7 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 						<MemberListStatus />
 					) : tabActive === 1 ? (
 						<MediaChannel channelId={channelId} />
-					) : tabActive === 4 && currentChannel.parent_id === '0' ? (
+					) : tabActive === 4 ? (
 						<Canvas
 							channelId={
 								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
@@ -99,6 +97,6 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 					)}
 				</ScrollView>
 			</View>
-		</>
+		</View>
 	);
 });

@@ -180,7 +180,7 @@ export function AddIcon({ fill, ...props }: ClassIconProps) {
 export function Check(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Check" viewBox="0 0 16 15.2" {...props}>
-			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" fill="#155EEF" />
+			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" stroke="currentColor" />
 		</svg>
 	);
 }
@@ -222,6 +222,22 @@ export function SettingProfile(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function ChannelBrowser(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg role="img" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" {...props}>
+			<path
+				fillRule="evenodd"
+				d="M18.5 23c.88 0 1.7-.25 2.4-.69l1.4 1.4a1 1 0 0 0 1.4-1.42l-1.39-1.4A4.5 4.5 0 1 0 18.5 23Zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"
+				clipRule="evenodd"
+				fill="currentColor"
+			></path>
+			<path
+				d="M3 3a1 1 0 0 0 0 2h18a1 1 0 1 0 0-2H3ZM2 8a1 1 0 0 1 1-1h18a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1ZM3 11a1 1 0 1 0 0 2h11a1 1 0 1 0 0-2H3ZM2 16a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1ZM3 19a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H3Z"
+				fill="currentColor"
+			></path>
+		</svg>
+	);
+}
 export function HeadPhoneICon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -1569,21 +1585,14 @@ export function ThreadNotClick(props: React.HTMLAttributes<SVGElement>) {
 
 export function AddCircle(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-			<g id="Live area" clipPath="url(#clip0_2253_615)">
-				<path
-					id="Vector"
-					fillRule="evenodd"
-					clipRule="evenodd"
-					d="M20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10ZM10 4.75C10.6904 4.75 11.25 5.30964 11.25 6V8.75H14C14.6904 8.75 15.25 9.30964 15.25 10C15.25 10.6904 14.6904 11.25 14 11.25H11.25V14C11.25 14.6903 10.6904 15.25 10 15.25C9.30966 15.25 8.75001 14.6903 8.75001 14V11.25H6.00005C5.30969 11.25 4.75005 10.6904 4.75005 10C4.75005 9.30964 5.30969 8.75 6.00005 8.75H8.75001V6C8.75001 5.30964 9.30966 4.75 10 4.75Z"
-					fill="currentColor"
-				/>
-			</g>
-			<defs>
-				<clipPath id="clip0_2253_615">
-					<rect width="20" height="20" fill="white" />
-				</clipPath>
-			</defs>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" {...props}>
+			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
+			<path
+				fill="currentColor"
+				fillRule="evenodd"
+				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm0-17a1 1 0 0 1 1 1v4h4a1 1 0 1 1 0 2h-4v4a1 1 0 1 1-2 0v-4H7a1 1 0 1 1 0-2h4V7a1 1 0 0 1 1-1Z"
+				clipRule="evenodd"
+			></path>
 		</svg>
 	);
 }
@@ -2464,6 +2473,17 @@ export const LockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 		</svg>
 	);
 };
+export const UnLockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" className={`${defaultSize}`}>
+			<path
+				fill={defaultFill}
+				fillRule="evenodd"
+				d="M7 7a5 5 0 0 1 9.843-1.25 1 1 0 0 1-1.937.5A3 3 0 0 0 9 7v3h8.4c.88 0 1.6.72 1.6 1.6v7c0 1.32-1.08 2.4-2.4 2.4H7.4C6.08 21 5 19.92 5 18.6v-7c0-.88.72-1.6 1.6-1.6H7V7Zm5 5.25a1.75 1.75 0 0 0-.75 3.332V18a.75.75 0 0 0 1.5 0v-2.418A1.75 1.75 0 0 0 12 12.25Z"
+			></path>
+		</svg>
+	);
+};
 
 export const PlusIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
@@ -2524,11 +2544,19 @@ export const EscIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 	);
 };
 
-export const CopyIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const CopyIcon: React.FC<IconProps> = ({ className = 'w-4 h-4' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
-			<path d="M5.5 3.5A1.5 1.5 0 0 1 7 2h2.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 1 .439 1.061V9.5A1.5 1.5 0 0 1 12 11V8.621a3 3 0 0 0-.879-2.121L9 4.379A3 3 0 0 0 6.879 3.5H5.5Z" />
-			<path d="M4 5a1.5 1.5 0 0 0-1.5 1.5v6A1.5 1.5 0 0 0 4 14h5a1.5 1.5 0 0 0 1.5-1.5V8.621a1.5 1.5 0 0 0-.44-1.06L7.94 5.439A1.5 1.5 0 0 0 6.878 5H4Z" />
+		<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+			<path
+				d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+			/>
+			<path
+				d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
+				stroke="currentColor"
+				strokeWidth="1.5"
+			/>
 		</svg>
 	);
 };
@@ -2595,7 +2623,7 @@ export function TrashIcon(props: React.HTMLAttributes<SVGElement>) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
-			className="dark:text-[#AEAEAE] text-textLightTheme"
+			className="dark:text-[#AEAEAE] text-colorTextLightMode"
 			{...props}
 		>
 			<path
@@ -2903,6 +2931,20 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+export function UploadSoundIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+			<g id="SVGRepo_iconCarrier">
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M9.29289 1.29289C9.48043 1.10536 9.73478 1 10 1H18C19.6569 1 21 2.34315 21 4V8C21 8.55228 20.5523 9 20 9C19.4477 9 19 8.55228 19 8V4C19 3.44772 18.5523 3 18 3H11V8C11 8.55228 10.5523 9 10 9H5V20C5 20.5523 5.44772 21 6 21H8C8.55228 21 9 21.4477 9 22C9 22.5523 8.55228 23 8 23H6C4.34315 23 3 21.6569 3 20V8C3 7.73478 3.10536 7.48043 3.29289 7.29289L9.29289 1.29289ZM6.41421 7H9V4.41421L6.41421 7ZM19.3053 13.2807C19.7026 12.897 20.3357 12.9081 20.7193 13.3053C22.4269 15.0736 22.4269 17.9264 20.7193 19.6947C20.3357 20.0919 19.7026 20.103 19.3053 19.7193C18.9081 19.3357 18.897 18.7026 19.2807 18.3053C20.2398 17.3121 20.2398 15.6879 19.2807 14.6947C18.897 14.2974 18.9081 13.6643 19.3053 13.2807ZM18 12C18 10.7639 16.5889 10.0584 15.6 10.8L12.6667 13H12C10.3431 13 9 14.3431 9 16V17C9 18.6569 10.3431 20 12 20H12.6667L15.6 22.2C16.5889 22.9416 18 22.2361 18 21V12ZM13.8667 14.6L16 13V20L13.8667 18.4C13.5205 18.1404 13.0994 18 12.6667 18H12C11.4477 18 11 17.5523 11 17V16C11 15.4477 11.4477 15 12 15H12.6667C13.0994 15 13.5205 14.8596 13.8667 14.6Z"
+					fill="currentColor"
+				></path>
+			</g>
+		</svg>
+	);
+}
 
 export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 	return (
@@ -3142,7 +3184,7 @@ export function IconUserProfileDM({ isWhite }: { isWhite?: boolean }) {
 
 export function IconReplyMessDeleted() {
 	return (
-		<svg width="8" height="8" viewBox="0 0 8 8" className="dark:text-zinc-400 text-colorTextLightMode -ml-[10px] mt-[3px]">
+		<svg width="8" height="8" viewBox="0 0 8 8" className="dark:text-zinc-400 text-colorTextLightMode ml-[2px] mt-1">
 			<path
 				d="M0.809739 3.59646L5.12565 0.468433C5.17446 0.431163 5.23323 0.408043 5.2951 0.401763C5.35698 0.395482 5.41943 0.406298 5.4752 0.432954C5.53096 0.45961 5.57776 0.50101 5.61013 0.552343C5.64251 0.603676 5.65914 0.662833 5.6581 0.722939V2.3707C10.3624 2.3707 11.2539 5.52482 11.3991 7.21174C11.4028 7.27916 11.3848 7.34603 11.3474 7.40312C11.3101 7.46021 11.2554 7.50471 11.1908 7.53049C11.1262 7.55626 11.0549 7.56204 10.9868 7.54703C10.9187 7.53201 10.857 7.49695 10.8104 7.44666C8.72224 5.08977 5.6581 5.63359 5.6581 5.63359V7.28135C5.65831 7.34051 5.64141 7.39856 5.60931 7.44894C5.5772 7.49932 5.53117 7.54004 5.4764 7.5665C5.42163 7.59296 5.3603 7.60411 5.29932 7.59869C5.23834 7.59328 5.18014 7.57151 5.13128 7.53585L0.809739 4.40892C0.744492 4.3616 0.691538 4.30026 0.655067 4.22975C0.618596 4.15925 0.599609 4.08151 0.599609 4.00269C0.599609 3.92386 0.618596 3.84612 0.655067 3.77562C0.691538 3.70511 0.744492 3.64377 0.809739 3.59646Z"
 				fill="currentColor"
@@ -5229,14 +5271,14 @@ export const ReloadIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
 						<path
 							d="M4,13 C4,17.4183 7.58172,21 12,21 C16.4183,21 20,17.4183 20,13 C20,8.58172 16.4183,5 12,5 C10.4407,5 8.98566,5.44609 7.75543,6.21762"
 							id="Path"
-							stroke="#ffffff"
+							stroke="currentColor"
 							strokeWidth="2"
 							strokeLinecap="round"
 						></path>
 						<path
 							d="M9.2384,1.89795 L7.49856,5.83917 C7.27552,6.34441 7.50429,6.9348 8.00954,7.15784 L11.9508,8.89768"
 							id="Path"
-							stroke="#ffffff"
+							stroke="currentColor"
 							strokeWidth="2"
 							strokeLinecap="round"
 						></path>
@@ -6164,21 +6206,21 @@ export function SendMoney(props: React.HTMLAttributes<SVGElement>) {
 				{' '}
 				<path
 					d="M9.5 13.75C9.5 14.72 10.25 15.5 11.17 15.5H13.05C13.85 15.5 14.5 14.82 14.5 13.97C14.5 13.06 14.1 12.73 13.51 12.52L10.5 11.47C9.91 11.26 9.51001 10.94 9.51001 10.02C9.51001 9.17999 10.16 8.48999 10.96 8.48999H12.84C13.76 8.48999 14.51 9.26999 14.51 10.24"
-					stroke="#23b850"
+					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>{' '}
-				<path d="M12 7.5V16.5" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path d="M12 7.5V16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
 				<path
 					d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2"
-					stroke="#23b850"
+					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>{' '}
-				<path d="M22 6V2H18" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
-				<path d="M17 7L22 2" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path d="M22 6V2H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
+				<path d="M17 7L22 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />{' '}
 			</g>
 		</svg>
 	);
@@ -6264,11 +6306,22 @@ export function CirclePlusFill(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function LoadingSpinner(props: React.HTMLAttributes<SVGElement>) {
+export function LoadingSpinner({ className }: { className?: string }) {
 	return (
-		<svg width="28px" height="28px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" {...props}>
-			<circle className="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" strokeWidth="5" fill="none" />
-			<path className="opacity-75" fill="currentColor" d="M25 5a20 20 0 0114.14 34.14l-2.83-2.83A15 15 0 0025 10V5z" />
+		<svg
+			className={`inline w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 ${className}`}
+			viewBox="0 0 100 101"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+				fill="currentFill"
+			/>
 		</svg>
 	);
 }
@@ -6284,7 +6337,7 @@ export function StopCall(props: React.HTMLAttributes<SVGElement>) {
 				{' '}
 				<path
 					d="m 14.234375 11.714844 c -0.382813 0.382812 -1 0.382812 -1.386719 0 l -1.039062 -1.039063 l -1.039063 -1.042969 c -0.386719 -0.382812 -0.386719 -1 0 -1.386718 l 0.492188 -0.492188 c -2.035157 -1.109375 -4.5 -1.109375 -6.535157 0 l 0.492188 0.492188 c 0.386719 0.386718 0.386719 1.003906 0 1.386718 l -1.039062 1.042969 l -1.039063 1.039063 c -0.386719 0.382812 -1.003906 0.382812 -1.386719 0 l -1.042968 -1.039063 c -0.957032 -0.957031 -0.957032 -2.511719 0 -3.46875 l 0.347656 -0.347656 c 3.816406 -3.816406 10.054687 -3.816406 13.871094 0 l 0.347656 0.347656 c 0.957031 0.957031 0.957031 2.511719 0 3.46875 z m 0 0"
-					fill="#ffffff"
+					fill="#ff0000"
 				/>{' '}
 			</g>
 		</svg>
@@ -6658,17 +6711,36 @@ export function PauseIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function History(props: React.HTMLAttributes<SVGAElement>) {
+export function History(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M12 8V12L15 15" stroke="#23b850" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="" {...props}>
+			<path d="M12 8V12L15 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 			<path
 				d="M3.05 11C3.27159 8.3288 4.51826 5.84755 6.53384 4.08373C8.54943 2.31991 11.1753 1.39728 13.8506 1.5215C16.5259 1.64571 19.0463 2.81031 20.8675 4.77142C22.6886 6.73253 23.6754 9.33897 23.6754 12.03C23.6754 14.721 22.6886 17.3275 20.8675 19.2886C19.0463 21.2497 16.5259 22.4143 13.8506 22.5385C11.1753 22.6627 8.54943 21.7401 6.53384 19.9763C4.51826 18.2124 3.27159 15.7312 3.05 13.06"
-				stroke="#23b850"
+				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			/>
+		</svg>
+	);
+}
+export function HistoryTransaction(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={props.className} {...props}>
+			<g>
+				<path
+					fillRule="evenodd"
+					clipRule="evenodd"
+					d="M5.07868 5.06891C8.87402 1.27893 15.0437 1.31923 18.8622 5.13778C22.6824 8.95797 22.7211 15.1313 18.9262 18.9262C15.1312 22.7211 8.95793 22.6824 5.13774 18.8622C2.87389 16.5984 1.93904 13.5099 2.34047 10.5812C2.39672 10.1708 2.775 9.88377 3.18537 9.94002C3.59575 9.99627 3.88282 10.3745 3.82658 10.7849C3.4866 13.2652 4.27782 15.881 6.1984 17.8016C9.44288 21.0461 14.6664 21.0646 17.8655 17.8655C21.0646 14.6664 21.046 9.44292 17.8015 6.19844C14.5587 2.95561 9.33889 2.93539 6.13935 6.12957L6.88705 6.13333C7.30126 6.13541 7.63535 6.47288 7.63327 6.88709C7.63119 7.3013 7.29372 7.63539 6.87951 7.63331L4.33396 7.62052C3.92269 7.61845 3.58981 7.28556 3.58774 6.8743L3.57495 4.32874C3.57286 3.91454 3.90696 3.57707 4.32117 3.57498C4.73538 3.5729 5.07285 3.907 5.07493 4.32121L5.07868 5.06891Z"
+					fill="currentColor"
+				/>
+				<path
+					opacity="0.8"
+					d="M12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V11.6893L15.0303 13.9697C15.3232 14.2626 15.3232 14.7374 15.0303 15.0303C14.7374 15.3232 14.2626 15.3232 13.9697 15.0303L11.5429 12.6036C11.3554 12.416 11.25 12.1617 11.25 11.8964V8C11.25 7.58579 11.5858 7.25 12 7.25Z"
+					fill="currentColor"
+				/>
+			</g>
 		</svg>
 	);
 }
@@ -6828,7 +6900,7 @@ export function SoundIcon(props: React.HTMLAttributes<SVGElement>) {
 				{' '}
 				<path
 					d="M9 19C9 20.1046 7.65685 21 6 21C4.34315 21 3 20.1046 3 19C3 17.8954 4.34315 17 6 17C7.65685 17 9 17.8954 9 19ZM9 19V5L21 3V17M21 17C21 18.1046 19.6569 19 18 19C16.3431 19 15 18.1046 15 17C15 15.8954 16.3431 15 18 15C19.6569 15 21 15.8954 21 17ZM9 9L21 7"
-					stroke="#000000"
+					stroke="currentColor"
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -6907,6 +6979,29 @@ export function VoiceEmojiControlIcon(props: React.HTMLAttributes<SVGElement>) {
 				clipRule="evenodd"
 				className=""
 			></path>
+		</svg>
+	);
+}
+export function TrumPartyControl({ className = '', ...props }: { className?: string } & React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg
+			className={`controlIcon_f1ceac iconHover__26d03 ${className}`}
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			fill="none"
+			viewBox="0 0 24 24"
+			{...props}
+		>
+			<path
+				d="M5.5713 14.5L9.46583 18.4141M18.9996 3.60975C17.4044 3.59505 16.6658 4.33233 16.4236 5.07743C16.2103 5.73354 16.4052 7.07735 15.896 8.0727C15.4091 9.02443 14.1204 9.5617 12.6571 9.60697M20 7.6104L20.01 7.61049M19 15.96L19.01 15.9601M7.00001 3.94926L7.01001 3.94936M19 11.1094C17.5 11.1094 16.5 11.6094 15.5949 12.5447M10.2377 7.18796C11 6.10991 11.5 5.10991 11.0082 3.52734M3.53577 20.4645L7.0713 9.85791L14.1424 16.929L3.53577 20.4645Z"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
 		</svg>
 	);
 }
@@ -7172,5 +7267,24 @@ export function AudioLevelCircle({ audioLevel, children, isActive }: AudioLevelC
 
 			<div className="z-10">{children}</div>
 		</div>
+	);
+}
+
+export function MarketIcons(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="28px" height="28px" {...props} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+			<path
+				d="M22.3596 8.27L22.0696 5.5C21.6496 2.48 20.2796 1.25 17.3497 1.25H14.9896H13.5097H10.4697H8.98965H6.58965C3.64965 1.25 2.28965 2.48 1.85965 5.53L1.58965 8.28C1.48965 9.35 1.77965 10.39 2.40965 11.2C3.16965 12.19 4.33965 12.75 5.63965 12.75C6.89965 12.75 8.10965 12.12 8.86965 11.11C9.54965 12.12 10.7097 12.75 11.9997 12.75C13.2896 12.75 14.4197 12.15 15.1096 11.15C15.8797 12.14 17.0696 12.75 18.3096 12.75C19.6396 12.75 20.8396 12.16 21.5896 11.12C22.1896 10.32 22.4597 9.31 22.3596 8.27Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M11.3491 16.6602C10.0791 16.7902 9.11914 17.8702 9.11914 19.1502V21.8902C9.11914 22.1602 9.33914 22.3802 9.60914 22.3802H14.3791C14.6491 22.3802 14.8691 22.1602 14.8691 21.8902V19.5002C14.8791 17.4102 13.6491 16.4202 11.3491 16.6602Z"
+				fill="currentColor"
+			/>
+			<path
+				d="M21.3709 14.3981V17.3781C21.3709 20.1381 19.1309 22.3781 16.3709 22.3781C16.1009 22.3781 15.8809 22.1581 15.8809 21.8881V19.4981C15.8809 18.2181 15.4909 17.2181 14.7309 16.5381C14.0609 15.9281 13.1509 15.6281 12.0209 15.6281C11.7709 15.6281 11.5209 15.6381 11.2509 15.6681C9.47086 15.8481 8.12086 17.3481 8.12086 19.1481V21.8881C8.12086 22.1581 7.90086 22.3781 7.63086 22.3781C4.87086 22.3781 2.63086 20.1381 2.63086 17.3781V14.4181C2.63086 13.7181 3.32086 13.2481 3.97086 13.4781C4.24086 13.5681 4.51086 13.6381 4.79086 13.6781C4.91086 13.6981 5.04086 13.7181 5.16086 13.7181C5.32086 13.7381 5.48086 13.7481 5.64086 13.7481C6.80086 13.7481 7.94086 13.3181 8.84086 12.5781C9.70086 13.3181 10.8209 13.7481 12.0009 13.7481C13.1909 13.7481 14.2909 13.3381 15.1509 12.5981C16.0509 13.3281 17.1709 13.7481 18.3109 13.7481C18.4909 13.7481 18.6709 13.7381 18.8409 13.7181C18.9609 13.7081 19.0709 13.6981 19.1809 13.6781C19.4909 13.6381 19.7709 13.5481 20.0509 13.4581C20.7009 13.2381 21.3709 13.7181 21.3709 14.3981Z"
+				fill="currentColor"
+			/>
+		</svg>
 	);
 }

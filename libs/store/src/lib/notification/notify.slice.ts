@@ -1,13 +1,14 @@
 import { captureSentryError } from '@mezon/logger';
 import { Direction_Mode, INotification, LoadingStatus, NotificationCategory, NotificationEntity } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import memoizee from 'memoizee';
 import { safeJSONParse } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiNotification } from 'mezon-js/api.gen';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 import { MessagesEntity } from '../messages/messages.slice';
+import { RootState } from '../store';
+
 export const NOTIFICATION_FEATURE_KEY = 'notification';
-const LIST_NOTIFICATION_CACHED_TIME = 1000 * 60 * 60;
 const LIMIT_NOTIFICATION = 50;
 
 export const mapNotificationToEntity = (notifyRes: ApiNotification): INotification => {
@@ -26,7 +27,14 @@ export interface NotificationState extends EntityState<NotificationEntity, strin
 	error?: string | null;
 	messageNotifiedId: string;
 	isShowInbox: boolean;
-	notifications: Record<NotificationCategory, { data: NotificationEntity[]; lastId: string }>;
+	notifications: Record<
+		NotificationCategory,
+		{
+			data: NotificationEntity[];
+			lastId: string;
+			cache?: CacheMetadata;
+		}
+	>;
 }
 
 export type LastSeenTimeStampChannelArgs = {
@@ -37,55 +45,73 @@ export type LastSeenTimeStampChannelArgs = {
 
 export const notificationAdapter = createEntityAdapter<NotificationEntity>();
 
-const fetchListNotificationCached = memoizee(
-	async (mezon: MezonValueContext, clanId: string, category: NotificationCategory | undefined, notificationId: string) => {
-		const response = await mezon.client.listNotifications(
-			mezon.session,
-			clanId,
-			LIMIT_NOTIFICATION,
-			notificationId || '',
-			category, // category
-			Direction_Mode.BEFORE_TIMESTAMP
-		);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: LIST_NOTIFICATION_CACHED_TIME,
-		normalizer: (args) => {
-			if (args[3] === undefined) {
-				args[3] = '';
-			}
-			return args[1] + args[2] + args[3] + args[0].session.username;
-		}
+export const fetchListNotificationCached = async (
+	getState: () => RootState,
+	ensuredMezon: MezonValueContext,
+	clanId: string,
+	category: NotificationCategory | undefined,
+	notificationId: string,
+	noCache = false
+) => {
+	const state = getState();
+	const notificationData = state[NOTIFICATION_FEATURE_KEY].notifications[category as NotificationCategory];
+	const apiKey = createApiKey('fetchListNotification', clanId, category || '', notificationId || '');
+	const shouldForceCall = shouldForceApiCall(apiKey, notificationData?.cache, noCache);
+
+	if (!shouldForceCall) {
+		return {
+			notifications: notificationData.data,
+			fromCache: true
+		};
 	}
-);
+
+	const response = await ensuredMezon.client.listNotifications(
+		ensuredMezon.session,
+		clanId,
+		LIMIT_NOTIFICATION,
+		notificationId || '',
+		category,
+		Direction_Mode.BEFORE_TIMESTAMP
+	);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
 
 export const fetchListNotification = createAsyncThunk(
 	'notification/fetchListNotification',
 	async ({ clanId, category, notificationId, noCache }: FetchNotificationArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			if (noCache) {
-				fetchListNotificationCached.delete(mezon, clanId, category, notificationId as string);
-			}
-			const response = await fetchListNotificationCached(mezon, clanId, category, notificationId as string);
+
+			const response = await fetchListNotificationCached(
+				thunkAPI.getState as () => RootState,
+				mezon,
+				clanId,
+				category,
+				notificationId as string,
+				noCache
+			);
+
+			const fromCache = response.fromCache || false;
+
 			if (!response.notifications) {
 				return {
 					category,
-					data: [] as INotification[]
+					data: [] as INotification[],
+					fromCache
 				};
 			}
-			if (Date.now() - response.time < 100) {
-				const notifications = response.notifications.map(mapNotificationToEntity);
-				return {
-					data: notifications,
-					category: category
-				};
-			}
+
+			const notifications = response.notifications.map(mapNotificationToEntity);
 			return {
-				category,
-				data: [] as INotification[]
+				data: notifications,
+				category: category,
+				fromCache
 			};
 		} catch (error) {
 			captureSentryError(error, 'notification/fetchListNotification');
@@ -183,6 +209,19 @@ export const notificationSlice = createSlice({
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
+		},
+		invalidateCache: (state, action: PayloadAction<{ category: NotificationCategory }>) => {
+			const { category } = action.payload;
+			if (state.notifications[category]?.cache) {
+				state.notifications[category].cache = undefined;
+			}
+		},
+		updateCache: (state, action: PayloadAction<{ category: NotificationCategory }>) => {
+			const { category } = action.payload;
+			if (!state.notifications[category]) {
+				state.notifications[category] = { data: [], lastId: '', cache: undefined };
+			}
+			state.notifications[category].cache = createCacheMetadata();
 		}
 	},
 
@@ -193,16 +232,20 @@ export const notificationSlice = createSlice({
 			})
 			.addCase(
 				fetchListNotification.fulfilled,
-				(state: NotificationState, action: PayloadAction<{ data: INotification[]; category: NotificationCategory }>) => {
+				(state: NotificationState, action: PayloadAction<{ data: INotification[]; category: NotificationCategory; fromCache?: boolean }>) => {
 					if (action.payload && Array.isArray(action.payload.data) && action.payload.data.length > 0) {
 						notificationAdapter.setMany(state, action.payload.data);
 
-						const { data, category } = action.payload;
+						const { data, category, fromCache } = action.payload;
 
 						if (state.notifications[category]) {
 							state.notifications[category].data = [...state.notifications[category].data, ...data];
 						} else {
-							state.notifications[category] = { data: [...data], lastId: '' };
+							state.notifications[category] = { data: [...data], lastId: '', cache: undefined };
+						}
+
+						if (!fromCache) {
+							state.notifications[category].cache = createCacheMetadata();
 						}
 
 						state.loadingStatus = 'loaded';

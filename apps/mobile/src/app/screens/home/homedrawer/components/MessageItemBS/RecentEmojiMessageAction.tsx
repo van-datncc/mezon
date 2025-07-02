@@ -63,8 +63,8 @@ export const RecentEmojiMessageAction = React.memo((props: IRecentEmojiMessageAc
 					</Pressable>
 				);
 			})}
-			<Pressable onPress={handleShowPicker} style={styles.emojiButton}>
-				<MezonIconCDN icon={IconCDN.reactionIcon} color={themeValue.text} height={size.s_30} width={size.s_30} />
+			<Pressable onPress={handleShowPicker} style={styles.favouriteIconItem}>
+				<MezonIconCDN icon={IconCDN.reactionIcon} color={themeValue.text} height={size.s_22} width={size.s_22} />
 			</Pressable>
 		</View>
 	);

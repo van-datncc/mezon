@@ -1,29 +1,24 @@
-import { QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
+import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, createEmojiSetting, selectCurrentClanId, selectEmojiByClanId, useAppDispatch } from '@mezon/store-mobile';
+import { createEmojiSetting, selectCurrentClanId, selectEmojiByClanId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { LIMIT_SIZE_UPLOAD_IMG, MAX_FILE_NAME_EMOJI } from '@mezon/utils';
+import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { Buffer as BufferMobile } from 'buffer';
-import { ApiClanEmojiCreateRequest, ApiMessageAttachment } from 'mezon-js/api.gen';
-import { useEffect, useRef } from 'react';
+import { ApiClanEmojiCreateRequest } from 'mezon-js/api.gen';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import { openCropper } from 'react-native-image-crop-picker';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image as ImageCompressor } from 'react-native-compressor';
+import RNFS from 'react-native-fs';
+import { Image, openPicker } from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
+import { IFile } from '../../../componentUI/MezonImagePicker';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { EmojiList } from './EmojiList';
+import { EmojiPreview } from './EmojiPreview';
 import { style } from './styles';
-
-export interface IFile {
-	uri: string;
-	name: string;
-	type: string;
-	size: number;
-	fileData: any;
-}
 
 export const { width, height } = Dimensions.get('window');
 type ClanSettingsScreen = typeof APP_SCREEN.MENU_CLAN.EMOJI_SETTING;
@@ -34,10 +29,7 @@ export function ClanEmojiSetting({ navigation }: MenuClanScreenProps<ClanSetting
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const { sessionRef, clientRef } = useMezon();
 	const { t } = useTranslation(['clanEmojiSetting']);
-	const emojiList = useSelector(selectEmojiByClanId(currentClanId || ''));
-
-	const timerRef = useRef<any>(null);
-	const buttonRef = useRef<any>(null);
+	const emojiList = useAppSelector((state) => selectEmojiByClanId(state, currentClanId || ''));
 
 	useEffect(() => {
 		navigation.setOptions({
@@ -46,99 +38,116 @@ export function ClanEmojiSetting({ navigation }: MenuClanScreenProps<ClanSetting
 		});
 	}, [navigation]);
 
-	useEffect(() => {
-		return () => {
-			timerRef?.current && clearTimeout(timerRef.current);
+	const handleUploadImage = useCallback(async (file: IFile) => {
+		if (Number(file.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 4)) {
+			Toast.show({
+				type: 'error',
+				text1: t('toast.errorSizeLimit')
+			});
+			return;
+		}
+
+		const session = sessionRef.current;
+		const client = clientRef.current;
+		if (!client || !session) {
+			throw new Error('Client or file is not initialized');
+		}
+
+		const arrayBuffer = BufferMobile.from(file?.fileData, 'base64');
+
+		const id = Snowflake.generate();
+		const path = 'emojis/' + id + '.webp';
+		const attachment = await handleUploadEmoticon(client, session, path, file as unknown as File, true, arrayBuffer);
+
+		return {
+			id,
+			url: attachment.url
 		};
 	}, []);
 
-	const handleSelectImage = async () => {
-		buttonRef.current.disabled = true;
-		const response = await launchImageLibrary({
-			mediaType: 'photo',
-			includeBase64: true,
-			quality: 1
-		});
+	const handleAddEmoji = async () => {
+		try {
+			const croppedFile = await openPicker({
+				mediaType: 'photo',
+				includeBase64: true,
+				cropping: true,
+				compressImageQuality: QUALITY_IMAGE_UPLOAD,
+				...(typeof width === 'number' && { width: width, height: width })
+			});
 
-		if (response.didCancel) {
-			console.warn('User cancelled camera');
-		} else if (response.errorCode) {
-			console.error('Camera Error: ', response.errorMessage);
-		} else {
-			const file = response?.assets[0];
-			return file;
+			if (Number(croppedFile.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 4)) {
+				Toast.show({
+					type: 'error',
+					text1: t('toast.errorSizeLimit')
+				});
+				return;
+			}
+
+			const data = {
+				children: <EmojiPreview image={croppedFile} onConfirm={handleUploadConfirm} />
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+		} catch (e) {
+			if (e?.code !== 'E_PICKER_CANCELLED') {
+				Toast.show({
+					type: 'error',
+					text1: 'Error uploading emoji'
+				});
+			}
 		}
-		buttonRef.current.disabled = false;
 	};
 
-	const handleAddEmoji = async () => {
-		const file = await handleSelectImage();
+	const handleUploadConfirm = async (croppedFile: Image, emojiName: string, isForSale: boolean) => {
 		try {
-			if (file) {
-				timerRef.current = setTimeout(
-					async () => {
-						const croppedFile = await openCropper({
-							path: file.uri,
-							mediaType: 'photo',
-							includeBase64: true,
-							compressImageQuality: QUALITY_IMAGE_UPLOAD,
-							...(typeof width === 'number' && { width: width, height: width })
-						});
+			const shortname = `:${emojiName}:`;
+			const { id, url } = await handleUploadImage({
+				fileData: croppedFile?.data,
+				name: croppedFile.filename,
+				uri: croppedFile.path,
+				size: croppedFile.size,
+				type: croppedFile.mime
+			});
+			const request: ApiClanEmojiCreateRequest = {
+				id: id,
+				category: 'Custom',
+				clan_id: currentClanId,
+				shortname: shortname,
+				source: url,
+				is_for_sale: isForSale
+			};
 
-						const arrayBuffer = BufferMobile.from(croppedFile.data, 'base64');
+			if (isForSale) {
+				const pathCompressed = await ImageCompressor.compress(croppedFile.path, {
+					compressionMethod: 'auto',
+					maxWidth: 35,
+					maxHeight: 35,
+					quality: 0.1
+				});
 
-						const uploadImagePayload = {
-							name: croppedFile.filename,
-							size: croppedFile.size,
-							type: croppedFile.mime,
-							uri: croppedFile.path,
-							fileData: croppedFile.data
-						} as unknown as File;
-
-						if (Number(croppedFile.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 4)) {
-							Toast.show({
-								type: 'error',
-								text1: t('toast.errorSizeLimit')
-							});
-							return;
-						}
-
-						dispatch(appActions.setLoadingMainMobile(true));
-
-						const session = sessionRef.current;
-						const client = clientRef.current;
-						const fileNameParts = file.fileName?.split('.');
-						const shortname = fileNameParts.slice(0, -1).join('.').slice(0, MAX_FILE_NAME_EMOJI);
-						const id = Snowflake.generate();
-						const path = 'emojis/' + id + '.webp';
-
-						handleUploadEmoticon(client, session, path, uploadImagePayload, true, arrayBuffer)
-							.then(async (attachment: ApiMessageAttachment) => {
-								const request: ApiClanEmojiCreateRequest = {
-									id: id,
-									category: 'Custom',
-									clan_id: currentClanId,
-									shortname: shortname,
-									source: attachment.url
-								};
-								dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
-							})
-							.finally(() => {
-								dispatch(appActions.setLoadingMainMobile(false));
-							});
-					},
-					Platform.OS === 'ios' ? 500 : 0
-				);
+				const fileData = await RNFS.readFile(pathCompressed?.replace?.('%20', ' ') || '', 'base64');
+				const { id } = await handleUploadImage({
+					fileData: fileData,
+					name: croppedFile.filename,
+					uri: croppedFile.path,
+					size: croppedFile.size,
+					type: croppedFile.mime
+				});
+				request.id = id;
 			}
+
+			dispatch(createEmojiSetting({ request: request, clanId: currentClanId }));
 		} catch (e) {
-			dispatch(appActions.setLoadingMainMobile(false));
+			Toast.show({
+				type: 'error',
+				text1: 'Error uploading emoji'
+			});
 		}
 	};
 
 	return (
 		<View style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				<Pressable ref={buttonRef} style={styles.addEmojiButton} onPress={handleAddEmoji}>
+				<Pressable style={styles.addEmojiButton} onPress={handleAddEmoji}>
 					<Text style={styles.buttonText}>{t('button.upload')}</Text>
 				</Pressable>
 				<Text style={styles.title}>{t('description.descriptions')}</Text>

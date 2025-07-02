@@ -23,10 +23,12 @@
             "title": "System Message Settings",
             "description": "This is the channel we send system event messages to. These can be turned off at any time.",
             "channel": "Channel",
-            "sendRandomWelcome": "Send a random welcome messages when someone joins this clan.",
-            "promptMembersReply": "Prompt members to reply to welcome messages with a sticker.",
-            "sendMessageBoost": "Send a messages when someone boosts this clan",
-            "sendHelpfulTips": "Send helpful tips for clan setup"
+            "selectChannel": "Select Notification Channel",
+            "channelDescription": "This is the channel where system messages will be sent",
+            "welcomeRandom": "Send a random welcome messages when someone joins this clan",
+            "welcomeSticker": "Prompt members to reply to welcome messages with a sticker",
+            "boostMessage": "Send a messages when someone boosts this clan",
+            "setupTips": "Send helpful tips for clan setup"
         },
         "deleteServer": {
             "title": "Delete Clan",
@@ -36,9 +38,15 @@
     "fields": {
         "defaultNotification": {
             "title": "Default Notification Settings",
-            "description": "This will determine whether members who have not explicitly set their notification settings receive notification for every messages sent in this server or not. We highly recommend setting this to only @mentions for community clan",
-            "allMessages": "All Messages",
-            "onlyMentions": "Only @mentions"
+            "description": "This will determine whether members who have not explicitly set their notification settings receive notification for every messages sent in this server or not. We highly recommend setting this to only @mention for community clan",
+            "allMessages": "All messages",
+            "onlyMentions": "Only @mention"
+        }
+    },
+    "permissions": {
+        "toast": {
+            "kickMemberSuccess": "Member kicked successfully",
+            "kickMemberFailed": "Failed to kick member"
         }
     }
 }

@@ -1,21 +1,25 @@
-import { useAuth, useFriends, useMemberStatus } from '@mezon/core';
-import { ActionEmitEvent, CheckIcon } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { useFriends, useMemberStatus } from '@mezon/core';
+import { ActionEmitEvent, CheckIcon, Icons } from '@mezon/mobile-components';
+import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	FriendsEntity,
+	accountActions,
 	channelMembersActions,
 	selectAccountCustomStatus,
+	selectAllAccount,
 	selectCurrentClanId,
 	selectUserStatus,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../componentUI/MezonAvatar';
 import { MezonButton } from '../../componentUI/MezonButton';
@@ -36,19 +40,26 @@ export enum ETypeCustomUserStatus {
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	const isTabletLandscape = useTabletLandscape();
-	const user = useAuth();
+	const userProfile = useSelector(selectAllAccount);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue, isTabletLandscape);
 	const { friends: allUser } = useFriends();
-	const { color } = useMixImageColor(user?.userProfile?.user?.avatar_url);
-	const { t } = useTranslation('profile');
+	const { color } = useMixImageColor(userProfile?.user?.avatar_url);
+	const { t } = useTranslation(['profile']);
 	const { t: tUser } = useTranslation('customUserStatus');
+	const { t: tStack } = useTranslation('screenStack');
 	const [isVisibleAddStatusUserModal, setIsVisibleAddStatusUserModal] = useState<boolean>(false);
 	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
-	const memberStatus = useMemberStatus(user?.userId || '');
+	const memberStatus = useMemberStatus(userProfile?.user?.id || '');
 	const userStatus = useSelector(selectUserStatus);
+
+	useFocusEffect(
+		React.useCallback(() => {
+			dispatch(accountActions.getUserProfile({ noCache: true }));
+		}, [dispatch])
+	);
 
 	const userStatusIcon = useMemo(() => {
 		const mobileIconSize = isTabletLandscape ? size.s_20 : size.s_18;
@@ -78,8 +89,8 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	}, [isTabletLandscape, memberStatus, userStatus]);
 
 	const tokenInWallet = useMemo(() => {
-		return user?.userProfile?.wallet ? safeJSONParse(user?.userProfile?.wallet || '{}')?.value : 0;
-	}, [user?.userProfile?.wallet]);
+		return userProfile?.wallet || 0;
+	}, [userProfile?.wallet]);
 
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
@@ -90,6 +101,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	};
 	const navigateToSettingScreen = () => {
 		navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HOME });
+	};
+
+	const navigateToShopScreen = () => {
+		navigation.navigate(APP_SCREEN.SHOP.STACK, { screen: APP_SCREEN.SHOP.HOME });
 	};
 
 	const navigateGoback = () => {
@@ -108,24 +123,27 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 	}, [friendList]);
 
 	const memberSince = useMemo(() => {
-		return moment(user?.userProfile?.user?.create_time).format('MMM DD, YYYY');
-	}, [user]);
+		return moment(userProfile?.user?.create_time).format('MMM DD, YYYY');
+	}, [userProfile?.user?.create_time]);
 
-	const handlePressSetCustomStatus = () => {
+	const handlePressSetCustomStatus = useCallback(() => {
 		setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal);
-	};
+	}, [isVisibleAddStatusUserModal]);
 
-	const handleCustomUserStatus = (customStatus = '', type: ETypeCustomUserStatus, duration?: number, noClearStatus?: boolean) => {
-		setIsVisibleAddStatusUserModal(false);
-		dispatch(
-			channelMembersActions.updateCustomStatus({
-				clanId: currentClanId ?? '',
-				customStatus: customStatus,
-				minutes: duration,
-				noClear: noClearStatus
-			})
-		);
-	};
+	const handleCustomUserStatus = useCallback(
+		(customStatus = '', type: ETypeCustomUserStatus, duration?: number, noClearStatus?: boolean) => {
+			setIsVisibleAddStatusUserModal(false);
+			dispatch(
+				channelMembersActions.updateCustomStatus({
+					clanId: currentClanId ?? '',
+					customStatus: customStatus,
+					minutes: duration,
+					noClear: noClearStatus
+				})
+			);
+		},
+		[currentClanId, dispatch]
+	);
 
 	const showUserStatusBottomSheet = () => {
 		const data = {
@@ -150,6 +168,32 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 	};
 
+	const copyUserId = () => {
+		const userId = userProfile?.user?.id;
+		if (!userId || userId.trim() === '') {
+			Toast.show({
+				type: 'error',
+				text1: t('emptyId')
+			});
+			return;
+		}
+		try {
+			Clipboard.setString(userId);
+			Toast.show({
+				type: 'success',
+				props: {
+					text2: t('copySuccess'),
+					leadingIcon: <MezonIconCDN icon={IconCDN.linkIcon} color={Colors.textLink} />
+				}
+			});
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				text1: t('errorCopy', { error: error })
+			});
+		}
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={[styles.containerBackground, { backgroundColor: color }]}>
@@ -159,66 +203,99 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 							<MezonIconCDN icon={IconCDN.chevronSmallLeftIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
 						</TouchableOpacity>
 					)}
-					<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
-						<MezonIconCDN icon={IconCDN.settingIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
-					</TouchableOpacity>
+					<View style={{ flexDirection: 'row', gap: size.s_10 }}>
+						<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToShopScreen()}>
+							<MezonIconCDN icon={IconCDN.shopSparkleIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.backgroundSetting} onPress={() => navigateToSettingScreen()}>
+							<MezonIconCDN icon={IconCDN.settingIcon} height={size.s_20} width={size.s_20} color={themeValue.textStrong} />
+						</TouchableOpacity>
+					</View>
 				</View>
 
-				<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.viewImageProfile}>
-					{user?.userProfile?.user?.avatar_url ? (
-						isTabletLandscape ? (
-							<Image
-								source={{
-									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
-								}}
-								style={styles.imgWrapper}
-							/>
+				<View style={styles.viewImageProfile}>
+					<TouchableOpacity onPress={showUserStatusBottomSheet} style={styles.imageProfile}>
+						{userProfile?.user?.avatar_url ? (
+							isTabletLandscape ? (
+								<Image
+									source={{
+										uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									}}
+									style={styles.imgWrapper}
+								/>
+							) : (
+								<FastImage
+									source={{
+										uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+									}}
+									style={styles.imgWrapper}
+								/>
+							)
 						) : (
-							<FastImage
-								source={{
-									uri: createImgproxyUrl(user?.userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+							<View
+								style={{
+									backgroundColor: themeValue.colorAvatarDefault,
+									overflow: 'hidden',
+									width: '100%',
+									height: '100%',
+									borderRadius: isTabletLandscape ? size.s_70 : size.s_50,
+									alignItems: 'center',
+									justifyContent: 'center'
 								}}
-								style={styles.imgWrapper}
-							/>
-						)
-					) : (
-						<View
-							style={{
-								backgroundColor: themeValue.colorAvatarDefault,
-								overflow: 'hidden',
-								width: '100%',
-								height: '100%',
-								borderRadius: isTabletLandscape ? size.s_70 : size.s_50,
-								alignItems: 'center',
-								justifyContent: 'center'
-							}}
-						>
-							<Text style={styles.textAvatar}>{user?.userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
-						</View>
-					)}
+							>
+								<Text style={styles.textAvatar}>{userProfile?.user?.username?.charAt?.(0)?.toUpperCase()}</Text>
+							</View>
+						)}
 
-					<View
-						style={[
-							{
-								backgroundColor: themeValue.tertiary,
-								borderRadius: size.s_20,
-								position: 'absolute',
-								bottom: -size.s_2,
-								right: -size.s_4
-							},
-							styles.dotStatusUser
-						]}
-					>
-						{userStatusIcon}
+						<View
+							style={[
+								{
+									backgroundColor: themeValue.tertiary,
+									borderRadius: size.s_20,
+									position: 'absolute',
+									bottom: -size.s_2,
+									right: -size.s_4
+								},
+								styles.dotStatusUser
+							]}
+						>
+							{userStatusIcon}
+						</View>
+					</TouchableOpacity>
+					<View style={styles.badgeStatusTemp} />
+
+					<View style={styles.badgeStatus}>
+						<View style={styles.badgeStatusInside} />
+						{!userCustomStatus && (
+							<TouchableOpacity
+								activeOpacity={1}
+								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								style={styles.iconAddStatus}
+							>
+								<MezonIconCDN icon={IconCDN.plusLargeIcon} height={size.s_12} width={size.s_12} color={themeValue.primary} />
+							</TouchableOpacity>
+						)}
+						<TouchableOpacity activeOpacity={1} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
+							<Text numberOfLines={1} style={styles.textStatus}>
+								{userCustomStatus ? userCustomStatus : t('addStatus')}
+							</Text>
+						</TouchableOpacity>
 					</View>
-				</TouchableOpacity>
+				</View>
 			</View>
 
 			{isTabletLandscape && (
 				<View style={styles.buttonListLandscape}>
-					<MezonButton viewContainerStyle={styles.button} onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}>
-						<MezonIconCDN icon={IconCDN.chatIcon} height={size.s_20} width={size.s_20} color={'white'} />
-						<Text style={styles.whiteText}>{t('addStatus')}</Text>
+					<MezonButton
+						viewContainerStyle={styles.button}
+						onPress={() => {
+							navigation.push(APP_SCREEN.WALLET, {
+								activeScreen: 'manage'
+							});
+						}}
+					>
+						<MezonIconCDN icon={IconCDN.wallet} height={size.s_20} width={size.s_20} color={'white'} />
+						<Text style={styles.whiteText}>{t('manageWallet')}</Text>
 					</MezonButton>
 
 					<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
@@ -228,42 +305,61 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 				</View>
 			)}
 
-			<ScrollView style={styles.contentWrapper}>
+			<ScrollView style={styles.contentWrapper} contentContainerStyle={{ paddingBottom: size.s_100 }}>
 				<View style={styles.contentContainer}>
-					<TouchableOpacity style={styles.viewInfo} onPress={showUserStatusBottomSheet}>
-						<Text style={styles.textName}>{user?.userProfile?.user?.display_name}</Text>
-						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
-					</TouchableOpacity>
-					<Text style={styles.text}>{user?.userProfile?.user?.username}</Text>
-					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}>
-						<CheckIcon width={size.s_14} height={size.s_14} color={Colors.azureBlue} />
-						<TouchableOpacity style={styles.token} onPress={showSendTokenBottomSheet}>
-							<Text
-								style={styles.text}
-							>{`${t('token')} ${tokenInWallet ? formatNumber(Number(tokenInWallet), 'vi-VN', 'VND') : '0'}`}</Text>
-						</TouchableOpacity>
-					</View>
-					{userCustomStatus ? (
-						<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-							<TouchableOpacity
-								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
-								style={styles.customUserStatusBtn}
-							>
-								<Text style={styles.text}>{userCustomStatus}</Text>
-							</TouchableOpacity>
-							<Pressable onPress={() => handleCustomUserStatus('', ETypeCustomUserStatus.Close)} style={styles.closeBtnUserStatus}>
-								<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
-							</Pressable>
+					<TouchableOpacity onPress={showUserStatusBottomSheet} style={{ marginBottom: size.s_10 }}>
+						<View style={styles.viewInfo}>
+							<Text style={styles.textName}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
+							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
 						</View>
-					) : null}
+						<Text style={styles.text}>{userProfile?.user?.username}</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={showSendTokenBottomSheet} style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+						<CheckIcon width={size.s_20} height={size.s_20} color={Colors.azureBlue} />
+						<View style={styles.token}>
+							<Text style={styles.text}>
+								{`${t('token')} ${tokenInWallet ? formatNumber(Number(tokenInWallet), 'vi-VN', 'VND') : '0'}`}
+							</Text>
+						</View>
+					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => {
+							navigation.push(APP_SCREEN.WALLET, {
+								activeScreen: 'transfer'
+							});
+						}}
+						style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}
+					>
+						<Icons.SendMoney height={size.s_20} width={size.s_20} color={baseColor.gray} />
+						<View style={styles.token}>
+							<Text style={styles.text}>{tStack('settingStack.sendToken')}</Text>
+						</View>
+					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => {
+							navigation.push(APP_SCREEN.WALLET, {
+								activeScreen: 'history'
+							});
+						}}
+						style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10, marginTop: size.s_10 }}
+					>
+						<Icons.History height={size.s_20} width={size.s_20} color={baseColor.gray} />
+						<View style={styles.token}>
+							<Text style={styles.text}>{tStack('settingStack.historyTransaction')}</Text>
+						</View>
+					</TouchableOpacity>
 					{!isTabletLandscape && (
 						<View style={styles.buttonList}>
 							<MezonButton
 								viewContainerStyle={styles.button}
-								onPress={() => setIsVisibleAddStatusUserModal(!isVisibleAddStatusUserModal)}
+								onPress={() => {
+									navigation.push(APP_SCREEN.WALLET, {
+										activeScreen: 'manage'
+									});
+								}}
 							>
-								<MezonIconCDN icon={IconCDN.chatIcon} height={size.s_20} width={size.s_20} color={'white'} />
-								<Text style={styles.whiteText}>{t('addStatus')}</Text>
+								<MezonIconCDN icon={IconCDN.wallet} height={size.s_18} width={size.s_18} color={'white'} />
+								<Text style={styles.whiteText}>{t('manageWallet')}</Text>
 							</MezonButton>
 
 							<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
@@ -276,10 +372,10 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 
 				<View style={styles.contentContainer}>
 					<View style={{ gap: size.s_20 }}>
-						{user?.userProfile?.user?.about_me ? (
+						{userProfile?.user?.about_me ? (
 							<View>
 								<Text style={styles.textTitle}>{t('aboutMe')}</Text>
-								<Text style={styles.text}>{user?.userProfile?.user?.about_me}</Text>
+								<Text style={styles.text}>{userProfile?.user?.about_me}</Text>
 							</View>
 						) : null}
 
@@ -296,6 +392,17 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					<MezonAvatar avatarUrl="" username="" height={size.s_30} width={size.s_30} stacks={firstFriendImageList} />
 					<MezonIconCDN
 						icon={IconCDN.chevronSmallRightIcon}
+						width={size.s_18}
+						height={size.s_18}
+						customStyle={{ marginLeft: size.s_4 }}
+						color={themeValue.textStrong}
+					/>
+				</TouchableOpacity>
+
+				<TouchableOpacity style={[styles.contentContainer, styles.imgList]} onPress={copyUserId}>
+					<Text style={styles.textTitle}>{t('copyUserId')}</Text>
+					<MezonIconCDN
+						icon={IconCDN.idIcon}
 						width={size.s_18}
 						height={size.s_18}
 						customStyle={{ marginLeft: size.s_4 }}

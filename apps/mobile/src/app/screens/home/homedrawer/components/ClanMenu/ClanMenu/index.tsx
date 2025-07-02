@@ -1,8 +1,14 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { appActions, categoriesActions, selectCurrentClan, selectIsShowEmptyCategory, useAppDispatch } from '@mezon/store-mobile';
+import {
+	appActions,
+	categoriesActions,
+	selectCurrentClan,
+	selectDefaultNotificationClan,
+	selectIsShowEmptyCategory,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { EPermission, sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -35,9 +41,9 @@ export default function ClanMenu() {
 	const { t } = useTranslation(['clanMenu']);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 
 	const navigation = useNavigation<AppStackScreenProps['navigation']>();
-	const { dismiss } = useBottomSheetModal();
 	const dispatch = useAppDispatch();
 	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
 
@@ -51,23 +57,23 @@ export default function ClanMenu() {
 	const isCanEditRole = useMemo(() => {
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;
 	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
-	const handleOpenInvite = () => {
+	const handleOpenInvite = useCallback(() => {
 		const data = {
 			snapPoints: ['70%', '90%'],
 			children: <InviteToChannel isUnknownChannel={false} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-	};
+	}, []);
 
-	const handleOpenSettings = () => {
+	const handleOpenSettings = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.SETTINGS });
-		dismiss();
-	};
+	}, [navigation]);
 
 	const handelOpenNotifications = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING });
-		dismiss();
-	}, []);
+	}, [navigation]);
 
 	const organizationMenu: IMezonMenuItemProps[] = [
 		// {
@@ -76,14 +82,14 @@ export default function ClanMenu() {
 		// },
 		{
 			onPress: () => {
-				dismiss();
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_CATEGORY });
 			},
 			title: t('menu.organizationMenu.createCategory')
 		},
 		{
 			onPress: () => {
-				dismiss();
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, { screen: APP_SCREEN.MENU_CLAN.CREATE_EVENT });
 			},
 			title: t('menu.organizationMenu.createEvent')
@@ -93,7 +99,7 @@ export default function ClanMenu() {
 	const optionsMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: () => {
-				dismiss();
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
 					screen: APP_SCREEN.SETTINGS.PROFILE,
 					params: { profileTab: EProfileTab.ClanProfile }
@@ -103,7 +109,7 @@ export default function ClanMenu() {
 		},
 		{
 			onPress: () => {
-				dismiss();
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 				navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 					screen: APP_SCREEN.MENU_CLAN.AUDIT_LOG
 				});
@@ -172,7 +178,7 @@ export default function ClanMenu() {
 		{
 			onPress: async () => {
 				await handleMarkAsReadClan(currentClan?.clan_id);
-				dismiss();
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			},
 			title: t('menu.watchMenu.markAsRead')
 		}
@@ -227,7 +233,12 @@ export default function ClanMenu() {
 					/>
 					<MezonButtonIcon
 						title={t('actions.notifications')}
-						icon={<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.textStrong} />}
+						icon={
+							<MezonIconCDN
+								icon={defaultNotificationClan?.notification_setting_type === 3 ? IconCDN.bellSlashIcon : IconCDN.bellIcon}
+								color={themeValue.textStrong}
+							/>
+						}
 						onPress={handelOpenNotifications}
 					/>
 

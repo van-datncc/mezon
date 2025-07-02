@@ -3,19 +3,24 @@ import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		itemDetail: {
+			gap: size.s_10,
+			maxWidth: '85%'
+		},
 		name: {
 			color: colors.white,
 			fontWeight: 'bold',
 			fontSize: size.medium,
-			marginTop: size.s_10
+			width: '100%'
 		},
 		value: {
 			color: colors.text,
 			fontSize: size.s_13,
 			marginTop: size.s_6,
-			width: '80%'
+			width: '100%'
 		},
 		option: {
+			marginTop: size.s_10,
 			justifyContent: 'space-between',
 			flexDirection: 'row',
 			alignItems: 'center'

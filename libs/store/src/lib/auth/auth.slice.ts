@@ -1,7 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
 import { LoadingStatus } from '@mezon/utils';
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from 'mezon-js';
+import { clearApiCallTracker } from '../cache-metadata';
 import { ensureClientAsync, ensureSession, getMezonCtx, restoreLocalStorage } from '../helpers';
 import { clearAllMemoizedFunctions } from '../memoize';
 export const AUTH_FEATURE_KEY = 'auth';
@@ -9,11 +10,12 @@ export const AUTH_FEATURE_KEY = 'auth';
 export interface AuthState {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	session?: ISession | null;
+	session: Record<string, ISession> | null;
 	isLogin?: boolean;
 	isRegistering?: LoadingStatus;
 	loadingStatusEmail?: LoadingStatus;
 	redirectUrl?: string | null;
+	activeAccount: string | null;
 }
 
 export interface ISession {
@@ -27,6 +29,7 @@ export interface ISession {
 	user_id?: string;
 	vars?: object;
 	is_remember?: boolean;
+	api_url: string;
 }
 
 export const initialAuthState: AuthState = {
@@ -35,7 +38,8 @@ export const initialAuthState: AuthState = {
 	isLogin: false,
 	isRegistering: 'not loaded',
 	loadingStatusEmail: 'not loaded',
-	redirectUrl: null
+	redirectUrl: null,
+	activeAccount: null
 };
 
 function normalizeSession(session: Session): ISession {
@@ -44,7 +48,7 @@ function normalizeSession(session: Session): ISession {
 
 export const authenticateApple = createAsyncThunk('auth/authenticateApple', async (token: string, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	const session = await mezon.authenticateApple(token);
+	const session = await mezon.authenticateMezon(token);
 	if (!session) {
 		return thunkAPI.rejectWithValue('Invalid session');
 	}
@@ -83,12 +87,13 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 	const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 
 	if (!sessionState) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid refreshSession');
 	}
 
-	if (mezon.sessionRef.current?.token === sessionState?.token) {
+	if (mezon.sessionRef.current?.token && mezon.sessionRef.current?.token === sessionState?.token) {
 		return sessionState;
 	}
+
 	let session;
 	try {
 		session = await mezon?.refreshSession({
@@ -96,11 +101,11 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 			is_remember: sessionState.is_remember ?? false
 		});
 	} catch (error: any) {
-		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	return normalizeSession(session);
@@ -111,7 +116,7 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 	const sessionState = selectSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
 
 	if (!sessionState) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid checkSessionWithToken');
 	}
 
 	if (mezon.sessionRef.current?.token === sessionState?.token) {
@@ -124,11 +129,11 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 			is_remember: sessionState.is_remember ?? false
 		});
 	} catch (error: any) {
-		return thunkAPI.rejectWithValue(error?.status === 401 ? 'Redirect Login' : 'Invalid session');
+		return thunkAPI.rejectWithValue('Redirect Login');
 	}
 
 	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid checkSessionWithToken');
 	}
 
 	return normalizeSession(session);
@@ -136,10 +141,16 @@ export const checkSessionWithToken = createAsyncThunk('auth/checkSessionWithToke
 
 export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platform }: { device_id?: string; platform?: string }, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
-	await mezon?.logOutMezon(device_id, platform);
+	const sessionState = selectOthersSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	thunkAPI.dispatch(authActions.setLogout());
 	clearAllMemoizedFunctions();
-	restoreLocalStorage(['persist:auth', 'persist:apps', 'persist:categories']);
+	clearApiCallTracker();
+	const restoreKey = ['persist:apps', 'persist:categories', 'persist:clans'];
+	if (sessionState) {
+		restoreKey.push('mezon_session');
+	}
+	restoreLocalStorage(restoreKey);
 });
 
 export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {
@@ -147,7 +158,7 @@ export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkA
 	const QRlogin = await mezon?.createQRLogin();
 
 	if (!QRlogin) {
-		return thunkAPI.rejectWithValue('Invalid session');
+		return thunkAPI.rejectWithValue('Invalid getQRCode');
 	}
 	return QRlogin;
 });
@@ -206,17 +217,47 @@ export const authSlice = createSlice({
 		},
 
 		setSession(state, action) {
-			state.session = action.payload;
+			if (action.payload.user_id) {
+				if (!state.session) {
+					state.session = {
+						[action.payload.user_id]: action.payload
+					};
+				} else {
+					state.session[action.payload.user_id] = action.payload;
+				}
+				state.activeAccount = action.payload.user_id;
+			}
 			state.isLogin = true;
 		},
 		setLogout(state) {
-			state.session = null;
-			state.isLogin = false;
+			if (state.session && state.activeAccount && Object.keys(state.session).length >= 2) {
+				delete state.session?.[state.activeAccount];
+				const key = Object.keys(state.session || [])[0];
+				state.activeAccount = key;
+			} else {
+				state.activeAccount = null;
+				state.session = null;
+				state.isLogin = false;
+			}
 			state.loadingStatus = 'not loaded';
 		},
 		refreshStatus(state) {
 			state.loadingStatus = 'not loaded';
 			state.loadingStatusEmail = 'not loaded';
+		},
+		checkFormatSession(state) {
+			const newSession: any = state.session;
+			if (newSession.token || !state.activeAccount) {
+				state.session = null;
+				state.isLogin = false;
+				state.activeAccount = null;
+			}
+		},
+		turnOffSetAccount(state) {
+			state.isLogin = true;
+		},
+		switchAccount(state, action: PayloadAction<string>) {
+			state.activeAccount = action.payload;
 		}
 	},
 	extraReducers: (builder) => {
@@ -226,7 +267,17 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateApple.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = action.payload.user_id;
+				}
+
 				state.isLogin = true;
 			})
 			.addCase(authenticateApple.rejected, (state: AuthState, action) => {
@@ -240,7 +291,16 @@ export const authSlice = createSlice({
 			})
 			.addCase(refreshSession.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 				state.isLogin = true;
 			})
 			.addCase(refreshSession.rejected, (state: AuthState, action) => {
@@ -253,7 +313,16 @@ export const authSlice = createSlice({
 			})
 			.addCase(checkSessionWithToken.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 				state.isLogin = true;
 			})
 			.addCase(checkSessionWithToken.rejected, (state: AuthState, action) => {
@@ -263,7 +332,14 @@ export const authSlice = createSlice({
 		builder
 			.addCase(checkLoginRequest.fulfilled, (state: AuthState, action) => {
 				if (action.payload !== null) {
-					state.session = action.payload;
+					if (state.session && action.payload.user_id) {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					if (!state.session && action.payload.user_id) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					}
 					state.isLogin = true;
 				}
 			})
@@ -288,7 +364,16 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateMezon.fulfilled, (state: AuthState, action) => {
 				state.loadingStatus = 'loaded';
-				state.session = action.payload;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 				state.isLogin = true;
 			})
 			.addCase(authenticateMezon.rejected, (state: AuthState, action) => {
@@ -301,8 +386,17 @@ export const authSlice = createSlice({
 			})
 			.addCase(authenticateEmail.fulfilled, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'loaded';
-				state.session = action.payload;
 				state.isLogin = true;
+				if (action.payload.user_id) {
+					if (!state.session) {
+						state.session = {
+							[action.payload.user_id]: action.payload
+						};
+					} else {
+						state.session[action.payload.user_id] = action.payload;
+					}
+					state.activeAccount = `${action.payload.user_id}`;
+				}
 			})
 			.addCase(authenticateEmail.rejected, (state: AuthState, action) => {
 				state.loadingStatusEmail = 'error';
@@ -349,8 +443,25 @@ export const selectAuthIsLoaded = createSelector(getAuthState, (state: AuthState
 
 export const selectIsLogin = createSelector(getAuthState, (state: AuthState) => state.isLogin);
 
-export const selectSession = createSelector(getAuthState, (state: AuthState) => state.session);
+export const selectSession = createSelector(getAuthState, (state: AuthState) => {
+	if (state.activeAccount) {
+		return state.session?.[state.activeAccount];
+	}
+	const key = Object.keys(state.session || [])[0];
+	return state.session?.[key];
+});
 
 export const selectRegisteringStatus = createSelector(getAuthState, (state: AuthState) => state.isRegistering);
 
 export const selectLoadingEmail = createSelector(getAuthState, (state: AuthState) => state.loadingStatusEmail);
+
+export const selectOthersSession = createSelector(getAuthState, (state: AuthState) => {
+	const key = Object.keys(state.session || []).filter((key) => {
+		return key !== state.activeAccount;
+	});
+	return state.session?.[key[0]];
+});
+
+export const selectAllSession = createSelector(getAuthState, (state: AuthState) => {
+	return state.session;
+});

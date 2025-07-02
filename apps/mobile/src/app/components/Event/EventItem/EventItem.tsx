@@ -5,11 +5,13 @@ import { EventManagementEntity, addUserEvent, deleteUserEvent, selectMemberClanB
 import { EEventStatus, createImgproxyUrl, sleep } from '@mezon/utils';
 import { ApiUserEventRequest } from 'mezon-js/api.gen';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import MezonButton from '../../../componentUI/MezonButton2';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
+import ImageNative from '../../ImageNative';
 import { EventChannelDetail } from '../EventChannelTitle';
 import { EventLocation } from '../EventLocation';
 import { ShareEventModal } from '../EventShare';
@@ -26,6 +28,7 @@ interface IEventItemProps {
 export function EventItem({ event, onPress, showActions = true, start }: IEventItemProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation(['eventMenu']);
 	const userCreate = useAppSelector((state) => selectMemberClanByUserId2(state, event?.creator_id || ''));
 	const { userId } = useAuth();
 	const [isInterested, setIsInterested] = useState<boolean>(false);
@@ -111,34 +114,34 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 					</View>
 				</View>
 
-				{!!event?.channel_id && event.channel_id !== '0' && !event?.is_private && (
-					<View style={styles.privateArea}>
-						<View style={[styles.privatePanel, { backgroundColor: baseColor.orange }]}>
-							<Text style={styles.privateText}>Channel Event</Text>
-						</View>
-					</View>
-				)}
+				<View style={styles.mainArea}>
+					<View style={styles.mainSec}>
+						{!!event?.channel_id && event.channel_id !== '0' && !event?.is_private && (
+							<View style={[styles.privatePanel, { backgroundColor: baseColor.orange }]}>
+								<Text style={styles.privateText}>Channel Event</Text>
+							</View>
+						)}
 
-				{event?.is_private && (
-					<View style={styles.privateArea}>
-						<View style={styles.privatePanel}>
-							<Text style={styles.privateText}>Private Event</Text>
-						</View>
-					</View>
-				)}
+						{event?.is_private && (
+							<View style={[styles.privatePanel, { backgroundColor: baseColor.orange }]}>
+								<Text style={styles.privateText}>Channel Event</Text>
+							</View>
+						)}
 
-				{!event?.is_private && !event?.channel_id && (
-					<View style={styles.privateArea}>
-						<View style={[styles.privatePanel, { backgroundColor: baseColor.blurple }]}>
-							<Text style={styles.privateText}>Clan Event</Text>
-						</View>
+						{!event?.is_private && !event?.channel_id && (
+							<View style={[styles.privatePanel, { backgroundColor: baseColor.blurple }]}>
+								<Text style={styles.privateText}>Clan Event</Text>
+							</View>
+						)}
+						<Text style={{ color: themeValue.textStrong }}>{event.title}</Text>
+						{event.description && <Text style={styles.description}>{event.description}</Text>}
+						<EventLocation event={event} />
 					</View>
-				)}
-
-				<View style={styles.mainSec}>
-					<Text style={{ color: themeValue.textStrong }}>{event.title}</Text>
-					{event.description && <Text style={styles.description}>{event.description}</Text>}
-					<EventLocation event={event} />
+					{event?.logo && (
+						<View style={styles.eventLogo}>
+							<ImageNative url={event?.logo} style={styles.eventLogoImage} />
+						</View>
+					)}
 				</View>
 
 				{showActions && (
@@ -151,7 +154,7 @@ export function EventItem({ event, onPress, showActions = true, start }: IEventI
 									<MezonIconCDN icon={IconCDN.bellIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
 								)
 							}
-							title={isInterested ? 'UnInterested' : 'Interested'}
+							title={isInterested ? t('item.uninterested') : t('item.interested')}
 							fluid
 							border
 							onPress={handleToggleUserEvent}

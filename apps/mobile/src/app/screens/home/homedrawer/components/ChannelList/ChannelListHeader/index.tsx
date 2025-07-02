@@ -61,7 +61,7 @@ const ChannelListHeader = () => {
 
 	const onOpenEvent = () => {
 		const data = {
-			heightFitContent: true,
+			snapPoints: ['50%', '80%'],
 			children: <EventViewer handlePressEventCreate={handlePressEventCreate} />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
@@ -84,7 +84,7 @@ const ChannelListHeader = () => {
 					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
 				</View>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text numberOfLines={1} style={styles.subTitle}>
+					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
 						{`${members} ${t('info.members')}`}
 					</Text>
 					<View
@@ -96,15 +96,15 @@ const ChannelListHeader = () => {
 							marginHorizontal: size.s_8
 						}}
 					/>
-					<Text numberOfLines={1} style={styles.subTitle}>
-						Community
+					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
+						{t('common.community')}
 					</Text>
 				</View>
 			</Pressable>
 			<View style={{ marginTop: size.s_10, flexDirection: 'row', gap: size.s_8 }}>
 				<Pressable onPress={navigateToSearchPage} style={styles.wrapperSearch}>
 					<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />
-					<Text style={styles.placeholderSearchBox}>{t('search')}</Text>
+					<Text style={styles.placeholderSearchBox}>{t('common.search')}</Text>
 				</Pressable>
 				<Pressable onPress={onOpenScanQR} style={styles.iconWrapper}>
 					<MezonIconCDN icon={IconCDN.scanQR} height={size.s_18} width={size.s_18} color={themeValue.text} />

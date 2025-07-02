@@ -8,6 +8,11 @@ interface UseKeyboardHandlerProps {
 	handleUndoRedoShortcut: (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => void;
 	handleSend: (anonymousMode?: boolean) => void;
 	anonymousMode: boolean;
+	isEphemeralMode?: boolean;
+	setIsEphemeralMode?: (mode: boolean) => void;
+	setEphemeralTargetUserId?: (userId: string | null) => void;
+	setEphemeralTargetUserDisplay?: (display: string | null) => void;
+	ephemeralTargetUserId?: string | null;
 }
 
 export const useKeyboardHandler = ({
@@ -16,7 +21,12 @@ export const useKeyboardHandler = ({
 	updateDraft,
 	handleUndoRedoShortcut,
 	handleSend,
-	anonymousMode
+	anonymousMode,
+	isEphemeralMode,
+	setIsEphemeralMode,
+	setEphemeralTargetUserId,
+	setEphemeralTargetUserDisplay,
+	ephemeralTargetUserId
 }: UseKeyboardHandlerProps) => {
 	const onKeyDown = useCallback(
 		(event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): void => {
@@ -38,6 +48,25 @@ export const useKeyboardHandler = ({
 			}
 
 			switch (key) {
+				case 'Escape': {
+					if (
+						(isEphemeralMode || ephemeralTargetUserId) &&
+						setIsEphemeralMode &&
+						setEphemeralTargetUserId &&
+						setEphemeralTargetUserDisplay
+					) {
+						event.preventDefault();
+						setIsEphemeralMode(false);
+						setEphemeralTargetUserId(null);
+						setEphemeralTargetUserDisplay(null);
+						updateDraft({
+							valueTextInput: '',
+							content: '',
+							mentionRaw: []
+						});
+					}
+					return;
+				}
 				case 'Enter': {
 					if (shiftKey || isComposing) {
 						return;
@@ -52,7 +81,19 @@ export const useKeyboardHandler = ({
 				}
 			}
 		},
-		[draftRequest, handleSend, anonymousMode, updateDraft, handleUndoRedoShortcut, editorRef]
+		[
+			draftRequest,
+			handleSend,
+			anonymousMode,
+			updateDraft,
+			handleUndoRedoShortcut,
+			editorRef,
+			isEphemeralMode,
+			setIsEphemeralMode,
+			setEphemeralTargetUserId,
+			setEphemeralTargetUserDisplay,
+			ephemeralTargetUserId
+		]
 	);
 
 	return { onKeyDown };

@@ -2,9 +2,10 @@ import { captureSentryError } from '@mezon/logger';
 import { ICategory, LoadingStatus, SortChannel, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api.gen';
+import { CacheMetadata, clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
 import { RootState } from '../store';
+
 export const CATEGORIES_FEATURE_KEY = 'categories';
 
 /*
@@ -28,6 +29,7 @@ export interface CategoriesState {
 			sortChannelByCategoryId: Record<string, boolean>;
 			categoryExpandState: Record<string, boolean>;
 			showEmptyCategory: boolean;
+			cache?: CacheMetadata;
 		}
 	>;
 	loadingStatus: LoadingStatus;
@@ -35,6 +37,7 @@ export interface CategoriesState {
 	ctrlKSelectedChannelId?: string;
 	ctrlKFocusChannel?: { id: string; parentId: string } | null;
 }
+
 export const categoriesAdapter = createEntityAdapter<CategoriesEntity>();
 
 type fetchCategoriesPayload = {
@@ -59,39 +62,58 @@ type SetCategoryExpandStatePayload = {
 	expandState: boolean;
 };
 
-const CATEGORIES_CACHED_TIME = 1000 * 60 * 60;
+const { selectAll: selectAllCategoriesEntities } = categoriesAdapter.getSelectors();
 
-const fetchCategoriesCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, clanId: string) => {
-		const response = await mezon.client.listCategoryDescs(mezon.session, clanId);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: CATEGORIES_CACHED_TIME,
-		normalizer: (args) => {
-			return args[1] + args[0].session.username;
-		}
+const selectCachedCategoriesByClan = createSelector(
+	[(state: RootState, clanId: string) => state[CATEGORIES_FEATURE_KEY].byClans[clanId]?.entities],
+	(entitiesState) => {
+		return entitiesState ? selectAllCategoriesEntities(entitiesState) : [];
 	}
 );
 
-export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId, noCache }: fetchCategoriesPayload, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	if (noCache) {
-		fetchCategoriesCached.delete(mezon, clanId);
+export const fetchCategoriesCached = async (getState: () => RootState, ensuredMezon: MezonValueContext, clanId: string, noCache = false) => {
+	const state = getState();
+	const clanData = state[CATEGORIES_FEATURE_KEY].byClans[clanId];
+	const apiKey = createApiKey('fetchCategories', clanId);
+	const shouldForceCall = shouldForceApiCall(apiKey, clanData?.cache, noCache);
+
+	if (!shouldForceCall) {
+		const categories = selectCachedCategoriesByClan(state, clanId);
+		return {
+			categorydesc: categories,
+			fromCache: true
+		};
 	}
 
-	const response = await fetchCategoriesCached(mezon, clanId);
+	const response = await ensuredMezon.client.listCategoryDescs(ensuredMezon.session, clanId);
 
-	if (!response.categorydesc) {
-		return { categories: [], clanId: clanId };
-	}
+	markApiFirstCalled(apiKey);
 
-	const payload: FetchCategoriesPayload = {
-		categories: response.categorydesc.map(mapCategoryToEntity),
-		clanId: clanId
+	return {
+		...response,
+		fromCache: false
 	};
-	return payload;
+};
+
+export const fetchCategories = createAsyncThunk('categories/fetchCategories', async ({ clanId, noCache }: fetchCategoriesPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await fetchCategoriesCached(thunkAPI.getState as () => RootState, mezon, clanId, noCache);
+
+		if (!response.categorydesc) {
+			return { categories: [], clanId: clanId };
+		}
+
+		const payload: FetchCategoriesPayload = {
+			categories: response.categorydesc.map(mapCategoryToEntity),
+			clanId: clanId,
+			fromCache: response.fromCache
+		};
+		return payload;
+	} catch (error) {
+		captureSentryError(error, 'categories/fetchCategories');
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const createNewCategory = createAsyncThunk('categories/createCategories', async (body: ApiCreateCategoryDescRequest, thunkAPI) => {
@@ -132,7 +154,10 @@ export const deleteCategory = createAsyncThunk(
 	async ({ clanId, categoryId, categoryLabel }: { clanId: string; categoryId: string; categoryLabel: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId, categoryLabel);
+			await mezon.client.deleteCategoryDesc(mezon.session, categoryId, clanId, categoryLabel);
+			// Clear API call tracker to force fresh data on next fetch
+			const apiKey = createApiKey('fetchCategories', clanId);
+			clearApiCallTracker(apiKey);
 		} catch (error) {
 			captureSentryError(error, 'categories/deleteCategory');
 			return thunkAPI.rejectWithValue(error);
@@ -152,9 +177,9 @@ export const updateCategoriesOrder = createAsyncThunk(
 			});
 
 			const state = thunkAPI.getState() as RootState;
-			const currentCategories = state[CATEGORIES_FEATURE_KEY].byClans[clan_id as string]?.entities.entities || {};
+			const currentCategories = selectCachedCategoriesByClan(state, clan_id as string);
 
-			const updatedCategories = Object.values(currentCategories).map((cat) => {
+			const updatedCategories = currentCategories.map((cat) => {
 				const updatedOrder = categories.find((c) => c.category_id === cat.id);
 				return {
 					...cat,
@@ -307,6 +332,8 @@ export const categoriesSlice = createSlice({
 					entities: newEntities
 				};
 
+				state.byClans[clanId].cache = createCacheMetadata();
+
 				categories.forEach((category) => {
 					if (state.byClans[clanId].categoryExpandState[category.id] === undefined) {
 						state.byClans[clanId].categoryExpandState[category.id] = true;
@@ -392,10 +419,9 @@ export const categoriesActions = {
  */
 export const getCategoriesState = (rootState: { [CATEGORIES_FEATURE_KEY]: CategoriesState }): CategoriesState => rootState[CATEGORIES_FEATURE_KEY];
 
-const { selectAll: selectAllCategoriesEntities } = categoriesAdapter.getSelectors();
-
 export const selectClanCategories = (clanId: string) =>
 	createSelector(getCategoriesState, (state) => state.byClans[clanId]?.entities ?? categoriesAdapter.getInitialState());
+
 export const selectCategoryIdSortChannel = createSelector(
 	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => {

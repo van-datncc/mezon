@@ -4,7 +4,7 @@ import { deleteSticker, selectMemberClanByUserId2, updateSticker, useAppDispatch
 import { selectCurrentUserId, useAppSelector } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { ClanSticker } from 'mezon-js';
-import { Ref, forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { Ref, forwardRef, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -107,7 +107,10 @@ export const StickerSettingItem = forwardRef(({ data, clanID, onSwipeOpen }: ISt
 		<Swipeable ref={ref} renderRightActions={renderRightAction} onSwipeableWillOpen={handleSwipeOpen} enabled={hasDeleteOrEditPermission}>
 			<View style={styles.container}>
 				<View style={styles.flexRow}>
-					<FastImage source={{ uri: data.source }} style={{ height: size.s_40, width: size.s_40 }} />
+					<FastImage
+						source={{ uri: sticker.source ? sticker.source : `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker.id + `.webp` }}
+						style={{ height: size.s_40, width: size.s_40 }}
+					/>
 
 					<TextInput
 						value={stickerName}

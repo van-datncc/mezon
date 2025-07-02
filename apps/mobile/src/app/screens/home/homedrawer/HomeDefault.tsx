@@ -4,17 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 import { setTimeout } from '@testing-library/react-native/build/helpers/timers';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Keyboard, Platform, StatusBar } from 'react-native';
+import { DeviceEventEmitter, Keyboard, Platform, StatusBar, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import AgeRestrictedModal from '../../../components/AgeRestricted/AgeRestrictedModal';
 import NotificationSetting from '../../../components/NotificationSetting';
+import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import ChannelAppHotbar from './ChannelAppHotbar';
 import ChannelMessages from './ChannelMessages';
 import { ChatBox } from './ChatBox';
 import DrawerListener from './DrawerListener';
 import HomeDefaultHeader from './HomeDefaultHeader';
 import PanelKeyboard from './PanelKeyboard';
-import { IModeKeyboardPicker } from './components/BottomKeyboardPicker';
 import LicenseAgreement from './components/LicenseAgreement';
 import { style } from './styles';
 // HomeDefault check
@@ -29,23 +29,15 @@ const HomeDefault = React.memo(
 		const channelType = props?.channelType;
 		const timeoutRef = useRef<any>(null);
 		const navigation = useNavigation<any>();
-		const panelKeyboardRef = useRef(null);
 
 		const isChannelApp = channelType === ChannelType.CHANNEL_TYPE_APP;
 
-		const onShowKeyboardBottomSheet = useCallback((isShow: boolean, type?: IModeKeyboardPicker) => {
-			if (panelKeyboardRef?.current) {
-				panelKeyboardRef.current?.onShowKeyboardBottomSheet(isShow, type);
-			}
-		}, []);
-
 		const onOpenDrawer = useCallback(() => {
 			requestAnimationFrame(async () => {
-				navigation.goBack();
-				onShowKeyboardBottomSheet(false, 'text');
+				navigation.navigate(APP_SCREEN.BOTTOM_BAR);
 				Keyboard.dismiss();
 			});
-		}, [navigation, onShowKeyboardBottomSheet]);
+		}, [navigation]);
 
 		const [isShowSettingNotifyBottomSheet, setIsShowSettingNotifyBottomSheet] = useState<boolean>(false);
 
@@ -72,28 +64,29 @@ const HomeDefault = React.memo(
 			<KeyboardAvoidingView
 				style={styles.channelView}
 				behavior={'padding'}
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight}
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
 			>
 				{Platform.OS === 'ios' && <LicenseAgreement />}
 				<DrawerListener />
 				<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
-				<ChannelMessages
-					channelId={channelId}
-					clanId={clanId}
-					isPublic={isPublicChannel}
-					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-				/>
+				<View style={{ flex: 1 }}>
+					<ChannelMessages
+						channelId={channelId}
+						clanId={clanId}
+						isPublic={isPublicChannel}
+						mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
+					/>
+				</View>
 				{isChannelApp && <ChannelAppHotbar channelId={channelId} clanId={clanId} />}
 				<ChatBox
 					channelId={channelId}
 					mode={isThread ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL}
-					onShowKeyboardBottomSheet={onShowKeyboardBottomSheet}
 					hiddenIcon={{
 						threadIcon: channelType === ChannelType.CHANNEL_TYPE_THREAD
 					}}
 					isPublic={isPublicChannel}
 				/>
-				<PanelKeyboard ref={panelKeyboardRef} currentChannelId={channelId} currentClanId={clanId} />
+				<PanelKeyboard currentChannelId={channelId} currentClanId={clanId} />
 
 				<AgeRestrictedModal />
 			</KeyboardAvoidingView>

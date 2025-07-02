@@ -12,7 +12,7 @@ import StatusBarHeight from '../../../../components/StatusBarHeight/StatusBarHei
 import { IconCDN } from '../../../../constants/icon_cdn';
 import { style } from './styles';
 
-const ChannelAppScreen = ({ navigation, route }) => {
+const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }) => {
 	const { themeValue, themeBasic } = useTheme();
 	const paramsRoute = route?.params;
 	const styles = style(themeValue);
@@ -39,20 +39,25 @@ const ChannelAppScreen = ({ navigation, route }) => {
 	}, []);
 
 	const uri = useMemo(() => {
-		let queryString: string;
+		let queryString = '';
 		if (paramsRoute?.code && paramsRoute?.subpath) {
 			queryString = `?code=${paramsRoute?.code}&subpath=${paramsRoute?.subpath}`;
 		} else if (paramsRoute?.code) {
 			queryString = `?code=${paramsRoute?.code}`;
 		} else if (paramsRoute?.subpath) {
 			queryString = `?subpath=${paramsRoute?.subpath}`;
-		} else {
 		}
 
 		const baseUrl = `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/apps-mobile/${paramsRoute?.clanId}/${paramsRoute?.channelId}`;
 
 		return queryString ? `${baseUrl}${queryString}` : baseUrl;
 	}, [paramsRoute?.channelId, paramsRoute?.clanId, paramsRoute?.code, paramsRoute?.subpath]);
+
+	const mezon_session = JSON.stringify({
+		host: process.env.NX_CHAT_APP_API_HOST as string,
+		port: process.env.NX_CHAT_APP_API_PORT as string,
+		ssl: true
+	});
 
 	const injectedJS = `
     (function() {
@@ -63,14 +68,28 @@ const ChannelAppScreen = ({ navigation, route }) => {
 		"_persist": JSON.stringify({"version":-1,"rehydrated":true})
 	};
     localStorage.setItem('persist:auth', JSON.stringify(authData));
+	localStorage.setItem('mezon_session', JSON.stringify(${mezon_session}));
     })();
 	true;
 	(function() {
-		const persistApp = JSON.parse(localStorage.getItem('persist:apps'));
-		if (persistApp) {
-			persistApp.theme = JSON.stringify("${themeBasic}");
-			persistApp.themeApp = JSON.stringify("${themeBasic}");
-			localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+		try {
+			const persistAppData = localStorage.getItem('persist:apps');
+			if (persistAppData && typeof persistAppData === 'string') {
+				const persistApp = JSON.parse(persistAppData);
+				if (persistApp && typeof persistApp === 'object') {
+					persistApp.theme = JSON.stringify("${themeBasic}");
+					persistApp.themeApp = JSON.stringify("${themeBasic}");
+					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+				}
+			}
+		} catch (error) {
+			console.error('Error parsing persist:apps data:', error);
+			// Create default app data if parsing fails
+			const defaultAppData = {
+				theme: JSON.stringify("${themeBasic}"),
+				themeApp: JSON.stringify("${themeBasic}")
+			};
+			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
 		}
 	})();
 	true;
@@ -108,7 +127,7 @@ const ChannelAppScreen = ({ navigation, route }) => {
 	// const reloadChannelApp = () => {
 	// 	webviewRef?.current?.reload();
 	// };
-	const onMessage = (event) => {
+	const onMessage = (event: any) => {
 		console.error('Received message from WebView:', event?.nativeEvent?.data);
 	};
 

@@ -1,11 +1,11 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { AttachmentEntity } from '@mezon/store';
 import { createImgproxyUrl, IEmbedProps } from '@mezon/utils';
 import React, { memo } from 'react';
 import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ImageListModal } from '../../../../../components/ImageListModal';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { EmbedAuthor } from './EmbedAuthor';
 import { EmbedDescription } from './EmbedDescription';
 import { EmbedFields } from './EmbedFields';
@@ -16,15 +16,32 @@ import { style } from './styles';
 type EmbedMessageProps = {
 	message_id: string;
 	embed: IEmbedProps;
+	channel_id: string;
+	onLongPress: () => void;
 };
 
-export const EmbedMessage = memo(({ message_id, embed }: EmbedMessageProps) => {
+export const EmbedMessage = memo(({ message_id, embed, channel_id, onLongPress }: EmbedMessageProps) => {
 	const { color, title, url, author, description, fields, image, timestamp, footer, thumbnail } = embed;
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 
+	const handlePressImage = () => {
+		const imageData = {
+			...image,
+			id: '',
+			filetype: 'image/jpeg',
+			message_id: message_id,
+			channelId: channel_id
+		};
+		const data = {
+			children: <ImageListModal channelId={''} imageSelected={imageData} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	};
+
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, isTabletLandscape && { width: '60%' }]}>
 			<View style={[styles.sizeColor, !!color && { backgroundColor: color }]} />
 			<View style={styles.embed}>
 				<View style={styles.valueContainer}>
@@ -44,15 +61,12 @@ export const EmbedMessage = memo(({ message_id, embed }: EmbedMessageProps) => {
 					)}
 				</View>
 				{!!image && (
-					<TouchableOpacity
-						onPress={() => {
-							const data = {
-								children: <ImageListModal channelId={''} imageSelected={image as AttachmentEntity} />
-							};
-							DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-						}}
-					>
-						<FastImage source={{ uri: image?.url }} style={styles.imageWrapper} resizeMode="cover" />
+					<TouchableOpacity onPress={handlePressImage} onLongPress={onLongPress}>
+						<FastImage
+							source={{ uri: image?.url }}
+							style={[styles.imageWrapper, { aspectRatio: image?.width / image?.height || 1 }]}
+							resizeMode="cover"
+						/>
 					</TouchableOpacity>
 				)}
 				{(!!timestamp || !!footer) && <EmbedFooter {...footer} timestamp={timestamp} />}

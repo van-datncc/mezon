@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { checkIsThread } from '@mezon/utils';
-import { ApiUpdateChannelDescRequest, ChannelType } from 'mezon-js';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, Pressable, ScrollView, Text, View } from 'react-native';
@@ -22,7 +22,6 @@ import MezonConfirm from '../../componentUI/MezonConfirm';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuItemProps, IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
-import MezonOption from '../../componentUI/MezonOption';
 import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN, MenuChannelScreenProps } from '../../navigation/ScreenTypes';
 import { AddMemberOrRoleBS } from '../../screens/channelPermissionSetting/components/AddMemberOrRoleBS';
@@ -61,20 +60,19 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		return isEqual(originSettingValue, currentSettingValue);
 	}, [originSettingValue, currentSettingValue]);
 
-	const currentCategoryName = useMemo(() => {
-		return channel?.category_name;
-	}, [channel?.category_name]);
 	const currentUserId = useSelector(selectCurrentUserId);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
-		headerRight: () => (
-			<Pressable onPress={() => handleSaveChannelSetting()}>
-				<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: isChannel ? t1('menuChannelStack.channelSetting') : t1('menuChannelStack.threadSetting'),
+			headerRight: () => (
+				<Pressable onPress={() => handleSaveChannelSetting()}>
+					<Text style={[styles.saveChangeButton, !isNotChanged ? styles.changed : styles.notChange]}>{t('confirm.save')}</Text>
+				</Pressable>
+			)
+		});
+	}, [navigation, isNotChanged, styles.saveChangeButton, styles.changed, styles.notChange, t, isChannel, t1]);
 
 	const handleUpdateValue = (value: Partial<IChannelSettingValue>) => {
 		setCurrentSettingValue({ ...currentSettingValue, ...value });
@@ -99,11 +97,17 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 		const isCheckNameChannelValue =
 			!!channelsClan?.length && channelsClan?.some((channel) => channel?.channel_label === currentSettingValue?.channelName);
 		setIsCheckDuplicateNameChannel(isCheckNameChannelValue);
-		const updateChannel: ApiUpdateChannelDescRequest = {
+		const updateChannel = {
 			channel_id: channel?.channel_id || '',
 			channel_label: currentSettingValue?.channelName,
-			category_id: channel.category_id,
-			app_url: ''
+			category_id: channel?.category_id,
+			app_url: channel?.app_url || '',
+			app_id: channel?.app_id || '',
+			age_restricted: channel?.age_restricted,
+			e2ee: channel?.e2ee,
+			topic: channel?.topic,
+			parent_id: channel?.parent_id,
+			channel_private: channel?.channel_private
 		};
 		if (isCheckNameChannelValue || !isCheckValid) return;
 		await dispatch(channelsActions.updateChannel(updateChannel));
@@ -134,17 +138,33 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 						});
 					}
 				},
+
+				{
+					title: t('fields.quickAction.title'),
+					expandable: true,
+					icon: <MezonIconCDN icon={IconCDN.quickAction} color={themeValue.text} />,
+					isShow: isChannel && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
+					onPress: () => {
+						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+							screen: APP_SCREEN.MENU_CHANNEL.QUICK_ACTION,
+							params: {
+								channelId,
+							}
+						});
+					}
+				},
+
 				{
 					title: t('fields.privateChannelInvite.addMember'),
 					expandable: true,
 					icon: <MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} />,
-					isShow: isChannel && !!channel.channel_private && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
+					isShow: isChannel && !!channel?.channel_private && channel?.type !== ChannelType.CHANNEL_TYPE_APP,
 					onPress: () => {
 						bottomSheetRef?.current?.present();
 					}
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[channel?.channel_private, channel?.type, channelId, isChannel, t, themeValue.text]
 	);
 
 	const webhookMenu = useMemo(
@@ -165,7 +185,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					}
 				}
 			] satisfies IMezonMenuItemProps[],
-		[]
+		[channel?.channel_id, channel?.type, t, themeValue.text]
 	);
 
 	const deleteMenu = useMemo(
@@ -175,7 +195,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					title: isChannel ? t('fields.channelDelete.delete') : t('fields.threadDelete.delete'),
 					textStyle: { color: 'red' },
 					onPress: () => handlePressDeleteChannel(),
-					icon: <MezonIconCDN icon={IconCDN.trashIcon} color="red" />
+					icon: <MezonIconCDN icon={IconCDN.trashIcon} color={Colors.textRed} />
 				},
 				{
 					title: isChannel ? t('fields.channelDelete.leave') : t('fields.threadLeave.leave'),
@@ -185,7 +205,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					isShow: channel?.creator_id !== currentUserId && channel?.type !== ChannelType.CHANNEL_TYPE_APP
 				}
 			] satisfies IMezonMenuItemProps[],
-		[channel?.creator_id, currentUserId, isChannel, t]
+		[channel?.creator_id, channel?.type, currentUserId, isChannel, t]
 	);
 
 	const topMenu = useMemo(
@@ -201,33 +221,33 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				// 	bottomDescription: ''
 				// }
 			] satisfies IMezonMenuSectionProps[],
-		[currentCategoryName]
+		[channel?.type, permissionMenu, t]
 	);
 
 	const bottomMenu = useMemo(() => [{ items: webhookMenu }, { items: deleteMenu }] satisfies IMezonMenuSectionProps[], []);
 
-	const hideInactiveOptions = useMemo(
-		() =>
-			[
-				{
-					title: t('fields.channelHideInactivity._1hour'),
-					value: 0
-				},
-				{
-					title: t('fields.channelHideInactivity._24hours'),
-					value: 1
-				},
-				{
-					title: t('fields.channelHideInactivity._3days'),
-					value: 2
-				},
-				{
-					title: t('fields.channelHideInactivity._1Week'),
-					value: 3
-				}
-			] satisfies IMezonOptionData,
-		[]
-	);
+	// const hideInactiveOptions = useMemo(
+	// 	() =>
+	// 		[
+	// 			{
+	// 				title: t('fields.channelHideInactivity._1hour'),
+	// 				value: 0
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._24hours'),
+	// 				value: 1
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._3days'),
+	// 				value: 2
+	// 			},
+	// 			{
+	// 				title: t('fields.channelHideInactivity._1Week'),
+	// 				value: 3
+	// 			}
+	// 		] satisfies IMezonOptionData,
+	// 	[]
+	// );
 
 	const handleDeleteChannel = useCallback(async () => {
 		await dispatch(
@@ -247,7 +267,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				})
 			);
 		}
-	}, []);
+	}, [channel?.channel_id, channel?.clan_id, channel?.parent_id]);
 
 	const handleJoinChannel = async () => {
 		const channelId = channel?.parent_id || '';
@@ -266,13 +286,13 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				clanId: channel?.clan_id || '',
 				channelId: channel?.parent_id || '',
 				threadId: channel?.id || '',
-				isPrivate: channel.channel_private || 0
+				isPrivate: channel?.channel_private || 0
 			})
 		);
 		navigation.navigate(APP_SCREEN.HOME);
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 		handleJoinChannel();
-	}, []);
+	}, [channel?.channel_private, channel?.clan_id, channel?.id, channel?.parent_id]);
 
 	const handlePressLeaveChannel = () => {
 		const data = {

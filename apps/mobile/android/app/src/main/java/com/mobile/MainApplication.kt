@@ -11,10 +11,8 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
-import com.mezon.mobile.SharedPreferencesPackage
 import com.livekit.reactnative.LiveKitReactNative
 import com.livekit.reactnative.audio.AudioType
-import com.mezon.mobile.FullScreenNotificationIncomingCallPackage
 import com.mezon.mobile.CustomImageViewPackage
 import com.mezon.mobile.PiPPackage
 import com.mezon.mobile.VideoThumbnailPackage;
@@ -23,6 +21,10 @@ import com.mezon.mobile.KeepAwakePackage;
 import com.mezon.mobile.DeviceUtilsPackage;
 import com.mezon.mobile.BluetoothPackage;
 import com.mezon.mobile.NavigationBarPackage;
+import com.mezon.mobile.NotificationPreferencesPackage;
+import com.mezon.mobile.CallStatePackage;
+import io.invertase.firebase.analytics.ReactNativeFirebaseAnalyticsPackage;
+
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 
 class MainApplication : Application(), ReactApplication {
@@ -32,9 +34,7 @@ class MainApplication : Application(), ReactApplication {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
-              add(FullScreenNotificationIncomingCallPackage())
               add(CustomImageViewPackage())
-              add(SharedPreferencesPackage())
               add(PiPPackage())
               add(VideoThumbnailPackage())
               add(CustomAudioPackage())
@@ -42,6 +42,9 @@ class MainApplication : Application(), ReactApplication {
               add(DeviceUtilsPackage())
               add(BluetoothPackage())
               add(NavigationBarPackage())
+              add(NotificationPreferencesPackage())
+              add(ReactNativeFirebaseAnalyticsPackage())
+              add(CallStatePackage())
             }
 
         override fun getJSMainModuleName(): String = "src/main"

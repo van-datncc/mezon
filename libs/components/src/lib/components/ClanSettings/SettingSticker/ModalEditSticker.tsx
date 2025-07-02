@@ -1,11 +1,11 @@
 import { useEscapeKeyClose } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { Button, Icons, InputField } from '@mezon/ui';
+import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
-import { ApiClanStickerAddRequest, ApiMessageAttachment, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
+import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ELimitSize, ModalErrorTypeUpload, ModalOverData } from '../../ModalError';
@@ -86,11 +86,17 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			const updateData: MezonUpdateClanEmojiByIdBody = {
 				source: graphicSource,
 				category: graphic?.category,
-				shortname: editingGraphic.shortname,
+				shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
 				clan_id: currentClanId || ''
 			};
+
+			const requestData = {
+				...updateData,
+				media_type: 0
+			};
+
 			isSticker
-				? await dispatch(updateSticker({ stickerId: graphic.id, request: updateData }))
+				? await dispatch(updateSticker({ stickerId: graphic.id, request: requestData }))
 				: await dispatch(emojiSuggestionActions.updateEmojiSetting({ request: updateData, emojiId: graphic.id }));
 			handleCloseModal();
 			return;
@@ -124,19 +130,33 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 		if (!file.name.endsWith('.gif')) {
 			resizeFile = (await resizeFileImage(file, dimension.maxWidth, dimension.maxHeight, 'file')) as File;
 		}
+		const isForSale = isForSaleRef.current?.checked;
+		const realImage = await handleUploadEmoticon(client, session, path, resizeFile as File);
 
-		handleUploadEmoticon(client, session, path, resizeFile).then(async (attachment: ApiMessageAttachment) => {
-			const request: ApiClanStickerAddRequest = {
-				id: id,
-				category: category,
-				clan_id: currentClanId,
-				shortname: editingGraphic.shortname,
-				source: attachment.url
-			};
-			isSticker
-				? dispatch(createSticker({ request: request, clanId: currentClanId }))
-				: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
-		});
+		const request: ApiClanStickerAddRequest = {
+			id: id,
+			category: category,
+			clan_id: currentClanId,
+			source: realImage.url,
+			shortname: isSticker ? editingGraphic.shortname : ':' + editingGraphic.shortname + ':',
+			is_for_sale: isForSale
+		};
+		if (isForSale) {
+			const idPreview = Snowflake.generate();
+			const fileBlur = await createBlurredImageFile(resizeFile);
+			const pathPreview = (isSticker ? 'stickers/' : 'emojis/') + idPreview + '.webp';
+			await handleUploadEmoticon(client, session, pathPreview, fileBlur as File);
+			request.id = idPreview;
+		}
+
+		const requestData = {
+			...request,
+			media_type: 0
+		};
+
+		isSticker
+			? dispatch(createSticker({ request: requestData, clanId: currentClanId }))
+			: dispatch(emojiSuggestionActions.createEmojiSetting({ request: request, clanId: currentClanId }));
 
 		handleCloseModal();
 	};
@@ -161,6 +181,39 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, handleCloseModal);
+
+	const isForSaleRef = useRef<HTMLInputElement | null>(null);
+
+	function createBlurredImageFile(originalFile: File, blurAmount = 7) {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.src = URL.createObjectURL(originalFile);
+
+			img.onload = () => {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				if (!ctx) {
+					reject(new Error('Cannot create canvas context.'));
+					return;
+				}
+				canvas.width = img.width;
+				canvas.height = img.height;
+				ctx.filter = `blur(${blurAmount}px)`;
+				ctx.drawImage(img, 0, 0);
+
+				canvas.toBlob((blob) => {
+					if (blob) {
+						const newFile = new File([blob], 'blurred-image.png', { type: 'image/png' });
+						resolve(newFile); // trả về file có thể dùng tiếp
+					} else {
+						reject(new Error('Không thể chuyển canvas thành file.'));
+					}
+				}, 'image/png');
+			};
+
+			img.onerror = () => reject(new Error('Không thể load ảnh.'));
+		});
+	}
 
 	return (
 		<>
@@ -236,10 +289,16 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						</div>
 					</div>
 				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none`}>
+				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none gap-2`}>
+					<div className="flex items-center flex-1 h-full gap-2">
+						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
+						<label htmlFor="sale_item" className="!text-textPrimaryLight dark:!text-textPrimary">
+							This is for sale
+						</label>
+					</div>
 					<Button
 						label="Never Mind"
-						className="dark:text-textPrimary !text-textPrimaryLight rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent "
+						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
 					/>
 					<Button

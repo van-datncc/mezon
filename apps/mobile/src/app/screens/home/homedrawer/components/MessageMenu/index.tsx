@@ -1,7 +1,9 @@
-import { ActionEmitEvent, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { useAuth, useFriends } from '@mezon/core';
+import { ActionEmitEvent, CheckIcon, CloseIcon, ENotificationActive, ENotificationChannelId, Icons } from '@mezon/mobile-components';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
+	EStateFriend,
 	channelsActions,
 	deleteChannel,
 	directActions,
@@ -12,6 +14,7 @@ import {
 	removeMemberChannel,
 	selectCurrentClan,
 	selectCurrentUserId,
+	selectFriendById,
 	selectNotifiSettingsEntitiesById,
 	useAppDispatch,
 	useAppSelector
@@ -24,6 +27,7 @@ import React, { memo, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../src/app/constants/icon_cdn';
@@ -44,6 +48,16 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 	const dispatch = useAppDispatch();
 	const navigation = useNavigation<any>();
 	const currentClan = useSelector(selectCurrentClan);
+	const { userProfile } = useAuth();
+	const infoFriend = useAppSelector((state) => selectFriendById(state, messageInfo?.user_id?.[0] || ''));
+	const didIBlockUser = useMemo(() => {
+		return (
+			infoFriend?.state === EStateFriend.BLOCK &&
+			infoFriend?.source_id === userProfile?.user?.id &&
+			infoFriend?.user?.id === messageInfo?.user_id?.[0]
+		);
+	}, [infoFriend, userProfile?.user?.id, messageInfo?.user_id?.[0]]);
+	const { blockFriend, unBlockFriend, deleteFriend, addFriend } = useFriends();
 
 	const dismiss = () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
@@ -102,6 +116,69 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		}
 	];
 
+	const handleAddFriend = () => {
+		addFriend({
+			ids: [messageInfo?.user_id?.[0]],
+			usernames: [messageInfo?.usernames?.[0]]
+		});
+		dismiss();
+	};
+
+	const handleDeleteFriend = () => {
+		deleteFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+		dismiss();
+	};
+
+	const handleBlockFriend = async () => {
+		try {
+			const isBlocked = await blockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+			if (isBlocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.blockUser.success'),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.blockUser.error'),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
+		} finally {
+			dismiss();
+		}
+	};
+
+	const handleUnblockFriend = async () => {
+		try {
+			const isUnblocked = await unBlockFriend(messageInfo?.usernames?.[0], messageInfo?.user_id?.[0]);
+			if (isUnblocked) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('notification.unblockUser.success'),
+						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
+					}
+				});
+			}
+		} catch (error) {
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('notification.unblockUser.error'),
+					leadingIcon: <CloseIcon color={Colors.red} width={20} height={20} />
+				}
+			});
+		} finally {
+			dismiss();
+		}
+	};
+
 	const profileMenu: IMezonMenuItemProps[] = [
 		{
 			onPress: async () => {
@@ -110,7 +187,33 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			},
 			title: t('menu.closeDm'),
 			isShow: !isGroup,
-			icon: <MezonIconCDN icon={IconCDN.userMinusIcon} color={baseColor.gray} />
+			icon: <MezonIconCDN icon={IconCDN.closeDMIcon} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_4 }} />,
+			textStyle: { marginLeft: -size.s_2 }
+		},
+		{
+			onPress: infoFriend?.state === EStateFriend.FRIEND ? handleDeleteFriend : handleAddFriend,
+			title: infoFriend?.state === EStateFriend.FRIEND ? t('menu.removeFriend') : t('menu.addFriend'),
+			isShow:
+				!isGroup &&
+				infoFriend?.state !== EStateFriend.BLOCK &&
+				infoFriend?.state !== EStateFriend.MY_PENDING &&
+				infoFriend?.state !== EStateFriend.OTHER_PENDING,
+			icon:
+				infoFriend?.state === EStateFriend.FRIEND ? (
+					<MezonIconCDN icon={IconCDN.removeFriend} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
+				) : (
+					<MezonIconCDN icon={IconCDN.userPlusIcon} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
+				)
+		},
+		{
+			onPress: didIBlockUser ? handleUnblockFriend : handleBlockFriend,
+			title: didIBlockUser ? t('menu.unblockUser') : t('menu.blockUser'),
+			isShow: !isGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser),
+			icon: didIBlockUser ? (
+				<MezonIconCDN icon={IconCDN.unblockUser} color={themeValue.textStrong} />
+			) : (
+				<MezonIconCDN icon={IconCDN.blockUser} color={themeValue.textStrong} />
+			)
 		}
 	];
 
@@ -137,7 +240,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		{
 			onPress: async () => await handleMarkAsRead(messageInfo?.channel_id ?? ''),
 			title: t('menu.markAsRead'),
-			icon: <MezonIconCDN icon={IconCDN.eyeIcon} color={baseColor.gray} />
+			icon: <MezonIconCDN icon={IconCDN.eyeIcon} color={themeValue.textStrong} />
 		}
 	];
 
@@ -145,7 +248,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		{
 			onPress: () => reserve(),
 			title: t('menu.favorite'),
-			icon: <Icons.FavoriteFilledIcon color={baseColor.gray} />
+			icon: <Icons.FavoriteFilledIcon color={themeValue.textStrong} />
 		}
 	];
 
@@ -176,9 +279,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 			onPress: handleEnableOrDisableE2EE,
 			title: messageInfo?.e2ee ? t('menu.disableE2EE') : t('menu.enableE2EE'),
 			icon: messageInfo?.e2ee ? (
-				<MezonIconCDN icon={IconCDN.lockUnlockIcon} color={themeValue.textStrong} />
+				<MezonIconCDN icon={IconCDN.lockUnlockIcon} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
 			) : (
-				<MezonIconCDN icon={IconCDN.lockIcon} color={themeValue.text} />
+				<MezonIconCDN icon={IconCDN.lockIcon} color={themeValue.textStrong} customStyle={{ marginBottom: size.s_2 }} />
 			)
 		},
 		{
@@ -195,9 +298,9 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 				dismiss();
 			},
 			icon: isDmUnmute ? (
-				<MezonIconCDN icon={IconCDN.bellSlashIcon} color={themeValue.textStrong} />
+				<MezonIconCDN icon={IconCDN.bellIcon} color={themeValue.textStrong} />
 			) : (
-				<MezonIconCDN icon={IconCDN.bellIcon} width={22} height={22} color={themeValue.text} />
+				<MezonIconCDN icon={IconCDN.bellSlashIcon} color={themeValue.textStrong} />
 			)
 		}
 		// {

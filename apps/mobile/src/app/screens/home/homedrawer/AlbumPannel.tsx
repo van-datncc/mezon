@@ -227,7 +227,9 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 			>
 				<Image source={{ uri: item?.coverPhoto }} style={styles.albumCoverImage} />
 				<View style={styles.albumTitleAndCount}>
-					<Text style={styles.albumTitle}>{item.title}</Text>
+					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.albumTitle}>
+						{item.title}
+					</Text>
 					<Text style={styles.albumImageCount}>{item.count}</Text>
 				</View>
 				{item?.title === valueAlbum && (
@@ -241,7 +243,14 @@ export const AlbumPanel = ({ valueAlbum, onAlbumChange }: IAlbumProps) => {
 
 	return (
 		<View style={styles.albumPanel}>
-			<FlatList data={albums} keyExtractor={(item, index) => `album_item_${item?.id}_${index}`} renderItem={renderItem} />
+			<FlatList
+				data={albums}
+				keyExtractor={(item, index) => `album_item_${item?.id}_${index}`}
+				renderItem={renderItem}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
+			/>
 		</View>
 	);
 };

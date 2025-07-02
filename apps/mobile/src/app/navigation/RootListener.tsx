@@ -11,6 +11,7 @@ import {
 	fcmActions,
 	friendsActions,
 	getStore,
+	gifsActions,
 	listChannelsByUserActions,
 	listUsersByUserActions,
 	messagesActions,
@@ -20,6 +21,7 @@ import {
 	selectHasInternetMobile,
 	selectIsFromFCMMobile,
 	selectIsLogin,
+	selectSession,
 	settingClanStickerActions,
 	useAppDispatch,
 	userStatusActions,
@@ -36,28 +38,22 @@ import {
 	STORAGE_CLAN_ID,
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_MY_USER_ID,
-	getAppInfo,
 	load,
 	save,
 	setCurrentClanLoader
 } from '@mezon/mobile-components';
-import notifee from '@notifee/react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ChannelType } from 'mezon-js';
+import analytics from '@react-native-firebase/analytics';
+import { ChannelType, Session } from 'mezon-js';
 import { AppState, DeviceEventEmitter, Platform, View } from 'react-native';
-import { handleFCMToken, setupCallKeep, setupNotificationListeners } from '../utils/pushNotificationHelpers';
+import { getVoIPToken, handleFCMToken } from '../utils/pushNotificationHelpers';
 
+const MAX_RETRIES_SESSION = 10;
 const RootListener = () => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const { handleReconnect } = useContext(ChatContext);
 	const dispatch = useAppDispatch();
-	const navigation = useNavigation<any>();
 	const hasInternet = useSelector(selectHasInternetMobile);
 	const appStateRef = useRef(AppState.currentState);
-
-	useEffect(() => {
-		startupRunning(navigation);
-	}, [navigation]);
 
 	useEffect(() => {
 		if (isLoggedIn && hasInternet) {
@@ -69,43 +65,52 @@ const RootListener = () => {
 		if (isLoggedIn) {
 			requestIdleCallback(() => {
 				setTimeout(() => {
-					Promise.all([initAppLoading(), mainLoader()]).catch((error) => {
-						console.error('Error in tasks:', error);
-					});
-				}, 1000);
+					initAppLoading();
+					mainLoader();
+				}, 2000);
 			});
 		}
 	}, [isLoggedIn]);
-
-	const startupRunning = async (navigation: any) => {
-		await setupNotificationListeners(navigation);
-		// if (Platform.OS === 'ios') {
-		// 	await setupCallKeep();
-		// }
-	};
 
 	const initAppLoading = async () => {
 		const isDisableLoad = await load(STORAGE_IS_DISABLE_LOAD_BACKGROUND);
 		const isFromFCM = isDisableLoad?.toString() === 'true';
 		await mainLoaderTimeout({ isFromFCM });
-		// if (!isFromFCM) {
-		// 	await sleep(1000);
-		// 	refreshMessageInitApp();
-		// }
 	};
+
+	const activeAgainLoaderBackground = useCallback(async () => {
+		try {
+			const store = getStore();
+			const currentClanId = selectCurrentClanId(store.getState() as any);
+			dispatch(appActions.setLoadingMainMobile(false));
+			if (currentClanId) {
+				const promise = [
+					dispatch(
+						voiceActions.fetchVoiceChannelMembers({
+							clanId: currentClanId ?? '',
+							channelId: '',
+							channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE || ChannelType.CHANNEL_TYPE_MEZON_VOICE
+						})
+					),
+					dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true }))
+				];
+				await Promise.allSettled(promise);
+			}
+			dispatch(directActions.fetchDirectMessage({ noCache: true }));
+			dispatch(clansActions.fetchClans({ noCache: true }));
+			return null;
+		} catch (error) {
+			/* empty */
+		}
+	}, [dispatch]);
 
 	const messageLoaderBackground = useCallback(async () => {
 		try {
 			const store = getStore();
 			const currentChannelId = selectCurrentChannelId(store.getState() as any);
 			const currentClanId = selectCurrentClanId(store.getState() as any);
-			handleReconnect('Initial reconnect attempt');
-			if (!currentChannelId) {
-				return null;
-			}
 			dispatch(appActions.setLoadingMainMobile(false));
-			await notifee.cancelAllNotifications();
-			const promise = [
+			if (currentChannelId) {
 				dispatch(
 					messagesActions.fetchMessages({
 						channelId: currentChannelId,
@@ -114,22 +119,13 @@ const RootListener = () => {
 						isClearMessage: true,
 						clanId: currentClanId
 					})
-				),
-				dispatch(
-					voiceActions.fetchVoiceChannelMembers({
-						clanId: currentClanId ?? '',
-						channelId: '',
-						channelType: ChannelType.CHANNEL_TYPE_GMEET_VOICE || ChannelType.CHANNEL_TYPE_MEZON_VOICE
-					})
-				),
-				dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true })),
-			];
-			await Promise.all(promise);
+				);
+			}
 			return null;
 		} catch (error) {
 			/* empty */
 		}
-	}, [dispatch, handleReconnect]);
+	}, [dispatch]);
 
 	const handleAppStateChange = useCallback(
 		async (state: string) => {
@@ -138,7 +134,11 @@ const RootListener = () => {
 			// Note: if is DM
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
 			const isFromFcmMobile = selectIsFromFCMMobile(store.getState());
+			if (state === 'active') {
+				await activeAgainLoaderBackground();
+			}
 			if (state === 'active' && !currentDirectId) {
+				handleReconnect('Initial reconnect attempt timeout');
 				if (isFromFCM?.toString() === 'true' || isFromFcmMobile) {
 					/* empty */
 				} else {
@@ -146,11 +146,23 @@ const RootListener = () => {
 				}
 			}
 		},
-		[messageLoaderBackground]
+		[activeAgainLoaderBackground, handleReconnect, messageLoaderBackground]
 	);
+
+	const logAppStarted = async () => {
+		try {
+			await analytics().setAnalyticsCollectionEnabled(true);
+			await analytics().logEvent('app_started', {
+				platform: Platform.OS
+			});
+		} catch (error) {
+			console.error('Failed to log app started event:');
+		}
+	};
 
 	useEffect(() => {
 		const appStateSubscription = AppState.addEventListener('change', handleAppStateChangeListener);
+		logAppStarted();
 		return () => {
 			appStateSubscription.remove();
 		};
@@ -165,7 +177,7 @@ const RootListener = () => {
 	}, []);
 
 	const authLoader = useCallback(async () => {
-		let retries = 3;
+		let retries = MAX_RETRIES_SESSION;
 		while (retries > 0) {
 			try {
 				const response = await dispatch(authActions.refreshSession());
@@ -173,11 +185,9 @@ const RootListener = () => {
 					retries -= 1;
 					if (retries === 0) {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
-						console.log('Session expired after 3 retries');
 						return;
 					}
-					console.log(`Session expired, retrying... (${3 - retries}/3)`);
-					await sleep(1000);
+					await sleep(1000 * (MAX_RETRIES_SESSION - retries));
 					continue;
 				}
 				const profileResponse = await dispatch(accountActions.getUserProfile());
@@ -190,11 +200,9 @@ const RootListener = () => {
 					retries -= 1;
 					if (retries === 0) {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
-						console.log('Session expired after 3 retries');
 						return;
 					}
-					console.log(`Session expired, retrying... (${3 - retries}/3)`);
-					await sleep(1000);
+					await sleep(1000 * (MAX_RETRIES_SESSION - retries));
 					continue;
 				}
 				break; // Exit the loop if no error
@@ -202,11 +210,9 @@ const RootListener = () => {
 				retries -= 1;
 				if (retries === 0) {
 					DeviceEventEmitter.emit(ActionEmitEvent.ON_SHOW_POPUP_SESSION_EXPIRED);
-					console.log('Session expired after 3 retries');
 					return;
 				}
-				console.log(`Error in authLoader, retrying... (${3 - retries}/3)`, error);
-				await sleep(1000);
+				await sleep(1000 * (MAX_RETRIES_SESSION - retries));
 			}
 		}
 	}, [dispatch]);
@@ -217,8 +223,19 @@ const RootListener = () => {
 				return;
 			}
 			const fcmtoken = await handleFCMToken();
+			const store = getStore();
+			const session = selectSession(store.getState());
+			const voipToken = Platform.OS === 'ios' ? await getVoIPToken() : '';
 			if (fcmtoken) {
-				dispatch(fcmActions.registFcmDeviceToken({ tokenId: fcmtoken, deviceId: username, platform: Platform.OS }));
+				dispatch(
+					fcmActions.registFcmDeviceToken({
+						session: session as Session,
+						tokenId: fcmtoken,
+						deviceId: username,
+						platform: Platform.OS,
+						voipToken
+					})
+				);
 			}
 		} catch (error) {
 			console.error('Error loading FCM config:', error);
@@ -228,16 +245,18 @@ const RootListener = () => {
 	const mainLoader = useCallback(async () => {
 		try {
 			const promises = [];
-			promises.push(dispatch(listUsersByUserActions.fetchListUsersByUser({})));
-			promises.push(dispatch(friendsActions.fetchListFriends({})));
+			promises.push(dispatch(listUsersByUserActions.fetchListUsersByUser({ noCache: true })));
+			promises.push(dispatch(friendsActions.fetchListFriends({ noCache: true })));
 			promises.push(dispatch(clansActions.joinClan({ clanId: '0' })));
 			promises.push(dispatch(directActions.fetchDirectMessage({ noCache: true })));
-			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({})));
-			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({})));
-			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({})));
+			promises.push(dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true })));
+			promises.push(dispatch(settingClanStickerActions.fetchStickerByUserId({ noCache: true })));
+			promises.push(dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true })));
+			promises.push(dispatch(gifsActions.fetchGifCategories()));
+			promises.push(dispatch(gifsActions.fetchGifCategoryFeatured()));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
 			promises.push(dispatch(acitvitiesActions.listActivities()));
-			await Promise.all(promises);
+			await Promise.allSettled(promises);
 			return null;
 		} catch (error) {
 			console.log('error mainLoader', error);
@@ -259,7 +278,7 @@ const RootListener = () => {
 					promises.push(dispatch(clansActions.joinClan({ clanId })));
 					promises.push(dispatch(clansActions.changeCurrentClan({ clanId })));
 				}
-				promises.push(dispatch(clansActions.fetchClans()));
+				promises.push(dispatch(clansActions.fetchClans({ noCache: true })));
 				const results = await Promise.all(promises);
 				if (!isFromFCM && !clanId) {
 					const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');

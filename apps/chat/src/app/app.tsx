@@ -1,22 +1,20 @@
 import { MezonStoreProvider, initStore, selectIsLogin, setIsElectronDownloading, setIsElectronUpdateAvailable } from '@mezon/store';
-import { CreateMezonClientOptions, MezonContextProvider, useMezon } from '@mezon/transport';
+import { MezonContextProvider, clearSessionFromStorage, getMezonConfig, useMezon } from '@mezon/transport';
 
+import { PopupManagerProvider } from '@mezon/components';
 import { PermissionProvider, useActivities, useSettingFooter } from '@mezon/core';
 import { captureSentryError } from '@mezon/logger';
 import { ACTIVE_WINDOW, DOWNLOAD_PROGRESS, TRIGGER_SHORTCUT, UPDATE_AVAILABLE, UPDATE_ERROR, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import 'react-contexify/ReactContexify.css';
 import { useDispatch, useSelector } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
+
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
 
-const mezon: CreateMezonClientOptions = {
-	host: process.env.NX_CHAT_APP_API_HOST as string,
-	port: process.env.NX_CHAT_APP_API_PORT as string,
-	key: process.env.NX_CHAT_APP_API_KEY as string,
-	ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
-};
+const mezon = getMezonConfig();
 
 export const LoadingFallbackWrapper = () => <LoadingFallback />;
 
@@ -47,6 +45,23 @@ const AppInitializer = () => {
 	const dispatch = useDispatch();
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const { setUserActivity } = useActivities();
+
+	const { clientRef } = useMezon();
+	if (clientRef?.current?.setBasePath) {
+		if (!isLogin) {
+			clearSessionFromStorage();
+			clientRef.current.setBasePath(
+				process.env.NX_CHAT_APP_API_GW_HOST as string,
+				process.env.NX_CHAT_APP_API_GW_PORT as string,
+				process.env.NX_CHAT_APP_API_SECURE === 'true'
+			);
+		} else {
+			const config = getMezonConfig();
+			if (config) {
+				clientRef.current.setBasePath(config.host, config.port, config.ssl);
+			}
+		}
+	}
 
 	useEffect(() => {
 		if (isElectron() && isLogin) {
@@ -137,10 +152,12 @@ export function App() {
 		>
 			{showLoading && <LoadingFallbackWrapper />}
 			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
-				<PermissionProvider>
-					<AppInitializer />
-					<Routes />
-				</PermissionProvider>
+				<PopupManagerProvider>
+					<PermissionProvider>
+						<AppInitializer />
+						<Routes />
+					</PermissionProvider>
+				</PopupManagerProvider>
 			</MezonStoreProvider>
 		</LoadingContext.Provider>
 	);

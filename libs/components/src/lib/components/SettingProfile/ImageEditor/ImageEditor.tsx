@@ -57,9 +57,16 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 			const scaleX = (bgCanvas.width / img.width) * baseZoomFactor;
 			const scaleY = (bgCanvas.height / img.height) * baseZoomFactor;
 			const scaleFactor = Math.min(scaleX, scaleY) * zoom;
+			let imgWidth = 0;
+			let imgHeight = 0;
 
-			const imgWidth = img.width * scaleFactor;
-			const imgHeight = img.height * scaleFactor;
+			if (img.width > img.height) {
+				imgHeight = img.height * scaleFactor <= 400 ? 400 : img.height * scaleFactor;
+				imgWidth = img.height * scaleFactor <= 400 ? (imgHeight * img.width) / img.height : img.width * scaleFactor;
+			} else {
+				imgWidth = img.width * scaleFactor <= 400 ? 400 : img.width * scaleFactor;
+				imgHeight = img.width * scaleFactor <= 400 ? (imgWidth * img.height) / img.width : img.height * scaleFactor;
+			}
 
 			// Center image
 			const centerX = bgCanvas.width / 2;
@@ -76,7 +83,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 			overlayCtx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
 			// Transparent circular area
-			const radius = 140;
+			const radius = 200;
 			overlayCtx.globalCompositeOperation = 'destination-out';
 			overlayCtx.beginPath();
 			overlayCtx.arc(overlayCanvas.width / 2, overlayCanvas.height / 2, radius, 0, Math.PI * 2);
@@ -155,7 +162,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 		if (!ctx) return;
 
 		// Size of the cropped canvas
-		const radius = 140;
+		const radius = 200;
 		const diameter = radius * 2;
 		tempCanvas.width = diameter;
 		tempCanvas.height = diameter;
@@ -175,7 +182,7 @@ const ImageEditor = React.memo(({ imageSource, onClose, setImageObject, setImage
 		// Export the cropped image
 		tempCanvas.toBlob((blob) => {
 			if (!blob) return;
-			const file = new File([blob], `${imageSource.filename}+cropped`, { type: 'image/png' });
+			const file = new File([blob], `${imageSource.filename}`, { type: 'image/png' });
 			setImageCropped(file);
 			handleClose();
 		}, 'image/png');

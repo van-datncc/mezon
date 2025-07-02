@@ -56,21 +56,34 @@ export const style = (colors: Attributes) =>
 
 		mainSec: {
 			gap: 5,
+			width: '67%',
 			marginBottom: Metrics.size.m
 		},
 
-		privateArea: {
-			marginBottom: size.s_16
+		mainArea: {
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginBottom: size.s_10
 		},
 
+		eventLogo: {
+			height: size.s_80,
+			borderRadius: size.s_6,
+			overflow: 'hidden',
+			width: '30%'
+		},
+		eventLogoImage: {
+			height: '100%',
+			width: '100%'
+		},
 		privatePanel: {
 			backgroundColor: baseColor.redStrong,
 			justifyContent: 'center',
 			alignItems: 'center',
 			padding: size.s_2,
 			borderRadius: size.s_2,
-			paddingHorizontal: size.s_2,
-			position: 'absolute'
+			alignSelf: 'flex-start'
 		},
 
 		privateText: {

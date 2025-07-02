@@ -2,11 +2,11 @@ import { captureSentryError } from '@mezon/logger';
 import { CanvasUpdate, ICanvas, LIMIT, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiEditChannelCanvasRequest } from 'mezon-js/api.gen';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
+import { RootState } from '../store';
 
 export const CANVAS_API_FEATURE_KEY = 'canvasapi';
-const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 
 /*
  * Update these interfaces according to your requirements.
@@ -14,6 +14,7 @@ const FETCH_MESSAGES_CACHED_TIME = 1000 * 60 * 60;
 export interface CanvasAPIEntity extends ICanvas {
 	id: string; // Primary ID
 	countCanvas?: number;
+	update_time?: string;
 }
 
 export interface CanvasAPIState {
@@ -24,19 +25,30 @@ export interface CanvasAPIState {
 		EntityState<CanvasAPIEntity, string> & {
 			id: string;
 			countCanvas?: number;
+			cache?: CacheMetadata;
 		}
 	>;
 }
 
 export const canvasAPIAdapter = createEntityAdapter({
 	selectId: (canvas: CanvasAPIEntity) => canvas.id || '',
-	sortComparer: (a, b) => b.id.localeCompare(a.id)
+	sortComparer: (a, b) => {
+		if (a.update_time && b.update_time) {
+			return new Date(b.update_time).getTime() - new Date(a.update_time).getTime();
+		}
+
+		if (a.update_time && !b.update_time) return -1;
+		if (!a.update_time && b.update_time) return 1;
+
+		return b.id.localeCompare(a.id);
+	}
 });
 
 type fetchCanvasPayload = {
 	id: string;
 	clan_id: string;
 	channel_id: string;
+	noCache?: boolean;
 };
 
 type getCanvasListPayload = {
@@ -47,20 +59,86 @@ type getCanvasListPayload = {
 	noCache?: boolean;
 };
 
-export const fetchCanvasCached = memoizeAndTrack(
-	async (mezon: MezonValueContext, channel_id: string, clan_id: string, limit?: number, page?: number) => {
-		const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, LIMIT, page);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: FETCH_MESSAGES_CACHED_TIME,
-		normalizer: (args) => {
-			// set default value
-			return args[1] + args[2] + args[3] + args[4] + args[0].session.username;
-		}
+const selectCachedCanvasByChannel = createSelector(
+	[(state: RootState, channelId: string) => state[CANVAS_API_FEATURE_KEY].channelCanvas[channelId]],
+	(channelData) => {
+		if (!channelData) return [];
+		const entities = Object.values(channelData.entities || {});
+		return entities.sort((a, b) => {
+			if (a.update_time && b.update_time) {
+				return new Date(b.update_time).getTime() - new Date(a.update_time).getTime();
+			}
+
+			if (a.update_time && !b.update_time) return -1;
+			if (!a.update_time && b.update_time) return 1;
+
+			return b.id.localeCompare(a.id);
+		});
 	}
 );
+
+const fetchCanvasListCached = async (
+	getState: () => RootState,
+	mezon: MezonValueContext,
+	channel_id: string,
+	clan_id: string,
+	limit?: number,
+	page?: number,
+	noCache = false
+) => {
+	const state = getState();
+	const channelData = state[CANVAS_API_FEATURE_KEY].channelCanvas[channel_id];
+	const apiKey = createApiKey('fetchCanvasList', channel_id, clan_id, String(limit || ''), String(page || ''));
+	const shouldForceCall = shouldForceApiCall(apiKey, channelData?.cache, noCache);
+
+	if (!shouldForceCall) {
+		const entities = selectCachedCanvasByChannel(state, channel_id);
+		return {
+			channel_canvases: entities,
+			count: channelData.countCanvas || 0,
+			fromCache: true
+		};
+	}
+
+	const response = await mezon.client.getChannelCanvasList(mezon.session, channel_id, clan_id, limit || LIMIT, page);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
+
+const fetchCanvasDetailCached = async (
+	getState: () => RootState,
+	mezon: MezonValueContext,
+	id: string,
+	clan_id: string,
+	channel_id: string,
+	noCache = false
+) => {
+	const state = getState();
+	const channelData = state[CANVAS_API_FEATURE_KEY].channelCanvas[channel_id];
+	const apiKey = createApiKey('fetchCanvasDetail', id, clan_id, channel_id);
+	const shouldForceCall = shouldForceApiCall(apiKey, channelData?.cache, noCache);
+
+	if (!shouldForceCall) {
+		return {
+			canvas: channelData.entities[id],
+			fromCache: true
+		};
+	}
+
+	const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false
+	};
+};
 
 export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', async (body: ApiEditChannelCanvasRequest, thunkAPI) => {
 	try {
@@ -68,7 +146,39 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 		const response = await mezon.client.editChannelCanvases(mezon.session, body);
 
-		return { ...response, channel_id: body.channel_id, title: body.title, content: body.content, is_default: body.is_default };
+		const result = {
+			...response,
+			channel_id: body.channel_id,
+			title: body.title,
+			content: body.content,
+			is_default: body.is_default,
+			update_time: new Date().toISOString()
+		};
+
+		if (body.channel_id && result.id) {
+			if (body.id) {
+				thunkAPI.dispatch(
+					canvasAPIActions.updateCanvas({
+						channelId: body.channel_id,
+						dataUpdate: {
+							id: result.id,
+							title: body.title as string,
+							content: body.content as string,
+							update_time: result.update_time
+						}
+					})
+				);
+			} else {
+				thunkAPI.dispatch(
+					canvasAPIActions.upsertOne({
+						channel_id: body.channel_id,
+						canvas: result
+					})
+				);
+			}
+		}
+
+		return result;
 	} catch (error) {
 		captureSentryError(error, 'canvas/editChannelCanvases');
 		return thunkAPI.rejectWithValue(error);
@@ -77,10 +187,12 @@ export const createEditCanvas = createAsyncThunk('canvas/editChannelCanvases', a
 
 export const getChannelCanvasDetail = createAsyncThunk(
 	'canvas/getChannelCanvasDetail',
-	async ({ id, clan_id, channel_id }: fetchCanvasPayload, thunkAPI) => {
+	async ({ id, clan_id, channel_id, noCache }: fetchCanvasPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.getChannelCanvasDetail(mezon.session, id, clan_id, channel_id);
+
+			const response = await fetchCanvasDetailCached(thunkAPI.getState as () => RootState, mezon, id, clan_id, channel_id, noCache);
+
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'canvas/getChannelCanvasDetail');
@@ -95,16 +207,9 @@ export const getChannelCanvasList = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-			if (noCache) {
-				fetchCanvasCached.delete(mezon, channel_id, clan_id, limit, page);
-			}
-			const response = await fetchCanvasCached(mezon, channel_id, clan_id, limit, page);
-			if (Date.now() - response.time > 100) {
-				return {
-					fromCache: true
-				};
-			}
-			return response;
+			const response = await fetchCanvasListCached(thunkAPI.getState as () => RootState, mezon, channel_id, clan_id, limit, page, noCache);
+
+			return { ...response, channel_id };
 		} catch (error) {
 			captureSentryError(error, 'canvas/getChannelCanvasList');
 			return thunkAPI.rejectWithValue(error);
@@ -117,6 +222,16 @@ export const deleteCanvas = createAsyncThunk('canvas/deleteCanvas', async ({ id,
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		const response = await mezon.client.deleteChannelCanvas(mezon.session, id, clan_id, channel_id);
+
+		if (channel_id && id) {
+			thunkAPI.dispatch(
+				canvasAPIActions.removeOneCanvas({
+					channelId: channel_id,
+					canvasId: id
+				})
+			);
+		}
+
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'canvas/deleteCanvas');
@@ -149,9 +264,21 @@ const handleSetManyCanvas = ({
 		});
 	}
 
-	const updatedChannelCanvas = canvasAPIAdapter.setAll(state.channelCanvas[channelId], adapterPayload);
+	const sortedPayload = [...adapterPayload].sort((a, b) => {
+		if (a.update_time && b.update_time) {
+			return new Date(b.update_time).getTime() - new Date(a.update_time).getTime();
+		}
+
+		if (a.update_time && !b.update_time) return -1;
+		if (!a.update_time && b.update_time) return 1;
+
+		return b.id.localeCompare(a.id);
+	});
+
+	const updatedChannelCanvas = canvasAPIAdapter.setAll(state.channelCanvas[channelId], sortedPayload);
 	state.channelCanvas[channelId] = updatedChannelCanvas;
 	state.channelCanvas[channelId].countCanvas = countCanvas;
+	state.channelCanvas[channelId].cache = createCacheMetadata();
 };
 
 export const canvasAPISlice = createSlice({
@@ -161,13 +288,13 @@ export const canvasAPISlice = createSlice({
 		// ...
 		updateCanvas: (state, action: PayloadAction<{ channelId: string; dataUpdate: CanvasUpdate }>) => {
 			const { channelId, dataUpdate } = action.payload;
-			const { id, title, content, creator_id } = dataUpdate;
+			const { id, title, content, update_time } = dataUpdate;
 			canvasAPIAdapter.updateOne(state.channelCanvas[channelId], {
 				id: id,
 				changes: {
 					title: title,
 					content: content,
-					creator_id: creator_id
+					update_time: update_time || new Date().toISOString()
 				}
 			});
 		},
@@ -184,7 +311,21 @@ export const canvasAPISlice = createSlice({
 					id: canvas.id
 				});
 			}
-			canvasAPIAdapter.upsertOne(state.channelCanvas[channel_id], canvas);
+			const canvasWithTimestamp = {
+				...canvas,
+				update_time: canvas.update_time || new Date().toISOString()
+			};
+
+			const currentEntities = Object.values(state.channelCanvas[channel_id].entities || {});
+			const existingCanvas = state.channelCanvas[channel_id].entities[canvas.id];
+
+			if (existingCanvas) {
+				const updatedEntities = currentEntities.map((entity) => (entity.id === canvas.id ? { ...entity, ...canvasWithTimestamp } : entity));
+				canvasAPIAdapter.setAll(state.channelCanvas[channel_id], updatedEntities);
+			} else {
+				const newEntities = [...currentEntities, canvasWithTimestamp];
+				canvasAPIAdapter.setAll(state.channelCanvas[channel_id], newEntities);
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -208,7 +349,7 @@ export const canvasAPISlice = createSlice({
 			.addCase(getChannelCanvasList.fulfilled, (state: CanvasAPIState, action: PayloadAction<any>) => {
 				state.loadingStatus = 'loaded';
 				if (action.payload.fromCache) return;
-				const channelId = (action as any)?.meta?.arg?.channel_id;
+				const channelId = action.payload.channel_id;
 				const reversedCanvas = action.payload.channel_canvases;
 				const countCanvas = action.payload.count;
 				handleSetManyCanvas({
@@ -285,6 +426,7 @@ export const canvasAPIActions = {
 export const getCanvasApiState = (rootState: { [CANVAS_API_FEATURE_KEY]: CanvasAPIState }): CanvasAPIState => rootState[CANVAS_API_FEATURE_KEY];
 
 export const getChannelIdCanvasAsSecondParam = (_: unknown, channelId: string) => channelId;
+export const getChannelIdCanvasAsParrent = (_: unknown, __: unknown, parrentChannelId?: string) => parrentChannelId;
 
 export const selectAllCanvas = createSelector(getCanvasApiState, (canvasState) => {
 	const res: CanvasAPIEntity[] = [];
@@ -294,13 +436,35 @@ export const selectAllCanvas = createSelector(getCanvasApiState, (canvasState) =
 	return res;
 });
 
-export const selectCanvasIdsByChannelId = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (state, channelId) => {
-	const entities = state?.channelCanvas[channelId]?.entities || {};
-	return Object.values(entities).map((entity) => ({
-		...entity,
-		title: entity.title || 'Untitled'
-	}));
-});
+export const selectCanvasIdsByChannelId = createSelector(
+	[getCanvasApiState, getChannelIdCanvasAsSecondParam, getChannelIdCanvasAsParrent],
+	(state, channelId, parrentChannelId) => {
+		const canvastCurrent = state?.channelCanvas[channelId]?.entities || {};
+		let wrapCanvast = { ...canvastCurrent };
+		if (parrentChannelId) {
+			const canvasParrent = state?.channelCanvas[parrentChannelId]?.entities || {};
+			wrapCanvast = { ...wrapCanvast, ...canvasParrent };
+		}
+
+		const entities = Object.values(wrapCanvast)
+			.map((entity) => ({
+				...entity,
+				title: entity.title || 'Untitled'
+			}))
+			.sort((a, b) => {
+				if (a.update_time && b.update_time) {
+					return new Date(b.update_time).getTime() - new Date(a.update_time).getTime();
+				}
+
+				if (a.update_time && !b.update_time) return -1;
+				if (!a.update_time && b.update_time) return 1;
+
+				return b.id.localeCompare(a.id);
+			});
+
+		return entities;
+	}
+);
 
 export const selectCanvasEntityById = createSelector(
 	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, canvasId) => canvasId],
@@ -311,18 +475,9 @@ export const selectCanvasEntityById = createSelector(
 
 export const selectDefaultCanvasByChannelId = createSelector([getCanvasApiState, getChannelIdCanvasAsSecondParam], (canvasState, channelId) => {
 	const entities = canvasState.channelCanvas[channelId]?.entities;
-	const ids = canvasState.channelCanvas[channelId]?.ids;
-	if (!entities || !ids) return null;
-
-	let defaultCanvas = null;
-
-	for (let i = 0; i < ids.length; i++) {
-		const id = ids[i];
-		if (entities[id]?.is_default === true) {
-			defaultCanvas = entities[id];
-			break;
-		}
-	}
+	if (!entities) return null;
+	const canvasEntities = Object.values(entities);
+	const defaultCanvas = canvasEntities.find((canvas) => canvas.is_default === true);
 
 	return defaultCanvas || null;
 });

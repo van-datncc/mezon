@@ -4,17 +4,11 @@ import { useAppNavigation, useAuth, useDragAndDrop, usePermissionChecker, useSea
 import {
 	ChannelsEntity,
 	ETypeMission,
-	RootState,
 	channelAppActions,
-	channelMetaActions,
 	channelsActions,
-	clansActions,
-	directMetaActions,
 	getStore,
 	gifsStickerEmojiActions,
 	handleParticipantVoiceState,
-	listChannelRenderAction,
-	listChannelsByUserActions,
 	onboardingActions,
 	selectAppChannelById,
 	selectChannelAppChannelId,
@@ -23,19 +17,17 @@ import {
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentClan,
-	selectFetchChannelStatus,
 	selectIsSearchMessage,
 	selectIsShowCanvas,
 	selectIsShowCreateThread,
 	selectIsShowMemberList,
 	selectLastMessageByChannelId,
-	selectListChannelRenderByClanId,
 	selectMissionDone,
 	selectMissionSum,
 	selectOnboardingByClan,
 	selectOnboardingMode,
-	selectPreviousChannels,
 	selectProcessingByClan,
+	selectSearchMessagesLoadingStatus,
 	selectStatusMenu,
 	selectTheme,
 	selectToCheckAppIsOpening,
@@ -50,10 +42,8 @@ import {
 	ApiChannelAppResponseExtend,
 	DONE_ONBOARDING_STATUS,
 	EOverriddenPermission,
-	IChannel,
 	ParticipantMeetState,
 	SubPanelName,
-	TIME_OFFSET,
 	isBackgroundModeActive,
 	isLinuxDesktop,
 	isWindowsDesktop,
@@ -63,7 +53,7 @@ import {
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
-import { DragEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DragEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChannelMedia } from './ChannelMedia';
@@ -76,12 +66,11 @@ function useChannelSeen(channelId: string) {
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const isFocus = !isBackgroundModeActive();
 
-	const previousChannels = useSelector(selectPreviousChannels);
 	useEffect(() => {
 		dispatch(gifsStickerEmojiActions.setSubPanelActive(SubPanelName.NONE));
 	}, [channelId, currentChannel, dispatch, isFocus]);
 	const { markAsReadSeen } = useSeenMessagePool();
-	const handleReadMessage = () => {
+	const handleReadMessage = useCallback(() => {
 		if (!lastMessage) {
 			return;
 		}
@@ -89,39 +78,8 @@ function useChannelSeen(channelId: string) {
 			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
 				? ChannelStreamMode.STREAM_MODE_CHANNEL
 				: ChannelStreamMode.STREAM_MODE_THREAD;
-		const store = getStore();
-		const state = store.getState() as RootState;
-		const badgeCountClan = state.clans.entities[currentChannel.clan_id as string]?.badge_count || 0;
-		markAsReadSeen(lastMessage, mode, badgeCountClan);
-	};
-	useEffect(() => {
-		if (previousChannels.at(1) && lastMessage) {
-			const timestamp = Date.now() / 1000;
-			dispatch(
-				listChannelRenderAction.removeBadgeFromChannel({
-					clanId: previousChannels.at(1)?.clanId as string,
-					channelId: previousChannels.at(1)?.channelId as string
-				})
-			);
-			handleReadMessage();
-
-			dispatch(
-				channelsActions.updateChannelBadgeCount({
-					clanId: previousChannels.at(1)?.clanId as string,
-					channelId: previousChannels.at(1)?.channelId as string,
-					count: 0,
-					isReset: true
-				})
-			);
-			dispatch(directMetaActions.setDirectLastSeenTimestamp({ channelId: previousChannels.at(1)?.channelId as string, timestamp }));
-		}
-	}, [previousChannels]);
-
-	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentChannel.clan_id as string));
-	const numberNotification = useMemo(() => {
-		const channel = listChannelRender?.find((channel) => channel.id === currentChannel.id);
-		return (channel as IChannel)?.count_mess_unread || 0;
-	}, [listChannelRender, currentChannel.id]);
+		markAsReadSeen(lastMessage, mode, currentChannel?.count_mess_unread || 0);
+	}, [lastMessage, currentChannel, markAsReadSeen]);
 
 	useEffect(() => {
 		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
@@ -133,77 +91,21 @@ function useChannelSeen(channelId: string) {
 				})
 			);
 		}
-		if (numberNotification && numberNotification > 0) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-			dispatch(listChannelRenderAction.removeBadgeFromChannel({ clanId: currentChannel.clan_id as string, channelId: currentChannel.id }));
-			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
-		}
 	}, [currentChannel?.id]);
 
 	useEffect(() => {
 		if (lastMessage && isFocus) {
 			handleReadMessage();
 		}
-	}, [lastMessage]);
+	}, [lastMessage, handleReadMessage, isFocus]);
+
+	useBackgroundMode(undefined, handleReadMessage, isFocus);
 }
 
-const WindowFocus = () => {
-	const dispatch = useAppDispatch();
-	const statusFetchChannel = useSelector(selectFetchChannelStatus);
-	const currentChannel = useAppSelector(selectCurrentChannel);
-	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, currentChannel?.channel_id as string));
-	const isFocus = !isBackgroundModeActive();
-	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentChannel?.clan_id as string));
-	const numberNotification = useMemo(() => {
-		const channel = listChannelRender?.find((channel) => channel.id === currentChannel?.id);
-		return (channel as IChannel)?.count_mess_unread || 0;
-	}, [listChannelRender, currentChannel?.id]);
-
-	const { markAsReadSeen } = useSeenMessagePool();
-
-	const handleReadMessage = () => {
-		if (!lastMessage) {
-			return;
-		}
-		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
-				? ChannelStreamMode.STREAM_MODE_CHANNEL
-				: ChannelStreamMode.STREAM_MODE_THREAD;
-		const store = getStore();
-		const state = store.getState() as RootState;
-		const badgeCountClan = state.clans.entities[currentChannel?.clan_id as string]?.badge_count || 0;
-		markAsReadSeen(lastMessage, mode, badgeCountClan);
-	};
-	const readMessage = useCallback(() => {
-		if (!statusFetchChannel) return;
-		const timestamp = Date.now() / 1000;
-		dispatch(
-			channelMetaActions.setChannelLastSeenTimestamp({ channelId: currentChannel?.channel_id as string, timestamp: timestamp + TIME_OFFSET })
-		);
-		dispatch(
-			listChannelRenderAction.removeBadgeFromChannel({
-				clanId: currentChannel?.clan_id as string,
-				channelId: currentChannel?.channel_id as string
-			})
-		);
-		dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
-		dispatch(
-			listChannelsByUserActions.updateChannelBadgeCount({
-				channelId: currentChannel?.channel_id as string,
-				count: numberNotification * -1,
-				isReset: true
-			})
-		);
-		handleReadMessage();
-	}, [numberNotification, lastMessage]);
-	useBackgroundMode(undefined, readMessage, isFocus);
-	return null;
-};
-
-function ChannelSeenListener({ channelId }: { channelId: string }) {
+const ChannelSeenListener = memo(({ channelId }: { channelId: string }) => {
 	useChannelSeen(channelId);
-	return <WindowFocus />;
-}
+	return null;
+});
 
 type ChannelMainContentTextProps = {
 	channelId: string;
@@ -217,7 +119,8 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ||
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ||
-		currentChannel?.type === ChannelType.CHANNEL_TYPE_APP
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ||
+		currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE
 			? ChannelStreamMode.STREAM_MODE_CHANNEL
 			: ChannelStreamMode.STREAM_MODE_THREAD;
 
@@ -314,7 +217,7 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 					</div>
 				</div>
 			)}
-			{currentChannel && (
+			{currentChannel && currentChannel?.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && (
 				<ChannelTyping channelId={currentChannel?.id} mode={mode} isPublic={currentChannel ? !currentChannel?.channel_private : false} />
 			)}
 		</div>
@@ -370,13 +273,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	};
 
 	useEffect(() => {
-		if (isShowMemberList) {
-			setIsShowCreateThread(false);
-		}
-	}, [isShowMemberList, setIsShowCreateThread]);
-
-	useEffect(() => {
-		if (!isShowCanvas && !isShowAgeRestricted && draggingState && !isChannelMezonVoice) {
+		if (!isShowCanvas && !isShowAgeRestricted && draggingState) {
 			openUploadFileModal();
 		}
 
@@ -422,7 +319,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 	const isChannelStream = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
 
 	return (
-		<div className={`w-full ${isChannelMezonVoice ? 'hidden' : ''}`}>
+		<div className={`w-full `}>
 			<div
 				className="flex flex-col flex-1 shrink min-w-0 bg-transparent h-[100%] z-10"
 				id="mainChat"
@@ -432,7 +329,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 				<div
 					className={`flex flex-row ${closeMenu ? `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBarMobile' : 'h-heightWithoutTopBarMobile'}` : `${isWindowsDesktop || isLinuxDesktop ? 'h-heightTitleBarWithoutTopBar' : 'h-heightWithoutTopBar'}`}`}
 				>
-					{!isShowCanvas && !isShowAgeRestricted && !isChannelMezonVoice && (
+					{!isShowCanvas && !isShowAgeRestricted && (
 						<div
 							className={`flex flex-col flex-1 min-w-60 ${isWindowsDesktop || isLinuxDesktop ? 'max-h-titleBarMessageViewChatDM' : 'max-h-messageViewChatDM'} ${isShowMemberList ? 'w-widthMessageViewChat' : isShowCreateThread ? 'w-widthMessageViewChatThread' : isSearchMessage ? 'w-widthSearchMessage' : 'w-widthThumnailAttachment'} h-full ${closeMenu && !statusMenu && isShowMemberList && !isChannelStream && 'hidden'} z-10`}
 						>
@@ -503,7 +400,6 @@ export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	if (!currentChannel) {
 		return null;
 	}
-
 	return (
 		<>
 			<ChannelMainContent channelId={chlId} />
@@ -515,6 +411,7 @@ export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 const SearchMessageChannel = () => {
 	const { totalResult, currentPage, searchMessages } = useSearchMessages();
 	const currentChannel = useSelector(selectCurrentChannel);
+	const isLoading = useAppSelector(selectSearchMessagesLoadingStatus) === 'loading';
 
 	return (
 		<SearchMessageChannelRender
@@ -523,6 +420,7 @@ const SearchMessageChannel = () => {
 			totalResult={totalResult}
 			channelId={currentChannel?.id || ''}
 			isDm={false}
+			isLoading={isLoading}
 		/>
 	);
 };
@@ -576,16 +474,16 @@ const OnboardingGuide = ({
 		<>
 			{missionDone < missionSum && currentMission ? (
 				<div
-					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bg-bgTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
+					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bu dark:bg-bgTertiary bg-bgLightTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold">{currentMission.title} </div>
-						<div className="text-[10px] font-normal text-channelTextLabel">
+						<div className="text-base font-semibold dark:text-white text-black">{currentMission.title} </div>
+						<div className="text-[10px] font-normal text-gray-600 dark:text-gray-300">
 							{' '}
 							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
-							<strong className="text-channelActiveColor">#{channelMission.channel_label}</strong>{' '}
+							<strong className="dark:text-white text-gray-800">#{channelMission.channel_label}</strong>{' '}
 						</div>
 					</div>
 				</div>

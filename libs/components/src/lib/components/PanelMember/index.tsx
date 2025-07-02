@@ -33,9 +33,8 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, EPermission, EUserSettings, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
+import { ChannelMembersEntity, EPermission, EUserSettings } from '@mezon/utils';
 import { format } from 'date-fns';
-import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MentionItem } from 'react-mentions';
@@ -44,7 +43,6 @@ import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
 import { directMessageValueProps } from '../DmList/DMListItem';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
-import ItemPanel from '../PanelChannel/ItemPanel';
 import { EActiveType } from '../SettingProfile/SettingRightProfile';
 import GroupPanelMember from './GroupPanelMember';
 import ItemPanelMember from './ItemPanelMember';
@@ -79,7 +77,6 @@ const PanelMember = ({
 	onClose,
 	onRemoveMember,
 	isMemberDMGroup,
-	isMemberChannel,
 	dataMemberCreate,
 	onOpenProfile
 }: PanelMemberProps) => {
@@ -93,7 +90,7 @@ const PanelMember = ({
 	const [hasClanOwnerPermission, hasAdminPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.administrator]);
 	const memberIsClanOwner = useClanOwnerChecker(member?.user?.id ?? '');
 	const { directId } = useAppParams();
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(directMessageValue?.dmID || ''));
+	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, directMessageValue?.dmID || ''));
 	const [nameChildren, setNameChildren] = useState('');
 	const [mutedUntil, setmutedUntil] = useState('');
 	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
@@ -155,10 +152,15 @@ const PanelMember = ({
 	};
 
 	const handleDirectMessageWithUser = async () => {
-		const response = await createDirectMessageWithUser(member?.user?.id || '');
+		const response = await createDirectMessageWithUser(
+			member?.user?.id || '',
+			member?.user?.display_name,
+			member?.user?.username,
+			member?.user?.avatar_url
+		);
 		if (response?.channel_id) {
 			const directDM = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
-			navigate('/' + directDM);
+			navigate(directDM);
 		}
 	};
 
@@ -347,67 +349,43 @@ const PanelMember = ({
 				<>
 					<GroupPanelMember>
 						<ItemPanelMember children="Mark As Read" onClick={() => handleMarkAsRead(directMessageValue?.dmID ?? '')} />
-						<ItemPanelMember
+						{/* <ItemPanelMember
 							children={!directMessageValue?.e2ee ? 'Enable E2EE' : 'Disable E2EE'}
 							onClick={() => handleEnableE2ee(directMessageValue?.dmID, directMessageValue?.e2ee)}
-						/>
+						/> */}
 						<ItemPanelMember children="Profile" onClick={handleOpenProfile} />
-						{directMessageValue ? (
+						{/* {directMessageValue ? (
 							checkDm && <ItemPanelMember children="Call" />
 						) : (
 							<ItemPanelMember children="Mention" onClick={handleClickMention} />
-						)}
+						)} */}
 
 						{!isSelf && (
 							<>
 								{!checkDm && (
 									<>
 										<ItemPanelMember children="Message" onClick={handleDirectMessageWithUser} />
-										<ItemPanelMember children="Call" />
+										{/* <ItemPanelMember children="Call" /> */}
 									</>
 								)}
-								<ItemPanelMember children="Add Friend Nickname" />
+								{/* <ItemPanelMember children="Add Friend Nickname" /> */}
 							</>
 						)}
-						{directMessageValue && <ItemPanelMember children="Close DM" />}
+						{/* {directMessageValue && <ItemPanelMember children="Close DM" />} */}
 					</GroupPanelMember>
 					{isMemberDMGroup && dataMemberCreate?.createId === userProfile?.user?.id && (
 						<GroupPanelMember>
 							<ItemPanelMember children="Remove From Group" onClick={handleRemoveMemberChannel} danger />
-							<ItemPanelMember children="Make Group Owner" danger />
+							{/* <ItemPanelMember children="Make Group Owner" danger /> */}
 						</GroupPanelMember>
 					)}
 
 					{!isMemberDMGroup && (
 						<GroupPanelMember>
-							{!isSelf && !directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />}
-							{isSelf && (
-								<>
-									<ItemPanelMember children="Deafen" type="checkbox" />
-									<ItemPanelMember children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />
-									<ItemPanelMember children="Apps" />
-								</>
-							)}
+							{/* {!isSelf && !directMessageValue && <ItemPanelMember children="Mute" type="checkbox" />} */}
+							{isSelf && <ItemPanelMember children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />}
 							{!isSelf && (
 								<>
-									{directMessageValue && <ItemPanelMember children="Apps" />}
-									<Dropdown
-										trigger="hover"
-										dismissOnClick={false}
-										renderTrigger={() => (
-											<div>
-												<ItemPanelMember children="Invite to Clan" dropdown />
-											</div>
-										)}
-										label=""
-										placement="left-start"
-										className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
-									>
-										<ItemPanelMember children="Komu" />
-										<ItemPanelMember children="Clan 1" />
-										<ItemPanelMember children="Clan 2" />
-										<ItemPanelMember children="Clan 3" />
-									</Dropdown>
 									{hasAddFriend === EStateFriend.FRIEND ? (
 										<ItemPanelMember
 											children="Remove Friend"
@@ -423,33 +401,15 @@ const PanelMember = ({
 											}}
 										/>
 									)}
-									<ItemPanelMember children="Block" />
+									{/* <ItemPanelMember children="Block" /> */}
 								</>
 							)}
 						</GroupPanelMember>
 					)}
-					{isMemberDMGroup && (
+					{isMemberDMGroup && !isSelf && (
 						<>
-							<ItemPanelMember children="Apps" />
 							{!isSelf && (
 								<>
-									<Dropdown
-										trigger="hover"
-										dismissOnClick={false}
-										renderTrigger={() => (
-											<div>
-												<ItemPanelMember children="Invite to Clan" dropdown />
-											</div>
-										)}
-										label=""
-										placement="left-start"
-										className="dark:!bg-bgProfileBody !bg-bgLightPrimary !left-[-6px] border-none py-[6px] px-[8px] w-[200px]"
-									>
-										<ItemPanelMember children="Komu" />
-										<ItemPanelMember children="Clan 1" />
-										<ItemPanelMember children="Clan 2" />
-										<ItemPanelMember children="Clan 3" />
-									</Dropdown>
 									{hasAddFriend === EStateFriend.FRIEND ? (
 										<ItemPanelMember children="Remove Friend" onClick={() => deleteFriend(friendInfor.name, friendInfor.id)} />
 									) : (
@@ -464,7 +424,7 @@ const PanelMember = ({
 						</>
 					)}
 
-					{directMessageValue && (
+					{/* {directMessageValue && (
 						<GroupPanelMember>
 							{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
 								<Dropdown
@@ -490,12 +450,10 @@ const PanelMember = ({
 								<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 							)}
 						</GroupPanelMember>
-					)}
+					)} */}
 					{!isSelf && (hasClanOwnerPermission || (hasAdminPermission && !memberIsClanOwner)) && (
 						<GroupPanelMember>
-							<ItemPanelMember children={`Timeout ${member?.user?.username}`} danger />
 							<ItemPanelMember onClick={handleRemoveMember} children={`Kick ${member?.user?.username}`} danger />
-							<ItemPanelMember children={`Ban ${member?.user?.username}`} danger />
 							{isPrivateThread && (
 								<ItemPanelMember
 									onClick={() => RemoveMemberFromPrivateThread(member?.user?.id as string)}
@@ -512,11 +470,6 @@ const PanelMember = ({
 								children={`Remove ${member?.user?.username} from this thread`}
 								danger
 							/>
-						</GroupPanelMember>
-					)}
-					{isSelf && !isMemberDMGroup && (
-						<GroupPanelMember>
-							<ItemPanelMember children="Roles" />
 						</GroupPanelMember>
 					)}
 				</>

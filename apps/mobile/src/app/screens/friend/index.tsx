@@ -51,14 +51,22 @@ export const FriendScreen = React.memo(({ navigation }: { navigation: any }) => 
 	const directMessageWithUser = useCallback(
 		async (user: FriendsEntity) => {
 			const listDM = selectDirectsOpenlist(store.getState() as any);
-			const directMessage = listDM.find((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === user?.user?.id);
+			const directMessage = listDM?.find?.((dm) => {
+				const userIds = dm?.user_id;
+				if (!Array.isArray(userIds) || userIds.length !== 1) {
+					return false;
+				}
+				return userIds[0] === user?.user?.id;
+			});
+
 			if (directMessage?.id) {
 				navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: directMessage?.id });
 				return;
 			}
 			const response = await createDirectMessageWithUser(
 				user?.user?.id,
-				user?.user?.display_name || user?.user?.username,
+				user?.user?.display_name,
+				user?.user?.username,
 				user?.user?.avatar_url
 			);
 			if (response?.channel_id) {

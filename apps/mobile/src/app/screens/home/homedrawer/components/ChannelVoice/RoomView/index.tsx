@@ -10,18 +10,34 @@ import {
 	load,
 	save
 } from '@mezon/mobile-components';
-import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { clansActions, selectIsPiPMode, selectVoiceInfo, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { ThemeModeBase, baseColor, size, useTheme } from '@mezon/mobile-ui';
+import {
+	clansActions,
+	groupCallActions,
+	selectIsPiPMode,
+	selectIsShowPreCallInterface,
+	selectVoiceInfo,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
+import * as Sentry from '@sentry/react-native';
 import { Track, createLocalAudioTrack, createLocalVideoTrack } from 'livekit-client';
+import LottieView from 'lottie-react-native';
+import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, NativeModules, Platform, TouchableOpacity, View, findNodeHandle } from 'react-native';
+import { DeviceEventEmitter, Dimensions, NativeModules, Platform, Text, TouchableOpacity, View, findNodeHandle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { ResumableZoom } from 'react-native-zoom-toolkit';
 import { useSelector } from 'react-redux';
+import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../../../../../assets/lottie';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
+import { EMessageBSToShow } from '../../../enums';
+import { ContainerMessageActionModal } from '../../MessageItemBS/ContainerMessageActionModal';
 import FocusedScreenPopup from '../FocusedScreenPopup';
 import ParticipantScreen from '../ParticipantScreen';
 import { style } from '../styles';
@@ -31,18 +47,26 @@ const RoomView = ({
 	onPressMinimizeRoom,
 	channelId,
 	clanId,
-	onFocusedScreenChange
+	onFocusedScreenChange,
+	isGroupCall = false,
+	participantsCount = 0,
+	onQuitGroupCall,
+	onCancelCall
 }: {
 	isAnimationComplete: boolean;
 	onPressMinimizeRoom: () => void;
 	channelId: string;
 	clanId: string;
 	onFocusedScreenChange: (track: TrackReference | null) => void;
+	isGroupCall?: boolean;
+	participantsCount?: number;
+	onQuitGroupCall?: () => void;
+	onCancelCall?: () => void;
 }) => {
 	const marginWidth = Dimensions.get('screen').width;
 	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare, Track.Source.ScreenShareAudio]);
 	const dispatch = useAppDispatch();
-	const { themeValue } = useTheme();
+	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
 	const room = useRoomContext();
 	const participants = useParticipants();
@@ -51,14 +75,33 @@ const RoomView = ({
 	const { isCameraEnabled, isMicrophoneEnabled, isScreenShareEnabled, localParticipant } = useLocalParticipant();
 	const voiceInfo = useSelector(selectVoiceInfo);
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
+	const [isHiddenControl, setIsHiddenControl] = useState<boolean>(false);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const screenCaptureRef = React.useRef(null);
+	const isShowPreCallInterface = useSelector(selectIsShowPreCallInterface);
+	const insets = useSafeAreaInsets();
+
+	useEffect(() => {
+		const subscription = focusedScreenShare
+			? Dimensions.addEventListener('change', () => {
+					setIsHiddenControl((prevState) => !prevState);
+				})
+			: null;
+
+		return () => subscription?.remove();
+	}, [focusedScreenShare]);
 
 	useEffect(() => {
 		if (localParticipant) {
 			loadLocalDefaults();
 		}
 	}, [localParticipant]);
+
+	useEffect(() => {
+		if (participants?.length > 1 && isShowPreCallInterface) {
+			dispatch(groupCallActions?.hidePreCallInterface());
+		}
+	}, [dispatch, isShowPreCallInterface, participants?.length]);
 
 	const loadLocalDefaults = async () => {
 		await localParticipant.setCameraEnabled(false);
@@ -104,18 +147,51 @@ const RoomView = ({
 				try {
 					await localParticipant.setMicrophoneEnabled(true);
 				} catch (enableError) {
-					try {
-						const newAudioTrack = await createLocalAudioTrack();
+					console.error('Error enabling microphone:', enableError);
+					let newAudioTrack;
 
+					try {
+						newAudioTrack = await createLocalAudioTrack();
+					} catch (createError) {
+						console.error('Error enabling microphone:', createError);
+						Sentry.captureException('ToogleMicMezonMeet', { extra: { createError } });
+						try {
+							const devices = await navigator.mediaDevices.enumerateDevices();
+							const audioInputDevices = devices?.filter((device) => device?.kind === 'audioinput');
+							if (audioInputDevices?.length === 0) {
+								Toast.show({
+									type: 'error',
+									text1: 'No audio input devices found'
+								});
+								return;
+							}
+							newAudioTrack = await createLocalAudioTrack({
+								deviceId: { exact: audioInputDevices?.[0]?.deviceId }
+							});
+						} catch (deviceError) {
+							console.error('Error creating audio track with device:', deviceError);
+							Toast.show({
+								type: 'error',
+								text1: `Error creating audio device: ${JSON.stringify(deviceError)}`
+							});
+						}
+					}
+
+					try {
 						const oldAudioPublication = Array.from(localParticipant.audioTrackPublications.values()).find(
 							(publication) => publication.source === Track.Source.Microphone
 						);
 						if (oldAudioPublication && oldAudioPublication.track) {
 							await localParticipant.unpublishTrack(oldAudioPublication.track, true);
 						}
+					} catch (unpublicError) {
+						console.error('error unpublic old track: ', unpublicError);
+					}
+
+					try {
 						await localParticipant.publishTrack(newAudioTrack);
-					} catch (newError) {
-						console.error('err: ', newError);
+					} catch (publishError) {
+						console.error('Error publish audio track:', publishError);
 					}
 				}
 			}
@@ -143,9 +219,16 @@ const RoomView = ({
 	}, [isScreenShareEnabled, localParticipant]);
 
 	const handleEndCall = useCallback(() => {
+		if (isGroupCall) {
+			if (isShowPreCallInterface) {
+				onCancelCall?.();
+			} else {
+				onQuitGroupCall?.();
+			}
+		}
 		room.disconnect();
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: voiceInfo?.clanId, channelId: voiceInfo?.channelId });
-	}, [room, voiceInfo?.channelId, voiceInfo?.clanId]);
+	}, [isGroupCall, isShowPreCallInterface, onCancelCall, onQuitGroupCall, room, voiceInfo?.channelId, voiceInfo?.clanId]);
 
 	const handleShowChat = () => {
 		if (!isTabletLandscape) {
@@ -188,26 +271,55 @@ const RoomView = ({
 		await jumpToChannel(channelId, clanId);
 	};
 
+	const handleOpenEmojiPicker = () => {
+		const data = {
+			snapPoints: ['45%', '75%'],
+			children: (
+				<ContainerMessageActionModal
+					message={undefined}
+					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+					type={EMessageBSToShow.MessageAction}
+					senderDisplayName={''}
+					isOnlyEmojiPicker={true}
+					channelId={voiceInfo?.channelId}
+					clanId={voiceInfo?.clanId}
+				/>
+			),
+			containerStyle: { zIndex: 1001 },
+			backdropStyle: { zIndex: 1000 }
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	};
+
 	useEffect(() => {
 		onFocusedScreenChange(focusedScreenShare);
 	}, [focusedScreenShare, onFocusedScreenChange]);
 
 	const RenderControlBar = () => {
 		return (
-			<View style={[styles.menuFooter, { bottom: Platform.OS === 'ios' || isTabletLandscape ? size.s_100 : size.s_70 }]}>
-				<View style={{ gap: size.s_16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
+			<View
+				style={[
+					styles.menuFooter,
+					{ bottom: Platform.OS === 'ios' ? (focusedScreenShare ? size.s_20 : insets.top + size.s_60) : size.s_20, zIndex: 2 }
+				]}
+			>
+				<View style={{ gap: size.s_10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: size.s_6 }}>
 					<TouchableOpacity onPress={handleToggleCamera} style={styles.menuIcon}>
-						{isCameraEnabled ? <MezonIconCDN icon={IconCDN.videoIcon} /> : <MezonIconCDN icon={IconCDN.videoSlashIcon} />}
+						<MezonIconCDN icon={isCameraEnabled ? IconCDN.videoIcon : IconCDN.videoSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={handleToggleMicrophone} style={styles.menuIcon}>
-						{isMicrophoneEnabled ? <MezonIconCDN icon={IconCDN.microphoneIcon} /> : <MezonIconCDN icon={IconCDN.microphoneSlashIcon} />}
+						 <MezonIconCDN icon={isMicrophoneEnabled ? IconCDN.microphoneIcon : IconCDN.microphoneSlashIcon} color={themeValue.textStrong}/>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
-						<MezonIconCDN icon={IconCDN.chatIcon} />
-					</TouchableOpacity>
-					<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
-						{isScreenShareEnabled ? <Icons.ShareScreenIcon /> : <Icons.ShareScreenSlashIcon />}
-					</TouchableOpacity>
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleShowChat} style={styles.menuIcon}>
+							<MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.textStrong}/>
+						</TouchableOpacity>
+					)}
+					{!isGroupCall && (
+						<TouchableOpacity onPress={handleToggleScreenShare} style={styles.menuIcon}>
+							{isScreenShareEnabled ? <Icons.ShareScreenIcon color={themeValue.textStrong}/> : <Icons.ShareScreenSlashIcon color={themeValue.textStrong}/>}
+						</TouchableOpacity>
+					)}
 					<TouchableOpacity onPress={handleEndCall} style={{ ...styles.menuIcon, backgroundColor: baseColor.redStrong }}>
 						<MezonIconCDN icon={IconCDN.phoneCallIcon} />
 					</TouchableOpacity>
@@ -218,30 +330,35 @@ const RoomView = ({
 
 	if (focusedScreenShare) {
 		return (
-			<View
-				style={
-					isPiPMode
-						? { width: '100%', flex: 1, alignItems: 'flex-start' }
-						: { width: '100%', flex: 1, alignItems: 'center', justifyContent: 'center' }
-				}
-			>
-				<View style={{ height: (isPiPMode ? 2 : 3) * size.s_100, width: '100%' }}>
-					<ResumableZoom>
-						<View style={{ height: (isPiPMode ? 2 : 3) * size.s_100, width: marginWidth }}>
+			<View style={{ width: '100%', flex: 1, alignItems: 'center' }}>
+				<View style={{ height: '100%', width: '100%' }}>
+					<ResumableZoom onTap={() => setIsHiddenControl((prevState) => !prevState)}>
+						<View style={{ height: '100%', width: marginWidth }}>
 							<VideoTrack
 								trackRef={focusedScreenShare}
-								objectFit={isPiPMode ? 'cover' : 'contain'}
-								style={{ height: (isPiPMode ? 2 : 3) * size.s_100, width: '100%' }}
+								objectFit={'contain'}
+								style={{
+									height: isPiPMode ? size.s_100 : '100%',
+									width: isPiPMode ? size.s_200 + size.s_10 : '100%',
+									alignSelf: 'center'
+								}}
+								iosPIP={{ enabled: true, startAutomatically: true, preferredSize: { width: 12, height: 8 } }}
 							/>
 						</View>
 					</ResumableZoom>
 				</View>
 				{!isPiPMode && (
-					<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
-						<Icons.ArrowShrinkIcon height={size.s_16} />
-					</TouchableOpacity>
+					<View style={[styles.wrapperHeaderFocusSharing]}>
+						<TouchableOpacity style={[styles.focusIcon]} onPress={() => handleOpenEmojiPicker()}>
+							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_16} width={size.s_24} color={'white'} />
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
+							<Icons.ArrowShrinkIcon height={size.s_16} />
+						</TouchableOpacity>
+					</View>
 				)}
-				{!isPiPMode && <RenderControlBar />}
+
+				{isPiPMode || isHiddenControl ? <View /> : <RenderControlBar />}
 			</View>
 		);
 	}
@@ -252,14 +369,20 @@ const RoomView = ({
 			{!isAnimationComplete ? (
 				<FocusedScreenPopup sortedParticipants={sortedParticipants} tracks={tracks} localParticipant={localParticipant} />
 			) : (
-				<ParticipantScreen
-					sortedParticipants={sortedParticipants}
-					tracks={tracks}
-					isFocusedScreen={focusedScreenShare}
-					setFocusedScreenShare={setFocusedScreenShare}
-				/>
+				<ParticipantScreen sortedParticipants={sortedParticipants} tracks={tracks} setFocusedScreenShare={setFocusedScreenShare} />
 			)}
-			{isAnimationComplete && <RenderControlBar />}
+			{isAnimationComplete && isGroupCall && participants.length <= 1 && isShowPreCallInterface && (
+				<View style={{ alignItems: 'center', justifyContent: 'center', paddingBottom: size.s_100 * 2 }}>
+					<LottieView
+						source={themeBasic === ThemeModeBase.DARK ? TYPING_DARK_MODE : TYPING_LIGHT_MODE}
+						autoPlay
+						loop
+						style={{ width: size.s_60, height: size.s_60 }}
+					/>
+					<Text style={styles.text}>{`${participantsCount} members will be notified`}</Text>
+				</View>
+			)}
+			{isAnimationComplete && !isPiPMode && <RenderControlBar />}
 			{screenCapturePickerView}
 		</View>
 	);

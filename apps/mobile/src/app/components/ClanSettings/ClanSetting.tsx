@@ -2,7 +2,7 @@ import { usePermissionChecker } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { EPermission } from '@mezon/utils';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, Pressable, ScrollView, View } from 'react-native';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
@@ -29,14 +29,16 @@ export function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScre
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;
 	}, [hasAdminPermission, hasManageClanPermission, isClanOwner]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerLeft: () => (
-			<Pressable style={{ padding: 20 }} onPress={handleClose}>
-				<MezonIconCDN icon={IconCDN.closeSmallBold} color={themeValue.textStrong} />
-			</Pressable>
-		)
-	});
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerLeft: () => (
+				<Pressable style={{ padding: 20 }} onPress={handleClose}>
+					<MezonIconCDN icon={IconCDN.closeSmallBold} color={themeValue.textStrong} />
+				</Pressable>
+			)
+		});
+	}, [navigation, themeValue.textStrong]);
 
 	function handleClose() {
 		navigation.goBack();
@@ -96,6 +98,14 @@ export function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScre
 			},
 			expandable: true,
 			icon: <MezonIconCDN icon={IconCDN.sticker} color={themeValue.text} />
+		},
+		{
+			title: t('menu.settings.sound'),
+			onPress: async () => {
+				navigation.navigate(APP_SCREEN.MENU_CLAN.SOUND_STICKER);
+			},
+			expandable: true,
+			icon: <MezonIconCDN icon={IconCDN.channelVoice} color={themeValue.text} />
 		}
 		// {
 		// 	title: t('menu.settings.webhooks'),

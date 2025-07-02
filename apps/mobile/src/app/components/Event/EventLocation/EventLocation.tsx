@@ -1,12 +1,13 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
 import { OptionEvent } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { DeviceEventEmitter, Linking, Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
+import JoinChannelVoiceBS from '../../../screens/home/homedrawer/components/ChannelVoice/JoinChannelVoiceBS';
 import { linkGoogleMeet } from '../../../utils/helpers';
 import { style } from './styles';
 
@@ -27,8 +28,11 @@ export function EventLocation({ event }: IEventLocation) {
 			const urlVoice = `${linkGoogleMeet}${channelVoice?.meeting_code}`;
 			await Linking.openURL(urlVoice);
 		} else if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-			dismiss();
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_CHANNEL_MENTION_MESSAGE_ITEM, channelVoice);
+			const dataa = {
+				snapPoints: ['45%', '45%'],
+				children: <JoinChannelVoiceBS channel={channelVoice} />
+			};
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, dataa });
 		} else {
 			const urlPrivateVoice = `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
 			await Linking.openURL(urlPrivateVoice);
@@ -39,8 +43,13 @@ export function EventLocation({ event }: IEventLocation) {
 		<View style={styles.container}>
 			{option === OptionEvent.OPTION_SPEAKER && (
 				<TouchableOpacity style={styles.inline} onPress={joinVoiceChannel}>
-					<MezonIconCDN icon={IconCDN.channelVoice} height={16} width={16} color={themeValue.textStrong} />
-					<Text style={styles.smallText}>{channelVoice?.channel_label || event?.meet_room?.room_name}</Text>
+					<MezonIconCDN
+						icon={event.is_private ? IconCDN.channelVoiceLock : IconCDN.channelVoice}
+						height={size.s_16}
+						width={size.s_16}
+						color={themeValue.textStrong}
+					/>
+					<Text style={styles.smallText}>{channelVoice?.channel_label || 'Private Room'}</Text>
 				</TouchableOpacity>
 			)}
 

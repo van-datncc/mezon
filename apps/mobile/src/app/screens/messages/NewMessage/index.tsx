@@ -1,7 +1,7 @@
 import { useDirect, useFriends } from '@mezon/core';
 import { ChevronIcon } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { FriendsEntity, getStore, selectDirectsOpenlist } from '@mezon/store-mobile';
+import { FriendsEntity, directActions, getStore, selectDirectsOpenlist, useAppDispatch } from '@mezon/store-mobile';
 import { User } from 'mezon-js';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +14,13 @@ import { EFriendItemAction } from '../../../components/FriendItem';
 import { FriendListByAlphabet } from '../../../components/FriendListByAlphabet';
 import { UserInformationBottomSheet } from '../../../components/UserInformationBottomSheet';
 import { IconCDN } from '../../../constants/icon_cdn';
+import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
 import { style } from './styles';
 
 export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
+	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [searchText, setSearchText] = useState<string>('');
@@ -27,6 +29,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const { friends: allUser } = useFriends();
 	const { createDirectMessageWithUser } = useDirect();
 	const store = getStore();
+	const dispatch = useAppDispatch();
 	const friendList: FriendsEntity[] = useMemo(() => {
 		return allUser.filter((user) => user.state === 0);
 	}, [allUser]);
@@ -44,8 +47,8 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 	const filteredFriendList = useMemo(() => {
 		return friendList.filter(
 			(friend) =>
-				normalizeString(friend?.user?.username).includes(normalizeString(searchText)) ||
-				normalizeString(friend?.user?.display_name).includes(normalizeString(searchText))
+				normalizeString(friend?.user?.username || '').includes(normalizeString(searchText)) ||
+				normalizeString(friend?.user?.display_name || '').includes(normalizeString(searchText))
 		);
 	}, [friendList, searchText]);
 
@@ -53,18 +56,32 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 		async (user: FriendsEntity) => {
 			const listDM = selectDirectsOpenlist(store.getState() as any);
 
-			const directMessage = listDM.find((dm) => dm?.user_id?.length === 1 && dm?.user_id[0] === user?.user?.id);
+			const directMessage = listDM.find((dm) => {
+				const userIds = dm?.user_id;
+				return Array.isArray(userIds) && userIds.length === 1 && userIds[0] === user?.user?.id;
+			});
 			if (directMessage?.id) {
-				navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: directMessage?.id });
+				if (isTabletLandscape) {
+					await dispatch(directActions.setDmGroupCurrentId(directMessage?.id));
+					navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+				} else {
+					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: directMessage?.id });
+				}
 				return;
 			}
 			const response = await createDirectMessageWithUser(
-				user?.user?.id,
-				user?.user?.display_name || user?.user?.username,
-				user?.user?.avatar_url
+				user?.user?.id || '',
+				user?.user?.display_name || '',
+				user?.user?.username || '',
+				user?.user?.avatar_url || ''
 			);
 			if (response?.channel_id) {
-				navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
+				if (isTabletLandscape) {
+					await dispatch(directActions.setDmGroupCurrentId(response?.channel_id));
+					navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+				} else {
+					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
+				}
 			}
 		},
 		[createDirectMessageWithUser, navigation, store]
@@ -80,7 +97,9 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 					directMessageWithUser(friend);
 					break;
 				case EFriendItemAction.ShowInformation:
-					setSelectedUser(friend?.user);
+					if (friend?.user) {
+						setSelectedUser(friend.user);
+					}
 					break;
 				default:
 					break;
@@ -134,7 +153,7 @@ export const NewMessageScreen = ({ navigation }: { navigation: any }) => {
 				showAction={false}
 			/>
 
-			<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />
+			{selectedUser && <UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />}
 		</View>
 	);
 };

@@ -1,5 +1,6 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
+import { MAX_LENGTH_MESSAGE_BUZZ } from '@mezon/utils';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -20,7 +21,7 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 
 	const onConfirm = async () => {
 		onClose();
-		if (!messageBuzz) {
+		if (!messageBuzz?.trim()) {
 			return;
 		}
 		onSubmit(messageBuzz);
@@ -37,7 +38,14 @@ export const ConfirmBuzzMessageModal = memo((props: IBuzzMessageModalProps) => {
 					<Text style={styles.title}>{t('buzz.description')}</Text>
 				</View>
 				<View style={styles.textBox}>
-					<TextInput style={styles.input} value={messageBuzz} onChangeText={setMessageBuzz} />
+					<TextInput
+						style={styles.input}
+						value={messageBuzz}
+						multiline={true}
+						numberOfLines={4}
+						maxLength={MAX_LENGTH_MESSAGE_BUZZ}
+						onChangeText={setMessageBuzz}
+					/>
 				</View>
 				<View style={styles.buttonsWrapper}>
 					<TouchableOpacity onPress={onConfirm} style={styles.yesButton}>

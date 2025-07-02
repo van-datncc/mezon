@@ -1,9 +1,8 @@
 import { useAuth } from '@mezon/core';
 import { appActions, canvasActions, canvasAPIActions, selectIdCanvas, useAppDispatch } from '@mezon/store';
-import { Icons } from '@mezon/ui';
 import { ICanvas } from '@mezon/utils';
+import { ButtonCopy } from 'libs/components/src/lib/components';
 import { useState } from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 type GroupCanvasProps = {
@@ -28,16 +27,6 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: G
 		dispatch(appActions.setIsShowCanvas(true));
 		dispatch(canvasActions.setIdCanvas(canvasId || ''));
 		onClose();
-		if (canvasId && channelId && clanId) {
-			const body = {
-				id: canvasId,
-				channel_id: channelId,
-				clan_id: clanId
-			};
-			const results = await dispatch(canvasAPIActions.getChannelCanvasDetail(body));
-			const dataUpdate = results?.payload;
-			dispatch(canvasAPIActions.updateCanvas({ channelId, dataUpdate }));
-		}
 	};
 
 	const handleDeleteCanvas = async () => {
@@ -62,24 +51,20 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: G
 
 	return (
 		<div className="w-full flex gap-2 relative">
-			<div
+			<Link
 				className="w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
 				role="button"
+				to={link}
+				onClick={handleOpenCanvas}
 			>
-				<Link to={link} onClick={handleOpenCanvas}>
-					<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
-						{canvas.title ? canvas.title : 'Untitled'}
-					</div>
-				</Link>
-			</div>
-			<CopyToClipboard text={process.env.NX_CHAT_APP_REDIRECT_URI + link} onCopy={() => setIsCopied(true)}>
-				<button
-					style={{ top: '9px' }}
-					className={`absolute top-0 dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent shadow-emoji_item-delete font-bold w-6 h-6 flex items-center justify-center rounded-full ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}`}
-				>
-					{isCopied ? <Icons.PasteIcon /> : <Icons.CopyLink className="w-4 h-4" />}
-				</button>
-			</CopyToClipboard>
+				<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
+					{canvas.title ? canvas.title : 'Untitled'}
+				</div>
+			</Link>
+			<ButtonCopy
+				copyText={process.env.NX_CHAT_APP_REDIRECT_URI + link}
+				className={`absolute top-2 !rounded-full overflow-hidden dark:border-black dark:shadow-[#000000] ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}  `}
+			/>
 			{!isDisableDelCanvas && (
 				<button
 					title="Delete Canvas"

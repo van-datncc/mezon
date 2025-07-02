@@ -32,7 +32,12 @@ export const EmbedTitle = memo(({ title, url }: EmbedDescriptionProps) => {
 					<Text style={styles.urlTitle}>{title}</Text>
 				</TouchableOpacity>
 			) : (
-				<Text style={styles.title}>{title}</Text>
+				<Text style={styles.title}>
+					{title
+						?.replace(/[\n\r\t]/g, ' ')
+						?.replace(/\s+/g, ' ')
+						?.trim()}
+				</Text>
 			)}
 		</View>
 	);

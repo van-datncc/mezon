@@ -23,6 +23,7 @@ interface RenderContentProps {
 	isReply?: boolean;
 	onClickToMessage?: (event: React.MouseEvent<HTMLDivElement | HTMLSpanElement>) => void;
 	className?: string;
+	isEphemeral?: boolean;
 }
 
 export interface ElementToken {
@@ -45,6 +46,96 @@ export function extractIdsFromUrl(url: string) {
 	const [, clanId, channelId, canvasId] = match;
 	return { clanId, channelId, canvasId };
 }
+
+const formatMarkdownHeadings = (text: string, isReply: boolean): React.ReactNode[] => {
+	if (!text) return [text];
+
+	const lines = text.split('\n');
+	const formattedLines: React.ReactNode[] = [];
+	let hasHeadings = false;
+
+	lines.forEach((line: string, index: number) => {
+		const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+		if (headingMatch) {
+			hasHeadings = true;
+			const headingLevel = headingMatch[1].length;
+			const headingText = headingMatch[2].trim();
+
+			switch (headingLevel) {
+				case 1:
+					formattedLines.push(
+						<h1
+							key={`h1-${index}`}
+							className={`${isReply ? 'text-sm' : 'text-4xl'} my-1 font-bold dark:text-white text-colorTextLightMode`}
+						>
+							{headingText}
+						</h1>
+					);
+					break;
+				case 2:
+					formattedLines.push(
+						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h2>
+					);
+					break;
+				case 3:
+					formattedLines.push(
+						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h3>
+					);
+					break;
+				case 4:
+					formattedLines.push(
+						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h4>
+					);
+					break;
+				case 5:
+					formattedLines.push(
+						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h5>
+					);
+					break;
+				case 6:
+					formattedLines.push(
+						<h6 key={`h6-${index}`} className="text-base my-1 font-bold dark:text-white text-colorTextLightMode">
+							{headingText}
+						</h6>
+					);
+					break;
+				default:
+					formattedLines.push(line);
+					break;
+			}
+		} else {
+			formattedLines.push(line + '\n');
+		}
+	});
+
+	if (!hasHeadings) {
+		return [text];
+	}
+
+	return formattedLines;
+};
+
+const FormattedPlainText: React.FC<{ text: string; isSearchMessage?: boolean; messageId?: string; keyPrefix: string; isReply: boolean }> = ({
+	text,
+	isSearchMessage,
+	messageId,
+	keyPrefix,
+	isReply
+}) => {
+	const formattedContent = formatMarkdownHeadings(text, isReply);
+	if (formattedContent.length === 1 && typeof formattedContent[0] === 'string') {
+		return <PlainText isSearchMessage={isSearchMessage} text={text} />;
+	}
+	return formattedContent;
+};
 
 // Utility functions for text selection
 const getSelectionIndex = (node: Node, offset: number, containerRef: HTMLDivElement | null) => {
@@ -97,7 +188,8 @@ export const MessageLine = ({
 	onCopy,
 	messageId,
 	isReply,
-	onClickToMessage
+	onClickToMessage,
+	isEphemeral
 }: RenderContentProps) => {
 	mode = mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL;
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [], vk = [], lky = [] } = content || {};
@@ -129,7 +221,14 @@ export const MessageLine = ({
 
 			if (lastindex < s) {
 				formattedContent.push(
-					<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-${messageId}`} text={t?.slice(lastindex, s) ?? ''} />
+					<FormattedPlainText
+						key={`plain-${lastindex}-${messageId}`}
+						text={t?.slice(lastindex, s) ?? ''}
+						isSearchMessage={isSearchMessage}
+						messageId={messageId}
+						keyPrefix="plain"
+						isReply={!!isReply}
+					/>
 				);
 			}
 
@@ -208,23 +307,28 @@ export const MessageLine = ({
 
 						const isCanvas = contentHasChannelLink && contentInElement?.includes('canvas');
 
-						if (isCanvas && channelId) {
+						const canvasTitleFromPayload = content.cvtt?.[canvasId];
+						let canvasTitle = canvasTitleFromPayload;
+
+						if (!canvasTitle) {
 							const state = getStore().getState();
 							const canvases = selectCanvasIdsByChannelId(state, channelId);
 							const foundCanvas = canvases.find((item) => item.id === canvasId);
-							if (foundCanvas) {
-								componentToRender = (
-									<CanvasHashtag
-										key={`canvas-${s}-${messageId}`}
-										clanId={clanId}
-										channelId={channelId}
-										canvasId={canvasId}
-										title={foundCanvas.title}
-										isTokenClickAble={isTokenClickAble}
-										isJumMessageEnabled={isJumMessageEnabled}
-									/>
-								);
-							}
+							canvasTitle = foundCanvas?.title;
+						}
+
+						if (isCanvas && channelId && canvasTitle) {
+							componentToRender = (
+								<CanvasHashtag
+									key={`canvas-${s}-${messageId}`}
+									clanId={clanId}
+									channelId={channelId}
+									canvasId={canvasId}
+									title={canvasTitle}
+									isTokenClickAble={isTokenClickAble}
+									isJumMessageEnabled={isJumMessageEnabled}
+								/>
+							);
 						} else if (!isCanvas && contentHasChannelLink) {
 							const channelFound = getTagByIdOnStored(channelId);
 							if (channelId && channelFound?.id) {
@@ -315,7 +419,14 @@ export const MessageLine = ({
 
 		if (t && lastindex < t?.length) {
 			formattedContent.push(
-				<PlainText isSearchMessage={isSearchMessage} key={`plain-${lastindex}-end-${messageId}`} text={t.slice(lastindex)} />
+				<FormattedPlainText
+					key={`plain-${lastindex}-end-${messageId}`}
+					text={t.slice(lastindex)}
+					isSearchMessage={isSearchMessage}
+					messageId={messageId}
+					keyPrefix="plain"
+					isReply={!!isReply}
+				/>
 			);
 		}
 
@@ -323,7 +434,7 @@ export const MessageLine = ({
 			formattedContent.push(
 				<p
 					key={`edited-status-${lastindex}-end`}
-					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px]"
+					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px] select-none"
 				>
 					(edited)
 				</p>
@@ -369,7 +480,7 @@ export const MessageLine = ({
 							minHeight: 30
 						}
 			}
-			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'}`}
+			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
 		>
 			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>

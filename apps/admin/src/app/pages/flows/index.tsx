@@ -1,7 +1,9 @@
-import { Spinner } from 'flowbite-react';
-import { useContext } from 'react';
+import { Icons } from '@mezon/ui';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FlowContext } from '../../context/FlowContext';
+import flowService from '../../services/flowService';
+import AppTokenModal from './AppTokenModal';
 import ListFlow from './ListFlows';
 
 const Flows = () => {
@@ -11,16 +13,43 @@ const Flows = () => {
 	const handleGoToAddFlowPage = () => {
 		navigate(`/developers/applications/${applicationId}/add-flow`);
 	};
+	const [hasToken, setHasToken] = useState(false);
+	const [openAppTokenModal, setOpenAppTokenModal] = useState(false);
+
+	useEffect(() => {
+		const getApplication = async () => {
+			try {
+				const res = await flowService.getApplication(applicationId ?? '');
+				if (res.id) {
+					setHasToken(true);
+				}
+			} catch {
+				//
+			}
+		};
+		getApplication();
+	}, [applicationId]);
+
+	const handleCreateApplication = useCallback(
+		(token: string) => {
+			flowService.createApplication(applicationId as string, token);
+		},
+		[applicationId]
+	);
+
 	return (
 		<div className="relative">
 			<div className="flex justify-between items-center">
 				<h4 className="text-xl font-semibold">Chat Flows</h4>
 				<div className="flex gap-2">
-					{/* <input
-						className="px-3 py-2 hover:border-blue-300 rounded-md border-[1px] border-gray-500 w-[250px] focus-visible:border-1 focus-visible:border-blue-300"
-						placeholder="Search with Name or Category"
-					/> */}
 					<button
+						onClick={() => setOpenAppTokenModal(true)}
+						className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md active:bg-blue-500 transition-all"
+					>
+						Set Token
+					</button>
+					<button
+						disabled={!hasToken}
 						onClick={handleGoToAddFlowPage}
 						className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md active:bg-blue-500 transition-all"
 					>
@@ -28,14 +57,18 @@ const Flows = () => {
 					</button>
 				</div>
 			</div>
-			{flowState.isLoading && (
-				<div className="absolute top-0 left-0 right-0 bottom-0 z-[999] text-center">
-					<Spinner size="xl" color="success" aria-label="Success spinner example" />
-				</div>
-			)}
+			{flowState.isLoading && <Icons.LoadingSpinner />}
 			<div className="mt-5 list-flows">
 				<ListFlow />
 			</div>
+			<AppTokenModal
+				open={openAppTokenModal}
+				onClose={() => setOpenAppTokenModal(false)}
+				title="App Token"
+				onSave={(data: { token: string }) => {
+					handleCreateApplication(data.token);
+				}}
+			/>
 		</div>
 	);
 };

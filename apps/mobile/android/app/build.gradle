@@ -93,8 +93,8 @@ android {
         applicationId "com.mezon.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 311
-        versionName "1.1.65"
+        versionCode 353
+        versionName "1.1.80"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -141,6 +141,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     implementation("com.facebook.react:hermes-engine:+")
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
+    implementation 'com.google.firebase:firebase-analytics:21.4.0'
 
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:3.1.3'

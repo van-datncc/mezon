@@ -1,5 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
-import { IChannelMember, IVoice, IvoiceInfo, LoadingStatus } from '@mezon/utils';
+import { generateBasePath } from '@mezon/transport';
+import { IVoice, IvoiceInfo, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
 import { ApiGenerateMeetTokenResponse } from 'mezon-js/api.gen';
@@ -19,7 +20,6 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	voiceInfo: IvoiceInfo | null;
 	loadingStatus: LoadingStatus;
 	error?: string | null;
-	voiceChannelMember: IChannelMember[];
 	showMicrophone: boolean;
 	showCamera: boolean;
 	showScreen: boolean;
@@ -27,6 +27,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	voiceConnectionState: boolean;
 	fullScreen?: boolean;
 	isJoined: boolean;
+	isGroupCallJoined: boolean;
 	token: string;
 	stream: MediaStream | null | undefined;
 	showSelectScreenModal: boolean;
@@ -40,7 +41,9 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 	externalGroup?: boolean;
 }
 
-export const voiceAdapter = createEntityAdapter<VoiceEntity>();
+export const voiceAdapter = createEntityAdapter({
+	selectId: (voice: VoiceEntity) => voice.id
+});
 
 type fetchVoiceChannelMembersPayload = {
 	clanId: string;
@@ -63,7 +66,7 @@ export const fetchVoiceChannelMembers = createAsyncThunk(
 				return [];
 			}
 
-			const members = response.voice_channel_users.map((channelRes) => {
+			const members: VoiceEntity[] = response.voice_channel_users.map((channelRes) => {
 				return {
 					user_id: channelRes.user_id || '',
 					clan_id: clanId,
@@ -91,7 +94,7 @@ export const generateMeetTokenExternal = createAsyncThunk(
 	async ({ token, displayName, isGuest }: { token: string; displayName?: string; isGuest?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureClientAsync(getMezonCtx(thunkAPI));
-			const response = await mezon.client.generateMeetTokenExternal(token, displayName, isGuest);
+			const response = await mezon.client.generateMeetTokenExternal(generateBasePath(), token, displayName, isGuest);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'meet/generateMeetTokenExternal');
@@ -103,15 +106,15 @@ export const generateMeetTokenExternal = createAsyncThunk(
 export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	error: null,
-	voiceChannelMember: [],
+	voiceInfo: null,
 	showMicrophone: false,
 	showCamera: false,
 	showScreen: false,
 	statusCall: false,
 	voiceConnectionState: false,
-	voiceInfo: null,
 	fullScreen: false,
 	isJoined: false,
+	isGroupCallJoined: false,
 	token: '',
 	stream: null,
 	showSelectScreenModal: false,
@@ -119,6 +122,7 @@ export const initialVoiceState: VoiceState = voiceAdapter.getInitialState({
 	guestUserId: undefined,
 	guestAccessToken: undefined,
 	joinCallExtStatus: 'not loaded',
+	isPiPMode: false,
 	openPopOut: false,
 	openChatBox: false,
 	externalGroup: false
@@ -128,18 +132,24 @@ export const voiceSlice = createSlice({
 	name: VOICE_FEATURE_KEY,
 	initialState: initialVoiceState,
 	reducers: {
-		add: voiceAdapter.addOne,
+		add: voiceAdapter.upsertOne,
 		addMany: voiceAdapter.addMany,
-		remove: voiceAdapter.removeOne,
+		remove: (state, action: PayloadAction<string>) => {
+			const keyRemove = action.payload;
+			voiceAdapter.removeOne(state, keyRemove);
+		},
 		voiceEnded: (state, action: PayloadAction<string>) => {
 			const channelId = action.payload;
 			const idsToRemove = Object.values(state.entities)
 				.filter((member) => member?.voice_channel_id === channelId)
-				.map((member) => member?.id);
+				.map((member) => member?.id + member?.voice_channel_id);
 			voiceAdapter.removeMany(state, idsToRemove);
 		},
 		setJoined: (state, action) => {
 			state.isJoined = action.payload;
+		},
+		setGroupCallJoined: (state, action) => {
+			state.isGroupCallJoined = action.payload;
 		},
 		setToken: (state, action) => {
 			state.token = action.payload;
@@ -179,6 +189,7 @@ export const voiceSlice = createSlice({
 			state.voiceInfo = null;
 			state.fullScreen = false;
 			state.isJoined = false;
+			state.isGroupCallJoined = false;
 			state.token = '';
 			state.stream = null;
 			state.openPopOut = false;
@@ -216,7 +227,6 @@ export const voiceSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchVoiceChannelMembers.fulfilled, (state: VoiceState, action: PayloadAction<any>) => {
-				state.voiceChannelMember = action.payload;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchVoiceChannelMembers.rejected, (state: VoiceState, action) => {
@@ -289,6 +299,7 @@ export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): V
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
 
 export const selectVoiceJoined = createSelector(getVoiceState, (state) => state.isJoined);
+export const selectGroupCallJoined = createSelector(getVoiceState, (state) => state.isGroupCallJoined);
 
 export const selectTokenJoinVoice = createSelector(getVoiceState, (state) => state.token);
 
@@ -306,8 +317,8 @@ export const selectVoiceFullScreen = createSelector(getVoiceState, (state) => st
 
 const selectChannelId = (_: RootState, channelId: string) => channelId;
 
-export const selectVoiceChannelMembersByChannelId = createSelector([selectAllVoice, selectChannelId], (entities, channelId) => {
-	return entities.filter((member) => member && member.voice_channel_id === channelId);
+export const selectVoiceChannelMembersByChannelId = createSelector([selectAllVoice, selectChannelId], (members, channelId) => {
+	return members.filter((member) => member && member.voice_channel_id === channelId);
 });
 export const selectStreamScreen = createSelector(getVoiceState, (state) => state.stream);
 

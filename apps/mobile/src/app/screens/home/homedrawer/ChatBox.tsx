@@ -13,8 +13,8 @@ interface IChatBoxProps {
 		threadIcon: boolean;
 	};
 	directMessageId?: string;
-	onShowKeyboardBottomSheet?: (isShow: boolean, type?: string) => void;
 	isPublic: boolean;
+	isFriendTargetBlocked?: boolean;
 }
 export const ChatBox = memo((props: IChatBoxProps) => {
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], props.channelId);

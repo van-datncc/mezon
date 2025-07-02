@@ -4,7 +4,7 @@
             "headerTitle": "Step 1 of 3",
             "title": "Where is your event?",
             "subtitle": "So no one gets lost on where to go",
-            "description": "You can give other people permission to create events in Server > Settings > Roles"
+            "description": "You can give other people permission to create events in Clan > Settings > Roles"
         },
         "eventDetails": {
             "headerTitle": "Step 2 of 3",
@@ -79,20 +79,23 @@
         "description": {
             "title": "Description",
             "description": "Tell people a little more about your event. Markdown, new lines, and links are supported."
-        }
+        },
+        "cover": "Image cover"
     },
     "actions": {
         "next": "Next",
-        "create": "Create Event"
+        "create": "Create Event",
+        "edit": "Update Event"
     },
     "notify": {
         "locationBlank": "A location is required",
         "titleBlank": "An event topic is required",
-        "time": "Invalid start time or end time"
+        "time": "Invalid start time or end time",
+        "type": "Event type is required"
     },
     "eventDetail": {
         "eventIsTaking": "Event is taking place!",
         "tenMinutesLeft": "10 minutes left. Join in!"
     },
-    "selectUser": "Select user to transfer"
+    "selectUser": "Select channel to create event"
 }

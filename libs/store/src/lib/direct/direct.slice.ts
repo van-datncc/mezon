@@ -42,18 +42,25 @@ export const mapDmGroupToEntity = (channelRes: ApiChannelDescription) => {
 
 export const createNewDirectMessage = createAsyncThunk(
 	'direct/createNewDirectMessage',
-	async ({ body, username, avatar }: { body: ApiCreateChannelDescRequest; username?: string | string[]; avatar?: string | string[] }, thunkAPI) => {
+	async (
+		{
+			body,
+			username,
+			avatar,
+			display_names
+		}: { body: ApiCreateChannelDescRequest; display_names?: string | string[]; username?: string | string[]; avatar?: string | string[] },
+		thunkAPI
+	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.createChannelDesc(mezon.session, body);
 			if (response) {
-				thunkAPI.dispatch(directActions.setDmGroupCurrentId(response.channel_id ?? ''));
-				thunkAPI.dispatch(directActions.setDmGroupCurrentType(response.type ?? 0));
 				thunkAPI.dispatch(
 					directActions.upsertOne({
 						id: response.channel_id || '',
 						...response,
 						usernames: Array.isArray(username) ? username : username ? [username] : [],
+						display_names: Array.isArray(display_names) ? display_names : display_names ? [display_names] : [],
 						channel_label: Array.isArray(username) ? username.toString() : username,
 						channel_avatar: Array.isArray(avatar) ? avatar : avatar ? [avatar] : [],
 						user_id: body.user_ids
@@ -128,11 +135,7 @@ export const fetchDirectMessage = createAsyncThunk(
 	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, noCache }: fetchDmGroupArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-			if (noCache) {
-				fetchChannelsCached.clear(mezon, 500, 1, '', channelType);
-			}
-			const response = await fetchChannelsCached(mezon, 500, 1, '', channelType);
+			const response = await fetchChannelsCached(thunkAPI.getState as () => RootState, mezon, 500, 1, '', channelType, noCache);
 			if (!response.channeldesc) {
 				thunkAPI.dispatch(directActions.setAll([]));
 				return [];

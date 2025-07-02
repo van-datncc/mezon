@@ -1,4 +1,4 @@
-import { AvatarImage, Coords, ModalRemoveMemberClan, PanelMember } from '@mezon/components';
+import { AvatarImage, Coords, ModalRemoveMemberClan, PanelMember, UserProfileModalInner } from '@mezon/components';
 import { useChannelMembersActions, useMemberContext, useOnClickOutside, usePermissionChecker, useRoles } from '@mezon/core';
 import {
 	RolesClanEntity,
@@ -84,19 +84,48 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 		mouseY: 0,
 		distanceToBottom: 0
 	});
+
+	const [openUserProfile, closeUserProfile] = useModal(() => {
+		return (
+			<UserProfileModalInner
+				userId={userId as string}
+				onClose={closeUserProfile}
+				isDM={false}
+				user={{
+					id: userId,
+					user_id: userId,
+					user: {
+						id: userId,
+						username: username
+					}
+				}}
+				avatar={avatar}
+			/>
+		);
+	}, [userId, username, avatar]);
+
 	const [openPanelMember, closePanelMember] = useModal(() => {
 		const member: ChannelMembersEntity = {
 			id: userId,
 			user_id: userId,
 			user: {
 				username: username,
-				id: userId
+				id: userId,
+				display_name: displayName,
+				avatar_url: avatar
 			}
 		};
 		return (
-			<PanelMember coords={coords} onClose={closePanelMember} onRemoveMember={handleClickRemoveMember} isMemberChannel={true} member={member} />
+			<PanelMember
+				coords={coords}
+				onClose={closePanelMember}
+				onRemoveMember={handleClickRemoveMember}
+				isMemberChannel={true}
+				member={member}
+				onOpenProfile={openUserProfile}
+			/>
 		);
-	}, [coords]);
+	}, [coords, openUserProfile]);
 
 	const handleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
 		setCoords({
@@ -248,6 +277,7 @@ const ListOptionRole = ({
 	const { updateRole } = useRoles();
 	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+	const currentClanId = useSelector(selectCurrentClanId);
 
 	const handleAddRoleMemberList = async (role: RolesClanEntity) => {
 		if (userRolesClan.usersRole[role.id]) {
@@ -258,7 +288,8 @@ const ListOptionRole = ({
 		await dispatch(
 			usersClanActions.addRoleIdUser({
 				id: role.id,
-				userId: userId
+				userId: userId,
+				clanId: currentClanId as string
 			})
 		);
 	};

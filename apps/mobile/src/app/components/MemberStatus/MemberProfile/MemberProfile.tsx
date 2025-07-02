@@ -1,5 +1,5 @@
 import { IUserStatus, OwnerIcon } from '@mezon/mobile-components';
-import { useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
 import { getStore, selectMemberClanByUserId2 } from '@mezon/store-mobile';
 import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -51,7 +51,7 @@ export function MemberProfile({
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
 		if (userInfo) {
-			return nickName || userInfo?.display_name || userInfo?.username || userInfo.clan_nick || userInfo?.user?.username;
+			return nickName || userInfo?.username || userInfo.clan_nick || userInfo?.user?.username;
 		}
 	}, [nickName, userInfo]);
 	const userColorRolesClan = useColorsRoleById(userInfo?.id || '')?.highestPermissionRoleColor;
@@ -72,14 +72,25 @@ export function MemberProfile({
 				username={userInfo?.username}
 				userStatus={userStatus}
 				customStatus={status}
+				width={size.s_36}
+				height={size.s_36}
 			/>
 
 			{/* Name */}
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
 				{!isHideUserName && (
-					<Text style={{ color: colorUserName }}>
-						{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
-					</Text>
+					<View style={styles.nameItem}>
+						{!!userInfo?.display_name?.length && userInfo?.display_name !== name && (
+							<Text style={{ color: themeValue.text }}>
+								{userInfo?.display_name?.length > numCharCollapse
+									? `${userInfo?.display_name?.substring(0, numCharCollapse)}...`
+									: userInfo?.display_name}
+							</Text>
+						)}
+						<Text style={{ color: colorUserName }}>
+							{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
+						</Text>
+					</View>
 				)}
 				{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
 					<OwnerIcon width={16} height={16} />

@@ -2,12 +2,12 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { attachmentActions } from '@mezon/store';
 import { useAppDispatch } from '@mezon/store-mobile';
-import { notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
+import { fileTypeImage, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, View } from 'react-native';
 import { ImageListModal } from '../../../../../components/ImageListModal';
-import { isImage, isVideo } from '../../../../../utils/helpers';
+import { checkFileTypeImage, isVideo } from '../../../../../utils/helpers';
 import { RenderDocumentsChat } from '../RenderDocumentsChat';
 import { RenderImageChat } from '../RenderImageChat';
 import { RenderVideoChat } from '../RenderVideoChat';
@@ -27,7 +27,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	attachments.forEach((attachment) => {
 		if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
 			videos.push(attachment);
-		} else if (attachment.filetype?.indexOf('image/png') !== -1 || attachment.filetype?.indexOf('image/jpeg') !== -1) {
+		} else if (fileTypeImage.includes(attachment?.filetype)) {
 			images.push(attachment);
 		} else {
 			documents.push(attachment);
@@ -44,8 +44,8 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, cl
 	const [videos, setVideos] = useState<ApiMessageAttachment[]>([]);
 	const [images, setImages] = useState<ApiMessageAttachment[]>([]);
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
-	const visibleImages = useMemo(() => images?.slice(0, 3), [images]);
-	const remainingImagesCount = images?.length - 3 || 0;
+	const visibleImages = useMemo(() => images?.reverse()?.slice(0, images?.length > 4 ? 3 : 4), [images]);
+	const remainingImagesCount = useMemo(() => images?.length - visibleImages?.length || 0, [images, visibleImages]);
 	useEffect(() => {
 		const { videos, images, documents } = classifyAttachments(attachments ?? []);
 		setVideos(videos);
@@ -69,7 +69,8 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, cl
 			if (!document?.url) {
 				return null;
 			}
-			const isShowImage = isImage(document?.url?.toLowerCase());
+
+			const isShowImage = checkFileTypeImage(document?.filetype);
 			const checkImage = notImplementForGifOrStickerSendFromPanel(document);
 			if (isShowImage || checkImage) {
 				return (

@@ -1,5 +1,6 @@
 import { useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
+	emojiRecentActions,
 	emojiSuggestionActions,
 	referencesActions,
 	selectAddEmojiState,
@@ -8,6 +9,7 @@ import {
 	selectModeResponsive,
 	selectTheme,
 	selectThreadCurrentChannel,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -15,6 +17,7 @@ import {
 	EEmojiCategory,
 	EPermission,
 	EmojiPlaces,
+	FOR_SALE_CATE,
 	IEmoji,
 	MAX_LENGTH_MESSAGE_BUZZ,
 	ModeResponsive,
@@ -26,7 +29,9 @@ import {
 } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MentionItem } from 'react-mentions';
+import { useModal } from 'react-modal-hook';
 import { useDispatch, useSelector } from 'react-redux';
+import ModalBuyItem from '../GifsStickersEmojis/ModalBuyItem';
 
 export type EmojiCustomPanelOptions = {
 	messageEmojiId?: string | undefined;
@@ -43,6 +48,7 @@ export type EmojiCustomPanelOptions = {
 	setBuzzInputRequest?: (value: RequestInput) => void;
 	toggleEmojiPanel?: () => void;
 	isFromTopicView?: boolean;
+	onEmojiSelect?: (emoji: string, emojiId: string) => void;
 };
 
 const searchEmojis = (emojis: IEmoji[], searchTerm: string) => {
@@ -94,11 +100,13 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 		[categoryEmoji]
 	);
 
-	const categoriesWithIcons = useMemo(() => {
-		return categoriesEmoji.map((category, index) => ({
+	const categoriesWithIcons: { name: string; icon: JSX.Element }[] = useMemo(() => {
+		const categories = categoriesEmoji.map((category, index) => ({
 			name: category,
 			icon: categoryIcons[index]
 		}));
+
+		return [{ name: FOR_SALE_CATE, icon: <Icons.MarketIcons /> }, ...categories];
 	}, [categoriesEmoji, categoryIcons]);
 
 	const channelID = props.isClanView ? currentChannel?.id : props.directId;
@@ -139,9 +147,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				dispatch(emojiSuggestionActions.setSuggestionEmojiObjPicked({ shortName: '', id: '', isReset: true }));
 				setAddEmojiActionChatbox(!addEmojiState);
 				setSuggestionEmojiObjPicked(emojiId, emojiPicked, props.isFromTopicView);
-				if (!shiftPressedState) {
-					setSubPanelActive(SubPanelName.NONE);
-				}
 			}
 			if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ) {
 				const lastIndexOfInputPlainText = (buzzInputRequest?.content ?? '')?.length;
@@ -166,6 +171,9 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					toggleEmojiPanel();
 				}
 			}
+			if (props.onEmojiSelect) {
+				props.onEmojiSelect(emojiPicked, emojiId);
+			}
 		},
 		[
 			subPanelActive,
@@ -187,7 +195,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			buzzInputRequest?.mentionRaw,
 			buzzInputRequest?.valueTextInput,
 			setBuzzInputRequest,
-			toggleEmojiPanel
+			toggleEmojiPanel,
+			props.onEmojiSelect
 		]
 	);
 
@@ -296,7 +305,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					return (
 						<button
 							key={index}
-							className={`w-9 h-9 py-2 max-sm:px-1 flex flex-row justify-center items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
+							className={`w-9 h-9 py-2 max-sm:px-1 flex flex-row justify-center dark:text-textPrimary items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
 							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
@@ -344,14 +353,17 @@ type DisplayByCategoriesProps = {
 	readonly categoryName?: string;
 	readonly onEmojiSelect: (emoji_id: string, emoji: string) => void;
 	readonly onEmojiHover: (item: any) => void;
-	readonly emojisData: any[];
+	readonly emojisData: IEmoji[];
 	onClickAddButton?: () => void;
 	showAddButton?: boolean;
 };
 
 const getEmojisByCategories = (emojis: IEmoji[], categoryParam: string) => {
+	if (categoryParam === FOR_SALE_CATE) {
+		return emojis.filter((emoji) => emoji?.is_for_sale);
+	}
 	return emojis
-		.filter((emoji) => !!emoji.id && emoji?.category?.includes(categoryParam))
+		.filter((emoji) => !!emoji.id && emoji?.category?.includes(categoryParam) && !emoji?.is_for_sale)
 		.map((emoji) => ({
 			...emoji,
 			category: emoji.category
@@ -411,6 +423,21 @@ const EmojisPanel = React.memo(function EmojisPanel({
 		return hasClanPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
 	}, [hasClanPermission, categoryName, showAddButton]);
 
+	const [itemUnlock, setItemUnlock] = useState<IEmoji | null>(null);
+	const handleOpenUnlockItem = (item: IEmoji) => {
+		setItemUnlock(item);
+		openModalBuy();
+	};
+	const dispatch = useAppDispatch();
+	const handleConfirmBuyItem = async () => {
+		if (itemUnlock) {
+			await dispatch(emojiRecentActions.buyItemForSale({ id: itemUnlock.id || '', type: 0 }));
+		}
+	};
+	const [openModalBuy, closeModalBuy] = useModal(() => {
+		return <ModalBuyItem onCancel={closeModalBuy} onConfirm={handleConfirmBuyItem} />;
+	}, [itemUnlock]);
+
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
@@ -418,13 +445,27 @@ const EmojisPanel = React.memo(function EmojisPanel({
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
+					className={` relative ${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
 					onClick={() => {
-						onEmojiSelect(item.id, item.shortname);
+						if (!item.is_for_sale || item.src) {
+							onEmojiSelect(item.id || '', item.shortname || '');
+						} else {
+							handleOpenUnlockItem(item);
+						}
 					}}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
-					<img draggable="false" src={getSrcEmoji(item?.id)} alt={item.shortname} className={'max-h-full max-w-full'} />
+					<img
+						draggable="false"
+						src={!item.src ? getSrcEmoji(item?.id || '') : item.src}
+						alt={item.shortname}
+						className={'max-h-full max-w-full'}
+					/>
+					{item.is_for_sale && !item.src && (
+						<div className="absolute left-3 flex items-center justify-center aspect-square pointer-events-none">
+							<Icons.LockIcon defaultSize="w-4 h-4 text-white block group-hover:hidden" defaultFill="white" />
+						</div>
+					)}
 				</button>
 			))}
 			{isShowAddButton && (

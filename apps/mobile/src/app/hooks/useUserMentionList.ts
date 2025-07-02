@@ -71,6 +71,8 @@ function UseMentionList({ channelID, channelMode }: UserMentionListProps): Menti
 
 		if (channelMode === ChannelStreamMode.STREAM_MODE_CHANNEL || channelMode === ChannelStreamMode.STREAM_MODE_THREAD) {
 			return [...sortedMentionList, ...roleMentions, hardcodedUser];
+		} else if (channelMode === ChannelStreamMode.STREAM_MODE_GROUP) {
+			return [...sortedMentionList, hardcodedUser];
 		} else {
 			return [...sortedMentionList];
 		}

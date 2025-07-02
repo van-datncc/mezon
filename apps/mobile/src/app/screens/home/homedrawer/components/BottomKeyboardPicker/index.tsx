@@ -1,7 +1,8 @@
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useTheme } from '@mezon/mobile-ui';
-import React, { Ref, forwardRef, memo } from 'react';
+import React, { Ref, forwardRef, memo, useMemo } from 'react';
+import { View } from 'react-native';
 import { style } from './styles';
 
 export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
@@ -9,7 +10,7 @@ export type IModeKeyboardPicker = 'text' | 'emoji' | 'attachment';
 interface IProps {
 	height: number;
 	children: React.ReactNode;
-	isStickyHeader: boolean;
+	isStickyHeader?: boolean;
 }
 
 const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
@@ -18,19 +19,23 @@ const BottomKeyboardPicker = forwardRef(function BottomKeyboardPicker(
 ) {
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
+	const snapPoints = useMemo(() => [height === 0 ? 1 : height, '100%'], [height]);
 
 	return (
 		<BottomSheet
 			ref={ref}
-			snapPoints={[height === 0 ? 1 : height, '100%']}
+			snapPoints={snapPoints}
 			animateOnMount
 			backgroundStyle={{
 				backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary
 			}}
 		>
-			<BottomSheetScrollView stickyHeaderIndices={isStickyHeader ? [0] : []} style={styles.contentContainer}>
+			<View
+				// stickyHeaderIndices={isStickyHeader ? [0] : []}
+				style={styles.contentContainer}
+			>
 				{children}
-			</BottomSheetScrollView>
+			</View>
 		</BottomSheet>
 	);
 });

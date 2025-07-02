@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useAppParams, useAuth, useChatReaction, useDirect, usePermissionChecker, useReference, useSendInviteMessage } from '@mezon/core';
 import {
+	channelMetaActions,
 	createEditCanvas,
 	directActions,
 	gifsStickerEmojiActions,
@@ -61,7 +62,6 @@ import {
 	isPublicChannel
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import 'react-contexify/ReactContexify.css';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import DynamicContextMenu from './DynamicContextMenu';
@@ -110,7 +110,7 @@ function MessageContextMenu({
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const listPinMessages = useSelector(selectPinMessageByChannelId(currentChannel?.id));
+	const listPinMessages = useAppSelector((state) => selectPinMessageByChannelId(state, currentChannel?.id as string));
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const isClanView = useSelector(selectClanView);
 	const currentTopicId = useSelector(selectCurrentTopicId);
@@ -403,6 +403,28 @@ function MessageContextMenu({
 			toast.error('Failed to note this message');
 		}
 	}, [dispatch, message]);
+
+	const handleMarkUnread = useCallback(async () => {
+		try {
+			dispatch(
+				messagesActions.updateLastSeenMessage({
+					clanId: message?.clan_id || '',
+					channelId: message?.channel_id,
+					messageId: message?.id,
+					mode: message?.mode || 0,
+					badge_count: 0
+				})
+			);
+			dispatch(
+				channelMetaActions.setChannelLastSeenTimestamp({
+					channelId: message?.channel_id as string,
+					timestamp: message.create_time_seconds || Date.now()
+				})
+			);
+		} catch (error) {
+			toast.error('Failed to note this message');
+		}
+	}, [dispatch, message]);
 	const checkPos = useMemo(() => {
 		if (posShowMenu === SHOW_POSITION.NONE || posShowMenu === SHOW_POSITION.IN_STICKER || posShowMenu === SHOW_POSITION.IN_EMOJI) {
 			return true;
@@ -428,7 +450,7 @@ function MessageContextMenu({
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
-		return !checkMessageInPinnedList && !isTopic;
+		return !checkMessageInPinnedList;
 	}, [checkMessageInPinnedList, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
@@ -497,8 +519,8 @@ function MessageContextMenu({
 	}, [checkElementIsImage, isClickedEmoji, isClickedSticker]);
 
 	const sendTransactionMessage = useCallback(
-		async (userId: string, username?: string, avatar?: string) => {
-			const response = await createDirectMessageWithUser(userId, username, avatar);
+		async (userId: string, display_name?: string, username?: string, avatar?: string) => {
+			const response = await createDirectMessageWithUser(userId, display_name, username, avatar);
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
@@ -562,7 +584,12 @@ function MessageContextMenu({
 									channelIdOnMessage: message?.channel_id
 								});
 
-								await sendTransactionMessage(message.sender_id || '', message.user?.name || message.user?.username, message.avatar);
+								await sendTransactionMessage(
+									message.sender_id || '',
+									message.user?.name,
+									message.user?.name || message.user?.username,
+									message.avatar
+								);
 							}
 						} catch (error) {
 							console.error('Failed to give cofffee message', error);
@@ -589,10 +616,10 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(pinMessageStatus === true, (builder) => {
+		builder.when(!isTopic && pinMessageStatus === true, (builder) => {
 			builder.addMenuItem('pinMessage', 'Pin Message', openPinMessageModal, <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
-		builder.when(pinMessageStatus === false, (builder) => {
+		builder.when(!isTopic && pinMessageStatus === false, (builder) => {
 			builder.addMenuItem('unPinMessage', 'Unpin Message', () => handleUnPinMessage(), <Icons.PinMessageRightClick defaultSize="w-4 h-4" />);
 		});
 
@@ -647,7 +674,7 @@ function MessageContextMenu({
 				'addToInbox',
 				'Add To Inbox',
 				handleMarkMessageNoti,
-				<svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
 						fill="currentColor"
@@ -656,14 +683,16 @@ function MessageContextMenu({
 			);
 		});
 
-		// builder.when(checkPos, (builder) => {
-		// 	builder.addMenuItem(
-		// 		'copyMessageLink',
-		// 		'Copy Message Link',
-		// 		() => console.log('copyMessageLink'),
-		// 		<Icons.CopyMessageLinkRightClick defaultSize="w-4 h-4" />
-		// 	);
-		// });
+		builder.when(checkPos, (builder) => {
+			builder.addMenuItem(
+				'markUnread',
+				'Mark Unread',
+				handleMarkUnread,
+				<svg height="16px" width="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					<path d="M410.9,0H85.1C72.3,0,61.8,10.4,61.8,23.3V512L248,325.8L434.2,512V23.3C434.2,10.4,423.8,0,410.9,0z" fill="currentColor" />
+				</svg>
+			);
+		});
 		message?.code !== TypeMessage.Topic &&
 			notAllowedType &&
 			!isTopic &&

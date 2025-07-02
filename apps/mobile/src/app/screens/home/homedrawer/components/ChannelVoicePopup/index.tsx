@@ -1,36 +1,38 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
+import { size } from '@mezon/mobile-ui';
 import {
 	appActions,
 	generateMeetToken,
+	getStoreAsync,
 	handleParticipantVoiceState,
-	selectChannelById2,
-	selectClanById,
 	selectIsPiPMode,
+	selectVoiceInfo,
+	selectVoiceJoined,
 	useAppDispatch,
 	useAppSelector,
 	voiceActions
 } from '@mezon/store-mobile';
-import { ParticipantMeetState } from '@mezon/utils';
+import { ParticipantMeetState, sleep } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, DeviceEventEmitter, Keyboard, PanResponder } from 'react-native';
-import { useSelector } from 'react-redux';
+import Toast from 'react-native-toast-message';
 import ChannelVoice from '../ChannelVoice';
 
-const ChannelVoicePopup = () => {
-	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
+const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
+	const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL || '';
 	const pan = useRef(new Animated.ValueXY()).current;
 	const isDragging = useRef(false);
 	const isFullScreen = useRef(true);
 	const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 	const [voicePlay, setVoicePlay] = useState(false);
 	const dispatch = useAppDispatch();
-	const [channelId, setChannelId] = useState();
+	const [channelId, setChannelId] = useState<string>('');
 	const [clanId, setClanId] = useState('');
-	const [token, setToken] = useState<string | null>(null);
-	const channel = useSelector((state) => selectChannelById2(state, channelId));
-	const clan = useSelector(selectClanById(clanId));
+	const [token, setToken] = useState<string>('');
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
+	const [isGroupCall, setIsGroupCall] = useState(false);
+	const [participantsCount, setParticipantsCount] = useState(0);
 	const { userProfile } = useAuth();
 
 	const panResponder = useRef(
@@ -91,59 +93,41 @@ const ChannelVoicePopup = () => {
 		}
 	};
 
-	useEffect(() => {
-		const eventOpenMezonMeet = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_MEZON_MEET, async (data) => {
-			setChannelId(data?.channelId);
-			setClanId(data?.clanId);
-			if (data?.isEndCall) {
-				handleLeaveRoom(data?.clanId, data?.channelId);
-				setVoicePlay(false);
-			} else {
-				handleJoinChannelVoice(data?.roomName, data?.channelId, data?.clanId);
-			}
-		});
-		return () => {
-			eventOpenMezonMeet.remove();
-		};
-	}, []);
-
-	const handleJoinChannelVoice = useCallback(
-		async (roomName: string, channelId: string, clanId: string) => {
-			if (!roomName) return;
-			dispatch(appActions.setLoadingMainMobile(true));
-			try {
-				const result = await dispatch(
-					generateMeetToken({
-						channelId,
-						roomName
+	const handleJoinChannelVoice = async (roomName: string, channelId: string, clanId: string) => {
+		if (!roomName) return;
+		dispatch(appActions.setLoadingMainMobile(true));
+		try {
+			const result = await dispatch(
+				generateMeetToken({
+					channelId,
+					roomName
+				})
+			).unwrap();
+			if (result) {
+				dispatch(
+					voiceActions.setVoiceInfo({
+						clanId: clanId as string,
+						clanName: '',
+						channelId: channelId as string,
+						channelLabel: '',
+						channelPrivate: 1
 					})
-				).unwrap();
-				if (result) {
-					dispatch(
-						voiceActions.setVoiceInfo({
-							clanId: clanId as string,
-							clanName: clan?.clan_name as string,
-							channelId: channelId as string,
-							channelLabel: channel?.channel_label as string
-						})
-					);
-					await participantMeetState(ParticipantMeetState.JOIN, clanId as string, channelId as string);
-					setToken(result);
-					dispatch(voiceActions.setJoined(true));
-					dispatch(appActions.setLoadingMainMobile(false));
-					setVoicePlay(true);
-				} else {
-					setToken(null);
-					dispatch(appActions.setLoadingMainMobile(false));
-				}
-			} catch (err) {
-				console.error('Failed to join room:', err);
-				setToken(null);
+				);
+				await participantMeetState(ParticipantMeetState.JOIN, clanId as string, channelId as string);
+				setToken(result);
+				dispatch(voiceActions.setJoined(true));
+				dispatch(appActions.setLoadingMainMobile(false));
+				setVoicePlay(true);
+			} else {
+				setToken('');
 				dispatch(appActions.setLoadingMainMobile(false));
 			}
-		},
-		[channel?.channel_label, clan?.clan_name, dispatch]
-	);
+		} catch (err) {
+			console.error('Failed to join room:', err);
+			setToken('');
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
+	};
 
 	const handleResizeStreamRoom = () => {
 		if (isFullScreen.current) {
@@ -174,8 +158,54 @@ const ChannelVoicePopup = () => {
 	}, [isAnimationComplete, voicePlay]);
 
 	const handlePressMinimizeRoom = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		isFullScreen.current = false;
 		handleResizeStreamRoom();
+	}, []);
+
+	useEffect(() => {
+		const eventOpenMezonMeet = DeviceEventEmitter.addListener(ActionEmitEvent.ON_OPEN_MEZON_MEET, async (data) => {
+			try {
+				const store = await getStoreAsync();
+				const voiceInfo = selectVoiceInfo(store.getState());
+				const isJoined = selectVoiceJoined(store.getState());
+				if (isJoined && !data?.isEndCall && voiceInfo?.channelId === data?.channelId) {
+					Toast.show({
+						type: 'info',
+						text1: 'Already in the call',
+						text2: 'You are already in this voice channel.'
+					});
+					return;
+				}
+
+				if (isJoined && !data?.isEndCall && voiceInfo?.channelId !== data?.channelId) {
+					await handleLeaveRoom(voiceInfo?.clanId || '', voiceInfo?.channelId || '');
+					setToken('');
+					setVoicePlay(false);
+					dispatch(appActions.setLoadingMainMobile(true));
+					await sleep(1000);
+				}
+
+				setChannelId(data?.channelId);
+				setClanId(data?.clanId);
+				if (data?.isEndCall) {
+					await handleLeaveRoom(data?.clanId, data?.channelId);
+					setVoicePlay(false);
+				} else {
+					if (data?.isGroupCall) {
+						setIsGroupCall(true);
+						setParticipantsCount(data?.participantsCount || 0);
+					}
+					await handleJoinChannelVoice(data?.roomName, data?.channelId, data?.clanId);
+				}
+			} catch (e) {
+				console.error('log  => e', e);
+				dispatch(appActions.setLoadingMainMobile(false));
+			}
+		});
+		return () => {
+			eventOpenMezonMeet.remove();
+		};
 	}, []);
 
 	if (!voicePlay) return null;
@@ -185,8 +215,10 @@ const ChannelVoicePopup = () => {
 			style={[
 				pan?.getLayout(),
 				{
-					zIndex: 999999,
-					position: 'absolute'
+					zIndex: 999,
+					position: 'absolute',
+					width: isAnimationComplete ? '100%' : size.s_100 * 2,
+					height: isAnimationComplete ? '100%' : size.s_150
 				}
 			]}
 		>
@@ -197,6 +229,9 @@ const ChannelVoicePopup = () => {
 				serverUrl={serverUrl}
 				isAnimationComplete={isPiPMode ? true : isAnimationComplete}
 				onPressMinimizeRoom={handlePressMinimizeRoom}
+				isGroupCall={isGroupCall}
+				participantsCount={participantsCount}
+				isFromNativeCall={isFromNativeCall}
 			/>
 		</Animated.View>
 	);

@@ -3,16 +3,17 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { baseColor, Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
 import { appActions } from '@mezon/store';
 import { getStoreAsync } from '@mezon/store-mobile';
+import { sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { safeJSONParse } from 'mezon-js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Camera, CameraType } from 'react-native-camera-kit';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
-import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 import RNQRGenerator from 'rn-qr-generator';
 import LogoMezonDark from '../../../../assets/svg/logoMezonDark.svg';
 import LogoMezonLight from '../../../../assets/svg/logoMezonLight.svg';
@@ -24,44 +25,52 @@ import { style } from './styles';
 export const QRScanner = () => {
 	const { t } = useTranslation(['qrScanner']);
 	const [hasPermission, setHasPermission] = useState(false);
-	const device = useCameraDevice('back');
+	const [doScanBarcode, setDoScanBarcode] = useState(true);
 	const navigation = useNavigation<any>();
 	const [valueCode, setValueCode] = useState<string>('');
+	const [cameraKey, setCameraKey] = useState(0);
+	const [isNavigating, setIsNavigating] = useState(false);
 	const [isSuccess, setIsSuccess] = useState<boolean>(false);
 	const { confirmLoginRequest } = useAuth();
 	const { themeValue, themeBasic } = useTheme();
+	const scanningRef = useRef(true);
 	const styles = style(themeValue);
 
-	const codeScanner = useCodeScanner({
-		codeTypes: ['qr'],
-		onCodeScanned: (codes) => {
-			onNavigationScanned(codes?.[0]?.value || '');
-		}
-	});
-
 	useEffect(() => {
-		const requestCameraPermission = async () => {
-			const permission = await Camera.requestCameraPermission();
-			setHasPermission(permission === 'granted');
-		};
-
 		requestCameraPermission();
 	}, []);
 
+	useEffect(() => {
+		return navigation.addListener('focus', () => {
+			setCameraKey((prev) => prev + 1);
+			setIsNavigating(false);
+			setDoScanBarcode(true);
+		});
+	}, [navigation]);
+
 	const requestCameraPermission = async () => {
-		const permission = await Camera.requestCameraPermission();
-		if (permission === 'denied') {
-			Alert.alert(
-				t('cameraPermissionDenied'),
-				t('pleaseAllowCamera'),
-				[
-					{ text: t('cancel'), style: 'cancel' },
-					{ text: t('openSettings'), onPress: () => Linking.openSettings() }
-				],
-				{ cancelable: false }
-			);
+		try {
+			if (Platform.OS === 'android') {
+				const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+					setHasPermission(true);
+				} else {
+					Alert.alert(
+						t('cameraPermissionDenied'),
+						t('pleaseAllowCamera'),
+						[
+							{ text: t('cancel'), style: 'cancel' },
+							{ text: t('openSettings'), onPress: () => Linking.openSettings() }
+						],
+						{ cancelable: false }
+					);
+				}
+			} else if (Platform.OS === 'ios') {
+				setHasPermission(true);
+			}
+		} catch (err) {
+			console.warn(err);
 		}
-		setHasPermission(permission === 'granted');
 	};
 
 	const onConfirmLogin = async () => {
@@ -100,6 +109,7 @@ export const QRScanner = () => {
 				mediaType: 'photo'
 			});
 			const fileUri = result?.assets?.[0]?.uri;
+
 			if (fileUri) {
 				const res = await RNQRGenerator.detect({
 					uri: fileUri
@@ -121,6 +131,8 @@ export const QRScanner = () => {
 		const store = await getStoreAsync();
 		try {
 			store.dispatch(appActions.setLoadingMainMobile(false));
+			setDoScanBarcode(false);
+			setIsNavigating(true);
 			if (value?.includes('channel-app')) {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, value);
 				return;
@@ -128,11 +140,9 @@ export const QRScanner = () => {
 			const valueObj = safeJSONParse(value || '{}');
 			// case Transfer funds
 			if (valueObj?.receiver_id) {
-				navigation.navigate(APP_SCREEN.SETTINGS.STACK, {
-					screen: APP_SCREEN.SETTINGS.SEND_TOKEN,
-					params: {
-						formValue: value
-					}
+				navigation.push(APP_SCREEN.WALLET, {
+					activeScreen: 'transfer',
+					formValue: value
 				});
 				// 	case login
 			} else if (value) {
@@ -150,6 +160,8 @@ export const QRScanner = () => {
 		} catch (error) {
 			store.dispatch(appActions.setLoadingMainMobile(false));
 			console.error('log  => error', error);
+		} finally {
+			setDoScanBarcode(true);
 		}
 	};
 
@@ -159,7 +171,7 @@ export const QRScanner = () => {
 		});
 	};
 
-	if (device == null || !hasPermission) {
+	if (!hasPermission) {
 		return (
 			<View style={styles.wrapper}>
 				<View style={[styles.popupLogin, { backgroundColor: 'rgba(0,0,0,0.16)' }]}>
@@ -199,7 +211,26 @@ export const QRScanner = () => {
 
 	return (
 		<View style={styles.wrapper}>
-			<Camera codeScanner={codeScanner} style={StyleSheet.absoluteFill} device={device} isActive={!valueCode} />
+			{!isNavigating && (
+				<Camera
+					key={cameraKey}
+					cameraType={CameraType.Back}
+					showFrame={false}
+					onReadCode={async (event) => {
+						if (!scanningRef.current) return;
+						const qrValue = event?.nativeEvent?.codeStringValue;
+						scanningRef.current = false;
+						if (qrValue) {
+							setDoScanBarcode(false);
+							await onNavigationScanned(qrValue);
+						}
+						await sleep(5000);
+						scanningRef.current = true;
+					}}
+					scanBarcode={doScanBarcode}
+					style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+				/>
+			)}
 			{!valueCode ? (
 				<View style={{ flex: 1 }}>
 					<View

@@ -6,7 +6,7 @@ import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { UnpinMessageObject } from '.';
-import { MemberProfile } from '../../../MemberProfile';
+import { SimpleMemberProfile } from '../../../MemberProfile';
 import MessageAttachment from '../../../MessageWithUser/MessageAttachment';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 
@@ -68,7 +68,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			<div className="flex items-start gap-2 w-full ">
 				<div className="pointer-events-none">
 					{' '}
-					<MemberProfile
+					<SimpleMemberProfile
 						isHideUserName={true}
 						avatar={avatarToShow}
 						name={nameToShow}

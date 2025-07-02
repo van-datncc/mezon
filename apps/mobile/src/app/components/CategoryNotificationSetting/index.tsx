@@ -2,6 +2,7 @@ import { optionNotification } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { defaultNotificationCategoryActions, selectCurrentClanId, selectDefaultNotificationCategory, useAppDispatch } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
+import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonOption from '../../componentUI/MezonOption';
@@ -9,6 +10,7 @@ import { style } from './styles';
 
 const CategoryNotificationSetting = ({ category }: { category: ICategoryChannel }) => {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation('clanNotificationsSetting');
 	const styles = style(themeValue);
 	const defaultCategoryNotificationSetting = useSelector(selectDefaultNotificationCategory);
 	const dispatch = useAppDispatch();
@@ -28,7 +30,7 @@ const CategoryNotificationSetting = ({ category }: { category: ICategoryChannel 
 			<MezonOption
 				value={defaultCategoryNotificationSetting?.notification_setting_type}
 				onChange={handleNotificationClanChange}
-				data={optionNotification}
+				data={optionNotification(t)}
 			/>
 		</ScrollView>
 	);

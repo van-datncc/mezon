@@ -3,16 +3,33 @@ import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { MAX_FILE_SIZE } from '@mezon/utils';
-import { CameraRoll, PhotoIdentifier, iosRefreshGallerySelection, iosRequestReadWriteGalleryPermission } from '@react-native-camera-roll/camera-roll';
+import {
+	CameraRoll,
+	PhotoIdentifier,
+	cameraRollEventEmitter,
+	iosRefreshGallerySelection,
+	iosRequestReadWriteGalleryPermission
+} from '@react-native-camera-roll/camera-roll';
 import { iosReadGalleryPermission } from '@react-native-camera-roll/camera-roll/src/CameraRollIOSPermission';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, DeviceEventEmitter, Dimensions, Linking, PermissionsAndroid, Platform, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import {
+	ActivityIndicator,
+	Alert,
+	AppState,
+	DeviceEventEmitter,
+	Dimensions,
+	EmitterSubscription,
+	Linking,
+	PermissionsAndroid,
+	Platform,
+	View
+} from 'react-native';
 import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
-import { Camera } from 'react-native-vision-camera';
 import { IFile } from '../../../../../../componentUI/MezonImagePicker';
 import GalleryItem from './components/GalleryItem';
 
@@ -24,12 +41,15 @@ interface IProps {
 
 const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation(['qrScanner']);
+	const [hasPermission, setHasPermission] = useState(false);
 	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
 	const [currentAlbums, setCurrentAlbums] = useState<string>('All');
 	const [pageInfo, setPageInfo] = useState(null);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>(null);
+	const haveLoadMorePhoto = useRef<any>(false);
 	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
 
 	const isDisableSelectAttachment = useMemo(() => {
@@ -45,6 +65,33 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			timerRef?.current && clearTimeout(timerRef.current);
 		};
 	}, []);
+
+	useEffect(() => {
+		const subscription = AppState.addEventListener('change', async (nextAppState) => {
+			if (nextAppState === 'active') {
+				loadPhotos(currentAlbums);
+			}
+		});
+
+		return () => {
+			subscription.remove();
+		};
+	}, [currentAlbums]);
+
+	useEffect(() => {
+		const subscription: EmitterSubscription = cameraRollEventEmitter.addListener('onLibrarySelectionChange', (_event) => {
+			if (!haveLoadMorePhoto?.current) {
+				loadPhotos(currentAlbums);
+				haveLoadMorePhoto.current = true;
+			}
+		});
+
+		return () => {
+			if (subscription) {
+				subscription.remove();
+			}
+		};
+	}, [currentAlbums]);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
@@ -263,18 +310,41 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		[onPickGallery]
 	);
 
-	const checkPermissionCamera = async () => {
-		const permission = await Camera.requestCameraPermission();
-		if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-			alertOpenSettings('Camera Permission', 'This app needs access to your camera');
+	const requestCameraPermission = async () => {
+		try {
+			if (Platform.OS === 'android') {
+				const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+				if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+					setHasPermission(true);
+					return true;
+				} else {
+					Alert.alert(
+						t('cameraPermissionDenied'),
+						t('pleaseAllowCamera'),
+						[
+							{ text: t('cancel'), style: 'cancel' },
+							{ text: t('openSettings'), onPress: () => Linking.openSettings() }
+						],
+						{ cancelable: false }
+					);
+					return false;
+				}
+			} else if (Platform.OS === 'ios') {
+				setHasPermission(true);
+				return true;
+			}
+		} catch (err) {
+			console.warn(err);
+			return false;
 		}
-		return permission === PermissionsAndroid.RESULTS.GRANTED;
+		return false;
 	};
 
 	const onOpenCamera = useCallback(async () => {
-		const isHavePermission = await checkPermissionCamera();
-
-		if (!isHavePermission) return;
+		if (!hasPermission) {
+			const granted = await requestCameraPermission();
+			if (!granted) return;
+		}
 
 		const options = {
 			durationLimit: 10000,
@@ -302,7 +372,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				onPickGallery(fileFormat);
 			}
 		});
-	}, [checkPermissionCamera, onPickGallery]);
+	}, [hasPermission, onPickGallery]);
 
 	const handleLoadMore = async () => {
 		if (pageInfo?.has_next_page) {
@@ -325,10 +395,10 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				numColumns={3}
 				renderItem={renderItem}
 				keyExtractor={(item, index) => `${index.toString()}_gallery_${item?.node?.id}`}
-				initialNumToRender={10}
-				maxToRenderPerBatch={10}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={2}
 				updateCellsBatchingPeriod={50}
-				windowSize={10}
 				scrollEventThrottle={16}
 				removeClippedSubviews={true}
 				viewabilityConfig={{

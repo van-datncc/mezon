@@ -4,6 +4,7 @@ import {
 	channelsActions,
 	friendsActions,
 	requestAddFriendParam,
+	selectBlockedUsers,
 	selectCloseMenu,
 	selectCurrentTabStatus,
 	selectStatusMenu,
@@ -11,7 +12,6 @@ import {
 	useAppDispatch
 } from '@mezon/store';
 import { Button, Icons, Image, InputField } from '@mezon/ui';
-import { isMacDesktop } from '@mezon/utils';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ActivityList from './ActivityList';
@@ -30,6 +30,7 @@ const FriendsPage = () => {
 	const [openModalAddFriend, setOpenModalAddFriend] = useState(false);
 	const [textSearch, setTextSearch] = useState('');
 	const currentTabStatus = useSelector(selectCurrentTabStatus);
+	const blockedUsers = useSelector(selectBlockedUsers);
 
 	const handleChangeTab = (valueTab: string) => {
 		dispatch(friendsActions.changeCurrentStatusTab(valueTab));
@@ -100,7 +101,7 @@ const FriendsPage = () => {
 			case 'pending':
 				return listFriends.filter((item) => item.state === 1 || item.state === 2);
 			case 'block':
-				return listFriends.filter((item) => item.state === 3);
+				return blockedUsers;
 			default:
 				return listFriends;
 		}
@@ -137,7 +138,7 @@ const FriendsPage = () => {
 	return (
 		<div className="flex flex-col flex-1 shrink min-w-0 dark:bg-bgPrimary bg-[#F0F0F0] h-[100%]">
 			<div
-				className={`${isMacDesktop ? 'draggable-area' : ''} flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader`}
+				className={`draggable-area flex min-w-0 items-center dark:bg-bgPrimary bg-[#F0F0F0] shadow border-b-[1px] dark:border-bgTertiary border-white px-6 py-3 justify-start h-heightHeader`}
 			>
 				{closeMenuMobile && (
 					<div onClick={() => setStatusMenu(true)}>
@@ -151,7 +152,7 @@ const FriendsPage = () => {
 					</div>
 					<div className="flex flex-row gap-4 border-l-[1px] pl-6 dark:border-bgModifierHover border-[#bbb]">
 						{tabData.map((tab, index) => (
-							<div key={index} className="relative">
+							<div key={index} className="relative flex items-center justify-center">
 								<button
 									className={`px-3 py-[6px] rounded-[4px] dark:text-white text-black ${currentTabStatus === tab.value && !openModalAddFriend ? 'dark:bg-[#151C2B] bg-[#cfdefd]' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 									tabIndex={index}
@@ -160,8 +161,8 @@ const FriendsPage = () => {
 									{tab.title}
 								</button>
 								{tab.value === 'pending' && quantityPendingRequest !== 0 && (
-									<div className="absolute w-[16px] h-[16px] rounded-full bg-colorDanger text-[#fff] font-bold flex items-center justify-center top-3 right-[5px]">
-										<div className="leading-[9px] text-[9px]">{quantityPendingRequest}</div>
+									<div className="absolute grid place-items-center w-[20px] h-[20px] rounded-full bg-colorDanger text-white text-[10px] font-medium top-[2px] right-3">
+										{quantityPendingRequest}
 									</div>
 								)}
 							</div>

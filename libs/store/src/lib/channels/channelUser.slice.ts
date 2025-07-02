@@ -2,10 +2,14 @@ import { captureSentryError } from '@mezon/logger';
 import { IChannelUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ChannelDescription, ChannelType } from 'mezon-js';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { memoizeAndTrack } from '../memoize';
 
 export const LIST_CHANNELS_USER_FEATURE_KEY = 'listchannelbyusers';
+
+interface RootState {
+	[LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState;
+}
 
 /*
  * Update these interfaces according to your requirements.
@@ -21,6 +25,7 @@ export const mapChannelsByUserToEntity = (channelRes: ChannelDescription) => {
 export interface ListChannelsByUserState extends EntityState<ChannelUsersEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	cache?: CacheMetadata;
 }
 
 export const listChannelsByUserAdapter = createEntityAdapter<ChannelUsersEntity>();
@@ -29,19 +34,39 @@ export interface ListChannelsByUserRootState {
 	[LIST_CHANNELS_USER_FEATURE_KEY]: ListChannelsByUserState;
 }
 
-export const fetchListChannelsByUserCached = memoizeAndTrack(
-	async (mezon: MezonValueContext) => {
-		const response = await mezon.client.listChannelByUserId(mezon.session);
-		return { ...response, time: Date.now() };
-	},
-	{
-		promise: true,
-		maxAge: 1000 * 60 * 60,
-		normalizer: (args) => {
-			return args[0].session.username || '';
-		}
+const selectAllChannelsByUserEntities = listChannelsByUserAdapter.getSelectors().selectAll;
+
+const selectCachedChannelsByUser = createSelector([(state: RootState) => state[LIST_CHANNELS_USER_FEATURE_KEY]], (channelsByUserState) => {
+	return selectAllChannelsByUserEntities(channelsByUserState);
+});
+
+export const fetchListChannelsByUserCached = async (getState: () => RootState, ensuredMezon: MezonValueContext, noCache = false) => {
+	const currentState = getState();
+	const channelsByUserState = currentState[LIST_CHANNELS_USER_FEATURE_KEY];
+
+	const apiKey = createApiKey('fetchChannelsByUser', ensuredMezon.session.username || '');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, channelsByUserState?.cache, noCache);
+
+	if (!shouldForceCall) {
+		const channels = selectCachedChannelsByUser(currentState);
+		return {
+			channeldesc: channels,
+			time: Date.now(),
+			fromCache: true
+		};
 	}
-);
+
+	const response = await ensuredMezon.client.listChannelByUserId(ensuredMezon.session);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		time: Date.now(),
+		fromCache: false
+	};
+};
 
 type fetchUserChannelsPayload = {
 	noCache?: boolean;
@@ -51,34 +76,33 @@ type fetchUserChannelsPayload = {
 type FetchMessagesPayloadAction = {
 	channels: ChannelUsersEntity[];
 	isClearChannel?: boolean;
+	fromCache: boolean;
 };
 
-export const fetchListChannelsByUser = createAsyncThunk<{ channels: ChannelUsersEntity[]; isClearChannel: boolean }, fetchUserChannelsPayload>(
-	'channelsByUser/fetchListChannelsByUser',
-	async ({ noCache = false, isClearChannel = false }: fetchUserChannelsPayload, thunkAPI) => {
-		try {
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			if (noCache) {
-				fetchListChannelsByUserCached.clear(mezon);
-			}
-			const response = await fetchListChannelsByUserCached(mezon);
-			if (!response?.channeldesc) {
-				return { channels: [], isClearChannel };
-			}
-
-			const channels = response.channeldesc.map(mapChannelsByUserToEntity);
-
-			return { channels, isClearChannel };
-		} catch (error) {
-			captureSentryError(error, 'channelsByUser/fetchListChannelsByUser');
-			return thunkAPI.rejectWithValue(error);
+export const fetchListChannelsByUser = createAsyncThunk<
+	{ channels: ChannelUsersEntity[]; isClearChannel: boolean; fromCache: boolean },
+	fetchUserChannelsPayload
+>('channelsByUser/fetchListChannelsByUser', async ({ noCache = false, isClearChannel = false }: fetchUserChannelsPayload, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await fetchListChannelsByUserCached(thunkAPI.getState as () => RootState, mezon, noCache);
+		if (!response?.channeldesc) {
+			return { channels: [], isClearChannel, fromCache: response?.fromCache || false };
 		}
+
+		const channels = response.channeldesc.map(mapChannelsByUserToEntity);
+
+		return { channels, isClearChannel, fromCache: response.fromCache };
+	} catch (error) {
+		captureSentryError(error, 'channelsByUser/fetchListChannelsByUser');
+		return thunkAPI.rejectWithValue(error);
 	}
-);
+});
 
 export const initialListChannelsByUserState: ListChannelsByUserState = listChannelsByUserAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	error: null
+	error: null,
+	cache: undefined
 });
 
 export const listChannelsByUserSlice = createSlice({
@@ -102,6 +126,18 @@ export const listChannelsByUserSlice = createSlice({
 				id: payload.channelId,
 				changes: {
 					last_sent_message: {
+						timestamp_seconds: timestamp
+					}
+				}
+			});
+		},
+		updateLastSeenTime: (state, action: PayloadAction<{ channelId: string }>) => {
+			const payload = action.payload;
+			const timestamp = Date.now() / 1000;
+			listChannelsByUserAdapter.updateOne(state, {
+				id: payload.channelId,
+				changes: {
+					last_seen_message: {
 						timestamp_seconds: timestamp
 					}
 				}
@@ -172,13 +208,16 @@ export const listChannelsByUserSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchListChannelsByUser.fulfilled, (state: ListChannelsByUserState, action: PayloadAction<FetchMessagesPayloadAction>) => {
-				const channels = action?.payload?.channels;
-				const isClearChannel = action?.payload?.isClearChannel || false;
-				if (isClearChannel) {
-					listChannelsByUserAdapter.setAll(state, channels);
-				} else {
-					listChannelsByUserAdapter.upsertMany(state, channels);
+				const { channels, isClearChannel, fromCache } = action.payload;
+				if (!fromCache) {
+					if (isClearChannel) {
+						listChannelsByUserAdapter.setAll(state, channels);
+					} else {
+						listChannelsByUserAdapter.upsertMany(state, channels);
+					}
+					state.cache = createCacheMetadata();
 				}
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchListChannelsByUser.rejected, (state: ListChannelsByUserState, action) => {

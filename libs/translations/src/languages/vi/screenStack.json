@@ -15,10 +15,12 @@
     "newOverride": "Ghi đè mới",
     "webhooks": "Webhook",
     "integrations": "Tích hợp",
-    "webhooksEdit": "Chỉnh sửa webhooks",
+    "webhooksEdit": "Chỉnh sửa webhook",
     "auditLog": "Nhật ký kiểm tra",
     "filterByUser": "Lọc theo người dùng",
-    "filterByAction": "Lọc theo hành động"
+    "filterByAction": "Lọc theo hành động",
+    "sound": "Hiệu ứng âm thanh",
+    "createSound": "Tạo hiệu ứng âm thanh"
   },
   "menuChannelStack": {
     "channelSetting": "Cài đặt kênh",
@@ -35,6 +37,10 @@
     "blockedUsers": "Người dùng bị chặn",
     "sendToken": "Chuyển khoản",
     "withdrawToken": "Rút tiền",
-    "historyTransaction": "Lịch sử giao dịch"
+    "historyTransaction": "Lịch sử giao dịch",
+    "quit": "Thoát",
+    "menu": "Danh mục",
+    "walletManagement": "Quản lý ví",
+    "setPassword": "Đặt Mật Khẩu"
   }
 }

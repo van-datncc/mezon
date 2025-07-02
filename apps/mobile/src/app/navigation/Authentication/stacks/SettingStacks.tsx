@@ -2,8 +2,6 @@ import { Fonts, size, useTheme } from '@mezon/mobile-ui';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
-import { HistoryTransactionScreen } from '../../../screens/profile/HistoryTransaction';
-import { SendTokenScreen } from '../../../screens/profile/SendToken';
 import { Settings } from '../../../screens/settings';
 import { AccountSetting } from '../../../screens/settings/AccountSetting';
 import { BlockedUsers } from '../../../screens/settings/AccountSetting/BlockedUsers';
@@ -13,6 +11,7 @@ import { LanguageSetting } from '../../../screens/settings/LanguageSetting';
 import { MyQRCode } from '../../../screens/settings/MyQRCode';
 import { ProfileSetting } from '../../../screens/settings/ProfileSetting';
 import { QRScanner } from '../../../screens/settings/QRScanner';
+import SetPassword from '../../../screens/settings/SetPassword';
 import { Sharing } from '../../../screens/settings/Sharing';
 import { APP_SCREEN } from '../../ScreenTypes';
 
@@ -135,25 +134,15 @@ export const SettingStacks = ({}: any) => {
 					}
 				}}
 			/>
+
 			<Stack.Screen
-				name={APP_SCREEN.SETTINGS.SEND_TOKEN}
-				component={SendTokenScreen}
+				name={APP_SCREEN.SETTINGS.SET_PASSWORD}
+				component={SetPassword}
 				options={{
-					headerTitle: '',
+					headerTitle: t('settingStack.setPassword'),
 					gestureEnabled: Platform.OS === 'ios',
 					headerStyle: {
 						backgroundColor: themeValue.primary
-					}
-				}}
-			/>
-			<Stack.Screen
-				name={APP_SCREEN.SETTINGS.HISTORY_TRANSACTION}
-				component={HistoryTransactionScreen}
-				options={{
-					headerTitle: t('settingStack.historyTransaction'),
-					gestureEnabled: Platform.OS === 'ios',
-					headerStyle: {
-						backgroundColor: themeValue.secondary
 					}
 				}}
 			/>

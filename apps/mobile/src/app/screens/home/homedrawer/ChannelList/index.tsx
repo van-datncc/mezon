@@ -20,17 +20,8 @@ import ChannelListHeader from '../components/ChannelList/ChannelListHeader';
 import { ChannelListItem } from '../components/ChannelList/ChannelListItem';
 import ChannelListScroll from '../components/ChannelList/ChannelListScroll';
 import ChannelListSection from '../components/ChannelList/ChannelListSection';
-import ChannelRouterListener from '../components/ChannelList/ChannelRouterListener';
 import ButtonNewUnread from './ButtonNewUnread';
 import { style } from './styles';
-export type ChannelsPositionRef = {
-	current: {
-		[key: number]: {
-			height: number;
-			cateId?: string | number;
-		};
-	};
-};
 
 const ChannelList = () => {
 	const { themeValue } = useTheme();
@@ -47,7 +38,7 @@ const ChannelList = () => {
 
 		const promise = [
 			dispatch(channelsActions.fetchChannels({ clanId: currentClan?.clan_id, noCache: true, isMobile: true })),
-			dispatch(clansActions.fetchClans()),
+			dispatch(clansActions.fetchClans({ noCache: true })),
 			dispatch(
 				voiceActions.fetchVoiceChannelMembers({
 					clanId: currentClan?.clan_id ?? '',
@@ -118,7 +109,6 @@ const ChannelList = () => {
 	return (
 		<View style={styles.mainList}>
 			<ChannelListScroll data={data} flashListRef={flashListRef} />
-			<ChannelRouterListener />
 			<FlatList
 				ref={flashListRef}
 				data={data}
@@ -127,10 +117,10 @@ const ChannelList = () => {
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
 				stickyHeaderIndices={[1]}
 				showsVerticalScrollIndicator={true}
-				initialNumToRender={10}
-				maxToRenderPerBatch={10}
-				updateCellsBatchingPeriod={50}
+				initialNumToRender={5}
+				maxToRenderPerBatch={5}
 				windowSize={10}
+				updateCellsBatchingPeriod={50}
 				scrollEventThrottle={16}
 				removeClippedSubviews={Platform.OS === 'android'}
 				keyboardShouldPersistTaps={'handled'}

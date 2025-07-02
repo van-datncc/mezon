@@ -1,13 +1,4 @@
-import {
-	ChannelDescription,
-	ChannelMessage,
-	ChannelStreamMode,
-	ChannelType,
-	HashtagDm,
-	NotificationType,
-	SFUSignalingFwd,
-	WebrtcSignalingFwd
-} from 'mezon-js';
+import { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, NotificationType, WebrtcSignalingFwd } from 'mezon-js';
 import {
 	ApiAccount,
 	ApiCategoryDesc,
@@ -271,6 +262,7 @@ export interface IFieldEmbed {
 	value: string;
 	inline?: boolean;
 	inputs?: SelectComponent | InputComponent | DatePickerComponent | RadioComponent | AnimationComponent;
+	shape?: GridComponent;
 	button?: ButtonComponent[];
 }
 
@@ -288,7 +280,8 @@ export enum EMessageComponentType {
 	INPUT = 3,
 	DATEPICKER = 4,
 	RADIO = 5,
-	ANIMATION = 6
+	ANIMATION = 6,
+	GRID = 7
 }
 
 export enum EIconEmbedButtonMessage {
@@ -315,6 +308,7 @@ export interface IMessageRatioOption {
 	name?: string;
 	value: string;
 	style?: EButtonMessageStyle;
+	disabled?: boolean;
 }
 
 export interface IMessageInput {
@@ -347,9 +341,23 @@ export interface IMessageAnimation {
 	isResult?: number;
 }
 
+export interface IMessageGrid {
+	items: IMessageGridItem[];
+	url_image?: string;
+	url_position?: string;
+}
+
+export interface IMessageGridItem {
+	width?: number;
+	height?: number;
+	start_col?: number;
+	start_row?: number;
+}
+
 export interface IMessageCallLog {
 	isVideo: boolean;
 	callLogType: IMessageTypeCallLog;
+	showCallBack?: boolean;
 }
 
 export enum EMessageSelectType {
@@ -377,6 +385,14 @@ export interface IMessageComponent<T> {
 	type: EMessageComponentType;
 	id: string;
 	component: T;
+	max_options?: number;
+}
+export interface IEmbedShapeComponent<T> {
+	type: EMessageComponentType;
+	id: string;
+	component: T;
+	columns: number;
+	rows: number;
 }
 
 export type ButtonComponent = IMessageComponent<IButtonMessage> & { type: EMessageComponentType.BUTTON };
@@ -385,6 +401,7 @@ export type InputComponent = IMessageComponent<IMessageInput> & { type: EMessage
 export type DatePickerComponent = IMessageComponent<IMessageDatePicker> & { type: EMessageComponentType.DATEPICKER };
 export type RadioComponent = IMessageComponent<IMessageRatioOption[]> & { type: EMessageComponentType.RADIO };
 export type AnimationComponent = IMessageComponent<IMessageAnimation> & { type: EMessageComponentType.ANIMATION };
+export type GridComponent = IEmbedShapeComponent<IMessageGrid> & { type: EMessageComponentType.GRID };
 
 export interface IMessageActionRow {
 	components: Array<ButtonComponent | SelectComponent | InputComponent>;
@@ -402,6 +419,7 @@ export interface IMessageSendPayload {
 	vk?: ILinkVoiceRoomOnMessage[];
 	embed?: IEmbedProps[];
 	canvas?: CanvasDataResponse;
+	cvtt?: Record<string, string>; // canvas title
 	components?: IMessageActionRow[];
 	callLog?: IMessageCallLog;
 	tp?: string;
@@ -458,10 +476,6 @@ export type IDMCall = {
 	callerId: string;
 	calleeId: string;
 	signalingData: WebrtcSignalingFwd;
-};
-
-export type IJoinSFU = {
-	joinSFUData: SFUSignalingFwd;
 };
 
 export interface CategoryNameProps {
@@ -603,6 +617,7 @@ export type IEmoji = {
 	logo?: string;
 	clan_name?: string;
 	clan_id?: string;
+	is_for_sale?: boolean;
 };
 
 export type IEmojiRecent = {
@@ -951,6 +966,7 @@ export type SearchItemProps = {
 	parent_id?: string;
 	clanId?: string;
 	meeting_code?: string;
+	searchName?: string;
 };
 
 export enum EEmojiCategory {
@@ -1098,10 +1114,9 @@ export type ICanvas = {
 
 export type CanvasUpdate = {
 	content: string;
-	creator_id: string;
-	editor_id: string;
 	id: string;
 	title: string;
+	update_time?: string;
 };
 
 export type IActivity = {
@@ -1151,7 +1166,8 @@ export enum TypeMessage {
 	MessageBuzz = 8,
 	Topic = 9,
 	AuditLog = 10,
-	SendToken = 11
+	SendToken = 11,
+	Ephemeral = 12
 }
 
 export enum ServerSettingsMenuValue {
@@ -1380,14 +1396,15 @@ export type MentionReactInputProps = {
 		anonymousMessage?: boolean,
 		mentionEveryone?: boolean,
 		displayName?: string,
-		clanNick?: string
+		clanNick?: string,
+		ephemeralReceiverId?: string
 	) => void;
 	readonly onTyping?: () => void;
 	readonly listMentions?: MentionDataProps[] | undefined;
 	readonly isThread?: boolean;
 	readonly isTopic?: boolean;
-	readonly handlePaste?: (event: React.ClipboardEvent<any>) => Promise<void>;
-	readonly handleConvertToFile?: (valueContent: string) => Promise<void>;
+	readonly handlePaste?: (event: React.ClipboardEvent<any>, anonymousMessage?: boolean) => Promise<void>;
+	readonly handleConvertToFile?: (valueContent: string, anonymousMessage?: boolean) => Promise<void>;
 	readonly currentClanId?: string;
 	readonly currentChannelId?: string;
 	readonly mode?: number;
@@ -1471,6 +1488,7 @@ export type IvoiceInfo = {
 	clanName: string;
 	channelId: string;
 	channelLabel: string;
+	channelPrivate: number;
 };
 
 export type ImageSourceObject = {

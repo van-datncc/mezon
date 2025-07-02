@@ -146,7 +146,7 @@ const MessageAttachment = ({
 	isInSearchMessage,
 	defaultMaxWidth
 }: MessageAttachmentProps) => {
-	const validateAttachment = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
+	const validateAttachment = (message.attachments || [])?.filter((attachment) => Object.keys(attachment).length !== 0);
 	if (!validateAttachment) return null;
 	return (
 		<Attachments
@@ -238,8 +238,12 @@ const ImageAlbum = ({
 						...attachmentData,
 						url: createImgproxyUrl(attachmentData.url || '', {
 							width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
-							height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
-							resizeType: 'fit'
+							height: attachmentData.height
+								? (attachmentData.width || 0) > 1600
+									? Math.round((1600 * attachmentData.height) / (attachmentData.width || 1))
+									: attachmentData.height
+								: 0,
+							resizeType: 'fill'
 						}),
 						uploaderData: {
 							name:

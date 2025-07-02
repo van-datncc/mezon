@@ -1,9 +1,10 @@
 import { useChannels, usePermissionChecker } from '@mezon/core';
-import { ChannelsEntity } from '@mezon/store';
+import { ChannelsEntity, selectWelcomeChannelByClanId } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { EChannelSettingTab } from '.';
 import ModalConfirm from '../ModalConfirm';
 
@@ -69,6 +70,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 			return <Icons.Stream defaultSize="w-5 h-5 min-w-5" />;
 		}
 	};
+	const welcomeChannelId = useSelector((state) => selectWelcomeChannelByClanId(state, channel?.clan_id as string));
 
 	return (
 		<div
@@ -92,6 +94,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 						/>
 						{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE &&
 							channel.type !== ChannelType.CHANNEL_TYPE_APP &&
+							channel.id !== welcomeChannelId &&
 							canEditChannelPermissions && (
 								<ChannelSettingItemButton
 									tabName={EChannelSettingTab.PREMISSIONS}
@@ -109,6 +112,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 					<ChannelSettingItemButton
 						tabName={EChannelSettingTab.INTEGRATIONS}
+						handleOnClick={handleButtonClick}
+						selectedButton={selectedButton}
+					/>
+				)}
+				{canEditChannelPermissions && channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+					<ChannelSettingItemButton
+						tabName={EChannelSettingTab.QUICK_MENU}
 						handleOnClick={handleButtonClick}
 						selectedButton={selectedButton}
 					/>

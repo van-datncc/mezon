@@ -16,7 +16,9 @@ export const SendTokenUser = forwardRef(() => {
 		() => [
 			{
 				onPress: () => {
-					navigation.push(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.SEND_TOKEN });
+					navigation.push(APP_SCREEN.WALLET, {
+						activeScreen: 'transfer'
+					});
 					dismiss();
 				},
 				title: t('settingStack.sendToken'),
@@ -24,14 +26,21 @@ export const SendTokenUser = forwardRef(() => {
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} color={baseColor.gray} />
 			},
 			{
-				onPress: () => dismiss(),
-				title: t('settingStack.withdrawToken'),
+				onPress: () => {
+					navigation.push(APP_SCREEN.WALLET, {
+						activeScreen: 'manage'
+					});
+					dismiss();
+				},
+				title: t('settingStack.walletManagement'),
 				isShow: true,
 				icon: <Icons.SendMoney height={size.s_24} width={size.s_24} rotate={-1} color={baseColor.gray} />
 			},
 			{
 				onPress: () => {
-					navigation.navigate(APP_SCREEN.SETTINGS.STACK, { screen: APP_SCREEN.SETTINGS.HISTORY_TRANSACTION });
+					navigation.push(APP_SCREEN.WALLET, {
+						activeScreen: 'history'
+					});
 					dismiss();
 				},
 				title: t('settingStack.historyTransaction'),

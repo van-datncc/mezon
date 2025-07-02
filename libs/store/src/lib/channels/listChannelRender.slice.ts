@@ -9,12 +9,18 @@ import { ChannelsEntity, IUpdateChannelRequest } from './channels.slice';
 
 export const CHANNEL_LIST_RENDER = 'CHANNEL_LIST_RENDER';
 
+export interface ChannelOrderList {
+	indexStart: number;
+	indexEnd: number;
+}
 export interface ChannelListRenderState {
 	listChannelRender: Record<string, Array<IChannel | ICategoryChannel>>;
+	listOrderChannelByCate: Record<string, ChannelOrderList[]>;
 }
 
 export const initialListChannelRenderState: ChannelListRenderState = {
-	listChannelRender: {}
+	listChannelRender: {},
+	listOrderChannelByCate: {}
 };
 
 export const updateClanBadgeRender = createAsyncThunk(
@@ -86,6 +92,9 @@ export const listChannelRenderSlice = createSlice({
 
 				state.listChannelRender[clanId] = [favorCate, ...listFavorChannel, ...listChannelRender];
 			}
+		},
+		clearListChannelRender: (state) => {
+			state.listChannelRender = {};
 		},
 		addChannelToListRender: (state, action: PayloadAction<ApiChannelDescription>) => {
 			const channelData: IChannel = {
@@ -235,9 +244,14 @@ export const listChannelRenderSlice = createSlice({
 		},
 		removeBadgeFromChannel: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
-			if (state.listChannelRender[clanId]) {
-				state.listChannelRender[clanId] = state.listChannelRender[clanId].map((channel) => {
-					if (channel.id === channelId) {
+			const channels = state.listChannelRender[clanId];
+
+			if (channels) {
+				let hasChanged = false;
+
+				const updatedChannels = channels.map((channel) => {
+					if (channel.id === channelId && (channel as any)?.count_mess_unread !== 0) {
+						hasChanged = true;
 						return {
 							...channel,
 							count_mess_unread: 0
@@ -245,6 +259,10 @@ export const listChannelRenderSlice = createSlice({
 					}
 					return channel;
 				});
+
+				if (hasChanged) {
+					state.listChannelRender[clanId] = updatedChannels;
+				}
 			}
 		},
 		leaveChannelListRender: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
@@ -368,6 +386,51 @@ export const listChannelRenderSlice = createSlice({
 				state.listChannelRender[clanId]?.splice(updateIndex, 1, activeThread);
 				state.listChannelRender[clanId].join();
 			}
+		},
+		sortChannelInCategory: (state, action: PayloadAction<{ clanId: string; categoryId: string; indexStart: number; indexEnd: number }>) => {
+			const { clanId, categoryId, indexStart, indexEnd } = action.payload;
+			if (!state.listOrderChannelByCate[categoryId]) {
+				const itemOrder = state.listChannelRender[clanId][indexStart];
+				const itemTarget = state.listChannelRender[clanId][indexEnd];
+				const channelThreadOrder = state.listChannelRender[clanId].filter((item) => {
+					if (
+						((item as IChannel).id === itemOrder.id || (item as IChannel).parent_id === itemOrder.id) &&
+						item.category_id !== FAVORITE_CATEGORY_ID
+					) {
+						return {
+							...item
+						};
+					}
+				});
+				const channelThreadTarget = state.listChannelRender[clanId].filter((item) => {
+					if (
+						((item as IChannel).id === itemTarget.id || (item as IChannel).parent_id === itemTarget.id) &&
+						item.category_id !== FAVORITE_CATEGORY_ID
+					) {
+						return {
+							...item
+						};
+					}
+				});
+
+				if (categoryId !== FAVORITE_CATEGORY_ID) {
+					state.listChannelRender[clanId].splice(indexStart, channelThreadOrder.length);
+					state.listChannelRender[clanId].join();
+					state.listChannelRender[clanId].splice(
+						indexStart < indexEnd
+							? indexEnd - channelThreadOrder.length + channelThreadTarget.length
+							: indexEnd + channelThreadTarget.length,
+						0,
+						...channelThreadOrder
+					);
+					state.listChannelRender[clanId].join();
+				} else {
+					state.listChannelRender[clanId].splice(indexStart, 1);
+					state.listChannelRender[clanId].join();
+					state.listChannelRender[clanId].splice(indexStart < indexEnd ? indexEnd : indexEnd + 1, 0, itemOrder);
+					state.listChannelRender[clanId].join();
+				}
+			}
 		}
 	}
 });
@@ -387,6 +450,10 @@ export const selectListChannelRenderByClanId = createSelector([getListChannelRen
 		return undefined;
 	}
 	return state.listChannelRender[clanId];
+});
+
+export const selectListOrderChannel = createSelector(getListChannelRenderState, (state) => {
+	return state.listOrderChannelByCate;
 });
 
 function prioritizeChannel(channels: IChannel[]): IChannel[] {
@@ -430,7 +497,7 @@ function sortChannels(channels: IChannel[], categoryId: string): IChannel[] {
 				if (thread.parent_id === channel.id) {
 					sortedChannels.push(thread);
 					if (channel.threadIds) {
-						channel.threadIds.push(thread.id);
+						channel.threadIds = [...channel.threadIds, thread.id];
 					} else {
 						channel.threadIds = [thread.id];
 					}

@@ -1,8 +1,8 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectAllAccount, selectUpdateToken } from '@mezon/store-mobile';
+import { selectAllAccount } from '@mezon/store-mobile';
 import { createImgproxyUrl, formatMoney } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { Grid } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
@@ -15,14 +15,14 @@ import { style } from './styles';
 export const MyQRCode = () => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation(['profile']);
 	const userProfile = useSelector(selectAllAccount);
 	const [urlQRCode, setUrlQRCode] = useState<string>('');
 	const isTabletLandscape = useTabletLandscape();
 
 	const tokenInWallet = useMemo(() => {
-		return userProfile?.wallet ? safeJSONParse(userProfile?.wallet || '{}')?.value : 0;
+		return userProfile?.wallet || 0;
 	}, [userProfile?.wallet]);
-	const getTokenSocket = useSelector(selectUpdateToken(userProfile?.user?.id ?? ''));
 
 	const genQRCode = useCallback(async () => {
 		const data = {
@@ -62,31 +62,32 @@ export const MyQRCode = () => {
 					style={styles.avatar}
 				/>
 				<View>
-					<Text style={styles.nameProfile}>{userProfile?.user?.display_name || userProfile?.user?.username}</Text>
-					<Text style={styles.tokenProfile}>Balance: {formatMoney(Number(tokenInWallet || 0) + Number(getTokenSocket || 0))}₫</Text>
+					<Text style={styles.nameProfile}>{userProfile?.user?.username || userProfile?.user?.display_name}</Text>
+					<Text style={styles.tokenProfile}>
+						{t('token')} {formatMoney(Number(tokenInWallet || 0))}₫
+					</Text>
 				</View>
 			</View>
-			{urlQRCode ? (
-				isTabletLandscape ? (
-					<View
-						style={{
-							height: size.s_100 * 3.6,
-							width: size.s_100 * 3.6,
-							backgroundColor: 'white',
-							alignSelf: 'center',
-							justifyContent: 'center',
-							marginVertical: size.s_40
-						}}
-					>
-						<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
-					</View>
-				) : (
-					<FastImage source={{ uri: urlQRCode }} style={styles.imageQR} />
-				)
-			) : (
+			{!urlQRCode && (
 				<View style={{ height: size.s_100 * 2.5, alignItems: 'center', justifyContent: 'center' }}>
 					<Grid color={themeValue.text} size={size.s_50} />
 				</View>
+			)}
+			{isTabletLandscape ? (
+				<View
+					style={{
+						height: size.s_100 * 3.6,
+						width: size.s_100 * 3.6,
+						backgroundColor: 'white',
+						alignSelf: 'center',
+						justifyContent: 'center',
+						marginVertical: size.s_40
+					}}
+				>
+					<FastImage source={{ uri: urlQRCode || '' }} style={styles.imageQR} />
+				</View>
+			) : (
+				<FastImage source={{ uri: urlQRCode || '' }} style={styles.imageQR} />
 			)}
 			<View
 				style={{

@@ -15,8 +15,8 @@
       "forwardAllMessages": "Chuyển tiếp tất cả tin nhắn",
       "location": "Vị trí",
       "files": "Tệp",
-      "saveImage": "Lưu phương tiện",
-      "copyMediaLink": "Sao chép liên kết phương tiện",
+      "saveImage": "Lưu file phương tiện",
+      "copyMediaLink": "Sao chép liên kết file phương tiện",
       "giveACoffee": "Mời một ly cà phê",
       "topicDiscussion": "Thảo luận chủ đề",
       "resend": "Gửi lại",
@@ -27,6 +27,13 @@
       "replyingTo": "Đang trả lời",
       "editingMessage": "Đang chỉnh sửa tin nhắn"
   },
+  "ephemeral": {
+    "headerText": "Tin nhắn riêng tư gửi {{username}}",
+    "selectUser": "Chọn người nhận tin nhắn riêng tư",
+    "description": "Gửi tin nhắn riêng tư (chỉ người được chọn mới thấy)",
+    "onlyVisibleToRecipient": "Chỉ người nhận mới thấy được"
+  },
+  "pasteImage": "Dán Ảnh",
   "toast": {
       "copyText": "Đã sao chép văn bản tin nhắn",
       "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi một chút",
@@ -46,10 +53,10 @@
       "createGroupWith": "Tạo nhóm mới với"
   },
   "reactions": {
-      "noActionTitle": "Không có phản ứng",
-      "noActionDescription": "Một thế giới lạnh lùng, không cảm xúc.",
-      "removeActions": "Xóa phản ứng"
-  },
+    "noActionTitle": "Chưa có biểu cảm",
+    "noActionDescription": "Một thế giới vắng bóng cảm xúc.",
+    "removeActions": "Xóa biểu cảm"
+},
   "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
   "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
   "forwardTo": "Chuyển tiếp đến",
@@ -61,13 +68,14 @@
       "title": "Báo cáo tin nhắn",
       "subTitle": "Vui lòng chọn tùy chọn mô tả vấn đề tốt nhất.",
       "selectedMessage": "Tin nhắn đã chọn",
-      "submitDescription": "Khi gửi báo cáo này, bạn xác nhận rằng nó là đúng sự thật và được thực hiện với thiện chí. Vui lòng tuân thủ Hướng dẫn Cộng đồng và không gửi các báo cáo sai hoặc trùng lặp.",
+         "submitDescription": "Khi gửi báo cáo này, bạn xác nhận thông tin là chính xác và được gửi với thiện ý. Vui lòng tuân thủ Quy định Cộng đồng và không gửi báo cáo sai sự thật hoặc trùng lặp.",
       "submitReport": "Gửi báo cáo",
       "cancel": "Hủy bỏ",
       "reportSubmitted": "Đã gửi báo cáo"
   },
   "tapToSeeAttachment": "Nhấn để xem tệp đính kèm",
-  "findThePerfectReaction": "Tìm phản ứng hoàn hảo",
+  "findThePerfectReaction": "Tìm biểu cảm hoàn hảo",
+  "findThePerfectGif": "Tìm ảnh động hoàn hảo",
   "findThePerfectSticker": "Tìm nhãn dán hoàn hảo",
   "pinMessage": "Ghim tin nhắn",
   "unpinMessage": "Bỏ ghim tin nhắn",
@@ -86,6 +94,7 @@
   },
   "newMessages": "TIN NHẮN MỚI",
   "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
+  "blockedUserMessage": "Bạn không thể trả lời cuộc trò chuyện này",
   "messageInputPlaceHolder": "Nhập tin nhắn...",
   "shareLocationModal": {
       "sendThisLocation": "Gửi vị trí này tới",
@@ -108,5 +117,10 @@
     "confirmText": "Gửi",
     "description": "Nhập nội dung Buzz!!",
     "cancel": "Hủy"
+  },
+  "tab": {
+    "emoji": "Biểu cảm",
+    "gif": "GIFs",
+    "sticker": "Nhãn dán"
   }
 }

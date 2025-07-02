@@ -1,6 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import { selectChannelsByClanId, selectCurrentClanId, useAppSelector } from '@mezon/store';
+import { channelsActions, selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
+import { useAppDispatch } from '@mezon/store-mobile';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
@@ -14,7 +15,8 @@ const ButtonNewUnread = React.memo(() => {
 	const styles = style(themeValue, isTabletLandscape);
 	const { t } = useTranslation('channelMenu');
 	const currentClanId = useSelector(selectCurrentClanId);
-	const channelsInClan = useAppSelector((state) => selectChannelsByClanId(state, currentClanId as string));
+	const channelsInClan = useAppSelector(selectAllChannels);
+	const dispatch = useAppDispatch();
 
 	const findFirstChannelWithBadgeCount = (channels = []) => channels?.find((item) => item?.count_mess_unread > 0) || null;
 
@@ -23,13 +25,12 @@ const ButtonNewUnread = React.memo(() => {
 	}, [channelsInClan]);
 
 	if (firstChannelBadgeCount) {
+		const onPressNewUnread = async () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, firstChannelBadgeCount?.channel_id);
+			await dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true, isMobile: true }));
+		};
 		return (
-			<TouchableOpacity
-				onPress={() => {
-					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, firstChannelBadgeCount?.channel_id);
-				}}
-				style={styles.buttonBadgeCount}
-			>
+			<TouchableOpacity onPress={onPressNewUnread} style={styles.buttonBadgeCount}>
 				<Text style={styles.buttonBadgeCountText}>@{t('btnBadgeCount')}</Text>
 			</TouchableOpacity>
 		);

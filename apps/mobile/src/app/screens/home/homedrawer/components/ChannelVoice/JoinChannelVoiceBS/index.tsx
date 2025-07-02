@@ -8,11 +8,11 @@ import {
 	save
 } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectCurrentClanId } from '@mezon/store-mobile';
+import { selectCurrentClanId, selectVoiceChannelMembersByChannelId, useAppSelector } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -21,12 +21,18 @@ import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../../../../navigation/ScreenTypes';
 import InviteToChannel from '../../InviteToChannel';
 import { style } from './JoinChannelVoiceBS.styles';
+import VoiceChannelAvatar from './VoiceChannelAvatar';
 function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { dismiss } = useBottomSheetModal();
 	const { t } = useTranslation(['channelVoice']);
 	const currentClanId = useSelector(selectCurrentClanId);
+
+	const voiceChannelMembers = useAppSelector((state) => selectVoiceChannelMembersByChannelId(state, channel.channel_id));
+
+	const badge = useMemo(() => (voiceChannelMembers?.length > 3 ? voiceChannelMembers?.length - 3 : 0), [voiceChannelMembers]);
+
 	const handleJoinVoice = async () => {
 		if (!channel.meeting_code) return;
 		const data = {
@@ -75,7 +81,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						}}
 						style={styles.buttonCircle}
 					>
-						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
+						<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} color={themeValue.textStrong} />
 					</TouchableOpacity>
 					<Text numberOfLines={2} style={[styles.text, { flexGrow: 1, flexShrink: 1 }]}>
 						{channel?.channel_label}
@@ -95,21 +101,33 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 						borderRadius: size.s_22
 					}}
 				>
-					<MezonIconCDN icon={IconCDN.userPlusIcon} />
+					<MezonIconCDN icon={IconCDN.userPlusIcon} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</View>
 			<View style={{ alignItems: 'center', gap: size.s_6, marginTop: size.s_20 }}>
 				<View
 					style={{
-						width: size.s_100,
-						height: size.s_100,
-						borderRadius: size.s_50,
+						paddingVertical: size.s_10,
 						justifyContent: 'center',
-						alignItems: 'center',
-						backgroundColor: themeValue.tertiary
+						alignItems: 'center'
 					}}
 				>
-					<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} />
+					{voiceChannelMembers?.length === 0 ? (
+						<View style={styles.iconVoice}>
+							<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
+						</View>
+					) : (
+						<View style={{ flexDirection: 'row' }}>
+							{voiceChannelMembers?.slice?.(0, 3)?.map((m) => {
+								return <VoiceChannelAvatar key={`${m.user_id}_user_join_voice`} userId={m.user_id} />;
+							})}
+							{badge > 0 && (
+								<View style={styles.badgeContainer}>
+									<Text style={styles.textBadge}>+{badge}</Text>
+								</View>
+							)}
+						</View>
+					)}
 				</View>
 				<Text style={styles.text}>{t('joinChannelVoiceBS.channelVoice')}</Text>
 				<Text style={styles.textDisable}>{t('joinChannelVoiceBS.readyTalk')}</Text>
@@ -153,7 +171,7 @@ function JoinChannelVoiceBS({ channel }: { channel: IChannel }) {
 								borderRadius: size.s_30
 							}}
 						>
-							<MezonIconCDN icon={IconCDN.chatIcon} />
+							<MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.textStrong} />
 						</View>
 					</TouchableOpacity>
 				</View>

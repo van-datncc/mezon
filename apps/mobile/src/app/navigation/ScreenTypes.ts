@@ -1,5 +1,5 @@
 import { ETypeSearch, ICategoryChannelOption } from '@mezon/mobile-components';
-import { ChannelsEntity, DirectEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
+import { ChannelsEntity, DirectEntity, EventManagementEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel, IMessageWithUser, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +18,7 @@ export const APP_SCREEN = {
 	HOME: 'HOME',
 	VIDEO_DETAIL: 'VIDEO_DETAIL',
 	CHANNEL_APP: 'CHANNEL_APP',
+	WALLET: 'WALLET',
 
 	SERVERS: {
 		STACK: 'ROUTES.SERVERS.STACK',
@@ -56,6 +57,11 @@ export const APP_SCREEN = {
 		HOME: 'ROUTES.PROFILE.HOME'
 	},
 
+	SHOP: {
+		STACK: 'ROUTES.SHOP.STACK',
+		HOME: 'ROUTES.SHOP.HOME'
+	},
+
 	MENU_THREAD: {
 		STACK: 'ROUTES.MENU_THREAD.STACK',
 		BOTTOM_SHEET: 'ROUTES.MENU_THREAD.BOTTOM_SHEET',
@@ -91,7 +97,9 @@ export const APP_SCREEN = {
 		WEBHOOKS_EDIT: 'WEBHOOKS_EDIT',
 		AUDIT_LOG: 'AUDIT_LOG',
 		FILTER_BY_USER: 'FILTER_BY_USER',
-		FILTER_BY_ACTION: 'FILTER_BY_ACTION'
+		FILTER_BY_ACTION: 'FILTER_BY_ACTION',
+		SOUND_STICKER: 'ROUTES.MENU_CLAN.SOUND_STICKER',
+		CREATE_SOUND: 'ROUTES.MENU_CLAN.CREATE_SOUND'
 	},
 
 	MENU_CHANNEL: {
@@ -103,7 +111,8 @@ export const APP_SCREEN = {
 		ADVANCED_PERMISSION_OVERRIDES: 'ADVANCED_PERMISSION_OVERRIDES',
 		SEARCH_MESSAGE_DM: 'SEARCH_MESSAGE_DM',
 		CANVAS: 'CANVAS',
-		CALL_DIRECT: 'CALL_DIRECT'
+		CALL_DIRECT: 'CALL_DIRECT',
+		QUICK_ACTION: 'QUICK_ACTION'
 	},
 
 	SETTINGS: {
@@ -119,8 +128,7 @@ export const APP_SCREEN = {
 		BLOCKED_USERS: 'ROUTES.SETTINGS.BLOCKED_USERS',
 		SEND_COFFEE: 'ROUTES.SETTINGS.SEND_COFFEE',
 		MY_QR_CODE: 'ROUTES.SETTINGS.MY_QR_CODE',
-		SEND_TOKEN: 'ROUTES.PROFILE.SEND_TOKEN',
-		HISTORY_TRANSACTION: 'ROUTES.PROFILE.HISTORY_TRANSACTION'
+		SET_PASSWORD: 'ROUTES.SETTINGS.SET_PASSWORD'
 	}
 } as const;
 
@@ -155,6 +163,10 @@ type FriendsStackParamList = {
 
 type ProfileStackParamList = {
 	[APP_SCREEN.PROFILE.HOME]: undefined;
+};
+
+type ShopStackParamList = {
+	[APP_SCREEN.SHOP.HOME]: undefined;
 };
 
 type MenuThreadStackParamList = {
@@ -210,6 +222,7 @@ type MenuClanStackParamList = {
 	};
 	[APP_SCREEN.MENU_CLAN.CREATE_EVENT]: {
 		onGoBack?: () => void;
+		eventId?: string;
 	};
 	[APP_SCREEN.MENU_CLAN.CREATE_EVENT_DETAILS]: {
 		type: OptionEvent;
@@ -218,6 +231,7 @@ type MenuClanStackParamList = {
 		eventChannelId: string;
 		isPrivate?: boolean;
 		onGoBack?: () => void;
+		currentEvent?: EventManagementEntity;
 	};
 	[APP_SCREEN.MENU_CLAN.CREATE_EVENT_PREVIEW]: {
 		type: OptionEvent;
@@ -230,7 +244,9 @@ type MenuClanStackParamList = {
 		frequency: number;
 		eventChannelId: string;
 		isPrivate?: boolean;
+		logo?: string;
 		onGoBack?: () => void;
+		currentEvent?: EventManagementEntity;
 	};
 	[APP_SCREEN.MENU_CLAN.SETTINGS]: { inviteRef: React.MutableRefObject<any> };
 	[APP_SCREEN.MENU_CLAN.OVERVIEW_SETTING]: undefined;
@@ -264,6 +280,8 @@ type MenuClanStackParamList = {
 	[APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT]: {
 		webhook: ApiWebhook;
 	};
+	[APP_SCREEN.MENU_CLAN.SOUND_STICKER]: undefined;
+	[APP_SCREEN.MENU_CLAN.CREATE_SOUND]: undefined;
 };
 
 type SettingStackParamList = {
@@ -275,10 +293,7 @@ type SettingStackParamList = {
 	[APP_SCREEN.SETTINGS.ACCOUNT]: undefined;
 	[APP_SCREEN.SETTINGS.BLOCKED_USERS]: undefined;
 	[APP_SCREEN.SETTINGS.MY_QR_CODE]: undefined;
-	[APP_SCREEN.SETTINGS.SEND_TOKEN]: {
-		formValue?: string;
-	};
-	[APP_SCREEN.SETTINGS.HISTORY_TRANSACTION]: undefined;
+	[APP_SCREEN.SETTINGS.SET_PASSWORD]: undefined;
 };
 
 type ChannelAppParamList = {
@@ -304,6 +319,7 @@ export type AppStackParamList = {
 	[APP_SCREEN.MESSAGES.STACK]: NavigatorScreenParams<MessagesStackParamList>;
 	[APP_SCREEN.FRIENDS.STACK]: NavigatorScreenParams<FriendsStackParamList>;
 	[APP_SCREEN.PROFILE.STACK]: NavigatorScreenParams<ProfileStackParamList>;
+	[APP_SCREEN.SHOP.STACK]: NavigatorScreenParams<ShopStackParamList>;
 	[APP_SCREEN.MENU_THREAD.STACK]: NavigatorScreenParams<MenuThreadStackParamList>;
 	[APP_SCREEN.MENU_CHANNEL.STACK]: NavigatorScreenParams<MenuChannelStackParamList>;
 	[APP_SCREEN.MENU_CLAN.STACK]: NavigatorScreenParams<MenuClanStackParamList>;

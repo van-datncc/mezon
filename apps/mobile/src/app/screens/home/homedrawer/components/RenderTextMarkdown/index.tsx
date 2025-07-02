@@ -15,6 +15,7 @@ import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import ImageNative from '../../../../../components/ImageNative';
+import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
@@ -48,21 +49,51 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-const screenWidth = Dimensions.get('screen').width;
+const screenWidth = Dimensions.get('window').width;
 const codeBlockMaxWidth = screenWidth - size.s_70;
 
-export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, isLastMessage?: boolean, isBuzzMessage?: boolean) => {
+export const markdownStyles = (
+	colors: Attributes,
+	isUnReadChannel?: boolean,
+	isLastMessage?: boolean,
+	isBuzzMessage?: boolean,
+	isTabletLandscape?: boolean
+) => {
 	const commonHeadingStyle = {
 		color: isUnReadChannel ? colors.white : isBuzzMessage ? baseColor.buzzRed : colors.text,
 		fontSize: isLastMessage ? size.small : size.medium
 	};
 	return StyleSheet.create({
-		heading1: commonHeadingStyle,
-		heading2: commonHeadingStyle,
-		heading3: commonHeadingStyle,
-		heading4: commonHeadingStyle,
-		heading5: commonHeadingStyle,
-		heading6: commonHeadingStyle,
+		heading1: {
+			color: colors.text,
+			fontSize: size.h1,
+			fontWeight: '600'
+		},
+		heading2: {
+			color: colors.text,
+			fontSize: size.h2,
+			fontWeight: '600'
+		},
+		heading3: {
+			color: colors.text,
+			fontSize: size.h3,
+			fontWeight: '600'
+		},
+		heading4: {
+			color: colors.text,
+			fontSize: size.h4,
+			fontWeight: '600'
+		},
+		heading5: {
+			color: colors.text,
+			fontSize: size.h5,
+			fontWeight: '600'
+		},
+		heading6: {
+			color: colors.text,
+			fontSize: size.h6,
+			fontWeight: '600'
+		},
 		body: commonHeadingStyle,
 		em: commonHeadingStyle,
 		s: commonHeadingStyle,
@@ -74,7 +105,6 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		code_block: {
 			color: colors.text,
-			paddingVertical: size.s_10,
 			borderColor: colors.secondary,
 			fontSize: size.h7,
 			lineHeight: size.s_22,
@@ -83,29 +113,27 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		code_inline: {
 			color: colors.text,
 			backgroundColor: colors.secondaryLight,
-			fontSize: size.medium,
-			lineHeight: size.s_20
+			fontSize: size.medium
 		},
 		fence: {
 			color: colors.text,
-			width: codeBlockMaxWidth,
+			width: isTabletLandscape ? codeBlockMaxWidth * 0.6 : codeBlockMaxWidth,
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
-			overflow: 'hidden'
+			overflow: 'hidden',
+			paddingVertical: size.s_10
 		},
 		link: {
 			color: colors.textLink,
 			fontSize: size.medium,
-			textDecorationLine: 'none',
-			lineHeight: size.s_20
+			textDecorationLine: 'none'
 		},
 		hashtag: {
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		iconEmojiInMessage: {
 			width: size.s_20,
@@ -122,14 +150,13 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		editedText: {
 			fontSize: size.small,
 			color: colors.textDisabled,
-			marginLeft: size.s_6
+			marginTop: size.s_2
 		},
 		mention: {
 			fontSize: size.medium,
 			fontWeight: '600',
 			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
+			backgroundColor: colors.midnightBlue
 		},
 		blockquote: {
 			backgroundColor: Colors.tertiaryWeight,
@@ -151,8 +178,7 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		},
 		textVoiceChannel: {
 			fontSize: size.medium,
-			color: colors.textLink,
-			lineHeight: size.s_20
+			color: colors.textLink
 		},
 		unknownChannel: { fontStyle: 'italic' },
 		roleMention: {
@@ -167,8 +193,10 @@ export const markdownStyles = (colors: Attributes, isUnReadChannel?: boolean, is
 		boldText: {
 			fontSize: size.medium,
 			fontWeight: 'bold',
-			lineHeight: size.s_20,
 			color: colors.text
+		},
+		blockSpacing: {
+			paddingVertical: size.s_4
 		}
 	});
 };
@@ -222,7 +250,7 @@ function parseMarkdownLink(text: string) {
 }
 
 export function extractYoutubeVideoId(url: string) {
-	const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+	const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
 	const match = url.match(regExp);
 	return match && match[2].length === 11 ? match[2] : null;
 }
@@ -258,6 +286,73 @@ const renderChannelIcon = (channelType: number, channelId: string, themeValue: A
 	return null;
 };
 
+const renderTextPalainContain = (
+	themeValue: Attributes,
+	text: string,
+	lastIndex: number,
+	isUnReadChannel: boolean,
+	isLastMessage: boolean,
+	isBuzzMessage: boolean,
+	isLastText = false
+) => {
+	const lines = text?.split('\n');
+	const headingFormattedLines = [];
+	let hasHeadings = false;
+
+	if (!lines?.length) {
+		return (
+			<Text key={`text-end_${lastIndex}_${text}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+				{text}
+			</Text>
+		);
+	}
+
+	lines.forEach((line, idx) => {
+		const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+		if (headingMatch && themeValue) {
+			hasHeadings = true;
+			const headingLevel = headingMatch[1].length;
+			const headingText = headingMatch[2].trim();
+
+			if (headingLevel) {
+				headingFormattedLines.push(
+					<Text key={`line-${idx}_${headingText}`} style={[themeValue ? markdownStyles(themeValue)?.[`heading${headingLevel}`] : {}]}>
+						{headingText}
+						{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
+					</Text>
+				);
+			} else {
+				headingFormattedLines.push(
+					<Text key={`line-${idx}_${line}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+						{line}
+						{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
+					</Text>
+				);
+			}
+		} else {
+			headingFormattedLines.push(
+				<Text key={`line-${idx}_${line}`} style={[themeValue ? markdownStyles(themeValue).body : {}]}>
+					{line}
+					{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
+				</Text>
+			);
+		}
+	});
+
+	if (!hasHeadings) {
+		return (
+			<Text
+				key={`text-end_${lastIndex}_${text}`}
+				style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}
+			>
+				{text}
+			</Text>
+		);
+	} else {
+		return <Text>{headingFormattedLines}</Text>;
+	}
+};
+
 export const RenderTextMarkdownContent = ({
 	content,
 	isEdited,
@@ -277,6 +372,7 @@ export const RenderTextMarkdownContent = ({
 	onLongPress
 }: IMarkdownProps) => {
 	const { themeValue } = useTheme();
+	const isTabletLandscape = useTabletLandscape();
 
 	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
 	let lastIndex = 0;
@@ -299,16 +395,12 @@ export const RenderTextMarkdownContent = ({
 		const contentInElement = t?.substring(s, e);
 
 		if (lastIndex < s) {
-			textParts.push(
-				<Text key={`text-${index}`} style={themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}}>
-					{t?.slice(lastIndex, s)}
-				</Text>
-			);
+			textParts.push(renderTextPalainContain(themeValue, t?.slice(lastIndex, s) ?? '', index, isUnReadChannel, isLastMessage, isBuzzMessage));
 		}
 
 		switch (element?.kindOf) {
 			case ETokenMessage.EMOJIS: {
-				const srcEmoji = getSrcEmoji(element.emojiid);
+				const srcEmoji = getSrcEmoji(element?.emojiid);
 				textParts.push(
 					<View key={`emoji-${index}`} style={!isOnlyContainEmoji && markdownStyles(themeValue).emojiInMessageContain}>
 						<ImageNative
@@ -328,8 +420,8 @@ export const RenderTextMarkdownContent = ({
 				const usersInChannel = selectAllChannelMembers(store.getState() as RootState, currentChannelId as string);
 				const mention = MentionUser({
 					tagName: contentInElement,
-					roleId: element.role_id || '',
-					tagUserId: element.user_id,
+					roleId: element?.role_id || '',
+					tagUserId: element?.user_id,
 					mode,
 					usersClan,
 					usersInChannel
@@ -350,7 +442,7 @@ export const RenderTextMarkdownContent = ({
 						]}
 						onPress={() => onMention?.(isRoleMention ? link.replace('@role', '@') : link)}
 					>
-						{text}
+						{text || contentInElement}
 					</Text>
 				);
 				break;
@@ -361,7 +453,7 @@ export const RenderTextMarkdownContent = ({
 					const channelsEntities = selectChannelsEntities(store.getState() as any);
 					const hashtagDmEntities = selectHashtagDmEntities(store.getState() as any);
 					const mention = ChannelHashtag({
-						channelHashtagId: element.channelid,
+						channelHashtagId: element?.channelid,
 						mode,
 						currentChannelId,
 						channelsEntities,
@@ -408,7 +500,7 @@ export const RenderTextMarkdownContent = ({
 			}
 
 			case ETokenMessage.MARKDOWNS: {
-				switch (element.type) {
+				switch (element?.type) {
 					case EBacktickType.SINGLE:
 					case EBacktickType.CODE:
 						textParts.push(
@@ -422,31 +514,38 @@ export const RenderTextMarkdownContent = ({
 						break;
 
 					case EBacktickType.PRE:
+					case EBacktickType.TRIPLE: {
 						textParts.push(
-							<Text>
-								{'\n'}
-								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>{contentInElement}</Text>
+							<Text key={`code-triple-${index}`}>
+								{s !== 0 && '\n'}
+								<View
+									style={
+										themeValue
+											? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage, isTabletLandscape)
+													.blockSpacing
+											: {}
+									}
+								>
+									<View
+										key={`pre-${index}`}
+										style={
+											themeValue
+												? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage, isTabletLandscape).fence
+												: {}
+										}
+									>
+										<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
+											{(contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
+												? contentInElement?.slice(3, -3)
+												: contentInElement
+											)?.replace(/^\n+|\n+$/g, '')}
+										</Text>
+									</View>
 								</View>
 							</Text>
 						);
 						break;
-
-					case EBacktickType.TRIPLE:
-						textParts.push(
-							<Text>
-								{'\n'}
-								<View key={`pre-${index}`} style={themeValue ? markdownStyles(themeValue).fence : {}}>
-									<Text style={themeValue ? markdownStyles(themeValue).code_block : {}}>
-										{(contentInElement?.startsWith('```') && contentInElement?.endsWith('```')
-											? contentInElement?.slice(3, -3)
-											: contentInElement
-										)?.replace(/^\n+|\n+$/g, '')}
-									</Text>
-								</View>
-							</Text>
-						);
-						break;
+					}
 
 					case EBacktickType.BOLD:
 						textParts.push(
@@ -460,7 +559,11 @@ export const RenderTextMarkdownContent = ({
 						const { clanId, channelId, canvasId } = extractIds(contentInElement);
 
 						const basePath = '/chat/clans/';
-						const contentHasChannelLink = contentInElement?.includes(basePath) && contentInElement?.includes('/channels/');
+						const contentHasChannelLink =
+							contentInElement?.includes(basePath) &&
+							contentInElement?.includes('/channels/') &&
+							!contentInElement?.includes('/canvas/');
+						const contentHasCanvasLink = contentInElement.includes('canvas') && canvasId && clanId && channelId;
 
 						if (contentHasChannelLink) {
 							const pathSegments = contentInElement?.split('/') as string[];
@@ -516,7 +619,7 @@ export const RenderTextMarkdownContent = ({
 							}
 						}
 
-						if (contentInElement.includes('canvas') && canvasId && clanId && channelId) {
+						if (contentHasCanvasLink) {
 							textParts.push(<RenderCanvasItem key={`canvas-${index}`} clanId={clanId} channelId={channelId} canvasId={canvasId} />);
 						} else if (contentInElement.includes('unknown')) {
 							textParts.push(
@@ -551,7 +654,6 @@ export const RenderTextMarkdownContent = ({
 									onPress={() => openUrl(contentInElement, null)}
 									onLongPress={onLongPress}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
-									themeValue={themeValue}
 								/>
 							);
 						} else {
@@ -580,9 +682,15 @@ export const RenderTextMarkdownContent = ({
 
 	if (lastIndex < (t?.length ?? 0)) {
 		textParts.push(
-			<Text key="text-end" style={[themeValue ? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage).body : {}]}>
-				{t?.slice(lastIndex)}
-			</Text>
+			renderTextPalainContain(
+				themeValue,
+				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
+				lastIndex,
+				isUnReadChannel,
+				isLastMessage,
+				isBuzzMessage,
+				true
+			)
 		);
 	}
 
@@ -611,9 +719,20 @@ export const RenderTextMarkdownContent = ({
 					}}
 				/>
 			)}
-			<Text>{textParts}</Text>
-			{markdownBlackParts && markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
-			{isEdited && <Text style={themeValue ? markdownStyles(themeValue).editedText : {}}>{translate('edited')}</Text>}
+
+			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+					{textParts?.length > 0 && <Text key={`textParts${t}_${lastIndex}`}>{textParts}</Text>}
+					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+				</View>
+				{isEdited && (
+					<View>
+						<Text key={`edited-${textParts}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
+							{translate('edited')}
+						</Text>
+					</View>
+				)}
+			</View>
 		</View>
 	);
 };

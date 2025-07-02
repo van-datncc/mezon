@@ -3,8 +3,10 @@ import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@r
 import { safeJSONParse } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { authActions } from '../auth/auth.slice';
+import { CacheMetadata, clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { clearAllMemoizedFunctions, memoizeAndTrack } from '../memoize';
+import { clearAllMemoizedFunctions } from '../memoize';
+import { RootState } from '../store';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
 export interface IAccount {
@@ -18,6 +20,7 @@ export interface AccountState {
 	userProfile?: IUserAccount | null;
 	anonymousMode: boolean;
 	logo?: string;
+	cache?: CacheMetadata;
 }
 
 export const initialAccountState: AccountState = {
@@ -27,27 +30,54 @@ export const initialAccountState: AccountState = {
 	anonymousMode: false
 };
 
-const CHANNEL_PROFILE_CACHED_TIME = 1000 * 60 * 60;
-const fetchUserProfileCached = memoizeAndTrack((mezon: MezonValueContext) => mezon.client.getAccount(mezon.session), {
-	promise: true,
-	maxAge: CHANNEL_PROFILE_CACHED_TIME,
-	normalizer: (args) => {
-		return args[0].session.username || '';
-	}
-});
+export const fetchUserProfileCached = async (getState: () => RootState, mezon: MezonValueContext, noCache = false) => {
+	const currentState = getState();
+	const accountData = currentState[ACCOUNT_FEATURE_KEY];
+	const apiKey = createApiKey('fetchUserProfile', mezon.session.username || '');
 
-export const getUserProfile = createAsyncThunk<IUserAccount, { noCache: boolean } | void>('account/user', async (arg, thunkAPI) => {
-	const mezon = await ensureSession(getMezonCtx(thunkAPI));
-	const noCache = arg?.noCache ?? false;
-	if (noCache) {
-		fetchUserProfileCached.clear(mezon);
+	const shouldForceCall = shouldForceApiCall(apiKey, accountData?.cache, noCache);
+
+	if (!shouldForceCall && accountData?.userProfile) {
+		return {
+			...accountData.userProfile,
+			fromCache: true,
+			time: accountData.cache?.lastFetched || Date.now()
+		};
 	}
-	const response = await fetchUserProfileCached(mezon);
-	if (!response) {
-		return thunkAPI.rejectWithValue('Invalid session');
+
+	const response = await mezon.client.getAccount(mezon.session);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false,
+		time: Date.now()
+	};
+};
+
+export const getUserProfile = createAsyncThunk<IUserAccount & { fromCache?: boolean }, { noCache: boolean } | void>(
+	'account/user',
+	async (arg, thunkAPI) => {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const noCache = arg?.noCache ?? false;
+
+		const response = await fetchUserProfileCached(thunkAPI.getState as () => RootState, mezon, Boolean(noCache));
+
+		if (!response) {
+			return thunkAPI.rejectWithValue('Invalid getUserProfile');
+		}
+
+		if (response.fromCache) {
+			return {
+				fromCache: true
+			} as IUserAccount & { fromCache: boolean };
+		}
+
+		const { fromCache, time, ...profileData } = response;
+		return { ...profileData, fromCache: false };
 	}
-	return response;
-});
+);
 
 export const deleteAccount = createAsyncThunk('account/deleteaccount', async (_, thunkAPI) => {
 	try {
@@ -56,6 +86,7 @@ export const deleteAccount = createAsyncThunk('account/deleteaccount', async (_,
 		const response = await mezon.client.deleteAccount(mezon.session);
 		thunkAPI.dispatch(authActions.setLogout());
 		clearAllMemoizedFunctions();
+		clearApiCallTracker();
 		return response;
 	} catch (error) {
 		//Todo: check clan owner before deleting account
@@ -82,15 +113,20 @@ export const accountSlice = createSlice({
 				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
 			}
 		},
+		setWalletMetadata(state, action: PayloadAction<any>) {
+			if (state?.userProfile?.user) {
+				const userMetadata = safeJSONParse(state.userProfile.user.metadata || '{}');
+				const updatedUserMetadata = { ...userMetadata, wallet: action.payload };
+				state.userProfile.user.metadata = JSON.stringify(updatedUserMetadata);
+			}
+		},
 		setLogoCustom(state, action: PayloadAction<string | undefined>) {
 			state.logo = action.payload;
 		},
 		setWalletValue(state, action: PayloadAction<number>) {
 			if (state.userProfile?.wallet) {
 				try {
-					const walletData = safeJSONParse(state.userProfile.wallet);
-					walletData.value = action.payload;
-					state.userProfile.wallet = JSON.stringify(walletData);
+					state.userProfile.wallet = action.payload;
 				} catch (error) {
 					console.error('Error set wallet value:', error);
 				}
@@ -99,9 +135,7 @@ export const accountSlice = createSlice({
 		updateWalletByAction(state: AccountState, action: PayloadAction<(currentValue: number) => number>) {
 			if (state.userProfile?.wallet) {
 				try {
-					const walletData = safeJSONParse(state.userProfile.wallet);
-					walletData.value = action.payload(walletData.value);
-					state.userProfile.wallet = JSON.stringify(walletData);
+					state.userProfile.wallet = action.payload(state.userProfile?.wallet);
 				} catch (error) {
 					console.error('Error updating wallet by action:', error);
 				}
@@ -134,9 +168,14 @@ export const accountSlice = createSlice({
 			.addCase(getUserProfile.pending, (state: AccountState) => {
 				state.loadingStatus = 'loading';
 			})
-			.addCase(getUserProfile.fulfilled, (state: AccountState, action: PayloadAction<IUserAccount>) => {
-				state.userProfile = action.payload;
-				state.logo = action.payload.logo;
+			.addCase(getUserProfile.fulfilled, (state: AccountState, action: PayloadAction<IUserAccount & { fromCache?: boolean }>) => {
+				const { fromCache, ...profileData } = action.payload;
+				if (!fromCache) {
+					state.userProfile = profileData;
+					state.logo = profileData.logo;
+					state.cache = createCacheMetadata();
+				}
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(getUserProfile.rejected, (state: AccountState, action) => {

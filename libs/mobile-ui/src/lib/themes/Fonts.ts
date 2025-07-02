@@ -13,13 +13,13 @@ const type = {
 };
 
 export const size = {
-	h1: verticalScale(38),
-	h2: verticalScale(34),
-	h3: verticalScale(30),
-	h4: verticalScale(26),
-	h5: verticalScale(20),
-	h6: verticalScale(19),
-	h7: verticalScale(14),
+	h1: verticalScale(30),
+	h2: verticalScale(26),
+	h3: verticalScale(22),
+	h4: verticalScale(18),
+	h5: verticalScale(16),
+	h6: verticalScale(14),
+	h7: verticalScale(12),
 	h85: verticalScale(12),
 	h8: verticalScale(11),
 	h9: verticalScale(9),
@@ -46,6 +46,7 @@ export const size = {
 	s_16: verticalScale(16),
 	s_17: verticalScale(17),
 	s_22: verticalScale(22),
+	s_26: verticalScale(26),
 	s_28: verticalScale(28),
 	s_30: verticalScale(30),
 	s_34: verticalScale(34),
@@ -58,12 +59,17 @@ export const size = {
 	s_60: verticalScale(60),
 	s_70: verticalScale(70),
 	s_80: verticalScale(80),
+	s_90: verticalScale(90),
 	s_100: verticalScale(100),
+	s_140: verticalScale(140),
 	s_150: verticalScale(150),
-	s_170: verticalScale(170),
+	s_165: verticalScale(165),
+	s_200: verticalScale(200),
+	s_210: verticalScale(210),
 	s_220: verticalScale(220),
 	s_300: verticalScale(300),
-	s_400: verticalScale(400)
+	s_400: verticalScale(400),
+	s_615: verticalScale(615)
 };
 
 const style = {

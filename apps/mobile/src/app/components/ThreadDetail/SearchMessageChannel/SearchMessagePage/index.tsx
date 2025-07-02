@@ -6,7 +6,8 @@ import {
 	selectAllChannelsByUser,
 	selectAllUsersByUser,
 	selectTotalResultSearchMessage,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { IChannel, SearchItemProps, compareObjects, normalizeString } from '@mezon/utils';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -31,7 +32,7 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	const { t } = useTranslation(['searchMessageChannel']);
 	const [activeTab, setActiveTab] = useState<number>(ACTIVE_TAB.MEMBER);
 	const store = getStore();
-	const totalResult = useSelector(selectTotalResultSearchMessage);
+	const totalResult = useAppSelector((state) => selectTotalResultSearchMessage(state, currentChannel?.channel_id));
 	const dispatch = useAppDispatch();
 	const [isContentReady, setIsContentReady] = useState(false);
 
@@ -62,10 +63,13 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 		if (!searchText) return allUsesInAllClans;
 		return allUsesInAllClans
 			?.filter((member) => {
-				return member?.username?.toLowerCase()?.includes(searchText?.toLowerCase());
+				return (
+					member?.username?.toLowerCase()?.includes(searchText?.toLowerCase()) ||
+					member?.display_name?.toLowerCase()?.includes(searchText?.toLowerCase())
+				);
 			})
 			.sort((a: SearchItemProps, b: SearchItemProps) => compareObjects(a, b, searchText, 'display_name'));
-	}, [searchText]);
+	}, [searchText, store]);
 
 	const TabList = useMemo(() => {
 		return [
@@ -112,9 +116,9 @@ function SearchMessagePage({ searchText, currentChannel, userMention, isSearchMe
 	};
 
 	return (
-		<View style={{ height: '100%', width: '100%' }}>
+		<View style={{ flex: 1 }}>
 			<HeaderTabSearch tabList={TabList} activeTab={activeTab} onPress={handelHeaderTabChange} />
-			<View>{isContentReady ? renderContent() : null}</View>
+			<View style={{ flex: 1 }}>{isContentReady ? renderContent() : null}</View>
 		</View>
 	);
 }

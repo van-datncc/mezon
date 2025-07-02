@@ -16,7 +16,18 @@ import SearchDmList from './SearchDmList';
 import { style } from './styles';
 
 const MessagesScreenRender = memo(({ chatList }: { chatList: string }) => {
-	const dmGroupChatList: string[] = useMemo(() => JSON.parse(chatList || '[]'), [chatList]);
+	const dmGroupChatList: string[] = useMemo(() => {
+		try {
+			if (!chatList || typeof chatList !== 'string') {
+				return [];
+			}
+			const parsed = JSON.parse(chatList);
+			return Array.isArray(parsed) ? parsed : [];
+		} catch (error) {
+			console.error('Error parsing chat list:', error);
+			return [];
+		}
+	}, [chatList]);
 	const [refreshing, setRefreshing] = useState(false);
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
@@ -43,7 +54,7 @@ const MessagesScreenRender = memo(({ chatList }: { chatList: string }) => {
 	};
 
 	const renderItem = useCallback(
-		({ item }) => {
+		({ item }: { item: string }) => {
 			return <DmListItem id={item} navigation={navigation} onLongPress={handleLongPress} />;
 		},
 		[handleLongPress, navigation]
@@ -65,9 +76,9 @@ const MessagesScreenRender = memo(({ chatList }: { chatList: string }) => {
 					keyExtractor={(dm) => dm + 'DM_MSG_ITEM'}
 					showsVerticalScrollIndicator={true}
 					removeClippedSubviews={Platform.OS === 'android'}
-					initialNumToRender={10}
-					maxToRenderPerBatch={10}
-					windowSize={10}
+					initialNumToRender={1}
+					maxToRenderPerBatch={1}
+					windowSize={2}
 					onEndReachedThreshold={0.7}
 					onMomentumScrollBegin={() => Keyboard.dismiss()}
 					keyboardShouldPersistTaps={'handled'}

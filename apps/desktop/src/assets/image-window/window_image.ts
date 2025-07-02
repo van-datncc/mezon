@@ -89,6 +89,12 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
   <style>
     ${image_window_css}
   </style>
+  <script>
+  function closeWindow() {
+    selectedImage.src = null;
+    window.electron.send('APP::IMAGE_WINDOW_TITLE_BAR_ACTION', 'APP::CLOSE_IMAGE_WINDOW');
+  }
+</script>
 </head>
 <body>
 <div class="title-bar">
@@ -107,7 +113,7 @@ function openImagePopup(imageData: ImageData, parentWindow: BrowserWindow = App.
         />
       </svg>
     </div>
-    <div id="close-window" class="function-button">
+    <div id="close-window" class="function-button" onclick="closeWindow()">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-button">
         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
@@ -353,22 +359,51 @@ export const scriptThumnails = (listImage, indexSelect) => {
 	return listImage
 		.map((image, index) => {
 			const time = escapeHtml(formatDateTime(image.create_time));
-			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
-        selectedImage.src = '${sanitizeUrl(image.url)}';
-        document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
-        document.getElementById('thumbnail-${index}').querySelector('.thumbnail').classList.add('active');
-         document.getElementById('thumbnail-${index}').querySelector('.thumbnail').scrollIntoView({ behavior: 'smooth', block: 'center' })
-        document.getElementById('userAvatar').src = "${sanitizeUrl(image.uploaderData.avatar)}"
-        document.getElementById('username').innerHTML  = "${escapeHtml(image.uploaderData.name)}"
-        document.getElementById('timestamp').innerHTML  = "${time}"
-      currentImageUrl = {
-        fileName : '${image.fileName}',
-        url : '${image.url}',
-        realUrl : '${image.realUrl || ''}'
-      }
+			const sanitizedUrl = sanitizeUrl(image.url);
+			const sanitizedAvatar = sanitizeUrl(image.uploaderData.avatar);
+			const escapedName = escapeHtml(image.uploaderData.name);
+			const escapedFileName = escapeHtml(image.fileName);
+			const sanitizedRealUrl = sanitizeUrl(image.realUrl || '');
 
-        currentIndex = ${index}
-      });`;
+			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
+				const selectedImage = document.getElementById('selectedImage');
+				if (selectedImage) {
+					selectedImage.src = ${JSON.stringify(sanitizedUrl)};
+				}
+
+				document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
+				const thumbContainer = document.getElementById('thumbnail-${index}');
+				if (thumbContainer) {
+					const thumbnail = thumbContainer.querySelector('.thumbnail');
+					if (thumbnail) {
+						thumbnail.classList.add('active');
+						thumbnail.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					}
+				}
+
+				const userAvatar = document.getElementById('userAvatar');
+				if (userAvatar) {
+					userAvatar.src = ${JSON.stringify(sanitizedAvatar)};
+				}
+
+				const username = document.getElementById('username');
+				if (username) {
+					username.textContent = ${JSON.stringify(escapedName)};
+				}
+
+				const timestamp = document.getElementById('timestamp');
+				if (timestamp) {
+					timestamp.textContent = ${JSON.stringify(time)};
+				}
+
+				window.currentImageUrl = {
+					fileName: ${JSON.stringify(escapedFileName)},
+					url: ${JSON.stringify(sanitizedUrl)},
+					realUrl: ${JSON.stringify(sanitizedRealUrl)}
+				};
+
+				window.currentIndex = ${index};
+			});`;
 		})
 		.join('');
 };
@@ -536,7 +571,7 @@ menu.addEventListener('click', async (e) => {
 
 				switch (action) {
 					case 'copyImage': {
-						window.electron.handleActionShowImage(action,currentImageUrl.realUrl );
+						window.electron.handleActionShowImage(action, window.currentImageUrl.realUrl );
 						break;
 					}
           default :

@@ -1,10 +1,11 @@
-import { MemberProfile } from '@mezon/components';
+import { SimpleMemberProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
 import { ChannelMembersEntity, FriendsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { toast } from 'react-toastify';
 
 type FriendProps = {
 	friend: FriendsEntity;
@@ -92,7 +93,7 @@ const FriendMenu = ({ friend, coords, onClose, onDeleteFriend, onBlockFriend }: 
 const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
-	const { acceptFriend, blockFriend, deleteFriend, unBlockFriend } = useFriends();
+	const { acceptFriend, deleteFriend, blockFriend, unBlockFriend } = useFriends();
 
 	const coords = useRef<Coords>({
 		mouseX: 0,
@@ -100,13 +101,17 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		distanceToBottom: 0
 	});
 
-	const directMessageWithUser = async (userId: string, username?: string, avatar?: string) => {
-		const response = await createDirectMessageWithUser(userId, username, avatar);
+	const directMessageWithUser = useCallback(async () => {
+		const userID = friend?.user?.id ?? '';
+		const name = friend?.user?.display_name || friend.user?.username;
+		const avatar = friend.user?.avatar_url;
+
+		const response = await createDirectMessageWithUser(userID, name, friend.user?.username, avatar);
 		if (response.channel_id) {
 			const directChat = toDmGroupPageFromFriendPage(response.channel_id, Number(response.type));
 			navigate(directChat);
 		}
-	};
+	}, [friend]);
 
 	const handleAcceptFriend = (username: string, id: string) => {
 		acceptFriend(username, id);
@@ -116,12 +121,26 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		deleteFriend(username, id);
 	};
 
-	const handleBlockFriend = (username: string, id: string) => {
-		blockFriend(username, id);
+	const handleBlockFriend = async (username: string, id: string) => {
+		try {
+			const isBlocked = await blockFriend(username, id);
+			if (isBlocked) {
+				toast.success('User blocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to block user');
+		}
 	};
 
-	const handleUnBlockFriend = (username: string, id: string) => {
-		unBlockFriend(username, id);
+	const handleUnblockFriend = async (username: string, id: string) => {
+		try {
+			const isUnblocked = await unBlockFriend(username, id);
+			if (isUnblocked) {
+				toast.success('User unblocked successfully');
+			}
+		} catch (error) {
+			toast.error('Failed to unblock user');
+		}
 	};
 
 	const handleMenuClick = (event: React.MouseEvent) => {
@@ -158,13 +177,11 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		<div className="border-t-[1px] dark:border-[#3f4147] border-gray-300 group/list_friends">
 			<div
 				key={friend?.user?.id}
-				onClick={() =>
-					directMessageWithUser(friend?.user?.id ?? '', friend?.user?.display_name || friend.user?.username, friend.user?.avatar_url)
-				}
+				onClick={directMessageWithUser}
 				className="py-3 flex justify-between items-center px-[12px] cursor-pointer dark:hover:bg-[#393c41] hover:bg-[#eaebed] rounded-lg"
 			>
 				<div key={friend?.user?.id} className={'flex-1'}>
-					<MemberProfile
+					<SimpleMemberProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
 						usernameAva={friend?.user?.username ?? ''}
@@ -176,7 +193,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						numberCharacterCollapse={100}
 						classParent={friend?.state !== undefined && friend?.state >= 1 ? '' : 'friendList h-10'}
 						positionType={MemberProfileType.LIST_FRIENDS}
-						customStatus={(friend?.user?.metadata as MetaDateStatusUser).status ?? ''}
+						customStatus={(friend?.user?.metadata as MetaDateStatusUser)?.status ?? ''}
 						isDM={true}
 						user={friend as ChannelMembersEntity}
 						statusOnline={userFriend?.metadata?.user_status}
@@ -185,10 +202,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 				<div onClick={(e) => e.stopPropagation()}>
 					{friend?.state === 0 && (
 						<div className="flex gap-3 items-center">
-							<button
-								onClick={() => directMessageWithUser(friend?.user?.id ?? '')}
-								className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2"
-							>
+							<button onClick={directMessageWithUser} className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
 								<Icons.IconChat className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black" />
 							</button>
 							<button onClick={handleMenuClick} className="dark:bg-bgTertiary bg-[#E1E1E1] rounded-full p-2">
@@ -226,9 +240,9 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						<div className="flex gap-3 items-center">
 							<button
 								className="bg-bgTertiary text-contentSecondary rounded-[6px] text-[14px] p-2 flex items-center justify-center hover:bg-bgPrimary"
-								onClick={() => handleUnBlockFriend(friend?.user?.username as string, friend?.user?.id as string)}
+								onClick={() => handleUnblockFriend(friend?.user?.username as string, friend?.user?.id as string)}
 							>
-								UnBlock
+								Unblock
 							</button>
 						</div>
 					)}

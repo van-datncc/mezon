@@ -71,9 +71,9 @@ const PinMessageItem = memo(({ pinMessageItem, handleUnpinMessage, contentMessag
 
 	return (
 		<TouchableOpacity onPress={handleJumpMess} style={styles.pinMessageItemWrapper}>
-			<MezonAvatar avatarUrl={priorityAvatar} username={namePriority}></MezonAvatar>
+			<MezonAvatar avatarUrl={priorityAvatar || pinMessageItem?.avatar} username={namePriority || pinMessageItem?.username}></MezonAvatar>
 			<View style={styles.pinMessageItemBox}>
-				<Text style={styles.pinMessageItemName}>{namePriority}</Text>
+				<Text style={styles.pinMessageItemName}>{namePriority || pinMessageItem?.username}</Text>
 				<RenderTextMarkdownContent content={contentMessage} isEdited={false} />
 				{pinMessageAttachments?.length > 0 && (
 					<MessageAttachment attachments={pinMessageAttachments} clanId={message?.clan_id} channelId={message?.channel_id} />

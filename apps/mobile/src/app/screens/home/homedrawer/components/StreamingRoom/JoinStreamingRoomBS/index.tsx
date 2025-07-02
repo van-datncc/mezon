@@ -10,7 +10,6 @@ import {
 import { size, useTheme } from '@mezon/mobile-ui';
 import {
 	selectAllAccount,
-	selectClanById,
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectSession,
@@ -40,7 +39,6 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 	const currentStreamInfo = useSelector(selectCurrentStreamInfo);
 	const playStream = useSelector(selectStatusStream);
 	const dispatch = useAppDispatch();
-	const clanById = useSelector(selectClanById(channel?.clan_id || ''));
 	const { handleChannelClick } = useWebRTCStream();
 	const userProfile = useSelector(selectAllAccount);
 	const sessionUser = useSelector(selectSession);
@@ -60,7 +58,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 					dispatch(
 						videoStreamActions.startStream({
 							clanId: channel?.clan_id || '',
-							clanName: clanById?.clan_name || '',
+							clanName: '',
 							streamId: channel?.channel_id || '',
 							streamName: channel?.channel_label || '',
 							parentId: channel?.parent_id || ''
@@ -108,7 +106,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 					}}
 					style={styles.buttonCircle}
 				>
-					<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} />
+					<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} color={themeValue.textStrong} />
 				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={() => {
@@ -124,7 +122,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 						borderRadius: size.s_22
 					}}
 				>
-					<MezonIconCDN icon={IconCDN.userPlusIcon} />
+					<MezonIconCDN icon={IconCDN.userPlusIcon} color={themeValue.textStrong} />
 				</TouchableOpacity>
 			</View>
 			<View style={{ alignItems: 'center', gap: size.s_6 }}>
@@ -138,7 +136,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 						backgroundColor: themeValue.tertiary
 					}}
 				>
-					<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} />
+					<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_36} height={size.s_36} color={themeValue.textStrong} />
 				</View>
 				<Text style={styles.text}>{t('joinStreamingRoomBS.stream')}</Text>
 				<Text style={styles.textDisable}>{t('joinStreamingRoomBS.noOne')}</Text>
@@ -166,7 +164,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 							borderRadius: size.s_30
 						}}
 					/>
-					<View style={{ flexDirection: 'column', flex: 1 }}>
+					<View style={{ flexDirection: 'column', flex: 1, alignItems: 'center' }}>
 						<TouchableOpacity style={styles.btnJoinVoice} onPress={handleJoinVoice}>
 							<Text style={styles.textBtnJoinVoice}>{t('joinStreamingRoomBS.joinStream')}</Text>
 						</TouchableOpacity>
@@ -183,7 +181,7 @@ function JoinStreamingRoomBS({ channel }: { channel: IChannel }) {
 								borderRadius: size.s_30
 							}}
 						>
-							<MezonIconCDN icon={IconCDN.chatIcon} />
+							<MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.textStrong} />
 						</View>
 					</TouchableOpacity>
 				</View>

@@ -19,8 +19,8 @@ interface IChatBoxProps {
 	};
 	directMessageId?: string;
 	canSendMessage?: boolean;
-	onShowKeyboardBottomSheet?: (isShow: boolean, type?: string) => void;
 	isPublic: boolean;
+	isFriendTargetBlocked?: boolean;
 }
 
 export const ChatBoxMain = memo((props: IChatBoxProps) => {
@@ -83,7 +83,7 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 			{messageActionNeedToResolve && (props?.canSendMessage || isDM) && (
 				<ActionMessageSelected messageActionNeedToResolve={messageActionNeedToResolve} onClose={deleteMessageActionNeedToResolve} />
 			)}
-			{!props?.canSendMessage && !isDM ? (
+			{(!props?.canSendMessage && !isDM) || (props?.isFriendTargetBlocked && props?.mode === ChannelStreamMode.STREAM_MODE_DM) ? (
 				<View
 					style={{
 						zIndex: 10,
@@ -103,10 +103,13 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 					>
 						<Text
 							style={{
-								color: themeValue.textDisabled
+								color: themeValue.textDisabled,
+								textAlign: 'center'
 							}}
 						>
-							{t('noSendMessagePermission')}
+							{props?.isFriendTargetBlocked && props?.mode === ChannelStreamMode.STREAM_MODE_DM
+								? t('blockedUserMessage')
+								: t('noSendMessagePermission')}
 						</Text>
 					</View>
 				</View>
@@ -118,7 +121,6 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 					mode={props?.mode}
 					hiddenIcon={props?.hiddenIcon}
 					messageAction={props?.messageAction}
-					onShowKeyboardBottomSheet={props?.onShowKeyboardBottomSheet}
 					isPublic={props?.isPublic}
 				/>
 			)}

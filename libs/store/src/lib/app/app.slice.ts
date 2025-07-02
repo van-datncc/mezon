@@ -1,8 +1,10 @@
 import { captureSentryError } from '@mezon/logger';
+import { listChannelRenderAction } from '@mezon/store';
 import { LoadingStatus } from '@mezon/utils';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
+import { clearApiCallTracker } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
@@ -24,10 +26,12 @@ export interface showSettingFooterProps {
 
 export interface AppState {
 	themeApp: 'light' | 'dark' | 'system';
+	currentLanguage: 'en' | 'vi';
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 	isShowMemberList: boolean;
 	isShowChatStream: boolean;
+	isShowChatVoice: boolean;
 	chatStreamWidth: number;
 	isShowCanvas: boolean;
 	isShowMemberListDM: boolean;
@@ -48,8 +52,10 @@ export interface AppState {
 export const initialAppState: AppState = {
 	loadingStatus: 'not loaded',
 	themeApp: 'dark',
+	currentLanguage: 'en',
 	isShowMemberList: true,
 	isShowChatStream: false,
+	isShowChatVoice: false,
 	chatStreamWidth: 0,
 	isShowCanvas: true,
 	isShowMemberListDM: true,
@@ -76,6 +82,8 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 		}
 
 		clearAllMemoizedFunctions();
+		thunkAPI.dispatch(listChannelRenderAction.clearListChannelRender());
+		clearApiCallTracker();
 
 		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';
 		const currentChannelId = state.channels?.byClans[state.clans?.currentClanId as string]?.currentChannelId;
@@ -105,7 +113,7 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 			);
 
 		thunkAPI.dispatch(clansActions.joinClan({ clanId: '0' }));
-		thunkAPI.dispatch(clansActions.fetchClans());
+		thunkAPI.dispatch(clansActions.fetchClans({}));
 		if (isClanView && currentClanId) {
 			thunkAPI.dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId }));
 			thunkAPI.dispatch(channelsActions.fetchChannels({ clanId: currentClanId, noCache: true }));
@@ -133,6 +141,9 @@ export const appSlice = createSlice({
 		setTheme: (state, action) => {
 			state.themeApp = action.payload;
 		},
+		setLanguage: (state, action) => {
+			state.currentLanguage = action.payload;
+		},
 		setIsShowMemberList: (state, action) => {
 			state.isShowMemberList = action.payload;
 		},
@@ -141,6 +152,9 @@ export const appSlice = createSlice({
 		},
 		setIsShowChatStream: (state, action) => {
 			state.isShowChatStream = action.payload;
+		},
+		setIsShowChatVoice: (state, action) => {
+			state.isShowChatVoice = action.payload;
 		},
 		setChatStreamWidth: (state, action) => {
 			state.chatStreamWidth = action.payload;
@@ -236,11 +250,14 @@ export const selectAllApp = createSelector(getAppState, (state: AppState) => sta
 
 export const selectTheme = createSelector(getAppState, (state: AppState) => state.themeApp || 'dark');
 
+export const selectCurrentLanguage = createSelector(getAppState, (state: AppState) => state.currentLanguage || 'en');
+
 export const selectError = createSelector(getAppState, (state: AppState) => state.error);
 
 export const selectIsShowMemberList = createSelector(getAppState, (state: AppState) => state.isShowMemberList);
 
 export const selectIsShowChatStream = createSelector(getAppState, (state: AppState) => state.isShowChatStream);
+export const selectIsShowChatVoice = createSelector(getAppState, (state: AppState) => state.isShowChatVoice);
 
 export const selectChatStreamWidth = createSelector(getAppState, (state: AppState) => state.chatStreamWidth);
 

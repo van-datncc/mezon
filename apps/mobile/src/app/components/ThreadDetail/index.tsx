@@ -52,7 +52,7 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const [page, setPage] = useState<number>(1);
 	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(false);
 	const [isPaginationVisible, setIsPaginationVisible] = useState<boolean>(false);
-	const threadFetched = useSelector((state) => selectThreadsByParentChannelId(state, currentChannel?.channel_id));
+	const threadFetched = useSelector((state) => selectThreadsByParentChannelId(state, channelThreads?.channel_id || currentChannel?.channel_id));
 	const threadsSearched = useSelector((state) => selectSearchedThreadResult(state, currentChannel?.channel_id));
 	const activeThreads = getActiveThreads(threadFetched);
 	const joinedThreads = getJoinedThreadsWithinLast30Days(threadFetched);
@@ -65,8 +65,12 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 	const fetchThreads = useCallback(
 		async (currentPage: number) => {
 			const body = {
-				channelId: isThread ? (currentChannel?.parent_id ?? '') : (currentChannel?.channel_id ?? ''),
-				clanId: currentChannel?.clan_id ?? '',
+				channelId: channelThreads?.channel_id
+					? channelThreads?.channel_id
+					: isThread
+						? (currentChannel?.parent_id ?? '')
+						: (currentChannel?.channel_id ?? ''),
+				clanId: channelThreads?.clan_id ?? currentChannel?.clan_id ?? '',
 				page: currentPage,
 				noCache: true
 			};
@@ -83,7 +87,15 @@ export default function CreateThreadModal({ navigation, route }: MenuThreadScree
 				setIsPaginationVisible(true);
 			}
 		},
-		[currentChannel?.channel_id, currentChannel?.clan_id, currentChannel?.parent_id, dispatch, isThread]
+		[
+			channelThreads?.channel_id,
+			channelThreads?.clan_id,
+			currentChannel?.channel_id,
+			currentChannel?.clan_id,
+			currentChannel?.parent_id,
+			dispatch,
+			isThread
+		]
 	);
 
 	useEffect(() => {

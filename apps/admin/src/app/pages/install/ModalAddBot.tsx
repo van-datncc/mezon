@@ -1,6 +1,7 @@
-import { addBotChat, selectAllAccount, selectAllClans, useAppDispatch } from '@mezon/store';
-import { memo, useCallback, useState } from 'react';
+import { addBotChat, getApplicationDetail, selectAllAccount, selectAllClans, selectAppDetail, useAppDispatch } from '@mezon/store';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import FooterModal from './components/FooterModal';
 import HeaderModal from './components/HeaderModal';
@@ -13,21 +14,28 @@ enum RequestStatusSuccess {
 }
 
 type ModalAddBotProps = {
-	nameBot?: string;
 	applicationId: string;
 	handleOpenModal: () => void;
 };
 
-const ModalAddBot = memo(({ nameBot = '', applicationId, handleOpenModal }: ModalAddBotProps) => {
+const ModalAddBot = memo(({ applicationId, handleOpenModal }: ModalAddBotProps) => {
 	const clans = useSelector(selectAllClans);
 	const dispatch = useAppDispatch();
 	const account = useSelector(selectAllAccount);
+	const appDetail = useSelector(selectAppDetail);
 
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const toggleSuccess = () => setOpenSuccess((s) => !s);
 
 	const [clanValue, setClanValue] = useState('');
 	const [clanError, setClanError] = useState<string>();
+
+	useEffect(() => {
+		if (applicationId) {
+			dispatch(getApplicationDetail({ appId: applicationId }));
+		}
+	}, [applicationId, dispatch]);
+
 	const clanConfig: SelectFieldConfig<any> = {
 		label: 'Add to clan',
 		value: clanValue,
@@ -53,27 +61,46 @@ const ModalAddBot = memo(({ nameBot = '', applicationId, handleOpenModal }: Moda
 		const cleanAppId = applicationId.replace(/\s+/g, ' ').trim();
 		const cleanClanId = clanValue.replace(/\s+/g, ' ').trim();
 
-		const resp = await dispatch(
-			addBotChat({
-				appId: cleanAppId,
-				clanId: cleanClanId
-			})
-		);
+		try {
+			const resp = await dispatch(
+				addBotChat({
+					appId: cleanAppId,
+					clanId: cleanClanId
+				})
+			);
 
-		if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
-			toggleSuccess();
+			if (resp.meta.requestStatus === RequestStatusSuccess.Fulfill) {
+				toggleSuccess();
+			} else {
+				toast.error('You are not the owner of this clan. Please choose your own clan.');
+			}
+		} catch (error: any) {
+			console.error('Add bot failed:', error);
+			toast.error('Add bot failed. Refresh the page and try again.');
 		}
 	}, [applicationId, clanValue, dispatch]);
 
 	if (openSuccess) {
-		return <ModalSuccess name={nameBot} clan={{ clanId: clanValue, clanName: '', isEmpty: false }} />;
+		return <ModalSuccess name={appDetail?.appname || ''} clan={{ clanId: clanValue, clanName: '', isEmpty: false }} />;
 	}
 
 	return (
 		<div className="rounded overflow-hidden dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full flex flex-col text-center">
-			<HeaderModal name={nameBot} username={account?.user?.username} />
+			{appDetail && (
+				<div className="flex flex-col items-center mt-4 mb-2">
+					{appDetail.applogo ? (
+						<img src={appDetail.applogo} alt={appDetail.appname} className="w-16 h-16 rounded-full object-cover mb-2" />
+					) : (
+						<span className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold mb-2">
+							{appDetail.appname?.[0]}
+						</span>
+					)}
+					<p className="text-xl font-semibold">{appDetail.appname}</p>
+				</div>
+			)}
+			<HeaderModal name={appDetail?.appname || ''} username={account?.user?.username} />
 			<SelectField {...clanConfig} />
-			<FooterModal name={nameBot} />
+			<FooterModal name={appDetail?.appname || ''} />
 			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
 		</div>
 	);

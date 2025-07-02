@@ -84,7 +84,7 @@ const ModalAddRules = ({ onClose, ruleEdit, tempId }: { onClose: () => void; rul
 			bottomLeftBtnFunction={handleRemoveRule}
 		>
 			<div className="flex flex-col pb-6">
-				<div className="text-base font-semibold absolute top-3 left-5 text-white">Edit Resources</div>
+				<div className="text-base font-semibold absolute top-3 left-5 text-gray-800 dark:text-white">Edit Resources</div>
 				<ControlInput
 					placeholder="#rules might be Rules"
 					title="Give this resource a name"
@@ -93,7 +93,7 @@ const ModalAddRules = ({ onClose, ruleEdit, tempId }: { onClose: () => void; rul
 					required
 				/>
 
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-6 bg-gray-300 dark:bg-channelTextLabel"></div>
 
 				<ControlInput
 					placeholder="Ex.Rule for the clan"
@@ -102,13 +102,13 @@ const ModalAddRules = ({ onClose, ruleEdit, tempId }: { onClose: () => void; rul
 					value={ruleDescription}
 					required
 				/>
-				<div className="w-full h-[1px] my-6 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-6 bg-gray-300 dark:bg-channelTextLabel"></div>
 
 				<div className="flex flex-col gap-2">
-					<h1 className="text-base font-semibold text-white">Rules Image</h1>
+					<h1 className="text-base font-semibold text-gray-800 dark:text-white">Rules Image</h1>
 
-					<div className="flex justify-between py-2 px-4 bg-bgTertiary rounded items-center">
-						<button className="hover:bg-hoverPrimary bg-primary rounded-[4px] py-[6px] px-2 text-nowrap relative select-none h-9 text-white overflow-hidden">
+					<div className="flex justify-between py-2 px-4 bg-gray-100 dark:bg-bgTertiary rounded items-center">
+						<button className="bg-indigo-500 hover:bg-indigo-600 dark:bg-primary dark:hover:bg-hoverPrimary rounded-[4px] py-[6px] px-2 text-nowrap relative select-none h-9 text-white overflow-hidden transition-colors">
 							Browse
 							<input
 								className="absolute w-full h-full cursor-pointer top-0 right-0 z-10 opacity-0 file:cursor-pointer"
@@ -119,7 +119,7 @@ const ModalAddRules = ({ onClose, ruleEdit, tempId }: { onClose: () => void; rul
 								onChange={handleAddImage}
 							/>
 						</button>
-						<div className="h-12 aspect-square rounded-md flex overflow-hidden bg-bgSecondaryHover ">
+						<div className="h-12 aspect-square rounded-md flex overflow-hidden bg-white dark:bg-bgSecondaryHover border border-gray-200 dark:border-transparent">
 							{ruleImage && <img id="blah" src={ruleImage} alt="your image" className="h-full w-full object-cover" />}
 						</div>
 					</div>

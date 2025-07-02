@@ -49,7 +49,6 @@ function MezonPage() {
 		backgroundRepeat: 'no-repeat',
 		backgroundPosition: 'center top'
 	};
-
 	const scrollToSection = (id: string, event: React.MouseEvent) => {
 		event.preventDefault();
 
@@ -65,6 +64,18 @@ function MezonPage() {
 			behavior: 'smooth',
 			top: sectionTop
 		});
+	};
+
+	const trackDownloadEvent = (platform: string, downloadType: string) => {
+		if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
+			(window as any).gtag('event', 'download_click', {
+				event_category: 'Downloads',
+				event_label: platform,
+				download_type: downloadType,
+				app_version: version,
+				custom_parameter_1: 'mezon_homepage'
+			});
+		}
 	};
 
 	useEffect(() => {
@@ -126,7 +137,13 @@ function MezonPage() {
 							</div>
 						</div>
 						<div className="flex justify-center items-center gap-[12px]">
-							<a className="cursor-pointer" href="https://apps.apple.com/vn/app/mezon/id6502750046" target="_blank" rel="noreferrer">
+							<a
+								className="cursor-pointer"
+								href="https://apps.apple.com/vn/app/mezon/id6502750046"
+								target="_blank"
+								rel="noreferrer"
+								onClick={() => trackDownloadEvent('iOS', 'App Store')}
+							>
 								<Icons.AppStoreBadge className="max-w-full max-md:h-[32px] max-md:w-[98px]" />
 							</a>
 							<a
@@ -134,6 +151,7 @@ function MezonPage() {
 								href="https://play.google.com/store/apps/details?id=com.mezon.mobile"
 								target="_blank"
 								rel="noreferrer"
+								onClick={() => trackDownloadEvent('Android', 'Google Play')}
 							>
 								<Icons.GooglePlayBadge className="max-w-full max-md:h-[32px] max-md:w-full" />
 							</a>
@@ -141,32 +159,55 @@ function MezonPage() {
 								<DropdownButton
 									icon={<Icons.MacAppStoreDesktop className="max-w-full max-md:h-[32px] max-md:w-full" />}
 									downloadLinks={[
-										{ url: downloadUrl, icon: <Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" /> },
-										{ url: universalUrl, icon: <Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" /> }
+										{
+											url: downloadUrl,
+											icon: <Icons.MacAppleSilicon className="max-w-full max-md:h-[32px] max-md:w-full" />,
+											trackingData: { platform: 'macOS', type: 'Apple Silicon' }
+										},
+										{
+											url: universalUrl,
+											icon: <Icons.MacAppleIntel className="max-w-full max-md:h-[32px] max-md:w-full" />,
+											trackingData: { platform: 'macOS', type: 'Intel' }
+										}
 									]}
 									dropdownRef={dropdownRef}
 									platform={Platform.MACOS}
+									onDownloadClick={trackDownloadEvent}
 								/>
 							) : platform === 'Linux' ? (
-								<a className="cursor-pointer leading-[0px]" href={downloadUrl} target="_blank" rel="noreferrer">
+								<a
+									className="cursor-pointer leading-[0px]"
+									href={downloadUrl}
+									target="_blank"
+									rel="noreferrer"
+									onClick={() => trackDownloadEvent('Linux', 'DEB Package')}
+								>
 									<Image src={`assets/linux.svg`} className="max-w-full max-md:h-[32px] max-md:w-full" />
 								</a>
 							) : (
 								<DropdownButton
 									icon={
-										<a className="cursor-pointer" href={downloadUrl} target="_blank" rel="noreferrer">
+										<a
+											className="cursor-pointer"
+											href={downloadUrl}
+											target="_blank"
+											rel="noreferrer"
+											onClick={() => trackDownloadEvent('Windows', 'EXE Installer')}
+										>
 											<Icons.MicrosoftDropdown className="max-w-full max-md:h-[32px] max-md:w-full" />
 										</a>
 									}
 									downloadLinks={[
 										{
 											url: portableUrl,
-											icon: <Icons.MicrosoftWinPortable className="max-w-full max-md:h-[32px] max-md:w-full" />
+											icon: <Icons.MicrosoftWinPortable className="max-w-full max-md:h-[32px] max-md:w-full" />,
+											trackingData: { platform: 'Windows', type: 'Portable' }
 										}
 									]}
 									dropdownRef={dropdownRef}
 									downloadUrl={downloadUrl}
 									isWindow={isWindow}
+									onDownloadClick={trackDownloadEvent}
 								/>
 							)}
 						</div>
@@ -191,6 +232,7 @@ export default MezonPage;
 interface DownloadLink {
 	url: string;
 	icon: JSX.Element;
+	trackingData?: { platform: string; type: string };
 }
 
 interface DropdownButtonProps {
@@ -200,9 +242,18 @@ interface DropdownButtonProps {
 	downloadUrl?: string;
 	platform?: Platform;
 	isWindow?: boolean;
+	onDownloadClick?: (platform: string, downloadType: string) => void;
 }
 
-export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, downloadLinks, dropdownRef, downloadUrl, isWindow }) => {
+export const DropdownButton: React.FC<DropdownButtonProps> = ({
+	platform,
+	icon,
+	downloadLinks,
+	dropdownRef,
+	downloadUrl,
+	isWindow,
+	onDownloadClick
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const toggleDropdown = () => {
@@ -216,7 +267,14 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 	};
 
 	const handleOpenCdnUrl = () => {
+		onDownloadClick?.('Windows', 'CDN Direct');
 		window.open(downloadUrl, '_blank', 'noreferrer');
+	};
+
+	const handleDownloadClick = (trackingData?: { platform: string; type: string }) => {
+		if (onDownloadClick && trackingData) {
+			onDownloadClick(trackingData.platform, trackingData.type);
+		}
 	};
 
 	useEffect(() => {
@@ -266,7 +324,14 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({ platform, icon, 
 						</div>
 					</div>
 					{downloadLinks.map((link, index) => (
-						<a key={index} className="cursor-pointer block" href={link.url} target="_blank" rel="noreferrer">
+						<a
+							key={index}
+							className="cursor-pointer block"
+							href={link.url}
+							target="_blank"
+							rel="noreferrer"
+							onClick={() => handleDownloadClick(link.trackingData)}
+						>
 							{link.icon}
 						</a>
 					))}

@@ -1,6 +1,6 @@
 import { useAuth, useMemberStatus } from '@mezon/core';
 import { selectAccountCustomStatus } from '@mezon/store';
-import { Spinner } from 'flowbite-react';
+import { Icons } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import AvatarProfile from '../ModalUserProfile/AvatarProfile';
@@ -39,11 +39,11 @@ const SettingUserClanProfileCard = (props: propProfilesform) => {
 			{props.isLoading && (
 				<div className="absolute w-[78px] h-[78px] top-[61px] left-[22px] z-20 flex items-center justify-center">
 					<div className="absolute w-full h-full bg-white rounded-full opacity-30"></div>
-					<Spinner size="lg" className="relative" />
+					<Icons.LoadingSpinner />
 				</div>
 			)}
 
-			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px]" style={{ backgroundColor: color }}></div>
+			<div className="h-[105px] rounded-tr-[10px] rounded-tl-[10px] !bg-indigo-400" style={{ backgroundColor: color }}></div>
 			<AvatarProfile
 				avatar={profiles.urlImage}
 				username={userProfile?.user?.username}

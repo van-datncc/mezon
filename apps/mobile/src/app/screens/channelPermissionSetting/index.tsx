@@ -1,6 +1,6 @@
 import { Colors, size, Text, useTheme } from '@mezon/mobile-ui';
 import { selectChannelById, useAppSelector } from '@mezon/store-mobile';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
@@ -39,59 +39,61 @@ export const ChannelPermissionSetting = ({ navigation, route }: MenuChannelScree
 		];
 	}, [t]);
 
-	navigation.setOptions({
-		headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
-		headerTitle: () => (
-			<View>
-				<Text bold h3 color={themeValue?.white}>
-					{t('channelPermission.title')}
-				</Text>
-			</View>
-		),
-		headerRight: () => {
-			if (currentTab === EPermissionSetting.BasicView) return null;
+	useEffect(() => {
+		navigation.setOptions({
+			headerStatusBarHeight: Platform.OS === 'android' ? 0 : undefined,
+			headerTitle: () => (
+				<View>
+					<Text bold h3 color={themeValue?.white}>
+						{t('channelPermission.title')}
+					</Text>
+				</View>
+			),
+			headerRight: () => {
+				if (currentTab === EPermissionSetting.BasicView) return null;
 
-			if (isAdvancedEditMode) {
+				if (isAdvancedEditMode) {
+					return (
+						<TouchableOpacity onPress={() => setIsAdvancedEditMode(false)}>
+							<View
+								style={{
+									marginRight: size.s_20
+								}}
+							>
+								<Text h4 color={themeValue.white}>
+									{t('channelPermission.done')}
+								</Text>
+							</View>
+						</TouchableOpacity>
+					);
+				}
+				//TODO: update later
+				// return (
+				// 	<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
+				// 		<Block marginRight={size.s_20}>
+				// 			<Text h4 color={themeValue.white}>
+				// 				{t('channelPermission.edit')}
+				// 			</Text>
+				// 		</Block>
+				// 	</TouchableOpacity>
+				// );
+			},
+			headerLeft: () => {
 				return (
-					<TouchableOpacity onPress={() => setIsAdvancedEditMode(false)}>
+					<TouchableOpacity onPress={() => navigation.goBack()}>
 						<View
 							style={{
-								marginRight: size.s_20
+								marginTop: size.s_8,
+								marginLeft: size.s_10
 							}}
 						>
-							<Text h4 color={themeValue.white}>
-								{t('channelPermission.done')}
-							</Text>
+							<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
 						</View>
 					</TouchableOpacity>
 				);
 			}
-			//TODO: update later
-			// return (
-			// 	<TouchableOpacity onPress={() => setIsAdvancedEditMode(true)}>
-			// 		<Block marginRight={size.s_20}>
-			// 			<Text h4 color={themeValue.white}>
-			// 				{t('channelPermission.edit')}
-			// 			</Text>
-			// 		</Block>
-			// 	</TouchableOpacity>
-			// );
-		},
-		headerLeft: () => {
-			return (
-				<TouchableOpacity onPress={() => navigation.goBack()}>
-					<View
-						style={{
-							marginTop: size.s_8,
-							marginLeft: size.s_10
-						}}
-					>
-						<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.white} height={size.s_22} width={size.s_22} />
-					</View>
-				</TouchableOpacity>
-			);
-		}
-	});
+		});
+	}, [currentTab, isAdvancedEditMode, navigation, t, themeValue.white]);
 
 	return (
 		<View style={{ flex: 1, backgroundColor: themeValue.secondary, paddingHorizontal: size.s_12 }}>

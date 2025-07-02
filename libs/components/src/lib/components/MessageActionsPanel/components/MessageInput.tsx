@@ -41,7 +41,7 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 			{textarea ? (
 				<textarea
 					onChange={handleChangeInput}
-					placeholder={placeholder + (required ? '*' : '')}
+					placeholder={(placeholder || '') + (required ? '*' : '')}
 					className={`outline-none p-4 py-2  dark:bg-bgTertiary bg-bgLightModeThird text-textSecondary800 dark:text-textSecondary rounded max-h-40 w-full hide-scrollbar`}
 					required={required}
 					defaultValue={input.defaultValue}
@@ -50,7 +50,7 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 				<input
 					onChange={handleChangeInput}
 					min={type === 'number' ? 0 : undefined}
-					placeholder={placeholder + (required ? '*' : '')}
+					placeholder={(placeholder || '') + (required ? '*' : '')}
 					type={type}
 					className={`outline-none p-4 py-2 dark:bg-bgTertiary bg-bgLightModeThird text-textSecondary800 dark:text-textSecondary rounded w-full hide-scrollbar`}
 					required={required}

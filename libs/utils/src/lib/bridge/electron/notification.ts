@@ -23,6 +23,7 @@ export interface NotificationData {
 	date: string;
 	image: string;
 	extras?: IMessageExtras;
+	sender_id?: string;
 }
 
 export enum NotificationPermissionStatus {
@@ -36,22 +37,30 @@ const DEFAULT_RECONNECT_INTERVAL = 1000; // 1s
 const DEFAULT_MAX_RECONNECT_INTERVAL = 32000; // 32s (after 5 reconnect attempts)
 const PING_TIMEOUT = 60000; // 60 seconds
 
+interface UserNotificationConnection {
+	userId: string;
+	ws: WebSocket | null;
+	wsActive: boolean;
+	reconnectAttempts: number;
+	reconnectInterval: number;
+	currentChannelId: string | undefined;
+	pingTimeout: NodeJS.Timeout | null;
+	previousAppId: number;
+	activeNotifications: Map<string, Notification>;
+	token: string;
+}
+
 export class MezonNotificationService {
-	private wsActive = false;
-	private ws: WebSocket | null = null;
-	private reconnectAttempts = 0;
 	private maxReconnectAttempts = DEFAULT_MAX_RECONNECT_ATTEMPTS;
-	private reconnectInterval = DEFAULT_RECONNECT_INTERVAL;
 	private maxReconnectInterval = DEFAULT_MAX_RECONNECT_INTERVAL;
 
-	public static instance: MezonNotificationService;
-	private currentChannelId: string | undefined;
-	private pingTimeout: NodeJS.Timeout | null = null;
-	private previousAppId = 0;
-	private currentUserId: string | null = null;
+	// Track connections per user ID
+	private userConnections: Map<string, UserNotificationConnection> = new Map();
 
-	// Track active notifications by channel ID
-	private activeNotifications: Map<string, Notification> = new Map();
+	// Current active user for primary operations
+	private currentActiveUserId: string | null = null;
+
+	public static instance: MezonNotificationService;
 
 	public static getInstance() {
 		if (!MezonNotificationService.instance) {
@@ -59,55 +68,87 @@ export class MezonNotificationService {
 		}
 		return MezonNotificationService.instance;
 	}
-	public setCurrentUserId = async (userId: string) => {
-		this.currentUserId = userId;
+
+	public setCurrentActiveUserId = (userId: string) => {
+		this.currentActiveUserId = userId;
 	};
 
-	public connect = async (token: string) => {
+	public getCurrentActiveUserId = (): string | null => {
+		return this.currentActiveUserId;
+	};
+
+	public connect = async (token: string, userId: string) => {
 		const hasPermission = await this.checkNotificationPermission();
 
 		if (!hasPermission) {
 			return;
 		}
 
-		if (!token || this.wsActive) {
+		if (!token || !userId) {
 			return;
 		}
 
-		this.close();
+		// Check if user already has an active connection
+		const existingConnection = this.userConnections.get(userId);
+		if (existingConnection && existingConnection.wsActive) {
+			console.warn(`User ${userId} already has an active notification connection`);
+			return;
+		}
+
+		// Close existing connection if it exists but not active
+		if (existingConnection) {
+			this.closeUserConnection(userId);
+		}
 
 		const wsUrl = process.env.NX_CHAT_APP_NOTIFICATION_WS_URL;
 		const ws = new WebSocket(`${wsUrl}/stream?token=${token}`);
 
+		// Create new connection object
+		const connection: UserNotificationConnection = {
+			userId,
+			ws,
+			wsActive: false,
+			reconnectAttempts: 0,
+			reconnectInterval: DEFAULT_RECONNECT_INTERVAL,
+			currentChannelId: undefined,
+			pingTimeout: null,
+			previousAppId: 0,
+			activeNotifications: new Map(),
+			token
+		};
+
 		ws.onopen = (_event) => {
-			this.wsActive = true;
-			this.restReconnectParam();
-			this.startPingMonitoring(token);
+			connection.wsActive = true;
+			this.restReconnectParam(connection);
+			this.startPingMonitoring(connection);
 		};
 
 		ws.onmessage = async (data: MessageEvent<string>) => {
 			try {
 				const objMsg = safeJSONParse(data.data);
 				if (objMsg === 'ping') {
-					this.handlePong();
-					this.startPingMonitoring(token);
+					this.handlePong(connection);
+					this.startPingMonitoring(connection);
 				} else {
 					const isFocus = !isBackgroundModeActive();
 					const msg = objMsg as NotificationData;
 					const { title, message, image } = msg ?? {};
 
 					const { link, e2eemess } = msg?.extras ?? {};
-					if (msg?.channel_id && msg?.channel_id === this.currentChannelId && isFocus) {
+
+					if (
+						(msg?.channel_id && msg?.channel_id === connection.currentChannelId && isFocus) ||
+						msg?.sender_id === this.currentActiveUserId
+					) {
 						return;
 					}
 					let msgContent = message;
 					if (e2eemess === 'true') {
-						msgContent = await MessageCrypt.mapE2EEcontent(message, this.currentUserId as string, true);
+						msgContent = await MessageCrypt.mapE2EEcontent(message, userId, true);
 					}
-
-					this.pushNotification(title, msgContent, image, link, msg);
-					if (isElectron() && msg?.appid && msg.appid !== this.previousAppId) {
-						this.previousAppId = msg.appid;
+					this.pushNotification(title, msgContent, image, link, msg, connection);
+					if (isElectron() && msg?.appid && msg.appid !== connection.previousAppId) {
+						connection.previousAppId = msg.appid;
 						electronBridge.invoke('APP::CHECK_UPDATE');
 					}
 				}
@@ -118,15 +159,44 @@ export class MezonNotificationService {
 		};
 
 		ws.onerror = (e) => {
-			this.wsActive = false;
-			this.reconnect(token);
+			connection.wsActive = false;
+			this.reconnect(connection);
 		};
 
 		ws.onclose = () => {
-			this.wsActive = false;
+			connection.wsActive = false;
 		};
 
-		this.ws = ws;
+		// Store the connection
+		this.userConnections.set(userId, connection);
+	};
+
+	public disconnect = (userId: string) => {
+		this.closeUserConnection(userId);
+		this.userConnections.delete(userId);
+	};
+
+	public disconnectAll = () => {
+		for (const [userId] of this.userConnections) {
+			this.closeUserConnection(userId);
+		}
+		this.userConnections.clear();
+		this.currentActiveUserId = null;
+	};
+
+	public getActiveConnections = (): string[] => {
+		const activeUsers: string[] = [];
+		for (const [userId, connection] of this.userConnections) {
+			if (connection.wsActive) {
+				activeUsers.push(userId);
+			}
+		}
+		return activeUsers;
+	};
+
+	public isUserConnected = (userId: string): boolean => {
+		const connection = this.userConnections.get(userId);
+		return connection?.wsActive || false;
 	};
 
 	private async checkNotificationPermission() {
@@ -149,7 +219,14 @@ export class MezonNotificationService {
 		}
 	}
 
-	public pushNotification(title: string, message: string, image: string, link: string | undefined, msg?: NotificationData) {
+	public pushNotification(
+		title: string,
+		message: string,
+		image: string,
+		link: string | undefined,
+		msg?: NotificationData,
+		connection?: UserNotificationConnection
+	) {
 		const hideContent = localStorage.getItem('hideNotificationContent') === 'true';
 		const notificationBody = hideContent ? '' : message;
 
@@ -175,8 +252,10 @@ export class MezonNotificationService {
 		}
 
 		const channelId = msg?.channel_id;
-		if (channelId && this.activeNotifications.has(channelId)) {
-			const previousNotification = this.activeNotifications.get(channelId);
+		const activeNotifications = connection?.activeNotifications || new Map();
+
+		if (channelId && activeNotifications.has(channelId)) {
+			const previousNotification = activeNotifications.get(channelId);
 			previousNotification?.close();
 		}
 
@@ -184,13 +263,14 @@ export class MezonNotificationService {
 			body: notificationBody,
 			icon: image ?? '',
 			data: {
-				link: link ?? ''
+				link: link ?? '',
+				userId: connection?.userId
 			},
 			tag: channelId
 		});
 
-		if (channelId) {
-			this.activeNotifications.set(channelId, notification);
+		if (channelId && connection) {
+			connection.activeNotifications.set(channelId, notification);
 		}
 
 		notification.onclick = (event) => {
@@ -202,15 +282,25 @@ export class MezonNotificationService {
 			const existingWindow = window.open('', '_self');
 
 			if (existingWindow) {
-				existingWindow.focus();
-				const notificationUrl = new URL(link);
-				const path = notificationUrl.pathname;
-				const fromTopic = msg?.extras?.topicId && msg?.extras?.topicId !== '0';
-				window.dispatchEvent(
-					new CustomEvent('mezon:navigate', {
-						detail: { url: path, msg: fromTopic ? msg : null }
-					})
-				);
+				try {
+					existingWindow.focus();
+					const notificationUrl = new URL(link);
+					const path = notificationUrl.pathname;
+					const fromTopic = msg?.extras?.topicId && msg?.extras?.topicId !== '0';
+
+					// Switch to the user who received the notification if needed
+					if (connection?.userId && this.currentActiveUserId !== connection.userId) {
+						this.setCurrentActiveUserId(connection.userId);
+					}
+
+					window.dispatchEvent(
+						new CustomEvent('mezon:navigate', {
+							detail: { url: path, msg: fromTopic ? msg : null, userId: connection?.userId }
+						})
+					);
+				} catch (error) {
+					console.error('Error navigating to link:', error);
+				}
 			} else {
 				window.location.href = link;
 			}
@@ -218,46 +308,76 @@ export class MezonNotificationService {
 	}
 
 	public get isActive() {
-		return this.wsActive;
+		// Return true if any connection is active
+		for (const [, connection] of this.userConnections) {
+			if (connection.wsActive) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	public close = () => {
-		this.ws?.close(1000, 'WebSocketStore#close');
+	public isActiveForUser = (userId: string): boolean => {
+		const connection = this.userConnections.get(userId);
+		return connection?.wsActive || false;
 	};
 
-	public setCurrentChannelId = (channelId: string) => {
-		this.currentChannelId = channelId;
+	private closeUserConnection = (userId: string) => {
+		const connection = this.userConnections.get(userId);
+		if (!connection) return;
+
+		connection.ws?.close(1000, 'WebSocketStore#close');
+		if (connection.pingTimeout) {
+			clearTimeout(connection.pingTimeout);
+			connection.pingTimeout = null;
+		}
+
+		// Close all active notifications for this user
+		connection.activeNotifications.forEach((notification) => notification.close());
+		connection.activeNotifications.clear();
 	};
 
-	private reconnect = (token: string) => {
-		if (this.reconnectAttempts < this.maxReconnectAttempts) {
+	public setCurrentChannelId = (channelId: string, userId?: string) => {
+		const targetUserId = userId || this.currentActiveUserId;
+		if (!targetUserId) return;
+
+		const connection = this.userConnections.get(targetUserId);
+		if (connection) {
+			connection.currentChannelId = channelId;
+		}
+	};
+
+	private reconnect = (connection: UserNotificationConnection) => {
+		if (connection.reconnectAttempts < this.maxReconnectAttempts) {
 			setTimeout(() => {
-				this.reconnectAttempts++;
-				this.connect(token);
-			}, this.reconnectInterval);
+				connection.reconnectAttempts++;
+				this.connect(connection.token, connection.userId);
+			}, connection.reconnectInterval);
 
 			// Exponentially increase the interval for the next reconnection attempt
-			if (this.reconnectInterval < this.maxReconnectInterval) {
-				this.reconnectInterval = this.reconnectInterval * 2;
+			if (connection.reconnectInterval < this.maxReconnectInterval) {
+				connection.reconnectInterval = connection.reconnectInterval * 2;
 			}
 		}
 	};
 
-	private restReconnectParam = () => {
-		this.reconnectAttempts = 0;
-		this.reconnectInterval = DEFAULT_RECONNECT_INTERVAL;
+	private restReconnectParam = (connection: UserNotificationConnection) => {
+		connection.reconnectAttempts = 0;
+		connection.reconnectInterval = DEFAULT_RECONNECT_INTERVAL;
 	};
 
-	public startPingMonitoring = (token: string) => {
-		this.pingTimeout && clearTimeout(this.pingTimeout);
-		this.pingTimeout = setTimeout(() => {
-			this.wsActive = false;
-			this.reconnect(token);
+	public startPingMonitoring = (connection: UserNotificationConnection) => {
+		if (connection.pingTimeout) {
+			clearTimeout(connection.pingTimeout);
+		}
+		connection.pingTimeout = setTimeout(() => {
+			connection.wsActive = false;
+			this.reconnect(connection);
 		}, PING_TIMEOUT);
 	};
 
-	private handlePong = () => {
-		this.ws?.send('pong');
+	private handlePong = (connection: UserNotificationConnection) => {
+		connection.ws?.send('pong');
 	};
 }
 

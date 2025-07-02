@@ -1,10 +1,13 @@
 import { captureSentryError } from '@mezon/logger';
-import { IActivity, LoadingStatus } from '@mezon/utils';
+import { FOR_24_HOURS, IActivity, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiCreateActivityRequest, ApiUserActivity } from 'mezon-js/api.gen';
-import { ensureSession, getMezonCtx } from '../helpers';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
 
 export const ACTIVITIES_API_FEATURE_KEY = 'activitiesapi';
+
+const ACTIVITIES_CACHE_TIME = FOR_24_HOURS;
 
 /*
  * Update these interfaces according to your requirements.
@@ -20,6 +23,7 @@ export const mapActivityEntity = (activitiesRes: ApiUserActivity) => {
 export interface ActivityState extends EntityState<ActivitiesEntity, string> {
 	loadingStatus: LoadingStatus;
 	error?: string | null;
+	cache?: CacheMetadata;
 }
 
 export const activityAdapter = createEntityAdapter({
@@ -42,17 +46,59 @@ export const createActivity = createAsyncThunk('activity/createActiviy', async (
 	}
 });
 
-export const listActivities = createAsyncThunk('activity/listActivities', async (_, thunkAPI) => {
+export const fetchActivitiesCached = async (getState: () => any, mezon: MezonValueContext, noCache = false) => {
+	const currentState = getState();
+	const activitiesState = currentState[ACTIVITIES_API_FEATURE_KEY];
+	const apiKey = createApiKey('listActivities');
+
+	const shouldForceCall = shouldForceApiCall(apiKey, activitiesState?.cache, noCache);
+
+	if (!shouldForceCall) {
+		return {
+			activities: Object.values(activitiesState.entities),
+			fromCache: true,
+			time: activitiesState.cache?.lastFetched || Date.now()
+		};
+	}
+
+	const response = await mezon.client.listActivity(mezon.session);
+
+	markApiFirstCalled(apiKey);
+
+	return {
+		...response,
+		fromCache: false,
+		time: Date.now()
+	};
+};
+
+type listActivitiesArgs = {
+	noCache?: boolean;
+};
+
+export const listActivities = createAsyncThunk('activity/listActivities', async ({ noCache }: listActivitiesArgs = {}, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await mezon.client.listActivity(mezon.session);
+		const response = await fetchActivitiesCached(thunkAPI.getState, mezon, Boolean(noCache));
+
+		if (!response) {
+			return thunkAPI.rejectWithValue('Invalid listActivities response');
+		}
+
+		if (response.fromCache && Date.now() - response.time > 100) {
+			return {
+				fromCache: true
+			};
+		}
+
 		if (!response.activities) {
 			return [];
 		}
-		const activities = response?.activities?.map(mapActivityEntity);
+
+		const activities = (response.activities as ApiUserActivity[]).map(mapActivityEntity);
 		thunkAPI.dispatch(acitvitiesActions.addMany(activities));
-		return response.activities;
+		return { activities, fromCache: response.fromCache };
 	} catch (error) {
 		captureSentryError(error, 'activity/listActivities');
 		return thunkAPI.rejectWithValue(error);
@@ -73,6 +119,9 @@ export const activitiesSlice = createSlice({
 		remove: activityAdapter.removeOne,
 		updateListActivity: (state: ActivityState, action: PayloadAction<ActivitiesEntity[]>) => {
 			activityAdapter.setAll(state, action.payload);
+		},
+		updateCache: (state) => {
+			state.cache = createCacheMetadata(ACTIVITIES_CACHE_TIME);
 		}
 		// ...
 	},
@@ -99,6 +148,12 @@ export const activitiesSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(listActivities.fulfilled, (state: ActivityState, action: PayloadAction<any>) => {
+				const { fromCache } = action.payload || {};
+
+				if (!fromCache) {
+					state.cache = createCacheMetadata(ACTIVITIES_CACHE_TIME);
+				}
+
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(listActivities.rejected, (state: ActivityState, action) => {
@@ -159,4 +214,6 @@ export const selectAllActivities = createSelector(getActivityState, selectAll);
 
 export const selectActivitiesEntities = createSelector(getActivityState, selectEntities);
 
-export const selectActivityByUserId = (userId: string) => createSelector(getActivityState, (state) => selectById(state, userId));
+export const selectActivityByUserId = createSelector([getActivityState, (state, userId: string) => userId], (state, userId) =>
+	selectById(state, userId)
+);

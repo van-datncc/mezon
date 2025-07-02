@@ -155,7 +155,8 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 				lastSentTimeStamp: '0',
 				idDM: findFilterDm(user?.id),
 				typeChat: TypeSearch.Dm_Type,
-				type: ChannelType.CHANNEL_TYPE_DM
+				type: ChannelType.CHANNEL_TYPE_DM,
+				searchName: (user.list_nick_names || []).join('.')
 			});
 		}
 		return list as SearchItemProps[];
@@ -263,7 +264,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 					navigate(toDmGroupPageFromMainApp(foundDirect.idDM ?? '', user?.type ?? ChannelType.CHANNEL_TYPE_DM));
 				}
 			} else {
-				const response = await createDirectMessageWithUser(user.id || '', user.displayName || user.name, user.avatarUser);
+				const response = await createDirectMessageWithUser(user.id || '', user.displayName || user.name, user.name, user.avatarUser);
 				if (response.channel_id) {
 					const directChat = toDmGroupPageFromMainApp(response.channel_id, Number(response.type));
 					navigate(directChat);

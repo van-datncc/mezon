@@ -61,20 +61,16 @@ export const ChannelsSearchTab = ({ listChannelSearch }: ChannelsSearchTabProps)
 	return (
 		<View style={styles.container}>
 			{listChannelSearch?.length > 0 ? (
-				<View
-					style={{
-						paddingBottom: size.s_100
-					}}
-				>
+				<View style={styles.listBox}>
 					<FlatList
 						data={combinedListChannel}
 						renderItem={renderItem}
 						keyExtractor={keyExtractor}
 						showsVerticalScrollIndicator={false}
-						initialNumToRender={10}
-						maxToRenderPerBatch={10}
+						initialNumToRender={1}
+						maxToRenderPerBatch={1}
+						windowSize={2}
 						updateCellsBatchingPeriod={50}
-						windowSize={10}
 						scrollEventThrottle={16}
 						removeClippedSubviews={true}
 						keyboardShouldPersistTaps={'handled'}

@@ -6,7 +6,7 @@ import { ChannelStatusEnum, checkIsThread, createImgproxyUrl, getSrcEmoji } from
 import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -89,7 +89,7 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 						</View>
 					)
 				)}
-				{emojiSrc && <Image style={styles.emojiImage} source={{ uri: emojiSrc }} />}
+				{emojiSrc && <FastImage style={styles.emojiImage} source={{ uri: emojiSrc }} />}
 				{!isChannelPrivate && isChannelText && !isThread && (
 					<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
 				)}
@@ -129,7 +129,9 @@ const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaul
 
 				{isRoleUser || name?.startsWith('here') ? renderRoleUser() : renderChannelBusy()}
 			</View>
-			<Text style={styles.subText}>{subText}</Text>
+			<Text style={styles.subText} numberOfLines={1}>
+				{subText}
+			</Text>
 		</View>
 	);
 });

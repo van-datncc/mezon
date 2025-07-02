@@ -1,14 +1,15 @@
-import { DeviceUUID } from 'device-uuid';
-import { Client, DefaultSocket, Session, Socket } from 'mezon-js';
+import { Client, Session, Socket } from 'mezon-js';
 import { WebSocketAdapterPb } from 'mezon-js-protobuf';
 import { ApiConfirmLoginRequest, ApiLoginIDResponse } from 'mezon-js/dist/api.gen';
 import React, { useCallback } from 'react';
 import { CreateMezonClientOptions, createClient as createMezonClient } from '../mezon';
 
-const MAX_WEBSOCKET_FAILS = 8;
-const MIN_WEBSOCKET_RETRY_TIME = 3000;
-const MAX_WEBSOCKET_RETRY_TIME = 300000;
-const JITTER_RANGE = 2000;
+const MAX_WEBSOCKET_FAILS = 15;
+const MIN_WEBSOCKET_RETRY_TIME = 1000;
+const MAX_WEBSOCKET_RETRY_TIME = 30000;
+const JITTER_RANGE = 1000;
+const FAST_RETRY_ATTEMPTS = 5;
+export const SESSION_STORAGE_KEY = 'mezon_session';
 
 type MezonContextProviderProps = {
 	children: React.ReactNode;
@@ -22,6 +23,79 @@ type Sessionlike = {
 	refresh_token: string;
 	created: boolean;
 	is_remember: boolean;
+	api_url: string;
+	expires_at?: number;
+	refresh_expires_at?: number;
+	created_at?: number;
+	username?: string;
+	user_id?: string;
+};
+
+const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) => {
+	try {
+		localStorage.setItem(
+			SESSION_STORAGE_KEY,
+			JSON.stringify({
+				host,
+				port,
+				ssl: useSSL
+			})
+		);
+	} catch (error) {
+		console.error('Failed to save Mezon config to local storage:', error);
+	}
+};
+
+export const clearSessionFromStorage = () => {
+	try {
+		localStorage.removeItem(SESSION_STORAGE_KEY);
+	} catch (error) {
+		console.error('Failed to clear session from local storage:', error);
+	}
+};
+
+export const getMezonConfig = (): CreateMezonClientOptions => {
+	try {
+		const storedConfig = localStorage.getItem('mezon_session');
+
+		if (storedConfig) {
+			const parsedConfig = JSON.parse(storedConfig);
+			if (parsedConfig.host) {
+				parsedConfig.port = parsedConfig.port || (process.env.NX_CHAT_APP_API_PORT as string);
+				parsedConfig.key = process.env.NX_CHAT_APP_API_KEY as string;
+				return parsedConfig;
+			}
+		}
+	} catch (error) {
+		console.error('Failed to get Mezon config from localStorage:', error);
+	}
+
+	return {
+		host: process.env.NX_CHAT_APP_API_GW_HOST as string,
+		port: process.env.NX_CHAT_APP_API_GW_PORT as string,
+		key: process.env.NX_CHAT_APP_API_KEY as string,
+		ssl: process.env.NX_CHAT_APP_API_SECURE === 'true'
+	};
+};
+
+export const extractAndSaveConfig = (session: Session | null, isFromMobile?: boolean) => {
+	if (!session || !session.api_url) return null;
+	try {
+		const url = new URL(session.api_url);
+		const host = url.hostname;
+		const port = url.port;
+		const useSSL = url.protocol === 'https:';
+
+		// mobile will use AsyncStorage to save in source mobile app
+		if (!isFromMobile) {
+			saveMezonConfigToStorage(host, port, useSSL);
+		}
+
+		return { host, port, useSSL };
+	} catch (error) {
+		console.error('Failed to extract config from session:', error);
+		return null;
+	}
 };
 
 export type MezonContextValue = {
@@ -29,18 +103,16 @@ export type MezonContextValue = {
 	sessionRef: React.MutableRefObject<Session | null>;
 	socketRef: React.MutableRefObject<Socket | null>;
 	createClient: () => Promise<Client>;
-	authenticateDevice: (username: string) => Promise<Session>;
 	authenticateMezon: (token: string, isRemember?: boolean) => Promise<Session>;
 	createQRLogin: () => Promise<ApiLoginIDResponse>;
 	checkLoginRequest: (LoginRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
 	confirmLoginRequest: (ConfirmRequest: ApiConfirmLoginRequest) => Promise<Session | null>;
-	authenticateApple: (token: string) => Promise<Session>;
 	authenticateEmail: (email: string, password: string) => Promise<Session>;
 
-	logOutMezon: (device_id?: string, platform?: string) => Promise<void>;
-	refreshSession: (session: Sessionlike) => Promise<Session>;
+	logOutMezon: (device_id?: string, platform?: string, clearSession?: boolean) => Promise<void>;
+	refreshSession: (session: Sessionlike) => Promise<Session | undefined>;
 	connectWithSession: (session: Sessionlike) => Promise<Session>;
-
+	createSocket: () => Promise<Socket>;
 	reconnectWithTimeout: (clanId: string) => Promise<unknown>;
 };
 
@@ -84,6 +156,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			throw new Error('Mezon client not initialized');
 		}
 		const session = await clientRef.current.checkLoginRequest(LoginRequest);
+		const config = extractAndSaveConfig(session, isFromMobile);
+		if (config) {
+			clientRef.current.setBasePath(config.host, config.port, config.useSSL);
+		}
+
 		const socket = await createSocket();
 		socketRef.current = socket;
 		return session;
@@ -96,7 +173,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!sessionRef.current) {
 			throw new Error('Mezon session not initialized');
 		}
-		const session = await clientRef.current.confirmLogin(sessionRef.current, confirmRequest);
+		const useSSL = process.env.NX_CHAT_APP_API_SECURE === 'true';
+		const scheme = useSSL ? 'https://' : 'http://';
+		const basePath = `${scheme}${process.env.NX_CHAT_APP_API_GW_HOST}:${process.env.NX_CHAT_APP_API_GW_PORT}`;
+		const session = await clientRef.current.confirmLogin(sessionRef.current, basePath, confirmRequest);
 		return session;
 	}, []);
 
@@ -108,28 +188,10 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session = await clientRef.current.authenticateMezon(token, undefined, undefined, isFromMobile ? true : (isRemember ?? false));
 			sessionRef.current = session;
 
-			const socket = await createSocket(); // Create socket after authentication
-			socketRef.current = socket;
-
-			if (!socketRef.current) {
-				return session;
+			const config = extractAndSaveConfig(session, isFromMobile);
+			if (config) {
+				clientRef.current.setBasePath(config.host, config.port, config.useSSL);
 			}
-
-			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
-			sessionRef.current = session2;
-
-			return session;
-		},
-		[createSocket, isFromMobile]
-	);
-
-	const authenticateApple = useCallback(
-		async (token: string) => {
-			if (!clientRef.current) {
-				throw new Error('Mezon client not initialized');
-			}
-			const session = await clientRef.current.authenticateApple(token);
-			sessionRef.current = session;
 
 			const socket = await createSocket(); // Create socket after authentication
 			socketRef.current = socket;
@@ -154,6 +216,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const session = await clientRef.current.authenticateEmail(email, password);
 			sessionRef.current = session;
 
+			const config = extractAndSaveConfig(session);
+			if (config) {
+				clientRef.current.setBasePath(config.host, config.port, config.useSSL);
+			}
+
 			const socket = await createSocket();
 			socketRef.current = socket;
 
@@ -170,7 +237,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	);
 
 	const logOutMezon = useCallback(
-		async (device_id?: string, platform?: string) => {
+		async (device_id?: string, platform?: string, clearSession?: boolean) => {
 			if (socketRef.current) {
 				socketRef.current.ondisconnect = () => {
 					//console.log('loged out');
@@ -187,27 +254,19 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					device_id || '',
 					platform || ''
 				);
-			}
 
-			sessionRef.current = null;
+				sessionRef.current = null;
+				if (clearSession) {
+					clearSessionFromStorage();
+					clientRef.current.setBasePath(
+						process.env.NX_CHAT_APP_API_GW_HOST as string,
+						process.env.NX_CHAT_APP_API_GW_PORT as string,
+						process.env.NX_CHAT_APP_API_SECURE === 'true'
+					);
+				}
+			}
 		},
 		[socketRef]
-	);
-
-	const authenticateDevice = useCallback(
-		async (username: string) => {
-			if (!clientRef.current) {
-				throw new Error('Mezon client not initialized');
-			}
-
-			const deviceId = new DeviceUUID().get();
-
-			const session = await clientRef.current.authenticateDevice(deviceId, true, username);
-			sessionRef.current = session;
-
-			return session;
-		},
-		[clientRef]
 	);
 
 	const refreshSession = useCallback(
@@ -215,10 +274,32 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			if (!clientRef.current) {
 				throw new Error('Mezon client not initialized');
 			}
+
+			const sessionObj = new Session(session.token, session.refresh_token, session.created, session.api_url, session.is_remember);
+
+			if (session.expires_at) {
+				sessionObj.expires_at = session.expires_at;
+			}
+
+			// if (sessionObj.isexpired(Date.now() / 1000)) {
+			// 	await logOutMezon();
+			// 	return;
+			// }
+
+			if (
+				!clientRef.current.host ||
+				(clientRef.current.host === process.env.NX_CHAT_APP_API_GW_HOST && clientRef.current.port === process.env.NX_CHAT_APP_API_GW_PORT)
+			) {
+				await logOutMezon();
+				return;
+			}
+
 			const newSession = await clientRef.current.sessionRefresh(
-				new Session(session.token, session.refresh_token, session.created, session.is_remember)
+				new Session(session.token, session.refresh_token, session.created, session.api_url, session.is_remember)
 			);
+
 			sessionRef.current = newSession;
+			extractAndSaveConfig(newSession, isFromMobile);
 
 			if (!socketRef.current) {
 				return newSession;
@@ -228,7 +309,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			sessionRef.current = session2;
 			return newSession;
 		},
-		[clientRef, socketRef, isFromMobile]
+		[clientRef, socketRef, isFromMobile, logOutMezon]
 	);
 
 	const connectWithSession = useCallback(
@@ -237,6 +318,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				throw new Error('Mezon client not initialized');
 			}
 			sessionRef.current = session;
+			extractAndSaveConfig(session, isFromMobile);
 			if (!socketRef.current) {
 				return session;
 			}
@@ -247,114 +329,80 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[clientRef, socketRef, isFromMobile]
 	);
 
-	const abortControllerRef = React.useRef<AbortController | null>(null);
-	const timeoutIdRef = React.useRef<NodeJS.Timeout | null>(null);
-
-	const reconnect = React.useCallback(
-		async (clanId: string) => {
-			if (!clientRef.current) {
-				return Promise.resolve(null);
-			}
-
-			const session = sessionRef.current;
-
-			if (!session) {
-				return Promise.resolve(null);
-			}
-
-			if (!socketRef.current) {
-				return Promise.resolve(null);
-			}
-
-			if (abortControllerRef.current) {
-				abortControllerRef.current.abort();
-			}
-
-			abortControllerRef.current = new AbortController();
-			const signal = abortControllerRef.current.signal;
-
-			// eslint-disable-next-line no-async-promise-executor
-			return new Promise(async (resolve, reject) => {
-				let failCount = 0;
-
-				signal.addEventListener('abort', () => {
-					if (timeoutIdRef.current) {
-						clearTimeout(timeoutIdRef.current);
-						return resolve('RECONNECTING');
-					}
-				});
-
-				const retry = async () => {
-					if (failCount >= MAX_WEBSOCKET_FAILS) {
-						return reject('Cannot reconnect to the socket. Please restart the app.');
-					}
-
-					try {
-						if (socketRef.current && socketRef.current.isOpen()) {
-							return resolve(socketRef.current);
-						}
-
-						const socket = await createSocket();
-						const newSession = await clientRef?.current?.sessionRefresh(
-							new Session(session.token, session.refresh_token, session.created, session.is_remember ?? false)
-						);
-
-						const connectedSession = await socket.connect(
-							newSession || session,
-							true,
-							isFromMobile ? '1' : '0',
-							DefaultSocket.DefaultConnectTimeoutMs,
-							signal
-						);
-
-						await socket.joinClanChat(clanId);
-						socketRef.current = socket;
-						sessionRef.current = connectedSession;
-						return resolve(socket);
-					} catch (error) {
-						failCount++;
-						const retryTime = isFromMobile
-							? 0
-							: Math.min(MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount), MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
-						await new Promise((res) => {
-							timeoutIdRef.current = setTimeout(res, retryTime);
-						});
-
-						if (socketRef.current && socketRef.current.isOpen()) {
-							return resolve(socketRef.current);
-						}
-						await retry();
-					}
-				};
-
-				if (socketRef.current && socketRef.current.isOpen()) {
-					return resolve(socketRef.current);
-				}
-				await retry();
-			});
-		},
-		[createSocket, isFromMobile]
-	);
-
-	const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+	const reconnectingRef = React.useRef<boolean>(false);
 
 	const reconnectWithTimeout = React.useCallback(
-		(clanId: string) => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
+		async (clanId: string) => {
+			if (reconnectingRef.current) {
+				return 'RECONNECTING';
 			}
 
 			if (socketRef.current && socketRef.current.isOpen()) {
-				return Promise.resolve(socketRef.current);
+				return socketRef.current;
 			}
 
-			return new Promise((resolve, reject) => {
-				timeoutRef.current = setTimeout(() => {
-					reconnect(clanId).then(resolve).catch(reject);
-				}, 500);
-			});
+			if (!clientRef.current || !sessionRef.current) {
+				return null;
+			}
+
+			reconnectingRef.current = true;
+
+			try {
+				let failCount = 0;
+
+				while (failCount < MAX_WEBSOCKET_FAILS) {
+					try {
+						if (socketRef.current && socketRef.current.isOpen()) {
+							return socketRef.current;
+						}
+
+						const socket = await createSocket();
+						const newSession = await clientRef.current.sessionRefresh(
+							new Session(
+								sessionRef.current.token,
+								sessionRef.current.refresh_token,
+								sessionRef.current.created,
+								sessionRef.current.api_url,
+								sessionRef.current.is_remember ?? false
+							)
+						);
+
+						const connectedSession = await socket.connect(newSession || sessionRef.current, true, isFromMobile ? '1' : '0');
+						await socket.joinClanChat(clanId);
+
+						socketRef.current = socket;
+						sessionRef.current = connectedSession;
+						extractAndSaveConfig(connectedSession, isFromMobile);
+
+						return socket;
+					} catch (error) {
+						failCount++;
+
+						if (failCount >= MAX_WEBSOCKET_FAILS) {
+							throw new Error('Cannot reconnect to the socket. Please restart the app.');
+						}
+
+						let retryTime: number;
+
+						if (isFromMobile) {
+							retryTime = 1000;
+						} else if (failCount <= FAST_RETRY_ATTEMPTS) {
+							retryTime = MIN_WEBSOCKET_RETRY_TIME + Math.random() * JITTER_RANGE;
+						} else {
+							const exponentialTime = MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount - FAST_RETRY_ATTEMPTS);
+							retryTime = Math.min(exponentialTime, MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
+						}
+
+						await new Promise((resolve) => setTimeout(resolve, retryTime));
+					}
+				}
+
+				throw new Error('Max reconnection attempts reached');
+			} finally {
+				reconnectingRef.current = false;
+			}
 		},
-		[reconnect, socketRef]
+		[createSocket, isFromMobile]
 	);
 
 	const value = React.useMemo<MezonContextValue>(
@@ -366,8 +414,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createQRLogin,
 			checkLoginRequest,
 			confirmLoginRequest,
-			authenticateDevice,
-			authenticateApple,
 			refreshSession,
 			createSocket,
 			logOutMezon,
@@ -384,8 +430,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			createQRLogin,
 			checkLoginRequest,
 			confirmLoginRequest,
-			authenticateDevice,
-			authenticateApple,
 			refreshSession,
 			createSocket,
 			logOutMezon,

@@ -12,7 +12,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons, customTheme } from '@mezon/ui';
-import { Button, Pagination } from 'flowbite-react';
+import { Pagination } from 'flowbite-react';
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import EmptyCanvas from './EmptyCanvas';
@@ -32,7 +32,7 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [keywordSearch, setKeywordSearch] = useState('');
 	const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, currentChannel?.channel_id ?? ''));
-	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? ''));
+	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, currentChannel?.channel_id ?? '', currentChannel?.parent_id));
 	const filteredCanvases = useMemo(() => {
 		if (!keywordSearch) return canvases;
 		const lowerCaseQuery = keywordSearch.toLowerCase().trim();
@@ -93,13 +93,12 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 					</div>
 					<SearchCanvas setKeywordSearch={setKeywordSearch} />
 					<div className="flex flex-row items-center gap-4">
-						<Button
+						<button
 							onClick={handleCreateCanvas}
-							size="sm"
-							className="h-6 rounded focus:ring-transparent bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover items-center"
+							className="px-3 h-6 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover"
 						>
 							Create
-						</Button>
+						</button>
 						<button onClick={onClose}>
 							<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
 						</button>

@@ -1,12 +1,14 @@
-import { useAuth, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAuth, useDirect, useMenu, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
+	authActions,
 	channelMembersActions,
 	giveCoffeeActions,
 	selectAccountCustomStatus,
 	selectCurrentClanId,
+	selectGroupCallJoined,
 	selectInfoSendToken,
 	selectIsElectronDownloading,
 	selectIsElectronUpdateAvailable,
@@ -16,7 +18,6 @@ import {
 	selectShowModalSendToken,
 	selectStatusMenu,
 	selectTheme,
-	selectUpdateToken,
 	selectVoiceJoined,
 	useAppDispatch,
 	userClanProfileActions
@@ -29,7 +30,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import { UserStatusIcon } from '../MemberProfile';
+import { UserStatusIconDM } from '../MemberProfile';
 import ModalCustomStatus from '../ModalUserProfile/StatusProfile/ModalCustomStatus';
 import ModalSendToken from '../ModalUserProfile/StatusProfile/ModalSendToken';
 import StreamInfo from '../StreamInfo';
@@ -54,8 +55,10 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const infoSendToken = useSelector(selectInfoSendToken);
 	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
+	const statusMenu = useSelector(selectStatusMenu);
 	const myProfile = useAuth();
-	const getTokenSocket = useSelector(selectUpdateToken(myProfile?.userId as string));
+
+	const { setStatusMenu } = useMenu();
 
 	const userCustomStatus: { status: string; user_status: EUserStatus } = useMemo(() => {
 		const metadata = myProfile.userProfile?.user?.metadata;
@@ -95,7 +98,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const { sendInviteMessage } = useSendInviteMessage();
 
 	const tokenInWallet = useMemo(() => {
-		return myProfile?.userProfile?.wallet ? safeJSONParse(myProfile?.userProfile?.wallet)?.value : 0;
+		return myProfile?.userProfile?.wallet ? myProfile?.userProfile?.wallet : 0;
 	}, [myProfile?.userProfile?.wallet]);
 
 	const handleCloseModalCustomStatus = () => {
@@ -103,8 +106,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setCustomStatus(userCustomStatus.status ?? '');
 	};
 
-	const { setIsShowSettingFooterStatus } = useSettingFooter();
+	const { setIsShowSettingFooterStatus, setIsUserProfile } = useSettingFooter();
 	const openSetting = () => {
+		setIsUserProfile(true);
 		setIsShowSettingFooterStatus(true);
 	};
 
@@ -133,8 +137,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	};
 
 	const sendNotificationMessage = useCallback(
-		async (userId: string, tokenValue: number, note: string, username?: string, avatar?: string) => {
-			const response = await createDirectMessageWithUser(userId, username, avatar);
+		async (userId: string, tokenValue: number, note: string, username?: string, avatar?: string, display_name?: string) => {
+			const response = await createDirectMessageWithUser(userId, display_name, username, avatar);
 			if (response.channel_id) {
 				const channelMode = ChannelStreamMode.STREAM_MODE_DM;
 				sendInviteMessage(
@@ -148,7 +152,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		[createDirectMessageWithUser, sendInviteMessage]
 	);
 
-	const handleSaveSendToken = async (id: string, username?: string, avatar?: string) => {
+	const handleSaveSendToken = async (id?: string, username?: string, avatar?: string, display_name?: string) => {
 		const userId = selectedUserId !== '' ? selectedUserId : id;
 		if (userId === '') {
 			setUserSearchError('Please select a user');
@@ -159,7 +163,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			return;
 		}
 
-		if (token > Number(tokenInWallet) + Number(getTokenSocket)) {
+		if (token > Number(tokenInWallet)) {
 			setError('Your amount exceeds wallet balance');
 			return;
 		}
@@ -176,7 +180,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		try {
 			await dispatch(giveCoffeeActions.sendToken(tokenEvent)).unwrap();
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_SUCCESS_STATUS }));
-			await sendNotificationMessage(userId, token, note ?? '', username, avatar);
+			if (id) {
+				await sendNotificationMessage(id, token, note ?? '', username, avatar, display_name);
+			}
 		} catch (err) {
 			dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: tokenEvent, status: TOKEN_FAILED_STATUS }));
 		}
@@ -206,6 +212,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	useEffect(() => {
 		loadParamsSendTokenFromURL();
+		dispatch(authActions.checkFormatSession());
 	}, []);
 
 	useEffect(() => {
@@ -233,7 +240,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const isInCall = useSelector(selectIsInCall);
 	const isJoin = useSelector(selectIsJoin);
 	const isVoiceJoined = useSelector(selectVoiceJoined);
-	const statusMenu = useSelector(selectStatusMenu);
+	const GroupCallJoined = useSelector(selectGroupCallJoined);
 
 	const [openProfileModal, closeProfileModal] = useModal(() => {
 		return (
@@ -251,43 +258,58 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		);
 	}, [userStatusProfile, rootRef.current, avatar, name]);
 
+	const handleCloseMenu = useCallback(() => {
+		setStatusMenu(false);
+	}, [setStatusMenu]);
+
 	return (
 		<div
-			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
+			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu
+				? 'max-sbm:fixed max-sbm:left-[72px] max-sbm:w-[calc(100vw-72px)] max-sbm:z-20 sbm:!w-widthChannelList'
+				: 'hidden'
+				} sbm:block`}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
 			{isJoin && <StreamInfo type={ESummaryInfo.STREAM} />}
-			{isVoiceJoined && <VoiceInfo />}
+			{(isVoiceJoined || GroupCallJoined) && <VoiceInfo />}
 			{(isElectronUpdateAvailable || IsElectronDownloading) && <UpdateButton isDownloading={!isElectronUpdateAvailable} />}
 			<div
-				className={`flex items-center gap-2 pr-4 pl-2 py-2 font-title text-[15px]
+				className={`z-10 flex items-center gap-2 pr-4 pl-2 py-2 font-title text-[15px]
 			 font-[500] text-white hover:bg-gray-550/[0.16]
 			 shadow-sm transition dark:bg-bgSecondary600 bg-channelTextareaLight
 			 w-full group focus-visible:outline-none footer-profile ${appearanceTheme === 'light' && 'lightMode'}`}
 			>
 				<div
-					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'}`}
+					className={`footer-profile h-10 flex-1 flex pl-2 items-center dark:hover:bg-bgHoverMember hover:bg-bgLightSecondary rounded-md ${appearanceTheme === 'light' && 'lightMode'} max-sbm:w-[60%]`}
 				>
-					<div className="cursor-pointer flex items-center gap-3 relative " onClick={openProfileModal}>
+					<div className="cursor-pointer flex items-center gap-3 relative flex-1 overflow-hidden" onClick={openProfileModal}>
 						<AvatarImage
 							alt={''}
 							username={name}
-							className="min-w-8 min-h-8 max-w-8 max-h-8"
+							className="min-w-8 min-h-8 max-w-8 max-h-8 flex-shrink-0"
 							classNameText="font-semibold"
 							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}
 						/>
 						<div className="absolute bottom-1 left-6">
-							<UserStatusIcon status={userCustomStatus?.user_status} />
+							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
-						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode  ">
-							<p className="text-base font-medium max-w-40 truncate dark:text-contentSecondary text-black">{name}</p>
-							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-40">{customStatus}</p>
+						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode overflow-hidden">
+							<p className="text-base font-medium truncate dark:text-contentSecondary text-black max-w-[150px] max-sbm:max-w-[100px]">{name}</p>
+							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">{customStatus}</p>
 						</div>
 					</div>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 flex-shrink-0">
+					{statusMenu && (
+						<div
+							onClick={handleCloseMenu}
+							className="cursor-pointer p-1 group/close opacity-80 dark:text-textIconFooterProfile text-black dark:hover:bg-bgDarkFooterProfile hover:bg-bgLightModeButton hover:rounded-md flex sbm:hidden"
+						>
+							<Icons.ArrowLeftCircle className="w-5 h-5" />
+						</div>
+					)}
 					<Icons.MicIcon className="ml-auto w-[18px] h-[18px] opacity-80 text-[#f00] dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 dark:text-[#AEAEAE] text-black  dark:hover:bg-[#5e5e5e] hover:bg-bgLightModeButton hidden" />
 					<div

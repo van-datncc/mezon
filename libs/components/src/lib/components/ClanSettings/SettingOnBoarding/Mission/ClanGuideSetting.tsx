@@ -3,35 +3,61 @@ import {
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectFormOnboarding,
-	selectMemberClanByUserId,
+	selectMemberClanByUserId2,
 	selectOnboardingByClan,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { titleMission } from '@mezon/utils';
 import { ApiOnboardingItem } from 'mezon-js/api.gen';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from '../GuideItemLayout';
 import ModalAddMission from './ModalAddMission';
 import ModalAddRules from './ModalAddRule';
 
-function ClanGuideSetting() {
+// Declare an interface for props
+interface ClanGuideSettingProps {
+	setOpenModalSaveChanges?: (isOpen: boolean) => void;
+}
+
+function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {}) {
 	const [openModalAddTask, closeModalAddTask] = useModal(() => {
-		return <ModalAddMission onClose={closeModalAddTask} />;
+		return (
+			<ModalAddMission
+				onClose={() => {
+					closeModalAddTask();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+			/>
+		);
 	});
 
 	const [openModalAddRules, closeModalAddRule] = useModal(() => {
-		return <ModalAddRules onClose={closeModalAddRule} />;
+		return (
+			<ModalAddRules
+				onClose={() => {
+					closeModalAddRule();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+			/>
+		);
 	});
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const onboardingByClan = useAppSelector((state) => selectOnboardingByClan(state, currentClanId as string));
 	const onboardingTemp = useSelector(selectFormOnboarding);
 
+	// Listen for changes in onboardingTemp to trigger the save modal
+	useEffect(() => {
+		if (setOpenModalSaveChanges && (onboardingTemp.task.length > 0 || onboardingTemp.rules.length > 0)) {
+			setOpenModalSaveChanges(true);
+		}
+	}, [onboardingTemp.task.length, onboardingTemp.rules.length, setOpenModalSaveChanges]);
+
 	return (
-		<div className="h-full flex gap-8 text-channelTextLabel w-[660px] text-sm font-medium">
+		<div className="h-full flex gap-8 text-gray-700 dark:text-channelTextLabel w-[660px] text-sm font-medium">
 			<div className="flex flex-col">
 				<SectionDescription
 					title="Welcome Sign"
@@ -39,7 +65,7 @@ function ClanGuideSetting() {
 				/>
 
 				<OwnerGreeting />
-				<div className="w-full h-[1px] my-8 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-8 bg-gray-300 dark:bg-channelTextLabel"></div>
 				<SectionDescription
 					title="New Member To Do's"
 					description={
@@ -50,11 +76,11 @@ function ClanGuideSetting() {
 				/>
 
 				<div className="flex flex-col gap-2 pb-8">
-					<div className="uppercase font-bold">Don't do this : too general</div>
+					<div className="uppercase font-bold text-gray-700 dark:text-channelTextLabel">Don't do this : too general</div>
 					<GuideItemLayout
 						hightLightIcon={true}
 						icon={<Icons.IconRemove fill="red" />}
-						className="px-3 py-[10px] bg-transparent hover:bg-transparent border-2 border-channelTextarea "
+						className="px-3 py-[10px] bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-transparent border-2 border-gray-300 dark:border-channelTextarea rounded-md"
 						title="chat with the community"
 						description="in #general"
 					/>
@@ -62,30 +88,32 @@ function ClanGuideSetting() {
 
 				<div className="flex flex-col gap-3">
 					{onboardingByClan.mission.map((mission) => (
-						<MissionItem mission={mission} key={mission.title} />
+						<MissionItem mission={mission} key={mission.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					{onboardingTemp.task.map((mission, index) => (
-						<MissionItem mission={mission} key={mission.title} temp={index} />
+						<MissionItem mission={mission} key={mission.title} temp={index} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					<GuideItemLayout
 						hightLightIcon={true}
 						gap={16}
-						icon={<Icons.RuleIcon />}
+						icon={<Icons.RuleIcon defaultFill="#ffffff" />}
 						className="px-3"
-						description={<div className="h-full flex items-center text-base text-white font-bold">Read the Rules </div>}
+						description={
+							<div className="h-full flex items-center text-base text-gray-800 dark:text-white font-bold">Read the Rules </div>
+						}
 					/>
 
 					<button
 						onClick={openModalAddTask}
-						className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-channelTextLabel rounded-md"
+						className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-gray-400 dark:border-channelTextLabel rounded-md hover:bg-gray-100 dark:hover:bg-bgSecondaryHover transition-colors"
 					>
 						<Icons.AddIcon className="w-4 h-4" /> Add a task
 					</button>
 				</div>
 
-				<div className="w-full h-[1px] my-8 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-8 bg-gray-300 dark:bg-channelTextLabel"></div>
 				<SectionDescription
 					title="Resource Pages"
 					description={
@@ -105,21 +133,21 @@ function ClanGuideSetting() {
 
 				<div className="flex flex-col gap-3">
 					{onboardingByClan.rule.map((rule) => (
-						<RuleItem rule={rule} key={rule.title} />
+						<RuleItem rule={rule} key={rule.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					{onboardingTemp.rules.map((rule, index) => (
-						<RuleItem rule={rule} temp={index} key={rule.title} />
+						<RuleItem rule={rule} temp={index} key={rule.title} setOpenModalSaveChanges={setOpenModalSaveChanges} />
 					))}
 
 					<button
-						className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-channelTextLabel rounded-md"
+						className="flex items-center justify-center p-4 text-primary text-base gap-1 border-dashed border-2 border-gray-400 dark:border-channelTextLabel rounded-md hover:bg-gray-100 dark:hover:bg-bgSecondaryHover transition-colors"
 						onClick={openModalAddRules}
 					>
 						<Icons.AddIcon className="w-4 h-4" /> Add a resource
 					</button>
 				</div>
-				<div className="w-full h-[1px] my-8 bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-8 bg-gray-300 dark:bg-channelTextLabel"></div>
 				<SectionDescription
 					title="Clan Guide Banner"
 					description="The recommended minimum size is 1920x480 and recommended aspect ratio is 4:1."
@@ -132,17 +160,17 @@ function ClanGuideSetting() {
 const SectionDescription = ({ title, description }: { title: string; description: ReactNode }) => {
 	return (
 		<>
-			<h2 className="text-channelActiveColor text-xl font-bold">{title}</h2>
-			<div className="pt-2 pb-8">{description}</div>
+			<h2 className="text-indigo-600 dark:text-channelActiveColor text-xl font-bold">{title}</h2>
+			<div className="pt-2 pb-8 text-gray-700 dark:text-channelTextLabel">{description}</div>
 		</>
 	);
 };
 const OwnerGreeting = () => {
 	const currenClan = useSelector(selectCurrentClan);
-	const clanOwner = useSelector(selectMemberClanByUserId(currenClan?.creator_id as string));
+	const clanOwner = useAppSelector((state) => selectMemberClanByUserId2(state, currenClan?.creator_id as string));
 	return (
-		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-[#d5ddec] to-[#bbbfc9]">
-			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-[#3d3f3d] to-[#1a1d1e] rounded-md">
+		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-indigo-300 to-purple-300 dark:from-[#9e9e9e] dark:to-[#494949]">
+			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-[#3d3f3d] dark:via-[#2d2f2e] dark:to-[#1a1d1e] rounded-md">
 				<div className="flex  gap-3">
 					<div className="w-12 relative">
 						<img
@@ -150,11 +178,11 @@ const OwnerGreeting = () => {
 							className="w-12 aspect-square rounded-full absolute bottom-0 left-0"
 						/>
 					</div>
-					<div className="flex font-semibold text-white items-center gap-1">
+					<div className="flex font-semibold text-indigo-600 dark:text-white items-center gap-1">
 						{clanOwner?.clan_nick ?? clanOwner.user?.display_name ?? clanOwner.user?.username} <Icons.OwnerIcon />
 					</div>
 				</div>
-				<div className="text-base text-white">
+				<div className="text-base text-indigo-700 dark:text-white">
 					Hi, this my onwner clan's greeting. You will see this message in the first time you join clan!
 				</div>
 			</div>
@@ -162,18 +190,33 @@ const OwnerGreeting = () => {
 	);
 };
 
-const MissionItem = ({ mission, temp }: { mission: ApiOnboardingItem; temp?: number }) => {
+interface MissionItemProps {
+	mission: ApiOnboardingItem;
+	temp?: number;
+	setOpenModalSaveChanges?: (isOpen: boolean) => void;
+}
+
+const MissionItem = ({ mission, temp, setOpenModalSaveChanges }: MissionItemProps) => {
 	const channelById = useSelector((state) => selectChannelById(state, mission.channel_id as string));
 
 	const [openEditModal, closeEditModal] = useModal(() => {
-		return <ModalAddMission onClose={closeEditModal} missionEdit={mission} tempId={temp} />;
+		return (
+			<ModalAddMission
+				onClose={() => {
+					closeEditModal();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+				missionEdit={mission}
+				tempId={temp}
+			/>
+		);
 	});
 
 	return (
 		<GuideItemLayout
 			key={mission.title}
 			hightLightIcon={true}
-			icon={<Icons.Hashtag />}
+			icon={<Icons.HashIcon className="w-4 text-white" />}
 			gap={16}
 			className="px-3"
 			title={mission.title}
@@ -181,11 +224,14 @@ const MissionItem = ({ mission, temp }: { mission: ApiOnboardingItem; temp?: num
 				<span>
 					{' '}
 					{titleMission[mission?.task_type ? mission?.task_type - 1 : 0]}{' '}
-					<span className="font-semibold text-channelActiveColor">#{channelById.channel_label}</span>{' '}
+					<span className="font-semibold text-gray-800 dark:text-white">#{channelById.channel_label}</span>{' '}
 				</span>
 			}
 			action={
-				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white" onClick={openEditModal}>
+				<button
+					className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors"
+					onClick={openEditModal}
+				>
 					{' '}
 					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
 				</button>
@@ -194,9 +240,24 @@ const MissionItem = ({ mission, temp }: { mission: ApiOnboardingItem; temp?: num
 	);
 };
 
-const RuleItem = ({ rule, temp }: { rule: ApiOnboardingItem; temp?: number }) => {
+interface RuleItemProps {
+	rule: ApiOnboardingItem;
+	temp?: number;
+	setOpenModalSaveChanges?: (isOpen: boolean) => void;
+}
+
+const RuleItem = ({ rule, temp, setOpenModalSaveChanges }: RuleItemProps) => {
 	const [openEditModal, closeEditModal] = useModal(() => {
-		return <ModalAddRules onClose={closeEditModal} ruleEdit={rule} tempId={temp} />;
+		return (
+			<ModalAddRules
+				onClose={() => {
+					closeEditModal();
+					if (setOpenModalSaveChanges) setOpenModalSaveChanges(true);
+				}}
+				ruleEdit={rule}
+				tempId={temp}
+			/>
+		);
 	});
 
 	return (
@@ -208,7 +269,10 @@ const RuleItem = ({ rule, temp }: { rule: ApiOnboardingItem; temp?: number }) =>
 			description={rule.content}
 			title={rule.title}
 			action={
-				<button className="w-8 h-8 rounded bg-buttonPrimary flex items-center justify-center text-white" onClick={openEditModal}>
+				<button
+					className="w-8 h-8 rounded bg-buttonPrimary hover:bg-blue-600 flex items-center justify-center text-white transition-colors"
+					onClick={openEditModal}
+				>
 					{' '}
 					<Icons.EditMessageRightClick defaultSize="w-5 h-5" />{' '}
 				</button>

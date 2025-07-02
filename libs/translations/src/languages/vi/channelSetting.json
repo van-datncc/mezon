@@ -18,7 +18,10 @@
         "channelPermission": {
             "title": "",
             "permission": "Quyền hạn kênh",
-            "description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với channel này."
+            "description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với kênh này."
+        },
+        "quickAction":{
+            "title": "Tác vụ"
         },
         "privateChannelInvite": {
             "addMember": "Thêm thành viên"
@@ -30,8 +33,8 @@
             "invite": "Lời mời"
         },
         "channelSlowMode": {
-            "title": "Slowmode Cooldown",
-            "description": "Thành viên sẽ bị hạn chế chỉ gửi được một tin nhắn và tạo một chuỗi theo khoảng thời gian này, trừ khi họ có quyền quản lý kênh hoặc quản lý tin nhắn.",
+            "title": "Chế độ chậm",
+            "description": "Thành viên sẽ bị hạn chế chỉ gửi được một tin nhắn một lần trong khoảng thời gian này, trừ khi họ có quyền quản lý kênh hoặc quản lý tin nhắn.",
             "_5seconds": "5 giây",
             "_10seconds": "10 giây",
             "_15seconds": "15 giây",
@@ -73,12 +76,12 @@
     },
     "confirm": {
         "delete": {
-            "content": "Bạn có chắc muốn xóa kênh #{channelName} ?. Hành động này không thể khôi phục lại",
+            "content": "Bạn có chắc chắn muốn xóa kênh #{channelName} không? Hành động này không thể khôi phục.",
             "confirmText": "Xóa",
             "title": "Xóa kênh"
         },
         "leave": {
-            "content": "Bạn có chắc muốn rời kênh #{channelName} ?. Hành động này không thể khôi phục lại",
+            "content": "Bạn có chắc chắn muốn rời kênh #{channelName} không? Hành động này không thể khôi phục.",
             "confirmText": "Rời",
             "title": "Rời kênh"
         },
@@ -89,7 +92,7 @@
     },
     "channelPermission": {
         "permissionOverrides": "Ghi đè quyền",
-        "save": "Save",
+        "save": "Lưu",
         "generalChannelPermission": "QUYỀN TỔNG QUÁT KÊNH",
         "title": "Quyền truy cập",
         "basicView": "Cơ bản",
@@ -133,7 +136,17 @@
             "success": "Lưu thành công",
             "failed": "Lưu thất bại"
         },
-        "roleAndMemberEmpty": "không có vai trò và thành viên nào để ghi đè quyền"
+        "roleAndMemberEmpty": "Chưa có vai trò và thành viên để thiết lập quyền riêng"
+    },
+    "quickAction":{
+        "title": "Cài đặt tác vụ",
+        "keyTitle": "Nhập từ khóa (VD: xinchao): ",
+        "valueTitle": "Nhập nội dung (VD: Chào buổi sáng, chúc bạn có một ngày mới tốt lành !)",
+        "save": "LƯU",
+        "cancel": "HỦY",
+        "deleteModal": "XÓA TÁC VỤ",
+        "deleteTitle": "Bạn có chắc chắn muốn xóa /{{key}} không ? Hành động này sẽ không thể hoàn tác được !"
+
     },
     "changeCategory": {
         "title": "Thay đổi danh mục",

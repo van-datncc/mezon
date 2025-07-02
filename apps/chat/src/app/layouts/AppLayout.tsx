@@ -1,7 +1,7 @@
 //TODO: recheck
 import { ToastController } from '@mezon/components';
 import { useCustomNavigate } from '@mezon/core';
-import { fcmActions, handleTopicNotification, selectAllAccount, selectIsLogin, useAppDispatch } from '@mezon/store';
+import { fcmActions, handleTopicNotification, selectAllAccount, selectAllSession, selectIsLogin, useAppDispatch } from '@mezon/store';
 import { Icons, MezonUiProvider } from '@mezon/ui';
 import {
 	CLOSE_APP,
@@ -15,7 +15,8 @@ import {
 	notificationService
 } from '@mezon/utils';
 import isElectron from 'is-electron';
-import React, { useEffect } from 'react';
+import { Session } from 'mezon-js';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData, useLocation } from 'react-router-dom';
 import { IAppLoaderData } from '../loaders/appLoader';
@@ -49,14 +50,14 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 	return (
 		<header id="titlebar" className={`dark:bg-bgTertiary bg-bgLightTertiary`} onDoubleClick={handleDoubleClick}>
 			<div id="drag-region">
-				<div className="dark:text-white ml-3 text-[15.15px] leading-[26.58px] font-semibold text-[#FFFFFF]">Mezon</div>
+				<div className="dark:text-white ml-3 text-[15.15px] leading-[26.58px] font-semibold text-textPrimaryLight">Mezon</div>
 				<div id="window-controls">
 					<div
 						className="button window-hover cursor-pointer dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
 						id="min-button"
 						onClick={handleMinimize}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.WindowMinimize className="w-[14px]" />
 						</div>
 					</div>
@@ -65,7 +66,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 						id="restore-button"
 						onClick={handleMaximize}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.WindowZoom className="w-[10px]" />
 						</div>
 					</div>
@@ -74,7 +75,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 						id="close-button"
 						onClick={handleClose}
 					>
-						<div className="w-fit flex flex-col items-center gap-2 text-bgPrimary dark:text-[#a8a6a6] group">
+						<div className="w-fit flex flex-col items-center gap-2 text-textPrimaryLight dark:text-[#a8a6a6] group">
 							<Icons.CloseButton className="w-[14px]" />
 						</div>
 					</div>
@@ -87,34 +88,48 @@ const TitleBar: React.FC<TitleBarProps> = ({ eventName }) => {
 const AppLayout = () => {
 	const dispatch = useAppDispatch();
 	const isLogin = useSelector(selectIsLogin);
+	const sessions = useSelector(selectAllSession);
 	const currentUserId = useSelector(selectAllAccount)?.user?.id;
 
 	useEffect(() => {
-		currentUserId && notificationService.setCurrentUserId(currentUserId);
+		currentUserId && notificationService.setCurrentActiveUserId(currentUserId);
 	}, [currentUserId]);
 
 	useEffect(() => {
 		if (!isLogin) {
-			notificationService.isActive && notificationService.close();
+			notificationService.isActive && notificationService.disconnectAll();
 			return;
 		}
+		handleConnectNoti();
+	}, [isLogin, sessions]);
 
-		dispatch(
-			fcmActions.registFcmDeviceToken({
-				tokenId: 'foo',
-				deviceId: 'bar',
-				platform: 'desktop'
-			})
-		)
-			.then((response): void => {
+	const handleConnectNoti = useCallback(async () => {
+		if (sessions) {
+			const tasks = Object.keys(sessions).map((key) => async () => {
+				const sessionData = sessions[key];
+				const session = new Session(
+					sessionData.token,
+					sessionData.refresh_token,
+					sessionData.created,
+					sessionData.api_url,
+					!!sessionData.is_remember
+				);
+				const response = await dispatch(
+					fcmActions.registFcmDeviceToken({
+						session: session as Session,
+						tokenId: `${sessionData.user_id}`,
+						deviceId: sessionData.username as string,
+						platform: 'desktop'
+					})
+				);
 				const token = (response?.payload as { token: string })?.token;
-				notificationService.connect(token);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-	}, [isLogin]);
 
+				notificationService.connect(token, sessionData.user_id as string);
+			});
+
+			await Promise.all(tasks.map((fn) => fn()));
+		}
+	}, [sessions, currentUserId]);
 	const navigate = useCustomNavigate();
 	useEffect(() => {
 		const handleCustomNavigation = (event: CustomEvent) => {

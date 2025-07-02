@@ -22,9 +22,8 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ApiChannelAppResponseExtend, ChannelStatusEnum, ChannelThreads, IChannel, openVoiceChannel } from '@mezon/utils';
-import { Spinner } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import React, { memo, useCallback, useMemo, useRef } from 'react';
+import React, { DragEvent, memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -45,6 +44,8 @@ export type ChannelLinkProps = {
 	channelType?: number;
 	permissions: IChannelLinkPermission;
 	isActive: boolean;
+	dragStart: (e: DragEvent<HTMLDivElement>) => void;
+	dragEnter: (e: DragEvent<HTMLDivElement>) => void;
 };
 
 export interface Coords {
@@ -78,7 +79,9 @@ const ChannelLinkComponent = ({
 	numberNotification,
 	isActive,
 	channelType,
-	permissions
+	permissions,
+	dragStart,
+	dragEnter
 }: ChannelLinkProps) => {
 	const { hasAdminPermission, hasClanPermission, hasChannelManagePermission, isClanOwner } = permissions;
 	const dispatch = useAppDispatch();
@@ -231,14 +234,16 @@ const ChannelLinkComponent = ({
 	return (
 		<div
 			onContextMenu={handleMouseClick}
-			id={channel.channel_id}
+			id={channel.id}
 			role="button"
-			className={`relative group z-10 dark:bg-bgSecondary bg-bgLightSecondary ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+			onDragStart={(e) => dragStart(e)}
+			onDragEnd={(e) => dragEnter(e)}
+			className={`relative group z-10 mt-[2px] dark:bg-bgSecondary bg-bgLightSecondary ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 				<span
 					ref={channelLinkRef}
-					className={`${classes[state]} ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${isActive ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
+					className={`${classes[state]} pointer-events-none ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${isActive ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
 					onClick={() => {
 						handleVoiceChannel(channel.id);
 						openModalJoinVoiceChannel(channel.meeting_code || '');
@@ -251,18 +256,24 @@ const ChannelLinkComponent = ({
 						{!isPrivate && <Icons.Speaker defaultSize="w-5 5-5 " />}
 					</div>
 					<p
-						className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${highLightVoiceChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+						className={`ml-2 w-full pointer-events-none dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${highLightVoiceChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
 							? `${channel?.channel_label.substring(0, 20)}...`
 							: channel?.channel_label}
 					</p>
-					{channel.status === StatusVoiceChannel.No_Active && <Spinner aria-label="Loading spinner" />}
+					{channel.status === StatusVoiceChannel.No_Active && <Icons.LoadingSpinner />}
 				</span>
 			) : (
-				<Link to={channelPath} onClick={handleClick} className="channel-link" draggable="false">
-					<span ref={channelLinkRef} className={`${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}>
+				<Link
+					to={channelPath}
+					id={`${channel.category_id}-${channel.id}`}
+					onClick={handleClick}
+					className={`channel-link block ${classes[state]} ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton' : ''}`}
+					draggable="false"
+				>
+					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 
 						<div className={`relative  ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
@@ -302,7 +313,7 @@ const ChannelLinkComponent = ({
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p
-							className={`ml-2 w-full dark:group-hover:text-white group-hover:text-black text-base focus:bg-bgModifierHover ${hightLightTextChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
+							className={`ml-2 w-full dark:group-hover:text-white pointer-events-none group-hover:text-black text-base focus:bg-bgModifierHover ${hightLightTextChannel ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20

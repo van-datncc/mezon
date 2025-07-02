@@ -13,12 +13,14 @@
         "serverRoles": "Clan Roles",
         "notificationSetting": "Notification settings",
         "newOverride": "New Override",
-        "webhooks": "Webhooks",
+        "webhooks": "Webhook",
         "integrations": "Integrations",
-        "webhooksEdit": "Webhooks Edit",
+        "webhooksEdit": "Webhook Edit",
         "auditLog": "Audit Log",
         "filterByUser": "Filter By User",
-        "filterByAction": "Filter By Action"
+        "filterByAction": "Filter By Action",
+        "sound": "Sound Sticker",
+        "createSound": "Create Sound Sticker"
     },
     "menuChannelStack": {
         "channelSetting": "Channel Settings",
@@ -35,6 +37,10 @@
         "blockedUsers": "Blocked Users",
         "sendToken": "Transfer Funds",
         "withdrawToken": "Withdraw",
-        "historyTransaction": "History Transaction"
+        "historyTransaction": "History Transaction",
+        "quit": "Quit",
+        "menu": "Menu",
+        "walletManagement": "Wallet Management",
+        "setPassword": "Set Password"
     }
 }

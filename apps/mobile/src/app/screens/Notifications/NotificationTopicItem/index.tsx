@@ -13,6 +13,7 @@ import { INotification } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
@@ -27,6 +28,7 @@ type NotifyProps = {
 
 const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps) => {
 	const { themeValue } = useTheme();
+	const { t } = useTranslation(['notification']);
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
 	const data = parseObject(notify?.message);
@@ -49,14 +51,10 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 	}, [memberClan, userIds, userId]);
 
 	useEffect(() => {
-		if (usernames.length === 0) {
-			setSubjectTopic('Topic and you');
-		}
-		if (usernames.length === 1) {
+		if (Array.isArray(usernames) && usernames.length > 0) {
 			setSubjectTopic(`${usernames[0]} and you`);
-		}
-		if (usernames.length > 1) {
-			setSubjectTopic(`${usernames[usernames.length - 1]} and ${usernames.length - 1} others`);
+		} else {
+			setSubjectTopic('Someone and you');
 		}
 	}, [usernames, userIds]);
 
@@ -97,11 +95,11 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 							{subjectTopic.toUpperCase()}
 						</Text>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							<Text style={styles.username}>{'Replied To: '}</Text>
+							<Text style={styles.username}>{t('repliedTo')}</Text>
 							{data?.content?.t || 'Unreachable message'}
 						</Text>
 						<Text numberOfLines={2} style={styles.notifyHeaderTitle}>
-							<Text style={styles.username}>{`${lastSentUser ? lastSentUser?.user?.username : 'Sender'}: `} </Text>
+							<Text style={styles.username}>{`${lastSentUser ? lastSentUser?.user?.username : t('sender')}: `} </Text>
 							{initMessage || 'Unreachable message'}
 						</Text>
 					</View>

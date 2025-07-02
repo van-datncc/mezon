@@ -26,12 +26,12 @@ import { Icons } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
-import { IMessageTypeCallLog, createImgproxyUrl, isMacDesktop, sleep } from '@mezon/utils';
+import { IMessageTypeCallLog, createImgproxyUrl, sleep } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
 import { ChannelType, WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { MemberProfile } from '../MemberProfile';
+import { SimpleMemberProfile } from '../MemberProfile';
 import DeviceSelector from './DeviceSelector';
 import LabelDm from './labelDm';
 
@@ -77,13 +77,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		handleEndCall,
 		toggleAudio,
 		toggleVideo,
-		toggleScreenShare,
 		handleSignalingMessage,
 		handleOtherCall,
 		localVideoRef,
 		remoteVideoRef,
-		localScreenVideoRef,
-		remoteScreenVideoRef,
 		changeAudioInputDevice,
 		changeAudioOutputDevice,
 		currentInputDevice,
@@ -131,11 +128,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	useImperativeHandle(ref, () => ({
 		triggerCall
 	}));
-
-	const handleShowShareScreenToggle = () => {
-		toggleScreenShare();
-		dispatch(DMCallActions.setIsShowShareScreen(!isShowShareScreen));
-	};
 
 	const handleMuteToggle = () => {
 		toggleAudio();
@@ -198,14 +190,14 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		<div
 			className={`${
 				(!isInChannelCalled && !isPlayDialTone) || dmGroupId !== directId || isPlayBusyTone ? '-z-50 opacity-0 hidden' : ''
-			} flex flex-col group right-0 fixed w-widthThumnailAttachment  ${!isShowMeetDM && !isRemoteVideo ? 'h-[240px] min-h-[240px]' : 'h-[510px] max-h-[510px]'} z-10 w-full p-3 min-w-0 items-center dark:bg-bgTertiary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink ${isMacDesktop ? 'draggable-area' : ''}`}
+			} flex flex-col group right-0 fixed w-widthThumnailAttachment  ${!isShowMeetDM && !isRemoteVideo ? 'h-[240px] min-h-[240px]' : 'h-[510px] max-h-[510px]'} z-10 w-full p-3 min-w-0 items-center dark:bg-bgTertiary bg-bgLightPrimary shadow border-b-[1px] dark:border-bgTertiary border-bgLightTertiary flex-shrink`}
 		>
 			<div className="sbm:justify-start justify-between items-center gap-1 flex w-full">
 				<div className="flex flex-row gap-1 items-center flex-1">
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
-					<MemberProfile
+					<SimpleMemberProfile
 						numberCharacterCollapse={22}
 						avatar={
 							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
@@ -367,16 +359,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								<Icons.IconMeetDM
 									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
 									isShowMeetDM={!isShowMeetDM}
-									isShowLine={true}
-								/>
-							</div>
-							<div
-								className={`h-[56px] w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${isShowShareScreen ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
-								onClick={handleShowShareScreenToggle}
-							>
-								<Icons.ShareScreen
-									className={`${isShowShareScreen ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowShareScreen={isShowShareScreen}
 									isShowLine={true}
 								/>
 							</div>

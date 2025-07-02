@@ -211,9 +211,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			borderBottomWidth: 1,
 			borderBottomColor: colors.border,
-			paddingRight: size.s_14
-			// paddingVertical: size.s_8,
-			// paddingBottom: size.s_12
+			paddingRight: size.s_14,
+			paddingBottom: size.s_4
 		},
 		lineActiveClan: {
 			backgroundColor: Colors.azureBlue,
@@ -556,22 +555,15 @@ export const style = (colors: Attributes) =>
 		btnScrollDown: {
 			position: 'absolute',
 			right: size.s_10,
-			bottom: size.s_20,
-			backgroundColor: colors.primary,
-			width: size.s_50,
-			height: size.s_50,
-			borderRadius: size.s_50,
+			bottom: size.s_28,
+			backgroundColor: colors.border,
+			borderColor: colors.textDisabled,
+			borderWidth: 1,
+			width: size.s_40,
+			height: size.s_40,
+			borderRadius: size.s_40,
 			justifyContent: 'center',
-			alignItems: 'center',
-			shadowColor: Colors.black,
-			shadowOffset: {
-				width: 0,
-				height: 4
-			},
-			shadowOpacity: 0.3,
-			shadowRadius: 4.65,
-			elevation: 8,
-			zIndex: 1000
+			alignItems: 'center'
 		},
 		wrapperFooterImagesModal: {
 			flex: 1,
@@ -726,7 +718,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_16
 		},
 		blockButton: {
-			backgroundColor: colors.channelNormal,
+			backgroundColor: Colors.red,
 			justifyContent: 'center',
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,
@@ -825,7 +817,8 @@ export const style = (colors: Attributes) =>
 		albumTitleAndCount: {
 			gap: size.s_10,
 			justifyContent: 'flex-start',
-			marginLeft: size.s_10
+			marginLeft: size.s_10,
+			width: '55%'
 		},
 		albumImageCount: {
 			fontSize: size.s_12,
@@ -851,5 +844,35 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_10,
 			marginBottom: size.s_6,
 			borderRadius: size.s_10
-		}
+		},
+		wrapperTextAvatar: {
+			width: size.s_100,
+			height: size.s_100,
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: colors.colorAvatarDefault,
+			borderRadius: size.s_50
+		},
+		textAvatar: {
+			textAlign: 'center',
+			fontSize: size.h1,
+			color: Colors.white
+		},
+		ephemeralMessage: {
+			backgroundColor: baseColor.blurple + '1A',
+			borderLeftWidth: size.s_4,
+			borderColor: baseColor.blurple,
+			borderRadius: size.s_6,
+		},
+		ephemeralIndicator: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			marginTop: size.s_4,
+		},
+		ephemeralText: {
+			fontSize: size.s_12,
+			color: colors.textDisabled,
+			fontStyle: 'italic',
+			marginLeft: size.s_4,
+		},
 	});

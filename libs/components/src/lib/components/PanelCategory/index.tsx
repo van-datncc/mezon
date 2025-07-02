@@ -51,9 +51,9 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-	const [canManageCategory] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
+	const [canManageCategory] = usePermissionChecker([EPermission.manageClan]);
 	const dispatch = useAppDispatch();
-	const defaultCategoryNotificationSetting = useAppSelector(selectDefaultNotificationCategory);
+	const defaultCategoryNotificationSetting = useAppSelector((state) => selectDefaultNotificationCategory(state, category?.id as string));
 	const currentClan = useAppSelector(selectCurrentClan);
 	const [muteUntil, setMuteUntil] = useState('');
 
@@ -156,7 +156,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 			tabIndex={-1}
 			role={'button'}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
+			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-30 w-[200px] py-[10px] px-[10px] shadow-md"
 		>
 			<GroupPanels>
 				<ItemPanel

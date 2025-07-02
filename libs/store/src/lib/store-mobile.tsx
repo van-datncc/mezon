@@ -23,6 +23,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesDefaultReducer, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
+import { QUICK_MENU_FEATURE_KEY, quickMenuReducer } from '@mezon/store';
 import { activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
 import { attachmentReducer } from './attachment/attachments.slice';
@@ -67,6 +68,7 @@ import { OVERRIDDEN_POLICIES_FEATURE_KEY, overriddenPoliciesReducer } from './po
 import { IsShowReducer, RolesClanReducer, roleIdReducer } from './roleclan/roleclan.slice';
 import { SEARCH_MESSAGES_FEATURE_KEY, searchMessageReducer } from './searchmessages/searchmessage.slice';
 import { settingStickerReducer } from './settingSticker/settingSticker.slice';
+import { groupCallReducer } from './slices/groupCall.slice';
 import { usersStreamReducer } from './stream/usersStream.slice';
 import { videoStreamReducer } from './stream/videoStream.slice';
 import { systemMessageReducer } from './systemMessages/systemMessage.slice';
@@ -483,7 +485,9 @@ const reducer = {
 	[EMBED_MESSAGE]: embedReducer,
 	walletLedger: walletLedgerReducer,
 	[CHANNEL_LIST_RENDER]: persistListChannelRenderReducer,
-	[COMPOSE_FEATURE_KEY]: persistedCompose
+	[COMPOSE_FEATURE_KEY]: persistedCompose,
+	groupCall: groupCallReducer,
+	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer
 };
 
 let storeInstance = configureStore({

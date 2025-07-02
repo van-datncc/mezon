@@ -65,17 +65,18 @@ export const AddStatusUserModal = ({ isVisible, setIsVisible, userCustomStatus, 
 		if (statusDuration === 0) {
 			noClear = true;
 		}
-		handleCustomUserStatus(lineStatus, ETypeCustomUserStatus.Save, minutes, noClear);
+		handleCustomUserStatus(lineStatus?.trim(), ETypeCustomUserStatus.Save, minutes, noClear);
 	};
 
 	return (
 		<MezonModal
 			visible={isVisible}
 			title={t('editStatus')}
+			animationType={'fade'}
 			visibleChange={setIsVisible}
 			headerStyles={styles.headerModal}
 			titleStyle={styles.titleModal}
-			rightBtnText={lineStatus ? t('save') : ''}
+			rightBtnText={t('save')}
 			onClickRightBtn={handleSaveCustomStatus}
 		>
 			<View>

@@ -27,6 +27,11 @@ const AddNodeMenuPopup = () => {
 			title: 'API Loader',
 			nodeType: 'apiLoader',
 			description: 'Fetches data from external APIs for integration into bot responses.'
+		},
+		{
+			title: 'Webhook',
+			nodeType: 'webhook',
+			description: 'Receives updates via HTTP requests for real-time integrations.'
 		}
 	];
 	return (

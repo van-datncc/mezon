@@ -24,8 +24,9 @@ export const style = (colors: Attributes) =>
 		menuFooter: {
 			position: 'absolute',
 			borderRadius: size.s_80,
-			backgroundColor: colors.secondary,
-			padding: size.s_10,
+			backgroundColor: 'rgba(48,48,48,0.55)',
+			paddingHorizontal: size.s_10,
+			paddingVertical: size.s_4,
 			alignItems: 'center',
 			alignSelf: 'center',
 			justifyContent: 'center'
@@ -59,7 +60,6 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_14,
 			color: colors.white,
 			fontWeight: '400',
-			flexGrow: 1,
 			flexShrink: 1
 		},
 		lineBtn: { width: '100%', alignItems: 'center', padding: size.s_6 },
@@ -70,6 +70,8 @@ export const style = (colors: Attributes) =>
 			width: size.s_50,
 			height: size.s_50,
 			backgroundColor: colors.border,
+			borderWidth: 0.5,
+			borderColor: colors.textDisabled,
 			borderRadius: size.s_50
 		},
 		addPeopleBtn: {
@@ -117,12 +119,41 @@ export const style = (colors: Attributes) =>
 			padding: size.s_6,
 			borderRadius: size.s_20
 		},
-		focusIcon: {
+		wrapperHeaderFocusSharing: {
 			position: 'absolute',
-			top: '3%',
+			top: '7%',
 			right: '3%',
+			flexDirection: 'row',
+			gap: size.s_10
+		},
+		focusIcon: {
 			backgroundColor: colors.selectedOverlay,
 			borderRadius: size.s_30,
 			padding: size.s_10
+		},
+		focusIconAbsolute: {
+			position: 'absolute',
+			top: '7%',
+			right: '3%'
+		},
+		reactionContainer: {
+			position: 'absolute',
+			bottom: '30%',
+			width: '70%',
+			left: '15%',
+			alignSelf: 'center',
+			right: size.s_20,
+			height: '40%'
+		},
+		animatedEmoji: {
+			height: size.s_40,
+			width: size.s_40
+		},
+		wrapperUser: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'center',
+			marginHorizontal: size.s_10,
+			alignSelf: 'center'
 		}
 	});

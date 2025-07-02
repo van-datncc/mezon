@@ -1,4 +1,4 @@
-import { rolesClanActions, selectCurrentClanId, useAppDispatch } from '@mezon/store';
+import { rolesClanActions, selectCurrentClanId, setAddPermissions, setRemovePermissions, useAppDispatch } from '@mezon/store';
 import { ApiRole } from 'mezon-js/dist/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -59,7 +59,8 @@ export function useRoles() {
 					roleIcon
 				})
 			);
-			await dispatch(rolesClanActions.fetchRolesClan({ clanId, noCache: true }));
+			dispatch(setAddPermissions([]));
+			dispatch(setRemovePermissions([]));
 			return response?.payload;
 		},
 		[dispatch]

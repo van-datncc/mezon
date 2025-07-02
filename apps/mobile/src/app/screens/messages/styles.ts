@@ -75,12 +75,14 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 
 		searchMessage: {
 			backgroundColor: isTablet ? colors.secondary : colors.primary,
-			borderRadius: 40,
-			alignItems: 'center',
+			borderRadius: size.s_20,
 			paddingHorizontal: size.s_12,
+			paddingVertical: size.s_12,
+			gap: size.s_8,
 			flexDirection: 'row',
-			justifyContent: 'space-between',
-			marginHorizontal: size.s_18
+			alignItems: 'center',
+			marginHorizontal: size.s_18,
+			marginBottom: size.s_6
 		},
 
 		searchInput: {
@@ -216,5 +218,30 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			flexWrap: 'nowrap',
 			overflow: 'hidden'
 		},
-		textQuantityPending: { fontSize: size.s_12, color: colors.white }
+		textQuantityPending: { fontSize: size.s_12, color: 'white' },
+		wrapperSearch: {
+			flex: 1,
+			flexDirection: 'row',
+			justifyContent: 'center',
+			alignItems: 'center',
+			height: size.s_36,
+			gap: size.s_8,
+			borderRadius: size.s_20,
+			backgroundColor: colors.primary,
+			borderWidth: 1,
+			borderColor: colors.secondaryLight
+		},
+		placeholderSearchBox: {
+			color: colors.text,
+			fontSize: size.s_14,
+			lineHeight: size.s_18
+		},
+		iconWrapper: {
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderRadius: size.s_36,
+			backgroundColor: colors.primary,
+			width: size.s_36,
+			height: size.s_36
+		}
 	});

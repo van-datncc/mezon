@@ -92,8 +92,8 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 	};
 
 	const checkMultipleSelect = useMemo(() => {
-		return (!!select.min_options && select.min_options > 1) || (!!select.max_options && select.max_options >= 2);
-	}, [select.min_options, select.max_options]);
+		return (!!select?.min_options && select?.min_options > 1) || (!!select?.max_options && select?.max_options >= 2);
+	}, [select?.min_options, select?.max_options]);
 	useEffect(() => {
 		if (select.valueSelected) {
 			handleOptionSelect(select.valueSelected);
@@ -134,15 +134,15 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 
 	const getSelectNote = () => {
 		if (select?.min_options && select?.max_options) {
-			return `Select from ${select.min_options} to ${select.max_options} options`;
+			return `Select from ${select?.min_options} to ${select?.max_options} options`;
 		}
 
 		if (select?.max_options) {
-			return `Select up to ${select.max_options} option${select.max_options > 1 ? 's' : ''}`;
+			return `Select up to ${select?.max_options} option${select?.max_options > 1 ? 's' : ''}`;
 		}
 
 		if (select?.min_options) {
-			return `Select at least ${select.min_options} option${select.min_options > 1 ? 's' : ''}`;
+			return `Select at least ${select?.min_options} option${select?.min_options > 1 ? 's' : ''}`;
 		}
 
 		return 'Select 1 option';
@@ -176,7 +176,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 							</div>
 						)}
 						<div className="flex flex-col justify-between items-start w-full">
-							<p className="dark:text-textPrimary text-textPrimary400">{select.placeholder}</p>
+							<p className="dark:text-textPrimary text-textPrimary400">{select?.placeholder}</p>
 							<p className={'text-xs italic'}>{getSelectNote()}</p>
 						</div>
 					</div>

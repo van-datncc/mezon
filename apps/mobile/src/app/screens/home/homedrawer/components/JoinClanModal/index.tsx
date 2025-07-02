@@ -39,7 +39,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 				store.dispatch(clansActions.joinClan({ clanId: res?.clan_id }));
 				save(STORAGE_CLAN_ID, res?.clan_id);
-				const clanResp = await store.dispatch(clansActions.fetchClans());
+				const clanResp = await store.dispatch(clansActions.fetchClans({ noCache: true }));
 				await setCurrentClanLoader(clanResp.payload);
 				store.dispatch(clansActions.changeCurrentClan({ clanId: res?.clan_id }));
 				const respChannel = await store.dispatch(channelsActions.fetchChannels({ clanId: res?.clan_id }));
@@ -63,7 +63,7 @@ const JoinClanModal = ({ visible, setVisible }: JoinClanModalProps) => {
 			headerStyles={styles.headerModal}
 		>
 			<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-				<View style={{ width: '100%', height: '100%', paddingHorizontal: size.s_20, paddingVertical: size.s_10, position: 'relative' }}>
+				<View style={{ width: '100%', height: '100%', paddingHorizontal: size.s_10, paddingVertical: size.s_10, position: 'relative' }}>
 					<View style={{ marginBottom: size.s_40 }}>
 						<Text style={styles.title}>{t('joinClan.joinExistClan')}</Text>
 						<Text style={styles.description}>{t('joinClan.enterInvite')}</Text>

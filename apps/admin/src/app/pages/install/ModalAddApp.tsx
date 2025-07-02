@@ -1,9 +1,11 @@
 import {
 	categoriesActions,
 	createNewChannel,
+	getApplicationDetail,
 	selectAllAccount,
 	selectAllCategories,
 	selectAllClans,
+	selectAppDetail,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -23,14 +25,14 @@ enum RequestStatusSuccess {
 }
 
 type ModalAddAppProps = {
-	nameApp?: string;
 	applicationId: string;
 	handleOpenModal: () => void;
 };
 
-const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: ModalAddAppProps) => {
+const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) => {
 	const dispatch = useAppDispatch();
 	const account = useSelector(selectAllAccount);
+	const appDetail = useAppSelector(selectAppDetail);
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const toggleSuccess = () => setOpenSuccess((s) => !s);
 	const [clanValue, setClanValue] = useState('');
@@ -43,6 +45,12 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 			dispatch(categoriesActions.fetchCategories({ clanId: clanValue }));
 		}
 	}, [clanValue, dispatch]);
+
+	useEffect(() => {
+		if (applicationId) {
+			dispatch(getApplicationDetail({ appId: applicationId }));
+		}
+	}, [applicationId, dispatch]);
 
 	const clans = useSelector(selectAllClans);
 
@@ -95,7 +103,7 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 				.slice(0, 32);
 
 		const data: ApiCreateChannelDescRequest = {
-			channel_label: sanitizeLabel(labelValue) || sanitizeLabel(nameApp),
+			channel_label: sanitizeLabel(labelValue) || sanitizeLabel(appDetail?.appname || ''),
 			app_id: applicationId,
 			clan_id: clanValue,
 			category_id: categoryValue,
@@ -107,28 +115,35 @@ const ModalAddApp = memo(({ nameApp = '', applicationId, handleOpenModal }: Moda
 		try {
 			const resp = await dispatch(createNewChannel(data)).unwrap();
 			toggleSuccess();
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				console.error('Create channel failed:', error);
-				toast.error(error.message || 'Channel name already exists, please choose another name');
-			} else {
-				console.error('Create channel failed:', error);
-				toast.error('An unknown error occurred');
-			}
+		} catch (error: any) {
+			console.error('Create channel failed:', error);
+			toast.error('Name already exists or you are not the owner of this clan, please choose another name or clan!');
 		}
-	}, [applicationId, clanValue, categoryValue, labelValue, dispatch]);
+	}, [applicationId, clanValue, categoryValue, labelValue, dispatch, appDetail]);
 
 	if (openSuccess) {
-		return <ModalSuccess name={nameApp} clan={{ clanId: clanValue, clanName: '', isEmpty: false }} />;
+		return <ModalSuccess name={appDetail?.appname || ''} clan={{ clanId: clanValue, clanName: '', isEmpty: false }} />;
 	}
 
 	return (
 		<div className="rounded overflow-hidden dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full flex flex-col text-center">
-			<HeaderModal name={nameApp} username={account?.user?.username} />
+			{appDetail && (
+				<div className="flex flex-col items-center mt-4 mb-2">
+					{appDetail.applogo ? (
+						<img src={appDetail.applogo} alt={appDetail.appname} className="w-16 h-16 rounded-full object-cover mb-2" />
+					) : (
+						<span className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold mb-2">
+							{appDetail.appname?.[0]}
+						</span>
+					)}
+					<p className="text-xl font-semibold">{appDetail.appname}</p>
+				</div>
+			)}
+			<HeaderModal name={appDetail?.appname || ''} username={account?.user?.username} />
 			<SelectField {...clanConfig} />
 			{clanValue && <SelectField {...categoryConfig} />}
-			<TextField label="Channel Name" value={labelValue} onChange={(v) => setLabelValue(v)} placeholder={nameApp} />
-			<FooterModal name={nameApp} />
+			<TextField label="Channel Name" value={labelValue} onChange={(v) => setLabelValue(v)} placeholder={appDetail?.appname || ''} />
+			<FooterModal name={appDetail?.appname || ''} />
 			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
 		</div>
 	);

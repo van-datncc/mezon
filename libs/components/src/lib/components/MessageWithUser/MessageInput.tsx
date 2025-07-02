@@ -14,6 +14,8 @@ import {
 	IMentionOnMessage,
 	IMessageSendPayload,
 	MentionDataProps,
+	RECENT_EMOJI_CATEGORY,
+	TITLE_MENTION_HERE,
 	ThemeApp,
 	addMarkdownPrefix,
 	addMention,
@@ -75,12 +77,18 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	}, [message?.id]);
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
-		if (query.length === 0) return;
-		const matches = emojis
-			.filter((emoji) => emoji.shortname && emoji.shortname.indexOf(query.toLowerCase()) > -1)
-			.slice(0, 20)
-			.map((emojiDisplay) => ({ id: emojiDisplay?.id, display: emojiDisplay?.shortname }));
-		callback(matches);
+		if (!query || emojis.length === 0) return;
+		const q = query.toLowerCase();
+		const matches: { id: string; display: string }[] = [];
+
+		for (const { id, shortname, category } of emojis) {
+			if (category === RECENT_EMOJI_CATEGORY || !shortname || !shortname.includes(q)) continue;
+			if (!id) continue;
+			matches.push({ id, display: shortname });
+			if (matches.length === 20) break;
+		}
+
+		if (matches.length) callback(matches);
 	};
 	const channels = useSelector(selectAllChannels);
 
@@ -227,7 +235,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	};
 
 	const handleSave = () => {
-		if (draftContent === '') {
+		if (draftContent?.trim() === '') {
 			textareaRef.current?.blur();
 			return showModal();
 		} else if (draftContent !== '' && draftContent === originalContent) {
@@ -336,7 +344,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						data={handleSearchUserMention}
 						trigger="@"
 						displayTransform={(id: any, display: any) => {
-							return display === '@here' ? `${display}` : `@${display}`;
+							return display === TITLE_MENTION_HERE ? `${display}` : `@${display}`;
 						}}
 						renderSuggestion={(suggestion: MentionDataProps) => {
 							return (
@@ -344,12 +352,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 									valueHightLight={valueHighlight}
 									avatarUrl={suggestion.avatarUrl}
 									subText={
-										suggestion.display === '@here'
+										suggestion.display === TITLE_MENTION_HERE
 											? 'Notify everyone who has permission to see this channel'
 											: (suggestion.username ?? '')
 									}
-									subTextStyle={(suggestion.display === '@here' ? 'normal-case' : 'lowercase') + ' text-xs'}
-									showAvatar={suggestion.display !== '@here'}
+									subTextStyle={(suggestion.display === TITLE_MENTION_HERE ? 'normal-case' : 'lowercase') + ' text-xs'}
+									showAvatar={suggestion.display !== TITLE_MENTION_HERE}
 									emojiId=""
 									display={suggestion.display}
 								/>

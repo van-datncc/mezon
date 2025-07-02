@@ -9,7 +9,8 @@ import {
 	selectDataReferences,
 	selectMissionDone,
 	selectOnboardingByClan,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, ThreadValue, blankReferenceObj } from '@mezon/utils';
@@ -35,7 +36,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	const appDispatch = useAppDispatch();
 	const { sendMessage, sendMessageTyping } = useChatSending({ channelOrDirect: channel, mode });
 	const anonymousMode = useSelector(selectAnonymousMode);
-	const dataReferences = useSelector(selectDataReferences(channelId ?? ''));
+	const dataReferences = useAppSelector((state) => selectDataReferences(state, channelId ?? ''));
 	const chatboxRef = useRef<HTMLDivElement | null>(null);
 	const currentClan = useSelector(selectCurrentClan);
 	const onboardingList = useSelector((state) => selectOnboardingByClan(state, clanId as string));
@@ -48,9 +49,12 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue,
 			anonymous?: boolean,
-			mentionEveryone?: boolean
+			mentionEveryone?: boolean,
+			displayName?: string,
+			clanNick?: string,
+			ephemeralReceiverId?: string
 		) => {
-			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone);
+			sendMessage(content, mentions, attachments, references, anonymous, mentionEveryone, false, undefined, ephemeralReceiverId);
 			handDoMessageMission();
 		},
 		[sendMessage, currentMission]
@@ -82,6 +86,16 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			})
 		);
 	}, [dataReferences.message_ref_id]);
+
+	const handleBotSendMessage = useCallback(
+		(text: string) => {
+			const content: IMessageSendPayload = {
+				t: text
+			};
+			handleSend(content);
+		},
+		[handleSend]
+	);
 
 	useEscapeKey(handleCloseReplyMessageBox, { preventEvent: !dataReferences.message_ref_id });
 

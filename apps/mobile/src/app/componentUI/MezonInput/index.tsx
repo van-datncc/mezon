@@ -1,4 +1,5 @@
 import { size, useTheme } from '@mezon/mobile-ui';
+import { sleep } from '@mezon/utils';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { StyleProp, Text, TextInput, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { ErrorInput } from '../../components/ErrorInput';
@@ -17,6 +18,7 @@ interface IMezonInputProps {
 	onTextChange?: (value: string) => void;
 	maxCharacter?: number;
 	inputWrapperStyle?: StyleProp<ViewStyle>;
+	inputStyle?: StyleProp<TextStyle>;
 	showBorderOnFocus?: boolean;
 	errorMessage?: string;
 	onFocus?: () => void;
@@ -26,6 +28,7 @@ interface IMezonInputProps {
 	disabled?: boolean;
 	isValid?: boolean;
 	defaultValue?: string;
+	forcusInput?: boolean;
 }
 
 export default function MezonInput({
@@ -38,6 +41,7 @@ export default function MezonInput({
 	onTextChange,
 	maxCharacter = 60,
 	inputWrapperStyle,
+	inputStyle,
 	showBorderOnFocus,
 	errorMessage,
 	titleUppercase,
@@ -46,7 +50,8 @@ export default function MezonInput({
 	prefixIcon,
 	disabled = false,
 	isValid = true,
-	defaultValue = ''
+	defaultValue = '',
+	forcusInput = false
 }: IMezonInputProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
@@ -58,6 +63,18 @@ export default function MezonInput({
 	useEffect(() => {
 		setIsCheckValid(validInput(value));
 	}, [value]);
+
+	const focusInput = async () => {
+		await sleep(300);
+		ref.current.focus();
+		setFocus(true);
+	};
+
+	useEffect(() => {
+		if (forcusInput) {
+			focusInput();
+		}
+	}, []);
 
 	function handleClearBtn() {
 		ref && ref.current && ref.current.clear();
@@ -98,7 +115,7 @@ export default function MezonInput({
 						numberOfLines={textarea ? 4 : 1}
 						textAlignVertical={textarea ? 'top' : 'center'}
 						maxLength={maxCharacter}
-						style={[styles.input, textarea && { height: size.s_100 }]}
+						style={[styles.input, textarea && { height: size.s_100 }, inputStyle]}
 						placeholder={placeHolder}
 						placeholderTextColor="gray"
 						onFocus={handleFocus}

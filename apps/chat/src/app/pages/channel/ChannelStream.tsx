@@ -373,17 +373,17 @@ export default function ChannelStream({
 	return (
 		<>
 			{(currentStreamInfo?.streamId !== currentChannel?.channel_id || !isJoin) && (
-				<div className="w-full h-full bg-black flex justify-center items-center">
+				<div className="w-full h-full bg-gray-300 dark:bg-black flex justify-center items-center">
 					<div className="flex flex-col justify-center items-center gap-4 w-full">
 						<div className="w-full flex gap-2 justify-center p-2">
 							{memberJoin.length > 0 && <UserListStreamChannel memberJoin={memberJoin} memberMax={3}></UserListStreamChannel>}
 						</div>
-						<div className="max-w-[350px] text-center text-3xl font-bold">
+						<div className="max-w-[350px] text-center text-3xl font-bold text-gray-800 dark:text-white">
 							{currentChannel?.channel_label && currentChannel.channel_label.length > 20
 								? `${currentChannel.channel_label.substring(0, 20)}...`
 								: currentChannel?.channel_label}
 						</div>
-						{memberJoin.length > 0 ? <div>Everyone is waiting for you inside</div> : <div>No one is currently in stream</div>}
+						{memberJoin.length > 0 ? <div className="text-gray-800 dark:text-white">Everyone is waiting for you inside</div> : <div className="text-gray-800 dark:text-white">No one is currently in stream</div>}
 						<button
 							disabled={!memberJoin.length}
 							className={`bg-green-700 rounded-3xl p-2 ${memberJoin.length > 0 ? 'hover:bg-green-600' : 'opacity-50'}`}
