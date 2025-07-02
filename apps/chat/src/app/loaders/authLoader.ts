@@ -1,6 +1,6 @@
 import {
-	accountActions,
 	AppDispatch,
+	accountActions,
 	authActions,
 	clansActions,
 	directActions,
@@ -15,6 +15,7 @@ import {
 	usersClanActions
 } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import { CustomLoaderFunction } from './appLoader';
 
 export interface IAuthLoaderData {
@@ -52,6 +53,27 @@ const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
 	});
 };
 
+const waitForSocketConnection = createAsyncThunk('auth/waitForSocketConnection', async (_, { extra }) => {
+	const { mezon } = extra as any;
+	if (!mezon) {
+		return;
+	}
+
+	return new Promise<void>((resolve) => {
+		const interval = setInterval(() => {
+			if (mezon.socketRef.current && (mezon.socketRef.current as any).adapter && (mezon.socketRef.current as any).adapter.isOpen()) {
+				clearInterval(interval);
+				resolve();
+			}
+		}, 100);
+
+		setTimeout(() => {
+			clearInterval(interval);
+			resolve();
+		}, 5000);
+	});
+});
+
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
 	let retries = 6;
 	let attempt = 0;
@@ -72,6 +94,7 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 			if (!(response as unknown as IWithError).error) {
 				const profileResponse = await dispatch(accountActions.getUserProfile());
 				if (!(profileResponse as unknown as IWithError).error) {
+					await dispatch(waitForSocketConnection());
 					return { isLogin: true } as IAuthLoaderData;
 				}
 				throw new Error('Session expired');

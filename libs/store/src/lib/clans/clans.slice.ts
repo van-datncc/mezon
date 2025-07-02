@@ -97,7 +97,7 @@ export const changeCurrentClan = createAsyncThunk<void, ChangeCurrentClanArgs>(
 				thunkAPI.dispatch(rolesClanActions.fetchRolesClan({ clanId }));
 				thunkAPI.dispatch(eventManagementActions.fetchEventManagement({ clanId }));
 				thunkAPI.dispatch(policiesActions.fetchPermissionsUser({ clanId }));
-				thunkAPI.dispatch(policiesActions.fetchPermission());
+				thunkAPI.dispatch(policiesActions.fetchPermission({}));
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId }));
 				thunkAPI.dispatch(defaultNotificationActions.getDefaultNotificationClan({ clanId: clanId }));
 				thunkAPI.dispatch(channelsActions.setStatusChannelFetch(clanId));

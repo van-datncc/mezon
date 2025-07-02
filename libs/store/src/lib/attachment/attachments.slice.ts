@@ -102,7 +102,7 @@ export const fetchChannelAttachments = createAsyncThunk(
 
 			const attachments = response.attachments.map((attachmentRes) => mapChannelAttachmentsToEntity(attachmentRes, channelId, clanId));
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return {
 					attachments: [],
 					channelId,

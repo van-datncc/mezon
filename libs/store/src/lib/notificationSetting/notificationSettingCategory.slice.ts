@@ -98,7 +98,7 @@ export const getDefaultNotificationCategory = createAsyncThunk(
 				return thunkAPI.rejectWithValue('Invalid getDefaultNotificationCategory');
 			}
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return {
 					fromCache: true,
 					categoryId,
@@ -299,12 +299,12 @@ export const fetchChannelCategorySettingCached = async (getState: () => RootStat
 		mezon,
 		{
 			api_name: 'GetChannelCategoryNotiSettingsList',
-			notification_category: {
+			notification_clan: {
 				clan_id: clanId
 			}
 		},
 		() => mezon.client.getChannelCategoryNotiSettingsList(mezon.session, clanId),
-		'notificaion_category_list'
+		'notification_list'
 	);
 
 	markApiFirstCalled(apiKey);
@@ -324,7 +324,7 @@ export const fetchChannelCategorySetting = createAsyncThunk(
 
 			const response = await fetchChannelCategorySettingCached(thunkAPI.getState as () => RootState, mezon, clanId, Boolean(noCache));
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return {
 					fromCache: true,
 					clanId,

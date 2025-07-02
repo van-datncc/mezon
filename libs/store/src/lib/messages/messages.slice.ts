@@ -39,7 +39,7 @@ import { channelMetaActions } from '../channels/channelmeta.slice';
 import { selectShowScrollDownButton } from '../channels/channels.slice';
 import { selectCurrentDM } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
-import { MezonValueContext, ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
 import { referencesActions, selectDataReferences } from './references.slice';
@@ -207,32 +207,32 @@ export const fetchMessagesCached = async (
 		};
 	}
 
-	const response = await fetchDataWithSocketFallback(
-		ensuredMezon,
-		{
-			api_name: 'ListChannelMessages',
-			list_channel_message_req: {
-				channel_id: channelId,
-				message_id: messageId,
-				direction,
-				clan_id: clanId,
-				topic_id: topicId,
-				limit: LIMIT_MESSAGE
-			}
-		},
-		() => ensuredMezon.client.listChannelMessages(ensuredMezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId),
-		'channel_message_list'
-	);
+	// const response = await fetchDataWithSocketFallback(
+	// 	ensuredMezon,
+	// 	{
+	// 		api_name: 'ListChannelMessages',
+	// 		list_channel_message_req: {
+	// 			channel_id: channelId,
+	// 			message_id: messageId,
+	// 			direction,
+	// 			clan_id: clanId,
+	// 			topic_id: topicId,
+	// 			limit: LIMIT_MESSAGE
+	// 		}
+	// 	},
+	// 	() => ensuredMezon.client.listChannelMessages(ensuredMezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId),
+	// 	'channel_message_list'
+	// );
 
-	// if (response?.messages) {
-	// 	response.messages = response.messages.map((item) => ({
-	// 		...item,
-	// 		attachments: safeJSONParse(item.attachments as any),
-	// 		content: safeJSONParse(item.content as any),
-	// 		mentions: safeJSONParse(item.mentions as any),
-	// 		references: safeJSONParse(item.references as any)
-	// 	}));
-	// }
+	const response = await ensuredMezon.client.listChannelMessages(
+		ensuredMezon.session,
+		clanId,
+		channelId,
+		messageId,
+		direction,
+		LIMIT_MESSAGE,
+		topicId
+	);
 
 	markApiFirstCalled(apiKey);
 

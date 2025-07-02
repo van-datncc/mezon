@@ -92,7 +92,7 @@ export const auditLogList = createAsyncThunk(
 				return thunkAPI.rejectWithValue('Invalid auditLogList');
 			}
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return {
 					fromCache: true
 				};
