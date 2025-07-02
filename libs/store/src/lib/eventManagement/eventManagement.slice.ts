@@ -4,7 +4,7 @@ import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, crea
 import { ApiEventManagement, ApiGenerateMezonMeetResponse, ApiUserEventRequest } from 'mezon-js/api.gen';
 import { ApiCreateEventRequest, MezonUpdateEventBody } from 'mezon-js/dist/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const EVENT_MANAGEMENT_FEATURE_KEY = 'eventmanagement';
@@ -38,7 +38,18 @@ export const fetchEventManagementCached = async (getState: () => RootState, ensu
 			fromCache: true
 		};
 	}
-	const response = await ensuredMezon.client.listEvents(ensuredMezon.session, clanId);
+
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListEvents',
+			list_event_req: {
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.listEvents(ensuredMezon.session, clanId),
+		'event_list'
+	);
 
 	markApiFirstCalled(apiKey);
 

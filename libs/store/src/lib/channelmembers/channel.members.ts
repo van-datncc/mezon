@@ -137,7 +137,7 @@ export const fetchChannelMembers = createAsyncThunk(
 					channelType
 				);
 
-				if (!response.fromCache && !(Date.now() - response.time > 100)) {
+				if (!response.fromCache && !response.fromCache) {
 					thunkAPI.dispatch(
 						channelMembersActions.setMemberChannels({ channelId: currentChannel.parent_id, members: response.channel_users ?? [] })
 					);
@@ -150,7 +150,7 @@ export const fetchChannelMembers = createAsyncThunk(
 				return { channel_users: [], fromCache: true, channelId };
 			}
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return { channel_users: response.channel_users || [], fromCache: false, channelId };
 			}
 

@@ -151,7 +151,7 @@ export const fetchDirectMessage = createAsyncThunk(
 				thunkAPI.dispatch(directActions.setAllStatusDMUnread(listStatusUnreadDM));
 			}
 
-			if (Date.now() - response.time > 100) {
+			if (response.fromCache) {
 				return [];
 			}
 
@@ -273,7 +273,7 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 					})
 				);
 
-				// TODO: update e2ee later
+				// TODO: update e2ee later gg
 				thunkAPI
 					.dispatch(
 						channelMembersActions.fetchChannelMembers({

@@ -562,7 +562,7 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 
 		const response = await fetchListFavoriteChannelCached(thunkAPI.getState as () => RootState, mezon, clanId, noCache);
 
-		if (Date.now() - response.time > 100) {
+		if (response.fromCache) {
 			return {
 				fromCache: true
 			};
@@ -630,7 +630,6 @@ export const addThreadToChannels = createAsyncThunk(
 	'channels/addThreadToChannels',
 	async ({ clanId, channelId }: { clanId: string; channelId: string }, thunkAPI) => {
 		const channelData = selectChannelByIdAndClanId(thunkAPI.getState() as RootState, clanId, channelId);
-
 		if (channelId && !channelData) {
 			const data = await thunkAPI
 				.dispatch(
@@ -641,17 +640,18 @@ export const addThreadToChannels = createAsyncThunk(
 					})
 				)
 				.unwrap();
-			if (data?.length > 0) {
+
+			if (data?.threads?.length > 0) {
 				thunkAPI.dispatch(
 					channelsActions.upsertOne({
 						clanId: clanId,
-						channel: { ...data[0], active: 1 } as ChannelsEntity
+						channel: { ...data.threads[0], active: 1 } as ChannelsEntity
 					})
 				);
 				thunkAPI.dispatch(
 					listChannelRenderAction.addThreadToListRender({
 						clanId: clanId,
-						channel: { ...data[0], active: 1 } as ChannelsEntity
+						channel: { ...data.threads[0], active: 1 } as ChannelsEntity
 					})
 				);
 			}
@@ -739,8 +739,8 @@ export const fetchChannels = createAsyncThunk(
 						})
 					)
 					.unwrap();
-				if (data?.length > 0) {
-					response.channeldesc.push({ ...data[0], active: 1 } as ChannelsEntity);
+				if (data?.threads?.length > 0) {
+					response.channeldesc.push({ ...data.threads[0], active: 1 } as ChannelsEntity);
 				}
 			}
 
