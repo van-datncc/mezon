@@ -1,12 +1,12 @@
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { Dropdown, Label, Modal } from 'flowbite-react';
+import { Dropdown } from 'flowbite-react';
 import { ReactNode, useEffect, useState } from 'react';
+import { ModalLayout } from '../../../components';
 
 type ModalCustomStatusProps = {
 	name: string;
-	openModal: boolean;
-	onClose?: () => void;
+	onClose: () => void;
 	customStatus?: string;
 	setCustomStatus: (customStatus: string) => void;
 	handleSaveCustomStatus?: () => void;
@@ -15,7 +15,6 @@ type ModalCustomStatusProps = {
 };
 
 const ModalCustomStatus = ({
-	openModal,
 	name,
 	customStatus,
 	onClose,
@@ -27,10 +26,8 @@ const ModalCustomStatus = ({
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (openModal) {
-			dispatch(userClanProfileActions.setShowModalFooterProfile(false));
-		}
-	}, [dispatch, openModal]);
+		dispatch(userClanProfileActions.setShowModalFooterProfile(false));
+	}, []);
 
 	const handleChangeCustomStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const updatedStatus = e.target.value.slice(0, 128).replace(/\\/g, '\\\\');
@@ -55,18 +52,15 @@ const ModalCustomStatus = ({
 	};
 
 	return (
-		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[440px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded">
+		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
+			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded w-[440px]">
 				<div>
 					<h1 className="dark:text-textDarkTheme  text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
 				<div className="flex w-full flex-col gap-5 pt-4">
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label
-								value={`What's cookin', ${name}?`}
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
-							/>
+							<p className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">What's cookin', {name}</p>
 						</div>
 						<input
 							type="text"
@@ -79,11 +73,7 @@ const ModalCustomStatus = ({
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label
-								htmlFor="clearAfter"
-								value="Clear after"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
-							/>
+							<p className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">Clear after</p>
 						</div>
 						<Dropdown
 							trigger="click"
@@ -107,11 +97,9 @@ const ModalCustomStatus = ({
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<Label
-								htmlFor="status"
-								value="Status"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
-							/>
+							<label htmlFor="status" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">
+								Status
+							</label>
 						</div>
 						<Dropdown
 							trigger="click"
@@ -150,7 +138,7 @@ const ModalCustomStatus = ({
 					</div>
 				</div>
 			</div>
-		</Modal>
+		</ModalLayout>
 	);
 };
 
