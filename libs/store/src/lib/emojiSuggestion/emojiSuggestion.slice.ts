@@ -4,7 +4,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Ent
 import { ClanEmoji } from 'mezon-js';
 import { ApiClanEmojiCreateRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { ensureSession, fetchDataWithSocketFallback, getMezonCtx, MezonValueContext } from '../helpers';
 import { RootState } from '../store';
 
 export const EMOJI_SUGGESTION_FEATURE_KEY = 'suggestionEmoji';
@@ -63,7 +63,15 @@ export const fetchEmojiCached = async (getState: () => RootState, ensuredMezon: 
 			fromCache: true
 		};
 	}
-	const response = await ensuredMezon.client.getListEmojisByUserId(ensuredMezon.session);
+
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'GetListEmojisByUserId'
+		},
+		() => ensuredMezon.client.getListEmojisByUserId(ensuredMezon.session),
+		'emoji_list'
+	);
 
 	markApiFirstCalled(apiKey);
 
@@ -101,7 +109,6 @@ export const createEmojiSetting = createAsyncThunk(
 			if (!res) {
 				return thunkAPI.rejectWithValue({});
 			}
-			thunkAPI.dispatch(fetchEmoji({ noCache: true }));
 		} catch (error) {
 			captureSentryError(error, 'emoji/createEmoji');
 			return thunkAPI.rejectWithValue(error);

@@ -3,7 +3,7 @@ import { IDefaultNotification, IDefaultNotificationClan, LoadingStatus } from '@
 import { PayloadAction, createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiNotificationSetting } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY = 'defaultnotificationclan';
@@ -37,7 +37,6 @@ type fetchNotificationClanSettingsArgs = {
 };
 
 export const fetchDefaultNotificationClanCached = async (getState: () => RootState, mezon: MezonValueContext, clanId: string, noCache = false) => {
-	const socket = mezon.socketRef?.current;
 	const currentState = getState();
 	const clanData = currentState[DEFAULT_NOTIFICATION_CLAN_FEATURE_KEY].byClans[clanId];
 	const apiKey = createApiKey('fetchDefaultNotificationClan', clanId);
@@ -52,26 +51,17 @@ export const fetchDefaultNotificationClanCached = async (getState: () => RootSta
 		};
 	}
 
-	let response;
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'GetNotificationClan',
-				notification_clan: {
-					clan_id: clanId
-				}
-			});
-			response = data?.notification_clan;
-			console.log(data, 'GetNotificationClan');
-		} catch (err) {
-			console.log(err, 'GetNotificationClan');
-			// ignore
-		}
-	}
-
-	if (!response) {
-		response = await mezon.client.getNotificationClan(mezon.session, clanId);
-	}
+	const response = await fetchDataWithSocketFallback(
+		mezon,
+		{
+			api_name: 'GetNotificationClancase',
+			notification_clan: {
+				clan_id: clanId
+			}
+		},
+		() => mezon.client.getNotificationClan(mezon.session, clanId),
+		'notification_setting'
+	);
 
 	markApiFirstCalled(apiKey);
 

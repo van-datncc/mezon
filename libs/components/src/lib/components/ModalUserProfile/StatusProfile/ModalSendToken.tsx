@@ -1,14 +1,12 @@
 import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUserClans } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
-import { Label, Modal } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AvatarImage, useVirtualizer } from '../../../components';
+import { AvatarImage, ModalLayout, useVirtualizer } from '../../../components';
 
 type ModalSendTokenProps = {
-	openModal: boolean;
-	onClose?: () => void;
+	onClose: () => void;
 	token: number;
 	setToken: (token: number) => void;
 	setSelectedUserId: (id: string) => void;
@@ -28,7 +26,6 @@ type ModalSendTokenProps = {
 };
 
 const ModalSendToken = ({
-	openModal,
 	onClose,
 	token,
 	setToken,
@@ -54,14 +51,13 @@ const ModalSendToken = ({
 	const [noteSendToken, setNoteSendToken] = useState(note || '');
 
 	useEffect(() => {
-		if (!openModal) {
+		setSelectedUserId('');
+
+		return () => {
 			setSearchTerm('');
 			setToken(0);
-		}
-		if (openModal) {
-			setSelectedUserId('');
-		}
-	}, [openModal]);
+		};
+	}, []);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -160,8 +156,8 @@ const ModalSendToken = ({
 	const amountRef = useRef<HTMLInputElement | null>(null);
 
 	return (
-		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[480px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="dark:bg-bgPrimary bg-bgLightMode rounded-xl overflow-hidden">
+		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
+			<div className="dark:bg-bgPrimary bg-bgLightMode rounded-xl overflow-hidden w-[480px]">
 				<div className="flex items-center justify-between p-6 border-b dark:border-gray-700 border-gray-200">
 					<div className="flex items-center gap-3">
 						<div className="w-10 h-10 rounded-full dark:bg-blue-600 bg-blue-500 flex items-center justify-center">
@@ -182,10 +178,7 @@ const ModalSendToken = ({
 
 				<div className="p-6 space-y-6">
 					<div className="space-y-3">
-						<Label value="To" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
-							<Icons.UserIcon className="w-4 h-4" />
-							Recipient
-						</Label>
+						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">To</p>
 						<div className="relative">
 							<input
 								type="text"
@@ -257,10 +250,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<Label value="Amount" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
-							<Icons.DollarIcon className="w-4 h-4" />
-							Amount
-						</Label>
+						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">Amount</p>
 						<div className="relative">
 							<input
 								ref={amountRef}
@@ -279,10 +269,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<Label value="Note" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
-							<Icons.ThreadIcon className="w-4 h-4" />
-							Note (Optional)
-						</Label>
+						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">Note (Optional)</p>
 						<input
 							type="text"
 							defaultValue={noteSendToken}
@@ -311,7 +298,7 @@ const ModalSendToken = ({
 					</button>
 				</div>
 			</div>
-		</Modal>
+		</ModalLayout>
 	);
 };
 

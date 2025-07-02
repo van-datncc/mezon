@@ -264,10 +264,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	return (
 		<div
-			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${statusMenu
-				? 'max-sbm:fixed max-sbm:left-[72px] max-sbm:w-[calc(100vw-72px)] max-sbm:z-20 sbm:!w-widthChannelList'
-				: 'hidden'
-				} sbm:block`}
+			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${
+				statusMenu ? 'max-sbm:fixed max-sbm:left-[72px] max-sbm:w-[calc(100vw-72px)] max-sbm:z-20 sbm:!w-widthChannelList' : 'hidden'
+			} sbm:block`}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
@@ -296,8 +295,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
 						<div className="flex flex-col dark:text-contentSecondary text-colorTextLightMode overflow-hidden">
-							<p className="text-base font-medium truncate dark:text-contentSecondary text-black max-w-[150px] max-sbm:max-w-[100px]">{name}</p>
-							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">{customStatus}</p>
+							<p className="text-base font-medium truncate dark:text-contentSecondary text-black max-w-[150px] max-sbm:max-w-[100px]">
+								{name}
+							</p>
+							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">
+								{customStatus}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -326,7 +329,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					customStatus={userCustomStatus.status || ''}
 					handleSaveCustomStatus={handleSaveCustomStatus}
 					name={name}
-					openModal={showModalCustomStatus}
 					onClose={handleCloseModalCustomStatus}
 					setNoClearStatus={setNoClearStatus}
 					setResetTimerStatus={setResetTimerStatus}
@@ -338,7 +340,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					token={token}
 					selectedUserId={selectedUserId}
 					handleSaveSendToken={handleSaveSendToken}
-					openModal={showModalSendToken}
 					onClose={handleClosePopup}
 					setSelectedUserId={setSelectedUserId}
 					setNote={setNote}

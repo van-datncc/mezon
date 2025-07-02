@@ -52,7 +52,6 @@ import {
 	policiesActions,
 	resetChannelBadgeCount,
 	rolesClanActions,
-	selectAllEmojiSuggestion,
 	selectAllTextChannel,
 	selectAllThreads,
 	selectAllUserClans,
@@ -70,6 +69,7 @@ import {
 	selectCurrentUserId,
 	selectDmGroupCurrentId,
 	selectIsInCall,
+	selectLastMessageByChannelId,
 	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
@@ -295,10 +295,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
-			const store = await getStoreAsync();
-			// check mobile
+			const store = getStore();
 			const isMobile = false;
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
+
+			if (message.id === '0') {
+				const lastMessage = selectLastMessageByChannelId(store.getState(), message.channel_id);
+				if (lastMessage?.id) {
+					message.id = (BigInt(lastMessage.id) + BigInt(1)).toString();
+					message.message_id = message.id;
+				}
+			}
+
 			if (message.code === TypeMessage.MessageBuzz) {
 				handleBuzz(message.channel_id, message.sender_id, true, message.mode);
 			}
@@ -885,10 +893,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const oneventemoji = useCallback(
 		async (eventEmoji: EventEmoji) => {
-			const store = await getStoreAsync();
-			const state = store.getState() as RootState;
-			const emojiList = selectAllEmojiSuggestion(state) as ApiClanEmoji[];
-
 			if (eventEmoji.action === EEventAction.CREATED) {
 				const newEmoji: ApiClanEmoji = {
 					category: eventEmoji.clan_name,
@@ -896,7 +900,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					creator_id: eventEmoji.user_id,
 					id: eventEmoji.id,
 					shortname: eventEmoji.short_name,
-					src: eventEmoji.source,
+					src: eventEmoji.user_id === userId || !eventEmoji.is_for_sale ? eventEmoji.source : undefined,
 					logo: eventEmoji.logo,
 					clan_name: eventEmoji.clan_name
 				};

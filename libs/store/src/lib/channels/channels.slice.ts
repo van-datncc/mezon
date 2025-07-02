@@ -28,7 +28,6 @@ import {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
 	ApiChannelAppResponse,
-	ApiChannelDescList,
 	ApiChannelDescription,
 	ApiCreateChannelDescRequest,
 	ApiMarkAsReadRequest
@@ -37,7 +36,7 @@ import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, s
 import { FetchCategoriesPayload, categoriesActions } from '../categories/categories.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { channelMembersActions } from '../channelmembers/channel.members';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { messagesActions } from '../messages/messages.slice';
 import { selectEntiteschannelCategorySetting } from '../notificationSetting/notificationSettingCategory.slice';
 import { notificationSettingActions } from '../notificationSetting/notificationSettingChannel.slice';
@@ -193,7 +192,6 @@ export const fetchChannelsCached = async (
 	channelType: number,
 	noCache = false
 ) => {
-	const socket = ensuredMezon.socketRef?.current;
 	const currentState = getState();
 	const clanData = currentState[CHANNELS_FEATURE_KEY].byClans[clanId];
 	const apiKey = createApiKey('fetchChannels', clanId, channelType);
@@ -209,27 +207,20 @@ export const fetchChannelsCached = async (
 		};
 	}
 
-	let response;
-	if (socket) {
-		try {
-			const data = await socket.listDataSocket({
-				api_name: 'ListChannelDescs',
-				list_channel_req: {
-					limit,
-					state: { value: 1 },
-					channel_type: channelType,
-					clan_id: clanId
-				}
-			});
-			response = data?.channel_desc_list as ApiChannelDescList;
-		} catch (err) {
-			// ignore
-		}
-	}
-
-	if (!response) {
-		response = await ensuredMezon.client.listChannelDescs(ensuredMezon.session, limit, state, '', clanId, channelType);
-	}
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListChannelDescs',
+			list_channel_req: {
+				limit,
+				state,
+				channel_type: channelType,
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.listChannelDescs(ensuredMezon.session, limit, state, '', clanId, channelType),
+		'channel_desc_list'
+	);
 
 	markApiFirstCalled(apiKey);
 
@@ -256,7 +247,17 @@ export const fetchListFavoriteChannelCached = async (getState: () => RootState, 
 		};
 	}
 
-	const response = await ensuredMezon.client.getListFavoriteChannel(ensuredMezon.session, clanId);
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'GetListFavoriteChannel',
+			favorite_channel_req: {
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.getListFavoriteChannel(ensuredMezon.session, clanId),
+		'favorite_channel_list'
+	);
 
 	markApiFirstCalled(apiKey);
 
@@ -282,7 +283,17 @@ export const fetchAppChannelCached = async (getState: () => RootState, ensuredMe
 		};
 	}
 
-	const response = await ensuredMezon.client.listChannelApps(ensuredMezon.session, clanId);
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListChannelApps',
+			list_apps_req: {
+				clan_id: clanId
+			}
+		},
+		() => ensuredMezon.client.listChannelApps(ensuredMezon.session, clanId),
+		'channel_apps_list'
+	);
 
 	markApiFirstCalled(apiKey);
 
@@ -551,7 +562,7 @@ export const fetchListFavoriteChannel = createAsyncThunk('channels/favorite', as
 
 		const response = await fetchListFavoriteChannelCached(thunkAPI.getState as () => RootState, mezon, clanId, noCache);
 
-		if (Date.now() - response.time > 100) {
+		if (response.fromCache) {
 			return {
 				fromCache: true
 			};
@@ -619,7 +630,6 @@ export const addThreadToChannels = createAsyncThunk(
 	'channels/addThreadToChannels',
 	async ({ clanId, channelId }: { clanId: string; channelId: string }, thunkAPI) => {
 		const channelData = selectChannelByIdAndClanId(thunkAPI.getState() as RootState, clanId, channelId);
-
 		if (channelId && !channelData) {
 			const data = await thunkAPI
 				.dispatch(
@@ -630,17 +640,18 @@ export const addThreadToChannels = createAsyncThunk(
 					})
 				)
 				.unwrap();
-			if (data?.length > 0) {
+
+			if (data?.threads?.length > 0) {
 				thunkAPI.dispatch(
 					channelsActions.upsertOne({
 						clanId: clanId,
-						channel: { ...data[0], active: 1 } as ChannelsEntity
+						channel: { ...data.threads[0], active: 1 } as ChannelsEntity
 					})
 				);
 				thunkAPI.dispatch(
 					listChannelRenderAction.addThreadToListRender({
 						clanId: clanId,
-						channel: { ...data[0], active: 1 } as ChannelsEntity
+						channel: { ...data.threads[0], active: 1 } as ChannelsEntity
 					})
 				);
 			}
@@ -728,8 +739,8 @@ export const fetchChannels = createAsyncThunk(
 						})
 					)
 					.unwrap();
-				if (data?.length > 0) {
-					response.channeldesc.push({ ...data[0], active: 1 } as ChannelsEntity);
+				if (data?.threads?.length > 0) {
+					response.channeldesc.push({ ...data.threads[0], active: 1 } as ChannelsEntity);
 				}
 			}
 

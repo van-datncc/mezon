@@ -31,16 +31,13 @@ import {
 	normalizeString,
 	removeDuplicatesById
 } from '@mezon/utils';
-import { Label, Modal } from 'flowbite-react';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ModalLayout } from '../../components';
 import MessageContent from '../MessageWithUser/MessageContent';
 import ListSearchForwardMessage from './ListSearchForwardMessage';
 
-type ModalParam = {
-	openModal: boolean;
-};
 type ObjectSend = {
 	id: string;
 	type: number;
@@ -48,7 +45,7 @@ type ObjectSend = {
 	channelLabel?: string;
 	isPublic: boolean;
 };
-const ForwardMessageModal = ({ openModal }: ModalParam) => {
+const ForwardMessageModal = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const dmGroupChatList = useSelector(selectAllDirectMessages);
@@ -302,8 +299,8 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 	};
 
 	return (
-		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[550px]' } }} show={openModal} dismissible={true} onClose={handleCloseModal}>
-			<div className="dark:bg-bgSecondary bg-bgLightMode pt-4 rounded">
+		<ModalLayout className="bg-bgModalDark" onClose={handleCloseModal}>
+			<div className="dark:bg-bgSecondary w-[550px] bg-bgLightMode pt-4 rounded">
 				<div>
 					<h1 className="dark:text-white text-textLightTheme text-xl font-semibold text-center">Forward Message</h1>
 				</div>
@@ -364,7 +361,9 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 				</div>
 				<div className="px-4">
 					<div className="mb-2 block">
-						<Label htmlFor="clearAfter" value="Shared content" className="dark:text-[#B5BAC1] text-xs uppercase font-semibold" />
+						<label htmlFor="clearAfter" className="dark:text-[#B5BAC1] text-xs uppercase font-semibold">
+							Shared content
+						</label>
 					</div>
 					<div
 						className={`h-20 overflow-y-auto dark:bg-bgProfileBody bg-bgLightModeThird p-[5px] rounded ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
@@ -374,7 +373,7 @@ const ForwardMessageModal = ({ openModal }: ModalParam) => {
 					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={handleForward} />
 				</div>
 			</div>
-		</Modal>
+		</ModalLayout>
 	);
 };
 export default ForwardMessageModal;
