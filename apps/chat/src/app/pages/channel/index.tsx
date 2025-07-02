@@ -206,12 +206,12 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 				<div className="flex gap-2 px-3 pt-2 text-theme-primary">
 					<div
 						onClick={handleLaunchApp}
-						className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black"
+						className="w-[calc(50%_-_4px)] border-theme-primary flex gap-1 items-center justify-center bg-item-theme py-2 px-2 rounded-md cursor-pointer font-medium text-theme-primary-hover"
 					>
 						<Icons.Joystick className="w-6" />
 						<div>{appButtonLabel}</div>
 					</div>
-					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black">
+					<div className="w-[calc(50%_-_4px)] border-theme-primary flex gap-1 items-center justify-center bg-item-theme py-2 px-2 rounded-md cursor-pointer font-medium text-theme-primary-hover">
 						<Icons.AppHelpIcon className="w-6" />
 						<div>Help</div>
 					</div>

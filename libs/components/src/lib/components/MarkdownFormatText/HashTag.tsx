@@ -73,7 +73,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			<div
 				onClick={tokenClickAble}
 				style={{ textDecoration: 'none' }}
-				className={`font-medium rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
+				className={`font-medium rounded-sm  inline whitespace-nowrap bg-mention color-mention${!isJumMessageEnabled ? ' hover-mention ' : `hover:none cursor-text`} `}
 			>
 				{channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 					<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />

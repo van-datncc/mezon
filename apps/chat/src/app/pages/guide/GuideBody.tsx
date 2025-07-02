@@ -87,17 +87,17 @@ function GuideBody() {
 	}, []);
 
 	return (
-		<div className="w-full h-full pt-4 bg-gray-50 dark:bg-transparent">
+		<div className="w-full h-full pt-4 ">
 			<div className="flex gap-6">
 				<div className="flex-1 flex flex-col gap-2">
 					<div className="flex flex-col gap-2">
-						<p className="p-2 text-xl font-bold text-gray-800 dark:text-white">Questions</p>
-						<div className="bg-white dark:bg-bgSecondaryHover flex flex-col gap-2 rounded-lg relative shadow-sm dark:shadow-none">
+						<p className="p-2 text-xl font-bold ">Questions</p>
+						<div className=" flex flex-col gap-2 rounded-lg relative shadow-sm dark:shadow-none">
 							{onboardingItem?.question.length > 0 ? (
 								<>
 									{onboardingItem?.question.map((question) => <QuestionItems question={question} key={question.id} />)}
 									<div className="absolute top-0 -left-4 w-1 h-full">
-										<div className="flex bg-gray-200 dark:bg-slate-700 relative rounded-2xl w-1 h-full overflow-hidden">
+										<div className="flex  relative rounded-2xl w-1 h-full overflow-hidden">
 											<div
 												className="absolute w-1 h-full transition-transform duration-1000 bg-green-600 dark:bg-[#16A34A] rounded-2xl"
 												style={{
@@ -111,7 +111,7 @@ function GuideBody() {
 							) : (
 								<>
 									{(!onboadingMode || (onboadingMode && formOnboarding?.questions?.length === 0)) && (
-											<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-gray-600 dark:text-channelTextLabel font-semibold justify-between bg-white dark:bg-[#282a2e] rounded-lg shadow-sm dark:shadow-none">
+										<div className="flex gap-2 h-20 p-4 w-full text-lg items-center font-semibold justify-between bg-item-theme rounded-lg shadow-sm">
 											You don't have any questions. Setting questions for this clan first !!
 										</div>
 									)}
@@ -120,7 +120,7 @@ function GuideBody() {
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
-						<p className="p-2 text-xl font-bold text-gray-800 dark:text-white">Resources</p>
+						<p className="p-2 text-xl font-bold ">Resources</p>
 						{onboardingItem?.rule?.length > 0 ? (
 							onboardingItem.rule.map((rule) => (
 								<GuideItemLayout
@@ -129,10 +129,10 @@ function GuideBody() {
 									hightLightIcon={true}
 									description={rule.content}
 									icon={<Icons.RuleIcon defaultFill="#e4e4e4" />}
-									background="bg-white dark:bg-gray-800"
-									className="shadow-sm dark:shadow-none"
+									background=""
+									className="shadow-sm bg-item-theme"
 									action={
-										<div className="w-[72px] aspect-square bg-gray-100 dark:bg-black rounded-lg flex overflow-hidden">
+										<div className="w-[72px] aspect-square  rounded-lg flex overflow-hidden">
 											{rule.image_url && <img src={rule.image_url} className="w-full h-full object-cover" />}
 										</div>
 									}
@@ -141,7 +141,7 @@ function GuideBody() {
 						) : (
 							<>
 								{(!onboadingMode || (onboadingMode && formOnboarding?.rules?.length === 0)) && (
-										<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-gray-600 dark:text-channelTextLabel font-semibold justify-between bg-white dark:bg-[#282a2e] rounded-lg shadow-sm dark:shadow-none">
+									<div className="flex gap-2 h-20 p-4 w-full text-lg items-center  font-semibold justify-between  rounded-lg shadow-sm bg-item-theme">
 										You don't have any rule. Setting rule for this clan first !!
 									</div>
 								)}
@@ -158,13 +158,13 @@ function GuideBody() {
 									icon={<Icons.RuleIcon />}
 									background="bg-white dark:bg-gray-800"
 									className="shadow-sm dark:shadow-none text-white"
-									action={<div className="w-[72px] aspect-square bg-gray-100 dark:bg-black rounded-lg"></div>}
+									action={<div className="w-[72px] aspect-square  rounded-lg"></div>}
 								/>
 							))}
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<p className="p-2 text-xl font-bold text-gray-800 dark:text-white">Missions </p>
+						<p className="p-2 text-xl font-bold ">Missions </p>
 						{onboardingItem?.mission?.length > 0 ? (
 							onboardingItem.mission.map((mission, index) => (
 								<GuideItemMission
@@ -177,7 +177,7 @@ function GuideBody() {
 						) : (
 							<>
 								{(!onboadingMode || (onboadingMode && formOnboarding?.task?.length === 0)) && (
-										<div className="flex gap-2 h-20 p-4 w-full text-lg items-center text-gray-600 dark:text-channelTextLabel font-semibold justify-between bg-white dark:bg-[#282a2e] rounded-lg shadow-sm dark:shadow-none">
+									<div className="flex gap-2 h-20 p-4 w-full text-lg items-center  font-semibold justify-between  rounded-lg shadow-sm bg-item-theme">
 										You don't have any mission. Setting mision for this clan first !!
 									</div>
 								)}
@@ -190,9 +190,9 @@ function GuideBody() {
 							))}
 					</div>
 				</div>
-				<div className="mt-8 flex flex-col gap-2 h-20 p-4 w-[300px] text-base justify-between bg-white dark:bg-[#282a2e] rounded-lg shadow-sm dark:shadow-none">
-					<div className="font-bold text-gray-800 dark:text-white">About</div>
-					<div className="text-gray-600 dark:text-channelTextLabel text-xs">Members online</div>
+				<div className="mt-8 flex flex-col gap-2 h-20 p-4 w-[300px] bg-item-theme text-base justify-between  rounded-lg shadow-sm ">
+					<div className="font-bold ">About</div>
+					<div className=" text-xs">Members online</div>
 				</div>
 			</div>
 		</div>
@@ -217,7 +217,7 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 			onClick={onClick}
 			background="bg-white dark:bg-gray-800"
 			description={
-				<span className="text-gray-600 dark:text-channelTextLabel">
+				<span className="">
 					{titleMission[mission.task_type ? mission.task_type - 1 : 0] || ''}{' '}
 					<span className="font-semibold text-blue-600 dark:text-channelActiveColor"> #{channelById?.channel_label} </span>{' '}
 				</span>
@@ -275,11 +275,11 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 						<GuideItemLayout
 							key={answer.title}
 							icon={answer.emoji}
-							description={<span className="text-gray-600 dark:text-channelTextLabel">{answer.description}</span>}
+							description={<span className="">{answer.description}</span>}
 							title={answer.title}
 							height={'h-auto'}
 							onClick={() => handleOnClickQuestion(index)}
-							className={` w-fit h-fit rounded-xl hover:bg-transparent text-gray-800 dark:text-white justify-center items-center px-4 py-2 border-2 border-gray-200 dark:border-[#4e5058] hover:border-gray-400 dark:hover:border-[#7d808c] font-medium flex gap-2 ${hightLight(index)}`}
+							className={` w-fit h-fit rounded-xl hover:bg-transparent  justify-center items-center px-4 py-2 border-2 border-gray-200 dark:border-[#4e5058] hover:border-gray-400 dark:hover:border-[#7d808c] font-medium flex gap-2 ${hightLight(index)}`}
 							background="bg-white dark:bg-transparent"
 						/>
 					))}

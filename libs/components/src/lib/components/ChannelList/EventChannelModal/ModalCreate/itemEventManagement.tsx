@@ -140,7 +140,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	useOnClickOutside(panelRef, () => setOpenPanel(false));
 
 	const cssEventStatus = useMemo(() => {
-		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
+		return eventIsUpcomming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : '';
 	}, [event?.event_status]);
 
 	const { toChannelPage, navigate } = useAppNavigation();
@@ -188,9 +188,9 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 	};
 
 	return (
-		<div className="dark:bg-[#212529] bg-bgModifierHoverLight rounded-lg overflow-hidden" ref={panelRef}>
+		<div className="rounded-lg overflow-hidden bg-theme-setting-nav border-theme-primary" ref={panelRef}>
 			{logo && <img src={logo} alt="logo" className="w-full max-h-[180px] object-cover" />}
-			<div className="p-4 border-b dark:border-slate-600 border-white cursor-pointer" onClick={() => event && setChooseEvent(event)}>
+			<div className="p-4 border-b-theme-primary cursor-pointer" onClick={() => event && setChooseEvent(event)}>
 				<div className="flex justify-between">
 					<div className="flex items-center gap-x-2 mb-4">
 						<Icons.IconEvents defaultSize={`font-semibold ${cssEventStatus}`} />
@@ -222,7 +222,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 				</div>
 				<div className="flex justify-between gap-4 select-text">
 					<div className={`${isReviewEvent || !logoRight ? 'w-full' : 'w-3/5'}`}>
-						<p className="hover:underline font-bold dark:text-white text-black text-base">{topic}</p>
+						<p className="hover:underline font-bold  text-base">{topic}</p>
 						<div className="break-all max-h-[75px] eventDescriptionTruncate">
 							{isReviewEvent ? reviewDescription : event?.description}
 						</div>
@@ -272,7 +272,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					{option === '' && !address && !channelVoice && (
 						<>
 							<Icons.Location />
-							<p className="hover:underline text-slate-400">{channelFirst.channel_label}</p>
+							<p className="hover:underline ">{channelFirst.channel_label}</p>
 						</>
 					)}
 					{isPrivateEvent && (
@@ -283,7 +283,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 									Private Room
 								</a>
 							) : (
-								<span className="text-gray-400 whitespace-normal break-words cursor-not-allowed">Private Room</span>
+								<span className="whitespace-normal break-words cursor-not-allowed">Private Room</span>
 							)}
 						</div>
 					)}
@@ -296,14 +296,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							handleStopPropagation(e);
 						}}
 					>
-						<div onClick={(e) => handleOpenPanel(e)}>
-							<Icons.IconEditThreeDot className="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black rotate-90" />
+						<div className="text-theme-primary-hover" onClick={(e) => handleOpenPanel(e)}>
+							<Icons.IconEditThreeDot className="rotate-90" />
 						</div>
 
 						{!checkOptionLocation && (
 							<button
 								onClick={() => setOpenModalShare(true)}
-								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+								className="flex gap-x-1 rounded-lg px-4 py-2  bg-theme-primary text-theme-primary-hover  hover:bg-opacity-80 font-medium "
 							>
 								{checkOptionVoice && <Icons.IconShareEventVoice />}
 								{checkOptionLocation && <Icons.IConShareEventLocation />}
@@ -313,7 +313,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 
 						{eventIsOngoing && isClanOwner ? (
 							<button
-								className="flex gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+								className="flex gap-x-1 rounded-lg text-theme-primary-hover px-4 py-2 bg-theme-primary "
 								onClick={() => setOpenModalDelEvent(true)}
 							>
 								End event
@@ -321,7 +321,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 						) : !eventIsOngoing ? (
 							<button
 								onClick={handleToggleUserEvent}
-								className="flex items-center gap-x-1 rounded px-4 py-2 dark:bg-zinc-600 bg-[#6d6f78] hover:bg-opacity-80 font-medium text-white"
+								className="flex items-center gap-x-1 rounded-lg text-theme-primary-hover px-4 py-2 bg-theme-primary"
 							>
 								{isInterested ? <Icons.MuteBell defaultSize="size-4 text-white" /> : <Icons.Bell className="size-4 text-white" />}
 								<span className="whitespace-nowrap">
@@ -337,7 +337,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 			<div className="flex gap-x-2 mx-4 mb-2">
 				{isPrivateEvent ? (
 					<span className="flex flex-row items-center gap-2">
-						<p className="text-slate-400">Only invited members can join.</p>
+						<p className="">Only invited members can join.</p>
 						{hasLink && (
 							<>
 								<button onClick={handleOpenLink} className="text-blue-500 hover:underline">
@@ -357,14 +357,14 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 					</span>
 				) : isChannelEvent ? (
 					<span className="flex flex-row">
-						<p className="text-slate-400">
+						<p className="">
 							{`The audience consists of members from ${isThread ? 'thread: ' : 'channel: '}`}
-							<strong className="text-slate-100">{textChannel.channel_label}</strong>
+							<strong className="">{textChannel.channel_label}</strong>
 						</p>
 					</span>
 				) : isClanEvent ? (
 					<span className="flex flex-row">
-						<p className="text-slate-400">This event is open to everyone in the clan.</p>
+						<p className="">This event is open to everyone in the clan.</p>
 					</span>
 				) : null}
 			</div>
