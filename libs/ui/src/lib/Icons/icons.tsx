@@ -180,7 +180,7 @@ export function AddIcon({ fill = 'currentColor', ...props }: ClassIconProps) {
 export function Check(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="false" aria-label="Check" viewBox="0 0 16 15.2" {...props}>
-			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" stroke='currentColor' />
+			<path d="M7.4 11.17L4 8.62l1-1.36 2 1.53L10.64 4 12 5z" stroke="currentColor" />
 		</svg>
 	);
 }
@@ -4440,7 +4440,7 @@ export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 24 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<path
 				fillRule="evenodd"

@@ -324,7 +324,7 @@ function SearchModal({ open, onClose }: SearchModalProps) {
 
 	return (
 		<Modal show={open} dismissible={true} onClose={onClose} className="bg-[#111111] bg-opacity-90 focus-visible:[&>*]:outline-none">
-			<Modal.Body className="theme-base-color px-6 py-4 rounded-[6px] h-[200px] w-full">
+			<Modal.Body className="bg-theme-setting-primary px-6 py-4 rounded-[6px] h-[200px] w-full">
 				<div className="flex flex-col">
 					<InputField
 						type="text"
@@ -350,7 +350,7 @@ export default memo(SearchModal);
 const FooterNoteModal = memo(() => {
 	return (
 		<div className="pt-2">
-			<span className="text-[13px] font-medium dark:text-contentTertiary text-textLightTheme">
+			<span className="text-[13px] font-medium ">
 				<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
 			</span>
 		</div>

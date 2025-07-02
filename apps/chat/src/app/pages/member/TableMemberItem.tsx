@@ -146,6 +146,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 		await removeMemberClan({ clanId: currentClanId as string, channelId: currentChannelId as string, userIds: [userId] });
 		setOpenModalRemoveMember(false);
 	};
+
 	return (
 		<>
 			<div

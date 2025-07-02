@@ -61,7 +61,7 @@ const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
 	return (
 		<div className="relative text-center my-4 px-4">
 			<hr className="border-t border-gray-300 dark:border-gray-600 absolute top-1/2 left-0 right-0" />
-			<span className="relative inline-block px-3 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
+			<span className="relative inline-block px-3  text-xs font-semibold">{messageDate}</span>
 		</div>
 	);
 };

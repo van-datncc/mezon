@@ -57,20 +57,19 @@ export const ChannelTypeComponent: React.FC<ChannelTypeProps> = ({ type, onChang
 
 	return (
 		<label
-			className={`Frame403 self-stretch px-2 py-2 dark:bg-bgSecondary bg-bgModifierHoverLight rounded-lg justify-center items-center gap-4 inline-flex ${disable ? 'hover:bg-none' : 'dark:hover:bg-bgHover hover:bg-[#bababa]'}  ${error ? 'border border-red-500' : ' border border-none'}`}
+			className={`Frame403 self-stretch px-2 py-2 bg-item-theme rounded-lg justify-center items-center gap-4  inline-flex ${disable ? 'hover:bg-none hover:cursor-not-allowed' : 'bg-item-hover text-theme-primary-hover hover:cursor-pointer'}  ${error ? 'border border-red-500' : ' border border-none'}`}
 			htmlFor={type?.toString()}
 		>
 			<div className={type === ChannelType.CHANNEL_TYPE_CHANNEL ? 'w-6 h-9' : 'w-6 h-6'}>{iconMap[type]}</div>
 			<div className="Frame402 grow shrink basis-0 flex-col justify-start items-start gap-1 inline-flex ">
-				<div className="Text self-stretch text-stone-300 text-sm font-bold leading-normal text-[10px]">
-					<p className="dark:text-white text-black">{labelMap[type]}</p>
+				<div className="Text self-stretch text-sm font-bold leading-normal text-[10px]">
+					<p className="">{labelMap[type]}</p>
 				</div>
-				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-zinc-400 text-sm font-normal leading-[18.20px] text-[10px] w-widthChannelTypeText">
-					<p className="one-line dark:text-white text-black">{descriptionMap[type]}</p>
+				<div className="SendMessagesImagesGifsEmojiOpinionsAndPuns self-stretch text-sm font-normal leading-[18.20px] text-[10px] w-widthChannelTypeText">
+					<p className="one-line ">{descriptionMap[type]}</p>
 				</div>
 			</div>
 			<div className={`RadioButton p-0.5 justify-start items-start flex `}>
-				{' '}
 				<div className="relative flex items-center">
 					<input
 						disabled={disable}

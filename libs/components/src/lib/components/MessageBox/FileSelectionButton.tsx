@@ -41,8 +41,8 @@ function FileSelectionButton({ currentClanId, currentChannelId, hasPermissionEdi
 	return (
 		<label className="pl-3 flex items-center h-11">
 			<input id="preview_img" type="file" onChange={handleChange} className="w-full hidden" multiple />
-			<div className="flex flex-row h-6 w-6 items-center justify-center cursor-pointer">
-				<Icons.AddCircle className="dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
+			<div className="flex flex-row h-6 w-6 items-center justify-center cursor-pointer text-theme-primary text-theme-primary-hover">
+				<Icons.AddCircle className="" />
 			</div>
 		</label>
 	);
