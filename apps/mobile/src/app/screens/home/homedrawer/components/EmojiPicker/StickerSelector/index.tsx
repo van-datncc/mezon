@@ -43,11 +43,9 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 			forSale: sticker?.is_for_sale
 		}))
 		.filter((sticker, index, self) => {
-			const firstIdTypeMatch = index === self?.findIndex((s) => s?.id === sticker?.id && s?.type === sticker?.type);
-			if (sticker?.type === FOR_SALE_CATE) {
-				return firstIdTypeMatch && index === self?.findIndex((s) => s?.type === sticker?.type);
-			}
-			return firstIdTypeMatch;
+			return sticker?.type === FOR_SALE_CATE 
+				? index === self?.findIndex((s) => s?.type === sticker?.type)
+				: index === self?.findIndex((s) => s?.id === sticker?.id && s?.type === sticker?.type);
 		})
 		.sort((a, b) => (a?.type === FOR_SALE_CATE && b?.type !== FOR_SALE_CATE ? -1 : a?.type !== FOR_SALE_CATE && b?.type === FOR_SALE_CATE ? 1 : 0));
 
