@@ -90,3 +90,34 @@ export const restoreLocalStorage = (keys: string[]) => {
 		}
 	});
 };
+
+export interface SocketDataRequest {
+	api_name: string;
+	[key: string]: any;
+}
+
+export async function fetchDataWithSocketFallback<T>(
+	mezon: MezonValueContext,
+	socketRequest: SocketDataRequest,
+	restApiFallback: () => Promise<T>,
+	responseKey?: string
+): Promise<T> {
+	const socket = mezon.socketRef?.current;
+	let response: T | undefined;
+
+	if (socket) {
+		try {
+			const data = await socket.listDataSocket(socketRequest);
+			response = responseKey ? data?.[responseKey] : data;
+		} catch (err) {
+			console.log(err, socketRequest);
+			// ignore socket errors and fallback to REST API
+		}
+	}
+
+	if (!response) {
+		response = await restApiFallback();
+	}
+
+	return response;
+}

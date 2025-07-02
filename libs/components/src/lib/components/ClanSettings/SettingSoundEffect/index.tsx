@@ -7,7 +7,8 @@ import {
     selectCurrentUserId,
     selectMemberClanByUserId,
     soundEffectActions,
-    useAppDispatch
+    useAppDispatch,
+    useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
@@ -41,7 +42,7 @@ const SettingSoundEffect = () => {
     const currentClan = useSelector(selectCurrentClan);
     const userProfile = useSelector(selectAllAccount);
 
-    const sounds = useSelector(selectAudioByClanId(currentClanId));
+    const sounds = useAppSelector(state => selectAudioByClanId(state, currentClanId));
 
     const isClanOwner = useMemo(() => {
         return currentClan?.creator_id === userProfile?.user?.id;

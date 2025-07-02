@@ -39,7 +39,7 @@ import { channelMetaActions } from '../channels/channelmeta.slice';
 import { selectShowScrollDownButton } from '../channels/channels.slice';
 import { selectCurrentDM } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
 import { referencesActions, selectDataReferences } from './references.slice';
@@ -199,7 +199,7 @@ export const fetchMessagesCached = async (
 	const apiKey = createApiKey('fetchMessages', clanId, channelId, messageId || '', direction || 1, topicId || '');
 	const shouldForceCall = shouldForceApiCall(apiKey, channelData?.cache, noCache);
 
-	if (!shouldForceCall && channelData?.ids.length > 0) {
+	if (!shouldForceCall && channelData?.ids?.length > 0) {
 		const cachedMessages = channelData.ids.map((id) => channelData.entities[id]).filter(Boolean);
 		return {
 			messages: cachedMessages,
@@ -207,15 +207,32 @@ export const fetchMessagesCached = async (
 		};
 	}
 
-	const response = await ensuredMezon.client.listChannelMessages(
-		ensuredMezon.session,
-		clanId,
-		channelId,
-		messageId,
-		direction,
-		LIMIT_MESSAGE,
-		topicId
+	const response = await fetchDataWithSocketFallback(
+		ensuredMezon,
+		{
+			api_name: 'ListChannelMessages',
+			list_channel_message_req: {
+				channel_id: channelId,
+				message_id: messageId,
+				direction,
+				clan_id: clanId,
+				topic_id: topicId,
+				limit: LIMIT_MESSAGE
+			}
+		},
+		() => ensuredMezon.client.listChannelMessages(ensuredMezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId),
+		'channel_message_list'
 	);
+
+	// if (response?.messages) {
+	// 	response.messages = response.messages.map((item) => ({
+	// 		...item,
+	// 		attachments: safeJSONParse(item.attachments as any),
+	// 		content: safeJSONParse(item.content as any),
+	// 		mentions: safeJSONParse(item.mentions as any),
+	// 		references: safeJSONParse(item.references as any)
+	// 	}));
+	// }
 
 	markApiFirstCalled(apiKey);
 
@@ -1082,15 +1099,15 @@ export const messagesSlice = createSlice({
 							const sendingMessages = state.channelMessages[topic_id]?.ids.filter(
 								(id) => state.channelMessages[topic_id].entities[id].isSending
 							);
-							if (sendingMessages && sendingMessages.length) {
-								for (const mid of sendingMessages) {
-									const message = state.channelMessages[topic_id].entities[mid];
-									if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
-										state.channelMessages[topic_id] = handleRemoveOneMessage({ state, channelId: topic_id, messageId: mid });
-										break;
-									}
-								}
-							}
+							// if (sendingMessages && sendingMessages.length) {
+							// 	for (const mid of sendingMessages) {
+							// 		const message = state.channelMessages[topic_id].entities[mid];
+							// 		if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
+							// 			state.channelMessages[topic_id] = handleRemoveOneMessage({ state, channelId: topic_id, messageId: mid });
+							// 			break;
+							// 		}
+							// 	}
+							// }
 						}
 					} else {
 						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });

@@ -11,7 +11,8 @@ import {
 	selectDefaultNotificationClan,
 	selectNotifiSettingsEntitiesById,
 	selectTheme,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Modal } from '@mezon/ui';
 import { ICategoryChannel, IChannel, ThemeApp } from '@mezon/utils';
@@ -98,7 +99,8 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const currentClan = useSelector(selectCurrentClan);
 	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
 	const currentChannel = useSelector(selectCurrentChannel);
-	const notificatonSelected = useSelector(selectNotifiSettingsEntitiesById(currentChannel?.id || ''));
+	const notificatonSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, currentChannel?.id || ''));
+
 	const channelCategorySettings = useSelector(selectAllchannelCategorySetting);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();

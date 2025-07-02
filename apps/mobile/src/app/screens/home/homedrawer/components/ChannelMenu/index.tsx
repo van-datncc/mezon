@@ -11,7 +11,8 @@ import {
 	selectCurrentUserId,
 	selectNotifiSettingsEntitiesById,
 	threadsActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store-mobile';
 import { ChannelThreads, EOverriddenPermission, EPermission, sleep } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -50,7 +51,9 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 	useEffect(() => {
 		dispatch(notificationSettingActions.getNotificationSetting({ channelId: channel?.channel_id }));
 	}, []);
-	const getNotificationChannelSelected = useSelector(selectNotifiSettingsEntitiesById(channel?.channel_id));
+
+	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, channel?.channel_id || ''));
+
 	const currentUserId = useSelector(selectCurrentUserId);
 
 	const isStreamOrVoiceChannel = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;

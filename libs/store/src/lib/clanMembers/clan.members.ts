@@ -51,7 +51,7 @@ export const fetchUsersClanCached = async (getState: () => RootState, ensuredMez
 	const apiKey = createApiKey('fetchUsersClan', clanId, ensuredMezon.session.username || '');
 	const shouldForceCall = shouldForceApiCall(apiKey, clanData?.cache, noCache);
 
-	if (!shouldForceCall && clanData?.entities.ids.length > 0) {
+	if (!shouldForceCall) {
 		const cachedUsers = selectCachedMembersByClan(currentState, clanId);
 		return {
 			users: cachedUsers,
@@ -60,6 +60,7 @@ export const fetchUsersClanCached = async (getState: () => RootState, ensuredMez
 	}
 
 	const response = await ensuredMezon.client.listClanUsers(ensuredMezon.session, clanId);
+
 	const users = response?.clan_users?.map(mapUsersClanToEntity) || [];
 
 	markApiFirstCalled(apiKey);
