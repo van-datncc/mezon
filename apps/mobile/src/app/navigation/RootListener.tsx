@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import {
 	accountActions,
-	acitvitiesActions,
 	appActions,
 	authActions,
 	channelsActions,
@@ -255,7 +254,7 @@ const RootListener = () => {
 			promises.push(dispatch(gifsActions.fetchGifCategories()));
 			promises.push(dispatch(gifsActions.fetchGifCategoryFeatured()));
 			promises.push(dispatch(userStatusActions.getUserStatus()));
-			promises.push(dispatch(acitvitiesActions.listActivities()));
+			
 			await Promise.allSettled(promises);
 			return null;
 		} catch (error) {

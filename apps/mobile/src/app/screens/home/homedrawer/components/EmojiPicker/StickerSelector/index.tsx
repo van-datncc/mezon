@@ -1,5 +1,5 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
-import { MediaType, selectAllStickerSuggestion, selectCurrentClan, useAppSelector } from '@mezon/store';
+import { MediaType, selectAllStickerSuggestion, selectCurrentClan, useAppSelector } from '@mezon/store-mobile';
 import { useEffect, useMemo, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
