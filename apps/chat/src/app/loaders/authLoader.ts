@@ -15,8 +15,8 @@ import {
 	usersClanActions
 } from '@mezon/store';
 import { IWithError } from '@mezon/utils';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import { CustomLoaderFunction } from './appLoader';
+import { waitForSocketConnection } from './socketUtils';
 
 export interface IAuthLoaderData {
 	isLogin: boolean;
@@ -53,27 +53,6 @@ const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
 	});
 };
 
-const waitForSocketConnection = createAsyncThunk('auth/waitForSocketConnection', async (_, { extra }) => {
-	const { mezon } = extra as any;
-	if (!mezon) {
-		return;
-	}
-
-	return new Promise<void>((resolve) => {
-		const interval = setInterval(() => {
-			if (mezon.socketRef.current && (mezon.socketRef.current as any).adapter && (mezon.socketRef.current as any).adapter.isOpen()) {
-				clearInterval(interval);
-				resolve();
-			}
-		}, 100);
-
-		setTimeout(() => {
-			clearInterval(interval);
-			resolve();
-		}, 5000);
-	});
-});
-
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
 	let retries = 6;
 	let attempt = 0;
@@ -94,7 +73,6 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 			if (!(response as unknown as IWithError).error) {
 				const profileResponse = await dispatch(accountActions.getUserProfile());
 				if (!(profileResponse as unknown as IWithError).error) {
-					await dispatch(waitForSocketConnection());
 					return { isLogin: true } as IAuthLoaderData;
 				}
 				throw new Error('Session expired');
@@ -129,6 +107,9 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 		const currentClanId = selectCurrentClanId(store.getState());
 		dispatch(usersClanActions.fetchUsersClan({ clanId: currentClanId as string }));
 	}
+	const session = await refreshSession({ dispatch, initialPath: initialPath as string });
+	await dispatch(waitForSocketConnection());
+
 	dispatch(clansActions.joinClan({ clanId: '0' }));
 	dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 	dispatch(listUsersByUserActions.fetchListUsersByUser({}));
@@ -153,7 +134,8 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 			window.addEventListener('online', handleOnline);
 		});
 	}
-	return await refreshSession({ dispatch, initialPath: initialPath as string });
+
+	return session;
 };
 
 export const shouldRevalidateAuth = () => {
