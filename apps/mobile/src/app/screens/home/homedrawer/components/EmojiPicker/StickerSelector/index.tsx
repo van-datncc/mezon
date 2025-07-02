@@ -8,6 +8,7 @@ import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import Sticker from './Sticker';
 import { style } from './styles';
+import { FOR_SALE_CATE } from '@mezon/utils';
 
 type StickerSelectorProps = {
 	onSelected?: (url: string) => void;
@@ -38,17 +39,17 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 		.map((sticker) => ({
 			id: sticker?.clan_id,
 			type: sticker?.clan_name,
-			url: sticker?.clan_name === 'forsale' ? null : sticker?.logo,
+			url: sticker?.clan_name === FOR_SALE_CATE ? null : sticker?.logo,
 			forSale: sticker?.is_for_sale
 		}))
 		.filter((sticker, index, self) => {
-			const firstIdTypeMatch = index === self.findIndex((s) => s?.id === sticker?.id && s?.type === sticker?.type);
-			if (sticker?.forSale) {
-				return firstIdTypeMatch && index === self.findIndex((s) => s?.type === sticker?.type);
+			const firstIdTypeMatch = index === self?.findIndex((s) => s?.id === sticker?.id && s?.type === sticker?.type);
+			if (sticker?.type === FOR_SALE_CATE) {
+				return firstIdTypeMatch && index === self?.findIndex((s) => s?.type === sticker?.type);
 			}
 			return firstIdTypeMatch;
 		})
-		.sort((a, b) => (a.forSale && !b.forSale ? -1 : !a.forSale && b.forSale ? 1 : 0));
+		.sort((a, b) => (a?.type === FOR_SALE_CATE && b?.type !== FOR_SALE_CATE ? -1 : a?.type !== FOR_SALE_CATE && b?.type === FOR_SALE_CATE ? 1 : 0));
 
 	const stickers = useMemo(
 		() =>
