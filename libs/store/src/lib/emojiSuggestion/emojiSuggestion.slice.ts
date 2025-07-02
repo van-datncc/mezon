@@ -109,7 +109,6 @@ export const createEmojiSetting = createAsyncThunk(
 			if (!res) {
 				return thunkAPI.rejectWithValue({});
 			}
-			thunkAPI.dispatch(fetchEmoji({ noCache: true }));
 		} catch (error) {
 			captureSentryError(error, 'emoji/createEmoji');
 			return thunkAPI.rejectWithValue(error);
