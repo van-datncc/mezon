@@ -60,7 +60,7 @@ enum StatusVoiceChannel {
 }
 
 export const classes = {
-	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1',
+	active: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 text-theme-primary-active',
 	inactiveUnread: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 bg-item-hover text-theme-primary-hover',
 	inactiveRead: 'flex flex-row items-center px-2 mx-2 rounded relative p-1 bg-item-hover text-theme-primary-hover'
 };
@@ -238,12 +238,12 @@ const ChannelLinkComponent = ({
 			role="button"
 			onDragStart={(e) => dragStart(e)}
 			onDragEnd={(e) => dragEnter(e)}
-			className={`relative group z-10   ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute dark:before:bg-channelActiveColor before:bg-channelActiveLightColor before:top-3' : ''}`}
+			className={`relative group z-10   ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute  before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 				<span
 					ref={channelLinkRef}
-					className={`${classes[state]} pointer-events-none ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${isActive ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''}`}
+					className={`${classes[state]} pointer-events-none ${channel.status === StatusVoiceChannel.Active ? 'cursor-pointer' : 'cursor-not-allowed'} ${isActive ? 'bg-item-theme text-theme-primary-active' : ''}`}
 					onClick={() => {
 						handleVoiceChannel(channel.id);
 						openModalJoinVoiceChannel(channel.meeting_code || '');
@@ -256,7 +256,7 @@ const ChannelLinkComponent = ({
 						{!isPrivate && <Icons.Speaker defaultSize="w-5 5-5 " />}
 					</div>
 					<p
-						className={`ml-2 w-full pointer-events-none text-theme-primary-hover text-base focus:bg-bgModifierHover ${highLightVoiceChannel ? 'text-theme-primary dark:font-medium font-semibold' : 'font-medium text-theme-primary'}`}
+						className={`ml-2 w-full pointer-events-none text-base text-theme-primary  ${highLightVoiceChannel ? 'bg-item-theme text-theme-primary-hover font-semibold' : ''}`}
 						title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 					>
 						{channel.channel_label && channel?.channel_label.length > 20
@@ -270,7 +270,7 @@ const ChannelLinkComponent = ({
 					to={channelPath}
 					id={`${channel.category_id}-${channel.id}`}
 					onClick={handleClick}
-					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-button-secondary border-theme-primary bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
+					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
 					draggable="false"
 				>
 					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
@@ -294,11 +294,9 @@ const ChannelLinkComponent = ({
 								<Icons.Hashtag defaultSize="w-5 h-5 " />
 							)}
 							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 h-5 " />}
-							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && (
-								<Icons.AppChannelIcon className={'w-5 h-5'} fill={theme} />
-							)}
+							{isPrivate !== 1 && channel.type === ChannelType.CHANNEL_TYPE_APP && <Icons.AppChannelIcon className={'w-5 h-5'} />}
 							{isPrivate && channel.type === ChannelType.CHANNEL_TYPE_APP ? (
-								<Icons.PrivateAppChannelIcon className={'w-5 h-5'} fill={theme} />
+								<Icons.PrivateAppChannelIcon className={'w-5 h-5'} />
 							) : null}
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}

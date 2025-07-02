@@ -1842,7 +1842,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export const ArrowDown: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 text-theme-primary text-theme-primary-hover min-w-4', size = '' }) => {
+export const ArrowDown: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 min-w-4', size = '' }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${size}`}>
 			<g id="Live area">
@@ -1933,7 +1933,7 @@ export function EyeOpen(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5 min-w-4' }) => {
+export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 min-w-4' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
@@ -1942,7 +1942,7 @@ export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M5.91083 3.41075C6.23626 3.08531 6.7639 3.08531 7.08934 3.41075L12.0893 8.41075C12.4148 8.73619 12.4148 9.26382 12.0893 9.58926L7.08934 14.5893C6.7639 14.9147 6.23626 14.9147 5.91083 14.5893C5.58539 14.2638 5.58539 13.7362 5.91083 13.4107L10.3216 9L5.91083 4.58926C5.58539 4.26382 5.58539 3.73619 5.91083 3.41075Z"
-					fill={defaultFill}
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -2160,7 +2160,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
@@ -2184,7 +2184,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 	);
 };
 
-export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`block  ${defaultSize}`}>
 			<g className="transform translate-y-[2px] translate-x-[-1.5px]">
@@ -4627,7 +4627,7 @@ export function AppChannelIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg
 			className="icon icon-tabler icon-tabler-apps"
-			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
 			width="24"
@@ -4648,7 +4648,7 @@ export function PrivateAppChannelIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg
 			className="icon icon-tabler icon-tabler-apps"
-			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
 			width="24"
@@ -6009,7 +6009,7 @@ export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
-export const GuideIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const GuideIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -6018,7 +6018,7 @@ export const GuideIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 			strokeMiterlimit="2"
 			clipRule="evenodd"
 			viewBox="0 0 32 32"
-			fill={defaultFill}
+			fill="currentColor"
 			id="direction-board"
 			className={`${defaultSize}`}
 		>

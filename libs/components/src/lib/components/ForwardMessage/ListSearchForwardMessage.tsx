@@ -26,7 +26,7 @@ const ListSearchForwardMessage = (props: ListSearchForwardMessageProps) => {
 		sortedList.slice(0, 15).map((item: any) => {
 			const isTypeDm = item.typeSearch === TypeSearch.Dm_Type;
 			return (
-				<div key={item.id} className="flex items-center px-4 py-1 dark:hover:bg-bgPrimary1 hover:bg-bgLightModeThird rounded">
+				<div key={item.id} className="flex items-center px-4 py-1 rounded bg-item-hover">
 					{isTypeDm ? (
 						<ItemDm
 							id={item.idDM}

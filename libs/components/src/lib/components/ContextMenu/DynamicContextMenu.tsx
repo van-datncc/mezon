@@ -65,13 +65,13 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		return emojiConverted.slice(0, 4);
 	}, [emojiConverted]) as IEmoji[];
 
-	const [warningStatus, setWarningStatus] = useState<string>('');
+	const [warningStatus, setWarningStatus] = useState<string>('var(--bg-item-hover)');
 
 	const className = {
 		'--contexify-menu-bgColor': 'var(--bg-theme-contexify)',
 		'--contexify-item-color': 'var(--text-theme-primary)',
 		'--contexify-activeItem-color': 'red',
-		'--contexify-activeItem-bgColor': 'var(--bg-item-hover)',
+		'--contexify-activeItem-bgColor': warningStatus || 'var(--bg-item-hover)',
 		'--contexify-rightSlot-color': 'var(--text-secondary)',
 		'--contexify-activeRightSlot-color': 'var(--text-secondary)',
 		'--contexify-arrow-color': 'var(--text-theme-primary)',
@@ -118,7 +118,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 											fontSize: '14px',
 											fontWeight: 500
 										}}
-										className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
+										className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 									>
 										<span>Add Reaction</span>
 									</div>
@@ -127,17 +127,17 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 						)}
 						label=""
 						placement="right-start"
-						className=" border-none"
+						className=" border-none bg-theme-contexify"
 					>
 						{firstFourElements.map((item, index) => (
-							<div className="w-[320px]" key={index}>
+							<div className="w-[320px] " key={index}>
 								<Item
 									className="flex justify-between items-center w-full px-2 py-1"
 									key={index}
 									onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}
 								>
 									<div
-										className={`flex truncate justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
+										className={`flex truncate justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 									>
 										{item.shortname}
 									</div>
@@ -158,7 +158,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 						<hr className="border-b-theme-primary" />
 						<Item className="w-full px-2 py-1" key={index} onClick={item.handleItemClick} disabled={item.disabled}>
 							<div
-								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
+								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 							>
 								<span>View More</span>
 							</div>
@@ -175,11 +175,11 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 							if (lableItemWarning) {
 								setWarningStatus('#E13542');
 							} else {
-								setWarningStatus('#4B5CD6');
+								setWarningStatus('var(--bg-item-hover)');
 							}
 						}}
 						onMouseLeave={() => {
-							setWarningStatus('#4B5CD6');
+							setWarningStatus('var(--bg-item-hover)');
 						}}
 					>
 						<div
@@ -192,7 +192,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 								fontSize: '14px',
 								fontWeight: 500
 							}}
-							className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
+							className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 						>
 							<span>{item.label}</span>
 							<span> {item.icon}</span>

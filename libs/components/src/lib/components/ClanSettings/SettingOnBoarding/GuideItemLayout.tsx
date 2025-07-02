@@ -21,7 +21,7 @@ export const GuideItemLayout = ({
 	hightLightIcon = false,
 	action,
 	className,
-	background = 'bg-gray-200 dark:bg-gray-800',
+	background = '',
 	height,
 	gap = 8,
 	onClick,
@@ -29,7 +29,7 @@ export const GuideItemLayout = ({
 }: GuideItemLayoutProps) => {
 	return (
 		<div
-			className={`p-4 flex items-start rounded-lg ${noNeedHover ? '' : 'hover:bg-gray-300 dark:hover:bg-gray-700'} ${height ? height : 'h-full'} ${background} ${className}`}
+			className={`p-4 flex items-start rounded-lg ${noNeedHover ? '' : 'bg-item-hover text-theme-primary-hover'} ${height ? height : 'h-full'} ${background} ${className}`}
 			style={{
 				gap: gap
 			}}
@@ -37,14 +37,12 @@ export const GuideItemLayout = ({
 		>
 			{icon && (
 				<div className="h-full flex items-center justify-center">
-					<div className={`${hightLightIcon ? 'rounded-full w-12 aspect-square bg-gray-600 dark:bg-black' : ''}  flex items-center justify-center`}>
-						{icon}
-					</div>
+					<div className={`${hightLightIcon ? 'rounded-full w-12 aspect-square ' : ''}  flex items-center justify-center`}>{icon}</div>
 				</div>
 			)}
 			<div className={`flex flex-1 text-base flex-col h-full justify-start`}>
-				{title && <div className="font-bold text-gray-900 dark:text-white">{title}</div>}
-				{description && <div className="text-gray-700 dark:text-channelTextLabel text-xs flex-1">{description}</div>}
+				{title && <div className="font-bold ">{title}</div>}
+				{description && <div className="text-xs flex-1">{description}</div>}
 			</div>
 			{action && <div className="flex items-center h-full">{action}</div>}
 		</div>

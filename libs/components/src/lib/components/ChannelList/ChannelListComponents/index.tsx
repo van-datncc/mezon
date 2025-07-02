@@ -87,15 +87,15 @@ export const Events = memo(() => {
 			{currentClan && currentClan.is_onboarding && (
 				<Link
 					to={serverGuidePath}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'bg-button-secondary' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'bg-button-secondary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
 							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-								<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+								<Icons.GuideIcon defaultSize="w-5 h-5 " defaultFill="" />
 							</div>
 						</div>
-						<div className="w-[99px] text-theme-primary text-base font-medium">Clan Guide</div>
+						<div className="w-[99px] text-base font-medium">Clan Guide</div>
 					</div>
 				</Link>
 			)}
@@ -118,14 +118,14 @@ export const Events = memo(() => {
 				</div>
 				{eventLoading === 'loaded' && numberEventUpcoming > 0 && (
 					<div className="w-5 h-5 p-2 bg-red-600 rounded-[50px] flex-col justify-center items-center flex">
-						<div className="text-theme-primary text-xs font-medium">{numberEventUpcoming}</div>
+						<div className="text-white text-xs font-medium">{numberEventUpcoming}</div>
 					</div>
 				)}
 			</div>
 
 			<Link
 				to={memberPath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isMemberPath ? 'bg-button-secondary border-theme-primary text-theme-secondary' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
+				className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isMemberPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
@@ -139,7 +139,7 @@ export const Events = memo(() => {
 			{checkAdminPermission ? (
 				<Link
 					to={channelSettingPath}
-					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-secondary' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
+					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">

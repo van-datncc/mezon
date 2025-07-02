@@ -138,10 +138,7 @@ const MentionUser = ({
 			)}
 			{displayToken?.type === MentionType.HERE && (
 				<span
-					className={`font-medium px-0.1 rounded-sm 'cursor-text'
-					${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-
-					 whitespace-nowrap !text-[#3297ff]  dark:bg-[#3C4270] bg-[#D1E0FF]  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+					className={`font-medium px-0.1 rounded-sm cursor-text whitespace-nowrap bg-mention color-mention   ${isJumMessageEnabled ? 'hover-mention underline decoration-1' : 'hover:none'}`}
 				>
 					{displayToken.display}
 				</span>
@@ -152,9 +149,7 @@ const MentionUser = ({
 					onMouseDown={!isJumMessageEnabled || isTokenClickAble ? (e) => handleOpenShortUser(e) : () => {}}
 					// eslint-disable-next-line @typescript-eslint/no-empty-function
 					style={{ textDecoration: 'none' }}
-					className={`outline-none font-medium px-0.1 rounded-sm
-				${isJumMessageEnabled ? 'cursor-pointer hover:!text-white' : 'hover:none'}
-				 whitespace-nowrap bg-mention color-mention  ${isJumMessageEnabled ? 'hover:bg-[#5865F2]' : 'hover:none'}`}
+					className={`outline-none font-medium px-0.1 rounded-sm whitespace-nowrap bg-mention color-mention hover-mention   ${isJumMessageEnabled ? '' : 'hover:none'}`}
 				>
 					{displayToken.display}
 				</button>
