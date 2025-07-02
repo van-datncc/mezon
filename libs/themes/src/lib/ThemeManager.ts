@@ -77,10 +77,10 @@ export const AVAILABLE_THEMES: ThemeConfig[] = [
 		cssFile: 'assets/themes/redDark.css'
 	},
 	{
-		name: 'sunset_gold',
-		displayName: 'Sunset Gold',
+		name: 'Abyss Dark',
+		displayName: 'Abyss Dark',
 		color: 'linear-gradient(135deg, #f6d365, #fda085)',
-		cssFile: 'assets/themes/sunset_gold.css'
+		cssFile: 'assets/themes/abyss_dark_.css'
 	}
 ];
 

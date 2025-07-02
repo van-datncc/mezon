@@ -77,7 +77,7 @@ button.bg-button-add-friend {
 	background: var(--bg-item-hover);
 }
 .bg-item-theme {
-	background: var(--bg-item-hover);
+	background: var(--bg-active-member-channel);
 }
 .bg-theme-surface {
 	background: var(--bg-surface);
