@@ -76,7 +76,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 
 	return (
 		<Modal show={openCreateCate} dismissible={true} onClose={onClose} className="bg-[#111111]  bg-opacity-80 text-theme-primary" size="lg">
-			<div className="theme-base-color  flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
+			<div className="theme-base-color flex items-center justify-between px-6 pt-4  rounded-tl-[5px] rounded-tr-[5px]">
 				<div className="text-[19px] font-bold uppercase">Create Category</div>
 				<button className="flex items-center justify-center opacity-50" onClick={onClose}>
 					<span className="text-4xl ">×</span>
@@ -89,7 +89,7 @@ const ModalCreateCategory = ({ openCreateCate, onClose, onCreateCategory }: Moda
 						type="text"
 						onChange={handleInputChange}
 						placeholder="Enter the category's name"
-						className="py-[8px]  text-[14px] mt-2 mb-0 border-theme-primary bg-theme-input-primary"
+						className="py-[8px] text-[14px] mt-2 mb-0 border-theme-primary bg-theme-input-primary"
 						value={nameCate}
 					/>
 				</div>

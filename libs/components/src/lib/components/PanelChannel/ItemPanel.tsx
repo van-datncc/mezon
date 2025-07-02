@@ -40,8 +40,8 @@ const ItemPanel = ({
 		>
 			<div className={'flex flex-row items-center justify-between w-full'}>
 				<li
-					className={`text-[14px] font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none m-0 truncate
-						${danger ? 'dark:text-colorDanger text-colorDanger' : info ? 'text-blue-500 dark:text-blue-400' : 'text-theme-primary'}`}
+					className={`text-[14px] font-medium w-full py-[6px] px-[8px]  text-left cursor-pointer list-none m-0 truncate
+						${danger ? ' text-colorDanger hover:text-white' : info ? 'text-blue-500 dark:text-blue-400' : 'text-theme-primary'}`}
 				>
 					{children}
 				</li>
@@ -49,7 +49,7 @@ const ItemPanel = ({
 				{type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked} readOnly />}
 				{type === 'radio' && <Radio className="" name={name} value="change here" checked={checked} readOnly />}
 			</div>
-			{subText && <div className="text-[12px] text-[#B5BAC1] ml-[8px] -mt-2 mb-1">{subText}</div>}
+			{subText && <div className="text-[12px] ml-[8px] -mt-2 mb-1">{subText}</div>}
 		</button>
 	);
 };

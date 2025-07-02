@@ -112,23 +112,23 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 				className={`fixed  inset-0 flex items-center justify-center z-50 ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 			>
 				<div className="fixed inset-0 bg-black opacity-80"></div>
-				<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode p-6 rounded-[5px] text-center w-[440px] flex flex-col justify-between gap-y-2">
+				<div className="relative z-10 p-6 rounded-[5px] text-center w-[440px] flex flex-col justify-between gap-y-2">
 					<div>
 						<h2 className="text-2xl font-semibold">Add members</h2>
-						<p className="text-contentTertiary text-[16px] mb-4 font-light inline-flex gap-x-2 items-center">
+						<p className=" text-[16px] mb-4 font-light inline-flex gap-x-2 items-center">
 							<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5" />
 							{selectedRole?.title}
 						</p>
 						<div className="w-full flex mb-3">
 							<InputField
-								className="flex-grow rounded w-full dark:text-white text-black border dark:border-black border-white p-2 focus:outline-none focus:border-white-500 dark:bg-bgTertiary bg-bgLightModeThird text-base"
+								className="flex-grow rounded w-full p-2 focus:outline-none focus:border-white-500 text-base"
 								type="text"
 								placeholder="Search Permissions"
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
 							/>
 						</div>
-						<p className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2 text-left">Members</p>
+						<p className="text-xs font-bold uppercase mb-2 text-left">Members</p>
 						<div className="overflow-y-auto thread-scroll">
 							<ul className="flex flex-col gap-y-[5px] max-h-[200px] font-light text-sm ">
 								{displayUsers.map((user) => (
