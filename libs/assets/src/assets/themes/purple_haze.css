@@ -41,8 +41,8 @@
 
 	--theme-input: hsl(240 4% 30% / 0.2);
 	--theme-border-input: color-mix(in oklab, hsl(240 4% 60% / 0.4) 100%, hsl(183 100% 80% / 0.3) 50%);
-
-	--theme-base-color: rgb(0, 14, 26);
+	/* màu nền của clan */
+	--theme-base-color: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
 	--theme-text-color-dark: rgb(229, 254, 255);
 	--theme-setting-primary: rgb(27, 28, 32);
 	--theme-setting-nav: rgb(21, 22, 24);
@@ -63,14 +63,15 @@
 		color-mix(in oklab, #0eb5bf 50%, #218be0 50%) 30%,
 		color-mix(in oklab, hsl(240 4% 40% / 0.3) 100%, hsl(50 100% 90% / 0.3) 50%) 100%
 	);
-
+	/* màu bên channel và user */
 	--bg-theme-direct-message: linear-gradient(rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.65)) fixed 0 0 / cover,
 		linear-gradient(154.19deg, hsl(202, 100%, 27%) 8.62%, hsl(298, 67%, 55%) 32%, hsl(258, 86%, 59%) 48.07%, hsl(298, 86%, 39%) 76.04%) fixed 0 0 /
 			cover;
-
-	--text-secondary: color-mix(in oklab, hsl(230 6% 80%) 100%, #00ffff 20%);
-	--bg-item-hover: hsl(258 50% 40% / 0.1);
-
+	/* màu text bên channel và user khi active */
+	--text-secondary: color-mix(in oklab, hsl(0 0% 95%) 100%, #ccfaff 10%);
+	--bg-item-hover: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+	/* màu click vào member channel */
+	--bg-active-member-channel: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
 	--bg-theme-input-primary: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5)) fixed 0 0 / cover,
 		linear-gradient(154.19deg, hsl(183.39 86% 40%) 8.62%, hsl(258.11 90% 46%) 48.07%, hsl(298.49 91% 34%) 76.04%) fixed 0 0 / cover;
 

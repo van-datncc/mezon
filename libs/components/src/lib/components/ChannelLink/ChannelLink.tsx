@@ -270,7 +270,7 @@ const ChannelLinkComponent = ({
 					to={channelPath}
 					id={`${channel.category_id}-${channel.id}`}
 					onClick={handleClick}
-					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : 'text-theme-primary'}`}
+					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-button-secondary border-theme-primary bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
 					draggable="false"
 				>
 					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
