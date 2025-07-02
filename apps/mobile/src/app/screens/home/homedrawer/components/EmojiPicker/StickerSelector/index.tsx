@@ -1,9 +1,11 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { MediaType, selectAllStickerSuggestion, selectCurrentClan, useAppSelector } from '@mezon/store';
 import { useEffect, useMemo, useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native-gesture-handler';
+import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../../../../constants/icon_cdn';
 import Sticker from './Sticker';
 import { style } from './styles';
 
@@ -34,12 +36,19 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 
 	const categoryLogo = clanStickers
 		.map((sticker) => ({
-			id: sticker.clan_id,
-			type: sticker.clan_name,
-			url: sticker.logo,
+			id: sticker?.clan_id,
+			type: sticker?.clan_name,
+			url: sticker?.clan_name === 'forsale' ? null : sticker?.logo,
 			forSale: sticker?.is_for_sale
 		}))
-		.filter((sticker, index, self) => index === self.findIndex((s) => s.id === sticker.id));
+		.filter((sticker, index, self) => {
+			const firstIdTypeMatch = index === self.findIndex((s) => s?.id === sticker?.id && s?.type === sticker?.type);
+			if (sticker?.forSale) {
+				return firstIdTypeMatch && index === self.findIndex((s) => s?.type === sticker?.type);
+			}
+			return firstIdTypeMatch;
+		})
+		.sort((a, b) => (a.forSale && !b.forSale ? -1 : !a.forSale && b.forSale ? 1 : 0));
 
 	const stickers = useMemo(
 		() =>
@@ -75,15 +84,21 @@ export default function StickerSelector({ onSelected, onScroll, mediaType = Medi
 			<ScrollView horizontal contentContainerStyle={styles.btnWrap}>
 				{categoryLogo?.map((item, index) => (
 					<TouchableOpacity key={index.toString()} onPress={() => handlePressCategory(item.type)} style={styles.btnEmo}>
-						<FastImage
-							resizeMode={FastImage.resizeMode.cover}
-							source={{
-								uri: item?.url || currentClan?.logo || '',
-								cache: FastImage.cacheControl.immutable,
-								priority: FastImage.priority.high
-							}}
-							style={{ height: '100%', width: '100%' }}
-						/>
+						{item.forSale ? (
+							<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+								<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />
+							</View>
+						) : (
+							<FastImage
+								resizeMode={FastImage.resizeMode.cover}
+								source={{
+									uri: item?.url || currentClan?.logo || '',
+									cache: FastImage.cacheControl.immutable,
+									priority: FastImage.priority.high
+								}}
+								style={{ height: '100%', width: '100%' }}
+							/>
+						)}
 					</TouchableOpacity>
 				))}
 			</ScrollView>
