@@ -1,4 +1,4 @@
-import { ButtonWithLoading } from '@mezon/ui';
+import { ButtonLoading } from '@mezon/ui';
 
 type ModalSaveChangesProps = {
 	onSave: () => void;
@@ -21,7 +21,7 @@ const ModalSaveChanges = ({ onSave, onReset, isLoading }: ModalSaveChangesProps)
 					<button onClick={onReset} className="rounded px-4 py-1.5 hover:underline">
 						Reset
 					</button>
-					<ButtonWithLoading
+					<ButtonLoading
 						label="Save Changes"
 						onClick={handleSaveChanges}
 						className="ml-auto bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white w-28"
