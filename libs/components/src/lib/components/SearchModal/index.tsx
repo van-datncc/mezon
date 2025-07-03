@@ -323,13 +323,14 @@ function SearchModal({ onClose }: SearchModalProps) {
 
 	return (
 		<ModalLayout onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-90 focus-visible:[&>*]:outline-none">
-			<div className="dark:bg-[#36393e] w-[640px] bg-bgLightMode px-6 py-4 rounded-[6px] w-full">
+			<div className="dark:bg-[#36393e] !w-[640px] bg-bgLightMode px-6 py-4 rounded-[6px]">
 				<div className="flex flex-col">
 					<InputField
 						type="text"
 						placeholder="Where would you like to go?"
 						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
 						onChange={(e) => debouncedSetSearchText(e.target.value)}
+						autoFocus
 					/>
 				</div>
 				<ListGroupSearchModal

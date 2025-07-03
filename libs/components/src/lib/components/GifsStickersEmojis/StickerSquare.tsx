@@ -79,7 +79,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 
 	const categoryLogo = useMemo(() => {
 		const categorizedStickers = clanStickers
-			.filter((sticker) => sticker.clan_name !== FOR_SALE_CATE)
+			.filter((sticker) => !sticker.is_for_sale)
 			.reduce((acc: { id?: string; type?: string; url?: string }[], sticker) => {
 				if (!acc.some((item) => item.id === sticker.clan_id)) {
 					acc.push({

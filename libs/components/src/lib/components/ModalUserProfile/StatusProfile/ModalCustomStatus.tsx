@@ -68,6 +68,7 @@ const ModalCustomStatus = ({
 							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
 							placeholder="Support has arrived!"
 							maxLength={128}
+							autoFocus
 							onChange={handleChangeCustomStatus}
 						/>
 					</div>
