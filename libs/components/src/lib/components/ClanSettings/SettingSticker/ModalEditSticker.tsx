@@ -1,10 +1,9 @@
 import { useEscapeKeyClose } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
-import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
+import { Button, ButtonLoading, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
@@ -290,7 +289,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						</div>
 					</div>
 				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-end justify-end select-none gap-2`}>
+				<div className={`absolute w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
 					<div className="flex items-center flex-1 h-full gap-2">
 						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
 						<label htmlFor="sale_item" className="!text-textPrimaryLight dark:!text-textPrimary">
@@ -298,16 +297,12 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						</label>
 					</div>
 					<Button
-						label="Never Mind"
-						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
+						className="px-2 py-1 border-none !text-textPrimaryLight dark:!text-textPrimary hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
-					/>
-					<ButtonWithLoading
-						label="Save Changes"
-						className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`}
-						disable={validateSaveChange}
-						onClick={onSaveChange}
-					/>
+					>
+						Never Mind
+					</Button>
+					<ButtonLoading className="px-2 py-1 h-9 w-32" label="Save Changes" disabled={validateSaveChange} onClick={onSaveChange} />
 				</div>
 			</div>
 

@@ -9,7 +9,7 @@ import {
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { ButtonWithLoading, Icons, InputField } from '@mezon/ui';
+import { ButtonLoading, Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
@@ -249,7 +249,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					>
 						Cancel
 					</button>
-					<ButtonWithLoading
+					<ButtonLoading
 						label="Done"
 						onClick={handleAddMember}
 						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"

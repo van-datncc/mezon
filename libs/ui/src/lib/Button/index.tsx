@@ -1,20 +1,18 @@
 import React, { ButtonHTMLAttributes } from 'react';
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'dangerouslySetInnerHTML'> {
 	className?: string;
-	label: string;
-	image?: string;
-	disable?: boolean;
-	noNeedOpacity?: boolean;
+	children?: React.ReactNode;
+	disabled?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({ disable, label, className, noNeedOpacity, ...rest }) => {
+const Button: React.FC<ButtonProps> = ({ disabled, children, className, ...rest }) => {
 	return (
 		<button
-			className={`bg-primary text-white font-[500] py-2 px-4 rounded ${disable ? `text-contentTertiary ${noNeedOpacity ? 'dark:bg-[#3b428a] bg-[#9da5ed]' : 'opacity-50'} cursor-not-allowed` : 'hover:bg-hoverPrimary bg-primary'} ${className}`}
+			className={`bg-buttonPrimary border border-buttonBorder text-white font-[500] rounded capitalize disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bg ${className}`}
 			{...rest}
-			disabled={disable}
+			disabled={disabled}
 		>
-			{label}
+			{children}
 		</button>
 	);
 };
