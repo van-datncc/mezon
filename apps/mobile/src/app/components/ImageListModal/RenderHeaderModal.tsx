@@ -22,7 +22,7 @@ import { style } from './styles';
 
 interface IRenderFooterModalProps {
 	onClose?: () => void;
-	imageSelected?: AttachmentEntity;
+	imageSelected?: AttachmentEntity & { channelId?: string };
 	onImageSaved?: () => void;
 	onLoading?: (isLoading: boolean) => void;
 }
@@ -48,7 +48,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				onImageSaved();
 			}
 		} catch (error) {
-			console.error(error);
+			// Error is handled silently as the operation is user-facing
 		}
 		onLoading(false);
 	};
