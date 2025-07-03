@@ -154,8 +154,8 @@ export const fetchClansCached = async (
 		{
 			api_name: 'ListClanDescs',
 			list_clan_req: {
-				limit: { value: limit },
-				state: { value: 1 }
+				limit,
+				state
 			}
 		},
 		() => ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || ''),

@@ -24,6 +24,7 @@ export interface PermissionRoleChannelState extends EntityState<PermissionRoleCh
 	cacheByChannels: Record<
 		string,
 		{
+			permissionRoleChannel?: ApiPermissionRoleChannelListEventResponse | null;
 			cache?: CacheMetadata;
 		}
 	>;
@@ -38,15 +39,9 @@ type fetchChannelsArgs = {
 	noCache?: boolean;
 };
 
-const selectCachedPermissionRoleChannelByChannel = createSelector(
-	[(state: RootState) => state[LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY], (state: RootState, channelId: string) => channelId],
-	(entities, channelId) => {
-		if (entities?.permission?.channel_id === channelId) {
-			return entities?.permission?.permission_role_channel;
-		}
-		return [];
-	}
-);
+const getInitialChannelState = () => ({
+	permissionRoleChannel: null
+});
 
 export const fetchPermissionRoleChannelCached = async (
 	getState: () => RootState,
@@ -57,18 +52,17 @@ export const fetchPermissionRoleChannelCached = async (
 	noCache = false
 ) => {
 	const state = getState();
-	const permissionRoleChannelData = state[LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY].cacheByChannels[channelId];
-	const apiKey = createApiKey('fetchPermissionRoleChannel', channelId);
-	const shouldForceCall = shouldForceApiCall(apiKey, permissionRoleChannelData?.cache, noCache);
+	const permissionRoleChannelState = state[LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY];
+	const channelData = permissionRoleChannelState.cacheByChannels[channelId] || getInitialChannelState();
+
+	const apiKey = createApiKey('fetchPermissionRoleChannel', channelId, roleId, userId);
+	const shouldForceCall = shouldForceApiCall(apiKey, channelData.cache, noCache);
 
 	if (!shouldForceCall) {
-		const permissionRoleChannel = selectCachedPermissionRoleChannelByChannel(state, channelId);
 		return {
-			channel_id: channelId,
-			permission_role_channel: permissionRoleChannel,
-			role_id: roleId,
-			time: Date.now(),
-			fromCache: true
+			...channelData.permissionRoleChannel,
+			fromCache: true,
+			time: channelData.cache?.lastFetched || Date.now()
 		};
 	}
 
@@ -163,6 +157,13 @@ export const permissionRoleChannelSlice = createSlice({
 			if (permission && permission.role_id === roleId && permission.channel_id === channelId) {
 				permission.permission_role_channel = permissionRole;
 			}
+
+			if (state.cacheByChannels[channelId]?.permissionRoleChannel) {
+				const channelPermission = state.cacheByChannels[channelId].permissionRoleChannel;
+				if (channelPermission && channelPermission.role_id === roleId && channelPermission.channel_id === channelId) {
+					channelPermission.permission_role_channel = permissionRole;
+				}
+			}
 		}
 	},
 	extraReducers: (builder) => {
@@ -171,13 +172,16 @@ export const permissionRoleChannelSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchPermissionRoleChannel.fulfilled, (state: PermissionRoleChannelState, action: PayloadAction<any>) => {
-				if (!action.payload?.fromCache)
-					if (!action.payload?.fromCache) {
-						if (!state.cacheByChannels[action.payload?.channel_id]) {
-							state.cacheByChannels[action.payload?.channel_id] = {};
-						}
-						state.cacheByChannels[action.payload?.channel_id].cache = createCacheMetadata();
-					}
+				const { channel_id, fromCache } = action.payload;
+
+				if (!state.cacheByChannels[channel_id]) {
+					state.cacheByChannels[channel_id] = getInitialChannelState();
+				}
+
+				if (!fromCache) {
+					state.cacheByChannels[channel_id].permissionRoleChannel = action.payload;
+					state.cacheByChannels[channel_id].cache = createCacheMetadata();
+				}
 				state.permission = action.payload;
 				state.loadingStatus = 'loaded';
 			})
@@ -235,12 +239,17 @@ import { mess } from '@mezon/store';
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = permissionRoleChannelAdapter.getSelectors();
 
 export const getPermissionRoleChannelState = (rootState: {
 	[LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY]: PermissionRoleChannelState;
 }): PermissionRoleChannelState => rootState[LIST_PERMISSION_ROLE_CHANNEL_FEATURE_KEY];
 
-export const selectPermissionRoleChannelsEntities = createSelector(getPermissionRoleChannelState, selectEntities);
-
-export const selectAllPermissionRoleChannel = createSelector(getPermissionRoleChannelState, (state) => state.permission);
+export const selectAllPermissionRoleChannel = createSelector(
+	[getPermissionRoleChannelState, (state: RootState, channelId: string) => channelId],
+	(state, channelId) => {
+		if (channelId && state.cacheByChannels[channelId]?.permissionRoleChannel) {
+			return state.cacheByChannels[channelId].permissionRoleChannel;
+		}
+		return state.permission;
+	}
+);

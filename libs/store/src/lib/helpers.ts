@@ -1,6 +1,6 @@
 import { MezonContextValue } from '@mezon/transport';
 import { GetThunkAPI } from '@reduxjs/toolkit';
-import { Client, Session } from 'mezon-js';
+import { Client, Friend, safeJSONParse, Session } from 'mezon-js';
 import { GetThunkAPIWithMezon } from './typings';
 
 export const getMezonCtx = (thunkAPI: GetThunkAPI<any>) => {
@@ -108,7 +108,39 @@ export async function fetchDataWithSocketFallback<T>(
 	if (socket) {
 		try {
 			const data = await socket.listDataSocket(socketRequest);
+
+			if (socketRequest.api_name === 'ListFriends') {
+				if (data?.[responseKey!]) {
+					data[responseKey!] = data?.[responseKey!]?.map((item: Friend) => ({
+						...item,
+						user: {
+							...item.user,
+							metadata: item.user?.metadata ? safeJSONParse(item.user?.metadata as string) : {}
+						}
+					}));
+				}
+
+				// refactor later
+			}
+
+			if (socketRequest.api_name === 'ListClanUsers') {
+				if (data?.[responseKey!]) {
+					data[responseKey!] = data?.[responseKey!]?.map((item: Friend) => ({
+						...item,
+						user: {
+							...item.user,
+							metadata: item.user?.metadata ? safeJSONParse(item.user?.metadata as string) : {}
+						}
+					}));
+				}
+
+				// refactor later
+			}
+
 			response = responseKey ? data?.[responseKey] : data;
+
+			// if (socketRequest.api_name === 'ListClanDescs') {
+			// }
 		} catch (err) {
 			console.log(err, socketRequest);
 			// ignore socket errors and fallback to REST API
