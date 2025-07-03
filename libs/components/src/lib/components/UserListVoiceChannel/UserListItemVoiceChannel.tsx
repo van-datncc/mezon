@@ -16,7 +16,7 @@ function UserListItem({ user, channelID, isPttList }: { user: IChannelMember; ch
 
 	return (
 		<div
-			className={`dark:hover:bg-[#36373D] hover:bg-bgLightModeButton w-[90%] flex p-1 ${isPttList ? 'w-full' : 'ml-5'} items-center gap-3 cursor-pointer rounded-sm`}
+			className={`bg-item-hover text-theme-primary-hover w-[90%] flex p-1 ${isPttList ? 'w-full' : 'ml-5'} items-center gap-3 cursor-pointer rounded-sm`}
 		>
 			<div className="w-5 h-5 rounded-full scale-75">
 				<div className="w-8 h-8 mt-[-0.3rem]">
@@ -37,7 +37,7 @@ function UserListItem({ user, channelID, isPttList }: { user: IChannelMember; ch
 				{member || userStream ? (
 					<NameComponent id={user.user_id || ''} name={name || ''} />
 				) : (
-					<p className="text-sm font-medium dark:text-[#AEAEAE] text-colorTextLightMode">{user.participant}</p>
+					<p className="text-sm font-medium ">{user.participant}</p>
 				)}
 			</div>
 		</div>

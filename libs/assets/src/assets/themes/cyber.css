@@ -113,8 +113,8 @@
 	);
 	--mention-color: color-mix(in oklab, hsl(230.769 calc(1 * 49.727%) 35.882% /1) 100%, rgb(77, 0, 42) 38%);
 
-	/* highlight */
-
+	--bg-mention-hover: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+	--color-mention-hover: hsl(0 calc(1 * 0%) 100% /1); /* highlight */
 	--bg-highlight: color-mix(
 		in oklab,
 		hsl(36.894 calc(1 * 100%) 31.569% /0.0784313725490196) 100%,

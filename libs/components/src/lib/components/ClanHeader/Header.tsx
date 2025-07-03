@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ name, handleShowModalClan, isShowModalP
 					className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-item-hover`}
 				>
 					<p className="text-theme-primary text-base font-semibold select-none one-line">{name?.toLocaleUpperCase()}</p>
-					<button className="w-6 h-8 flex flex-col justify-center">
+					<button className="w-6 h-8 flex flex-col justify-center text-theme-primary text-theme-primary-hover">
 						<Icons.ArrowDown />
 					</button>
 				</div>

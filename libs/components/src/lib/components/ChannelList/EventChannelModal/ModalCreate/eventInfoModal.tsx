@@ -10,7 +10,7 @@ import { checkError } from '../eventHelper';
 
 const DatePickerWrapper = lazy(() => import('./DatePickerWrapper'));
 
-const DatePickerPlaceholder = () => <div className="w-full h-[38px] bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>;
+const DatePickerPlaceholder = () => <div className="w-full h-[38px]  animate-pulse rounded"></div>;
 
 export type EventInfoModalProps = {
 	contentSubmit: ContenSubmitEventProps;
@@ -196,7 +196,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					placeholder="What's your event?"
 					onChange={(e) => setContentSubmit((prev) => ({ ...prev, topic: e.target.value }))}
 					value={contentSubmit.topic}
-					className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border dark:border-black p-2 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
+					className={`font-[400] rounded w-full  outline-none text-[15px]border border-theme-primary p-2 focus:outline-none focus:border-white-500 bg-theme-input ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED) * 2}
 				/>
 			</div>
@@ -208,7 +208,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					</h3>
 					<Suspense fallback={<DatePickerPlaceholder />}>
 						<DatePickerWrapper
-							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
+							className="bg-theme-input p-2 rounded outline-none w-full"
 							wrapperClassName="w-full"
 							selected={contentSubmit.selectedDateStart}
 							onChange={handleDateChangeStart}
@@ -233,7 +233,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 					</h3>
 					<Suspense fallback={<DatePickerPlaceholder />}>
 						<DatePickerWrapper
-							className="dark:bg-black bg-bgModifierHoverLight dark:text-white text-black p-2 rounded outline-none w-full"
+							className="bg-theme-input p-2 rounded outline-none w-full"
 							wrapperClassName="w-full"
 							selected={contentSubmit.selectedDateEnd}
 							onChange={handleDateChangeEnd}
@@ -254,7 +254,7 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<h3 className="uppercase text-[11px] font-semibold">Event Frequency</h3>
 				<select
 					name="frequency"
-					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+					className={`block w-full bg-theme-input border-theme-primary rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 					value={selectedFrequency}
 					onChange={handleFrequencyChange}
 				>
@@ -274,14 +274,14 @@ const EventInfoModal = (props: EventInfoModalProps) => {
 				<div className="relative">
 					<TextArea
 						placeholder="Let everyone know how to use this channel!"
-						className="resize-none h-auto min-h-[87px] w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black overflow-y-hidden outline-none py-2 pl-3 pr-5"
+						className="resize-none h-auto min-h-[87px] w-full bg-theme-input overflow-y-hidden outline-none py-2 pl-3 pr-5"
 						value={contentSubmit.description}
 						onChange={handleChangeTextArea}
 						rows={1}
 						refTextArea={textAreaRef}
 						maxLength={1000}
 					></TextArea>
-					<p className="absolute bottom-2 right-2 text-[#AEAEAE]">{countCharacterDescription}</p>
+					<p className="absolute bottom-2 right-2 ">{countCharacterDescription}</p>
 				</div>
 			</div>
 			<div className="mb-4 cursor-default">

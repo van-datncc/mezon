@@ -47,7 +47,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 
 	return (
 		<div>
-			<div className="w-full h-full max-w-[100%] flex justify-center items-center text-textPrimaryLight dark:text-textPrimary">
+			<div className="w-full h-full max-w-[100%] flex justify-center items-center  ">
 				<div className="flex flex-col items-center">
 					<img src={'assets/images/warning.svg'} alt="warning" width={200} height={200} />
 
@@ -57,16 +57,10 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 					</div>
 
 					<div className="flex space-x-4">
-						<button
-							className="border-2 border-gray-600 rounded-lg px-6 py-2 bg-gray-600 dark:text-textPrimary"
-							onClick={handleCloseModal}
-						>
+						<button className="border-2 border-theme-primary rounded-lg px-6 py-2 y" onClick={handleCloseModal}>
 							Nope
 						</button>
-						<button
-							className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger dark:text-textPrimary"
-							onClick={handleSaveChannelId}
-						>
+						<button className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger " onClick={handleSaveChannelId}>
 							Continue
 						</button>
 					</div>
@@ -80,7 +74,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 					dismissible={true}
 					// onClose={handleCloseModal}
 				>
-					<div className="dark:bg-bgSecondary bg-bgLightMode pt-4 rounded flex flex-col items-center text-white">
+					<div className=" pt-4 rounded flex flex-col items-center">
 						<img src={'assets/images/cake.png'} alt="warning" width={200} height={200} />
 						<div className="text-center ml-6 mr-6">
 							<h2 className="text-2xl font-bold text-center mb-4">Please confirm your birthday</h2>
@@ -90,7 +84,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 							type="date"
 							id="birthday"
 							onChange={handleBirthdayChange}
-							className="mb-4 px-4 py-2 mt-5 border-2 border-gray-400 rounded-lg bg-bgModalDark w-9/10"
+							className="mb-4 px-4 py-2 mt-5 border-2 border-theme-primary rounded-lg bg-theme-input w-9/10"
 						/>
 						<div className="flex space-x-4 mb-4 w-9/10">
 							<button

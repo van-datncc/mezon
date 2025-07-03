@@ -189,7 +189,7 @@ function MessageWithUser({
 						},
 						{ '!bg-bgMessageReplyHighline': messageReplyHighlight },
 						{ 'bg-highlight': isHighlight },
-						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved },
+						{ '!bg-[#eab30833]': checkMessageTargetToMoved },
 						{
 							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
 						}
@@ -280,7 +280,7 @@ function MessageWithUser({
 									isEphemeral={isEphemeralMessage}
 								/>
 								{isEphemeralMessage && (
-									<div className="flex items-center gap-1 mt-1 mb-1 text-xs text-gray-500 dark:text-gray-400 italic">
+									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic">
 										<Icons.EyeClose className="w-3 h-3" />
 										<span>Only visible to recipient</span>
 									</div>
@@ -394,7 +394,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	};
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} bg-item-hover relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : 'bg-item-hover'} relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}
@@ -404,9 +404,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			{isHover && (
 				<>
 					{!showMessageHead && create_time && (
-						<span className="absolute left-[24px] top-[4px] dark:text-zinc-400 text-colorTextLightMode text-[10px]">
-							{convertTimeHour(create_time)}
-						</span>
+						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[10px]">{convertTimeHour(create_time)}</span>
 					)}
 					{popup?.()}
 				</>
