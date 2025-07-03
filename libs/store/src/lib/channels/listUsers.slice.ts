@@ -40,7 +40,7 @@ export const fetchListUsersByUserCached = async (getState: () => RootState, mezo
 
 	if (!shouldForceCall) {
 		return {
-			users: Object.values(usersData.entities),
+			users: selectAll(usersData),
 			fromCache: true,
 			time: usersData.cache?.lastFetched || Date.now()
 		};
@@ -64,6 +64,8 @@ export const fetchListUsersByUser = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 			const response = await fetchListUsersByUserCached(thunkAPI.getState as () => RootState, mezon, Boolean(noCache));
+
+			console.log(response, 'response');
 
 			if (response?.fromCache) {
 				return {

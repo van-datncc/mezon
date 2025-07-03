@@ -63,6 +63,8 @@ const selectCachedCanvasByChannel = createSelector(
 	[(state: RootState, channelId: string) => state[CANVAS_API_FEATURE_KEY].channelCanvas[channelId]],
 	(channelData) => {
 		if (!channelData) return [];
+
+		//TODO: recheck
 		const entities = Object.values(channelData.entities || {});
 		return entities.sort((a, b) => {
 			if (a.update_time && b.update_time) {

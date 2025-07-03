@@ -1,8 +1,9 @@
 import { useEscapeKeyClose } from '@mezon/core';
 import { createSticker, emojiSuggestionActions, selectCurrentClanId, updateSticker, useAppDispatch } from '@mezon/store';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
+
 import { Button, ButtonLoading, Checkbox, Icons, InputField } from '@mezon/ui';
-import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
+import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage, sanitizeUrlSecure } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
@@ -330,9 +331,15 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 export default ModalSticker;
 
 const PreviewStickerBox = ({ preview }: { preview: string }) => {
+	const sanitizedPreview = sanitizeUrlSecure(preview, {
+		allowedProtocols: ['https:', 'http:', 'data:', 'blob:'],
+		allowedDomains: ['cdn.mezon.ai', 'tenor.com'],
+		maxLength: 2048
+	});
+
 	return (
 		<div className={'m-auto absolute w-40 aspect-square overflow-hidden flex items-center justify-center'}>
-			<img className="h-full w-auto object-cover" src={preview} />
+			<img className="h-full w-auto object-cover" alt="sticker" src={sanitizedPreview} />
 		</div>
 	);
 };
