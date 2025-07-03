@@ -4,6 +4,7 @@ import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
+import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
@@ -101,7 +102,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			handleCloseModal();
 			return;
 		}
-		handleCreateSticker();
+		await handleCreateSticker();
 	};
 
 	const handleCreateSticker = async () => {
@@ -143,7 +144,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 		};
 		if (isForSale) {
 			const idPreview = Snowflake.generate();
-			const fileBlur = await createBlurredImageFile(resizeFile);
+			const fileBlur = await createBlurredWatermarkedImageFile(resizeFile, 'SOLD', 2);
 			const pathPreview = (isSticker ? 'stickers/' : 'emojis/') + idPreview + '.webp';
 			await handleUploadEmoticon(client, session, pathPreview, fileBlur as File);
 			request.id = idPreview;
@@ -184,7 +185,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	const isForSaleRef = useRef<HTMLInputElement | null>(null);
 
-	function createBlurredImageFile(originalFile: File, blurAmount = 7) {
+	function createBlurredWatermarkedImageFile(originalFile: File, watermarkText = 'SOLD', blurAmount = 2) {
 		return new Promise((resolve, reject) => {
 			const img = new Image();
 			img.src = URL.createObjectURL(originalFile);
@@ -201,10 +202,25 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				ctx.filter = `blur(${blurAmount}px)`;
 				ctx.drawImage(img, 0, 0);
 
+				ctx.filter = 'none';
+				const fontSize = Math.floor(canvas.width / 2);
+				ctx.font = `bold ${fontSize}px sans-serif`;
+				ctx.fillStyle = 'rgba(128, 128, 128, 0.35)';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+
+				ctx.save();
+				ctx.translate(canvas.width / 2, canvas.height / 2);
+				ctx.rotate((45 * Math.PI) / 180);
+
+				ctx.fillText(watermarkText, 0, 0);
+
+				ctx.restore();
+
 				canvas.toBlob((blob) => {
 					if (blob) {
-						const newFile = new File([blob], 'blurred-image.png', { type: 'image/png' });
-						resolve(newFile); // trả về file có thể dùng tiếp
+						const newFile = new File([blob], 'blurred-watermarked.png', { type: 'image/png' });
+						resolve(newFile);
 					} else {
 						reject(new Error('Không thể chuyển canvas thành file.'));
 					}
@@ -301,7 +317,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
 					/>
-					<Button
+					<ButtonWithLoading
 						label="Save Changes"
 						className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`}
 						disable={validateSaveChange}
