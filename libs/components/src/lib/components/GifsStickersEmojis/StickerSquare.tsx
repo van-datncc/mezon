@@ -25,7 +25,14 @@ type ChannelMessageBoxProps = {
 };
 
 interface ICategorizedStickerProps {
-	stickerList: any[];
+	stickerList: {
+		id: string | undefined;
+		url: string | undefined;
+		type: string | undefined;
+		clanName: string | undefined;
+		clanId: string | undefined;
+		forSale: boolean | undefined;
+	}[];
 	categoryName: string;
 	onClickSticker: (stickerUrl: StickerPanel) => void;
 	valueInputToCheckHandleSearch?: string;
@@ -230,7 +237,9 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({
 	valueInputToCheckHandleSearch,
 	onOpenBuySticker
 }) => {
-	const stickersListByCategoryName = stickerList.filter((sticker) => sticker.type === categoryName);
+	const stickersListByCategoryName = stickerList.filter((sticker) =>
+		categoryName === FOR_SALE_CATE ? sticker.forSale : sticker.type === categoryName && !sticker.forSale
+	);
 	const [isShowStickerList, setIsShowStickerList] = useState(true);
 	const currentClan = useAppSelector(selectCurrentClan);
 
