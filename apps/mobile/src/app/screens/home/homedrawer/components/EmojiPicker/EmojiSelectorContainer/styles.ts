@@ -33,7 +33,8 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			color: colors.text,
 			fontSize: size.medium,
 			fontWeight: '600',
-			paddingBottom: size.s_4
+			paddingBottom: size.s_4,
+			textTransform: 'capitalize'
 		},
 		textInputWrapper: {
 			flexDirection: 'row',
