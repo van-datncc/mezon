@@ -2,7 +2,7 @@ import { useEscapeKeyClose } from '@mezon/core';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
-import ButtonWithLoading from '../Button/ButtonWithLoading';
+import ButtonLoading from '../Button/ButtonLoading';
 import { Hashtag, HashtagLocked, Speaker, SpeakerLocked } from '../Icons';
 
 export type ModalProps = {
@@ -105,7 +105,7 @@ const Modal = (props: ModalProps) => {
 										Back
 									</button>
 									{titleConfirm && (
-										<ButtonWithLoading
+										<ButtonLoading
 											className={`text-white font-semibold text-sm px-4 py-2 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 bg-primary text-[16px] leading-6 rounded ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
 											onClick={handleConfirmClick}
 											label={titleConfirm}

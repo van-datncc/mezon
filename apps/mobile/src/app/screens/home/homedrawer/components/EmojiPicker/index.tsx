@@ -7,7 +7,7 @@ import { MediaType, selectAnonymousMode, selectCurrentChannel, selectDmGroupCurr
 import { IMessageSendPayload, checkIsThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { MutableRefObject, useCallback, useEffect, useState } from 'react';
+import React, { MutableRefObject, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Text, TextInput, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -171,7 +171,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 			setStickerMode(MediaType.STICKER);
 		}
 	}, [stickerMode]);
-	
+
 	return (
 		<TouchableWithoutFeedback onPressIn={handleInputSearchBlur}>
 			<View style={styles.container}>
@@ -234,7 +234,12 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 				) : mode === 'gif' ? (
 					<GifSelector onScroll={onScroll} onSelected={(url) => handleSelected('gif', url)} searchText={searchText} />
 				) : (
-					<StickerSelector onScroll={onScroll} onSelected={(sticker) => handleSelected('sticker', sticker)} mediaType={stickerMode} searchText={searchText} />
+					<StickerSelector
+						onScroll={onScroll}
+						onSelected={(sticker) => handleSelected('sticker', sticker)}
+						mediaType={stickerMode}
+						searchText={searchText}
+					/>
 				)}
 			</View>
 		</TouchableWithoutFeedback>

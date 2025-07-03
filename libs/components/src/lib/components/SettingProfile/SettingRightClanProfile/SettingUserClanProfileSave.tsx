@@ -1,5 +1,5 @@
 import { getSelectedRoleId } from '@mezon/store';
-import { ButtonWithLoading } from '@mezon/ui';
+import { ButtonLoading } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 
 export type ModalSettingSave = {
@@ -33,7 +33,7 @@ export const SettingUserClanProfileSave = (props: SettingUserClanProfileSaveProp
 				>
 					Reset
 				</button>
-				<ButtonWithLoading
+				<ButtonLoading
 					className="ml-auto bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white"
 					label="Save Changes"
 					onClick={handleSaveChanges}

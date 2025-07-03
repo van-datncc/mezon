@@ -55,7 +55,7 @@ export const fetchActivitiesCached = async (getState: () => any, mezon: MezonVal
 
 	if (!shouldForceCall) {
 		return {
-			activities: Object.values(activitiesState.entities),
+			activities: selectAll(activitiesState),
 			fromCache: true,
 			time: activitiesState.cache?.lastFetched || Date.now()
 		};
