@@ -1,17 +1,11 @@
 import { captureSentryError } from '@mezon/logger';
-import {
-	CacheMetadata,
-	createApiKey,
-	createCacheMetadata,
-	markApiFirstCalled,
-	RootState,
-	shouldForceApiCall,
-	stickerSettingActions
-} from '@mezon/store';
 import { IEmojiRecent, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiClanEmoji } from 'mezon-js/dist/api.gen';
-import { ensureSession, getMezonCtx, MezonValueContext } from '../helpers';
+import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
+import { stickerSettingActions } from '../settingSticker/settingSticker.slice';
+import { RootState } from '../store';
 import { emojiSuggestionActions, selectAllEmojiSuggestion } from './emojiSuggestion.slice';
 
 export const EMOJI_RECENT_FEATURE_KEY = 'emojiRecent';

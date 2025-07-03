@@ -1623,20 +1623,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			if (status === EEventAction.CREATED && role) {
 				dispatch(
 					rolesClanActions.add({
-						id: role.id as string,
-						clan_id: role.clan_id,
-						title: role.title,
-						color: role.color,
-						role_icon: role.role_icon,
-						slug: role.slug,
-						description: role.description,
-						creator_id: role.creator_id,
-						active: role.active,
-						display_online: role.display_online,
-						allow_mention: role.allow_mention,
-						role_channel_active: role.role_channel_active,
-						channel_ids: role.channel_ids,
-						max_level_permission: role.max_level_permission
+						role: {
+							id: role.id as string,
+							clan_id: role.clan_id,
+							title: role.title,
+							color: role.color,
+							role_icon: role.role_icon,
+							slug: role.slug,
+							description: role.description,
+							creator_id: role.creator_id,
+							active: role.active,
+							display_online: role.display_online,
+							allow_mention: role.allow_mention,
+							role_channel_active: role.role_channel_active,
+							channel_ids: role.channel_ids,
+							max_level_permission: role.max_level_permission
+						},
+						clanId: role.clan_id as string
 					})
 				);
 
@@ -1677,7 +1680,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					}
 				}
 
-				dispatch(rolesClanActions.update(role));
+				dispatch(rolesClanActions.update({ role, clanId: role.clan_id as string }));
 				return;
 			}
 
@@ -1693,7 +1696,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (isUserResult) {
 					dispatch(policiesActions.removeOne(role.id as string));
 				}
-				dispatch(rolesClanActions.remove(role.id as string));
+				dispatch(rolesClanActions.remove({ roleId: role.id as string, clanId: role.clan_id as string }));
 			}
 		},
 		[userId]
