@@ -11,6 +11,7 @@ import {
 } from '@mezon/store';
 import { Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
+import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -249,13 +250,11 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					>
 						Cancel
 					</button>
-					<button
-						color="blue"
+					<ButtonWithLoading
+						label="Done"
 						onClick={handleAddMember}
 						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
-					>
-						Done
-					</button>
+					/>
 				</div>
 			</div>
 		</div>
