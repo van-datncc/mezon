@@ -104,6 +104,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const handleCloseModalCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
 		setCustomStatus(userCustomStatus.status ?? '');
+		closeSetCustomStatus();
 	};
 
 	const { setIsShowSettingFooterStatus, setIsUserProfile } = useSettingFooter();
@@ -192,6 +193,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const handleClosePopup = () => {
 		dispatch(giveCoffeeActions.setSendTokenEvent({ tokenEvent: null, status: TOKEN_FAILED_STATUS }));
 		handleCloseModalSendToken();
+		closeModalSendToken();
 	};
 
 	const loadParamsSendTokenFromURL = () => {
@@ -262,6 +264,52 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		setStatusMenu(false);
 	}, [setStatusMenu]);
 
+	const [openSetCustomStatus, closeSetCustomStatus] = useModal(() => {
+		return (
+			<ModalCustomStatus
+				setCustomStatus={setCustomStatus}
+				customStatus={userCustomStatus.status || ''}
+				handleSaveCustomStatus={handleSaveCustomStatus}
+				name={name}
+				onClose={handleCloseModalCustomStatus}
+				setNoClearStatus={setNoClearStatus}
+				setResetTimerStatus={setResetTimerStatus}
+			/>
+		);
+	}, [userCustomStatus.status]);
+
+	const [openModalSendToken, closeModalSendToken] = useModal(() => {
+		return (
+			<ModalSendToken
+				setToken={setToken}
+				token={token}
+				selectedUserId={selectedUserId}
+				handleSaveSendToken={handleSaveSendToken}
+				onClose={handleClosePopup}
+				setSelectedUserId={setSelectedUserId}
+				setNote={setNote}
+				error={error}
+				userSearchError={userSearchError}
+				userId={myProfile.userId as string}
+				note={note}
+				sendTokenInputsState={sendTokenInputsState}
+				infoSendToken={infoSendToken}
+				isButtonDisabled={isButtonDisabled}
+			/>
+		);
+	}, [token, selectedUserId, note, infoSendToken, isButtonDisabled, sendTokenInputsState, myProfile.userId]);
+
+	useEffect(() => {
+		if (showModalCustomStatus) {
+			openSetCustomStatus();
+			return;
+		}
+		if (showModalSendToken) {
+			openModalSendToken();
+		}
+	}, [showModalCustomStatus, showModalSendToken]);
+
+	useEffect(() => {}, []);
 	return (
 		<div
 			className={`fixed bottom-0 left-[72px] min-h-14 w-widthChannelList z-10 ${
@@ -323,35 +371,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					</div>
 				</div>
 			</div>
-			{showModalCustomStatus && (
-				<ModalCustomStatus
-					setCustomStatus={setCustomStatus}
-					customStatus={userCustomStatus.status || ''}
-					handleSaveCustomStatus={handleSaveCustomStatus}
-					name={name}
-					onClose={handleCloseModalCustomStatus}
-					setNoClearStatus={setNoClearStatus}
-					setResetTimerStatus={setResetTimerStatus}
-				/>
-			)}
-			{showModalSendToken && (
-				<ModalSendToken
-					setToken={setToken}
-					token={token}
-					selectedUserId={selectedUserId}
-					handleSaveSendToken={handleSaveSendToken}
-					onClose={handleClosePopup}
-					setSelectedUserId={setSelectedUserId}
-					setNote={setNote}
-					error={error}
-					userSearchError={userSearchError}
-					userId={myProfile.userId as string}
-					note={note}
-					sendTokenInputsState={sendTokenInputsState}
-					infoSendToken={infoSendToken}
-					isButtonDisabled={isButtonDisabled}
-				/>
-			)}
 		</div>
 	);
 }
