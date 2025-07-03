@@ -47,6 +47,7 @@ export function useImage() {
 					text1: 'Error saving image',
 					type: 'error'
 				});
+				throw err;
 			} finally {
 				if (Platform.OS === 'android') {
 					await RNFetchBlob.fs.unlink(filePath);
