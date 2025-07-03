@@ -5,11 +5,9 @@ import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import { clearApiCallTracker } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
-import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 import { usersClanActions } from '../clanMembers/clan.members';
 import { clansActions } from '../clans/clans.slice';
 import { directActions } from '../direct/direct.slice';
-import { clearAllMemoizedFunctions } from '../memoize';
 import { createCachedSelector, messagesActions } from '../messages/messages.slice';
 import { RootState } from '../store';
 import { voiceActions } from '../voice/voice.slice';
@@ -81,8 +79,6 @@ export const refreshApp = createAsyncThunk('app/refreshApp', async ({ id }: { id
 			throw Error('refresh app error: state does not init');
 		}
 
-		clearAllMemoizedFunctions();
-		thunkAPI.dispatch(listChannelRenderAction.clearListChannelRender());
 		clearApiCallTracker();
 
 		const isClanView = state?.clans?.currentClanId && state.clans.currentClanId !== '0';

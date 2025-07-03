@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { authActions } from '../auth/auth.slice';
 import { CacheMetadata, clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, getMezonCtx } from '../helpers';
-import { clearAllMemoizedFunctions } from '../memoize';
 import { RootState } from '../store';
 
 export const ACCOUNT_FEATURE_KEY = 'account';
@@ -85,7 +84,6 @@ export const deleteAccount = createAsyncThunk('account/deleteaccount', async (_,
 
 		const response = await mezon.client.deleteAccount(mezon.session);
 		thunkAPI.dispatch(authActions.setLogout());
-		clearAllMemoizedFunctions();
 		clearApiCallTracker();
 		return response;
 	} catch (error) {

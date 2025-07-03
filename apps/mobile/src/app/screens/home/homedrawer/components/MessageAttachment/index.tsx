@@ -18,13 +18,25 @@ interface IProps {
 	clanId: string;
 	channelId: string;
 }
+
+const isSecureTenorUrl = (url: string | undefined): boolean => {
+	if (!url) return false;
+	try {
+		const parsedUrl = new URL(url);
+		const hostname = parsedUrl.hostname.toLowerCase();
+		return hostname === 'tenor.com' || hostname.endsWith('.tenor.com');
+	} catch {
+		return false;
+	}
+};
+
 const classifyAttachments = (attachments: ApiMessageAttachment[]) => {
 	const videos: ApiMessageAttachment[] = [];
 	const images: ApiMessageAttachment[] = [];
 	const documents: ApiMessageAttachment[] = [];
 
 	(attachments || [])?.forEach?.((attachment) => {
-		if (attachment.filetype?.indexOf('video/mp4') !== -1 && !attachment.url?.includes('tenor.com')) {
+		if (attachment.filetype?.indexOf('video/mp4') !== -1 && !isSecureTenorUrl(attachment.url)) {
 			videos.push(attachment);
 		} else if (fileTypeImage.includes(attachment?.filetype)) {
 			images.push(attachment);
@@ -45,6 +57,7 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, cl
 	const [documents, setDocuments] = useState<ApiMessageAttachment[]>([]);
 	const visibleImages = useMemo(() => images?.reverse()?.slice(0, images?.length > 4 ? 3 : 4), [images]);
 	const remainingImagesCount = useMemo(() => images?.length - visibleImages?.length || 0, [images, visibleImages]);
+
 	useEffect(() => {
 		const { videos, images, documents } = classifyAttachments(attachments ?? []);
 		setVideos(videos);
