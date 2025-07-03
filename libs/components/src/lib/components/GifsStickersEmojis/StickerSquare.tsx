@@ -240,7 +240,7 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({
 	const stickersListByCategoryName = stickerList.filter((sticker) =>
 		categoryName === FOR_SALE_CATE ? sticker.forSale : sticker.type === categoryName && !sticker.forSale
 	);
-	const [isShowStickerList, setIsShowStickerList] = useState(true);
+	const [isShowStickerList, setIsShowStickerList] = useState(categoryName === FOR_SALE_CATE ? false : true);
 	const currentClan = useAppSelector(selectCurrentClan);
 
 	const handleToggleButton = () => {
@@ -284,11 +284,17 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
 									onClick={() => (!sticker.forSale || sticker.url ? onClickSticker(sticker) : onOpenBuySticker(sticker))}
 									role="button"
 								/>
-								{sticker.forSale && !sticker.url && (
-									<div className="absolute left-8 flex items-center justify-center aspect-square pointer-events-none">
-										<Icons.LockIcon defaultSize="w-16 h-16 text-white block group-hover:hidden" defaultFill="white" />
-										<Icons.UnLockIcon defaultSize="w-16 h-16 text-white hidden group-hover:block" defaultFill="white" />
-									</div>
+								{sticker.forSale && (
+									<>
+										{!sticker.url && (
+											<div className="absolute left-8 flex items-center justify-center aspect-square pointer-events-none group">
+												<Icons.LockIcon defaultSize="w-16 h-16 text-white block group-hover:hidden" defaultFill="white" />
+												<Icons.UnLockIcon defaultSize="w-16 h-16 text-white hidden group-hover:block" defaultFill="white" />
+											</div>
+										)}
+
+										<Icons.MarketIcons className="absolute top-1 right-1 w-4 h-4 text-yellow-300" />
+									</>
 								)}
 							</div>
 						))}
