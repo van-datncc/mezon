@@ -72,9 +72,9 @@ export const fetchChannelMembersCached = async (
 	const shouldForceCall = shouldForceApiCall(apiKey, channelMembersState?.memberChannels?.[channelId]?.cache, noCache);
 
 	if (!shouldForceCall) {
-		// const cachedChannelData = channelMembersState.memberChannels[channelId];
+		const cachedChannelData = channelMembersState.memberChannels[channelId];
 		return {
-			channel_users: [],
+			channel_users: Object.values(cachedChannelData.entities),
 			time: Date.now(),
 			fromCache: true
 		};
@@ -146,12 +146,8 @@ export const fetchChannelMembers = createAsyncThunk(
 
 			const response = await fetchChannelMembersCached(thunkAPI.getState as () => RootState, mezon, clanId, channelId, channelType, noCache);
 
-			if (response.fromCache) {
-				return { channel_users: [], fromCache: true, channelId };
-			}
-
-			if (response.fromCache) {
-				return { channel_users: response.channel_users || [], fromCache: false, channelId };
+			if (response.fromCache && response.channel_users) {
+				return { channel_users: response.channel_users || [], fromCache: true, channelId };
 			}
 
 			if (!response.channel_users) {

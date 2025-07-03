@@ -16,7 +16,7 @@ import {
 	setSelectedRoleId,
 	useAppDispatch
 } from '@mezon/store';
-import { ButtonWithLoading, Icons, InputField } from '@mezon/ui';
+import { ButtonLoading, Icons, InputField } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -119,7 +119,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 								onChange={(e) => setValueSearch(e.target.value)}
 							/>
 						</div>
-						<ButtonWithLoading
+						<ButtonLoading
 							className="text-[15px] bg-blue-600 hover:bg-blue-500 rounded-[3px] py-[5px] px-2 text-nowrap font-medium inline-flex items-center justify-center h-[32.5px]"
 							onClick={handleCreateNewRole}
 							label="Create Role"
