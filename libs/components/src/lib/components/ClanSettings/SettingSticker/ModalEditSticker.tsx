@@ -144,7 +144,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 		};
 		if (isForSale) {
 			const idPreview = Snowflake.generate();
-			const fileBlur = await createBlurredImageFile(resizeFile);
+			const fileBlur = await createBlurredWatermarkedImageFile(resizeFile, 'SOLD', 2);
 			const pathPreview = (isSticker ? 'stickers/' : 'emojis/') + idPreview + '.webp';
 			await handleUploadEmoticon(client, session, pathPreview, fileBlur as File);
 			request.id = idPreview;
@@ -185,7 +185,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	const isForSaleRef = useRef<HTMLInputElement | null>(null);
 
-	function createBlurredImageFile(originalFile: File, blurAmount = 7) {
+	function createBlurredWatermarkedImageFile(originalFile: File, watermarkText = 'SOLD', blurAmount = 2) {
 		return new Promise((resolve, reject) => {
 			const img = new Image();
 			img.src = URL.createObjectURL(originalFile);
@@ -202,10 +202,25 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 				ctx.filter = `blur(${blurAmount}px)`;
 				ctx.drawImage(img, 0, 0);
 
+				ctx.filter = 'none';
+				const fontSize = Math.floor(canvas.width / 2);
+				ctx.font = `bold ${fontSize}px sans-serif`;
+				ctx.fillStyle = 'rgba(128, 128, 128, 0.35)';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+
+				ctx.save();
+				ctx.translate(canvas.width / 2, canvas.height / 2);
+				ctx.rotate((45 * Math.PI) / 180);
+
+				ctx.fillText(watermarkText, 0, 0);
+
+				ctx.restore();
+
 				canvas.toBlob((blob) => {
 					if (blob) {
-						const newFile = new File([blob], 'blurred-image.png', { type: 'image/png' });
-						resolve(newFile); // trả về file có thể dùng tiếp
+						const newFile = new File([blob], 'blurred-watermarked.png', { type: 'image/png' });
+						resolve(newFile);
 					} else {
 						reject(new Error('Không thể chuyển canvas thành file.'));
 					}
