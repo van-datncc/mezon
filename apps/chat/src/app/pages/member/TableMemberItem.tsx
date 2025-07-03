@@ -30,8 +30,6 @@ type TableMemberItemProps = {
 const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime, displayName }: TableMemberItemProps) => {
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
 
-	console.log(clanJoinTime, 'clanJoinTime');
-
 	const userRolesClan = useMemo(() => {
 		const activeRole: Record<string, string> = {};
 		let userRoleLength = 0;
