@@ -12,7 +12,7 @@ export const MemberMenuItem: FC<MemberMenuItemProps> = ({ label, onClick, isWarn
 	return (
 		<Item
 			onClick={onClick}
-			className="flex truncate justify-between items-center w-full font-sans text-sm font-medium dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF] p-1"
+			className="flex truncate justify-between items-center w-full font-sans text-sm font-medium text-theme-primary text-theme-primary-hover p-1"
 		>
 			<div
 				style={{

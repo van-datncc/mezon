@@ -172,7 +172,7 @@ const UserProfileModalInner = ({
 					style={{ backgroundColor: color }}
 					onClick={() => setGroupIconBanner(initOpenModal)}
 				>
-					<div className={`rounded-tl-lg rounded-tr-lg h-[60px] flex justify-end gap-x-2 p-2 `}>
+					<div className={`rounded-tl-lg rounded-tr-lg h-[60px] bg-private-theme flex justify-end gap-x-2 p-2 `}>
 						<GroupIconBanner
 							checkAddFriend={checkAddFriend}
 							openModal={openGroupIconBanner}

@@ -192,7 +192,7 @@ const UserProfilePopup = ({ username, userID, channelId, mode, isDm, positionSho
 
 	return (
 		<div
-			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
+			className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 bg-outside-footer w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
 			style={{
 				top: `${positionShortUser?.top}px`,
 				...positionStyle

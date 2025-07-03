@@ -115,7 +115,7 @@
 
 	--bg-secondary-button-hover: hsl(258 50% 40% / 0.3);
 	/* màu contexify */
-	--bg-theme-contexify: rgb(32, 36, 48);
+	--bg-theme-contexify: rgb(49, 42, 95);
 	--bg-count-page: #1b1d2b; /* nền đậm hơi tím-xám */
 	--text-count-page: #a5b4fc; /* chữ xanh tím neon nhẹ (giống Tailwind indigo-300) */
 	--bg-count-page-hover: #2c2e41; /* hover sáng hơn nhẹ */

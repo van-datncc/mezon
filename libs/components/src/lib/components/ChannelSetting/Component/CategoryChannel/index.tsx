@@ -59,7 +59,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 					)}
 					label=""
 					placement="bottom-start"
-					className="dark:bg-black bg-white border-none py-[6px] px-[8px] w-[200px]"
+					className="bg-theme-contexify text-theme-primary border-none py-[6px] px-[8px] w-[200px]"
 				>
 					{listCategory.map((category) => {
 						if (category.id !== realTimeChannel.category_id) {

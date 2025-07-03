@@ -115,7 +115,7 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 						<div className="w-full flex-grow">
 							<InputField
 								type="text"
-								className="rounded-lg w-full border-theme-primary  px-2 py-1 focus:outline-none focus:border-white-500 bg-theme-input text-base"
+								className="rounded-lg w-full border-theme-primary  px-2 py-1 focus:outline-none bg-theme-contexify focus:border-white-500 bg-theme-input text-base"
 								placeholder="Search Roles"
 								onChange={(e) => setValueSearch(e.target.value)}
 							/>

@@ -17,7 +17,7 @@
 	background: var(--private-theme);
 }
 .bg-theme-contexify {
-	background: var(--bg-theme-contexify);
+	background: var(--bg-theme-contexify) !important;
 }
 .theme-base-color {
 	background: var(--theme-base-color);

@@ -204,7 +204,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								<Submenu
 									label={
 										<span
-											className="flex truncate justify-between items-center w-full font-sans text-sm font-medium dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF] p-1"
+											className="flex truncate justify-between items-center w-full font-sans text-sm font-medium text-theme-primary text-theme-primary-hover p-1 "
 											style={{ fontFamily: `'gg sans', 'Noto Sans', sans-serif`, padding: 8 }}
 										>
 											{nameChildren}
@@ -243,3 +243,4 @@ export const useDirectMessageContextMenu = () => {
 };
 
 export * from './types';
+

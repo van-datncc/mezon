@@ -193,8 +193,7 @@ const ModalUserProfile = ({
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg bg-indigo-400 rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
-				style={{ backgroundColor: color }}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg  rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 bg-private-theme`}
 			>
 				{!checkUser && !checkAnonymous && (
 					<GroupIconBanner
@@ -252,7 +251,7 @@ const ModalUserProfile = ({
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
-								className={`w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] `}
+								className={`w-full border text-theme-primary color-text-secondary dark:border-bgDisable rounded-[5px] bg-theme-contexify p-[5px] `}
 								placeholder={`Message @${placeholderUserName}`}
 								value={content}
 								onKeyPress={(e) => {
@@ -282,7 +281,7 @@ const ModalUserProfile = ({
 						</>
 					)}
 					{!isFooterProfile && checkUser && (
-						<button className="rounded dark:bg-slate-800 bg-bgLightModeButton py-2 hover:bg-opacity-50 mt-2" onClick={openSetting}>
+						<button className="rounded bg-outside-footer py-2 hover:bg-opacity-50 mt-2" onClick={openSetting}>
 							Edit Profile
 						</button>
 					)}
