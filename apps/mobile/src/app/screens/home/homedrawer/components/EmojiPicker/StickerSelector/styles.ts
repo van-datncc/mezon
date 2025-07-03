@@ -57,7 +57,7 @@ export const style = (colors: Attributes) =>
 			textAlign: 'center'
 		},
 		wrapperIconLocked: {
-			backgroundColor: 'rgba(0, 0, 0, 0.7)',
+			backgroundColor: 'rgba(0, 0, 0, 0.2)',
 			position: 'absolute',
 			alignSelf: 'center',
 			justifyContent: 'center',
