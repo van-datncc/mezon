@@ -385,7 +385,7 @@ function MessageContextMenu({
 		setIsShowCreateThread(true);
 		setOpenThreadMessageState(true);
 		dispatch(threadsActions.setOpenThreadMessageState(true));
-		setValueThread(message);
+		setValueThread({ ...message, references: [] });
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setValueThread]);
 
 	const handleCreateTopic = useCallback(() => {

@@ -32,14 +32,7 @@ const ButtonWithLoading: React.FC<ButtonProps> = ({ onClick, label, className = 
 			disabled={disable || loading}
 			className={`rounded-md flex items-center justify-center gap-2 px-4 py-2 bg-primary min-w-32 w-fit ${className} ${disable || loading ? '!bg-bgDisable !cursor-not-allowed' : ''}`}
 		>
-			{loading ? (
-				<>
-					<Icons.LoadingSpinner className="!text-white" />
-					Loading...
-				</>
-			) : (
-				label
-			)}
+			{loading ? <Icons.IconLoadingTyping bgFill="mx-auto" /> : label}
 		</button>
 	);
 };

@@ -154,8 +154,8 @@ export const fetchClansCached = async (
 		{
 			api_name: 'ListClanDescs',
 			list_clan_req: {
-				limit: { value: limit },
-				state: { value: 1 }
+				limit: limit,
+				state: 1
 			}
 		},
 		() => ensuredMezon.client.listClanDescs(ensuredMezon.session, limit, state, cursor || ''),
@@ -179,7 +179,6 @@ export const fetchClans = createAsyncThunk('clans/fetchClans', async ({ noCache 
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const response = await fetchClansCached(thunkAPI.getState as () => RootState, mezon, LIMIT_CLAN_ITEM, 1, '', noCache);
-
 		if (!response.clandesc) {
 			return { clans: [], fromCache: response.fromCache };
 		}
