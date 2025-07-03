@@ -4,6 +4,7 @@ import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Button, Checkbox, Icons, InputField } from '@mezon/ui';
 import { LIMIT_SIZE_UPLOAD_IMG, resizeFileImage } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
+import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { ClanEmoji, ClanSticker } from 'mezon-js';
 import { ApiClanStickerAddRequest, MezonUpdateClanEmojiByIdBody } from 'mezon-js/api.gen';
 import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from 'react';
@@ -101,7 +102,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 			handleCloseModal();
 			return;
 		}
-		handleCreateSticker();
+		await handleCreateSticker();
 	};
 
 	const handleCreateSticker = async () => {
@@ -301,7 +302,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						className=" !text-textPrimaryLight dark:!text-textPrimary  rounded px-4 py-1.5 hover:underline hover:bg-transparent bg-transparent"
 						onClick={handleCloseModal}
 					/>
-					<Button
+					<ButtonWithLoading
 						label="Save Changes"
 						className={`bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white`}
 						disable={validateSaveChange}
