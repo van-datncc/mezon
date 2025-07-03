@@ -143,7 +143,7 @@ function MessageWithUser({
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
 			<div
-				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9  w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
+				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9  w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in border-theme-primary bg-outside-footer `}
 				style={{
 					top: `${positionShortUser.current?.top}px`,
 					left: `${positionShortUser.current?.left}px`

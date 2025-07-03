@@ -215,7 +215,7 @@ const RoleClanItem = ({
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	return (
-		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 dark:bg-slate-800 bg-slate-300 dark:text-[#AEAEAE] text-colorTextLightMode hoverIconBlackImportant">
+		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-private-theme text-theme-primary hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
 				<>
 					<button

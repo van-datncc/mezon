@@ -156,7 +156,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 	}, []);
 
 	return (
-		<>
+		<div className="bg-theme-contexify text-theme-primary">
 			<div className="border-b dark:border-[#2e2f34]">
 				<ItemPanelMember onClick={() => handleMarkAsRead(dmGroupId ?? '')} children="Mark as read" />
 			</div>
@@ -182,7 +182,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 						)}
 						label=""
 						placement="right-start"
-						className=" border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+						className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 					>
 						<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
 						<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
@@ -205,7 +205,7 @@ const PanelGroupDM = ({ isDmGroupOwner, dmGroupId, lastOne }: PanelGroupDMPProps
 					buttonName="Delete Group"
 				/>
 			)}
-		</>
+		</div>
 	);
 };
 

@@ -72,7 +72,7 @@ const CopyButtonComponent: React.FC<CopyButtonComponentProps> = ({
 
 	return (
 		<ButtonSwitch
-			className={`dark:text-[#B5BAC1] text-colorTextLightMode gap-2 p-1 text-sm bg-transparent dark:hover:bg-zinc-700 hover:bg-bgLightModeButton ${className ?? ''}`}
+			className={`text-theme-primary gap-2 p-1 text-sm bg-transparent bg-item-theme-hover ${className ?? ''}`}
 			iconDefault={<Icons.CopyIcon />}
 			iconSwitch={<Icons.Tick defaultSize="w-4 h-4" fill="currentColor" />}
 			onClick={handleCopy}

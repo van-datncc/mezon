@@ -49,7 +49,7 @@ const ItemPanel = ({
 				{type === 'checkbox' && <Checkbox id="accept" checked={checked} defaultChecked={defaultChecked} readOnly />}
 				{type === 'radio' && <Radio className="" name={name} value="change here" checked={checked} readOnly />}
 			</div>
-			{subText && <div className="text-[12px] ml-[8px] -mt-2 mb-1">{subText}</div>}
+			{subText && <div className="text-[12px] ml-[8px] -mt-2 mb-1 text-theme-primary">{subText}</div>}
 		</button>
 	);
 };

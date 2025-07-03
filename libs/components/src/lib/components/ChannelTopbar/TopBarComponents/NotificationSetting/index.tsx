@@ -129,7 +129,7 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px]">
-				<div className="flex flex-col pb-1 mb-1 border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0">
+				<div className="flex flex-col pb-1 mb-1 border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0 ">
 					{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
 						<Dropdown
 							trigger="hover"
@@ -146,7 +146,7 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 							)}
 							label=""
 							placement="right-start"
-							className=" border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+							className="bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] "
 						>
 							<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
 							<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />

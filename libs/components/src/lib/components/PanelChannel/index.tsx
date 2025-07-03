@@ -379,7 +379,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								)}
 								label=""
 								placement="right-start"
-								className=" border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								className="bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
 								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
 								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
@@ -403,7 +403,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								)}
 								label=""
 								placement="right-start"
-								className="border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
 								<ItemPanel
 									children="Use Category Default"
@@ -462,7 +462,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								)}
 								label=""
 								placement="right-start"
-								className=" border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+									className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
 								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
 								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
@@ -486,7 +486,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 								)}
 								label=""
 								placement="right-start"
-								className=" border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+									className="bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
 								<ItemPanel
 									children="Use Category Default"

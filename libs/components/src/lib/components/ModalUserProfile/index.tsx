@@ -193,8 +193,7 @@ const ModalUserProfile = ({
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
 			<div
-				className={`${classBanner ? classBanner : 'rounded-tl-lg bg-indigo-400 rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 `}
-				style={{ backgroundColor: color }}
+				className={`${classBanner ? classBanner : 'rounded-tl-lg  rounded-tr-lg h-[105px]'} flex justify-end gap-x-2 p-2 bg-private-theme`}
 			>
 				{!checkUser && !checkAnonymous && (
 					<GroupIconBanner
@@ -220,7 +219,7 @@ const ModalUserProfile = ({
 				statusOnline={statusOnline}
 			/>
 			<div className="px-[16px]">
-				<div className="theme-base-color w-full border-theme-primary p-2 my-[16px] text-theme-primary text-theme-primary-hover shadow rounded-[10px] flex flex-col text-justify">
+				<div className=" w-full border-theme-primary p-2 my-[16px] text-theme-primary text-theme-primary-hover shadow rounded-[10px] flex flex-col text-justify bg-item-theme  bg-item-theme-hover ">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{isUserRemoved
@@ -229,7 +228,10 @@ const ModalUserProfile = ({
 									? 'Anonymous'
 									: userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
-						<p className="font-medium tracking-wide text-sm my-0">{isUserRemoved ? 'Unknown User' : usernameShow}</p>
+						<p className="text-lg font-semibold tracking-wide text-theme-primary my-0">
+							{isUserRemoved ? 'Unknown User' : usernameShow}
+						</p>
+
 					</div>
 
 					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}
@@ -249,7 +251,7 @@ const ModalUserProfile = ({
 						<div className="w-full items-center mt-2">
 							<input
 								type="text"
-								className={`w-full border dark:border-bgDisable rounded-[5px] dark:bg-bgTertiary bg-bgLightModeSecond p-[5px] `}
+								className={`w-full border text-theme-primary color-text-secondary dark:border-bgDisable rounded-[5px] bg-theme-contexify p-[5px] `}
 								placeholder={`Message @${placeholderUserName}`}
 								value={content}
 								onKeyPress={(e) => {
@@ -279,7 +281,7 @@ const ModalUserProfile = ({
 						</>
 					)}
 					{!isFooterProfile && checkUser && (
-						<button className="rounded dark:bg-slate-800 bg-bgLightModeButton py-2 hover:bg-opacity-50 mt-2" onClick={openSetting}>
+						<button className="rounded bg-outside-footer py-2 hover:bg-opacity-50 mt-2" onClick={openSetting}>
 							Edit Profile
 						</button>
 					)}

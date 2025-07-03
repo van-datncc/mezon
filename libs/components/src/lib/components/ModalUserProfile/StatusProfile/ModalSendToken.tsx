@@ -161,11 +161,11 @@ const ModalSendToken = ({
 
 	return (
 		<Modal className="bg-bgModalDark" theme={{ content: { base: 'w-[480px]' } }} show={openModal} dismissible={true} onClose={onClose}>
-			<div className="theme-base-color rounded-xl overflow-hidden">
+			<div className="bg-theme-chat rounded-xl overflow-hidden">
 				<div className="flex items-center justify-between p-6 ">
 					<div className="flex items-center gap-3">
-						<div className="w-10 h-10 rounded-full bg-theme-primary text-theme-primary-hover flex items-center justify-center">
-							<Icons.DollarIcon className="w-5 h-5" />
+						<div className="w-10 h-10 rounded-full bg-button-add-friend text-theme-primary-hover flex items-center justify-center">
+							<Icons.DollarIcon className="w-5 h-5" defaultFill='text-theme-primary' />
 						</div>
 						<div>
 							<h1 className="text-theme-primary text-lg font-semibold">Send Tokens</h1>
@@ -179,9 +179,9 @@ const ModalSendToken = ({
 
 				<div className="p-6 space-y-6 border-t-theme-primary">
 					<div className="space-y-3">
-						<Label value="To" className="text-theme-primary text-sm font-medium flex items-center gap-2">
+						<Label value="To" color="text-theme-primary" className="text-theme-primary text-sm font-medium flex items-center gap-2">
 							<Icons.UserIcon className="w-4 h-4" />
-							Recipient
+							To
 						</Label>
 						<div className="relative">
 							<input
@@ -196,7 +196,7 @@ const ModalSendToken = ({
 							/>
 							{isDropdownOpen && (
 								<div
-									className="absolute z-20 w-full mt-2 base-theme-color border-b-theme-primary rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll "
+									className="absolute z-20 w-full mt-2 base-theme-color border-b-theme-primary rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll text-theme-primary bg-theme-surface "
 									ref={dropdownRef}
 								>
 									<div
@@ -252,7 +252,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<Label value="Amount" className="text-theme-primary text-sm font-medium flex items-center gap-2">
+						<Label value="Amount" color="text-theme-primary" className="text-theme-primary text-sm font-medium flex items-center gap-2">
 							<Icons.DollarIcon className="w-4 h-4" />
 							Amount
 						</Label>
@@ -272,7 +272,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<Label value="Note" className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">
+						<Label value="Note" color="text-theme-primary" className="text-theme-primary text-sm font-medium flex items-center gap-2">
 							<Icons.ThreadIcon className="w-4 h-4" />
 							Note (Optional)
 						</Label>
