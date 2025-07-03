@@ -115,7 +115,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		if (type === 'gif') {
 			handleSend({ t: '' }, [], [{ url: data }], isEmpty(messageRef) ? [] : [messageRef]);
 		} else if (type === 'sticker') {
-			const imageUrl = data?.url ? data?.url : `${process.env.NX_BASE_IMG_URL}/stickers/${data?.id}.webp`;
+			const imageUrl = data?.source ? data?.source : `${process.env.NX_BASE_IMG_URL}/stickers/${data?.id}.webp`;
 			handleSend(
 				{ t: '' },
 				[],
