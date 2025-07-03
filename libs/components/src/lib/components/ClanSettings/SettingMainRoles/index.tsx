@@ -16,9 +16,8 @@ import {
 	setSelectedRoleId,
 	useAppDispatch
 } from '@mezon/store';
-import { Icons, InputField } from '@mezon/ui';
+import { ButtonWithLoading, Icons, InputField } from '@mezon/ui';
 import { DEFAULT_ROLE_COLOR, EVERYONE_ROLE_ID } from '@mezon/utils';
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteModal } from '../DeleteRoleModal/deleteRoleModal';

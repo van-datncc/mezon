@@ -1,5 +1,5 @@
 import { getSelectedRoleId } from '@mezon/store';
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
+import { ButtonWithLoading } from '@mezon/ui';
 import { useSelector } from 'react-redux';
 
 export type ModalSettingSave = {

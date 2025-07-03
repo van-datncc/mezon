@@ -1,4 +1,4 @@
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
+import { ButtonWithLoading } from '@mezon/ui';
 
 type ModalSaveChangesProps = {
 	onSave: () => void;

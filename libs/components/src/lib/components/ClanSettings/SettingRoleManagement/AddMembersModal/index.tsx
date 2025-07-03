@@ -9,9 +9,8 @@ import {
 	setAddMemberRoles,
 	usersClanActions
 } from '@mezon/store';
-import { Icons, InputField } from '@mezon/ui';
+import { ButtonWithLoading, Icons, InputField } from '@mezon/ui';
 import { ThemeApp, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';

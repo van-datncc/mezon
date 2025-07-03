@@ -9,9 +9,8 @@ import {
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store';
-import { Icons, InputField } from '@mezon/ui';
+import { ButtonWithLoading, Icons, InputField } from '@mezon/ui';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
-import ButtonWithLoading from 'libs/ui/src/lib/Button/ButtonWithLoading';
 import { ChannelType } from 'mezon-js';
 import { ApiUser } from 'mezon-js/api.gen';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
