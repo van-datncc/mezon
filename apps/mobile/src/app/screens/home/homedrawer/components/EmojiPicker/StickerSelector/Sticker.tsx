@@ -16,12 +16,12 @@ import { style } from './styles';
 interface ISticker {
 	stickerList: any[];
 	categoryName: string;
-	categoryForSale?: boolean;
 	onClickSticker: (sticker: any) => void;
+	forSale?: boolean;
 	isAudio?: boolean;
 }
 
-export default memo(function Sticker({ stickerList, categoryName, categoryForSale, onClickSticker, isAudio }: ISticker) {
+export default memo(function Sticker({ stickerList, categoryName, onClickSticker, isAudio, forSale }: ISticker) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['token']);
@@ -29,12 +29,12 @@ export default memo(function Sticker({ stickerList, categoryName, categoryForSal
 	const stickersListByCategoryName = useMemo(
 		() =>
 			stickerList?.filter((sticker) => {
-				if (categoryName === FOR_SALE_CATE) {
-					return sticker?.type === categoryName && sticker?.forSale === categoryForSale;
+				if (categoryName === FOR_SALE_CATE && forSale) {
+					return sticker?.is_for_sale;
 				}
-				return sticker?.type === categoryName;
+				return sticker?.clan_name === categoryName && sticker?.source;
 			}),
-		[stickerList, categoryName, categoryForSale]
+		[stickerList, categoryName, forSale]
 	);
 
 	const onBuySticker = async (sticker: any) => {
@@ -61,7 +61,7 @@ export default memo(function Sticker({ stickerList, categoryName, categoryForSal
 	};
 
 	const onPress = (sticker: any) => {
-		if (sticker?.forSale && !sticker?.url) {
+		if (sticker?.is_for_sale && !sticker?.source) {
 			const data = {
 				children: (
 					<MezonConfirm
@@ -85,28 +85,28 @@ export default memo(function Sticker({ stickerList, categoryName, categoryForSal
 				{stickersListByCategoryName?.length > 0 &&
 					stickersListByCategoryName.map((sticker, index) => (
 						<TouchableOpacity
-							key={`${index}_${sticker?.type}_sticker`}
+							key={`${index}_${sticker?.clan_name}_sticker`}
 							onPress={() => onPress(sticker)}
 							style={isAudio ? styles.audioContent : styles.content}
 						>
 							{isAudio ? (
 								<>
-									<RenderAudioItem audioURL={sticker?.url} />
+									<RenderAudioItem audioURL={sticker?.source} />
 									<Text style={styles.soundName} numberOfLines={1}>
-										{sticker?.name}
+										{sticker?.shortname}
 									</Text>
 								</>
 							) : (
 								<FastImage
 									source={{
-										uri: sticker?.url ? sticker?.url : `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker?.id + `.webp`,
+										uri: sticker?.source ? sticker?.source : `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker?.id + `.webp`,
 										cache: FastImage.cacheControl.immutable,
 										priority: FastImage.priority.high
 									}}
 									style={{ height: '100%', width: '100%' }}
 								/>
 							)}
-							{sticker?.forSale && !sticker?.url && (
+							{sticker?.is_for_sale && !sticker?.source && (
 								<View style={styles.wrapperIconLocked}>
 									<MezonIconCDN icon={IconCDN.lockIcon} color={'#e1e1e1'} width={size.s_30} height={size.s_30} />
 								</View>

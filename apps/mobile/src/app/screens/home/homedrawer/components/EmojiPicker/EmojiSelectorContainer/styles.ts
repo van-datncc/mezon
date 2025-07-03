@@ -56,6 +56,19 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			borderRadius: size.s_12,
 			overflow: 'hidden'
 		},
+		clanLogoText: {
+			justifyContent: 'center',
+			alignItems: 'center',
+			backgroundColor: colors.secondary,
+			borderRadius: size.s_20,
+			height: size.s_27,
+			width: size.s_27,
+		},
+		clanNameText: {
+			color: colors.textStrong,
+			fontSize: size.medium,
+			fontWeight: '600',
+		},
 		wrapperIconEmojiLocked: {
 			backgroundColor: 'rgba(0, 0, 0, 0.7)',
 			position: 'absolute',
