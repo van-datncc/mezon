@@ -5,7 +5,6 @@ import {
 	authActions,
 	clanMembersMetaActions,
 	clansActions,
-	clearAllMemoizedFunctions,
 	clearApiCallTracker,
 	giveCoffeeActions,
 	selectOthersSession,
@@ -129,7 +128,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 
 	const handleSwitchAccount = async () => {
 		if (isElectron()) {
-			clearAllMemoizedFunctions();
 			clearApiCallTracker();
 			localStorage.removeItem('remember_channel');
 

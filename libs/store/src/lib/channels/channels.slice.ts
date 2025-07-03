@@ -745,7 +745,7 @@ export const fetchChannels = createAsyncThunk(
 			}
 
 			const listChannelRender = selectListChannelRenderByClanId(thunkAPI.getState(), clanId);
-			if (listChannelRender && Date.now() - response.time > 1000) {
+			if (listChannelRender && response.fromCache) {
 				return {
 					channels: [],
 					clanId: clanId,
@@ -1370,29 +1370,6 @@ export const channelsSlice = createSlice({
 				state.showScrollDownButton = {};
 			}
 			state.showScrollDownButton[channelId] = isVisible;
-		},
-		updateChannelsCache: (state, action: PayloadAction<{ clanId: string }>) => {
-			const { clanId } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
-			state.byClans[clanId].channelsCache = createCacheMetadata(LIST_CHANNEL_CACHED_TIME);
-		},
-
-		updateFavoriteChannelsCache: (state, action: PayloadAction<{ clanId: string }>) => {
-			const { clanId } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
-			state.byClans[clanId].favoriteChannelsCache = createCacheMetadata(LIST_CHANNEL_CACHED_TIME);
-		},
-
-		updateAppChannelsCache: (state, action: PayloadAction<{ clanId: string }>) => {
-			const { clanId } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
-			state.byClans[clanId].appChannelsCache = createCacheMetadata(LIST_CHANNEL_CACHED_TIME);
 		}
 	},
 	extraReducers: (builder) => {

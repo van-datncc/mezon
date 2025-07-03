@@ -74,7 +74,7 @@ export const fetchChannelMembersCached = async (
 	if (!shouldForceCall) {
 		const cachedChannelData = channelMembersState.memberChannels[channelId];
 		return {
-			channel_users: Object.values(cachedChannelData.entities),
+			channel_users: cachedChannelData.ids?.map((item) => ({ user_id: item })) || [],
 			time: Date.now(),
 			fromCache: true
 		};
