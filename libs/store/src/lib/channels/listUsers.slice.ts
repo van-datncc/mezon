@@ -65,8 +65,6 @@ export const fetchListUsersByUser = createAsyncThunk(
 
 			const response = await fetchListUsersByUserCached(thunkAPI.getState as () => RootState, mezon, Boolean(noCache));
 
-			console.log(response, 'response');
-
 			if (response?.fromCache) {
 				return {
 					fromCache: true,
