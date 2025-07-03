@@ -284,8 +284,8 @@ export const joinDirectMessage = createAsyncThunk<void, JoinDirectMessagePayload
 						})
 					)
 					.then((data) => {
-						const members = data.payload as members[];
-						if (type === ChannelType.CHANNEL_TYPE_DM && members && members.length > 0) {
+						const members = (data.payload as any)?.channel_users as members[];
+						if (type === ChannelType.CHANNEL_TYPE_DM && members?.length > 0) {
 							const userIds = members.map((member) => member?.user_id as string);
 							thunkAPI.dispatch(hashtagDmActions.fetchHashtagDm({ userIds: userIds, directId: directMessageId }));
 						}
