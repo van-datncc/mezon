@@ -2611,13 +2611,13 @@ export const BackToCategoriesGif: React.FC<IconProps> = ({ defaultFill = '#AEAEA
 	);
 };
 
-export const SmilingFace: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const SmilingFace: React.FC<IconProps> = ({ defaultFill = 'currentColor', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="18" height="18" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g clipPath="url(#clip0_2372_24105)">
 				<path
 					d="M12.5 2C7.00797 2 2.5 6.50742 2.5 12C2.5 17.4926 7.00797 22 12.5 22C17.992 22 22.5 17.4926 22.5 12C22.5 6.50742 17.992 2 12.5 2ZM8.98438 6.72656C9.95367 6.72656 10.7422 7.51508 10.7422 8.48438C10.7422 8.80824 10.4801 9.07031 10.1562 9.07031C9.83238 9.07031 9.57031 8.80824 9.57031 8.48438C9.57031 8.16109 9.30711 7.89844 8.98438 7.89844C8.66164 7.89844 8.39844 8.16109 8.39844 8.48438C8.39844 8.80824 8.13637 9.07031 7.8125 9.07031C7.48863 9.07031 7.22656 8.80824 7.22656 8.48438C7.22656 7.51508 8.01508 6.72656 8.98438 6.72656ZM12.5 17.2734C9.59207 17.2734 7.22656 14.9079 7.22656 12C7.22656 11.6761 7.48863 11.4141 7.8125 11.4141C8.13637 11.4141 8.39844 11.6761 8.39844 12C8.39844 14.2614 10.2386 16.1016 12.5 16.1016C14.7614 16.1016 16.6016 14.2614 16.6016 12C16.6016 11.6761 16.8636 11.4141 17.1875 11.4141C17.5114 11.4141 17.7734 11.6761 17.7734 12C17.7734 14.9079 15.4079 17.2734 12.5 17.2734ZM17.1875 9.07031C16.8636 9.07031 16.6016 8.80824 16.6016 8.48438C16.6016 8.16109 16.3384 7.89844 16.0156 7.89844C15.6929 7.89844 15.4297 8.16109 15.4297 8.48438C15.4297 8.80824 15.1676 9.07031 14.8438 9.07031C14.5199 9.07031 14.2578 8.80824 14.2578 8.48438C14.2578 7.51508 15.0463 6.72656 16.0156 6.72656C16.9849 6.72656 17.7734 7.51508 17.7734 8.48438C17.7734 8.80824 17.5114 9.07031 17.1875 9.07031Z"
-					fill="#B5BAC1"
+					stroke={defaultFill}
 				/>
 			</g>
 			<defs>
@@ -4386,7 +4386,7 @@ export function MacIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const DollarIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
+export const DollarIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill }) => {
 	return (
 		<svg
 			height="800px"
@@ -4398,7 +4398,7 @@ export const DollarIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 			viewBox="0 0 64 64"
 			enableBackground="new 0 0 64 64"
 			xmlSpace="preserve"
-			className={` ${defaultSize}`}
+			className={` ${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<g id="US-coin">
 				<path

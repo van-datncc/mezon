@@ -9,7 +9,7 @@ type ItemProfileProps = {
 const ItemProfile = ({ avatar, username, onClick }: ItemProfileProps) => {
 	return (
 		<div
-			className="flex items-center justify-between gap-2 rounded-sm dark:hover:bg-zinc-700 hover:bg-bgLightModeButton dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-black px-2"
+			className="flex items-center justify-between gap-2 rounded-sm text-theme-primary-hover bg-theme-hover px-2"
 			onClick={onClick}
 		>
 			{avatar ? (

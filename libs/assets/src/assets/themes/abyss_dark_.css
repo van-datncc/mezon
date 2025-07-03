@@ -52,6 +52,9 @@
 
 	--border-theme-primary: color-mix(in oklab, hsl(240 100% 50%) 100%, hsl(240 100% 30%) 30%);
 	--border-primary: hsl(240 0% 30% / 0.4);
+	--border-t-theme-primary: color-mix(in oklab, hsl(240 100% 50%) 100%, hsl(240 100% 30%) 30%);
+	--border-r-t-l-theme-primary: color-mix(in oklab, hsl(240 100% 50%) 100%, hsl(240 100% 30%) 30%);
+	--border-r-b-l-theme-primary: color-mix(in oklab, hsl(240 100% 50%) 100%, hsl(240 100% 30%) 30%);
 	--border-secondary: #4444ff;
 	--border-focus: #6666ff;
 	--border-divider: #000033;

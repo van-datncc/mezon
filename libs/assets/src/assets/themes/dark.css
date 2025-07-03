@@ -26,6 +26,9 @@
 	--bg-active-member-channel: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
 	--border-color-primary: #3c3c3c;
 	--border-theme-primary: #007acc;
+	--border-t-theme-primary: #007acc;
+	--border-r-t-l-theme-primary: #007acc;
+	--border-r-b-l-theme-primary: #007acc;
 	--border-primary: #444;
 	--border-secondary: #555;
 	--border-focus: #007acc;

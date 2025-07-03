@@ -2,9 +2,7 @@
 	background: var(--bg-primary);
 }
 
-.bg-theme-chat {
-	background: var(--bg-secondary);
-}
+
 
 .bg-theme-direct-message {
 	background: var(--bg-theme-direct-message);
@@ -77,6 +75,9 @@ button.bg-button-add-friend {
 	background: var(--bg-item-hover);
 }
 .bg-item-theme {
+	background: var(--bg-active-member-channel);
+}
+.bg-item-theme-hover:hover {
 	background: var(--bg-active-member-channel);
 }
 .bg-theme-surface {
@@ -193,3 +194,34 @@ in .custom-contexify-menu {
 	--contexify-arrow-color: var(--text-theme-primary);
 	--contexify-activeArrow-color: var(--text-secondary);
 }
+.border-r-t-l-theme-primary {
+	border-top-left-radius: var(--border-r-t-l-theme-primary);
+}
+.border-r-b-l-theme-primary {
+	border-bottom-left-radius: var(--border-r-b-l-theme-primary);
+}
+
+.bg-count-page {
+	background-color: var(--bg-count-page);
+	color: var(--text-count-page);
+}
+.bg-count-page-hover:hover {
+	background-color: var(--bg-count-page-hover);
+	color: var(--text-count-page-hover);
+}
+.bg-count-page-active {
+	background-color: var(--bg-count-page-active);
+	color: var(--text-count-page-active);
+}
+.bg-footer-profile {
+	background: var(--bg-footer);
+}
+
+.bg-theme-chat {
+	background: var(--bg-secondary);
+}
+.bg-outside-footer {
+	background: var(--bg-outside-footer);
+}
+
+
