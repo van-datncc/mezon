@@ -110,8 +110,8 @@ export async function fetchDataWithSocketFallback<T>(
 			const data = await socket.listDataSocket(socketRequest);
 
 			if (socketRequest.api_name === 'ListFriends') {
-				if (data?.[responseKey!]) {
-					data[responseKey!] = data?.[responseKey!]?.map((item: Friend) => ({
+				if (responseKey && data?.[responseKey]?.friends) {
+					data[responseKey].friends = data[responseKey]?.friends?.map((item: Friend) => ({
 						...item,
 						user: {
 							...item.user,
@@ -124,8 +124,8 @@ export async function fetchDataWithSocketFallback<T>(
 			}
 
 			if (socketRequest.api_name === 'ListClanUsers') {
-				if (data?.[responseKey!]) {
-					data[responseKey!] = data?.[responseKey!]?.map((item: Friend) => ({
+				if (responseKey && data?.[responseKey]?.clan_users) {
+					data[responseKey].clan_users = data[responseKey]?.clan_users?.map((item: Friend) => ({
 						...item,
 						user: {
 							...item.user,
