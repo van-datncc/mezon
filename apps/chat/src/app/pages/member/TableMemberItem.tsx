@@ -5,13 +5,13 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectRolesClanEntities,
-	selectTheme,
 	selectUserMaxPermissionLevel,
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store';
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import { ChannelMembersEntity, DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_ID, createImgproxyUrl } from '@mezon/utils';
+import { formatDistance } from 'date-fns';
 import Tooltip from 'rc-tooltip';
 import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -30,7 +30,6 @@ type TableMemberItemProps = {
 const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime, displayName }: TableMemberItemProps) => {
 	const rolesClanEntity = useSelector(selectRolesClanEntities);
 
-	const appearanceTheme = useSelector(selectTheme);
 	const userRolesClan = useMemo(() => {
 		const activeRole: Record<string, string> = {};
 		let userRoleLength = 0;
@@ -179,7 +178,9 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 				</div>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">{clanJoinTime ?? '-'}</span>
+				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">
+					{clanJoinTime ? formatDistance(clanJoinTime as string, new Date(), { addSuffix: true }) : '-'}
+				</span>
 			</div>
 			<div className="flex-1 p-1 text-center">
 				<span className="text-xs dark:text-textDarkTheme text-textLightTheme font-medium uppercase">

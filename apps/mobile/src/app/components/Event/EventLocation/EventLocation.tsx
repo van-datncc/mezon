@@ -1,4 +1,3 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { EventManagementEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
@@ -20,19 +19,17 @@ export function EventLocation({ event }: IEventLocation) {
 	const styles = style(themeValue);
 	const option = event.address ? OptionEvent.OPTION_LOCATION : OptionEvent.OPTION_SPEAKER;
 	const channelVoice = useAppSelector((state) => selectChannelById(state, event?.channel_voice_id || ''));
-	// const channelFirst = useSelector(selectChannelFirst);
-	const { dismiss } = useBottomSheetModal();
 
 	const joinVoiceChannel = async () => {
 		if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE) {
 			const urlVoice = `${linkGoogleMeet}${channelVoice?.meeting_code}`;
 			await Linking.openURL(urlVoice);
 		} else if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-			const dataa = {
+			const data = {
 				snapPoints: ['45%', '45%'],
 				children: <JoinChannelVoiceBS channel={channelVoice} />
 			};
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, dataa });
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		} else {
 			const urlPrivateVoice = `${process.env.NX_CHAT_APP_REDIRECT_URI}${event?.meet_room?.external_link}`;
 			await Linking.openURL(urlPrivateVoice);
