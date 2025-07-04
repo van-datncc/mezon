@@ -19,50 +19,10 @@ export const AVAILABLE_THEMES: ThemeConfig[] = [
 		cssFile: 'assets/themes/light.css'
 	},
 	{
-		name: 'cyber',
-		displayName: 'Cyber Theme',
-		color: 'linear-gradient(135deg, #1e3c72, #1e3c72)',
-		cssFile: 'assets/themes/cyber.css'
-	},
-
-	{
-		name: 'green_meadow',
-		displayName: 'Green Meadow',
-		color: `linear-gradient(
-		  hsl(0 calc(1*0%) 100% / 0.47843137254901963), 
-		  hsl(0 calc(1*0%) 100% / 0.47843137254901963)
-		),
-		linear-gradient(
-		  180deg,
-		  hsl(165.625 calc(1*39.669%) 52.549% / 1) 6.15%,
-		  hsl(118.681 calc(1*40.444%) 55.882% / 1) 48.7%,
-		  hsl(86.667 calc(1*48.293%) 59.804% / 1) 93.07%
-		)`,
-		cssFile: 'assets/themes/green_meadow.css'
-	},
-	{
-		name: 'soft_peach',
-		displayName: 'Soft Peach',
-		color: 'linear-gradient(135deg, #ffafbd, #ffc3a0)',
-		cssFile: 'assets/themes/soft_peach.css'
-	},
-	{
-		name: 'lavender_mist',
-		displayName: 'Lavender Mist',
-		color: 'linear-gradient(135deg, #c9d6ff, #e2e2e2)',
-		cssFile: 'assets/themes/lavender_mist.css'
-	},
-	{
-		name: 'cloud_white',
-		displayName: 'Cloud White',
-		color: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)',
-		cssFile: 'assets/themes/cloud_white.css'
-	},
-	{
 		name: 'pink_blossom',
 		displayName: 'Pink Blossom',
 		color: 'linear-gradient(135deg, #ffdde1, #ee9ca7)',
-		cssFile: 'assets/themes/pink_blossom.css'
+		cssFile: 'assets/themes/cyber.css'
 	},
 	{
 		name: 'purple_haze',
