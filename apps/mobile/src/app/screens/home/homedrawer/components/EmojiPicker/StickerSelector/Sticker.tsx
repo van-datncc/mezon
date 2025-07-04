@@ -32,7 +32,7 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 				if (categoryName === FOR_SALE_CATE && forSale) {
 					return sticker?.is_for_sale;
 				}
-				return sticker?.clan_name === categoryName && sticker?.source;
+				return sticker?.clan_name === categoryName && sticker?.source && !sticker?.is_for_sale;
 			}),
 		[stickerList, categoryName, forSale]
 	);
