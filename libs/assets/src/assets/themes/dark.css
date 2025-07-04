@@ -59,8 +59,15 @@
 	--border-divider: #2b2b2b;
 	--border-hover: #4177c9;
 	--bg-hover-select-status: #2d3035;
-	--mention-primary: rgba(77, 127, 255, 0.1);
-	--mention-color: #c7d5f0;
+	/* mention */
+	--mention-primary: rgba(67, 97, 238, 0.24);
+	--mention-color: #3298FF;
+	--bg-mention-hover: rgba(67, 98, 238, 0.39);
+	--color-mention-hover: #3298FF;
+	--bg-mention-evryone: #2eb08b63;
+	--color-mention-evryone: #2EB08C;
+	--bg-mention-everyone-hover: #2eb08b8c;
+	--color-mention-everyone-hover: #32b993;
 
 	--bg-highlight: rgba(77, 120, 204, 0.08);
 	--bg-secondary-button-hover: rgba(77, 77, 77, 0.3);

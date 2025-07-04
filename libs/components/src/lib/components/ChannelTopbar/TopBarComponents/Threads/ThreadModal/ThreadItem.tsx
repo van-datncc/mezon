@@ -167,7 +167,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 						</div>
 						<div className="overflow-x-hidden">
 							<p className="text-xs font-medium leading-4 ml-2">
-								<span className="truncate dark:text-white text-colorTextLightMode">•&nbsp;{timeMessage}</span>
+								<span className="truncate text-theme-primary">•&nbsp;{timeMessage}</span>
 							</p>
 						</div>
 					</div>

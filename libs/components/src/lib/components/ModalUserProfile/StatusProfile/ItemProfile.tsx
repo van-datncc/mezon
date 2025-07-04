@@ -19,7 +19,7 @@ const ItemProfile = ({ avatar, username, onClick }: ItemProfileProps) => {
 					{username && username.charAt(0).toUpperCase()}
 				</div>
 			)}
-			<li className="text-[14px] dark:text-white text-colorTextLightMode w-full py-[6px] cursor-pointer list-none ">{username}</li>
+			<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none ">{username}</li>
 		</div>
 	);
 };
