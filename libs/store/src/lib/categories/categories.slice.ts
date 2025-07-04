@@ -429,24 +429,11 @@ export const categoriesActions = {
  */
 export const getCategoriesState = (rootState: { [CATEGORIES_FEATURE_KEY]: CategoriesState }): CategoriesState => rootState[CATEGORIES_FEATURE_KEY];
 
-export const selectClanCategories = (clanId: string) =>
-	createSelector(getCategoriesState, (state) => state.byClans[clanId]?.entities ?? categoriesAdapter.getInitialState());
-
 export const selectCategoryIdSortChannel = createSelector(
 	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string],
 	(state, clanId) => {
 		return state.byClans[clanId]?.sortChannelByCategoryId;
 	}
-);
-
-export const selectCategoriesEntities = createSelector(
-	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string],
-	(state, clanId) => state.byClans[clanId]?.entities.entities ?? {}
-);
-
-export const selectCategoriesIds = createSelector(
-	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string],
-	(state, clanId) => state.byClans[clanId]?.entities.ids ?? []
 );
 
 export const selectIsShowEmptyCategory = createSelector(
