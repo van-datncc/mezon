@@ -111,7 +111,7 @@ const AppPageBottom = () => {
 						)}
 						label=""
 						placement="bottom-end"
-						className={`dark:bg-black bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+						className={`bg-theme-setting-primary  border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 					>
 						<Dropdown.Item
 							children={'Date of Creation'}

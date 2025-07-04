@@ -114,8 +114,8 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 		<div className="quick-menu-access-manager">
 			<div className="flex items-center justify-between mb-6">
 				<div>
-					<h3 className="text-xl font-semibold text-white mb-1">Quick Menu Commands</h3>
-					<p className="text-sm text-gray-400">Create custom slash commands for this channel</p>
+					<h3 className="text-xl font-semibold text-theme-primary mb-1">Quick Menu Commands</h3>
+					<p className="text-sm text-theme-primary">Create custom slash commands for this channel</p>
 				</div>
 				<button
 					onClick={openCreateModal}
@@ -129,9 +129,15 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 			</div>
 
 			{quickMenuItems.length === 0 ? (
-				<div className="bg-[#2b2d31] rounded-lg p-8 text-center border border-[#3e4146]">
+				<div className="bg-theme-setting-nav rounded-lg p-8 text-center border border-[#3e4146]">
 					<div className="mb-4">
-						<svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="mx-auto text-gray-500">
+						<svg
+							width="48"
+							height="48"
+							viewBox="0 0 24 24"
+							fill="none"
+							className="mx-auto text-[var(--text-theme-primary)]"
+						>
 							<path
 								d="M5 7H19C20.1046 7 21 7.89543 21 9V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V9C3 7.89543 3.89543 7 5 7Z"
 								stroke="currentColor"
@@ -139,11 +145,18 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 								strokeLinecap="round"
 								strokeLinejoin="round"
 							/>
-							<path d="M3 7L12 13L21 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+							<path
+								d="M3 7L12 13L21 7"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
 						</svg>
 					</div>
-					<h4 className="text-lg font-medium text-white mb-2">No commands yet</h4>
-					<p className="text-gray-400 mb-6">Get started by creating your first slash command</p>
+
+					<h4 className="text-lg font-medium text-theme-primary mb-2">No commands yet</h4>
+					<p className="text-theme-primary mb-6">Get started by creating your first slash command</p>
 					<button
 						onClick={openCreateModal}
 						className="bg-[#5865f2] hover:bg-[#4752c4] text-white px-6 py-2 rounded-md font-medium transition-colors duration-200"

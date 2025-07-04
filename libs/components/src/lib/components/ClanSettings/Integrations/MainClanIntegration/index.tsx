@@ -19,8 +19,8 @@ const MainClanIntegrations = ({ setIsOpenClanWebhooks, allClanWebhooks }: IClanI
 			<div className="flex gap-4 max-sm:gap-0 max-sbm:w-[40%] items-center">
 				<Icons.WebhooksIcon />
 				<div>
-					<div className="pb-[3px] font-semibold break-all">Clan Webhooks</div>
-					<div className="text-[12px]">
+					<div className="pb-[3px] font-semibold break-all text-theme-primary">Clan Webhooks</div>
+					<div className="text-[12px] text-theme-primary">
 						{allClanWebhooks && allClanWebhooks?.length > 1
 							? allClanWebhooks?.length + ' webhooks'
 							: allClanWebhooks?.length + ' webhook'}
@@ -36,7 +36,7 @@ const MainClanIntegrations = ({ setIsOpenClanWebhooks, allClanWebhooks }: IClanI
 				</div>
 			) : (
 				<div className="items-center cursor-pointer text-[14px] flex gap-[4px]">
-					<div>View Clan Webhook</div>
+						<div className="text-theme-primary">View Clan Webhook</div>
 					<Icons.ArrowDown defaultSize="h-[15px] w-[15px] -rotate-90" />
 				</div>
 			)}

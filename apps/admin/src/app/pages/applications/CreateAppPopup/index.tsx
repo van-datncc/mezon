@@ -131,7 +131,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50 bg-[#000000c9]">
 			<form className="relative z-10 w-[450px]" onSubmit={handleSubmit}>
-				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px] flex flex-col gap-5 pb-5 rounded-t-md">
+				<div className="bg-theme-setting-primary pt-[16px] px-[16px] flex flex-col gap-5 pb-5 rounded-t-md">
 					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold">
 						Create a {typeApplication ? 'new application' : 'bot'}
 					</div>
@@ -195,7 +195,7 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						</div>
 					</div>
 				</div>
-				<div className="dark:bg-[#2b2d31] bg-[#f2f3f5] dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
+				<div className="bg-theme-setting-nav dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
 						Cancel
 					</div>

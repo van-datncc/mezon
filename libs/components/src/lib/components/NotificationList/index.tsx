@@ -125,7 +125,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 			className="absolute top-8 right-0 z-[99999999] rounded-lg dark:shadow-shadowBorder shadow-shadowInbox w-[480px]"
 		>
 			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
-				<div className="py-2 px-3 dark:bg-[#2B2D31] bg-[#F2F3F5]">
+				<div className="py-2 px-3 bg-theme-setting-nav">
 					<div className="flex flex-row items-center justify-between gap-2 font-bold text-[16px]">
 						<div className="flex flex-row items-center justify-start">
 							<InboxButton />
