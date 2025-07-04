@@ -108,8 +108,15 @@
 	--border-divider: #00475e;
 	--border-hover: #00ccff;
 
-	--mention-primary: color-mix(in oklab, hsl(264 100% 66% / 0.25) 100%, hsl(206 75% 50% / 0.25) 50%);
-	--mention-color: color-mix(in oklab, hsl(230 50% 90% / 1) 100%, #00ffff 30%);
+	/* mention */
+	--mention-primary: rgba(67, 97, 238, 0.24);
+	--mention-color: #3298FF;
+	--bg-mention-hover: rgba(67, 98, 238, 0.39);
+	--color-mention-hover: #3298FF;
+	--bg-mention-evryone: #2eb08b63;
+	--color-mention-evryone: #2EB08C;
+	--bg-mention-everyone-hover: #2eb08b8c;
+	--color-mention-everyone-hover: #32b993;
 
 	--bg-highlight: color-mix(in oklab, hsl(36 100% 30% / 0.08) 100%, hsl(60 100% 50% / 0.08) 50%);
 	--bg-hover-select-status: #2B1351;
