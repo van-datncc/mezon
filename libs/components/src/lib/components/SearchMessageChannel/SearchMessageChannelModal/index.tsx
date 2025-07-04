@@ -64,7 +64,7 @@ const SearchMessageChannelModal = ({
 
 	return (
 		<div
-			className={`absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded theme-base-color z-[9999] w-widthModalSearch shadow`}
+			className={` bg-theme-contexify absolute left-0 top-10 pb-3 ${valueDisplay ? 'pt-0' : 'pt-3'} rounded theme-base-color z-[9999] w-widthModalSearch shadow `}
 			tabIndex={0}
 		>
 			{valueDisplay && (

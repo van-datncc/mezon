@@ -80,6 +80,9 @@ button.bg-button-add-friend {
 .bg-item-theme-hover:hover {
 	background: var(--bg-active-member-channel);
 }
+.bg-item-theme-hover-status:hover {
+	background: var(--bg-hover-select-status);
+}
 .bg-theme-surface {
 	background: var(--bg-surface);
 }
@@ -113,7 +116,9 @@ button.bg-button-add-friend {
 .border-user {
 	border-color: var(--theme-setting-primary);
 }
-
+.bg-control-nav{
+	background: var(--text-theme-primary);
+}
 .border-theme-secondary {
 	border-color: var(--border-secondary);
 }
@@ -145,6 +150,22 @@ button.bg-button-add-friend {
 .color-mention {
 	color: var(--mention-color);
 }
+.color-mention-everyone {
+	color: var(--color-mention-everyone);
+}
+.color-mention-everyone-hover {
+	color: var(--color-mention-everyone-hover);
+}
+.bg-mention-everyone-hover:hover {
+	background-color: var(--bg-mention-everyone-hover);
+}
+.bg-mention-everyone {	
+	background-color: var(--bg-mention-evryone);
+}
+.color-mention-hover {
+	color: var(--color-mention-hover);
+}
+
 .color-text-active-button {
 	color: var(--color-text-active-button);
 }

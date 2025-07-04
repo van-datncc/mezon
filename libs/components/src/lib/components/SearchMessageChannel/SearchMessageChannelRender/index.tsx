@@ -76,7 +76,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 	if (isLoading) {
 		return (
 			<>
-				<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+				<div className="w-1 h-full bg-theme-primary"></div>
 				<div className="flex flex-col w-[420px] h-full">
 					<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
 						<h3 className="select-none">Searching...</h3>
@@ -91,16 +91,16 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 
 	return (
 		<>
-			<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+			<div className="w-1 h-full bg-theme-primary"></div>
 			<div className="flex flex-col w-[420px] h-full">
-				<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
+				<div className="flex flex-row justify-between items-center h-14 p-4 text-theme-primary bg-theme-chat">
 					<h3 className="select-none">{`${totalResult < 1 ? 'No Results' : `${totalResult} Results`}`}</h3>
 				</div>
 				<MessageContextMenuProvider channelId={channelId}>
 					{groupedMessages.length > 0 ? (
 						<div
 							ref={messageContainerRef}
-							className={`flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+							className={`flex flex-col flex-1 h-full p-4 bg-outside-footer max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 						>
 							<div className="flex flex-col flex-1 gap-[20px]">
 								{groupedMessages.map((group, groupIndex) => {
@@ -189,7 +189,7 @@ const SearchedItem = ({ searchMessage, searchChannel, user }: ISearchedItemProps
 	};
 
 	return (
-		<div className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full relative group">
+		<div className="flex items-center px-[5px] pb-[12px] bg-item-theme">
 			<button
 				onClick={handleClickJump}
 				className="absolute py-1 px-2 text-textLightTheme dark:text-textDarkTheme dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
