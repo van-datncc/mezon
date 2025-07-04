@@ -6,13 +6,28 @@ interface MemberMenuItemProps {
 	onClick: () => void;
 	isWarning?: boolean;
 	rightElement?: ReactNode;
+	setWarningStatus?: (status: string) => void;
 }
 
-export const MemberMenuItem: FC<MemberMenuItemProps> = ({ label, onClick, isWarning = false, rightElement }) => {
+export const MemberMenuItem: FC<MemberMenuItemProps> = ({ label, onClick, isWarning = false, rightElement, setWarningStatus }) => {
 	return (
 		<Item
 			onClick={onClick}
 			className="flex truncate justify-between items-center w-full font-sans text-sm font-medium text-theme-primary text-theme-primary-hover p-1"
+			onMouseEnter={() => {
+				if (setWarningStatus) {
+					if (isWarning) {
+						setWarningStatus('#E13542');
+					} else {
+						setWarningStatus('var(--bg-item-hover)');
+					}
+				}
+			}}
+			onMouseLeave={() => {
+				if (setWarningStatus) {
+					setWarningStatus('var(--bg-item-hover)');
+				}
+			}}
 		>
 			<div
 				style={{
@@ -24,7 +39,7 @@ export const MemberMenuItem: FC<MemberMenuItemProps> = ({ label, onClick, isWarn
 					fontSize: '14px',
 					fontWeight: 500
 				}}
-				className={`${isWarning ? 'text-[#E13542] hover:text-[#FFFFFF]' : 'dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'} p-1`}
+				className={`${isWarning ? 'text-[#E13542] hover:text-white' : 'text-theme-primary-hover'} p-1`}
 			>
 				<span className="truncate max-w-[160px] block overflow-hidden text-ellipsis whitespace-nowrap" title={label}>
 					{label}
