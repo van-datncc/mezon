@@ -63,7 +63,7 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, message, isTopic }: User
 				<div className="flex flex-col justify-center ">
 					<div
 						onClick={(e) => e.stopPropagation()}
-						className={`z-50 w-[18rem] dark:bg-bgSecondary600 bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
+						className={`z-50 w-[18rem] bg-item-theme border-color-primary rounded-sm min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel?.emojiId} emojiName={emojiShowPanel?.emoji ?? ''} count={count} />
 						<div ref={ref} tabIndex={-1} className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none">
@@ -155,7 +155,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			</div>
 
 			<NameComponent id={sender.sender_id ?? ''} name={user?.clan_nick || user?.user?.display_name || user?.user?.username} />
-			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
+			<p className="text-xs absolute right-8 ">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">
 					<Icons.Close defaultSize="w-3 h-3" />

@@ -169,7 +169,7 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 		return (
 			<div
 				style={{ height: 44 }}
-				className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+				className="opacity-80 bg-theme-input text-theme-primary ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission rounded one-line"
 			>
 				You do not have permission to send messages in this channel.
 			</div>

@@ -199,7 +199,9 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 				<button className={`absolute right-1 top-1 `} onClick={handleCopyClick}>
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
-				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
+				<code className={`w-full font-sans text-theme-primary ${isInPinMsg ? 'whitespace-pre-wrap  block break-words w-full' : ''}`}>
+					{contentBacktick}
+				</code>
 			</pre>
 		</div>
 	);
