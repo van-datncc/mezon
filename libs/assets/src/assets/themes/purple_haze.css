@@ -112,7 +112,7 @@
 	--mention-color: color-mix(in oklab, hsl(230 50% 90% / 1) 100%, #00ffff 30%);
 
 	--bg-highlight: color-mix(in oklab, hsl(36 100% 30% / 0.08) 100%, hsl(60 100% 50% / 0.08) 50%);
-
+	--bg-hover-select-status: #2B1351;
 	--bg-secondary-button-hover: hsl(258 50% 40% / 0.3);
 	/* màu contexify */
 	--bg-theme-contexify: rgb(49, 42, 95);

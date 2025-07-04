@@ -216,7 +216,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 	}, [items, checkPos, firstFourElements, messageId, handleClickEmoji]);
 
 	return (
-		<Menu onVisibilityChange={onVisibilityChange} id={menuId} className="z-50 rounded-lg bg-theme-contexify text-theme-primary text-theme-primary-hover ">
+		<Menu onVisibilityChange={onVisibilityChange} style={className} id={menuId} className="z-50 rounded-lg  text-theme-primary text-theme-primary-hover ">
 			{checkPos && <ReactionPart emojiList={firstFourElements} messageId={messageId} isOption={false} message={message} isTopic={isTopic} />}
 			{children}
 		</Menu>

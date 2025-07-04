@@ -65,7 +65,7 @@ const ModalCustomStatus = ({
 						<div className="mb-2 block">
 							<Label
 								value={`What's cookin', ${name}?`}
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+								className=" text-theme-primary  dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
 							/>
 						</div>
 						<input
@@ -82,7 +82,7 @@ const ModalCustomStatus = ({
 							<Label
 								htmlFor="clearAfter"
 								value="Clear after"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+								className=" text-theme-primary  dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
 							/>
 						</div>
 						<Dropdown
@@ -110,7 +110,7 @@ const ModalCustomStatus = ({
 							<Label
 								htmlFor="status"
 								value="Status"
-								className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
+								className=" text-theme-primary dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold"
 							/>
 						</div>
 						<Dropdown
@@ -165,7 +165,7 @@ const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps)
 	return (
 		<div
 			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm bg-theme-setting-nav text-theme-primary-hover cursor-pointer text-theme-primary bg-item-theme-hover px-3"
+			className="flex items-center justify-between h-11 rounded-sm bg-theme-setting-nav text-theme-primary-hover cursor-pointer text-theme-primary bg-item-theme-hover-status px-3"
 		>
 			{startIcon && (
 				<div className="flex items-center justify-center h-[18px] w-[18px] mr-2">
