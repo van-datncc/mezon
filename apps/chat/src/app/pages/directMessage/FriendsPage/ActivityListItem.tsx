@@ -39,8 +39,8 @@ const ActivityItem = ({ user, activity }: { user?: IUserItemActivity; activity?:
 				</div>
 
 				<div className="flex flex-col font-medium flex-1">
-					<span className="text-base font-medium">{username}</span>
-					<p className="w-full text-[12px] line-clamp-1 break-all">{activityDescription || activityName}</p>
+					<span className="text-base font-medium text-theme-primary">{username}</span>
+					<p className="w-full text-[12px] line-clamp-1 break-all text-theme-primary">{activityDescription || activityName}</p>
 				</div>
 			</div>
 		</div>

@@ -44,13 +44,15 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 				<h3 className="font-bold text-xl text-theme-primary">Category</h3>
 
 				<p className="text-xs font-bold text-theme-primary">Channel name</p>
-				<div className="bg-theme-setting-nav border-theme-primary  pl-3 py-2 w-full  outline-none text-theme-primary">{realTimeChannel.channel_label}</div>
+				<div className="bg-theme-setting-nav border-theme-primary  pl-3 py-2 w-full  outline-none text-theme-primary">
+					{realTimeChannel.channel_label}
+				</div>
 				<p className="text-xs font-bold text-theme-primary mt-4">Category</p>
 				<Dropdown
 					trigger="click"
 					dismissOnClick={false}
 					renderTrigger={() => (
-						<div className="w-full border-theme-primary text-theme-primary h-12 rounded-md bg-theme-setting-primary  flex flex-row px-3 justify-between items-center uppercase">
+						<div className="w-full  h-12 rounded-md border-theme-primary text-theme-primary bg-theme-setting-primary  flex flex-row px-3 justify-between items-center uppercase">
 							<p>{realTimeChannel.category_name}</p>
 							<div>
 								<Icons.ArrowDownFill />

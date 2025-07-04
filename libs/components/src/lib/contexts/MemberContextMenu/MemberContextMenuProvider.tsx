@@ -217,12 +217,12 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 	const isLightMode = appearanceTheme === 'light';
 
 	const className: CSSProperties = {
-		'--contexify-menu-bgColor': isLightMode ? '#FFFFFF' : '#111214',
-		'--contexify-activeItem-bgColor': '#4B5CD6',
-		'--contexify-rightSlot-color': '#6f6e77',
-		'--contexify-activeRightSlot-color': '#fff',
-		'--contexify-arrow-color': '#6f6e77',
-		'--contexify-activeArrow-color': '#fff',
+		'--contexify-menu-bgColor': 'var(--bg-theme-contexify)',
+		'--contexify-activeItem-bgColor': 'var(--bg-item-hover)',
+		'--contexify-rightSlot-color': 'var(--text-secondary)',
+		'--contexify-activeRightSlot-color': 'var(--text-secondary)',
+		'--contexify-arrow-color': 'var(--text-theme-primary)',
+		'--contexify-activeArrow-color': '#f80808',
 		'--contexify-itemContent-padding': '-3px',
 		'--contexify-menu-radius': '2px',
 		'--contexify-activeItem-radius': '2px',

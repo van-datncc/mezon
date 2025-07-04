@@ -157,7 +157,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 			>
 				{!normalizeSearchText && listRecent.length > 0 && (
 					<>
-						<div className="text-xs font-semibold uppercase py-2 text-theme-primary-active">Previous channels</div>
+						<div className="text-xs font-semibold uppercase text-theme-primary py-2 text-theme-primary-active">Previous channels</div>
 						<ListSearchModal
 							listSearch={listRecent}
 							focusItemId={focusItemId}
