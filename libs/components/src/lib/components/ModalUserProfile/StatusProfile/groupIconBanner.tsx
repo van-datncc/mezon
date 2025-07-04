@@ -5,8 +5,6 @@ import {
 	giveCoffeeActions,
 	selectCurrentUserId,
 	selectInfoSendToken,
-	selectSendTokenEvent,
-	selectTheme,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -28,8 +26,6 @@ type GroupIconBannerProps = {
 
 const GroupIconBanner = (props: GroupIconBannerProps) => {
 	const { checkAddFriend, openModal, user, showPopupLeft, setOpenModal, kichUser } = props;
-	const appearanceTheme = useSelector(selectTheme);
-	const sendTokenEvent = useSelector(selectSendTokenEvent);
 	const transferDetail = useSelector(selectInfoSendToken);
 	const { addFriend, acceptFriend, deleteFriend } = useFriends();
 	const currentUserId = useAppSelector(selectCurrentUserId);
@@ -118,7 +114,6 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 
 	const handleOpenTransferModal = () => {
 		const note = 'Transfer funds';
-
 		dispatch(
 			giveCoffeeActions.setInfoSendToken({
 				sender_id: userProfile?.user?.id,
@@ -126,55 +121,37 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				receiver_id: user?.id,
 				amount: 0,
 				note: note,
-				extra_attribute: transferDetail?.extra_attribute ?? ''
+				extra_attribute: transferDetail?.extra_attribute ?? '',
+				receiver_name: user ? (user.name ? user.name : user.user?.username) : ''
 			})
 		);
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
-
+	if (isMe) return null;
 	return (
 		<>
-			{!isMe && (
-				<>
-					<div
-						className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
-						onClick={(e) => {
-							handleDefault(e);
-							handleOpenTransferModal();
-						}}
-					>
-						<span title="Transfer">
-							<Icons.Transaction className="size-4 iconWhiteImportant" />
-						</span>
-					</div>
-					{buttonFriendProps.map((button, index) => (
-						<div
-							className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
-							onClick={(e) => handleOnClickButtonFriend(e, index)}
-							key={button.title}
-						>
-							<span title={button.title}>{button.icon}</span>
-
-							{openModal.openFriend && checkAddFriend === EStateFriend.FRIEND && (
-								<PopupFriend user={user} showPopupLeft={showPopupLeft} />
-							)}
-						</div>
-					))}
-				</>
-			)}
-
-			{/* <div
+			<div
 				className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
 				onClick={(e) => {
 					handleDefault(e);
-					setOpenModal({ openFriend: false, openOption: !openModal.openOption });
+					handleOpenTransferModal();
 				}}
 			>
-				<span title="More">
-					<Icons.ThreeDot defaultSize="size-4 iconWhiteImportant" />
+				<span title="Transfer">
+					<Icons.Transaction className="size-4 iconWhiteImportant" />
 				</span>
-				{openModal.openOption && <PopupOption showPopupLeft={showPopupLeft} isMe={isMe} />}
-			</div> */}
+			</div>
+			{buttonFriendProps.map((button, index) => (
+				<div
+					className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
+					onClick={(e) => handleOnClickButtonFriend(e, index)}
+					key={button.title}
+				>
+					<span title={button.title}>{button.icon}</span>
+
+					{openModal.openFriend && checkAddFriend === EStateFriend.FRIEND && <PopupFriend user={user} showPopupLeft={showPopupLeft} />}
+				</div>
+			))}
 		</>
 	);
 };
