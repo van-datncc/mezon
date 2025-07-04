@@ -317,7 +317,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	};
 
 	const handleActionSaveImage = async () => {
-		const media = message?.attachments;
+		const media = message?.attachments?.length > 0 ? message?.attachments : message?.content?.embed?.map((item) => item?.image);
 		dispatch(appActions.setLoadingMainMobile(true));
 		if (media && media.length > 0) {
 			const promises = media?.map(downloadAndSaveMedia);
@@ -523,8 +523,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			);
 		}
 		const mediaList =
-			message?.attachments?.length > 0 &&
-			message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))
+			(message?.attachments?.length > 0 &&
+				message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))) ||
+			message?.content?.embed?.some((embed) => embed?.image)
 				? []
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
