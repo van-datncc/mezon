@@ -1,11 +1,10 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, IThread, LIMIT, LoadingStatus, sortChannelsByLastActivity, ThreadStatus, TypeCheck } from '@mezon/utils';
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
+import { channelsActions, listChannelRenderAction } from '@mezon/store';
+import { IMessageWithUser, IThread, LIMIT, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
+import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { channelsActions } from '../channels/channels.slice';
-import { listChannelRenderAction } from '../channels/listChannelRender.slice';
-import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
+import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -372,7 +371,7 @@ export const threadsSlice = createSlice({
 		},
 		removeThreadFromCache: (state, action: PayloadAction<{ channelId: string; threadId: string }>) => {
 			const { channelId, threadId } = action.payload;
-			const channelData = state.byChannels[channelId];
+			const channelData = state.byChannels?.[channelId];
 
 			if (channelData && channelData.threads) {
 				channelData.threads = channelData.threads.filter((thread) => thread.id !== threadId);
