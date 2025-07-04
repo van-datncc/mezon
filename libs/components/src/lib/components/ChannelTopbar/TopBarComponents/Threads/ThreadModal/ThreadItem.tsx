@@ -149,14 +149,14 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 	return (
 		<div
 			onClick={() => handleLinkThread(thread.channel_id as string, thread.clan_id || '')}
-			className="relative overflow-y-hidden p-4 mb-2 cursor-pointer rounded-lg h-[72px] dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
+			className="relative overflow-y-hidden p-4 mb-2 cursor-pointer rounded-lg h-[72px] bg-item-theme"
 			role="button"
 			ref={panelRef}
 			onContextMenu={handlePannelThread}
 		>
 			<div className="flex flex-row justify-between items-center">
 				<div className="flex flex-col gap-1">
-					<p className="text-base font-semibold leading-5 dark:text-white text-black one-line">{thread?.channel_label}</p>
+					<p className="text-base font-semibold leading-5 one-line">{thread?.channel_label}</p>
 					<div className="flex flex-row items-center h-6">
 						<AvatarRound src={user?.clan_avatar ?? avatarImg} className="mr-2 h-4" />
 						<span className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">

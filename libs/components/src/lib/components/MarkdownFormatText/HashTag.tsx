@@ -109,7 +109,7 @@ function PrivateChannel({ onClick }: { onClick: () => void }) {
 	return (
 		<span
 			onClick={onClick}
-			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap dark:!text-[#ffffff] dark:bg-[#3e3f3f] bg-[#F2F3F5] relative top-[3px] cursor-pointer`}
+			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap color-mention bg-mention relative top-[3px] cursor-pointer`}
 		>
 			<Icons.LockedPrivate className={`mt-1 w-4 h-4`} />
 			<span>private-channel</span>

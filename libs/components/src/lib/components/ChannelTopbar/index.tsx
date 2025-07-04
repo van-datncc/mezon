@@ -587,7 +587,7 @@ const DmTopbarTools = memo(() => {
 						disabled={isGroupCallDisabled}
 						className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
 					>
-						<Icons.IconPhoneDM />
+						<Icons.IconPhoneDM defaultSize="size-5" />
 					</button>
 					<button
 						title="Start Video Call"
@@ -595,7 +595,7 @@ const DmTopbarTools = memo(() => {
 						disabled={isGroupCallDisabled}
 						className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
 					>
-						<Icons.IconMeetDM />
+						<Icons.IconMeetDM defaultSize="size-5" />
 					</button>
 					<PinButton mode={mode} styleCss="text-theme-primary-hover" />
 
@@ -603,14 +603,14 @@ const DmTopbarTools = memo(() => {
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
 						<button title="Show Member List" onClick={() => setIsShowMemberListDM(!isShowMemberListDM)}>
 							<span>
-								<Icons.MemberList isWhite={isShowMemberListDM} />
+								<Icons.MemberList defaultSize="size-5" />
 							</span>
 						</button>
 					)}
 					{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 						<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)}>
 							<span>
-								<Icons.IconUserProfileDM />
+								<Icons.IconUserProfileDM defaultSize="size-5" />
 							</span>
 						</button>
 					)}
@@ -619,14 +619,14 @@ const DmTopbarTools = memo(() => {
 			{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && (
 				<button title="Show Member List" onClick={() => setIsShowMemberListDM(!isShowMemberListDM)} className="sbm:hidden">
 					<span>
-						<Icons.MemberList isWhite={isShowMemberListDM} />
+						<Icons.MemberList defaultSize="size-5" />
 					</span>
 				</button>
 			)}
 			{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (
 				<button title="Show User Profile" onClick={() => setIsUseProfileDM(!isUseProfileDM)} className="sbm:hidden">
 					<span>
-						<Icons.IconUserProfileDM />
+						<Icons.IconUserProfileDM defaultSize="size-5" />
 					</span>
 				</button>
 			)}
@@ -655,7 +655,7 @@ function FileButton({ isLightMode }: { isLightMode: boolean }) {
 				onClick={handleShowFile}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.FileIcon defaultSize="size-6" />
+				<Icons.FileIcon defaultSize="size-5" />
 			</button>
 			{isShowFile && <FileModal onClose={handleClose} rootRef={fileRef} />}
 		</div>
@@ -683,7 +683,7 @@ function CanvasButton({ onClick }: { onClick?: () => void }) {
 				onClick={handleShowCanvas}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.CanvasIcon defaultSize="size-6" />
+				<Icons.CanvasIcon defaultSize="size-5" />
 			</button>
 			{isShowCanvas && <CanvasModal onClose={handleClose} rootRef={canvasRef} />}
 		</div>
@@ -709,7 +709,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 				onClick={handleToggleThreads}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.ThreadIcon defaultSize="size-6" />
+				<Icons.ThreadIcon defaultSize="size-5" />
 			</button>
 			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>
@@ -767,7 +767,7 @@ function MuteButton({ isLightMode }: { isLightMode: boolean }) {
 				onClick={handleShowNotificationSetting}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				{isMuteBell ? <Icons.MuteBell /> : <Icons.UnMuteBell defaultSize="size-6" />}
+				{isMuteBell ? <Icons.MuteBell defaultSize="size-5" /> : <Icons.UnMuteBell defaultSize="size-5" />}
 			</button>
 			{isShowNotificationSetting && <NotificationSetting onClose={handleClose} rootRef={notiRef} />}
 		</div>
@@ -806,7 +806,7 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 				onClick={handleTogglePinMessage}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.PinRight />
+				<Icons.PinRight defaultSize="size-5" />
 				{isShowPinBadge && <div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px]  box-content" />}
 			</button>
 			{isShowPinMessage && <PinnedMessages mode={mode} rootRef={pinRef} onClose={handleTogglePinMessage} />}
@@ -838,7 +838,7 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 				onClick={handleShowInbox}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.Inbox />
+				<Icons.Inbox defaultSize="size-5" />
 				{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 			</button>
 			{isShowInbox && <NotificationList rootRef={inboxRef} />}
@@ -849,9 +849,9 @@ export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boo
 export function RedDot() {
 	return (
 		<div
-			className="absolute border-[1px] dark:border-bgPrimary border-[#ffffff]
-		 w-[12px] h-[12px] rounded-full bg-colorDanger
-		  font-bold text-[11px] flex items-center justify-center -bottom-1.5 -right-1"
+			className="absolute border-theme-primary
+		 w-[8px] h-[8px] rounded-full bg-colorDanger outline outline-1 outline-transparent
+		  font-bold text-[11px] flex items-center justify-center -bottom-[0.05rem] -right-[0.075rem]"
 		></div>
 	);
 }
@@ -876,7 +876,7 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	return (
 		<div className="relative leading-5 h-5">
 			<button title="Members" onClick={handleClick} className="text-theme-primary text-theme-primary-hover">
-				<Icons.MemberList isWhite={isActive} />
+				<Icons.MemberList defaultSize="size-5" />
 			</button>
 		</div>
 	);
@@ -891,7 +891,7 @@ function ChatButton({ isLightMode, closeMenuOnMobile }: { isLightMode?: boolean;
 	return (
 		<div className="relative leading-5 h-5">
 			<button title="Show Chat" onClick={handleClick} className="text-theme-primary text-theme-primary-hover">
-				<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
+				<Icons.Chat defaultSize="size-5" />
 			</button>
 		</div>
 	);
@@ -917,7 +917,7 @@ const AddMemberToGroupDm = memo(({ currentDmGroup }: { currentDmGroup: DirectEnt
 				</div>
 			)}
 			<span title="Add friends to DM">
-				<Icons.IconAddFriendDM />
+				<Icons.IconAddFriendDM defaultSize="size-5" />
 			</span>
 		</div>
 	);

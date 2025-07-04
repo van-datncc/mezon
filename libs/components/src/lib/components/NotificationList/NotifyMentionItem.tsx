@@ -70,9 +70,9 @@ function NotifyMentionItem({ notify, isUnreadTab }: NotifyMentionProps) {
 	}, [dispatch, messageId, notify.id]);
 
 	return (
-		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
+		<div className=" bg-transparent rounded-[8px] relative group">
 			<button
-				className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+				className="absolute py-1 px-2 top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 				onClick={handleClickJump}
 			>
 				Jump
@@ -96,14 +96,14 @@ function MentionTabContent({ message }: IMentionTabContent) {
 	}, [message.references]);
 
 	return (
-		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
+		<div className="flex flex-col p-2 bg-item-theme rounded-lg ">
 			{checkMessageHasReply && (
 				<div className="max-w-full overflow-hidden">
 					<MessageReply message={message} />
 				</div>
 			)}
 
-			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-item-theme">
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"

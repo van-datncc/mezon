@@ -63,7 +63,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	return (
 		<div
 			key={pinMessage.id}
-			className="relative flex flex-row justify-between dark:bg-bgPrimary bg-white dark: py-3 px-3 mx-2 w-widthPinMess cursor-default rounded overflow-hidden border dark:border-bgTertiary border-gray-300 group/item-pinMess"
+			className="relative flex flex-row justify-between  py-3 px-3 mx-2 w-widthPinMess cursor-default rounded overflow-hidden border-theme-primary bg-item-theme group/item-pinMess"
 		>
 			<div className="flex items-start gap-2 w-full ">
 				<div className="pointer-events-none">
@@ -80,8 +80,8 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 
 				<div className="flex flex-col gap-1 text-left w-[85%] enableSelectText cursor-text">
 					<div className="flex items-center gap-4">
-						<div className="font-medium dark:text-textDarkTheme text-textLightTheme">{nameToShow}</div>
-						<div className="dark:text-zinc-400 text-colorTextLightMode text-[10px]">{messageTime}</div>
+						<div className="font-medium ">{nameToShow}</div>
+						<div className=" text-[10px]">{messageTime}</div>
 					</div>
 					<div className="leading-6">
 						<MessageLine
@@ -104,14 +104,11 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 				</div>
 			</div>
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
-				<button
-					onClick={handleJumpMess}
-					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit text-theme-primary"
-				>
+				<button onClick={handleJumpMess} className="text-xs border-theme-primary rounded-lg p-1 h-fit text-theme-primary-hover">
 					Jump
 				</button>
 				<button
-					className="dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
+					className=" mr-1 bg-theme-input bg-secondary-button-hover text-theme-primary-hover rounded-full w-6 h-6 items-center justify-center text-[10px] px-3 py-2 flex"
 					onClick={handleUnpinConfirm}
 				>
 					✕
