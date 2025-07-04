@@ -233,7 +233,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 			return () => clearTimeout(timer);
 		}
-	}, [showModalSendToken]);
+	}, [showModalSendToken, infoSendToken]);
 
 	const rootRef = useRef<HTMLDivElement>(null);
 
@@ -306,10 +306,11 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		}
 		if (showModalSendToken) {
 			openModalSendToken();
+		} else {
+			closeModalSendToken();
 		}
-	}, [showModalCustomStatus, showModalSendToken]);
+	}, [closeModalSendToken, openModalSendToken, openSetCustomStatus, showModalCustomStatus, showModalSendToken]);
 
-	useEffect(() => {}, []);
 	return (
 		<div
 			className={`fixed bottom-3 left-[12px] border-theme-primary rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthProfile z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}

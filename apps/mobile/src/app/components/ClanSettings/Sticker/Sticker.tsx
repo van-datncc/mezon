@@ -1,20 +1,19 @@
 import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { createSticker, selectCurrentClanId, selectStickersByClanId, useAppDispatch } from '@mezon/store-mobile';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { Buffer as BufferMobile } from 'buffer';
 import { ApiClanStickerAddRequest } from 'mezon-js/api.gen';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import RNFS from 'react-native-fs';
 import { openPicker } from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { IFile } from '../../../componentUI/MezonImagePicker';
 import { EmojiPreview } from '../Emoji/EmojiPreview';
 import { StickerList } from './StickerList';
@@ -23,11 +22,9 @@ import { style } from './styles';
 export function StickerSetting({ navigation }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const timerRef = useRef<any>(null);
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const listSticker = useSelector(selectStickersByClanId(currentClanId));
-	const availableLeft = useMemo(() => 50 - listSticker?.length, [listSticker]);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation(['clanStickerSetting']);
 
@@ -92,7 +89,6 @@ export function StickerSetting({ navigation }) {
 	};
 
 	const handleUploadConfirm = async (croppedFile, name, isForSale) => {
-
 		const { id, url } = await handleUploadImage({
 			fileData: croppedFile?.data,
 			name: croppedFile.filename,
@@ -133,28 +129,22 @@ export function StickerSetting({ navigation }) {
 		dispatch(createSticker({ request: request, clanId: currentClanId }));
 	};
 
-	return (
-		<View style={styles.container}>
-			<ScrollView contentContainerStyle={{ backgroundColor: themeValue.primary }}>
-				<MezonButton
-					title={t('btn.upload')}
-					type={EMezonButtonTheme.SUCCESS}
-					size={EMezonButtonSize.MD}
-					rounded={true}
-					containerStyle={styles.btn}
-					onPress={handleUploadSticker}
-					titleStyle={styles.btnTitle}
-				/>
-
-				<Text style={styles.text}>{t('content.description')}</Text>
+	const ListHeaderComponent = () => {
+		return (
+			<View style={{ paddingBottom: size.s_20 }}>
+				<Pressable style={styles.addButton} onPress={handleUploadSticker}>
+					<Text style={styles.buttonText}>{t('btn.upload')}</Text>
+				</Pressable>
 				<Text style={[styles.text, styles.textTitle]}>{t('content.requirements')}</Text>
 				<Text style={styles.text}>{t('content.reqType')}</Text>
 				<Text style={styles.text}>{t('content.reqDim')}</Text>
 				<Text style={styles.text}>{t('content.reqSize')}</Text>
-
-				<Text style={[styles.text, styles.textTitle]}>{t('content.available', { left: availableLeft })}</Text>
-				<StickerList listSticker={listSticker} clanID={currentClanId} />
-			</ScrollView>
+			</View>
+		);
+	};
+	return (
+		<View style={styles.container}>
+			<StickerList listSticker={listSticker} clanID={currentClanId} ListHeaderComponent={ListHeaderComponent} />
 		</View>
 	);
 }

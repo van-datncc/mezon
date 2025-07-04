@@ -1,7 +1,7 @@
 import { toChannelPage, useAppNavigation, useClans } from '@mezon/core';
 import { channelsActions, checkDuplicateNameClan, selectAllAccount, selectCurrentChannelId, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { Icons, InputField, Modal } from '@mezon/ui';
+import { Button, ButtonLoading, Icons, InputField, Modal } from '@mezon/ui';
 import { DEBOUNCE_TYPING_TIME, LIMIT_SIZE_UPLOAD_IMG, ValidateSpecialCharacters, fileTypeImage } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useCallback, useState } from 'react';
@@ -120,15 +120,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	}, []);
 
 	return (
-		<Modal
-			showModal={open}
-			onClose={handleClose}
-			title=""
-			titleConfirm="Create"
-			confirmButton={handleCreateClan}
-			disableButtonConfirm={checkvalidate !== EValidateListMessage.VALIDATED}
-			classNameBox="h-full"
-		>
+		<Modal showModal={open} onClose={handleClose} confirmButton={handleCreateClan} classNameBox="h-full">
 			<div className="flex items-center flex-col justify-center ">
 				<span className=" text-[24px] pb-4 font-[700] leading-8">Customize Your Clan</span>
 				<p className="  text-center text-[20px] leading-6 font-[400]">
@@ -171,6 +163,20 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 				handleClose={() => seOpenModalError((prev) => ({ ...prev, errorType: false }))}
 			/>
 			<ModalOverData openModal={openModalError.errorSize} handleClose={() => seOpenModalError((prev) => ({ ...prev, errorSize: false }))} />
+			<div className="flex items-center border-t border-solid dark:border-borderDefault rounded-b justify-between pt-4">
+				<Button
+					className="text-contentBrandLight px-4 py-2 background-transparent font-semibold text-sm outline-none focus:outline-none rounded-lg"
+					onClick={onClose}
+				>
+					Back
+				</Button>
+				<ButtonLoading
+					className={`font-semibold text-sm px-4 py-2 shadow hover:shadow-lg rounded-lg ${checkvalidate !== EValidateListMessage.VALIDATED ? 'opacity-50 cursor-not-allowed' : ''}`}
+					onClick={handleCreateClan}
+					label="Create"
+					disabled={checkvalidate !== EValidateListMessage.VALIDATED}
+				/>
+			</div>
 		</Modal>
 	);
 };
