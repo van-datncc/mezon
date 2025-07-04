@@ -1105,7 +1105,7 @@ export const ThreadIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 
 export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className={` ${defaultSize}}`}>
+		<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className={` ${defaultSize}`}>
 			<path
 				d="M19,3H5C3.895,3,3,3.895,3,5v14c0,1.105,0.895,2,2,2h10l6-6V5C21,3.895,20.105,3,19,3z M8,7h8c0.552,0,1,0.448,1,1v0 c0,0.552-0.448,1-1,1H8C7.448,9,7,8.552,7,8v0C7,7.448,7.448,7,8,7z M11,13H8c-0.552,0-1-0.448-1-1v0c0-0.552,0.448-1,1-1h3 c0.552,0,1,0.448,1,1v0C12,12.552,11.552,13,11,13z M14,19.5V14h5.5L14,19.5z"
 				fill="currentColor"
@@ -1114,18 +1114,9 @@ export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 	);
 };
 
-export const TopicIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const TopicIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			width="24"
-			height="24"
-			fill="none"
-			x="0px"
-			y="0px"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-		>
+		<svg width="24" height="24" fill="none" x="0px" y="0px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={` ${defaultSize} `}>
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
 			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
 			<g id="SVGRepo_iconCarrier">
@@ -1167,7 +1158,7 @@ export function TopicIcon2(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '' }) => {
+export const MuteBell: React.FC<IconProps> = ({ defaultSize = '' }) => {
 	return (
 		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 			<path
@@ -1178,7 +1169,7 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
+export const UnMuteBell: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" className={` ${defaultSize}`} viewBox="0 0 24 24">
 			<path
@@ -1319,14 +1310,9 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 	);
 };
 
-export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', className }) => {
+export const ThreeDot: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', className }) => {
 	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={` dark:text-[#B5BAC1] text-colorTextLightMode ${className}  ${defaultSize}`}
-		>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={` ${className}  ${defaultSize}`}>
 			<g id="Live area">
 				<g id="Vector">
 					<path
@@ -1347,9 +1333,19 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = () => {
+export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
 	return (
-		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+		<svg
+			x="0"
+			y="0"
+			aria-hidden="true"
+			role="img"
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			className={defaultSize}
+		>
 			<path
 				fill="currentColor"
 				fillRule="evenodd"
@@ -1360,15 +1356,9 @@ export const Inbox: React.FC<IconProps> = () => {
 	);
 };
 
-export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
-	const [isWhite, setIsWhite] = useState<boolean>(false);
-
-	const handleClick = () => {
-		setIsWhite(!isWhite);
-	};
+export const Help: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6' }) => {
 	return (
 		<svg
-			onClick={handleClick}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -1376,7 +1366,7 @@ export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
+			className={` ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
@@ -6616,9 +6606,9 @@ export function CalendarIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const FileIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const FileIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" id="attachment" className={`${defaultSize} }`}>
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 100 100" id="attachment" className={`${defaultSize}`}>
 			<g id="_x37_7_Essential_Icons">
 				<path
 					id="Attachment"
