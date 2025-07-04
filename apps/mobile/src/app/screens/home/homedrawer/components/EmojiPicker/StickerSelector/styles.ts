@@ -12,25 +12,31 @@ export const style = (colors: Attributes) =>
 		},
 		audioContent: {
 			width: (Metrics.screenWidth - size.s_30) / 2.01,
+			height: size.s_90,
 			borderRadius: 10,
 			overflow: 'hidden',
 			borderWidth: 1,
 			borderColor: colors.border,
+			justifyContent: 'center',
 			alignItems: 'center',
 			paddingHorizontal: size.s_10,
 			paddingVertical: size.s_6
 		},
 		btnEmo: {
-			width: size.s_30,
-			height: size.s_30,
-			borderRadius: 50,
+			padding: size.s_4,
+			borderRadius: size.s_10
+		},
+		btnEmoImage: {
+			width: size.s_24,
+			height: size.s_24,
+			borderRadius: size.s_24,
 			overflow: 'hidden',
-			backgroundColor: Colors.black
+			backgroundColor: colors.secondary
 		},
 		btnWrap: {
 			display: 'flex',
 			flexDirection: 'row',
-			gap: size.s_10,
+			gap: size.s_6,
 			marginTop: size.s_10
 		},
 		session: {},
@@ -43,11 +49,7 @@ export const style = (colors: Attributes) =>
 			marginBottom: size.s_10
 		},
 		sessionContent: {
-			display: 'flex',
-			flexDirection: 'row',
-			flexWrap: 'wrap',
-			gap: size.s_10,
-			alignItems: 'center'
+			display: 'flex'
 		},
 		soundName: {
 			fontSize: size.medium,
@@ -57,7 +59,6 @@ export const style = (colors: Attributes) =>
 			textAlign: 'center'
 		},
 		wrapperIconLocked: {
-			backgroundColor: 'rgba(0, 0, 0, 0.2)',
 			position: 'absolute',
 			alignSelf: 'center',
 			justifyContent: 'center',
@@ -78,5 +79,4 @@ export const style = (colors: Attributes) =>
 			fontSize: size.s_16,
 			fontWeight: 'bold'
 		}
-
 	});
