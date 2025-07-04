@@ -9,7 +9,7 @@ interface IIntegrationProps {
 const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps) => {
 	return (
 		<>
-			<div className="text-sm pt-5">
+			<div className="text-sm pt-5 text-theme-primary">
 				Customize your server with integrations. Manage webhooks, followed channels and apps, as well as Twitch and YouTube settings for
 				creators. <b className="font-semibold text-[#00a8fc] hover:underline cursor-pointer">Learn more about managing integrations.</b>
 			</div>
@@ -25,8 +25,8 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 				<div className="flex gap-4 max-sm:gap-0 max-sbm:w-[40%] items-center">
 					<Icons.WebhooksIcon />
 					<div>
-						<div className="pb-[3px] font-semibold break-all">Webhooks</div>
-						<div className="text-[12px]">
+						<div className="pb-[3px] font-semibold break-all text-theme-primary">Webhooks</div>
+						<div className="text-[12px] text-theme-primary">
 							{allWebhooks && allWebhooks?.length > 1 ? allWebhooks?.length + ' webhooks' : allWebhooks?.length + ' webhook'}
 						</div>
 					</div>
@@ -40,7 +40,7 @@ const MainIntegrations = ({ setIsOpenWebhooks, allWebhooks }: IIntegrationProps)
 					</div>
 				) : (
 					<div className="items-center cursor-pointer text-[14px] flex gap-[4px]">
-						<div>View Webhook</div>
+							<div className="text-theme-primary">View Webhook</div>
 						<Icons.ArrowDown defaultSize="h-[15px] w-[15px]  -rotate-90" />
 					</div>
 				)}

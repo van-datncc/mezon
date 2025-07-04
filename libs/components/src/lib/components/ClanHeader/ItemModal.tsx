@@ -15,6 +15,7 @@ const ItemModal = ({ children, endIcon, onClick, disabled }: ItemModalProps) => 
 			className="flex items-center w-full justify-between rounded-sm hover:bg-bgSelectItem group pr-2"
 		>
 			<li className="text-[14px] group-hover:text-white font-medium w-full py-[6px] px-[8px] text-left cursor-pointer list-none ">
+
 				{children}
 			</li>
 			{endIcon && <div className="flex items-center justify-center h-[18px] w-[18px]">{endIcon}</div>}

@@ -37,10 +37,10 @@ export const SFUBtn: React.FC<ISFUBtnProps> = ({ isLightMode }) => {
 			>
 				{isJoined ? (
 					<div className="size-6 flex items-center justify-center">
-						<Icons.JoinedSFU className="size-4 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+						<Icons.JoinedSFU className="size-4 dark:hover:text-white hover:text-black text-theme-primary" />
 					</div>
 				) : (
-					<Icons.NotJoinedSFU className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+						<Icons.NotJoinedSFU className="size-6 dark:hover:text-white hover:text-black text-theme-primary" />
 				)}
 			</button>
 		</div>

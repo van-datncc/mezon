@@ -29,7 +29,7 @@ function CustomSelectField({
 				className="bg-transparent border rounded-sm px-2 py-2 outline-none"
 			>
 				{options.map((option, index) => (
-					<option className="bg-white text-gray-800 dark:bg-gray-700 dark:text-white" key={index} value={option.value}>
+					<option className="bg-theme-setting-nav  text-gray-800  dark:text-white" key={index} value={option.value}>
 						{option.label}
 					</option>
 				))}
