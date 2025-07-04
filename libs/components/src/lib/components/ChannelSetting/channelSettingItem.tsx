@@ -74,7 +74,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 
 	return (
 		<div
-			className={`overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-white dark:text-white text-black flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow  ${stateClose && !stateMenu ? 'hidden' : 'flex'}`}
+			className={`overflow-y-auto w-1/6 xl:w-1/4 min-w-56 text-theme-primary bg-theme-setting-nav flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow  ${stateClose && !stateMenu ? 'hidden' : 'flex'}`}
 		>
 			<div className="w-170px flex flex-col">
 				<div className="flex justify-start max-w-[170px]">
@@ -161,7 +161,7 @@ const ChannelSettingItemButton = ({
 	};
 	return (
 		<button
-			className={`dark:text-[#AEAEAE] text-black w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-2 hover:bg-bgModifierHoverLight dark:hover:bg-bgModalLight ${selectedButton === tabName ? 'dark:bg-[#232E3B] bg-bgLightModeButton' : ''}`}
+			className={`text-theme-primary text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-2 bg-item-theme-hover ${selectedButton === tabName ? 'bg-item-theme' : ''}`}
 			onClick={handleOnClickTabChannelSetting}
 		>
 			{tabName}

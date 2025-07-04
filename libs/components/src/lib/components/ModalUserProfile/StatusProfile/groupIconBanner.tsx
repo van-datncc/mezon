@@ -68,7 +68,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Add friend',
-						icon: <Icons.AddPerson className="size-4" />
+						icon: <Icons.AddPerson className="size-4 text-theme-primary" />
 					}
 				];
 		}

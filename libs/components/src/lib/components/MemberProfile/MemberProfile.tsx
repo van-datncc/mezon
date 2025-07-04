@@ -139,15 +139,15 @@ const MemberProfileCore = ({
 							className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start  ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 						>
 							{customStatus && isListFriend ? (
-								<span className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 `}>
+								<span className={`text-[11px] text-left text-theme-primary line-clamp-1 `}>
 									{customStatus}
 								</span>
 							) : (
-								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode `}>
+									<span className={`text-[11px] text-theme-primary line-clamp-1 `}>
 									{typeof userStatus === 'string' && userStatus ? userStatus : !status?.status ? 'Offline' : 'Online'}
 								</span>
 							)}
-							<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
+							<p className="text-[11px] text-theme-primary line-clamp-1 overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
 								{user?.user?.username}
 							</p>
 						</div>

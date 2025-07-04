@@ -250,11 +250,11 @@ const RequestFailedPopup = ({ togglePopup }: { togglePopup: () => void }) => {
 		<div ref={modalRef} tabIndex={-1} className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={togglePopup} className="fixed inset-0 bg-black opacity-50" />
 			<div className="relative z-10 w-[440px] text-center">
-				<div className="dark:bg-[#313338] bg-white dark:text-[#dbdee1] text-textLightTheme px-4 py-5 flex flex-col gap-5 items-center rounded-t-md">
+				<div className="bg-theme-setting-primary dark:text-[#dbdee1] text-textLightTheme px-4 py-5 flex flex-col gap-5 items-center rounded-t-md">
 					<div className="text-textLightTheme dark:text-textDarkTheme uppercase font-semibold text-[20px]">Friend request failed</div>
 					<div>You're already friends with that user!</div>
 				</div>
-				<div className="p-4 dark:bg-[#2b2d31] bg-[#f2f3f5] rounded-b-md">
+				<div className="p-4 bg-theme-setting-nav rounded-b-md">
 					<div
 						onClick={togglePopup}
 						className="w-full cursor-pointer bg-[#5865f2] hover:bg-[#4752c4] text-whit rounded-sm h-[44px] flex items-center font-semibold justify-center"

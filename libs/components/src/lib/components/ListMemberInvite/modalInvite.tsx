@@ -169,7 +169,7 @@ const ModalInvite = (props: ModalParam) => {
 			classNameBox="max-w-[440px]"
 		>
 			<div className="space-y-2">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Expire After</h3>
+					<h3 className="text-xs font-bold text-theme-primary">Expire After</h3>
 				<select
 					name="expireAfter"
 					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
@@ -186,7 +186,7 @@ const ModalInvite = (props: ModalParam) => {
 				</select>
 			</div>
 			<div className="space-y-2">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase">Max Number of Uses</h3>
+					<h3 className="text-xs font-bold text-theme-primary">Max Number of Uses</h3>
 				<select
 					name="maxNumberofUses"
 					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}

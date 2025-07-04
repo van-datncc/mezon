@@ -326,7 +326,7 @@ const WebhookItemChannelDropdown = ({
 			)}
 			label=""
 			placement="bottom-end"
-			className={`dark:bg-black bg-white border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+			className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 		>
 			{parentChannelsInClan.map((channel) => {
 				if (webhookItem.channel_id !== channel.channel_id) {
