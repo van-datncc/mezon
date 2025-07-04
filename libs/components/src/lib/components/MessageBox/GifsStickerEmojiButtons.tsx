@@ -85,25 +85,29 @@ const GifStickerEmojiButtons = memo(
 			<div className="flex flex-row absolute h-11 items-center gap-1 mr-3 top-0 right-0 z-20">
 				{!isTopic && (
 					<div {...voiceLongPress} className={`w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-						<Icons.MicEnable
-							className={`w-6 h-6 ${isRecording ? 'text-red-600' : 'dark:text-[#AEAEAE] text-colorTextLightMode dark:hover:text-white hover:text-black'}`}
-						/>
+						<Icons.MicEnable className={`w-6 h-6 ${isRecording ? 'text-red-600' : 'text-theme-primary text-theme-primary-hover'}`} />
 					</div>
 				)}
 
-				<div onClick={handleOpenGifs} className={`block max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
+				<div
+					onClick={handleOpenGifs}
+					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+				>
 					<Icons.Gif defaultSize="w-6 h-6" />
 				</div>
 
 				<div
 					onClick={handleOpenStickers}
-					className={`block max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Sticker defaultSize="w-6 h-6" isWhite={false} />
+					<Icons.Sticker defaultSize="w-6 h-6" />
 				</div>
 
-				<div onClick={handleOpenEmoji} className={`w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-					<Icons.Smile defaultSize="w-6 h-6" defaultFill={`${'#AEAEAE'}`} />
+				<div
+					onClick={handleOpenEmoji}
+					className={`w-6 h-6 text-theme-primary text-theme-primary-hover ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+				>
+					<Icons.Smile defaultSize="w-6 h-6" />
 				</div>
 			</div>
 		);

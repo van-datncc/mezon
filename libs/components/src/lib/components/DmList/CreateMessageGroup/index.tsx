@@ -226,19 +226,19 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 			ref={modalRef}
 			tabIndex={-1}
 			onMouseDown={(e) => e.stopPropagation()}
-			className={`absolute top-8 right-0 z-50 outline-none dark:bg-bgPrimary bg-bgLightPrimary w-[440px] border border-slate-300 dark:border-none rounded shadow shadow-neutral-800 ${classNames}`}
+			className={`absolute top-8 right-0 z-50 outline-none bg-theme-setting-primary border-theme-primary w-[440px] rounded shadow shadow-neutral-800 ${classNames}`}
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
 		>
 			<div className="cursor-default text-start">
 				<div className="p-4">
-					<h3 className="text-xl dark:text-white text-textLightTheme">Select Friends</h3>
-					<p className="dark:text-textThreadPrimary text-textPrimaryLight pt-1">{`You can add ${numberCanAdd} more friends.`}</p>
+					<h3 className="text-xl ">Select Friends</h3>
+					<p className=" pt-1">{`You can add ${numberCanAdd} more friends.`}</p>
 					<InputField
 						type="text"
 						placeholder="Type the username of a friend"
-						className="h-[34px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-[20px]"
+						className="h-[34px] text-[16px] mt-[20px]"
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 						autoFocus={true}
@@ -251,7 +251,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 								key={friend.id}
 								onMouseEnter={() => setIdActive(friend.id ?? '')}
 								onMouseLeave={() => setIdActive(friend.id ?? '')}
-								className={`${idActive === friend.id ? 'dark:bg-bgModifierHover bg-bgLightModeThird' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-[6px] cursor-pointer`}
+								className={`${idActive === friend.id ? 'bg-item-theme ' : ''} flex items-center h-10 px-2 ml-3 mr-2 py-[8px] rounded-lg cursor-pointer`}
 							>
 								<label className="flex flex-row items-center justify-between w-full gap-2 py-[3px] cursor-pointer">
 									<div className="flex flex-row items-center gap-2">
@@ -267,10 +267,8 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 											className="size-8"
 											classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 										/>
-										<span className={`text-base font-medium dark:text-white text-textLightTheme one-line`}>
-											{friend.user?.display_name}
-										</span>
-										<span className="dark:text-colorNeutral text-colorTextLightMode font-medium">{friend.user?.username}</span>
+										<span className={`text-base font-medium  one-line`}>{friend.user?.display_name}</span>
+										<span className="  font-medium">{friend.user?.username}</span>
 									</div>
 									<div className="relative flex flex-row justify-center">
 										<input
@@ -279,7 +277,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 											value={friend.id}
 											checked={selectedFriends.includes(friend?.id || '')}
 											onChange={handleCheckboxChange}
-											className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none"
+											className="peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border-theme-primary rounded-md focus:outline-none"
 										/>
 										<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4" />
 									</div>
@@ -295,7 +293,7 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 					<button
 						disabled={selectedFriends.length === 0}
 						onClick={handleCreateDM}
-						className="h-[38px] w-full text-sm text-white dark:bg-buttonPrimary bg-buttonPrimary dark:hover:bg-bgSelectItemHover hover:bg-bgSelectItemHover rounded"
+						className="h-[38px] w-full text-sm text-white bg-buttonPrimary  hover:bg-bgSelectItemHover rounded"
 					>
 						{currentDM?.type === ChannelType.CHANNEL_TYPE_GROUP
 							? 'Add to Group Chat'

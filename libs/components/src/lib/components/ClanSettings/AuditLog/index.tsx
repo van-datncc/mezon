@@ -72,15 +72,12 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 	return (
 		<div className="mt-[60px]">
 			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-semibold dark:text-textDarkTheme text-textLightTheme flex">
+				<h2 className="text-xl font-semibold  flex">
 					<div>Audit Log</div>
 				</h2>
 				<div className="flex gap-4 items-center">
 					<div className="relative">
-						<div
-							onClick={handleSearchMemberClick}
-							className="flex items-center gap-3 dark:text-textPrimary text-buttonProfile w-full text-[13px] line-clamp-1 break-all"
-						>
+						<div onClick={handleSearchMemberClick} className="flex items-center gap-3  w-full text-[13px] line-clamp-1 break-all">
 							<div className="max-sm:hidden">Filter by User</div>
 							<div className="flex items-center gap-1 cursor-pointer">
 								<div className=" one-line">
@@ -104,10 +101,7 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 						)}
 					</div>
 					<div className="relative">
-						<div
-							onClick={handleSearchActionClick}
-							className="flex items-center gap-3 dark:text-textPrimary text-buttonProfile w-full text-[13px] line-clamp-1 break-all"
-						>
+						<div onClick={handleSearchActionClick} className="flex items-center gap-3 w-full text-[13px] line-clamp-1 break-all">
 							<div className="max-sm:hidden">Filter by Action</div>
 							<div className="flex items-center gap-1 cursor-pointer">
 								<div className=" one-line">{actionFilter && actionFilter !== ActionLog.ALL_ACTION_AUDIT ? actionFilter : 'All'}</div>
@@ -135,9 +129,8 @@ const AuditLog = ({ currentClanId }: AuditLogProps) => {
 							value={selectedDate.split('-').reverse().join('-')}
 							onChange={handleDateChange}
 							max={maxDate}
-							className="dark:bg-[#2d2d2d] dark:text-[#fff] 
-							text-[#333] bg-[#f8f9fa] border-none border border-[#ccc] rounded-md p-2 
-							hover:border-blue-500 focus:ring focus:ring-blue-300 
+							className=" 
+							bg-input-theme focus:outline-none focus:ring-0 border-theme-primary rounded-lg p-2
 							transition ease-in-out duration-200"
 						/>
 					</div>

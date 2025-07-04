@@ -40,7 +40,7 @@ const ScreenSelectionModal = memo(({ onClose }: ScreenSelectionModalProps) => {
 			className="outline-none justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 focus:outline-none bg-black bg-opacity-80 dark:text-white text-black hide-scrollbar overflow-hidden contain-layout contain-paint"
 		>
 			<div className="relative w-full sm:h-auto rounded-lg max-w-[600px] contain-layout contain-paint" onClick={handleStop}>
-				<div className="flex items-center gap-x-4 dark:bg-[#1E1F22] bg-bgLightModeSecond dark:text-white text-black gap-2 p-4">
+				<div className="flex items-center gap-x-4 theme-base-color gap-2 p-4">
 					{TABS.map((tab, index) => (
 						<button
 							key={tab.value}

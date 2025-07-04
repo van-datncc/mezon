@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { ContextMenuItem, IEmoji, IMessageWithUser, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { CSSProperties, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from './MessageContextMenuContext';
@@ -65,23 +65,18 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		return emojiConverted.slice(0, 4);
 	}, [emojiConverted]) as IEmoji[];
 
-	const [warningStatus, setWarningStatus] = useState<string>('');
+	const [warningStatus, setWarningStatus] = useState<string>('var(--bg-item-hover)');
 
-	const isLightMode = appearanceTheme === 'light';
-
-	const className: CSSProperties = {
-		'--contexify-menu-bgColor': isLightMode ? '#FFFFFF' : '#111214',
-		'--contexify-activeItem-bgColor': warningStatus,
-		'--contexify-rightSlot-color': '#6f6e77',
-		'--contexify-activeRightSlot-color': '#fff',
-		'--contexify-arrow-color': '#6f6e77',
-		'--contexify-activeArrow-color': '#fff',
-		'--contexify-itemContent-padding': '-3px',
-		'--contexify-menu-radius': '2px',
-		'--contexify-activeItem-radius': '2px',
-		'--contexify-menu-minWidth': '188px',
-		'--contexify-separator-color': '#ADB3B9'
-	} as CSSProperties;
+	const className = {
+		'--contexify-menu-bgColor': 'var(--bg-theme-contexify)',
+		'--contexify-item-color': 'var(--text-theme-primary)',
+		'--contexify-activeItem-color': 'red',
+		'--contexify-activeItem-bgColor': warningStatus || 'var(--bg-item-hover)',
+		'--contexify-rightSlot-color': 'var(--text-secondary)',
+		'--contexify-activeRightSlot-color': 'var(--text-secondary)',
+		'--contexify-arrow-color': 'var(--text-theme-primary)',
+		'--contexify-activeArrow-color': 'var(--text-secondary)'
+	} as React.CSSProperties;
 
 	const { posShowMenu, onVisibilityChange } = useMessageContextMenu();
 	const checkPos = useMemo(() => {
@@ -123,7 +118,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 											fontSize: '14px',
 											fontWeight: 500
 										}}
-										className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+										className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 									>
 										<span>Add Reaction</span>
 									</div>
@@ -132,17 +127,17 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 						)}
 						label=""
 						placement="right-start"
-						className="dark:bg-black bg-white border-none"
+						className=" border-none bg-theme-contexify"
 					>
 						{firstFourElements.map((item, index) => (
-							<div className="w-[320px]" key={index}>
+							<div className="w-[320px] " key={index}>
 								<Item
 									className="flex justify-between items-center w-full px-2 py-1"
 									key={index}
 									onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}
 								>
 									<div
-										className={`flex truncate justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+										className={`flex truncate justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 									>
 										{item.shortname}
 									</div>
@@ -160,10 +155,10 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 								</Item>
 							</div>
 						))}
-						<hr className="border-t dark:border-gray-600" />
+						<hr className="border-b-theme-primary" />
 						<Item className="w-full px-2 py-1" key={index} onClick={item.handleItemClick} disabled={item.disabled}>
 							<div
-								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+								className={`class="flex justify-between items-center w-full font-sans text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 							>
 								<span>View More</span>
 							</div>
@@ -180,11 +175,11 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 							if (lableItemWarning) {
 								setWarningStatus('#E13542');
 							} else {
-								setWarningStatus('#4B5CD6');
+								setWarningStatus('var(--bg-item-hover)');
 							}
 						}}
 						onMouseLeave={() => {
-							setWarningStatus('#4B5CD6');
+							setWarningStatus('var(--bg-item-hover)');
 						}}
 					>
 						<div
@@ -197,7 +192,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 								fontSize: '14px',
 								fontWeight: 500
 							}}
-							className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF]' : ' dark:text-[#ADB3B9] text-[#4E5058] hover:text-[#FFFFFF] dark:hover:text-[#FFFFFF]'}  p-1`}
+							className={`${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
 						>
 							<span>{item.label}</span>
 							<span> {item.icon}</span>
@@ -221,7 +216,12 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 	}, [items, checkPos, firstFourElements, messageId, handleClickEmoji]);
 
 	return (
-		<Menu onVisibilityChange={onVisibilityChange} id={menuId} style={className} className="z-50">
+		<Menu
+			onVisibilityChange={onVisibilityChange}
+			id={menuId}
+			style={className}
+			className="z-50 rounded-lg  text-theme-primary text-theme-primary-hover "
+		>
 			{checkPos && <ReactionPart emojiList={firstFourElements} messageId={messageId} isOption={false} message={message} isTopic={isTopic} />}
 			{children}
 		</Menu>

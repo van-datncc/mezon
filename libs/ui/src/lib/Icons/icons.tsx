@@ -164,14 +164,14 @@ export function UploadImage(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function AddIcon({ fill, ...props }: ClassIconProps) {
+export function AddIcon({ fill = 'currentColor', ...props }: ClassIconProps) {
 	return (
 		<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<path
 				fillRule="evenodd"
 				clipRule="evenodd"
+				fill={fill}
 				d="M27.3332 14C27.3332 21.3638 21.3636 27.3333 13.9998 27.3333C6.63604 27.3333 0.666504 21.3638 0.666504 14C0.666504 6.63621 6.63604 0.666672 13.9998 0.666672C21.3636 0.666672 27.3332 6.63621 27.3332 14ZM13.9999 7.00001C14.9203 7.00001 15.6665 7.7462 15.6665 8.66667V12.3333H19.3332C20.2537 12.3333 20.9999 13.0795 20.9999 14C20.9999 14.9205 20.2537 15.6667 19.3332 15.6667H15.6665V19.3333C15.6665 20.2538 14.9203 21 13.9999 21C13.0794 21 12.3332 20.2538 12.3332 19.3333V15.6667H8.66657C7.7461 15.6667 6.9999 14.9205 6.9999 14C6.9999 13.0795 7.7461 12.3333 8.66657 12.3333H12.3332V8.66667C12.3332 7.7462 13.0794 7.00001 13.9999 7.00001Z"
-				fill={fill ? fill : '#155EEF'}
 			/>
 		</svg>
 	);
@@ -211,7 +211,7 @@ export function Chevron(props: React.HTMLAttributes<SVGElement>) {
 
 export function SettingProfile(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
 				fill="currentColor"
 				fillRule="evenodd"
@@ -314,7 +314,7 @@ export function AddPerson(props: React.HTMLAttributes<SVGElement>) {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className="dark:text-[#CBD5E0] text-colorTextLightMode"
+			className=""
 			fill="none"
 			viewBox="0 0 24 24"
 			{...props}
@@ -347,11 +347,11 @@ export function PendingFriend(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
-				fill="#caccce"
+				fill="currentColor"
 				d="M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM2 20.53A9.53 9.53 0 0 1 11.53 11h.94c1.28 0 2.5.25 3.61.7.41.18.36.77-.05.96a7 7 0 0 0-3.65 8.6c.11.36-.13.74-.5.74H6.15a.5.5 0 0 1-.5-.55l.27-2.6c.02-.26-.27-.37-.41-.16-.48.74-1.03 1.8-1.32 2.9a.53.53 0 0 1-.5.41h-.22C2.66 22 2 21.34 2 20.53Z"
 			></path>
 			<path
-				fill="#caccce"
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M19 24a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm1-7a1 1 0 1 0-2 0v2c0 .27.1.52.3.7l1 1a1 1 0 0 0 1.4-1.4l-.7-.71V17Z"
 				clipRule="evenodd"
@@ -1108,16 +1108,9 @@ interface IconProps {
 	className?: string;
 }
 
-export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const ThreadIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			x="0"
-			y="0"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-			viewBox="0 0 24 24"
-		>
+		<svg x="0" y="0" role="img" xmlns="http://www.w3.org/2000/svg" className={` ${defaultSize} `} viewBox="0 0 24 24">
 			<path
 				d="M12 2.81a1 1 0 0 1 0-1.41l.36-.36a1 1 0 0 1 1.41 0l9.2 9.2a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.3.13l-9.54-6.72a1 1 0 0 1-.08-1.58l1-1L12 2.8ZM12 21.2a1 1 0 0 1 0 1.41l-.35.35a1 1 0 0 1-1.41 0l-9.2-9.19a1 1 0 0 1 0-1.41l.7-.7a1 1 0 0 1 1.3-.12l9.54 6.72a1 1 0 0 1 .07 1.58l-1 1 .35.36ZM15.66 16.8a1 1 0 0 1-1.38.28l-8.49-5.66A1 1 0 1 1 6.9 9.76l8.49 5.65a1 1 0 0 1 .27 1.39ZM17.1 14.25a1 1 0 1 0 1.11-1.66L9.73 6.93a1 1 0 0 0-1.11 1.66l8.49 5.66Z"
 				fill="currentColor"
@@ -1126,17 +1119,9 @@ export const ThreadIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
-export const CanvasIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			x="0px"
-			y="0px"
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className={` ${defaultSize}`}>
 			<path
 				d="M19,3H5C3.895,3,3,3.895,3,5v14c0,1.105,0.895,2,2,2h10l6-6V5C21,3.895,20.105,3,19,3z M8,7h8c0.552,0,1,0.448,1,1v0 c0,0.552-0.448,1-1,1H8C7.448,9,7,8.552,7,8v0C7,7.448,7.448,7,8,7z M11,13H8c-0.552,0-1-0.448-1-1v0c0-0.552,0.448-1,1-1h3 c0.552,0,1,0.448,1,1v0C12,12.552,11.552,13,11,13z M14,19.5V14h5.5L14,19.5z"
 				fill="currentColor"
@@ -1145,22 +1130,10 @@ export const CanvasIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 	);
 };
 
-export const TopicIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const TopicIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			width="24"
-			height="24"
-			fill="none"
-			x="0px"
-			y="0px"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-		>
-			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+		<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`${defaultSize}`}>
 			<g id="SVGRepo_iconCarrier">
-				{' '}
 				<path
 					fillRule="evenodd"
 					clipRule="evenodd"
@@ -1169,11 +1142,12 @@ export const TopicIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-				></path>{' '}
+				/>
 				<path
 					d="M9.5 13.25C9.08579 13.25 8.75 13.5858 8.75 14C8.75 14.4142 9.08579 14.75 9.5 14.75V13.25ZM13.5 14.75C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25V14.75ZM9.5 10.25C9.08579 10.25 8.75 10.5858 8.75 11C8.75 11.4142 9.08579 11.75 9.5 11.75V10.25ZM15.5 11.75C15.9142 11.75 16.25 11.4142 16.25 11C16.25 10.5858 15.9142 10.25 15.5 10.25V11.75ZM9.5 14.75H13.5V13.25H9.5V14.75ZM9.5 11.75H15.5V10.25H9.5V11.75Z"
-					fill="currentColor"
-				></path>{' '}
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
 			</g>
 		</svg>
 	);
@@ -1185,32 +1159,21 @@ export function TopicIcon2(props: React.HTMLAttributes<SVGElement>) {
 			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
 			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
 			<g id="SVGRepo_iconCarrier">
-				{' '}
 				<path
 					d="M8 9.5H15M8 13.5H13M15.6953 19.2318L19.1027 20.3676C19.8845 20.6282 20.6282 19.8844 20.3676 19.1027L19.2318 15.6953M15.3 19.1C15.3 19.1 14.0847 20 11.5 20C6.80558 20 3 16.1944 3 11.5C3 6.80558 6.80558 3 11.5 3C16.1944 3 20 6.80558 20 11.5C20 14 19.1 15.3 19.1 15.3"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
-				></path>{' '}
+				></path>
 			</g>
 		</svg>
 	);
 }
 
-export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '', isWhite = false }) => {
+export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = '' }) => {
 	return (
-		<svg
-			x="0"
-			y="0"
-			aria-hidden="true"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			className={`dark:hover:text-white hover:text-black ${defaultSize === '' ? (isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode') : defaultSize}`}
-			viewBox="0 0 24 24"
-		>
+		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
 			<path
 				fill="currentColor"
 				d="M1.3 21.3a1 1 0 1 0 1.4 1.4l20-20a1 1 0 0 0-1.4-1.4l-20 20ZM3.13 16.13c.11.27.46.28.66.08L15.73 4.27a.47.47 0 0 0-.07-.74 6.97 6.97 0 0 0-1.35-.64.62.62 0 0 1-.38-.43 2 2 0 0 0-3.86 0 .62.62 0 0 1-.38.43A7 7 0 0 0 5 9.5v2.09a.5.5 0 0 1-.13.33l-1.1 1.22A3 3 0 0 0 3 15.15v.28c0 .24.04.48.13.7ZM18.64 9.36c.13-.13.36-.05.36.14v2.09c0 .12.05.24.13.33l1.1 1.22a3 3 0 0 1 .77 2.01v.28c0 .67-.34 1.29-.95 1.56-1.31.6-4 1.51-8.05 1.51-.46 0-.9-.01-1.33-.03a.48.48 0 0 1-.3-.83l8.27-8.28ZM9.18 19.84A.16.16 0 0 0 9 20a3 3 0 1 0 6 0c0-.1-.09-.17-.18-.16a24.84 24.84 0 0 1-5.64 0Z"
@@ -1221,15 +1184,7 @@ export const MuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 
 export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
 	return (
-		<svg
-			x="0"
-			y="0"
-			aria-hidden="true"
-			role="img"
-			xmlns="http://www.w3.org/2000/svg"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
-			viewBox="0 0 24 24"
-		>
+		<svg x="0" y="0" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" className={` ${defaultSize}`} viewBox="0 0 24 24">
 			<path
 				fill="currentColor"
 				d="M9.7 2.89c.18-.07.32-.24.37-.43a2 2 0 0 1 3.86 0c.05.2.19.36.38.43A7 7 0 0 1 19 9.5v2.09c0 .12.05.24.13.33l1.1 1.22a3 3 0 0 1 .77 2.01v.28c0 .67-.34 1.29-.95 1.56-1.31.6-4 1.51-8.05 1.51-4.05 0-6.74-.91-8.05-1.5-.61-.28-.95-.9-.95-1.57v-.28a3 3 0 0 1 .77-2l1.1-1.23a.5.5 0 0 0 .13-.33V9.5a7 7 0 0 1 4.7-6.61ZM9.18 19.84A.16.16 0 0 0 9 20a3 3 0 1 0 6 0c0-.1-.09-.17-.18-.16a24.86 24.86 0 0 1-5.64 0Z"
@@ -1238,7 +1193,7 @@ export const UnMuteBell: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 	);
 };
 
-export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6' }) => {
+export const PinRight: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6' }) => {
 	return (
 		<svg
 			x="0"
@@ -1248,7 +1203,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6'
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1259,7 +1214,7 @@ export const PinRight: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-6 h-6'
 	);
 };
 
-export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
+export const TalkPTT: React.FC<IconProps> = () => {
 	return (
 		<svg
 			x="0"
@@ -1269,7 +1224,7 @@ export const TalkPTT: React.FC<IconProps> = ({ isWhite }) => {
 			xmlns="http://www.w3.org/2000/svg"
 			width="32"
 			height="32"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			viewBox="0 -4 24 24"
 		>
 			<path
@@ -1290,7 +1245,7 @@ export const MutePTT: React.FC<IconProps> = ({ isWhite }) => {
 			xmlns="http://www.w3.org/2000/svg"
 			width="32"
 			height="32"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'text-theme-primary'}`}
 			viewBox="0 -4 24 24"
 		>
 			<path d="M12 1C13.6452 1 15.0585 1.99333 15.6728 3.41298L7.99997 11.0858V5C7.99997 2.79086 9.79083 1 12 1Z" fill="currentColor" />
@@ -1347,7 +1302,7 @@ export function LeaveSFU(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '', isWhite = false }) => {
+export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defaultFill = '' }) => {
 	return (
 		<svg
 			x="0"
@@ -1357,7 +1312,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
+			className={`${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1370,12 +1325,7 @@ export const MemberList: React.FC<IconProps> = ({ defaultSize = 'w-6 h-6', defau
 
 export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', className }) => {
 	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={` dark:text-[#B5BAC1] text-colorTextLightMode ${className}  ${defaultSize}`}
-		>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`  ${className}  ${defaultSize}`}>
 			<g id="Live area">
 				<g id="Vector">
 					<path
@@ -1396,21 +1346,17 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false, className = '' }) => {
-	const classProps = className
-		? className
-		: `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`;
-
+export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
 	return (
 		<svg
 			x="0"
 			y="0"
+			className={defaultSize}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`${classProps} ${defaultFill ? defaultFill : ''}`}
 			viewBox="0 0 24 24"
 		>
 			<path
@@ -1439,7 +1385,7 @@ export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'} ${defaultSize}`}
+			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'text-theme-primary'} ${defaultSize}`}
 			viewBox="0 0 24 24"
 		>
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
@@ -1480,7 +1426,7 @@ export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -1515,7 +1461,7 @@ export function Search(props: React.HTMLAttributes<SVGElement>) {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			className="dark:text-[#949BA4] text-black"
+			className="text-theme-primary"
 			viewBox="0 0 24 24"
 			{...props}
 		>
@@ -1606,7 +1552,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1703,7 +1649,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 	);
 };
 
-export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false }) => {
+export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1712,7 +1658,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite 
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#AEAEAE] text-colorTextLightMode'}`}
+			className="text-theme-primary text-theme-primary-hover"
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1887,7 +1833,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite 
 export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${defaultSize} ${'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={`${defaultSize} text-theme-primary text-theme-primary-hover`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -1905,10 +1851,7 @@ export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export const ArrowDown: React.FC<IconProps> = ({
-	defaultSize = 'w-4 h-4 dark:text-channelTextLabel text-colorTextLightMode dark:hover:text-white hover:text-black min-w-4',
-	size = ''
-}) => {
+export const ArrowDown: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 min-w-4', size = '' }) => {
 	return (
 		<svg viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${defaultSize} ${size}`}>
 			<g id="Live area">
@@ -1999,7 +1942,7 @@ export function EyeOpen(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4 min-w-4' }) => {
+export const ArrowRight: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 min-w-4' }) => {
 	return (
 		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
@@ -2008,7 +1951,7 @@ export const ArrowRight: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 					fillRule="evenodd"
 					clipRule="evenodd"
 					d="M5.91083 3.41075C6.23626 3.08531 6.7639 3.08531 7.08934 3.41075L12.0893 8.41075C12.4148 8.73619 12.4148 9.26382 12.0893 9.58926L7.08934 14.5893C6.7639 14.9147 6.23626 14.9147 5.91083 14.5893C5.58539 14.2638 5.58539 13.7362 5.91083 13.4107L10.3216 9L5.91083 4.58926C5.58539 4.26382 5.58539 3.73619 5.91083 3.41075Z"
-					fill={defaultFill}
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -2057,7 +2000,7 @@ export const Read: React.FC<IconProps> = () => {
 
 export const Sent: React.FC<IconProps> = () => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ">
 			<g id="Live area">
 				<path
 					id="Vector"
@@ -2092,7 +2035,7 @@ export function Plus(props: React.HTMLAttributes<SVGElement>) {
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`dark:text-white text-colorTextLightMode ${defaultSize}`}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`text-theme-primary ${defaultSize}`}>
 			<g id="Live area">
 				<path
 					fill="currentColor"
@@ -2226,7 +2169,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 			viewBox="0 0 20 20"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<path
 				d="M11.5512 1.57323C11.9214 1.75834 12.1065 2.12856 12.1065 2.40622V19.0659C12.1065 19.4361 11.9214 19.7138 11.5512 19.8989C11.2735 20.084 10.8107 19.9915 10.5331 19.8064L4.88727 15.3638H1.92554C1.37022 15.3638 1 14.9936 1 14.4382V7.03392C1 6.47859 1.37022 6.10838 1.92554 6.10838H4.97982L10.6256 1.66579C10.9033 1.48068 11.2735 1.48068 11.5512 1.57323Z"
@@ -2250,16 +2193,9 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 	);
 };
 
-export const HashtagLocked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			width="20"
-			height="20"
-			viewBox="0 0 20 20"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={`block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`block  ${defaultSize}`}>
 			<g className="transform translate-y-[2px] translate-x-[-1.5px]">
 				<path
 					d="M17.4393 9.4715L17.6833 8.6585H11.7483C11.5857 8.6585 11.4231 8.49589 11.4231 8.33329V7.76419H9.14667L10.2036 3.86175H8.41496L7.35805 7.76419H3.37431L2.8865 9.4715H6.87024L6.05724 12.3983H2.1548L1.66699 14.1056H5.65073L4.51252 18.3333H6.30114L7.43935 14.1056H10.5288L9.39057 18.3333H11.1792L12.3174 14.1056H16.3011L16.7889 12.3983H12.8052L13.6182 9.4715H17.4393ZM10.9353 12.3983H7.84585L8.65886 9.4715H11.7483L10.9353 12.3983Z"
@@ -2295,20 +2231,14 @@ export function HashtagWarning(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const Hashtag: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', className = '' }) => {
 	return (
-		<svg
-			width="20"
-			height="20"
-			viewBox="0 0 20 20"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
-			<g className="transform translate-y-[4.5px] translate-x-[-0.7px]">
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`block ${defaultSize} ${className}`}>
+			<g className="translate-x-[1px] translate-y-[2px]">
 				<path
 					d="M3.56915 15.415L4.73001 11.0721H0.666992L1.13341 9.31012H5.20679L6.00489 6.28358H1.94187L2.41865 4.53192H6.48167L7.55961 0.5H9.38382L8.29552 4.53192H11.4568L12.5347 0.5H14.3589L13.2706 4.53192H17.3337L16.8672 6.28358H12.8042L11.9854 9.31012H16.0484L15.582 11.0721H11.519L10.3581 15.415H8.54427L9.69477 11.0721H6.54386L5.383 15.415H3.56915ZM7.02064 9.31012H10.1716L10.98 6.28358H7.8291L7.02064 9.31012Z"
 					fill="currentColor"
+					strokeWidth="1.2"
 				/>
 			</g>
 		</svg>
@@ -2325,7 +2255,7 @@ export const Location: React.FC<IconProps> = ({ defaultFill }) => {
 			height="20"
 			fill="none"
 			viewBox="0 0 24 24"
-			className={`w-5 h-5 dark:text-[#AEAEAE] text-colorTextLightMode ${defaultFill}`}
+			className={`w-5 h-5  ${defaultFill}`}
 		>
 			<path
 				fill="currentColor"
@@ -2351,7 +2281,7 @@ export const Reply: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			onClick={handleClick}
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={` ${defaultSize}`}
 		>
 			<path
 				fillRule="evenodd"
@@ -2371,7 +2301,7 @@ export const CircleClose: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defa
 			viewBox="0 0 24 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className="dark:hover:text-white hover:text-black dark:text-[#AEAEAE] text-colorTextLightMode"
+			className="dark:hover:text-white hover:text-black "
 		>
 			<g clipPath="url(#clip0_403_4302)">
 				<path
@@ -2418,7 +2348,7 @@ export const ViewRole: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 
 	return (
 		<svg
-			className={isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}
+			className={isWhite ? 'dark:text-white text-black' : 'text-theme-primary'}
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
 			onClick={handleClick}
@@ -2462,11 +2392,11 @@ export const SyncIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const LockIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const LockIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" className={`${defaultSize}`}>
 			<path
-				fill={defaultFill}
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M6 9h1V6a5 5 0 0 1 10 0v3h1a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3Zm9-3v3H9V6a3 3 0 1 1 6 0Zm-1 8a2 2 0 0 1-1 1.73V18a1 1 0 1 1-2 0v-2.27A2 2 0 1 1 14 14Z"
 			></path>
@@ -2616,16 +2546,7 @@ export const AddMemberCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', de
 
 export function TrashIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			fill="none"
-			viewBox="0 0 24 24"
-			className="dark:text-[#AEAEAE] text-colorTextLightMode"
-			{...props}
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className="" {...props}>
 			<path
 				fill="currentColor"
 				d="M14.25 1c.41 0 .75.34.75.75V3h5.25c.41 0 .75.34.75.75v.5c0 .41-.34.75-.75.75H3.75A.75.75 0 0 1 3 4.25v-.5c0-.41.34-.75.75-.75H9V1.75c0-.41.34-.75.75-.75h4.5Z"
@@ -2656,15 +2577,7 @@ export const Locked: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSi
 
 export const Download: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			aria-hidden="true"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			fill="none"
-			viewBox="0 0 24 24"
-			className="dark:text-[#AEAEAE] text-colorTextLightMode"
-		>
+		<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" className="">
 			<path
 				fill="currentColor"
 				d="M12 2a1 1 0 0 1 1 1v10.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V3a1 1 0 0 1 1-1ZM3 20a1 1 0 1 0 0 2h18a1 1 0 1 0 0-2H3Z"
@@ -2716,13 +2629,13 @@ export const BackToCategoriesGif: React.FC<IconProps> = ({ defaultFill = '#AEAEA
 	);
 };
 
-export const SmilingFace: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const SmilingFace: React.FC<IconProps> = ({ defaultFill = 'currentColor', defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="18" height="18" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<g clipPath="url(#clip0_2372_24105)">
 				<path
 					d="M12.5 2C7.00797 2 2.5 6.50742 2.5 12C2.5 17.4926 7.00797 22 12.5 22C17.992 22 22.5 17.4926 22.5 12C22.5 6.50742 17.992 2 12.5 2ZM8.98438 6.72656C9.95367 6.72656 10.7422 7.51508 10.7422 8.48438C10.7422 8.80824 10.4801 9.07031 10.1562 9.07031C9.83238 9.07031 9.57031 8.80824 9.57031 8.48438C9.57031 8.16109 9.30711 7.89844 8.98438 7.89844C8.66164 7.89844 8.39844 8.16109 8.39844 8.48438C8.39844 8.80824 8.13637 9.07031 7.8125 9.07031C7.48863 9.07031 7.22656 8.80824 7.22656 8.48438C7.22656 7.51508 8.01508 6.72656 8.98438 6.72656ZM12.5 17.2734C9.59207 17.2734 7.22656 14.9079 7.22656 12C7.22656 11.6761 7.48863 11.4141 7.8125 11.4141C8.13637 11.4141 8.39844 11.6761 8.39844 12C8.39844 14.2614 10.2386 16.1016 12.5 16.1016C14.7614 16.1016 16.6016 14.2614 16.6016 12C16.6016 11.6761 16.8636 11.4141 17.1875 11.4141C17.5114 11.4141 17.7734 11.6761 17.7734 12C17.7734 14.9079 15.4079 17.2734 12.5 17.2734ZM17.1875 9.07031C16.8636 9.07031 16.6016 8.80824 16.6016 8.48438C16.6016 8.16109 16.3384 7.89844 16.0156 7.89844C15.6929 7.89844 15.4297 8.16109 15.4297 8.48438C15.4297 8.80824 15.1676 9.07031 14.8438 9.07031C14.5199 9.07031 14.2578 8.80824 14.2578 8.48438C14.2578 7.51508 15.0463 6.72656 16.0156 6.72656C16.9849 6.72656 17.7734 7.51508 17.7734 8.48438C17.7734 8.80824 17.5114 9.07031 17.1875 9.07031Z"
-					fill="#B5BAC1"
+					stroke={defaultFill}
 				/>
 			</g>
 			<defs>
@@ -2808,7 +2721,7 @@ export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
 			height="18"
 			fill="none"
 			viewBox="0 0 24 24"
-			className="dark:text-[#AEAEAE] text-colorTextLightMode group-hover:text-white"
+			className=" group-hover:text-white"
 		>
 			<path
 				fill="currentColor"
@@ -2898,7 +2811,7 @@ export function ArrowDownFill(props: React.HTMLAttributes<SVGElement>) {
 			width="16"
 			height="16"
 			fill="currentColor"
-			className="bi bi-caret-down-fill"
+			className="bi bi-caret-down-fill text-theme-primary"
 			viewBox="0 0 16 16"
 			{...props}
 		>
@@ -2911,7 +2824,7 @@ export function FiltersIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
-				fill="#B5BAC1"
+				fill="currentColor"
 				d="M22 5a1 1 0 0 1-1 1h-8.2a2.5 2.5 0 1 1 0-2H21a1 1 0 0 1 1 1ZM6 5c0 .34.04.67.11 1H3a1 1 0 0 1 0-2h3.11A4.5 4.5 0 0 0 6 5ZM22 19a1 1 0 0 1-1 1h-8.2a2.5 2.5 0 1 1 0-2H21a1 1 0 0 1 1 1ZM6 19c0 .34.04.67.11 1H3a1 1 0 1 1 0-2h3.11A4.5 4.5 0 0 0 6 19ZM21 13a1 1 0 1 0 0-2h-3.2a2.5 2.5 0 1 0 0 2H21ZM11.11 13a4.5 4.5 0 0 1 0-2H3a1 1 0 1 0 0 2h8.11Z"
 			></path>
 		</svg>
@@ -2922,12 +2835,12 @@ export function ImageUploadIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
-				fill="#B5BAC1"
+				fill="currentColor"
 				fillRule="evenodd"
 				d="M2 5a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v8.67c0 .12-.34.17-.39.06A2.87 2.87 0 0 0 19 12a3 3 0 0 0-2.7 1.7c-.1.18-.36.22-.48.06l-.47-.63a2 2 0 0 0-3.2 0L9.93 16.1l-.5-.64a1.5 1.5 0 0 0-2.35 0l-1.86 2.32A.75.75 0 0 0 5.81 19h5.69c.28 0 .5.23.54.5.17.95.81 1.68 1.69 2.11.11.06.06.39-.06.39H5a3 3 0 0 1-3-3V5Zm8.2.98c.23-.91-.88-1.55-1.55-.9a.93.93 0 0 1-1.3 0c-.67-.65-1.78-.01-1.55.9a.93.93 0 0 1-.65 1.12c-.9.26-.9 1.54 0 1.8.48.14.77.63.65 1.12-.23.91.88 1.55 1.55.9a.93.93 0 0 1 1.3 0c.67.65 1.78.01 1.55-.9a.93.93 0 0 1 .65-1.12c.9-.26.9-1.54 0-1.8a.93.93 0 0 1-.65-1.12Z"
 				clipRule="evenodd"
 			></path>
-			<path fill="#B5BAC1" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z"></path>
+			<path fill="currentColor" d="M19 14a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 1 1 0-2h3v-3a1 1 0 0 1 1-1Z"></path>
 		</svg>
 	);
 }
@@ -2966,7 +2879,7 @@ export function AvatarUser(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function IconEvents({ defaultSize = 'w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode' }) {
+export function IconEvents({ defaultSize = 'w-5 h-5 ' }) {
 	return (
 		<svg
 			aria-hidden="true"
@@ -3064,7 +2977,7 @@ export function IconClockChannel() {
 	);
 }
 
-export function IconPhoneDM({ ...props }) {
+export function IconPhoneDM({ defaultSize = 'w-5 h-5 ' }) {
 	return (
 		<svg
 			x="0"
@@ -3076,7 +2989,7 @@ export function IconPhoneDM({ ...props }) {
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
-			{...props}
+			className={defaultSize}
 		>
 			<path
 				fill="currentColor"
@@ -3087,7 +3000,7 @@ export function IconPhoneDM({ ...props }) {
 	);
 }
 
-export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props }) {
+export function IconMeetDM({ isShowMeetDM = false, defaultSize = 'w-5 h-5', isShowLine = false, ...props }) {
 	return (
 		<svg
 			x="0"
@@ -3099,6 +3012,7 @@ export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props 
 			height="24"
 			fill="none"
 			viewBox="0 0 24 24"
+			className={defaultSize}
 			{...props}
 		>
 			<path
@@ -3134,10 +3048,10 @@ export function IconMeetDM({ isShowMeetDM = false, isShowLine = false, ...props 
 	);
 }
 
-export function IconAddFriendDM({ isWhite }: { isWhite?: boolean }) {
+export function IconAddFriendDM({ defaultSize = 'w-5 h-5' }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={defaultSize}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -3157,10 +3071,10 @@ export function IconAddFriendDM({ isWhite }: { isWhite?: boolean }) {
 	);
 }
 
-export function IconUserProfileDM({ isWhite }: { isWhite?: boolean }) {
+export function IconUserProfileDM({ defaultSize = 'w-5 h-5 ' }) {
 	return (
 		<svg
-			className={`dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={defaultSize}
 			x="0"
 			y="0"
 			aria-hidden="true"
@@ -3184,7 +3098,7 @@ export function IconUserProfileDM({ isWhite }: { isWhite?: boolean }) {
 
 export function IconReplyMessDeleted() {
 	return (
-		<svg width="8" height="8" viewBox="0 0 8 8" className="dark:text-zinc-400 text-colorTextLightMode ml-[2px] mt-1">
+		<svg width="8" height="8" viewBox="0 0 8 8" className=" ml-[2px] mt-1">
 			<path
 				d="M0.809739 3.59646L5.12565 0.468433C5.17446 0.431163 5.23323 0.408043 5.2951 0.401763C5.35698 0.395482 5.41943 0.406298 5.4752 0.432954C5.53096 0.45961 5.57776 0.50101 5.61013 0.552343C5.64251 0.603676 5.65914 0.662833 5.6581 0.722939V2.3707C10.3624 2.3707 11.2539 5.52482 11.3991 7.21174C11.4028 7.27916 11.3848 7.34603 11.3474 7.40312C11.3101 7.46021 11.2554 7.50471 11.1908 7.53049C11.1262 7.55626 11.0549 7.56204 10.9868 7.54703C10.9187 7.53201 10.857 7.49695 10.8104 7.44666C8.72224 5.08977 5.6581 5.63359 5.6581 5.63359V7.28135C5.65831 7.34051 5.64141 7.39856 5.60931 7.44894C5.5772 7.49932 5.53117 7.54004 5.4764 7.5665C5.42163 7.59296 5.3603 7.60411 5.29932 7.59869C5.23834 7.59328 5.18014 7.57151 5.13128 7.53585L0.809739 4.40892C0.744492 4.3616 0.691538 4.30026 0.655067 4.22975C0.618596 4.15925 0.599609 4.08151 0.599609 4.00269C0.599609 3.92386 0.618596 3.84612 0.655067 3.77562C0.691538 3.70511 0.744492 3.64377 0.809739 3.59646Z"
 				fill="currentColor"
@@ -3257,12 +3171,12 @@ export function WebhooksIcon(props: React.HTMLAttributes<SVGElement>) {
 			<path
 				fill="currentColor"
 				d="m7.7 16.95 3.68-6.76a1 1 0 0 0-.5-1.4A3 3 0 1 1 15 6a1 1 0 1 0 2 0 5 5 0 1 0-7.85 4.1L5.95 16a2 2 0 1 0 1.78 3h8.54a2 2 0 1 0 0-2H7.73l-.02-.05Z"
-				className=""
+				className="text-theme-primary"
 			></path>
 			<path
 				fill="currentColor"
 				d="M13.8 6.86A2 2 0 1 0 12.16 8l4.53 6.58a1 1 0 0 0 .82.43h.5a3 3 0 1 1-1.98 5.25 1 1 0 0 0-.66-.25h-.01a1 1 0 0 0-.66 1.75A4.98 4.98 0 0 0 23 18a5 5 0 0 0-4.97-5L13.8 6.86ZM5.97 13.88a1 1 0 0 1-.72 1.21 3 3 0 1 0 2.73 5.16 1 1 0 1 1 1.33 1.5A4.98 4.98 0 0 1 1 18a5 5 0 0 1 3.75-4.84 1 1 0 0 1 1.22.72Z"
-				className=""
+				className="text-theme-primary"
 			></path>
 		</svg>
 	);
@@ -3524,7 +3438,7 @@ export function SelectFileIcon(props: React.HTMLAttributes<SVGElement>) {
 				<path d="m0 0h18v18h-18z" />
 				<path
 					d="m13.5 8.25v4.5c0 .8284271-.6715729 1.5-1.5 1.5h-10.5c-.82842712 0-1.5-.6715729-1.5-1.5v-10.5c0-.82842712.67157288-1.5 1.5-1.5h7.5-3v1.5h-4.5v10.5h10.5v-4.5zm-5.28-.5325 2.655 3.5325h-8.25l2.0625-2.6475 1.47 1.77zm3.78-5.4675h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25v-2.25h1.5z"
-					fill="#4f545c"
+					fill="currentColor"
 					transform="translate(2.25 1.5)"
 				/>
 			</g>
@@ -4491,7 +4405,7 @@ export function MacIcon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const DollarIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
+export const DollarIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill }) => {
 	return (
 		<svg
 			height="800px"
@@ -4503,7 +4417,7 @@ export const DollarIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-
 			viewBox="0 0 64 64"
 			enableBackground="new 0 0 64 64"
 			xmlSpace="preserve"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
+			className={` ${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<g id="US-coin">
 				<path
@@ -4545,7 +4459,7 @@ export function Stream({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 24 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : 'dark:text-channelTextLabel text-colorTextLightMode'}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
 		>
 			<path
 				fillRule="evenodd"
@@ -4643,28 +4557,26 @@ export function MarkAllAsRead(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function HatIcon({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function HatIcon({ defaultFill = 'fill-current text-theme-primary', defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
 		<svg
 			version="1.1"
 			id="_x32_"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			className={`${defaultSize}`}
+			className={`${defaultSize} ${defaultFill}`}
 			viewBox="0 0 512 512"
 			xmlSpace="preserve"
+			fill="currentColor"
 		>
-			<g>
-				<path
-					className="st0"
-					d="M511.883,298.395c-2.781-27.281-54.391-46.141-129.406-51.844c-7.172-42.047-15.469-90.563-17.891-103.75
-		c-5.563-30.203-45.344-47.094-74.891-25.313c-15.5,11.422-29.359,12.234-36.703,12.234s-15.5,1.625-36.703-12.234
-		c-30.719-20.094-69.328-4.891-74.875,25.313c-2.969,16.109-14.688,84.844-22.391,130.203
-		C45.211,293.817-2.711,323.114,0.117,350.723c4.25,41.625,122.266,63.671,263.578,49.218
-		C405.039,385.488,516.148,340.036,511.883,298.395z M132.289,308.348l8.156-42.406c0,0,145.188,22.828,226.75-19.578l8.156,35.891
-		C375.352,282.254,287.258,337.708,132.289,308.348z"
-				/>
-			</g>
+			<path
+				d="M511.883,298.395c-2.781-27.281-54.391-46.141-129.406-51.844c-7.172-42.047-15.469-90.563-17.891-103.75
+				c-5.563-30.203-45.344-47.094-74.891-25.313c-15.5,11.422-29.359,12.234-36.703,12.234s-15.5,1.625-36.703-12.234
+				c-30.719-20.094-69.328-4.891-74.875,25.313c-2.969,16.109-14.688,84.844-22.391,130.203
+				C45.211,293.817-2.711,323.114,0.117,350.723c4.25,41.625,122.266,63.671,263.578,49.218
+				C405.039,385.488,516.148,340.036,511.883,298.395z M132.289,308.348l8.156-42.406c0,0,145.188,22.828,226.75-19.578l8.156,35.891
+				C375.352,282.254,287.258,337.708,132.289,308.348z"
+			/>
 		</svg>
 	);
 }
@@ -4732,7 +4644,7 @@ export function AppChannelIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg
 			className="icon icon-tabler icon-tabler-apps"
-			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
 			width="24"
@@ -4753,7 +4665,7 @@ export function PrivateAppChannelIcon({ fill, ...props }: ClassIconProps) {
 	return (
 		<svg
 			className="icon icon-tabler icon-tabler-apps"
-			fill={fill === 'dark' ? '#AEAEAE' : '#535353'}
+			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
 			width="24"
@@ -6016,14 +5928,7 @@ export function Microsoft(props: React.HTMLAttributes<SVGElement>) {
 
 export const LoLGame: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="30"
-			height="32"
-			viewBox="0 0 30 32"
-			fill="none"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" width="30" height="32" viewBox="0 0 30 32" fill="none" className={` block  ${defaultSize}`}>
 			<g>
 				<path
 					d="M1.80644 9.75049C0.655032 11.8373 0 14.2271 0 16.7683C0 19.3095 0.655032 21.7015 1.80644 23.7883V9.75049Z"
@@ -6050,7 +5955,7 @@ export const Spotify: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 			enableBackground="new 0 0 40 40"
 			viewBox="0 0 40 40"
 			id="spotify"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
+			className={` block  ${defaultSize}`}
 		>
 			<switch>
 				<g>
@@ -6066,12 +5971,7 @@ export const Spotify: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 
 export const VisualStudioCode: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			id="visual-studio-code"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="visual-studio-code" className={` block  ${defaultSize}`}>
 			<path
 				fill="#1677C7"
 				d="m2.419 13.939 3.434-2.589L12 17l3-1.456V4.456L12 3 5.853 8.65 2.418 6.062 1 6.889 4.385 10 1 13.111l1.419.828zM12 6.717v6.566L7.644 10 12 6.717z"
@@ -6126,7 +6026,7 @@ export function WindowZoom(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
-export const GuideIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const GuideIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -6135,7 +6035,7 @@ export const GuideIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaul
 			strokeMiterlimit="2"
 			clipRule="evenodd"
 			viewBox="0 0 32 32"
-			fill={defaultFill}
+			fill="currentColor"
 			id="direction-board"
 			className={`${defaultSize}`}
 		>
@@ -6182,7 +6082,7 @@ export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', 
 			height="20"
 			fill="none"
 			viewBox="0 0 24 24"
-			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`} ${defaultSize}`}
+			className={`${defaultFill ? defaultFill : `dark:hover:text-white hover:text-black ${isWhite ? 'dark:text-white text-black' : 'text-theme-primary'}`} ${defaultSize}`}
 		>
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
@@ -6579,13 +6479,7 @@ export function InfoIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export const OutGoingCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			id="call"
-			fill="none"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="call" fill="none" className={` block  ${defaultSize}`}>
 			<path
 				d="M19.44,13c-.22,0-.45-.07-.67-.12a9.44,9.44,0,0,1-1.31-.39,2,2,0,0,0-2.48,1l-.22.45a12.18,12.18,0,0,1-2.66-2,12.18,12.18,0,0,1-2-2.66L10.52,9a2,2,0,0,0,1-2.48,10.33,10.33,0,0,1-.39-1.31c-.05-.22-.09-.45-.12-.68a3,3,0,0,0-3-2.49h-3a3,3,0,0,0-3,3.41A19,19,0,0,0,18.53,21.91l.38,0a3,3,0,0,0,2-.76,3,3,0,0,0,1-2.25v-3A3,3,0,0,0,19.44,13Zm.5,6a1,1,0,0,1-.34.75,1.06,1.06,0,0,1-.82.25A17,17,0,0,1,4.07,5.22a1.09,1.09,0,0,1,.25-.82,1,1,0,0,1,.75-.34h3a1,1,0,0,1,1,.79q.06.41.15.81a11.12,11.12,0,0,0,.46,1.55l-1.4.65a1,1,0,0,0-.49,1.33,14.49,14.49,0,0,0,7,7,1,1,0,0,0,.76,0,1,1,0,0,0,.57-.52l.62-1.4a13.69,13.69,0,0,0,1.58.46q.4.09.81.15a1,1,0,0,1,.79,1ZM21.86,2.68a1,1,0,0,0-.54-.54,1,1,0,0,0-.38-.08h-4a1,1,0,1,0,0,2h1.58l-3.29,3.3a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l3.3-3.29V7.06a1,1,0,0,0,2,0v-4A1,1,0,0,0,21.86,2.68Z"
 				fill="currentColor"
@@ -6596,13 +6490,7 @@ export const OutGoingCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', def
 
 export const IncomingCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			id="call"
-			fill="none"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="call" fill="none" className={` block  ${defaultSize}`}>
 			<path
 				d="M15.55,9a1.07,1.07,0,0,0,.39.07h4a1,1,0,0,0,0-2H18.35l3.29-3.29a1,1,0,1,0-1.41-1.41L16.94,5.65V4.06a1,1,0,1,0-2,0v4a1.07,1.07,0,0,0,.07.39A1,1,0,0,0,15.55,9Zm3.89,4c-.22,0-.45-.07-.67-.12a9.44,9.44,0,0,1-1.31-.39,2,2,0,0,0-2.48,1l-.22.45a12.18,12.18,0,0,1-2.66-2,12.18,12.18,0,0,1-2-2.66L10.52,9a2,2,0,0,0,1-2.48,10.33,10.33,0,0,1-.39-1.31c-.05-.22-.09-.45-.12-.68a3,3,0,0,0-3-2.49h-3a3,3,0,0,0-3,3.41A19,19,0,0,0,18.53,21.91l.38,0a3,3,0,0,0,2-.76,3,3,0,0,0,1-2.25v-3A3,3,0,0,0,19.44,13Zm.5,6a1,1,0,0,1-.34.75,1.06,1.06,0,0,1-.82.25A17,17,0,0,1,4.07,5.22a1.09,1.09,0,0,1,.25-.82,1,1,0,0,1,.75-.34h3a1,1,0,0,1,1,.79q.06.41.15.81a11.12,11.12,0,0,0,.46,1.55l-1.4.65a1,1,0,0,0-.49,1.33,14.49,14.49,0,0,0,7,7,1,1,0,0,0,.76,0,1,1,0,0,0,.57-.52l.62-1.4a13.69,13.69,0,0,0,1.58.46q.4.09.81.15a1,1,0,0,1,.79,1Z"
 				fill="currentColor"
@@ -6613,12 +6501,7 @@ export const IncomingCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', def
 
 export const MissedCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			id="call"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="call" className={` block  ${defaultSize}`}>
 			<path
 				d="M6,7.49a1,1,0,0,0,1-1V5.9L9.88,8.78a3,3,0,0,0,4.24,0l4.59-4.59a1,1,0,0,0,0-1.41,1,1,0,0,0-1.42,0L12.71,7.36a1,1,0,0,1-1.42,0L8.41,4.49H9a1,1,0,0,0,0-2H6a1,1,0,0,0-.92.61A1.09,1.09,0,0,0,5,3.49v3A1,1,0,0,0,6,7.49Zm15.94,7.36a16.27,16.27,0,0,0-19.88,0,2.69,2.69,0,0,0-1,2,2.66,2.66,0,0,0,.78,2.07L3.6,20.72A2.68,2.68,0,0,0,7.06,21l.47-.32a8.13,8.13,0,0,1,1-.55,1.85,1.85,0,0,0,1-2.3l-.09-.24a10.49,10.49,0,0,1,5.22,0l-.09.24a1.85,1.85,0,0,0,1,2.3,8.13,8.13,0,0,1,1,.55l.47.32a2.58,2.58,0,0,0,1.54.5,2.72,2.72,0,0,0,1.92-.79l1.81-1.82A2.66,2.66,0,0,0,23,16.83,2.69,2.69,0,0,0,21.94,14.85ZM20.8,17.49,19,19.3a.68.68,0,0,1-.86.1c-.19-.14-.38-.27-.59-.4a11.65,11.65,0,0,0-1.09-.61l.4-1.09a1,1,0,0,0-.6-1.28,12.42,12.42,0,0,0-8.5,0,1,1,0,0,0-.6,1.28l.4,1.1a9.8,9.8,0,0,0-1.1.6l-.58.4A.66.66,0,0,1,5,19.3L3.2,17.49A.67.67,0,0,1,3,17a.76.76,0,0,1,.28-.53,14.29,14.29,0,0,1,17.44,0A.76.76,0,0,1,21,17,.67.67,0,0,1,20.8,17.49Z"
 				fill="currentColor"
@@ -6629,13 +6512,7 @@ export const MissedCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defau
 
 export const CancelCall: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			id="call-cancel"
-			fill="none"
-			className={` block dark:text-[#AEAEAE] text-colorTextLightMode ${defaultSize}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="call-cancel" fill="none" className={` block  ${defaultSize}`}>
 			<path
 				d="M19.85,5.56l1.79-1.79a1,1,0,1,0-1.41-1.41L18.44,4.15l-1.8-1.79a1,1,0,0,0-1.41,1.41L17,5.56l-1.79,1.8a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0L18.44,7l1.79,1.79a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM19.44,13c-.22,0-.45-.07-.67-.12a9.44,9.44,0,0,1-1.31-.39,2,2,0,0,0-2.48,1l-.22.45a12.18,12.18,0,0,1-2.66-2,12.18,12.18,0,0,1-2-2.66L10.52,9a2,2,0,0,0,1-2.48,10.33,10.33,0,0,1-.39-1.31c-.05-.22-.09-.45-.12-.68a3,3,0,0,0-3-2.49h-3a3,3,0,0,0-3,3.41A19,19,0,0,0,18.53,21.91l.38,0a3,3,0,0,0,2-.76,3,3,0,0,0,1-2.25v-3A3,3,0,0,0,19.44,13Zm.5,6a1,1,0,0,1-.34.75,1.06,1.06,0,0,1-.82.25A17,17,0,0,1,4.07,5.22a1.09,1.09,0,0,1,.25-.82,1,1,0,0,1,.75-.34h3a1,1,0,0,1,1,.79q.06.41.15.81a11.12,11.12,0,0,0,.46,1.55l-1.4.65a1,1,0,0,0-.49,1.33,14.49,14.49,0,0,0,7,7,1,1,0,0,0,.76,0,1,1,0,0,0,.57-.52l.62-1.4a13.69,13.69,0,0,0,1.58.46q.4.09.81.15a1,1,0,0,1,.79,1Z"
 				fill="currentColor"
@@ -6758,14 +6635,7 @@ export function CalendarIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export const FileIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="100"
-			height="100"
-			viewBox="0 0 100 100"
-			id="attachment"
-			className={`hover:text-black dark:hover:text-white ${defaultSize} ${isWhite ? 'dark:text-white text-black' : 'dark:text-[#B5BAC1] text-colorTextLightMode'}`}
-		>
+		<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" id="attachment" className={`${defaultSize} }`}>
 			<g id="_x37_7_Essential_Icons">
 				<path
 					id="Attachment"

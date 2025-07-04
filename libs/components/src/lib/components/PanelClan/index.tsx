@@ -116,7 +116,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 			tabIndex={-1}
 			role={'button'}
 			style={{ left: coords.mouseX, bottom: positionTop ? '12px' : 'auto', top: positionTop ? 'auto' : coords.mouseY }}
-			className="outline-none fixed top-full dark:bg-bgProfileBody bg-white rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md"
+			className="outline-none fixed top-full  rounded-sm z-20 w-[200px] py-[10px] px-[10px] shadow-md bg-theme-contexify"
 		>
 			{userProfile ? (
 				<GroupPanels>
@@ -143,7 +143,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 							)}
 							label=""
 							placement="right-start"
-							className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
+								className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
 						>
 							{notificationTypesList.map((notification) => (
 								<ItemPanel

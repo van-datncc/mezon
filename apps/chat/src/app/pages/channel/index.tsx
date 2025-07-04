@@ -169,7 +169,7 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 		return (
 			<div
 				style={{ height: 44 }}
-				className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+				className="opacity-80 bg-theme-input text-theme-primary ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission rounded one-line"
 			>
 				You do not have permission to send messages in this channel.
 			</div>
@@ -199,19 +199,19 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	};
 
 	return (
-		<div className={`flex-shrink flex flex-col dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
+		<div className={`flex-shrink flex flex-col bg-theme-chat h-auto relative ${isShowMemberList ? 'w-full' : 'w-full'}`}>
 			{showPreviewMode && <OnboardingGuide currentMission={currentMission} missionSum={missionSum} missionDone={missionDone} />}
 			{currentChannel && <ChannelMessageBox clanId={currentChannel?.clan_id} channel={currentChannel} mode={mode} />}
 			{isAppChannel && (
-				<div className="flex gap-2 px-3 pt-2 dark:text-channelTextLabel text-colorTextLightMode">
+				<div className="flex gap-2 px-3 pt-2 text-theme-primary">
 					<div
 						onClick={handleLaunchApp}
-						className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black"
+						className="w-[calc(50%_-_4px)] border-theme-primary flex gap-1 items-center justify-center bg-item-theme py-2 px-2 rounded-md cursor-pointer font-medium text-theme-primary-hover"
 					>
 						<Icons.Joystick className="w-6" />
 						<div>{appButtonLabel}</div>
 					</div>
-					<div className="w-[calc(50%_-_4px)] flex gap-1 items-center justify-center dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton py-2 px-2 rounded-md cursor-pointer font-medium dark:hover:text-white hover:text-black">
+					<div className="w-[calc(50%_-_4px)] border-theme-primary flex gap-1 items-center justify-center bg-item-theme py-2 px-2 rounded-md cursor-pointer font-medium text-theme-primary-hover">
 						<Icons.AppHelpIcon className="w-6" />
 						<div>Help</div>
 					</div>
@@ -357,7 +357,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
-							className={` dark:bg-bgSecondary bg-bgLightSecondary text-[#84ADFF] relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							className={`bg-active-friend-list text-theme-primary relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>
 							<MemberList />
@@ -474,16 +474,16 @@ const OnboardingGuide = ({
 		<>
 			{missionDone < missionSum && currentMission ? (
 				<div
-					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bu dark:bg-bgTertiary bg-bgLightTertiary top-2 flex pt-2 px-4 pb-4 items-center gap-3"
+					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bu bg-theme-contexify top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
-					<Icons.Hashtag />
+					<Icons.Hashtag className="text-theme-primary" />
 					<div className=" flex flex-col">
-						<div className="text-base font-semibold dark:text-white text-black">{currentMission.title} </div>
-						<div className="text-[10px] font-normal text-gray-600 dark:text-gray-300">
+						<div className="text-base font-semibold text-theme-primary">{currentMission.title} </div>
+						<div className="text-[10px] font-normal text-theme-primary">
 							{' '}
 							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
-							<strong className="dark:text-white text-gray-800">#{channelMission.channel_label}</strong>{' '}
+							<strong className="text-theme-primary">#{channelMission.channel_label}</strong>{' '}
 						</div>
 					</div>
 				</div>

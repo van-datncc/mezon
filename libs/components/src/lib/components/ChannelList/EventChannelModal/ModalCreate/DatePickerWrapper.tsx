@@ -29,7 +29,7 @@ const DatePickerWrapper = (props: DatePickerWrapperProps) => {
 	}, []);
 
 	if (isLoading || !DatePickerComponent) {
-		return <div className="w-full h-[38px] bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>;
+		return <div className="w-full h-[38px]  animate-pulse rounded"></div>;
 	}
 
 	return <DatePickerComponent {...props} />;

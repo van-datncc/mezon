@@ -271,11 +271,7 @@ export function MyVideoConference({
 											onClick={handleShowInbox}
 											onContextMenu={(e) => e.preventDefault()}
 										>
-											<Icons.Inbox
-												isWhite={isShowInbox}
-												defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}
-												className={`${isShowMember ? 'hover:text-black dark:hover:text-white' : 'hover:text-gray-200'}`}
-											/>
+											<Icons.Inbox defaultSize="size-5" />
 											{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 										</button>
 										{isShowInbox && <NotificationList rootRef={inboxRef} />}

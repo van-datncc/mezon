@@ -122,8 +122,8 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 	return (
 		<Modal showModal={open} onClose={handleClose} confirmButton={handleCreateClan} classNameBox="h-full">
 			<div className="flex items-center flex-col justify-center ">
-				<span className="dark:text-contentPrimary text-black text-[24px] pb-4 font-[700] leading-8">Customize Your Clan</span>
-				<p className="dark:text-contentTertiary text-black  text-center text-[20px] leading-6 font-[400]">
+				<span className=" text-[24px] pb-4 font-[700] leading-8">Customize Your Clan</span>
+				<p className="  text-center text-[20px] leading-6 font-[400]">
 					Give your new clan a personality with a name and an icon. You can always change it later.
 				</p>
 				<label className="block mt-8 mb-4">
@@ -132,28 +132,28 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 					) : (
 						<div
 							id="preview_img"
-							className="h-[81px] w-[81px] flex justify-center items-center flex-col dark:bg-bgSecondary bg-bgModifierHoverLight border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
+							className="h-[81px] w-[81px] flex justify-center items-center flex-col  border-white relative border-[1px] border-dashed rounded-full cursor-pointer transform hover:scale-105 transition duration-300 ease-in-out"
 						>
 							<div className="absolute right-0 top-[-3px] left-[54px]">
 								<Icons.AddIcon />
 							</div>
-							<Icons.UploadImage className="text-black dark:text-white" />
+							<Icons.UploadImage className="" />
 							<span className="text-[14px]">Upload</span>
 						</div>
 					)}
-					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
+					<input id="preview_img" type="file" onChange={(e) => handleFile(e)} className="w-full text-sm hidden" />
 				</label>
 				<div className="w-full">
 					<span className="font-[700] text-[16px] leading-6">CLAN NAME</span>
 					<InputField
 						onChange={handleInputChange}
 						type="text"
-						className="dark:bg-bgSurface bg-bgModifierHoverLight mb-2 mt-4 py-2"
+						className="mb-2 mt-4 py-2"
 						placeholder={`Enter the clan name`}
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>
 					{checkvalidate !== EValidateListMessage.VALIDATED && <p className="text-[#e44141] text-xs italic font-thin">{checkvalidate}</p>}
-					<span className="text-[14px] text-contentTertiary">
+					<span className="text-[14px] ">
 						By creating a clan, you agree to Mezon's <span className="text-contentBrandLight">Community Guidelines</span>.
 					</span>
 				</div>

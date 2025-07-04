@@ -16,7 +16,7 @@ export function StartCallButton({ loading, isJoinVoice, onClick }: IStartCallBut
 				onContextMenu={(e) => e.preventDefault()}
 			>
 				{isJoinVoice ? (
-					<Icons.StartCall className="size-6 dark:hover:text-white hover:text-black dark:text-[#B5BAC1] text-colorTextLightMode" />
+					<Icons.StartCall className="size-6 dark:hover:text-white hover:text-black text-theme-primary" />
 				) : (
 					<Icons.StopCall className="size-6 text-red-600" />
 				)}

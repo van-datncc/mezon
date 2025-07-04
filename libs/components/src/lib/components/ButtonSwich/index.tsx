@@ -41,7 +41,7 @@ export const ButtonSwitch: React.FC<ButtonSwitchProps> = ({ title, duration = 10
 	return (
 		<button
 			onMouseLeave={handleSetDefault}
-			className={`flex items-center p-1 rounded-sm bg-bgSecondary hover:bg-bgSecondaryHover ${className ?? ''} `}
+			className={`flex items-center p-1 rounded-sm bg-bgSecondary bg-item-theme-hover ${className ?? ''} `}
 			onClick={handleOnClickButton}
 			disabled={disabled}
 		>

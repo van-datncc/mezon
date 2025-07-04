@@ -11,13 +11,13 @@ type HeaderProps = {
 
 const Header: React.FC<HeaderProps> = ({ name, handleShowModalClan, isShowModalPanelClan, modalRef, children }) => {
 	return (
-		<div ref={modalRef} tabIndex={-1} className={`outline-none h-[50px] relative bg-gray-950`}>
+		<div ref={modalRef} tabIndex={-1} className={`outline-none h-[50px] relative border-b-theme-primary`}>
 			<div className={`relative h-[50px] top-0`} onClick={handleShowModalClan}>
 				<div
-					className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 dark:bg-bgSecondary bg-bgLightSecondary dark:hover:bg-[#35373C] hover:bg-[#E2E7F6] shadow border-b-[1px] dark:border-bgTertiary border-bgLightSecondary`}
+					className={`cursor-pointer w-full p-3 left-0 top-0 absolute flex h-heightHeader justify-between items-center gap-2 bg-item-hover`}
 				>
-					<p className="dark:text-white text-black text-base font-semibold select-none one-line">{name?.toLocaleUpperCase()}</p>
-					<button className="w-6 h-8 flex flex-col justify-center">
+					<p className="text-theme-primary text-base font-semibold select-none one-line">{name?.toLocaleUpperCase()}</p>
+					<button className="w-6 h-8 flex flex-col justify-center text-theme-primary text-theme-primary-hover">
 						<Icons.ArrowDown />
 					</button>
 				</div>

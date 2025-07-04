@@ -70,7 +70,9 @@ const Questions = ({ handleGoToPage }: IQuestionsProps) => {
 					<div
 						className={`flex items-center justify-between gap-2 bg-indigo-100 dark:bg-bgTertiary py-3 px-4 ${showChannelNotAssigned ? 'rounded-t-xl' : 'rounded-xl'}`}
 					>
-						<div className="text-[12px] font-semibold text-gray-700 dark:text-white">No public channels are missing from Questions and Default Channels.</div>
+						<div className="text-[12px] font-semibold text-gray-700 dark:text-white">
+							No public channels are missing from Questions and Default Channels.
+						</div>
 						<div className="flex items-center gap-3">
 							<div className="w-[120px] h-[6px] bg-gray-200 dark:bg-[#3b3d44] rounded-lg flex justify-start">
 								<div className="w-[70%] h-full rounded-lg bg-green-600" />
@@ -262,7 +264,7 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 						onChange={handleQuestionOnchange}
 					/>
 				) : (
-						<div className="text-gray-800 dark:text-white text-xl font-semibold truncate">{titleQuestion}</div>
+					<div className="text-gray-800 dark:text-white text-xl font-semibold truncate">{titleQuestion}</div>
 				)}
 			</div>
 			{isExpanded && (
@@ -292,11 +294,15 @@ const QuestionItem = ({ question, index, tempId }: { question: ApiOnboardingItem
 						<div className="flex gap-6">
 							<div className="flex items-center gap-2">
 								<input type="checkbox" name="multiple-answer" className="w-5 h-5 accent-indigo-500" />
-								<label htmlFor="multiple-answer" className="text-gray-700 dark:text-channelTextLabel">Allow multiple answers</label>
+								<label htmlFor="multiple-answer" className="text-gray-700 dark:text-channelTextLabel">
+									Allow multiple answers
+								</label>
 							</div>
 							<div className="flex items-center gap-2">
 								<input type="checkbox" name="required" className="w-5 h-5 accent-indigo-500" />
-								<label htmlFor="required" className="text-gray-700 dark:text-channelTextLabel">Required</label>
+								<label htmlFor="required" className="text-gray-700 dark:text-channelTextLabel">
+									Required
+								</label>
 							</div>
 						</div>
 						<div
@@ -348,8 +354,8 @@ const ModalAddAnswer = ({ closeAnswerPopup, index, setAnswer, titleQuestion, edi
 		<ModalControlRule bottomLeftBtn="Remove" bottomLeftBtnFunction={handleRemoveAnswer} onClose={closeAnswerPopup} onSave={handleSaveAnswer}>
 			<>
 				<div className="absolute top-5 flex flex-col gap-2 w-[400px] ">
-					<div className="uppercase text-xs font-medium text-gray-700 dark:text-channelTextLabel">Question {index + 1}</div>
-					<div className="text-xl text-gray-800 dark:text-white font-semibold truncate">{titleQuestion || 'What is your question'} ?</div>
+					<div className="uppercase text-xs font-medium ">Question {index + 1}</div>
+					<div className="text-xl  font-semibold truncate">{titleQuestion || 'What is your question'} ?</div>
 				</div>
 				<div className="pb-5 pt-10 flex flex-col gap-2">
 					<ControlInput

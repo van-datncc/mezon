@@ -78,7 +78,7 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 						/>
 					) : (
 						option?.clan_name && (
-							<div className="w-[40px] h-[40px] dark:bg-bgSecondary bg-bgLightMode rounded-lg flex justify-center items-center dark:text-contentSecondary text-textLightTheme text-[20px] clan">
+							<div className="w-[40px] h-[40px] bg-add-clan-hover theme-base-color rounded-xl flex justify-center items-center text-theme-primary text-theme-primary-hover hover:text-white text-[20px] clan">
 								{(option?.clan_name || '').charAt(0).toUpperCase()}
 							</div>
 						)
@@ -88,7 +88,7 @@ const SidebarClanItem = ({ option, active, onMouseDown, className = '' }: Sideba
 
 			{badgeCountClan > 0 && (
 				<div
-					className={`flex items-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-1px] right-[-2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${
+					className={`flex items-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-1px] right-[-2px] outline outline-[1px] outline-white  ${
 						badgeCountClan >= 10 ? 'w-[22px] h-[16px]' : 'w-[16px] h-[16px]'
 					}`}
 				>

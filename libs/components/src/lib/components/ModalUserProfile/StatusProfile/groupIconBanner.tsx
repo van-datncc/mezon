@@ -43,32 +43,32 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Friend',
-						icon: <Icons.IconFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IconFriend className="size-4" />
 					}
 				];
 			case EStateFriend.OTHER_PENDING:
 				return [
 					{
 						title: 'Pending',
-						icon: <Icons.PendingFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.PendingFriend className="size-4 text-theme-primary" />
 					}
 				];
 			case EStateFriend.MY_PENDING:
 				return [
 					{
 						title: 'Accept',
-						icon: <Icons.IConAcceptFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IConAcceptFriend className="size-4" />
 					},
 					{
 						title: 'Ignore',
-						icon: <Icons.IConIgnoreFriend className="iconWhiteImportant size-4" />
+						icon: <Icons.IConIgnoreFriend className="size-4" />
 					}
 				];
 			default:
 				return [
 					{
 						title: 'Add friend',
-						icon: <Icons.AddPerson className="iconWhiteImportant size-4" />
+						icon: <Icons.AddPerson className="size-4 text-theme-primary" />
 					}
 				];
 		}

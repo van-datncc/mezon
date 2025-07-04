@@ -89,32 +89,30 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 		<>
 			{!openEdit && (
 				<>
-					<p className="text-sm dark:text-zinc-400 text-colorTextLightMode mb-4">
-						Use roles to group your server members and assign permissions.
-					</p>
+					<p className="text-sm mb-4">Use roles to group your server members and assign permissions.</p>
 					<div
 						onClick={() => {
 							handleRoleClick(EVERYONE_ROLE_ID);
 							setOpenEdit(true);
 						}}
-						className="rounded dark:bg-bgSecondary bg-bgLightMode p-4 pr-6 flex justify-between cursor-pointer group mb-4 dark:hover:bg-bgSecondaryHover hover:bg-bgLightModeButton"
+						className="rounded-lg border-theme-primary bg-theme-input p-4 pr-6 flex justify-between cursor-pointer group mb-4 bg-item-hover text-theme-primary-hover"
 					>
 						<div className="flex gap-x-4 items-center">
-							<div className="dark:bg-bgPrimary bg-white p-1 rounded-full h-fit">
+							<div className=" p-1 rounded-full h-fit">
 								<Icons.MemberList defaultSize="w-5 h-5" />
 							</div>
-							<div className="dark:text-textThreadPrimary text-gray-500 dark:group-hover:text-white group-hover:text-black">
+							<div className="">
 								<h4 className="text-base font-semibold">Default permissions</h4>
 								<p className="text-xs">@everyone •&nbsp;applies to all server members</p>
 							</div>
 						</div>
-						<Icons.ArrowDown defaultSize="w-[20px] h-[30px] -rotate-90 dark:text-textThreadPrimary text-gray-500 dark:group-hover:text-white group-hover:text-black" />
+						<Icons.ArrowDown defaultSize="w-[20px] h-[30px] -rotate-90 " />
 					</div>
 					<div className="flex items-center space-x-4 ">
 						<div className="w-full flex-grow">
 							<InputField
 								type="text"
-								className="rounded w-full dark:text-white text-black border dark:border-bgTertiary px-2 py-1 focus:outline-none focus:border-white-500 dark:bg-bgTertiary bg-bgLightModeThird text-base"
+								className="rounded-lg w-full border-theme-primary  px-2 py-1 focus:outline-none bg-theme-contexify focus:border-white-500 bg-theme-input text-base"
 								placeholder="Search Roles"
 								onChange={(e) => setValueSearch(e.target.value)}
 							/>
@@ -125,36 +123,27 @@ const ServerSettingMainRoles = (props: ModalOpenEdit) => {
 							label="Create Role"
 						/>
 					</div>
-					<p className="dark:text-textThreadPrimary text-gray-500 text-sm mt-2">
+					<p className=" text-sm mt-2">
 						Members use the colour of the highest role they have on this list. Drag roles to reorder them.&nbsp;
 					</p>
 					<br />
-					<div className={`overflow-hidden w-full ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
-						<table className="w-full divide-y divide-gray-200 dark:divide-gray-500 mb-10">
+					<div className={`overflow-hidden w-full `}>
+						<table className="w-full divide-y  mb-10">
 							<thead>
 								<tr className="h-11">
-									<th
-										scope="col"
-										className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase tracking-wider w-1/2 text-left"
-									>
+									<th scope="col" className="text-xs font-bold uppercase tracking-wider w-1/2 text-left">
 										Roles - {numRoles - 1}
 									</th>
-									<th
-										scope="col"
-										className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase tracking-wider w-1/4 text-center"
-									>
+									<th scope="col" className="text-xs font-bold uppercase tracking-wider w-1/4 text-center">
 										Members
 									</th>
-									<th
-										scope="col"
-										className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase tracking-wider w-1/4 text-center"
-									></th>
+									<th scope="col" className="text-xs font-bold uppercase tracking-wider w-1/4 text-center"></th>
 								</tr>
 							</thead>
-							<tbody className="divide-y divide-gray-200 dark:divide-gray-500">
+							<tbody className="divide-y ">
 								{numRoles === 0 ? (
 									<tr className="h-14">
-										<td className="dark:text-gray-300 text-gray-600 text-[15px]">
+										<td className=" text-[15px]">
 											<p className="inline-flex gap-x-2 mt-1.5">
 												<Icons.RoleIcon defaultSize="w-5 h-5 min-w-5" />
 												No Roles

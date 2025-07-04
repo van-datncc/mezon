@@ -84,7 +84,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 		<div
 			ref={ref}
 			style={{ height: 42 }}
-			className={`flex items-center group/itemListDm relative cursor-pointer text-[#AEAEAE] hover:text-white h-fit pl-2 rounded-[6px] dark:hover:dark:bg-bgModifierHover hover:bg-[#E1E1E1] w-full dark:focus:bg-bgTertiary focus:bg-[#c7c7c7] ${isActive ? 'dark:bg-bgModifierHover bg-bgLightModeButton !dark:text-white' : ''}`}
+			className={`flex items-center group/itemListDm relative cursor-pointer bg-item-hover h-fit px-2 rounded-[6px] w-full ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
 			onClick={() => {
 				joinToChatAndNavigate(id, directMessage?.type as number);
 			}}

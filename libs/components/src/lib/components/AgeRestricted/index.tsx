@@ -85,7 +85,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 
 	return (
 		<div>
-			<div className="w-full h-full max-w-[100%] flex justify-center items-center text-textPrimaryLight dark:text-textPrimary">
+			<div className="w-full h-full max-w-[100%] flex justify-center items-center  ">
 				<div className="flex flex-col items-center">
 					<img src={'assets/images/warning.svg'} alt="warning" width={200} height={200} />
 
@@ -95,16 +95,10 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 					</div>
 
 					<div className="flex space-x-4">
-						<button
-							className="border-2 border-gray-600 rounded-lg px-6 py-2 bg-gray-600 dark:text-textPrimary"
-							onClick={handleCloseModal}
-						>
+						<button className="border-2 border-theme-primary rounded-lg px-6 py-2 y" onClick={handleCloseModal}>
 							Nope
 						</button>
-						<button
-							className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger dark:text-textPrimary"
-							onClick={handleSaveChannelId}
-						>
+						<button className="border-2 border-colorDanger rounded-lg px-6 py-2 bg-colorDanger " onClick={handleSaveChannelId}>
 							Continue
 						</button>
 					</div>

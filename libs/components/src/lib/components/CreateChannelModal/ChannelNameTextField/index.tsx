@@ -114,12 +114,12 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 			<ChannelLableModal labelProp={channelNameProps} />
 			<div className="ContentContainer self-stretch h-11 flex-col items-start flex">
 				<div
-					className={`InputContainer self-stretch h-11 px-4 py-3 dark:bg-neutral-950 bg-white rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
+					className={`InputContainer self-stretch h-11 px-4 py-3 bg-item-theme rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
 				>
 					{iconMap[type]}
 					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
 						<input
-							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
+							className="Input grow shrink basis-0 h-10 outline-none bg-transparent  text-sm font-normal "
 							onChange={handleInputChange}
 							placeholder={placeholder}
 							maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}

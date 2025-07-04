@@ -19,7 +19,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 
 	useEscapeKeyClose(modalRef, onClose);
 	return (
-		<div ref={modalRef} className="dark:text-white text-black">
+		<div ref={modalRef} className="">
 			<ItemEventManagement
 				topic={contentSubmit.topic}
 				voiceChannel={contentSubmit.voiceChannel || ''}
@@ -37,7 +37,7 @@ const ReviewModal = (props: ReviewModalProps) => {
 			/>
 			<div className="mt-8">
 				<h3 className="text-center font-semibold text-xl">Here's a preview of your event.</h3>
-				<p className="text-center dark:text-slate-400 text-colorTextLightMode">This event will auto-start when it's time.</p>
+				<p className="text-center ">This event will auto-start when it's time.</p>
 			</div>
 		</div>
 	);

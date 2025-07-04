@@ -184,7 +184,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 	return (
 		<div ref={modalRef} tabIndex={-1} className="fixed  inset-0 flex items-center justify-center z-50 text-white">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 dark:bg-bgDisable bg-bgLightMode dark:text-textDarkTheme text-textLightTheme p-6 rounded-[5px] w-[440px] text-[15px]">
+			<div className="relative z-10 p-6 rounded-[5px] w-[440px] text-[15px]">
 				<h2 className="text-[24px] font-semibold text-center">Add members or roles</h2>
 				<div className="flex justify-center">
 					{isPrivate === ChannelStatusEnum.isPrivate &&
@@ -200,7 +200,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 						)}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream defaultSize="w-5 5-5" />}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && <Icons.Hashtag defaultSize="w-5 h-5" />}
-					<p className="dark:text-[#AEAEAE] text-colorTextLightMode text-[16px]" style={{ wordBreak: 'break-word' }}>
+					<p className=" text-[16px]" style={{ wordBreak: 'break-word' }}>
 						{channel.channel_label}
 					</p>
 				</div>
@@ -208,7 +208,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					<InputField
 						type="text"
 						placeholder="e.g. Moderators, @wumpus"
-						className="dark:bg-bgTertiary bg-bgLightTertiary pl-3 py-[6px] w-full border-0 outline-none rounded"
+						className="pl-3 py-[6px] w-full border-0 outline-none rounded"
 						onChange={handleValueSearch}
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>

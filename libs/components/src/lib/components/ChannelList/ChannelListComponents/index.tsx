@@ -87,33 +87,33 @@ export const Events = memo(() => {
 			{currentClan && currentClan.is_onboarding && (
 				<Link
 					to={serverGuidePath}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'bg-button-secondary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
 							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-								<Icons.GuideIcon defaultSize="w-5 h-5 dark:fill-channelTextLabel" defaultFill="" />
+								<Icons.GuideIcon defaultSize="w-5 h-5 " defaultFill="" />
 							</div>
 						</div>
-						<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Clan Guide</div>
+						<div className="w-[99px] text-base font-medium">Clan Guide</div>
 					</div>
 				</Link>
 			)}
 
 			<div
-				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded h-[34px] dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton"
+				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded-lg h-[34px] bg-item-hover  text-theme-primary text-theme-primary-hover"
 				onClick={openModal}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
-					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
+					<div className="h-5 relative flex justify-center gap-2  items-center">
+						<div className="w-5 h-5">
 							<Icons.IconEvents />
 						</div>
-					</div>
-					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">
-						{numberEventManagement === 0 && 'Events'}
-						{numberEventManagement === 1 && '1 Event'}
-						{numberEventManagement > 1 && `${numberEventManagement} Events`}
+						<div className="w-[99px] text-base font-medium">
+							{numberEventManagement === 0 && 'Events'}
+							{numberEventManagement === 1 && '1 Event'}
+							{numberEventManagement > 1 && `${numberEventManagement} Events`}
+						</div>
 					</div>
 				</div>
 				{eventLoading === 'loaded' && numberEventUpcoming > 0 && (
@@ -125,29 +125,29 @@ export const Events = memo(() => {
 
 			<Link
 				to={memberPath}
-				className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isMemberPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+				className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isMemberPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="w-5 h-5 relative flex flex-row items-center">
-						<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-							<Icons.MemberList defaultSize="w-5 h-5 dark:text-channelTextLabel" />
+						<div className="w-5 h-5 ">
+							<Icons.MemberList defaultSize="w-5 h-5" />
 						</div>
 					</div>
-					<div className="w-[99px] dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Members</div>
+					<div className="text-base font-medium">Members</div>
 				</div>
 			</Link>
 			{checkAdminPermission ? (
 				<Link
 					to={channelSettingPath}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isSettingPath ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight' : ''} dark:hover:bg-bgModifierHover hover:bg-bgModifierHoverLight`}
+					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
-							<div className="w-5 h-5 dark:text-channelTextLabel text-colorTextLightMode">
+							<div className="w-5 h-5">
 								<Icons.ChannelBrowser />
 							</div>
 						</div>
-						<div className="w-full dark:text-channelTextLabel text-colorTextLightMode text-base font-medium">Channels</div>
+						<div className="w-full text-base font-medium">Channels</div>
 					</div>
 				</Link>
 			) : null}
@@ -201,8 +201,8 @@ const OnboardingGetStart = ({ link, clanId }: { link: string; clanId: string }) 
 	return (
 		<div className="w-full h-12 flex flex-col gap-2 relative px-2" onClick={handleNavigate}>
 			<div className="flex justify-between">
-				<p className="text-sm font-bold dark:text-white text-colorTextLightMode">Get Started</p>
-				<div className="flex gap-[1px] items-center dark:text-white text-colorTextLightMode">
+				<p className="text-sm font-bold text-theme-primary">Get Started</p>
+				<div className="flex gap-[1px] items-center text-theme-primary">
 					<p className="text-xs font-bold ">{missionDone}</p>
 					<p className="text-xs">of</p>
 					<p className="text-xs font-bold">{missionSum}</p>
@@ -218,7 +218,7 @@ const OnboardingGetStart = ({ link, clanId }: { link: string; clanId: string }) 
 					}}
 				></div>
 			</div>
-			<hr className="absolute bottom-1 left-0 h-[0.08px] w-full dark:border-borderDivider border-white" />
+			<hr className="absolute bottom-1 left-0 h-[0.08px] w-full " />
 		</div>
 	);
 };

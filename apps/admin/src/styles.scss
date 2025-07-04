@@ -657,11 +657,11 @@ input:-webkit-autofill:active {
 
 // css icon
 .iconWhiteImportant * {
-	color: white !important;
+	color: var(--text-theme-primary) !important;
 }
 
 .textWhiteHoverImportant:hover {
-	color: white !important;
+	color: var(--text-theme-primary) !important;
 }
 
 .hoverIconBlackImportant:hover button svg {

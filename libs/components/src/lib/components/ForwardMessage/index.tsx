@@ -300,19 +300,19 @@ const ForwardMessageModal = () => {
 
 	return (
 		<ModalLayout className="bg-bgModalDark" onClose={handleCloseModal}>
-			<div className="dark:bg-bgSecondary w-[550px] bg-bgLightMode pt-4 rounded">
+			<div className="bg-theme-setting-primary w-[550px] text-theme-primary pt-4 rounded">
 				<div>
-					<h1 className="dark:text-white text-textLightTheme text-xl font-semibold text-center">Forward Message</h1>
+					<h1 className=" text-xl font-semibold text-center">Forward Message</h1>
 				</div>
 				<div className="px-4 pt-4">
 					<input
 						type="text"
-						className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgTertiary bg-bgModifierHoverLight text-base rounded placeholder:text-sm"
+						className=" bg-theme-input outline-none w-full h-10 p-[10px] border-theme-primary text-base rounded-lg "
 						placeholder="Search"
 						onChange={(e) => setSearchText(e.target.value)}
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
-					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}>
+					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] `}>
 						{!normalizedSearchText.startsWith('@') && !normalizedSearchText.startsWith('#') ? (
 							<>
 								<ListSearchForwardMessage
@@ -321,19 +321,13 @@ const ForwardMessageModal = () => {
 									selectedObjectIdSends={selectedObjectIdSends}
 									handleToggle={handleToggle}
 								/>
-								{isNoResult && (
-									<span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">
-										Can't seem to find what you're looking for?
-									</span>
-								)}
+								{isNoResult && <span className=" flex flex-row justify-center ">Can't seem to find what you're looking for?</span>}
 							</>
 						) : (
 							<>
 								{normalizedSearchText.startsWith('@') && (
 									<>
-										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">
-											Search friend and users
-										</span>
+										<span className=" text-left opacity-60 text-[11px] pb-1 uppercase">Search friend and users</span>
 										<ListSearchForwardMessage
 											listSearch={addPropsIntoListMember}
 											searchText={searchText.slice(1)}
@@ -344,9 +338,7 @@ const ForwardMessageModal = () => {
 								)}
 								{normalizedSearchText.startsWith('#') && (
 									<>
-										<span className="dark:text-textPrimary text-colorTextLightMode text-left opacity-60 text-[11px] pb-1 uppercase">
-											Searching channel
-										</span>
+										<span className=" text-left opacity-60 text-[11px] pb-1 uppercase">Searching channel</span>
 										<ListSearchForwardMessage
 											listSearch={listChannelSearch}
 											searchText={normalizedSearchText.slice(1)}
@@ -361,13 +353,11 @@ const ForwardMessageModal = () => {
 				</div>
 				<div className="px-4">
 					<div className="mb-2 block">
-						<label htmlFor="clearAfter" className="dark:text-[#B5BAC1] text-xs uppercase font-semibold">
+						<label htmlFor="clearAfter" className="text-xs uppercase font-semibold text-theme-primary">
 							Shared content
 						</label>
 					</div>
-					<div
-						className={`h-20 overflow-y-auto dark:bg-bgProfileBody bg-bgLightModeThird p-[5px] rounded ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
-					>
+					<div className={`h-20 overflow-y-auto  p-[5px] rounded-lg border-theme-primary bg-item-theme`}>
 						<MessageContent message={selectedMessage} />
 					</div>
 					<FooterButtonsModal onClose={handleCloseModal} sentToMessage={handleForward} />
@@ -388,7 +378,7 @@ const FooterButtonsModal = (props: FooterButtonsModalProps) => {
 	return (
 		<div className="flex justify-end p-4 rounded-b gap-4">
 			<button
-				className="py-2 h-10 px-4 rounded dark:bg-slate-500 bg-slate-500 hover:!underline focus:ring-transparent"
+				className="py-2 h-10 px-4 rounded-lg border-theme-primary hover:!underline focus:ring-transparent"
 				type="button"
 				onClick={onClose}
 			>
@@ -396,7 +386,7 @@ const FooterButtonsModal = (props: FooterButtonsModalProps) => {
 			</button>
 			<button
 				onClick={sentToMessage}
-				className="py-2 h-10 px-4 rounded dark:bg-bgSelectItem bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent"
+				className="py-2 h-10 px-4 rounded text-white bg-bgSelectItem hover:!bg-bgSelectItemHover focus:ring-transparent"
 			>
 				Send
 			</button>

@@ -322,13 +322,13 @@ function SearchModal({ onClose }: SearchModalProps) {
 	);
 
 	return (
-		<ModalLayout onClose={onClose} className="bg-[#111111] text-contentPrimary bg-opacity-90 focus-visible:[&>*]:outline-none">
-			<div className="dark:bg-[#36393e] !w-[640px] bg-bgLightMode px-6 py-4 rounded-[6px]">
+		<ModalLayout onClose={onClose} className="bg-opacity-90 focus-visible:[&>*]:outline-none">
+			<div className="bg-theme-setting-primary !w-[640px] px-6 py-4 rounded-[6px]  ">
 				<div className="flex flex-col">
 					<InputField
 						type="text"
 						placeholder="Where would you like to go?"
-						className="py-[18px] dark:bg-bgTertiary bg-bgLightModeThird dark:text-textDarkTheme text-textLightTheme text-[16px] mt-2 mb-[15px]"
+						className="py-[18px] text-[16px] mt-2 mb-[15px]"
 						onChange={(e) => debouncedSetSearchText(e.target.value)}
 						autoFocus
 					/>
@@ -350,7 +350,7 @@ export default memo(SearchModal);
 const FooterNoteModal = memo(() => {
 	return (
 		<div className="pt-2">
-			<span className="text-[13px] font-medium dark:text-contentTertiary text-textLightTheme">
+			<span className="text-[13px] font-medium text-theme-primary">
 				<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
 			</span>
 		</div>

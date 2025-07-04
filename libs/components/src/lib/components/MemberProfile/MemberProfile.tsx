@@ -139,15 +139,13 @@ const MemberProfileCore = ({
 							className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start  ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 						>
 							{customStatus && isListFriend ? (
-								<span className={`text-[11px] text-left dark:text-contentSecondary text-colorTextLightMode line-clamp-1 `}>
-									{customStatus}
-								</span>
+								<span className={`text-[11px] text-left text-theme-primary opacity-60 line-clamp-1 `}>{customStatus}</span>
 							) : (
-								<span className={`text-[11px] dark:text-contentSecondary text-colorTextLightMode `}>
+								<span className={`text-[11px] text-theme-primary opacity-60 `}>
 									{typeof userStatus === 'string' && userStatus ? userStatus : !status?.status ? 'Offline' : 'Online'}
 								</span>
 							)}
-							<p className="text-[11px] dark:text-contentSecondary text-colorTextLightMode overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
+							<p className="text-[11px] text-theme-primary opacity-60 overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
 								{user?.user?.username}
 							</p>
 						</div>
@@ -160,9 +158,9 @@ const MemberProfileCore = ({
 									${!isOwnerClanOrGroup && 'w-full'}
 									${isListFriend ? ' inline-flex justify-start' : ''}
 									${positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
-									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis group-hover/itemListDm:text-black dark:group-hover/itemListDm:text-white` : ''}
+									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis text-theme-primary-hover` : ''}
 									${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-									${isUnReadDirect && !isMute ? 'dark:text-white text-black dark:font-medium font-semibold' : 'font-medium dark:text-channelTextLabel text-colorTextLightMode'}
+									${isUnReadDirect && !isMute ? ' font-semibold' : 'font-medium  '}
 								`}
 									title={name}
 								>
@@ -185,7 +183,7 @@ const MemberProfileCore = ({
 							</div>
 							{customStatus && isMemberDMGroup && (
 								<p
-									className={`dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px]`}
+									className={`text-theme-primary opacity-60 w-full text-[12px] line-clamp-1 break-all max-w-[176px]`}
 									title={customStatus}
 								>
 									{customStatus}
@@ -194,7 +192,7 @@ const MemberProfileCore = ({
 						</div>
 					)}
 					{Number(user?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<p className="dark:text-channelTextLabel text-colorTextLightMode text-xs">{countMember} Members</p>
+						<p className="text-theme-primary opacity-60 text-xs">{countMember} Members</p>
 					)}
 				</div>
 			</div>
@@ -312,7 +310,7 @@ const DMUserName = ({
 		<span
 			className={`one-line text-start ${hideLongName && 'truncate !block'} ${
 				isOwnerClanOrGroup && 'max-w-[140px]'
-			} ${isListFriend ? 'dark:text-white text-black' : ''}`}
+			} ${isListFriend ? 'text-theme-primary' : ''}`}
 		>
 			{!isHiddenAvatarPanel && name}
 		</span>

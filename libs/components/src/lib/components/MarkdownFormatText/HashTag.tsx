@@ -73,7 +73,7 @@ const ChannelHashtag = ({ channelHastagId, isJumMessageEnabled, isTokenClickAble
 			<div
 				onClick={tokenClickAble}
 				style={{ textDecoration: 'none' }}
-				className={`font-medium rounded-sm  inline whitespace-nowrap !text-[#3297ff] dark:bg-[#3C4270] bg-[#D1E0FF] ${!isJumMessageEnabled ? ' hover:bg-[#5865F2] hover:!text-white cursor-pointer ' : `hover:none cursor-text`} `}
+				className={`font-medium rounded-sm  inline whitespace-nowrap bg-mention color-mention${!isJumMessageEnabled ? ' hover-mention ' : `hover:none cursor-text`} `}
 			>
 				{channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 					<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />
@@ -109,7 +109,7 @@ function PrivateChannel({ onClick }: { onClick: () => void }) {
 	return (
 		<span
 			onClick={onClick}
-			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap dark:!text-[#ffffff] dark:bg-[#3e3f3f] bg-[#F2F3F5] relative top-[3px] cursor-pointer`}
+			className={`px-0.1 rounded-sm inline-flex w-fit whitespace-nowrap color-mention bg-mention relative top-[3px] cursor-pointer`}
 		>
 			<Icons.LockedPrivate className={`mt-1 w-4 h-4`} />
 			<span>private-channel</span>

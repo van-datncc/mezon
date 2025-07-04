@@ -14,15 +14,13 @@ const MainClanIntegrations = ({ setIsOpenClanWebhooks, allClanWebhooks }: IClanI
 					setIsOpenClanWebhooks();
 				}
 			}}
-			className={`mt-5 dark:text-[#b5bac1] text-textLightTheme py-[20px] px-[16px] flex justify-between items-center border dark:border-black border-[#d1d4d9] rounded-md dark:bg-[#2b2d31] bg-bgLightSecondary ${allClanWebhooks?.length !== 0 ? 'cursor-pointer' : ''}`}
+			className={`mt-5  py-[20px] px-[16px] flex justify-between items-center border-theme-primary rounded-lg bg-item-theme ${allClanWebhooks?.length !== 0 ? 'cursor-pointer' : ''}`}
 		>
-			<div className="flex gap-3 max-sm:gap-0 max-sbm:w-[40%] items-center">
-				<div className="rounded-full p-4 max-sm:p-2 dark:bg-[#111214]">
-					<Icons.WebhooksIcon className="text-[#4e5058] dark:text-[#b5bac1]" />
-				</div>
+			<div className="flex gap-4 max-sm:gap-0 max-sbm:w-[40%] items-center">
+				<Icons.WebhooksIcon />
 				<div>
-					<div className="pb-[3px] font-semibold break-all">Clan Webhooks</div>
-					<div className="text-[12px]">
+					<div className="pb-[3px] font-semibold break-all text-theme-primary">Clan Webhooks</div>
+					<div className="text-[12px] text-theme-primary">
 						{allClanWebhooks && allClanWebhooks?.length > 1
 							? allClanWebhooks?.length + ' webhooks'
 							: allClanWebhooks?.length + ' webhook'}
@@ -37,9 +35,9 @@ const MainClanIntegrations = ({ setIsOpenClanWebhooks, allClanWebhooks }: IClanI
 					Create Clan Webhook
 				</div>
 			) : (
-				<div className="items-center cursor-pointer text-[#4e5058] dark:text-[#b5bac1] text-[14px] flex gap-[4px]">
-					<div>View Clan Webhook</div>
-					<Icons.ArrowDown defaultSize="h-[15px] w-[15px] dark:text-[#b5bac1] text-black -rotate-90" />
+				<div className="items-center cursor-pointer text-[14px] flex gap-[4px]">
+						<div className="text-theme-primary">View Clan Webhook</div>
+					<Icons.ArrowDown defaultSize="h-[15px] w-[15px] -rotate-90" />
 				</div>
 			)}
 		</div>

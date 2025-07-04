@@ -101,7 +101,7 @@ const OverviewSetting: React.FC<IOverViewSettingProps> = ({ category, onClose })
 	return (
 		<>
 			<div className="flex flex-1 flex-col">
-				<h3 className="text-xs font-bold dark:text-textSecondary text-textSecondary800 uppercase mb-2">Category Name</h3>
+				<h3 className="text-xs font-bold text-theme-primary mb-2">Category Name</h3>
 				<div className="w-full">
 					<input
 						type="text"

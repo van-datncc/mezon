@@ -19,18 +19,18 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 	return (
 		<div className="flex flex-col">
 			<div className="flex flex-col xl:flex-row gap-x-1 text-sm font-normal">
-				<p className="dark:text-bgLightPrimary text-bgPrimary">Show who you are with different profiles for each of your clans</p>
+				<p className="">Show who you are with different profiles for each of your clans</p>
 			</div>
-			<p className="mt-[20px] font-bold text-sm dark:text-[#CCCCCC] text-black tracking-wide">CHOOSE A CLAN</p>
+			<p className="mt-[20px] font-bold text-sm  tracking-wide">CHOOSE A CLAN</p>
 			<select
 				name="clan"
-				className="block w-full mt-1 dark:bg-bgTertiary bg-[#f0f0f0] dark:text-white text-black rounded px-4 py-3 font-normal text-sm tracking-wide outline-none"
+				className="block w-full mt-1 bg-item-theme px-4 py-3 font-normal text-sm tracking-wide outline-none border-theme-primary"
 				disabled={flagOption}
 				value={selectedClanId}
 				onChange={handleClanChange}
 			>
 				{clans.map((clan) => (
-					<option key={clan.id} value={clan.id} style={{ width: '200px' }} className="">
+					<option key={clan.id} value={clan.id} style={{ width: '200px' }} className="theme-base-color rounded-lg bg-item-hover">
 						{clan.clan_name}
 					</option>
 				))}

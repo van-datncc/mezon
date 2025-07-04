@@ -156,7 +156,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 							screen: APP_SCREEN.MENU_CHANNEL.QUICK_ACTION,
 							params: {
-								channelId,
+								channelId
 							}
 						});
 					}

@@ -91,7 +91,7 @@ const NotificationSoundSetting = () => {
 
 	return (
 		<>
-			<div className={'flex w-full p-2 dark:text-textDarkTheme text-textLightTheme font-bold'}>
+			<div className={'flex w-full p-2 font-bold'}>
 				<p className={'w-1/2'}>Name</p>
 				<p className={'w-1/3'}>Duration</p>
 				<p className={'ml-auto'}>Play</p>
