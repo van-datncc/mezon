@@ -1,5 +1,5 @@
 import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUserClans } from '@mezon/store';
-import { Icons } from '@mezon/ui';
+import { ButtonLoading, Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -43,7 +43,6 @@ const ModalSendToken = ({
 }: ModalSendTokenProps) => {
 	const usersClan = useSelector(selectAllUserClans);
 	const friends = useSelector(selectAllFriends);
-
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState(infoSendToken?.receiver_name || '');
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -51,8 +50,6 @@ const ModalSendToken = ({
 	const [noteSendToken, setNoteSendToken] = useState(note || '');
 
 	useEffect(() => {
-		setSelectedUserId('');
-
 		return () => {
 			setSearchTerm('');
 			setToken(0);
@@ -288,14 +285,12 @@ const ModalSendToken = ({
 					>
 						Cancel
 					</button>
-					<button
-						className="flex-1 h-12 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium transition-all flex items-center justify-center gap-2"
-						type="button"
+					<ButtonLoading
+						className="flex-1 h-12 px-4 rounded-xl text-white font-medium"
 						onClick={handleSendToken}
 						disabled={isButtonDisabled || !selectedUserId || token <= 0}
-					>
-						Send Tokens
-					</button>
+						label="Send Tokens"
+					/>
 				</div>
 			</div>
 		</ModalLayout>
