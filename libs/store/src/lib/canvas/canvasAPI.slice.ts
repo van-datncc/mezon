@@ -430,14 +430,6 @@ export const getCanvasApiState = (rootState: { [CANVAS_API_FEATURE_KEY]: CanvasA
 export const getChannelIdCanvasAsSecondParam = (_: unknown, channelId: string) => channelId;
 export const getChannelIdCanvasAsParrent = (_: unknown, __: unknown, parrentChannelId?: string) => parrentChannelId;
 
-export const selectAllCanvas = createSelector(getCanvasApiState, (canvasState) => {
-	const res: CanvasAPIEntity[] = [];
-	Object.values(canvasState.channelCanvas || {}).forEach((item) => {
-		res.concat(Object.values(item?.entities || {}));
-	});
-	return res;
-});
-
 export const selectCanvasIdsByChannelId = createSelector(
 	[getCanvasApiState, getChannelIdCanvasAsSecondParam, getChannelIdCanvasAsParrent],
 	(state, channelId, parrentChannelId) => {

@@ -174,7 +174,7 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 				</div>
 				<div className="w-[120px]">
 					{threadMembers && (
-						<AvatarGroup className="flex gap-3 justify-end items-center">
+						<AvatarGroup className="flex justify-end items-center">
 							{previewAvatarList?.map((avatar, index) => (
 								<img
 									key={(avatar.clan_avatar || avatar.user?.avatar_url || avatar.id) + index}

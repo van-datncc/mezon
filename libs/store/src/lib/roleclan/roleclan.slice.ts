@@ -687,7 +687,13 @@ export const selectCurrentRole = createSelector(
 	(roles, roleId) => roles.find((role) => role.id === roleId) || null
 );
 
-export const selectRolesClanEntities = createSelector(getRolesClanState, selectEntities);
+export const selectRolesClanEntities = createSelector(
+	[getRolesClanState, (state: RootState) => state.clans.currentClanId as string],
+	(state, clanId) => {
+		const clanData = state.byClans[clanId];
+		return clanData ? clanData.roles : {};
+	}
+);
 
 const handleMapUpdateRole = (
 	role: RolesClanEntity,

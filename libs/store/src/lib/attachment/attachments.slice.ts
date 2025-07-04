@@ -261,13 +261,8 @@ export const attachmentActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll, selectEntities } = attachmentAdapter.getSelectors();
 
 export const getAttachmentState = (rootState: { [ATTACHMENT_FEATURE_KEY]: AttachmentState }): AttachmentState => rootState[ATTACHMENT_FEATURE_KEY];
-
-export const selectAllAttachment = createSelector(getAttachmentState, selectAll);
-
-export const selectAttachmentEntities = createSelector(getAttachmentState, selectEntities);
 
 export const selectAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.attachment);
 
@@ -278,9 +273,6 @@ export const selectOpenModalAttachment = createSelector(getAttachmentState, (sta
 export const selectModeAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.mode);
 
 export const selectMessageIdAttachment = createSelector(getAttachmentState, (state: AttachmentState) => state.messageId);
-
-export const selectAttachmentPhoto = () =>
-	createSelector(selectAllAttachment, (attachments) => (attachments || []).filter((att) => att?.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)));
 
 export const selectAllListAttachmentByChannel = createSelector([getAttachmentState, (state, channelId: string) => channelId], (state, channelId) => {
 	if (!Object.prototype.hasOwnProperty.call(state.listAttachmentsByChannel, channelId)) {

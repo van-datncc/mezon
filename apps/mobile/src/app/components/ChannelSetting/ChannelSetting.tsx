@@ -156,7 +156,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 						navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 							screen: APP_SCREEN.MENU_CHANNEL.QUICK_ACTION,
 							params: {
-								channelId,
+								channelId
 							}
 						});
 					}
@@ -266,12 +266,15 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 				return;
 			}
 
-			await dispatch(
+			const response = await dispatch(
 				channelsActions.deleteChannel({
 					channelId: channel?.channel_id,
 					clanId: channel?.clan_id
 				})
 			);
+			if (response?.meta?.requestStatus === 'rejected') {
+				throw response?.error?.message;
+			}
 			navigation.navigate(APP_SCREEN.HOME);
 			if (channel?.parent_id !== '0') {
 				await dispatch(

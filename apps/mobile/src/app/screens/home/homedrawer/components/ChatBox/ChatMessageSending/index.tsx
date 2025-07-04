@@ -41,7 +41,8 @@ import {
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api.gen';
 import React, { MutableRefObject, memo, useCallback, useMemo } from 'react';
-import { DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
@@ -432,13 +433,19 @@ export const ChatMessageSending = memo(
 				}}
 			>
 				{isAvailableSending || !!attachmentDataRef?.length ? (
-					<TouchableOpacity activeOpacity={0.8} onPress={handleSendMessage} style={[styles.btnIcon, styles.iconSend]}>
+					<Pressable
+						android_ripple={{
+							color: themeValue.secondaryLight
+						}}
+						onPress={handleSendMessage}
+						style={[styles.btnIcon, styles.iconSend]}
+					>
 						<MezonIconCDN icon={IconCDN.sendMessageIcon} width={size.s_18} height={size.s_18} color={baseColor.white} />
-					</TouchableOpacity>
+					</Pressable>
 				) : (
-					<TouchableOpacity onLongPress={startRecording} style={[styles.btnIcon, styles.iconVoice]}>
+					<Pressable onLongPress={startRecording} style={[styles.btnIcon, styles.iconVoice]}>
 						<MezonIconCDN icon={IconCDN.microphoneIcon} width={size.s_18} height={size.s_18} color={themeValue.textStrong} />
-					</TouchableOpacity>
+					</Pressable>
 				)}
 			</View>
 		);

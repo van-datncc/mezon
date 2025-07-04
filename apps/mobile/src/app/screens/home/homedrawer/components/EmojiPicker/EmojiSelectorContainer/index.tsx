@@ -43,7 +43,6 @@ export default function EmojiSelectorContainer({
 	const { categoryEmoji, categoriesEmoji, emojis } = useEmojiSuggestionContext();
 	const { themeValue, themeBasic } = useTheme();
 	const styles = style(themeValue);
-	const [selectedCategory, setSelectedCategory] = useState<string>('');
 	const [emojisSearch, setEmojiSearch] = useState<IEmoji[]>();
 	const [keywordSearch, setKeywordSearch] = useState<string>('');
 	const flatListRef = useRef(null);
@@ -185,10 +184,10 @@ export default function EmojiSelectorContainer({
 					/>
 				</View>
 
-				{!isReactMessage && <CategoryList categoriesWithIcons={categoriesWithIcons} selectedCategory={selectedCategory} />}
+				{!isReactMessage && <CategoryList categoriesWithIcons={categoriesWithIcons} setSelectedCategory={handleSelectCategory} />}
 			</View>
 		);
-	}, [selectedCategory, themeBasic, isReactMessage, themeValue, categoriesWithIcons]);
+	}, [themeBasic, isReactMessage, themeValue, categoriesWithIcons]);
 
 	const data = useMemo(() => {
 		if (emojisSearch?.length > 0 && keywordSearch) {
@@ -226,7 +225,7 @@ export default function EmojiSelectorContainer({
 				);
 			}
 		},
-		[ListCategoryArea, handleEmojiSelect]
+		[handleEmojiSelect]
 	);
 
 	const handleSelectCategory = useCallback(
@@ -250,7 +249,6 @@ export default function EmojiSelectorContainer({
 								viewPosition: 0,
 								viewOffset: 120
 							});
-							setSelectedCategory(categoryName);
 						}, 300);
 					}
 				} catch (error) {
@@ -260,17 +258,6 @@ export default function EmojiSelectorContainer({
 		},
 		[data]
 	);
-
-	useEffect(() => {
-		const scrollToCategoryListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SCROLL_TO_CATEGORY_EMOJI, ({ name }) => {
-			handleSelectCategory(name);
-		});
-
-		return () => {
-			scrollToCategoryListener.remove();
-		};
-	}, [handleSelectCategory]);
-
 	useEffect(() => {
 		return () => {
 			if (timeoutRef?.current) {
@@ -279,17 +266,20 @@ export default function EmojiSelectorContainer({
 		};
 	}, []);
 
+	const keyExtractor = useCallback((item) => `${item.name}-emoji-panel`, []);
+
 	return (
 		<BottomSheetFlatList
 			ref={flatListRef}
 			data={data}
-			keyExtractor={(item) => `${item.name}-emoji-panel`}
+			keyExtractor={keyExtractor}
 			renderItem={renderItem}
 			stickyHeaderIndices={[0]}
 			initialNumToRender={1}
 			maxToRenderPerBatch={1}
 			windowSize={2}
-			removeClippedSubviews={false}
+			removeClippedSubviews={true}
+			showsVerticalScrollIndicator={false}
 			keyboardShouldPersistTaps="handled"
 			disableVirtualization
 			style={{ marginBottom: -size.s_20 }}
