@@ -174,14 +174,14 @@ const AddRolesComp = ({
 					onChange={handleInputChange}
 					onClick={(e) => e.stopPropagation()}
 				/>
-				<Icons.Search className="size-5 dark:text-white text-colorTextLightMode absolute right-2 top-2" />
+				<Icons.Search className="size-5 text-theme-primary absolute right-2 top-2" />
 			</div>
 			<div className="w-full flex-1 overflow-y-scroll overflow-x-hidden hide-scrollbar space-y-1">
 				{filteredListRoleBySearch.length > 0 ? (
 					filteredListRoleBySearch.map((role, index) => (
 						<div
 							key={index}
-							className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center dark:text-white text-colorTextLightMode"
+							className="text-base w-full rounded-[10px] p-2 bg-transparent mr-2 dark:hover:bg-gray-800 hover:bg-bgLightModeButton flex gap-2 items-center text-theme-primary"
 							onClick={() => addRole(role.id)}
 						>
 							<div className="size-3 min-w-3 rounded-full" style={{ backgroundColor: role.color || DEFAULT_ROLE_COLOR }}></div>

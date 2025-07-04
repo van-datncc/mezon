@@ -118,7 +118,7 @@ const SearchMemberAuditLogModal = ({
 						{searchTerm ? (
 							<Icons.Close defaultSize="size-4" />
 						) : (
-							<Icons.Search className="w-4 h-4 dark:text-white text-colorTextLightMode" />
+								<Icons.Search className="w-4 h-4 text-theme-primary" />
 						)}
 					</span>
 				</div>
@@ -146,7 +146,7 @@ const SearchMemberAuditLogModal = ({
 							))
 					) : (
 						<div className="w-full h-full text-center text-gray-400 flex flex-col justify-center items-center">
-							<div className="dark:text-white text-colorTextLightMode font-medium text-xl">Nope!</div>
+								<div className="text-theme-primary font-medium text-xl">Nope!</div>
 							<div>Did you make a typo?</div>
 						</div>
 					)}

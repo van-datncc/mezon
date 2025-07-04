@@ -66,7 +66,7 @@ const formatMarkdownHeadings = (text: string, isReply: boolean): React.ReactNode
 					formattedLines.push(
 						<h1
 							key={`h1-${index}`}
-							className={`${isReply ? 'text-sm' : 'text-4xl'} my-1 font-bold dark:text-white text-colorTextLightMode`}
+							className={`${isReply ? 'text-sm' : 'text-4xl'} my-1 font-bold text-theme-primary`}
 						>
 							{headingText}
 						</h1>
@@ -74,35 +74,35 @@ const formatMarkdownHeadings = (text: string, isReply: boolean): React.ReactNode
 					break;
 				case 2:
 					formattedLines.push(
-						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold text-theme-primary">
 							{headingText}
 						</h2>
 					);
 					break;
 				case 3:
 					formattedLines.push(
-						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold text-theme-primary">
 							{headingText}
 						</h3>
 					);
 					break;
 				case 4:
 					formattedLines.push(
-						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold text-theme-primary">
 							{headingText}
 						</h4>
 					);
 					break;
 				case 5:
 					formattedLines.push(
-						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold text-theme-primary">
 							{headingText}
 						</h5>
 					);
 					break;
 				case 6:
 					formattedLines.push(
-						<h6 key={`h6-${index}`} className="text-base my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h6 key={`h6-${index}`} className="text-base my-1 font-bold text-theme-primary">
 							{headingText}
 						</h6>
 					);
