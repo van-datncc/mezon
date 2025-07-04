@@ -2,8 +2,6 @@
 	background: var(--bg-primary);
 }
 
-
-
 .bg-theme-direct-message {
 	background: var(--bg-theme-direct-message);
 }
@@ -39,6 +37,9 @@
 .bg-button-add-friend,
 button.bg-button-add-friend {
 	background: var(--bg-button-add-friend);
+}
+.bg-button-primary {
+	background: var(--bg-button-primary);
 }
 
 .bg-button-hover:hover:not(:disabled) {
@@ -116,7 +117,7 @@ button.bg-button-add-friend {
 .border-user {
 	border-color: var(--theme-setting-primary);
 }
-.bg-control-nav{
+.bg-control-nav {
 	background: var(--text-theme-primary);
 }
 .border-theme-secondary {
@@ -159,7 +160,7 @@ button.bg-button-add-friend {
 .bg-mention-everyone-hover:hover {
 	background-color: var(--bg-mention-everyone-hover);
 }
-.bg-mention-everyone {	
+.bg-mention-everyone {
 	background-color: var(--bg-mention-evryone);
 }
 .color-mention-hover {
@@ -257,5 +258,3 @@ input.bg-theme-input-primary::placeholder {
 .bg-outside-footer {
 	background: var(--bg-outside-footer);
 }
-
-

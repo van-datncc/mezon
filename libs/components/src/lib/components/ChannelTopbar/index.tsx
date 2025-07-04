@@ -851,7 +851,7 @@ export function RedDot() {
 		<div
 			className="absolute border-theme-primary
 		 w-[10px] h-[10px] rounded-full bg-colorDanger
-		  font-bold text-[11px] flex items-center justify-center -bottom-1.5 -right-1"
+		  font-bold text-[11px] flex items-center justify-center -bottom-[0.15rem] -right-[0.175rem]"
 		></div>
 	);
 }
