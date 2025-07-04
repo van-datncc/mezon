@@ -139,15 +139,13 @@ const MemberProfileCore = ({
 							className={`absolute top-[22px] mr-5 max-w-full overflow-x-hidden transition-all duration-300 flex flex-col items-start justify-start  ${isHideAnimation ? '' : 'group-hover:-translate-y-4'}`}
 						>
 							{customStatus && isListFriend ? (
-								<span className={`text-[11px] text-left text-theme-primary line-clamp-1 `}>
-									{customStatus}
-								</span>
+								<span className={`text-[11px] text-left text-theme-primary opacity-60 line-clamp-1 `}>{customStatus}</span>
 							) : (
-									<span className={`text-[11px] text-theme-primary line-clamp-1 `}>
+								<span className={`text-[11px] text-theme-primary opacity-60 `}>
 									{typeof userStatus === 'string' && userStatus ? userStatus : !status?.status ? 'Offline' : 'Online'}
 								</span>
 							)}
-							<p className="text-[11px] text-theme-primary line-clamp-1 overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
+							<p className="text-[11px] text-theme-primary opacity-60 overflow-x-hidden whitespace-nowrap text-ellipsis text-left w-full">
 								{user?.user?.username}
 							</p>
 						</div>
@@ -185,7 +183,7 @@ const MemberProfileCore = ({
 							</div>
 							{customStatus && isMemberDMGroup && (
 								<p
-									className={`dark:text-channelTextLabel text-black w-full text-[12px] line-clamp-1 break-all max-w-[176px]`}
+									className={`text-theme-primary opacity-60 w-full text-[12px] line-clamp-1 break-all max-w-[176px]`}
 									title={customStatus}
 								>
 									{customStatus}
@@ -194,7 +192,7 @@ const MemberProfileCore = ({
 						</div>
 					)}
 					{Number(user?.type) === ChannelType.CHANNEL_TYPE_GROUP && (
-						<p className="dark:text-channelTextLabel text-colorTextLightMode text-xs">{countMember} Members</p>
+						<p className="text-theme-primary opacity-60 text-xs">{countMember} Members</p>
 					)}
 				</div>
 			</div>

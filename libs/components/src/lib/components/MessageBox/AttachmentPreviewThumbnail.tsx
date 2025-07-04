@@ -30,27 +30,23 @@ const AttachmentPreviewThumbnail: React.FC<AttachmentPreviewThumbnailProps> = ({
 	return (
 		<div
 			title={attachment.filename}
-			className="flex justify-center items-center p-2 mb-3 rounded dark:bg-bgSecondary bg-bgLightSecondary w-[216px] h-[216px] flex-shrink-0 border dark:text-textDarkTheme text-textLightTheme dark:border-bgSecondary relative"
+			className="flex justify-center items-center p-2 mb-3 rounded bg-item-theme w-[216px] h-[216px] flex-shrink-0 border-theme-primary   relative"
 		>
 			<div className="cursor-pointer rounded-md flex flex-row justify-center items-center mb-2">
 				<div>{thumbnailAttachment}</div>
-				<div className="dark:bg-bgPrimary bg-bgLightPrimary flex flex-row w-21 top-[-1px] right-[-16px] h-8 absolute rounded-sm shadow-shadowInbox">
+				<div className=" flex flex-row w-21 top-[-1px] right-[-16px] bg-theme-contexify h-8 absolute rounded-lg shadow-shadowInbox">
 					<button
 						onClick={handleShowAttachment}
-						className="w-8 h-8 flex flex-row justify-center items-center dark:hover:bg-bgHover hover:bg-bgLightModeButton"
+						className="w-8 h-8 flex flex-row justify-center items-center bg-item-hover text-theme-primary-hover"
 					>
-						{isHideAttachment ? (
-							<Icons.EyeClose className="w-5 h-5 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
-						) : (
-							<Icons.EyeOpen className="w-5 h-5 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
-						)}
+						{isHideAttachment ? <Icons.EyeClose className="w-5 h-5 " /> : <Icons.EyeOpen className="w-5 h-5 " />}
 					</button>
-					<button className="w-8 h-8 flex flex-row justify-center items-center dark:hover:bg-bgHover hover:bg-bgLightModeButton">
-						<Icons.PenEdit className="w-5 h-5 dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
+					<button className="w-8 h-8 flex flex-row justify-center items-center bg-item-hover text-theme-primary-hover">
+						<Icons.PenEdit className="w-5 h-5 " />
 					</button>
 					<button
 						onClick={handleRemove}
-						className="w-8 h-8 flex flex-row justify-center items-center dark:hover:bg-bgHover hover:bg-bgLightModeButton"
+						className="w-8 h-8 flex flex-row justify-center items-center bg-item-hover text-theme-primary-hover"
 					>
 						<Icons.TrashIcon className="w-5 h-5 text-colorDanger hover:text-colorDangerHover" />
 					</button>

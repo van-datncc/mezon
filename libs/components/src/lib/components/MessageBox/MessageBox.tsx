@@ -130,9 +130,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
 				<div
-					className={`${
-						checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
-					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] bg-theme-input' : ''} text-theme-primary max-h-full`}
 				>
 					<div
 						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${

@@ -285,7 +285,7 @@ const DirectMessage = () => {
 							{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM && (currentDmGroup.user_id?.length === 0 || isBlocked) ? (
 								<div
 									style={{ height: 44 }}
-									className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+									className="opacity-80 bg-theme-input  ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission text-theme-primary rounded one-line"
 								>
 									{isBlocked ? " You can't reply to this conversation" : ' You do not have permission to send message'}
 								</div>
@@ -321,7 +321,7 @@ const DirectMessage = () => {
 							dataMemberCreate={{ createId: currentDmGroup?.creator_id || '' }}
 						>
 							<div
-								className={`contain-strict dark:bg-bgSecondary bg-bgLightSecondary overflow-y-scroll h-[calc(100vh_-_50px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
+								className={`contain-strict text-theme-primary bg-active-friend-list overflow-y-scroll h-[calc(100vh_-_50px)] thread-scroll ${isShowMemberListDM ? 'flex' : 'hidden'} ${closeMenu ? 'w-full' : 'w-[241px]'}`}
 							>
 								<MemberListGroupChat directMessageId={directId} createId={currentDmGroup?.creator_id} />
 							</div>
