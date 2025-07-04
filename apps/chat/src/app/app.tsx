@@ -14,7 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { preloadedState } from './mock/state';
 import { Routes } from './routes';
 
-import { ThemeDemo, ThemeManager } from '@mezon/themes';
+import { ThemeManager } from '@mezon/themes';
 
 ThemeManager.initializeTheme();
 
@@ -158,7 +158,7 @@ export function App() {
 			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 				<PopupManagerProvider>
 					<PermissionProvider>
-						<ThemeDemo />
+						{/* <ThemeDemo /> */}
 						<AppInitializer />
 						<Routes />
 					</PermissionProvider>

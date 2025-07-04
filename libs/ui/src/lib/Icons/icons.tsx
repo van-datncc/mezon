@@ -1132,7 +1132,7 @@ export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 
 export const TopicIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`${defaultSize} ${className}`}>
+		<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`${defaultSize}`}>
 			<g id="SVGRepo_iconCarrier">
 				<path
 					fillRule="evenodd"

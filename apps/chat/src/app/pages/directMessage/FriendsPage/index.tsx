@@ -166,12 +166,7 @@ const FriendsPage = () => {
 							</div>
 						))}
 					</div>
-					<Button
-						variant={'primary'}
-						size="sm"
-						onClick={handleOpenRequestFriend}
-						className="whitespace-nowrap bg-button-add-friend text-white "
-					>
+					<Button onClick={handleOpenRequestFriend} className="whitespace-nowrap bg-button-add-friend text-white ">
 						Add Friend
 					</Button>
 				</div>
