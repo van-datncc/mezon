@@ -179,7 +179,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false, onSoundSelect }:
 							key={cat.id}
 							onClick={(e) => scrollToClanSidebar(e, cat.type)}
 							className={`flex justify-center items-center w-11 h-11 rounded-full bg-item-hover transition-all duration-200 ${
-								selectedType === cat.type ? 'bg-[#5865f2] dark:shadow-md' : 'dark:bg-[#36393f] bg-[#e3e5e8]'
+								selectedType === cat.type ? 'bg-[#5865f2] dark:shadow-md' : 'bg-item-theme'
 							}`}
 						>
 							{cat.url !== '' ? (
@@ -246,7 +246,7 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 			<div className="mb-3">
 				<button
 					onClick={handleToggleButton}
-					className="w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2f3136] bg-[#f2f3f5] z-10 dark:text-[#ffffff] text-[#060607] max-h-full"
+					className="w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem]  max-h-full"
 				>
 					<p className="uppercase font-semibold text-xs tracking-wider">
 						{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}
