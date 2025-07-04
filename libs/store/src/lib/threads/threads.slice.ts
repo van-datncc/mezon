@@ -1,9 +1,10 @@
 import { captureSentryError } from '@mezon/logger';
-import { channelsActions, listChannelRenderAction } from '@mezon/store';
-import { IMessageWithUser, IThread, LIMIT, LoadingStatus, ThreadStatus, TypeCheck, sortChannelsByLastActivity } from '@mezon/utils';
+import { IMessageWithUser, IThread, LIMIT, LoadingStatus, TypeCheck } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { channelsActions } from '../channels/channels.slice';
+import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
@@ -523,60 +524,7 @@ export const selectIsShowCreateThread = createSelector([getThreadsState, (_, cha
 });
 
 export const selectIsThreadModalVisible = createSelector(getThreadsState, (state: ThreadsState) => state.isThreadModalVisible);
-// new update
-// is thread public and last message within 30days
-export const selectActiveThreads = () =>
-	createSelector([selectAllThreads], (threads) => {
-		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
-		const currentTime = Math.floor(Date.now() / 1000);
-		const result = threads.filter((thread) => {
-			const lastMessageTimestamp = thread?.last_sent_message?.timestamp_seconds;
-			const isWithin30Days = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) < thirtyDaysInSeconds;
-			return thread.active === ThreadStatus.activePublic && isWithin30Days;
-		});
-		const sortByLsentMess = sortChannelsByLastActivity(result as any);
-		return sortByLsentMess;
-	});
-// is thread joined and last message within 30days
-export const selectJoinedThreadsWithinLast30Days = () =>
-	createSelector([selectAllThreads], (threads) => {
-		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
-		const currentTime = Math.floor(Date.now() / 1000);
-		const result = threads.reduce((accumulator, thread) => {
-			if (
-				thread.active === ThreadStatus.joined &&
-				thread.last_sent_message?.timestamp_seconds &&
-				currentTime - Number(thread.last_sent_message.timestamp_seconds) < thirtyDaysInSeconds
-			) {
-				accumulator.push(thread);
-			}
-			return accumulator;
-		}, [] as ThreadsEntity[]);
-		return result;
-	});
-// is thread joined/public and last message over 30days
-export const selectThreadsOlderThan30Days = () =>
-	createSelector([selectAllThreads], (threads) => {
-		const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
-		const currentTime = Math.floor(Date.now() / 1000);
-		const result = threads.reduce((accumulator, thread) => {
-			if (
-				thread.last_sent_message?.timestamp_seconds &&
-				currentTime - Number(thread.last_sent_message?.timestamp_seconds) > thirtyDaysInSeconds
-			) {
-				accumulator.push(thread);
-			}
-			return accumulator;
-		}, [] as ThreadsEntity[]);
-		const sortByLsentMess = sortChannelsByLastActivity(result as any);
 
-		return sortByLsentMess;
-	});
-
-export const selectShowEmptyStatus = () =>
-	createSelector(selectAllThreads, (threads) => {
-		return threads.length === 0;
-	});
 export const selectClickedOnThreadBoxStatus = createSelector(getThreadsState, (state) => state.isFocusThreadBox);
 
 export const selectSearchedThreadLoadingStatus = createSelector(getThreadsState, (state) => state.loadingStatusSearchedThread);

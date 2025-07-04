@@ -126,11 +126,7 @@ export const activitiesSlice = createSlice({
 		remove: activityAdapter.removeOne,
 		updateListActivity: (state: ActivityState, action: PayloadAction<ActivitiesEntity[]>) => {
 			activityAdapter.setAll(state, action.payload);
-		},
-		updateCache: (state) => {
-			state.cache = createCacheMetadata(ACTIVITIES_CACHE_TIME);
 		}
-		// ...
 	},
 	extraReducers: (builder) => {
 		builder
