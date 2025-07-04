@@ -36,7 +36,7 @@ export function ReplyMessageBox({ channelId, dataReferences, className }: Messag
 				Replying to <span className=" text-theme-primary-active font-semibold">{nameShowed}</span>
 			</div>
 			<button className="relative" onClick={handleRemoveReply}>
-				<Icons.CircleClose />
+				<Icons.Close />
 			</button>
 		</div>
 	);

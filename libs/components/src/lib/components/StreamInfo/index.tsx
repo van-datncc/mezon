@@ -131,7 +131,7 @@ const StreamInfo = ({ type }: StreamInfoProps) => {
 						</span>
 					</div>
 					<button className="w-fit" onClick={handleClick}>
-						<div className="hover:underline font-medium text-xs dark:text-contentSecondary text-colorTextLightMode">
+						<div className="hover:underline font-medium text-xs text-theme-primary">
 							{streamAddress.length > 30 ? `${streamAddress.substring(0, 30)}...` : streamAddress}
 						</div>
 					</button>

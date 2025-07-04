@@ -26,7 +26,7 @@ const ExitSetting = (props: ModalExitProps) => {
 					<div onClick={handleClose} className="rounded-full p-[10px] border-theme-primary bg-button-secondary bg-secondary-button-hover">
 						<Icons.CloseButton className="w-4" />
 					</div>
-					<div className="font-semibold text-[13px] ">ESC</div>
+					<div className="font-semibold text-[13px] text-theme-primary">ESC</div>
 				</div>
 			</div>
 		</div>

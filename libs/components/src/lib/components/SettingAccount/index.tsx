@@ -67,7 +67,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 		>
 			<h1 className="text-xl font-semibold tracking-wider mb-8">My Account</h1>
 			<div className="w-full rounded-lg overflow-hidden bg-theme-setting-nav">
-				<div className="h-[100px]  bg-private-theme"></div>
+				<div style={{ backgroundColor: color }} className="h-[100px]  "></div>
 				<div className="flex justify-between relative -top-5 px-4 flex-col sbm:flex-row sbm:items-center">
 					<div className="flex items-center gap-x-4">
 						<AvatarImage

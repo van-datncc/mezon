@@ -145,7 +145,7 @@ const VoiceInfo = React.memo(() => {
 	return (
 		<div
 			className={`flex flex-col gap-2 border-b-2 dark:border-borderDefault border-gray-300 px-4 py-2 hover:bg-gray-550/[0.16] shadow-sm transition
-			${isLightMode ? 'bg-channelTextareaLight lightMode' : 'dark:bg-bgSecondary600'} w-full group`}
+			bg-theme-chat w-full group`}
 		>
 			<div className="flex justify-between items-center">
 				<div className="flex flex-col max-w-[200px]">
@@ -154,7 +154,7 @@ const VoiceInfo = React.memo(() => {
 						<span className="text-green-600 font-medium text-base">{showCamera ? 'Video' : 'Voice'} Connected</span>
 					</div>
 					<button className="w-fit" onClick={redirectToVoice}>
-						<div className="hover:underline font-medium text-xs dark:text-contentSecondary text-colorTextLightMode">
+						<div className="hover:underline font-medium text-xs text-theme-primary">
 							{voiceAddress.length > 30 ? `${voiceAddress.substring(0, 30)}...` : voiceAddress}
 						</div>
 					</button>

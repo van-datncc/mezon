@@ -11,7 +11,6 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 }
-
 const Button: React.FC<ButtonProps> = ({ variant, size, disabled, children, className, ...rest }) => {
 	return (
 		<button
