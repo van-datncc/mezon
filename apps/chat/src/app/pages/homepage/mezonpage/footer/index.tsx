@@ -61,7 +61,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 							<div className="flex gap-[32px] max-lg:flex-col">
 								<div className="flex flex-col gap-[12px]">
 									<a
-										href="#"
+										href="https://mezon.ai/blogs/executive-summary"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -69,7 +69,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Executive Summary
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/problem-statement"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -77,7 +77,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Problem Statement
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/solution"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -85,7 +85,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Solution
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/blockchain-economy"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -93,7 +93,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Blockhain & Token Economy
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/developers"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -103,7 +103,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 								</div>
 								<div className="flex flex-col gap-[12px]">
 									<a
-										href=""
+										href="https://mezon.ai/blogs/technica-architecture"
 										target="_blank"
 										rel="noreferrer"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
@@ -111,7 +111,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Technical Architecture
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/readmap"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -119,7 +119,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Product roadmap
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/tokenomics"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -128,7 +128,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Tokenomics
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/team"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -139,7 +139,8 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 							</div>
 						</div>
 						<div className="flex flex-col gap-[16px]">
-							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>							<div className="flex flex-col gap-[16px]">
+							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>{' '}
+							<div className="flex flex-col gap-[16px]">
 								<a
 									href="https://apps.apple.com/vn/app/mezon/id6502750046"
 									target="_blank"
@@ -155,7 +156,8 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									onClick={() => trackFooterDownloadEvent('Android', 'Google Play')}
 								>
 									<Image src={`assets/google-play.svg`} className="max-w-[135px]" />
-								</a>								{platform === Platform.MACOS ? (
+								</a>{' '}
+								{platform === Platform.MACOS ? (
 									<div className="relative inline-block leading-[0px]" ref={dropdownRef}>
 										<button onClick={toggleDropdown}>
 											<Icons.MacAppStoreDesktop className="max-w-full h-[40px] w-fit" />
@@ -185,25 +187,25 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										)}
 									</div>
 								) : platform === 'Linux' ? (
-										<a
-											className="cursor-pointer"
-											href={downloadUrl}
-											target="_blank"
-											rel="noreferrer"
-											onClick={() => trackFooterDownloadEvent('Linux', 'DEB Package')}
-										>
+									<a
+										className="cursor-pointer"
+										href={downloadUrl}
+										target="_blank"
+										rel="noreferrer"
+										onClick={() => trackFooterDownloadEvent('Linux', 'DEB Package')}
+									>
 										<Image src={`assets/linux.svg`} className="max-w-[135px]" />
 									</a>
 								) : (
 									<DropdownButton
 										icon={
-													<a
-														className="cursor-pointer"
-														href={downloadUrl}
-														target="_blank"
-														rel="noreferrer"
-														onClick={() => trackFooterDownloadEvent('Windows', 'EXE Installer')}
-													>
+											<a
+												className="cursor-pointer"
+												href={downloadUrl}
+												target="_blank"
+												rel="noreferrer"
+												onClick={() => trackFooterDownloadEvent('Windows', 'EXE Installer')}
+											>
 												<Icons.MicrosoftDropdown className="max-w-full h-[40px] w-fit" />
 											</a>
 										}
@@ -216,7 +218,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										]}
 										dropdownRef={dropdownRef}
 										downloadUrl={downloadUrl}
-												onDownloadClick={trackFooterDownloadEvent}
+										onDownloadClick={trackFooterDownloadEvent}
 									/>
 								)}
 							</div>
@@ -228,13 +230,13 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 				<div className="w-10/12 px-[32px] max-md:px-[16px] flex items-center gap-[32px] justify-between max-lg:gap-[24px] max-lg:w-full max-lg:flex-col-reverse max-lg:items-start">
 					<div className="text-[16px] leading-[24px] font-normal text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
 					<div className="flex items-center gap-[24px]">
-						<a href="https://www.linkedin.com/company/nccplus-vietnam" target="_blank" rel="noreferrer">
+						<a href="https://www.linkedin.com/company/106435035" target="_blank" rel="noreferrer">
 							<Image src={`assets/instagram.svg`} />
 						</a>
-						<a href="https://www.facebook.com/profile.php?id=61558081847939" target="_blank" rel="noreferrer">
+						<a href="https://www.facebook.com/mezonworld" target="_blank" rel="noreferrer">
 							<Image src={`assets/facebook.svg`} />
 						</a>
-						<a href="https://github.com/nccasia/mezon-fe" target="_blank" rel="noreferrer">
+						<a href="https://github.com/mezonai/mezon" target="_blank" rel="noreferrer">
 							<Image src={`assets/twitter.svg`} />
 						</a>
 					</div>
