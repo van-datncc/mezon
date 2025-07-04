@@ -36,7 +36,7 @@ const ItemPanel = ({
 		<button
 			disabled={disabled}
 			onClick={onClick}
-			className={`flex flex-col justify-center w-full rounded-sm hover:[&>*]:text-[#fff] bg-item-hover pr-2 ${danger ? 'hover:bg-colorDanger' : ''}`}
+			className={`flex flex-col justify-center w-full rounded-sm bg-item-hover pr-2 ${danger ? 'hover:bg-colorDanger' : ''}`}
 		>
 			<div className={'flex flex-row items-center justify-between w-full'}>
 				<li

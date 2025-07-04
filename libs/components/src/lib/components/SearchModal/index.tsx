@@ -350,7 +350,7 @@ export default memo(SearchModal);
 const FooterNoteModal = memo(() => {
 	return (
 		<div className="pt-2">
-			<span className="text-[13px] font-medium ">
+			<span className="text-[13px] font-medium text-theme-primary">
 				<span className="text-[#2DC770] opacity-100 font-bold">PROTIP: </span>Start searches with @, # to narrow down results.
 			</span>
 		</div>
