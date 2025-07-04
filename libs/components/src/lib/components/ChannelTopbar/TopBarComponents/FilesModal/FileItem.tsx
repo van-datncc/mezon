@@ -77,7 +77,7 @@ const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 				event.stopPropagation();
 				handleDownload(event);
 			}}
-			className={`cursor-pointer break-all w-full gap-3 flex py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
+			className={`cursor-pointer break-all w-full gap-3 flex py-3 pl-3 pr-3 rounded-lg max-w-full ${hideTheInformationFile ? 'bg-theme-setting-nav border-theme-primary' : ''}  relative`}
 			role="button"
 		>
 			<div className="flex items-center">{thumbnailAttachment}</div>
@@ -93,20 +93,20 @@ const FileItem = ({ attachmentData, mode }: FileItemProps) => {
 									Download <span className="font-medium uppercase">{fileType}</span>
 								</span>
 							) : (
-								<p className="dark:text-textDarkTheme text-textLightTheme w-fit one-line">
-									Shared by {username} <span className="text-sm text-gray-500">{attachmentSendTime}</span>
+								<p className=" w-fit one-line">
+									Shared by {username} <span className="text-sm ">{attachmentSendTime}</span>
 								</p>
 							)}
 						</div>
 						{hoverShowOptButtonStatus && (
-							<div className="h-8 absolute right-4 top-1/2 transform -translate-y-1/2 rounded-md dark:bg-[#313338] border dark:border-0 bg-gray-200 flex flex-row justify-center items-center">
+							<div className="h-8 absolute right-4 top-1/2 transform -translate-y-1/2 rounded-md  border flex flex-row justify-center items-center">
 								<div
 									onClick={(event) => {
 										event.stopPropagation();
 										handleDownload(event);
 									}}
 									role="button"
-									className="rounded-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+									className="rounded-md w-8 h-8 flex flex-row justify-center items-center cursor-pointer bg-theme-input bg-secondary-button-hover text-theme-primary-hover "
 								>
 									<Icons.Download defaultSize="w-4 h-4" />
 								</div>

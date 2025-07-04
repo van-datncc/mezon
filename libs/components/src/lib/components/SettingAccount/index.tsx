@@ -81,7 +81,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 						<div className="font-semibold text-lg">{userProfile?.user?.display_name}</div>
 					</div>
 					<div
-						className="bg-button-add-friend	text-white hover:opacity-80 h-fit px-4 py-2 rounded-lg cursor-pointer hover:bg-opacity-80 w-fit text-center"
+						className="bg-button-primary text-white hover:opacity-80 h-fit px-4 py-2 rounded-lg cursor-pointer hover:bg-opacity-80 w-fit text-center"
 						onClick={handleClick}
 					>
 						Edit User Profile

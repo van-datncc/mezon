@@ -277,7 +277,7 @@ const ClanGroup = ({ group, onMouseDown, onMouseEnter, className = '', isGroupIn
 
 			{totalBadgeCount > 0 && (
 				<div
-					className={`flex items-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-1px] right-[-2px] outline outline-[3px] outline-white dark:outline-bgSecondary500 ${
+					className={`flex items-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-1px] right-[-2px] outline outline-[1px] outline-white ${
 						totalBadgeCount >= 10 ? 'w-[22px] h-[16px]' : 'w-[16px] h-[16px]'
 					}`}
 				>

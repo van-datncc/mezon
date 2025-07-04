@@ -32,9 +32,7 @@ function convertContentToObject(notify: any) {
 }
 function NotificationWebhookClanItem({ notify }: NotifyClanWebhookProps) {
 	const parseNotify = convertContentToObject(notify);
-	return (
-		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">{<MentionTabContent message={parseNotify.content} />}</div>
-	);
+	return <div className=" bg-transparent rounded-[8px] relative group">{<MentionTabContent message={parseNotify.content} />}</div>;
 }
 
 export default NotificationWebhookClanItem;
@@ -48,8 +46,8 @@ function MentionTabContent({ message }: IMentionTabContent) {
 	const { priorityAvatar } = useGetPriorityNameFromUserClan(message.sender_id);
 
 	return (
-		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
-			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-[#FFFFFF] dark:bg-[#313338]">
+		<div className="flex flex-col p-2 bg-item-theme rounded-lg ">
+			<div className="flex flex-row p-1 w-full gap-4  rounded-lg bg-item-theme">
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"

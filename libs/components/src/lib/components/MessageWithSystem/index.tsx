@@ -36,7 +36,7 @@ function MessageWithSystem({ message, onContextMenu, popup, isSearchMessage, sho
 					messageId={message?.id}
 					className={'fullBoxText relative group'}
 				>
-					<div className={`flex items-start min-h-8 relative w-full px-3 pt-2 pl-5 ${isCustom ? 'pb-2' : ''}`}>
+					<div className={`flex items-start min-h-8 relative w-full px-3 text-theme-primary pt-2 pl-5 ${isCustom ? 'pb-2' : ''}`}>
 						{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 flex-shrink-0" />}
 						{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 flex-shrink-0" />}
 						{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6 flex-shrink-0" />}
@@ -59,9 +59,8 @@ function MessageWithSystem({ message, onContextMenu, popup, isSearchMessage, sho
 const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
 	const messageDate = !message?.create_time ? '' : convertDateString(message?.create_time as string);
 	return (
-		<div className="relative text-center my-4 px-4">
-			<hr className="border-t border-gray-300 dark:border-gray-600 absolute top-1/2 left-0 right-0" />
-			<span className="relative inline-block px-3 text-theme-primary text-xs font-semibold">{messageDate}</span>
+		<div className="mt-5 mb-2  w-full h-px flex items-center justify-center border-b-theme-primary">
+			<span className="px-4 bg-item text-theme-primary text-xs font-semibold bg-theme-primary rounded-lg ">{messageDate}</span>
 		</div>
 	);
 };

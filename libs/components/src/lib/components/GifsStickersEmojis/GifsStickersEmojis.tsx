@@ -106,7 +106,7 @@ export const GifStickerEmojiPopup = ({
 					? 'min-h-[350px]'
 					: 'min-h-[500px]';
 
-		return `${baseClasses} ${widthClasses} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30 ${heightClasses}`;
+		return `${baseClasses} ${widthClasses} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg text-theme-primary bg-theme-setting-primary shadow shadow-neutral-900 z-30 ${heightClasses}`;
 	}, [currentChannel?.type, emojiAction, isShowEmojiPicker]);
 
 	const contentWidthClass = useMemo(() => {
@@ -161,15 +161,11 @@ const TabBar = React.memo(
 		};
 	}) => {
 		const getTabClassName = useCallback((isActive: boolean) => {
-			return `relative px-2 mx-2 rounded-md ${
-				isActive
-					? 'font-semibold dark:text-white text-black'
-					: 'dark:text-gray-300 text-colorTextLightMode dark:hover:text-white hover:text-black'
-			}`;
+			return `relative px-2 mx-2 rounded-md ${isActive ? 'text-theme-primary-active font-semibold' : 'text-theme-primary'}`;
 		}, []);
 
 		return (
-			<div className="flex justify-start flex-row mt-3 border-b border-blue-500 pb-1 pt-1 max-sm:justify-evenly">
+			<div className="flex justify-start flex-row mt-3 border-b-theme-primary pb-1 pt-1 max-sm:justify-evenly">
 				{showTabs.gifs && (
 					<button className={getTabClassName(subPanelActive === SubPanelName.GIFS)} onClick={() => onTabClick(SubPanelName.GIFS)}>
 						Gifs

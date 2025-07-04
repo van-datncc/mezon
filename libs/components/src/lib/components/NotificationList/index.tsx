@@ -119,26 +119,22 @@ function NotificationList({ rootRef }: NotificationProps) {
 	};
 
 	return (
-		<div
-			ref={modalRef}
-			tabIndex={-1}
-			className="absolute top-8 right-0 z-[99999999] rounded-lg dark:shadow-shadowBorder shadow-shadowInbox w-[480px]"
-		>
-			<div className="flex flex-col dark:bg-bgPrimary bg-white border-borderDefault dark:text-contentSecondary text-black text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
-				<div className="py-2 px-3 bg-theme-setting-nav">
+		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowInbox w-[480px]">
+			<div className="flex flex-col bg-theme-setting-primary text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
+				<div className="py-2 px-3 ">
 					<div className="flex flex-row items-center justify-between gap-2 font-bold text-[16px]">
 						<div className="flex flex-row items-center justify-start">
 							<InboxButton />
 							<div>Inbox </div>
 						</div>
 					</div>
-					<div className="flex flex-row border-b-[1px] border-b-gray-300">
+					<div className="flex flex-row border-b-theme-primary">
 						<div className="flex flex-row gap-4 py-3 w-[90%]">
 							{tabDataNotify.map((tab, index: number) => {
 								return (
 									<div key={index}>
 										<button
-											className={`px-2 py-[4px] rounded-[4px] text-base font-medium ${currentTabNotify === tab.value ? 'dark:bg-bgTertiary bg-bgLightModeButton dark:text-contentPrimary text-colorTextLightMode' : ''}`}
+											className={`px-2 py-[4px] rounded-[4px] text-base font-medium ${currentTabNotify === tab.value ? 'bg-button-primary text-white' : ''}`}
 											tabIndex={index}
 											onClick={() => handleChangeTab(tab.value)}
 										>
@@ -152,7 +148,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 				</div>
 
 				<div
-					className={`dark:bg-bgSecondary bg-bgLightSecondary flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+					className={` flex flex-col max-w-[600px] max-h-heightInBox overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 				>
 					{currentTabNotify === InboxType.INDIVIDUAL && (
 						<div
