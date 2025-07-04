@@ -119,7 +119,7 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 			/>
 			{anonymousMode && (
 				<div className="absolute -top-3 -right-3 rotate-45 anonymousAnimation">
-					<Icons.HatIcon defaultSize="w-7 h-7 dark:fill-white fill-black " />
+					<Icons.HatIcon defaultSize="w-7 h-7  " />
 				</div>
 			)}
 		</div>

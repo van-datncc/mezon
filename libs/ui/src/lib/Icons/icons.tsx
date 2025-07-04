@@ -1133,9 +1133,7 @@ export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 
 export const TopicIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="24" height="24" fill="none" x="0px" y="0px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={` ${defaultSize} `}>
-			<g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-			<g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+		<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`${defaultSize} ${className}`}>
 			<g id="SVGRepo_iconCarrier">
 				<path
 					fillRule="evenodd"
@@ -2236,12 +2234,7 @@ export function HashtagWarning(props: React.HTMLAttributes<SVGElement>) {
 
 export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', className = '' }) => {
 	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			className={`block ${defaultSize} ${className}`}
-		>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`block ${defaultSize} ${className}`}>
 			<g className="translate-x-[1px] translate-y-[2px]">
 				<path
 					d="M3.56915 15.415L4.73001 11.0721H0.666992L1.13341 9.31012H5.20679L6.00489 6.28358H1.94187L2.41865 4.53192H6.48167L7.55961 0.5H9.38382L8.29552 4.53192H11.4568L12.5347 0.5H14.3589L13.2706 4.53192H17.3337L16.8672 6.28358H12.8042L11.9854 9.31012H16.0484L15.582 11.0721H11.519L10.3581 15.415H8.54427L9.69477 11.0721H6.54386L5.383 15.415H3.56915ZM7.02064 9.31012H10.1716L10.98 6.28358H7.8291L7.02064 9.31012Z"
@@ -4565,28 +4558,26 @@ export function MarkAllAsRead(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export function HatIcon({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function HatIcon({ defaultFill = 'fill-current text-theme-primary', defaultSize = 'w-5 h-5' }: IconProps) {
 	return (
 		<svg
 			version="1.1"
 			id="_x32_"
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
-			className={`${defaultSize}`}
+			className={`${defaultSize} ${defaultFill}`}
 			viewBox="0 0 512 512"
 			xmlSpace="preserve"
+			fill="currentColor"
 		>
-			<g>
-				<path
-					className="st0"
-					d="M511.883,298.395c-2.781-27.281-54.391-46.141-129.406-51.844c-7.172-42.047-15.469-90.563-17.891-103.75
-		c-5.563-30.203-45.344-47.094-74.891-25.313c-15.5,11.422-29.359,12.234-36.703,12.234s-15.5,1.625-36.703-12.234
-		c-30.719-20.094-69.328-4.891-74.875,25.313c-2.969,16.109-14.688,84.844-22.391,130.203
-		C45.211,293.817-2.711,323.114,0.117,350.723c4.25,41.625,122.266,63.671,263.578,49.218
-		C405.039,385.488,516.148,340.036,511.883,298.395z M132.289,308.348l8.156-42.406c0,0,145.188,22.828,226.75-19.578l8.156,35.891
-		C375.352,282.254,287.258,337.708,132.289,308.348z"
-				/>
-			</g>
+			<path
+				d="M511.883,298.395c-2.781-27.281-54.391-46.141-129.406-51.844c-7.172-42.047-15.469-90.563-17.891-103.75
+				c-5.563-30.203-45.344-47.094-74.891-25.313c-15.5,11.422-29.359,12.234-36.703,12.234s-15.5,1.625-36.703-12.234
+				c-30.719-20.094-69.328-4.891-74.875,25.313c-2.969,16.109-14.688,84.844-22.391,130.203
+				C45.211,293.817-2.711,323.114,0.117,350.723c4.25,41.625,122.266,63.671,263.578,49.218
+				C405.039,385.488,516.148,340.036,511.883,298.395z M132.289,308.348l8.156-42.406c0,0,145.188,22.828,226.75-19.578l8.156,35.891
+				C375.352,282.254,287.258,337.708,132.289,308.348z"
+			/>
 		</svg>
 	);
 }
