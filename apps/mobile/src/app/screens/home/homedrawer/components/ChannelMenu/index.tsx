@@ -383,7 +383,12 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 			if (channel?.channel_id === currentSystemMessage?.channel_id) {
 				Toast.show({ type: 'error', text1: t('modalConfirm.channel.systemChannel') });
 			} else {
-				await dispatch(channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' }));
+				const response = await dispatch(
+					channelsActions.deleteChannel({ channelId: channel?.channel_id || '', clanId: channel?.clan_id || '' })
+				);
+				if (response?.meta?.requestStatus === 'rejected') {
+					throw response?.error?.message;
+				}
 			}
 		} catch (error) {
 			Toast.show({ type: 'error', text1: t('modalConfirm.channel.error', { error }) });

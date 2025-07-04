@@ -1,20 +1,18 @@
 import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { createSticker, selectCurrentClanId, selectStickersByClanId, useAppDispatch } from '@mezon/store-mobile';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { Buffer as BufferMobile } from 'buffer';
 import { ApiClanStickerAddRequest } from 'mezon-js/api.gen';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, ScrollView, Text, View } from 'react-native';
-import { Image as ImageCompressor } from 'react-native-compressor';
-import RNFS from 'react-native-fs';
+import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-native';
 import { openPicker } from 'react-native-image-crop-picker';
 import Toast from 'react-native-toast-message';
+import { WebView } from 'react-native-webview';
 import { useSelector } from 'react-redux';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../componentUI/MezonButton2';
 import { IFile } from '../../../componentUI/MezonImagePicker';
 import { EmojiPreview } from '../Emoji/EmojiPreview';
 import { StickerList } from './StickerList';
@@ -23,13 +21,96 @@ import { style } from './styles';
 export function StickerSetting({ navigation }) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const timerRef = useRef<any>(null);
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const listSticker = useSelector(selectStickersByClanId(currentClanId));
-	const availableLeft = useMemo(() => 50 - listSticker?.length, [listSticker]);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation(['clanStickerSetting']);
+
+	const [watermarkState, setWatermarkState] = useState<{
+		isProcessing: boolean;
+		html: string;
+		resolve?: (value: string) => void;
+		reject?: (reason?: any) => void;
+	}>({
+		isProcessing: false,
+		html: ''
+	});
+
+	const createBlurredWatermarkedImageFile = (base64Data: string, watermarkText = 'SOLD') => {
+		return new Promise((resolve, reject) => {
+			const dataUri = `data:image/png;base64,${base64Data}`;
+
+			const html = `
+				<!DOCTYPE html>
+				<html>
+				<head>
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				</head>
+				<body>
+					<canvas id="canvas"></canvas>
+					<script>
+						const canvas = document.getElementById('canvas');
+						const ctx = canvas.getContext('2d');
+						const img = new Image();
+						
+						img.onload = function() {
+							canvas.width = img.width;
+							canvas.height = img.height;
+							ctx.filter = 'blur(2px)';
+							ctx.drawImage(img, 0, 0);
+							
+							ctx.filter = 'none';
+							const fontSize = Math.floor(canvas.width / 2);
+							ctx.font = 'bold ' + fontSize + 'px sans-serif';
+							ctx.fillStyle = 'rgba(128, 128, 128, 0.75)';
+							ctx.textAlign = 'center';
+							ctx.textBaseline = 'middle';
+							
+							ctx.save();
+							ctx.translate(canvas.width / 2, canvas.height / 2);
+							ctx.rotate((45 * Math.PI) / 180);
+							ctx.fillText('${watermarkText}', 0, 0);
+							ctx.restore();
+							
+							const dataURL = canvas.toDataURL('image/png', 1);
+							window.ReactNativeWebView.postMessage(dataURL);
+						};
+						
+						img.onerror = () => window.ReactNativeWebView.postMessage('ERROR: Image load failed');
+						img.src = '${dataUri}';
+					</script>
+				</body>
+				</html>
+			`;
+
+			setWatermarkState({
+				isProcessing: true,
+				html,
+				resolve,
+				reject
+			});
+		});
+	};
+
+	const handleWebViewMessage = useCallback(
+		(event: any) => {
+			const result = event.nativeEvent.data;
+
+			if (result?.startsWith('ERROR')) {
+				watermarkState.reject?.(new Error('Cannot process image'));
+			} else if (result.startsWith('data:image')) {
+				const base64Data = result.split(',')[1];
+				watermarkState.resolve?.(base64Data);
+			}
+
+			setWatermarkState({
+				isProcessing: false,
+				html: ''
+			});
+		},
+		[watermarkState]
+	);
 
 	const handleUploadImage = useCallback(async (file: IFile) => {
 		if (Number(file.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 2)) {
@@ -92,7 +173,6 @@ export function StickerSetting({ navigation }) {
 	};
 
 	const handleUploadConfirm = async (croppedFile, name, isForSale) => {
-
 		const { id, url } = await handleUploadImage({
 			fileData: croppedFile?.data,
 			name: croppedFile.filename,
@@ -113,17 +193,11 @@ export function StickerSetting({ navigation }) {
 			is_for_sale: isForSale
 		};
 		if (isForSale) {
-			const pathCompressed = await ImageCompressor.compress(croppedFile.path, {
-				compressionMethod: 'auto',
-				maxWidth: 20,
-				maxHeight: 20,
-				quality: 0.1
-			});
+			const fileData = await createBlurredWatermarkedImageFile(croppedFile?.data);
 
-			const fileData = await RNFS.readFile(pathCompressed?.replace?.('%20', ' ') || '', 'base64');
 			const { id } = await handleUploadImage({
 				fileData: fileData,
-				name: croppedFile.filename,
+				name: croppedFile.modificationDate,
 				uri: croppedFile.path,
 				size: croppedFile.size,
 				type: croppedFile.mime
@@ -133,28 +207,33 @@ export function StickerSetting({ navigation }) {
 		dispatch(createSticker({ request: request, clanId: currentClanId }));
 	};
 
-	return (
-		<View style={styles.container}>
-			<ScrollView contentContainerStyle={{ backgroundColor: themeValue.primary }}>
-				<MezonButton
-					title={t('btn.upload')}
-					type={EMezonButtonTheme.SUCCESS}
-					size={EMezonButtonSize.MD}
-					rounded={true}
-					containerStyle={styles.btn}
-					onPress={handleUploadSticker}
-					titleStyle={styles.btnTitle}
-				/>
-
-				<Text style={styles.text}>{t('content.description')}</Text>
+	const ListHeaderComponent = () => {
+		return (
+			<View style={{ paddingBottom: size.s_20 }}>
+				<Pressable style={styles.addButton} onPress={handleUploadSticker}>
+					<Text style={styles.buttonText}>{t('btn.upload')}</Text>
+				</Pressable>
 				<Text style={[styles.text, styles.textTitle]}>{t('content.requirements')}</Text>
 				<Text style={styles.text}>{t('content.reqType')}</Text>
 				<Text style={styles.text}>{t('content.reqDim')}</Text>
 				<Text style={styles.text}>{t('content.reqSize')}</Text>
-
-				<Text style={[styles.text, styles.textTitle]}>{t('content.available', { left: availableLeft })}</Text>
-				<StickerList listSticker={listSticker} clanID={currentClanId} />
-			</ScrollView>
+			</View>
+		);
+	};
+	return (
+		<View style={styles.container}>
+			<StickerList listSticker={listSticker} clanID={currentClanId} ListHeaderComponent={ListHeaderComponent} />
+			{watermarkState?.isProcessing && (
+				<WebView
+					source={{ html: watermarkState?.html }}
+					style={{
+						position: 'absolute'
+					}}
+					onMessage={handleWebViewMessage}
+					javaScriptEnabled={true}
+					domStorageEnabled={true}
+				/>
+			)}
 		</View>
 	);
 }

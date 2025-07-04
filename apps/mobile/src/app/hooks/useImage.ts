@@ -12,17 +12,28 @@ export function useImage() {
 	const downloadImage = useCallback(
 		async (imageUrl: string, type: string) => {
 			try {
-				const response = await RNFetchBlob.config({
-					fileCache: true,
-					appendExt: type
-				}).fetch('GET', imageUrl);
+				let filePath = '';
 
-				if (response.info().status === 200) {
-					const filePath = response.path();
+				if (imageUrl.startsWith('data:image/')) {
+					const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+					const extension = type || 'png';
+					filePath = `${RNFetchBlob.fs.dirs.CacheDir}/image_${Date.now()}.${extension}`;
+
+					await RNFetchBlob.fs.writeFile(filePath, base64Data, 'base64');
 					return filePath;
 				} else {
-					console.error('Error downloading image:', response.info());
-					return null;
+					const response = await RNFetchBlob.config({
+						fileCache: true,
+						appendExt: type
+					}).fetch('GET', imageUrl);
+
+					if (response.info().status === 200) {
+						filePath = response.path();
+						return filePath;
+					} else {
+						console.error('Error downloading image:', response.info());
+						return null;
+					}
 				}
 			} catch (error) {
 				console.error('Error downloading image:', error);

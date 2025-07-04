@@ -3,7 +3,7 @@ import { useAppNavigation, useAuth } from '@mezon/core';
 import { authActions, selectIsLogin, selectLoadingEmail, useAppDispatch } from '@mezon/store';
 import { validateEmail, validatePassword } from '@mezon/utils';
 
-import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
+import { ButtonLoading, FormError, Input, PasswordInput } from '@mezon/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLoaderData } from 'react-router-dom';
@@ -124,22 +124,17 @@ function Login() {
 		await dispatch(authActions.authenticateEmail({ email, password }));
 	};
 
-	const handleSubmit = useCallback(
-		(e: React.FormEvent) => {
-			e.preventDefault();
+	const handleSubmit = useCallback(async () => {
+		const emailError = validateEmail(email);
+		const passwordError = validatePassword(password);
 
-			const emailError = validateEmail(email);
-			const passwordError = validatePassword(password);
+		if (emailError || passwordError) {
+			setErrors({ email: emailError, password: passwordError });
+			return;
+		}
 
-			if (emailError || passwordError) {
-				setErrors({ email: emailError, password: passwordError });
-				return;
-			}
-
-			handleLogin({ email, password });
-		},
-		[email, password]
-	);
+		await handleLogin({ email, password });
+	}, [email, password]);
 
 	const disabled = !!errors.email || !!errors.password || !email || !password || isLoadingLoginEmail !== 'not loaded';
 
@@ -168,7 +163,7 @@ function Login() {
 						<div className="min-h-[20px]">{errors.email && <FormError message={errors.email} />}</div>
 						<PasswordInput onFocus={handleFocus} id="password" label="Password" value={password} onChange={handlePasswordChange} />
 						<div className="min-h-[20px]">{errors.password && <FormError message={errors.password} />}</div>
-						<SubmitButton disabled={disabled} submitButtonText={'Log In'} isLoading={isLoadingLoginEmail} />
+						<ButtonLoading className="w-full h-10" disabled={disabled} label="Log In" onClick={handleSubmit} />
 					</form>
 					<div className="mt-4 flex items-center text-gray-400">
 						<input

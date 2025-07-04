@@ -16,7 +16,7 @@ const EmojiCategory: FC<EmojiCategoryProps> = ({ emojisData, categoryName, onEmo
 	const styles = style(themeValue);
 
 	return (
-		<View key={categoryName} style={styles.displayByCategories}>
+		<View style={styles.displayByCategories}>
 			<Text style={styles.titleCategories}>{categoryName}</Text>
 			<EmojisPanel emojisData={emojisData} onEmojiSelect={onEmojiSelect} />
 		</View>

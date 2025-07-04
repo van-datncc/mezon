@@ -2,7 +2,7 @@ import { useEscapeKeyClose } from '@mezon/core';
 import { ChannelStatusEnum, IChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
-import ButtonLoading from '../Button/ButtonLoading';
+import Button from '../Button';
 import { Hashtag, HashtagLocked, Speaker, SpeakerLocked } from '../Icons';
 
 export type ModalProps = {
@@ -11,8 +11,6 @@ export type ModalProps = {
 	title?: string;
 	onClose: () => void;
 	confirmButton?: () => void;
-	titleConfirm?: string;
-	disableButtonConfirm?: boolean;
 	classNameBox?: string;
 	subTitleBox?: string;
 	classSubTitleBox?: string;
@@ -29,8 +27,6 @@ const Modal = (props: ModalProps) => {
 		confirmButton,
 		title,
 		children,
-		titleConfirm,
-		disableButtonConfirm,
 		classNameBox,
 		subTitleBox,
 		classSubTitleBox,
@@ -77,43 +73,19 @@ const Modal = (props: ModalProps) => {
 									)}
 									<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 								</div>
-								<button
-									className="flex items-center justify-center opacity-50"
-									onClick={() => {
-										onClose();
-									}}
+								<Button
+									className="flex items-center rounded-full aspect-square h-6 text-5xl leading-3 justify-center opacity-50 bg-transparent hover:bg-bgHover "
+									onClick={onClose}
 								>
-									<span className="text-5xl leading-3 dark:hover:text-white hover:text-black">×</span>
-								</button>
+									×
+								</Button>
 							</div>
 
 							{/*body*/}
 							<div className="relative px-5 py-4 flex-auto bg-transparent max-h-[500px] overflow-auto hide-scrollbar">
-								<div className={`dark:bg-[#323232] bg-bgLightModeSecond rounded-[5px] bg-transparent ${classNameWrapperChild}`}>
-									{children}
-								</div>
+								<div className={`${classNameWrapperChild}`}>{children}</div>
 							</div>
 							{/*footer*/}
-							{confirmButton && title !== 'Invite friends to KOMU' && (
-								<div className="flex items-center p-4 border-t border-solid dark:border-borderDefault rounded-b justify-between">
-									<button
-										className="text-contentBrandLight background-transparent font-semibold px-4 py-2
-										text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all
-										duration-150 text-[16px] leading-6 rounded-lg"
-										onClick={onClose}
-									>
-										Back
-									</button>
-									{titleConfirm && (
-										<ButtonLoading
-											className={`text-white font-semibold text-sm px-4 py-2 shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150 bg-primary text-[16px] leading-6 rounded ${disableButtonConfirm ? 'opacity-50 cursor-not-allowed' : ''}`}
-											onClick={handleConfirmClick}
-											label={titleConfirm}
-											disabled={disableButtonConfirm}
-										/>
-									)}
-								</div>
-							)}
 						</div>
 					</div>
 				</div>

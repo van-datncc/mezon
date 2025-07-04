@@ -43,7 +43,7 @@ export const useEmojiPopupModal = (props: EmojiPopupModalProps): EmojiPopupModal
 				}}
 			>
 				<div
-					className="absolute z-10 origin-bottom-right rounded-lg shadow-lg"
+					className="absolute z-10 origin-bottom-right rounded-lg shadow-lg max-sbm:!left-3 max-sbm:!right-3"
 					onClick={(e) => e.stopPropagation()}
 					style={{
 						left: `${clickPosition.x}px`,

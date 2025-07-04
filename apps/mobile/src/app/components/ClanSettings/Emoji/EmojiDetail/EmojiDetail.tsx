@@ -125,12 +125,7 @@ export const EmojiDetail = forwardRef(({ item, onSwipeOpen }: ServerDetailProps,
 						{dataAuthor?.user?.username}
 					</Text>
 					<View style={styles.imgWrapper}>
-						<MezonClanAvatar
-							alt={dataAuthor?.user?.username}
-							image={dataAuthor?.user?.avatar_url}
-							imageHeight={size.s_30}
-							imageWidth={size.s_30}
-						/>
+						<MezonClanAvatar alt={dataAuthor?.user?.username} image={dataAuthor?.user?.avatar_url} imageHeight={30} imageWidth={30} />
 					</View>
 				</View>
 			</Pressable>

@@ -1,5 +1,5 @@
 'use client';
-import { FormError, Input, PasswordInput, SubmitButton } from '@mezon/ui';
+import { ButtonLoading, FormError, Input, PasswordInput } from '@mezon/ui';
 import { LoadingStatus, validateEmail, validatePassword } from '@mezon/utils';
 import type React from 'react';
 import { useCallback, useState } from 'react';
@@ -69,29 +69,24 @@ export default function SetPassword({
 		[password]
 	);
 
-	const handleSubmit = useCallback(
-		(e: React.FormEvent) => {
-			e.preventDefault();
+	const handleSubmit = useCallback(() => {
+		const emailError = validateEmail(email);
+		const passwordError = validatePassword(password);
+		const confirmError = password !== confirmPassword ? "Confirmation password doesn't match" : '';
 
-			const emailError = validateEmail(email);
-			const passwordError = validatePassword(password);
-			const confirmError = password !== confirmPassword ? "Confirmation password doesn't match" : '';
+		if (emailError || passwordError || confirmError) {
+			setErrors({
+				email: emailError,
+				password: passwordError,
+				confirmPassword: confirmError
+			});
+			return;
+		}
 
-			if (emailError || passwordError || confirmError) {
-				setErrors({
-					email: emailError,
-					password: passwordError,
-					confirmPassword: confirmError
-				});
-				return;
-			}
-
-			if (onSubmit) {
-				onSubmit({ email, password });
-			}
-		},
-		[email, password, confirmPassword, onSubmit]
-	);
+		if (onSubmit) {
+			onSubmit({ email, password });
+		}
+	}, [email, password, confirmPassword, onSubmit]);
 
 	const disabled =
 		!!errors.email || !!errors.password || !!errors.confirmPassword || !email || !password || !confirmPassword || isLoading === 'loading';
@@ -148,7 +143,7 @@ export default function SetPassword({
 						/>
 					</div>
 					<div className="p-6">
-						<SubmitButton disabled={disabled} submitButtonText={submitButtonText} isLoading={isLoading} />
+						<ButtonLoading disabled={disabled} label={submitButtonText} onClick={handleSubmit} />
 					</div>
 				</form>
 			</div>

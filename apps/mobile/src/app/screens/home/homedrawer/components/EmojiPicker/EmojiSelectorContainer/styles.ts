@@ -63,15 +63,14 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			backgroundColor: colors.secondary,
 			borderRadius: size.s_20,
 			height: size.s_27,
-			width: size.s_27,
+			width: size.s_27
 		},
 		clanNameText: {
 			color: colors.textStrong,
 			fontSize: size.medium,
-			fontWeight: '600',
+			fontWeight: '600'
 		},
 		wrapperIconEmojiLocked: {
-			backgroundColor: 'rgba(0, 0, 0, 0.7)',
 			position: 'absolute',
 			alignSelf: 'center',
 			justifyContent: 'center',
@@ -81,5 +80,5 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			width: (isTabletLandscape ? Metrics.screenWidth * 0.7 - size.s_20 : Metrics.screenWidth - size.s_20) / 9 - size.s_6,
 			height: size.s_30,
 			zIndex: 1
-		},
+		}
 	});
