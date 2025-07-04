@@ -1,4 +1,4 @@
-import { Metrics, size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { MediaType, selectAllStickerSuggestion, useAppSelector } from '@mezon/store-mobile';
 import { FOR_SALE_CATE } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
@@ -73,6 +73,10 @@ const StickerSelector = ({ onSelected, onScroll, mediaType = MediaType.STICKER, 
 	}, [filteredStickers]);
 
 	const handlePressCategory = (category: any) => {
+		if (category?.id === selectedCategory?.id) {
+			setSelectedCategory(null);
+			return;
+		}
 		setSelectedCategory(category);
 	};
 
@@ -94,26 +98,37 @@ const StickerSelector = ({ onSelected, onScroll, mediaType = MediaType.STICKER, 
 			<ScrollView horizontal contentContainerStyle={styles.btnWrap}>
 				{categoryLogo?.length > 0 &&
 					categoryLogo?.map((item, index) => (
-						<TouchableOpacity key={index.toString()} onPress={() => handlePressCategory(item)} style={styles.btnEmo}>
-							{item?.forSale ? (
-								<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-									<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />
-								</View>
-							) : item?.url ? (
-								<FastImage
-									resizeMode={FastImage.resizeMode.cover}
-									source={{
-										uri: item?.url,
-										cache: FastImage.cacheControl.immutable,
-										priority: FastImage.priority.high
-									}}
-									style={{ height: '100%', width: '100%' }}
-								/>
-							) : (
-								<View style={styles.forSaleContainer}>
-									<Text style={styles.forSaleText}>{item?.type?.charAt(0)?.toUpperCase()}</Text>
-								</View>
-							)}
+						<TouchableOpacity
+							key={index.toString()}
+							onPress={() => handlePressCategory(item)}
+							style={[
+								styles.btnEmo,
+								{
+									backgroundColor: item?.id === selectedCategory?.id ? baseColor.blurple : 'transparent'
+								}
+							]}
+						>
+							<View style={styles.btnEmoImage}>
+								{item?.forSale ? (
+									<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+										<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />
+									</View>
+								) : item?.url ? (
+									<FastImage
+										resizeMode={FastImage.resizeMode.cover}
+										source={{
+											uri: item?.url,
+											cache: FastImage.cacheControl.immutable,
+											priority: FastImage.priority.high
+										}}
+										style={{ height: '100%', width: '100%' }}
+									/>
+								) : (
+									<View style={styles.forSaleContainer}>
+										<Text style={styles.forSaleText}>{item?.type?.charAt(0)?.toUpperCase()}</Text>
+									</View>
+								)}
+							</View>
 						</TouchableOpacity>
 					))}
 			</ScrollView>

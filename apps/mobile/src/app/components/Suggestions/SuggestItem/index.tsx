@@ -19,121 +19,124 @@ type SuggestItemProps = {
 	isDisplayDefaultAvatar?: boolean;
 	isRoleUser?: boolean;
 	emojiId?: string;
+	emojiSrcUnlock?: string;
 	channelId?: string;
 	channel?: ChannelsEntity;
 	color?: string;
 };
 
-const SuggestItem = memo(({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, channel, color }: SuggestItemProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const emojiSrc = emojiId ? getSrcEmoji(emojiId) : '';
-	const { t } = useTranslation(['clan']);
-	const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
-		const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
-		const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
+const SuggestItem = memo(
+	({ channelId, avatarUrl, name, subText, isDisplayDefaultAvatar, isRoleUser, emojiId, emojiSrcUnlock, channel, color }: SuggestItemProps) => {
+		const { themeValue } = useTheme();
+		const styles = style(themeValue);
+		const emojiSrc = emojiSrcUnlock ? emojiSrcUnlock : getSrcEmoji(emojiId) || '';
+		const { t } = useTranslation(['clan']);
+		const { isChannelPrivate, isChannelText, isThread, isChannelVoice, isChannelStream, isChannelApp } = useMemo(() => {
+			const isChannelPrivate = channel?.channel_private === ChannelStatusEnum.isPrivate;
+			const isChannelText = channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 
-		const isThread = checkIsThread(channel as ChannelsEntity);
+			const isThread = checkIsThread(channel as ChannelsEntity);
 
-		const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
-		const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
-		const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;
+			const isChannelVoice = channel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
+			const isChannelStream = channel?.type === ChannelType.CHANNEL_TYPE_STREAMING;
+			const isChannelApp = channel?.type === ChannelType.CHANNEL_TYPE_APP;
 
-		return {
-			isChannelPrivate,
-			isChannelText,
-			isThread,
-			isChannelVoice,
-			isChannelStream,
-			isChannelApp
-		};
-	}, [channel]);
+			return {
+				isChannelPrivate,
+				isChannelText,
+				isThread,
+				isChannelVoice,
+				isChannelStream,
+				isChannelApp
+			};
+		}, [channel]);
 
-	const isVoiceActive = useCheckVoiceStatus(channelId);
+		const isVoiceActive = useCheckVoiceStatus(channelId);
 
-	const renderRoleUser = () => (
-		<View>
-			{isRoleUser && (
-				<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
-					<Icons.RoleIcon width={size.s_20} height={size.s_20} />
-					<Text style={[styles.roleText, { color: color ?? themeValue.textRoleLink }]}>{`${name}`}</Text>
-				</View>
-			)}
-			{name?.startsWith('here') && <Text style={[styles.roleText, styles.textHere]}>{`@${name}`}</Text>}
-		</View>
-	);
-
-	const renderChannelBusy = () => (
-		<View style={styles.channelWrapper}>
-			<Text style={styles.title}>{name}</Text>
-			{isVoiceActive && <Text style={styles.channelBusyText}>({t('busy')})</Text>}
-		</View>
-	);
-
-	return (
-		<View style={styles.wrapperItem}>
-			<View style={styles.containerItem}>
-				{avatarUrl ? (
-					<FastImage
-						style={styles.image}
-						source={{
-							uri: createImgproxyUrl(avatarUrl ?? '', { width: 100, height: 100, resizeType: 'fit' })
-						}}
-					/>
-				) : (
-					!name.startsWith('here') &&
-					!isRoleUser &&
-					isDisplayDefaultAvatar && (
-						<View style={styles.avatarMessageBoxDefault}>
-							<Text style={styles.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
-						</View>
-					)
+		const renderRoleUser = () => (
+			<View>
+				{isRoleUser && (
+					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+						<Icons.RoleIcon width={size.s_20} height={size.s_20} />
+						<Text style={[styles.roleText, { color: color ?? themeValue.textRoleLink }]}>{`${name}`}</Text>
+					</View>
 				)}
-				{emojiSrc && <FastImage style={styles.emojiImage} source={{ uri: emojiSrc }} />}
-				{!isChannelPrivate && isChannelText && !isThread && (
-					<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{isChannelPrivate && isChannelText && !isThread && (
-					<MezonIconCDN icon={IconCDN.channelTextLock} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{!isChannelPrivate && isChannelText && isThread && (
-					<MezonIconCDN icon={IconCDN.threadIcon} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{isChannelPrivate && isChannelText && isThread && (
-					<MezonIconCDN icon={IconCDN.threadLockIcon} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{!isChannelPrivate && isChannelVoice && (
-					<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{isChannelPrivate && isChannelVoice && (
-					<MezonIconCDN icon={IconCDN.channelVoiceLock} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
-				)}
-				{!isChannelPrivate && isChannelStream && (
-					<MezonIconCDN
-						icon={IconCDN.channelStream}
-						customStyle={styles.streamIcon}
-						height={size.s_16}
-						width={size.s_16}
-						color={themeValue.channelNormal}
-					/>
-				)}
-				{!isChannelPrivate && isChannelApp && (
-					<MezonIconCDN
-						icon={IconCDN.channelApp}
-						customStyle={styles.streamIcon}
-						height={size.s_16}
-						width={size.s_16}
-						color={themeValue.channelNormal}
-					/>
-				)}
-
-				{isRoleUser || name?.startsWith('here') ? renderRoleUser() : renderChannelBusy()}
+				{name?.startsWith('here') && <Text style={[styles.roleText, styles.textHere]}>{`@${name}`}</Text>}
 			</View>
-			<Text style={styles.subText} numberOfLines={1}>
-				{subText}
-			</Text>
-		</View>
-	);
-});
+		);
+
+		const renderChannelBusy = () => (
+			<View style={styles.channelWrapper}>
+				<Text style={styles.title}>{name}</Text>
+				{isVoiceActive && <Text style={styles.channelBusyText}>({t('busy')})</Text>}
+			</View>
+		);
+
+		return (
+			<View style={styles.wrapperItem}>
+				<View style={styles.containerItem}>
+					{avatarUrl ? (
+						<FastImage
+							style={styles.image}
+							source={{
+								uri: createImgproxyUrl(avatarUrl ?? '', { width: 100, height: 100, resizeType: 'fit' })
+							}}
+						/>
+					) : (
+						!name.startsWith('here') &&
+						!isRoleUser &&
+						isDisplayDefaultAvatar && (
+							<View style={styles.avatarMessageBoxDefault}>
+								<Text style={styles.textAvatarMessageBoxDefault}>{name?.charAt(0)?.toUpperCase()}</Text>
+							</View>
+						)
+					)}
+					{!!emojiSrc && !!emojiId && <FastImage style={styles.emojiImage} source={{ uri: emojiSrc }} />}
+					{!isChannelPrivate && isChannelText && !isThread && (
+						<MezonIconCDN icon={IconCDN.channelText} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{isChannelPrivate && isChannelText && !isThread && (
+						<MezonIconCDN icon={IconCDN.channelTextLock} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{!isChannelPrivate && isChannelText && isThread && (
+						<MezonIconCDN icon={IconCDN.threadIcon} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{isChannelPrivate && isChannelText && isThread && (
+						<MezonIconCDN icon={IconCDN.threadLockIcon} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{!isChannelPrivate && isChannelVoice && (
+						<MezonIconCDN icon={IconCDN.channelVoice} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{isChannelPrivate && isChannelVoice && (
+						<MezonIconCDN icon={IconCDN.channelVoiceLock} width={size.s_16} height={size.s_16} color={themeValue.channelNormal} />
+					)}
+					{!isChannelPrivate && isChannelStream && (
+						<MezonIconCDN
+							icon={IconCDN.channelStream}
+							customStyle={styles.streamIcon}
+							height={size.s_16}
+							width={size.s_16}
+							color={themeValue.channelNormal}
+						/>
+					)}
+					{!isChannelPrivate && isChannelApp && (
+						<MezonIconCDN
+							icon={IconCDN.channelApp}
+							customStyle={styles.streamIcon}
+							height={size.s_16}
+							width={size.s_16}
+							color={themeValue.channelNormal}
+						/>
+					)}
+
+					{isRoleUser || name?.startsWith('here') ? renderRoleUser() : renderChannelBusy()}
+				</View>
+				<Text style={styles.subText} numberOfLines={1}>
+					{subText}
+				</Text>
+			</View>
+		);
+	}
+);
 
 export default SuggestItem;

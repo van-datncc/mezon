@@ -29,7 +29,6 @@ import { useNavigation } from '@react-navigation/native';
 // eslint-disable-next-line
 import { useMezon } from '@mezon/transport';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { ClipboardImagePreview } from 'apps/mobile/src/app/components/ClipboardImagePreview';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +37,7 @@ import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
+import { ClipboardImagePreview } from '../../../../../../components/ClipboardImagePreview';
 import { EmojiSuggestion, HashtagSuggestions, Suggestions } from '../../../../../../components/Suggestions';
 import { SlashCommandSuggestions } from '../../../../../../components/Suggestions/SlashCommandSuggestions';
 import { SlashCommandMessage } from '../../../../../../components/Suggestions/SlashCommandSuggestions/SlashCommandMessage';

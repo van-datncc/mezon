@@ -214,7 +214,18 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) 
 		fetchEmojis();
 	}, [keyword, emojiListPNG]);
 
+	const getEmojiIdFromSrc = (src) => {
+		try {
+			if (!src) return '';
+			return src?.split('/')?.pop().split('.')[0];
+		} catch (e) {
+			return '';
+		}
+	};
+
 	const handleEmojiSuggestionPress = (emoji: any) => {
+		const emojiId = getEmojiIdFromSrc(emoji?.src) || emoji?.id;
+
 		const emojiItemName = `:${emoji?.shortname?.split?.(':')?.join('')}:`;
 		onSelect({
 			...emoji,
@@ -224,7 +235,7 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) 
 		dispatch(
 			emojiSuggestionActions.setSuggestionEmojiObjPicked({
 				shortName: emojiItemName,
-				id: emoji.id
+				id: emojiId
 			})
 		);
 	};
@@ -235,7 +246,12 @@ const EmojiSuggestion: FC<IEmojiSuggestionProps> = memo(({ keyword, onSelect }) 
 			data={formattedEmojiData}
 			renderItem={({ item }) => (
 				<Pressable onPress={() => handleEmojiSuggestionPress(item)}>
-					<SuggestItem isDisplayDefaultAvatar={false} name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''} emojiId={item?.id} />
+					<SuggestItem
+						isDisplayDefaultAvatar={false}
+						name={`:${item?.shortname?.split?.(':')?.join('')}:` ?? ''}
+						emojiId={item?.id}
+						emojiSrcUnlock={item?.src}
+					/>
 				</Pressable>
 			)}
 			initialNumToRender={5}
