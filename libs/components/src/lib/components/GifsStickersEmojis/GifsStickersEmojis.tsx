@@ -106,7 +106,7 @@ export const GifStickerEmojiPopup = ({
 					? 'min-h-[350px]'
 					: 'min-h-[500px]';
 
-		return `${baseClasses} ${widthClasses} max-sbm:w-[312px] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30 ${heightClasses}`;
+		return `${baseClasses} ${widthClasses} max-sbm:w-[calc(100dvw_-_24px)] max-sbm:rounded-lg h-fit rounded-lg dark:bg-bgSecondary bg-bgLightMode shadow shadow-neutral-900 z-30 ${heightClasses}`;
 	}, [currentChannel?.type, emojiAction, isShowEmojiPicker]);
 
 	const contentWidthClass = useMemo(() => {
