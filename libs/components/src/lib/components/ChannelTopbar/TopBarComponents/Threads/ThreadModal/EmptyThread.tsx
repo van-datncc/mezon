@@ -17,18 +17,16 @@ const EmptyThread = ({ onClick }: EmptyThreadProps) => {
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[400px] p-12">
-			<button className="relative mx-auto mb-4 p-[22px] rounded-full dark:bg-bgPrimary bg-bgLightPrimary cursor-default">
-				<Icons.ThreadEmpty className="w-9 h-9 dark:bg-bgPrimary bg-bgLightPrimary dark:text-bgIconDark text-bgIconLight" />
+			<button className="relative mx-auto mb-4 p-[22px] rounded-full bg-theme-item cursor-default">
+				<Icons.ThreadEmpty className="w-9 h-9 " />
 				<Icons.EmptyUnreadStyle className="w-[104px] h-[80px] absolute top-0 left-[-10px]" />
 			</button>
-			<h2 className="text-2xl dark:text-gray-100 text-bgPrimary font-semibold mb-2">There are no threads.</h2>
-			<p className="text-base dark:text-gray-300 text-textSecondary800 text-center">
-				Stay focused on a conversation with a thread - a temporary text channel.
-			</p>
+			<h2 className="text-2xl font-semibold mb-2">There are no threads.</h2>
+			<p className="text-base  text-center">Stay focused on a conversation with a thread - a temporary text channel.</p>
 			{canManageThread && (
 				<button
 					onClick={handleCreateThread}
-					className=" py-2 px-3 mt-6 h-10 font-medium text-sm rounded focus:ring-transparent bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover"
+					className=" py-2 px-3 mt-6 h-10 font-medium text-sm rounded focus:ring-transparent bg-button-primary text-white"
 				>
 					Create Thread
 				</button>

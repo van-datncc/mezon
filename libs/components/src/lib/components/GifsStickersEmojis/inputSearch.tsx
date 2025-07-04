@@ -71,18 +71,18 @@ export const InputSearch: React.FC = () => {
 
 			{!trendingClickingStatus && (
 				<div
-					className={`transition-all duration-300 h-8 pl-4 pr-2 py-3 dark:bg-[#1E1F22] bg-white relative rounded items-center inline-flex w-[97%] m-2 text-center`}
+					className={`transition-all duration-300 h-8 pl-4 pr-2 py-3 bg-theme-input relative rounded items-center inline-flex w-[97%] m-2 text-center`}
 				>
 					<input
 						onChange={handleInputChange}
 						type="text"
 						placeholder={valuePlaceHolder || 'search'}
-						className="dark:text-[#AEAEAE] text-black dark:placeholder-[#AEAEAE] placeholder-colorTextLightMode outline-none bg-transparent w-full"
+						className="bg-theme-input outline-none bg-transparent w-full"
 						value={valueInput}
 						ref={searchInputRef}
 					/>
 
-					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1 dark:bg-[#1E1F22] bg-white top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">
+					<div className="w-5 h-6 flex flex-row items-center pl-1 absolute right-1  top-1/4 transform -translate-y-1/2 m-2 cursor-pointer">
 						<Icons.Search />
 					</div>
 				</div>

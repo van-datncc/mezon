@@ -295,24 +295,24 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-			<div className="thread-scroll dark:bg-bgPrimary bg-bgLightMode rounded-lg shadow-xl max-w-lg w-full mx-4 p-6 max-h-[80vh] overflow-y-auto">
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-theme-primary">
+			<div className="thread-scroll bg-theme-setting-primary rounded-lg shadow-xl max-w-lg w-full mx-4 p-6 max-h-[80vh] overflow-y-auto">
 				<div className="flex justify-between items-center mb-6">
-					<h2 className="text-xl font-semibold text-gray-900 dark:text-white">Blockchain Wallet Management</h2>
-					<button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+					<h2 className="text-xl font-semibold ">Blockchain Wallet Management</h2>
+					<button onClick={onClose} className="text-theme-primary-hover">
 						<Icons.CloseIcon className="w-6 h-6" />
 					</button>
 				</div>
 
 				{!walletData.address ? (
 					<div className="text-center py-8">
-						<div className="w-16 h-16 mx-auto mb-4 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+						<div className="w-16 h-16 mx-auto mb-4  rounded-full flex items-center justify-center bg-item-theme">
 							<WalletIcon />
 						</div>
-						<p className="text-gray-500 dark:text-gray-400 mb-6">No wallet found</p>
+						<p className="mb-6">No wallet found</p>
 						<button
 							onClick={generateWallet}
-							className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg text-sm font-medium inline-flex items-center gap-2"
+							className="bg-button-primary hover:bg-buttonPrimaryHover text-white px-6 py-3 rounded-lg text-sm font-medium inline-flex items-center gap-2"
 						>
 							<WalletIcon />
 							Generate New Wallet (BIP39 Standard)
@@ -328,34 +328,30 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 						</div>
 
 						<div>
-							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Wallet Address</label>
-							<div className="flex items-center gap-3 p-3 border dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
-								<span className="text-sm font-mono truncate flex-1 text-gray-900 dark:text-white">{walletData.address}</span>
-								<ButtonCopy
-									copyText={walletData.address}
-									className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md text-sm"
-									title="Copy address"
-								/>
+							<label className="block text-sm font-medium  mb-2">Wallet Address</label>
+							<div className="flex items-center gap-3 p-3 border rounded-lg ">
+								<span className="text-sm font-mono truncate flex-1 ">{walletData.address}</span>
+								<ButtonCopy copyText={walletData.address} className="p-2  rounded-md text-sm" title="Copy address" />
 							</div>
 						</div>
 
 						<div>
-							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Private Key</label>
+							<label className="block text-sm font-medium  mb-2">Private Key</label>
 							{walletData.showPrivateKey ? (
 								<div className="space-y-3">
-									<div className="p-3 border dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
-										<span className="text-xs font-mono break-all text-gray-900 dark:text-white">{walletData.privateKey}</span>
+									<div className="p-3 border rounded-lg ">
+										<span className="text-xs font-mono break-all ">{walletData.privateKey}</span>
 									</div>
 									<div className="flex gap-2">
 										<ButtonCopy
 											copyText={walletData.privateKey}
-											className="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2"
+											className="flex-1 py-2 px-4 border-theme-primary text-theme-primary hover:bg-blue-600 hover:text-white rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2"
 											title="Copy to clipboard"
 										/>
 
 										<button
 											onClick={() => setWalletData((prev) => ({ ...prev, showPrivateKey: false, privateKey: '' }))}
-											className="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 inline-flex items-center gap-2"
+											className="py-2 px-4 border-theme-primary bg-secondary-button-hover text-theme-primary-hover rounded-lg text-sm  inline-flex items-center gap-2"
 										>
 											<Icons.EyeClose className="w-4 h-4" />
 											Hide
@@ -365,27 +361,24 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 							) : (
 								<button
 									onClick={() => handlePinVerification('privateKey')}
-									className="w-full py-3 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors inline-flex items-center justify-center gap-2"
+									className="w-full py-3 px-4 border-2 border-dashed  rounded-lg hover:border-blue-500  transition-colors inline-flex items-center justify-center gap-2"
 								>
 									<Icons.EyeOpen className="w-4 h-4" />
-									<span className="text-blue-500 dark:text-blue-400 font-medium">Show private key</span>
+									<span className="text-blue-500  font-medium">Show private key</span>
 								</button>
 							)}
 						</div>
 
 						<div>
-							<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Secret Recovery Phrase</label>
+							<label className="block text-sm font-medium  mb-2">Secret Recovery Phrase</label>
 							{walletData.showRecoveryPhrase ? (
 								<div className="space-y-3">
-									<div className="p-3 border dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700">
+									<div className="p-3 border ">
 										<div className="grid grid-cols-3 gap-2">
 											{walletData.recoveryPhrase.split(' ').map((word, index) => (
-												<div
-													key={index}
-													className="text-xs font-mono p-2 bg-white dark:bg-gray-800 rounded border text-center"
-												>
-													<span className="text-gray-500 text-[10px]">{index + 1}</span>
-													<div className="text-gray-900 dark:text-white">{word}</div>
+												<div key={index} className="text-xs font-mono p-2 rounded border text-center">
+													<span className="text-[10px]">{index + 1}</span>
+													<div className="">{word}</div>
 												</div>
 											))}
 										</div>
@@ -399,7 +392,7 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 
 										<button
 											onClick={() => setWalletData((prev) => ({ ...prev, showRecoveryPhrase: false, recoveryPhrase: '' }))}
-											className="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 inline-flex items-center gap-2"
+											className="py-2 px-4 border  rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 inline-flex items-center gap-2"
 										>
 											<Icons.EyeClose className="w-4 h-4" />
 											Hide
@@ -409,7 +402,7 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 							) : (
 								<button
 									onClick={() => handlePinVerification('recoveryPhrase')}
-									className="w-full py-3 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors inline-flex items-center justify-center gap-2"
+									className="w-full py-3 px-4 border-2 border-dashed  rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors inline-flex items-center justify-center gap-2"
 								>
 									<Icons.EyeOpen className="w-4 h-4" />
 									<span className="text-blue-500 dark:text-blue-400 font-medium">Show recovery phrase</span>
@@ -438,23 +431,23 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 
 				{showPinModal.isOpen && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
-						<div className="dark:bg-bgPrimary bg-bgLightMode rounded-lg shadow-xl p-6 w-85">
+						<div className="bg-theme-setting-primary rounded-lg shadow-xl p-6 w-85">
 							<div className="flex items-center gap-3 mb-4">
-								<Icons.LockIcon className="w-6 h-6 text-blue-500" />
-								<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+								<Icons.LockIcon className="w-6 h-6" />
+								<h3 className="text-lg font-semibold ">
 									{showPinModal.type === 'setup' ? 'Set Up Security PIN' : 'Security Verification'}
 								</h3>
 							</div>
 
 							{showPinModal.type === 'setup' ? (
 								<div>
-									<p className="text-gray-600 dark:text-gray-300 mb-4">Create a 6-digit PIN to encrypt your wallet like MetaMask</p>
+									<p className=" mb-4">Create a 6-digit PIN to encrypt your wallet like MetaMask</p>
 									<input
 										type="password"
 										maxLength={6}
 										value={pin}
 										onChange={(e) => setPin(e.target.value)}
-										className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-center text-lg font-mono bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+										className="w-full p-3 border-theme-primary rounded-lg text-center text-lg font-mono bg-theme-input focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
 										placeholder="••••••"
 										autoFocus
 									/>
@@ -463,16 +456,14 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 										maxLength={6}
 										value={confirmPin}
 										onChange={(e) => setConfirmPin(e.target.value)}
-										className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-center text-lg font-mono bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+										className="w-full p-3 border-theme-primary rounded-lg text-center text-lg font-mono bg-theme-input focus:outline-none focus:ring-2 focus:ring-blue-500"
 										placeholder="Confirm PIN"
 									/>
-									<p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-										This PIN will encrypt your private key and recovery phrase
-									</p>
+									<p className="text-xs mt-2 text-center">This PIN will encrypt your private key and recovery phrase</p>
 								</div>
 							) : (
 								<div>
-									<p className="text-gray-600 dark:text-gray-300 mb-6">
+									<p className=" mb-6">
 										Enter your 6-digit PIN to decrypt and view{' '}
 										{showPinModal.type === 'privateKey' ? 'private key' : 'recovery phrase'}
 									</p>
@@ -481,13 +472,11 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 										maxLength={6}
 										value={pin}
 										onChange={(e) => setPin(e.target.value)}
-										className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-center text-lg font-mono bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+										className="w-full p-3 border-theme-primary rounded-lg text-center text-lg font-mono bg-theme-input focus:outline-none focus:ring-2 focus:ring-blue-500"
 										placeholder="••••••"
 										autoFocus
 									/>
-									<p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
-										Data is encrypted and stored securely in local
-									</p>
+									<p className="text-xs mt-2 text-center">Data is encrypted and stored securely in local</p>
 								</div>
 							)}
 
@@ -499,14 +488,14 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 										setConfirmPin('');
 										setIsSettingUpPin(false);
 									}}
-									className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+									className="flex-1 py-2 px-4 border-theme-primary rounded-lg text-sm bg-secondary-button-hover "
 								>
 									Cancel
 								</button>
 								<button
 									onClick={handlePinConfirm}
 									disabled={showPinModal.type === 'setup' ? pin.length !== 6 || confirmPin.length !== 6 : pin.length !== 6}
-									className="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2"
+									className="flex-1 py-2 px-4 bg-button-primary disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium inline-flex items-center justify-center gap-2"
 								>
 									<Icons.LockIcon className="w-4 h-4" />
 									{showPinModal.type === 'setup' ? 'Encrypt Wallet' : 'Decrypt & Show'}

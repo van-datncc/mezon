@@ -51,26 +51,19 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: G
 
 	return (
 		<div className="w-full flex gap-2 relative">
-			<Link
-				className="w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg dark:bg-bgPrimary bg-bgLightPrimary border border-transparent dark:hover:border-bgModifierHover hover:border-bgModifierHover hover:bg-bgLightModeButton"
-				role="button"
-				to={link}
-				onClick={handleOpenCanvas}
-			>
-				<div className="h-6 text-xs one-line font-semibold leading-6 dark:text-bgLightPrimary text-bgPrimary">
-					{canvas.title ? canvas.title : 'Untitled'}
-				</div>
+			<Link className="w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg border-theme-primary" role="button" to={link} onClick={handleOpenCanvas}>
+				<div className="h-6 text-xs one-line font-semibold leading-6 ">{canvas.title ? canvas.title : 'Untitled'}</div>
 			</Link>
 			<ButtonCopy
 				copyText={process.env.NX_CHAT_APP_REDIRECT_URI + link}
-				className={`absolute top-2 !rounded-full overflow-hidden dark:border-black dark:shadow-[#000000] ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}  `}
+				className={`absolute top-2 !rounded-full overflow-hidden  ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}  `}
 			/>
 			{!isDisableDelCanvas && (
 				<button
 					title="Delete Canvas"
 					style={{ top: '9px' }}
 					onClick={handleDeleteCanvas}
-					className="absolute top-0 right-[5px] dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full"
+					className="absolute top-0 right-[5px]  bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full"
 				>
 					X
 				</button>

@@ -86,16 +86,16 @@ function AllNotificationItem({ notify }: NotifyMentionProps) {
 	};
 
 	return (
-		<div className="dark:bg-bgTertiary bg-transparent rounded-[8px] relative group">
+		<div className=" bg-transparent rounded-[8px] relative group">
 			<button
-				className="absolute dark:bg-bgTertiary bg-bgLightModeButton mr-1 dark:text-contentPrimary text-colorTextLightMode top-[10px] z-50 right-3 rounded-full w-6 h-6 flex items-center justify-center text-[10px]"
+				className="absolute mr-1  top-[10px] z-50 right-3 rounded-full w-6 h-6 flex items-center justify-center text-[10px] hover:text-colorDanger"
 				onClick={(event) => handleDeleteNotification(event, parseNotify.id, parseNotify.category as NotificationCategory)}
 			>
 				✕
 			</button>
 			{parseNotify.category === NotificationCategory.MENTIONS && (
 				<button
-					className="absolute py-1 px-2 dark:bg-bgSecondary bg-bgLightTertiary bottom-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+					className="absolute py-1 px-2 bottom-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
 					onClick={handleClickJump}
 				>
 					Jump
@@ -139,14 +139,14 @@ function AllTabContent({ message, subject, category, senderId }: IMentionTabCont
 	const isChannel = message.mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
 
 	return (
-		<div className="flex flex-col p-2 bg-[#FFFFFF] dark:bg-[#313338] rounded-lg ">
+		<div className="flex flex-col p-2 bg-item-theme rounded-lg ">
 			{checkMessageHasReply && (
 				<div className="max-w-full overflow-hidden">
 					<MessageReply message={message} />
 				</div>
 			)}
 
-			<div className="flex flex-row items-start p-1 w-full gap-4 rounded-lg bg-[#f8f8f8] dark:bg-[#313338]">
+			<div className="flex flex-row items-start p-1 w-full gap-4 rounded-lg ">
 				<AvatarImage
 					alt="user avatar"
 					className="w-10 h-10 min-w-10"

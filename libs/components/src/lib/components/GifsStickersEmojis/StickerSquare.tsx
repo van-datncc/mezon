@@ -171,7 +171,7 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 				<div
 					className="w-11 max-sm:gap-x-1
 				flex flex-col max-sm:flex-row max-sm:justify-end max-sbm:justify-start gap-y-1
-				max-sm:w-full max-sbm:w-11 dark:bg-[#1E1F22] bg-bgLightModeSecond pt-1
+				max-sm:w-full max-sbm:w-11 bg-item-theme pt-1
 				px-1 md:items-start pb-1 rounded max-sbm:flex-col
 				items-center min-h-[25rem]"
 				>
@@ -179,12 +179,12 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 						<button
 							key={avt.id}
 							onClick={(e) => scrollToCategory(e, avt.type || '')}
-							className="flex justify-center items-center max-sm:px-1 w-9 h-9 rounded-lg hover:bg-[#41434A]"
+							className="flex justify-center items-center max-sm:px-1 w-9 h-9 rounded-lg bg-item-hover"
 						>
 							{avt.type === FOR_SALE_CATE ? (
 								<div
 									onClick={(e) => scrollToCategory(e, FOR_SALE_CATE)}
-									className="w-9 h-9 py-2 dark:text-textPrimary max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md"
+									className="w-9 h-9 py-2  max-sm:hidden flex flex-row justify-center items-center hover:rounded-md"
 								>
 									<Icons.MarketIcons />
 								</div>
@@ -194,11 +194,11 @@ function StickerSquare({ channel, mode, onClose, isTopic = false }: ChannelMessa
 										<img
 											src={avt.url}
 											alt={`avt ${avt.id}`}
-											className={`w-7 h-7 object-cover aspect-square cursor-pointer dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${avt.type === selectedType ? 'bg-bgDisable' : ''} hover:rounded-full justify-center items-center border border-bgHoverMember rounded-full aspect-square`}
+											className={`w-7 h-7 object-cover aspect-square cursor-pointer  bg-item-hover ${avt.type === selectedType ? 'bg-item-theme' : ''} hover:rounded-full justify-center items-center border-theme-primary rounded-full aspect-square`}
 											role="button"
 										/>
 									) : (
-										<div className="dark:text-textDarkTheme text-textLightTheme">{avt?.type?.charAt(0).toUpperCase()}</div>
+										<div className="">{avt?.type?.charAt(0).toUpperCase()}</div>
 									)}
 								</>
 							)}
@@ -251,7 +251,7 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({
 		<div>
 			<button
 				onClick={handleToggleButton}
-				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black max-h-full"
+				className="w-full flex flex-row justify-start bg-item-theme items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem]  z-10  max-h-full"
 			>
 				<p className="uppercase">{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
 				<span className={`${isShowStickerList ? ' rotate-90' : ''}`}>
@@ -280,7 +280,7 @@ const StickerPanel: React.FC<IStickerPanelProps> = ({ stickerList, onClickSticke
 								<img
 									src={sticker.url ? sticker.url : `${process.env.NX_BASE_IMG_URL}/stickers/` + sticker.id + `.webp`}
 									alt="sticker"
-									className={`w-full h-full aspect-square object-cover dark:hover:bg-bgDisable hover:bg-bgLightModeButton ${sticker.id === '0' ? 'blur-sm' : ''}`}
+									className={`w-full h-full aspect-square object-cover  hover:bg-bgLightModeButton ${sticker.id === '0' ? 'blur-sm' : ''}`}
 									onClick={() => (!sticker.forSale || sticker.url ? onClickSticker(sticker) : onOpenBuySticker(sticker))}
 									role="button"
 								/>

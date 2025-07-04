@@ -7,11 +7,11 @@ const SearchFile = ({ setKeywordSearch }: { setKeywordSearch: React.Dispatch<Rea
 
 	return (
 		<div className="relative">
-			<div className={`transition-all duration-300 w-56 h-6 pl-4 pr-2 py-3 dark:bg-[#151515] bg-bgLightMode rounded items-center inline-flex`}>
+			<div className={`transition-all duration-300 w-56 h-6 pl-4 pr-2 py-3 bg-theme-input rounded items-center inline-flex`}>
 				<input
 					type="text"
 					placeholder="Search for File Name"
-					className="dark:text-contentTertiary text-black text-sm dark:placeholder-contentTertiary placeholder-bgPrimary placeholder:text-sm outline-none bg-transparent w-full"
+					className="text-sm placeholder:text-sm outline-none bg-transparent w-full"
 					onChange={(event) => hanldeChange(event)}
 				/>
 			</div>
