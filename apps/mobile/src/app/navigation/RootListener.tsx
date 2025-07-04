@@ -315,8 +315,8 @@ const RootListener = () => {
 				const results = await Promise.all(promises);
 				if (!isFromFCM && !clanId) {
 					const clanResp = results.find((result) => result.type === 'clans/fetchClans/fulfilled');
-					if (clanResp) {
-						await setCurrentClanLoader(clanResp.payload, clanId, false);
+					if (clanResp?.payload || clanResp?.payload?.clans) {
+						await setCurrentClanLoader(clanResp?.payload?.clans || clanResp?.payload, clanId, false);
 					}
 				}
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);

@@ -28,5 +28,19 @@ export const style = (colors: Attributes) =>
 
 		btnTitle: {
 			color: baseColor.white
-		}
+		},
+		addButton: {
+			marginHorizontal: size.s_16,
+			height: size.s_30,
+			backgroundColor: baseColor.blurple,
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderRadius: size.s_15,
+			marginVertical: size.s_15
+		},
+		buttonText: {
+			fontSize: size.s_14,
+			color: baseColor.white,
+			fontWeight: '500'
+		},
 	});
