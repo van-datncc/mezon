@@ -169,7 +169,7 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 		return (
 			<div
 				style={{ height: 44 }}
-				className="opacity-80 dark:bg-[#34363C] bg-[#F5F6F7] ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission dark:text-[#4E504F] text-[#D5C8C6] rounded one-line"
+				className="opacity-80 bg-theme-input text-theme-primary ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission rounded one-line"
 			>
 				You do not have permission to send messages in this channel.
 			</div>
@@ -477,7 +477,7 @@ const OnboardingGuide = ({
 					className="relative rounded-t-md w-[calc(100%_-_32px)] h-14 left-4 bu bg-theme-contexify top-2 flex pt-2 px-4 pb-4 items-center gap-3"
 					onClick={handleDoNextMission}
 				>
-					<Icons.Hashtag className='text-theme-primary' />
+					<Icons.Hashtag className="text-theme-primary" />
 					<div className=" flex flex-col">
 						<div className="text-base font-semibold text-theme-primary">{currentMission.title} </div>
 						<div className="text-[10px] font-normal text-theme-primary">

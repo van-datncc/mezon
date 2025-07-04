@@ -10,7 +10,7 @@ const ActivityListItem = ({ user }: ActivityProps) => {
 	const activityByUserId = useAppSelector((state) => selectActivityByUserId(state, user?.user?.id || ''));
 
 	return (
-		<div className="dark:border-borderDefault border-gray-300 group/list_friends">
+		<div className="border-color-primary group/list_friends">
 			<div key={user?.user?.id} className="flex justify-between items-center rounded-lg">
 				<ActivityItem user={user} activity={activityByUserId} />
 			</div>
@@ -25,8 +25,8 @@ const ActivityItem = ({ user, activity }: { user?: IUserItemActivity; activity?:
 	const activityName = activity?.activity_name;
 
 	return (
-		<div className="w-full">
-			<div className="flex items-center gap-[9px] relative dark:text-channelTextLabel text-colorTextLightMode">
+		<div className="w-full text-theme-primary">
+			<div className="flex items-center gap-[9px] relative ">
 				<div className="relative">
 					<AvatarImage
 						alt={username}
@@ -40,7 +40,7 @@ const ActivityItem = ({ user, activity }: { user?: IUserItemActivity; activity?:
 
 				<div className="flex flex-col font-medium flex-1">
 					<span className="text-base font-medium">{username}</span>
-					<p className="w-full text-[12px] line-clamp-1 break-all">{activityDescription || activityName}</p>
+					<p className="w-full text-[12px] opacity-60 line-clamp-1 break-all">{activityDescription || activityName}</p>
 				</div>
 			</div>
 		</div>

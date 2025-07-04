@@ -62,5 +62,5 @@ export function EmbedDescription({ description }: EmbedDescriptionProps) {
 		return formattedContent;
 	}, [elements]);
 
-	return <div className="mt-2 text-sm text-textSecondary800 dark:text-textSecondary break-words">{content}</div>;
+	return <div className="mt-2 text-sm text-theme-primary break-words">{content}</div>;
 }
