@@ -203,13 +203,19 @@ export const ChatBoxBottomBar = memo(
 			try {
 				if (imageBase64) {
 					const now = Date.now();
-
+					const fileName = `paste_image_${now}.png`;
+					const tempPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+					
+					await RNFS.writeFile(tempPath, imageBase64?.split(',')?.[1], 'base64');
+					const fileInfo = await RNFS.stat(tempPath);
+					
 					const imageFile = {
-						filename: `paste_image_${now}.png`,
+						filename: fileName,
 						filetype: 'image/png',
-						url: imageBase64
+						url: `file://${fileInfo?.path}`,
+						size: fileInfo?.size
 					};
-
+		
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
 							channelId,
