@@ -1,4 +1,4 @@
-import { Attributes, Colors, Metrics, size } from '@mezon/mobile-ui';
+import { Attributes, Metrics, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -7,8 +7,7 @@ export const style = (colors: Attributes) =>
 			height: (Metrics.screenWidth - size.s_6 * size.s_10) / 5.1,
 			width: (Metrics.screenWidth - size.s_6 * size.s_10) / 5.1,
 			borderRadius: 10,
-			overflow: 'hidden',
-			backgroundColor: Colors.black
+			overflow: 'hidden'
 		},
 		audioContent: {
 			width: (Metrics.screenWidth - size.s_30) / 2.01,

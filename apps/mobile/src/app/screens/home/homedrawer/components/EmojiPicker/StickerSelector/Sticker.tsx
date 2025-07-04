@@ -59,16 +59,26 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 	const { t } = useTranslation(['token']);
 	const dispatch = useAppDispatch();
 
-	const stickersListByCategoryName = useMemo(
-		() =>
-			stickerList?.filter((sticker) => {
-				if (categoryName === FOR_SALE_CATE && forSale) {
-					return sticker?.is_for_sale;
-				}
-				return sticker?.clan_name === categoryName && sticker?.source && !sticker?.is_for_sale;
-			}),
-		[stickerList, categoryName, forSale]
-	);
+	const stickersListByCategoryName = useMemo(() => {
+		const data = stickerList?.filter((sticker) => {
+			if (categoryName === FOR_SALE_CATE && forSale) {
+				return sticker?.is_for_sale;
+			}
+			return sticker?.clan_name === categoryName && sticker?.source && !sticker?.is_for_sale;
+		});
+		if (!data?.length) return [];
+		const remainder = data.length % NUM_COLUMNS;
+		if (remainder === 0) return data;
+
+		const paddingCount = NUM_COLUMNS - remainder;
+		const paddedItems = Array.from({ length: paddingCount }, (_, i) => ({
+			id: `empty-${i}`,
+			title: '',
+			isEmpty: true
+		}));
+
+		return [...data, ...paddedItems];
+	}, [stickerList, categoryName, forSale]);
 
 	const onBuySticker = useCallback(
 		async (sticker: any) => {
