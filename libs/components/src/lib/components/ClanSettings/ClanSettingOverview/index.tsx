@@ -123,7 +123,6 @@ const ClanSettingOverview = () => {
 			await dispatch(createSystemMessage(updateSystemMessageRequest));
 			setSystemMessage(updateSystemMessageRequest);
 			setUpdateSystemMessageRequest(updateSystemMessageRequest);
-			setUpdateSystemMessageRequest(updateSystemMessageRequest);
 		}
 	};
 
