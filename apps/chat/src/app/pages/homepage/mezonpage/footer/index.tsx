@@ -61,7 +61,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 							<div className="flex gap-[32px] max-lg:flex-col">
 								<div className="flex flex-col gap-[12px]">
 									<a
-										href="#"
+										href="https://mezon.ai/blogs/executive-summary"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -69,7 +69,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Executive Summary
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/problem-statement"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -77,7 +77,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Problem Statement
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/solution"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -85,7 +85,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Solution
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/blockchain-economy"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -93,7 +93,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Blockhain & Token Economy
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/developers"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -103,7 +103,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 								</div>
 								<div className="flex flex-col gap-[12px]">
 									<a
-										href=""
+										href="https://mezon.ai/blogs/technica-architecture"
 										target="_blank"
 										rel="noreferrer"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
@@ -111,7 +111,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Technical Architecture
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/readmap"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -119,7 +119,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Product roadmap
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/tokenomics"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
@@ -128,7 +128,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										Tokenomics
 									</a>
 									<a
-										href=""
+										href="https://mezon.ai/blogs/team"
 										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
