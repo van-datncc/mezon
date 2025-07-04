@@ -106,7 +106,7 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">
 				<button
 					onClick={handleJumpMess}
-					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit dark:text-white text-colorTextLightMode"
+					className="text-xs dark:bg-bgTertiary bg-bgLightModeButton rounded p-1 h-fit text-theme-primary"
 				>
 					Jump
 				</button>

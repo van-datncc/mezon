@@ -44,7 +44,7 @@ const TopicHeader = ({ topicCurrentChannel }: TopicHeaderProps) => {
 		<div className="flex flex-row items-center justify-between px-4 h-[48px] min-h-[50px] border-b-[1px] dark:border-bgTertiary border-bgLightTertiary z-10 dark:bg-bgPrimary bg-bgLightPrimary">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
 				<Icons.TopicIcon />
-				<span className="text-base font-semibold dark:text-white text-colorTextLightMode">{'Topic'}</span>
+				<span className="text-base font-semibold text-theme-primary">{'Topic'}</span>
 			</div>
 			<button onClick={(e) => handleCloseModal(e)} className="relative right-0">
 				<Icons.Close />

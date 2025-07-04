@@ -345,7 +345,7 @@ const ThreadBox = () => {
 							value={nameValueThread ?? ''}
 							label="Thread Name"
 							placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-							className="h-10 p-[10px] dark:bg-bgTertiary bg-bgTextarea dark:text-white text-colorTextLightMode text-base outline-none rounded-md placeholder:text-sm"
+							className="h-10 p-[10px] dark:bg-bgTertiary bg-bgTextarea text-theme-primary text-base outline-none rounded-md placeholder:text-sm"
 						/>
 						{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 						{valueThread && openThreadMessageState && <ChannelMessageThread user={currentClanUser} message={valueThread} />}

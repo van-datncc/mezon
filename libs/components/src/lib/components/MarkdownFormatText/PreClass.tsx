@@ -19,7 +19,7 @@ const PreClass = ({ children, isInPinMsg }: IPreClassProps) => {
 
 	return (
 		<pre
-			className={`pre dark:text-white text-colorTextLightMode bg-bgLightSecondary dark:bg-bgSecondary border border-[#E3E5E8] dark:border-[#1E1F22] ${isInPinMsg ? 'flex items-start' : ''}`}
+			className={`pre text-theme-primary bg-bgLightSecondary dark:bg-bgSecondary border border-[#E3E5E8] dark:border-[#1E1F22] ${isInPinMsg ? 'flex items-start' : ''}`}
 		>
 			<ButtonCopy
 				copyText={children.props.children}
