@@ -80,6 +80,8 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 
 	const categoryIcons = useMemo(
 		() => [
+			<Icons.Star defaultSize="w-7 h-7" />,
+			<Icons.MarketIcons />,
 			<Icons.ClockHistory defaultSize="w-7 h-7" />,
 			...categoryEmoji.map((emoji) =>
 				emoji.clan_logo !== '' ? (
@@ -101,12 +103,13 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	);
 
 	const categoriesWithIcons: { name: string; icon: JSX.Element }[] = useMemo(() => {
+		categoriesEmoji.splice(1, 0, FOR_SALE_CATE);
 		const categories = categoriesEmoji.map((category, index) => ({
 			name: category,
 			icon: categoryIcons[index]
 		}));
 
-		return [{ name: FOR_SALE_CATE, icon: <Icons.MarketIcons /> }, ...categories];
+		return categories;
 	}, [categoriesEmoji, categoryIcons]);
 
 	const channelID = props.isClanView ? currentChannel?.id : props.directId;
@@ -297,10 +300,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
         overflow-y-scroll
         hide-scrollbar`}
 			>
-				<div className="w-9 h-9 py-2 max-sm:hidden flex flex-row justify-center items-center dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md">
-					<Icons.Star defaultSize="w-7 h-7" />
-				</div>
-				<hr className=" bg-gray-200 border w-full max-sm:h-full max-sm:w-[1px] max-sm:hidden" />
 				{categoriesWithIcons.map((item, index) => {
 					return (
 						<button
@@ -380,7 +379,7 @@ const DisplayByCategories = React.memo(function DisplayByCategories({
 }: DisplayByCategoriesProps) {
 	const emojisByCategoryName = useMemo(() => getEmojisByCategories(emojisData, categoryName ?? ''), [emojisData, categoryName]);
 
-	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(true);
+	const [emojisPanel, setEmojisPanelStatus] = useState<boolean>(categoryName === FOR_SALE_CATE ? false : true);
 	return (
 		<div>
 			<button
