@@ -8,7 +8,7 @@ import { Buffer as BufferMobile } from 'buffer';
 import { ApiClanEmojiCreateRequest } from 'mezon-js/api.gen';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Dimensions, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Platform, Pressable, Text, View } from 'react-native';
 import { Image as ImageCompressor } from 'react-native-compressor';
 import RNFS from 'react-native-fs';
 import { Image, openPicker } from 'react-native-image-crop-picker';
@@ -144,17 +144,21 @@ export function ClanEmojiSetting({ navigation }: MenuClanScreenProps<ClanSetting
 		}
 	};
 
-	return (
-		<View style={styles.container}>
-			<ScrollView contentContainerStyle={styles.scrollContainer}>
+	const ListHeaderComponent = () => {
+		return (
+			<View>
 				<Pressable style={styles.addEmojiButton} onPress={handleAddEmoji}>
 					<Text style={styles.buttonText}>{t('button.upload')}</Text>
 				</Pressable>
 				<Text style={styles.title}>{t('description.descriptions')}</Text>
 				<Text style={styles.lightTitle}>{t('description.requirements')}</Text>
 				<Text style={styles.requireTitle}>{t('description.requireList')}</Text>
-				<EmojiList emojiList={emojiList} />
-			</ScrollView>
+			</View>
+		);
+	};
+	return (
+		<View style={styles.container}>
+			<EmojiList emojiList={emojiList?.length > 0 ? emojiList : []} ListHeaderComponent={ListHeaderComponent} />
 		</View>
 	);
 }

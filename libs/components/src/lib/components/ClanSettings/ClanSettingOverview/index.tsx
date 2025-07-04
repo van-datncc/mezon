@@ -36,7 +36,7 @@ const ClanSettingOverview = () => {
 
 	useEffect(() => {
 		fetchSystemMessage();
-	}, [currentClan]);
+	}, []);
 
 	const handleUploadBackground = (urlImage: string) => {
 		setClanRequest({ ...clanRequest, banner: urlImage });
@@ -117,10 +117,12 @@ const ClanSettingOverview = () => {
 				cachedMessage: updateSystemMessageRequest
 			};
 			await dispatch(updateSystemMessage(request));
-			setSystemMessage(cachedMessageUpdate);
+			setSystemMessage(updateSystemMessageRequest);
+			setUpdateSystemMessageRequest(updateSystemMessageRequest);
 		} else if (updateSystemMessageRequest) {
 			await dispatch(createSystemMessage(updateSystemMessageRequest));
 			setSystemMessage(updateSystemMessageRequest);
+			setUpdateSystemMessageRequest(updateSystemMessageRequest);
 		}
 	};
 

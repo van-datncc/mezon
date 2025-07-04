@@ -1,28 +1,32 @@
 import { size } from '@mezon/mobile-ui';
-import { FlashList } from '@shopify/flash-list';
-import { ClanEmoji, ClanSticker } from 'mezon-js';
-import { useCallback, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { ClanSticker } from 'mezon-js';
+import { memo, useCallback, useRef, useState } from 'react';
+import { FlatList } from 'react-native';
 import Sound from 'react-native-sound';
 import { SoundItem } from '../SoundItem';
-type EmojiListProps = {
+
+type SoundListProps = {
 	soundList: ClanSticker[];
+	ListHeaderComponent: React.ComponentType<any>;
 };
 
-export const SoundList = ({ soundList }: EmojiListProps) => {
-	const row: Array<any> = [];
-	let prevOpenedRow: { close: () => void };
-	const [currentSoundId, setCurrentSoundId] = useState(null);
-	const currentSoundRef = useRef(null);
+const SoundItemMemo = memo(SoundItem);
 
-	const stopCurrentSound = () => {
+const ITEM_HEIGHT = size.s_60;
+
+export const SoundList = ({ soundList, ListHeaderComponent }: SoundListProps) => {
+	const row = useRef<{ [key: string]: { close: () => void } }>({}).current;
+	const [currentSoundId, setCurrentSoundId] = useState<string | null>(null);
+	const currentSoundRef = useRef<Sound | null>(null);
+
+	const stopCurrentSound = useCallback(() => {
 		if (currentSoundRef.current) {
-			currentSoundRef.current?.stop(() => {
+			currentSoundRef.current.stop(() => {
 				currentSoundRef.current?.release();
 				currentSoundRef.current = null;
 			});
 		}
-	};
+	}, []);
 
 	const onPlaySound = useCallback(
 		(item: ClanSticker) => {
@@ -48,45 +52,67 @@ export const SoundList = ({ soundList }: EmojiListProps) => {
 			currentSoundRef.current = sound;
 			setCurrentSoundId(item.id);
 		},
-		[currentSoundId]
+		[currentSoundId, stopCurrentSound]
 	);
 
-	const closeRow = (id: string) => {
-		if (prevOpenedRow && prevOpenedRow !== row[parseInt(id)]) {
-			prevOpenedRow.close();
-		}
-		prevOpenedRow = row[parseInt(id)];
-	};
+	const closeRow = useCallback(
+		(id: string) => {
+			const prevOpenedRow = Object.values(row).find((r) => r !== row[id]);
+			if (prevOpenedRow) {
+				prevOpenedRow.close();
+			}
+		},
+		[row]
+	);
 
-	const handleSwipe = useCallback((item: ClanEmoji) => {
-		closeRow(item.id);
-	}, []);
+	const handleSwipe = useCallback(
+		(item: ClanSticker) => {
+			closeRow(item.id);
+		},
+		[closeRow]
+	);
 
 	const renderItem = useCallback(
-		({ item }) => (
-			<SoundItem
+		({ item }: { item: ClanSticker }) => (
+			<SoundItemMemo
 				item={item}
-				key={`emoji_${item?.clan_id}_${item?.id}`}
 				ref={(ref) => {
-					row[parseInt(item.id)] = ref;
+					if (ref) {
+						row[item.id] = ref;
+					}
 				}}
 				onSwipeOpen={handleSwipe}
 				onPressPlay={onPlaySound}
 				isPlaying={currentSoundId === item?.id}
 			/>
 		),
-		[currentSoundId, handleSwipe, onPlaySound]
+		[currentSoundId, handleSwipe, onPlaySound, row]
+	);
+
+	const keyExtractor = useCallback((item: ClanSticker) => `sound_sticker_${item?.clan_id}_${item?.id}`, []);
+
+	const getItemLayout = useCallback(
+		(_: any, index: number) => ({
+			length: ITEM_HEIGHT,
+			offset: ITEM_HEIGHT * index,
+			index
+		}),
+		[]
 	);
 
 	return (
-		<View>
-			<FlashList
-				data={soundList}
-				extraData={currentSoundId}
-				keyExtractor={(item) => item.id}
-				renderItem={renderItem}
-				estimatedItemSize={size.s_60}
-			/>
-		</View>
+		<FlatList
+			data={soundList}
+			extraData={currentSoundId}
+			keyExtractor={keyExtractor}
+			renderItem={renderItem}
+			ListHeaderComponent={ListHeaderComponent}
+			getItemLayout={getItemLayout}
+			removeClippedSubviews
+			maxToRenderPerBatch={10}
+			updateCellsBatchingPeriod={50}
+			windowSize={5}
+			initialNumToRender={10}
+		/>
 	);
 };

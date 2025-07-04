@@ -371,6 +371,72 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 		[navigation]
 	);
 
+	if (showConfirmModal) {
+		return (
+			<Modal visible={true} supportedOrientations={['portrait', 'landscape']}>
+				{fileShared && isShowModalShare ? (
+					<Sharing data={fileShared} onClose={onCloseFileShare} />
+				) : (
+					<ViewShot
+						ref={viewToSnapshotRef}
+						options={{ fileName: 'send_money_success_mobile', format: 'png', quality: 1 }}
+						style={{ flex: 1 }}
+					>
+						<View style={styles.fullscreenModal}>
+							<View style={styles.modalHeader}>
+								<View>
+									<Icons.TickIcon width={100} height={100} />
+								</View>
+								<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
+								<Text style={styles.amountText}>{tokenCount} ₫</Text>
+							</View>
+
+							<View style={styles.modalBody}>
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('receiver')}</Text>
+									<Text style={[styles.value, { fontSize: size.s_20 }]}>
+										{/*eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
+										{/*@ts-expect-error*/}
+										{selectedUser?.username || jsonObject?.receiver_name || 'Unknown'}
+									</Text>
+								</View>
+
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('note')}</Text>
+									<Text style={styles.value}>{note?.replace?.(/\s+/g, ' ')?.trim() || ''}</Text>
+								</View>
+
+								<View style={styles.infoRow}>
+									<Text style={styles.label}>{t('date')}</Text>
+									<Text style={styles.value}>{successTime}</Text>
+								</View>
+							</View>
+							<View style={styles.action}>
+								<View style={styles.actionMore}>
+									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
+										<MezonIconCDN icon={IconCDN.shareIcon} width={size.s_24} height={size.s_24} />
+										<Text style={styles.textActionMore}>{t('share')}</Text>
+									</TouchableOpacity>
+									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleSaveImage}>
+										<MezonIconCDN icon={IconCDN.downloadIcon} width={size.s_24} height={size.s_24} />
+										<Text style={styles.textActionMore}>{t('saveImage')}</Text>
+									</TouchableOpacity>
+									<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
+										<Icons.ArrowLeftRightIcon />
+										<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
+									</TouchableOpacity>
+								</View>
+
+								<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
+									<Text style={styles.confirmText}>{t('complete')}</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</ViewShot>
+				)}
+			</Modal>
+		);
+	}
 	return (
 		<KeyboardAvoidingView
 			style={styles.container}
@@ -459,68 +525,6 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 						<Text style={styles.buttonTitle}>{t('sendToken')}</Text>
 					</Pressable>
 				</View>
-				<Modal visible={showConfirmModal} supportedOrientations={['portrait', 'landscape']}>
-					{fileShared && isShowModalShare ? (
-						<Sharing data={fileShared} onClose={onCloseFileShare} />
-					) : (
-						<ViewShot
-							ref={viewToSnapshotRef}
-							options={{ fileName: 'send_money_success_mobile', format: 'png', quality: 1 }}
-							style={{ flex: 1 }}
-						>
-							<View style={styles.fullscreenModal}>
-								<View style={styles.modalHeader}>
-									<View>
-										<Icons.TickIcon width={100} height={100} />
-									</View>
-									<Text style={styles.successText}>{t('toast.success.sendSuccess')}</Text>
-									<Text style={styles.amountText}>{tokenCount} ₫</Text>
-								</View>
-
-								<View style={styles.modalBody}>
-									<View style={styles.infoRow}>
-										<Text style={styles.label}>{t('receiver')}</Text>
-										<Text style={[styles.value, { fontSize: size.s_20 }]}>
-											{/*eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
-											{/*@ts-expect-error*/}
-											{selectedUser?.username || jsonObject?.receiver_name || 'Unknown'}
-										</Text>
-									</View>
-
-									<View style={styles.infoRow}>
-										<Text style={styles.label}>{t('note')}</Text>
-										<Text style={styles.value}>{note?.replace?.(/\s+/g, ' ')?.trim() || ''}</Text>
-									</View>
-
-									<View style={styles.infoRow}>
-										<Text style={styles.label}>{t('date')}</Text>
-										<Text style={styles.value}>{successTime}</Text>
-									</View>
-								</View>
-								<View style={styles.action}>
-									<View style={styles.actionMore}>
-										<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
-											<MezonIconCDN icon={IconCDN.shareIcon} width={size.s_24} height={size.s_24} />
-											<Text style={styles.textActionMore}>{t('share')}</Text>
-										</TouchableOpacity>
-										<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleSaveImage}>
-											<MezonIconCDN icon={IconCDN.downloadIcon} width={size.s_24} height={size.s_24} />
-											<Text style={styles.textActionMore}>{t('saveImage')}</Text>
-										</TouchableOpacity>
-										<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
-											<Icons.ArrowLeftRightIcon />
-											<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
-										</TouchableOpacity>
-									</View>
-
-									<TouchableOpacity style={styles.confirmButton} onPress={handleConfirmSuccessful}>
-										<Text style={styles.confirmText}>{t('complete')}</Text>
-									</TouchableOpacity>
-								</View>
-							</View>
-						</ViewShot>
-					)}
-				</Modal>
 				<BottomSheetModal
 					ref={BottomSheetRef}
 					snapPoints={snapPoints}

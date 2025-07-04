@@ -121,7 +121,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const isCanLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
 			try {
-				setIsDisableLoadMore(true);
 				const store = getStore();
 				const isFetching = selectMessageIsLoading(store.getState());
 				if (isLoadMore?.current?.[direction] || isFetching) return false;
@@ -133,7 +132,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					const hasMoreTop = selectHasMoreMessageByChannelId2(store.getState(), channelId);
 					if (!hasMoreTop) return false;
 				}
-
+				setIsDisableLoadMore(true);
 				isLoadMore.current[direction] = true;
 				return true;
 			} catch (error) {

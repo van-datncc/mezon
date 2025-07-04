@@ -372,7 +372,7 @@ export const threadsSlice = createSlice({
 		},
 		removeThreadFromCache: (state, action: PayloadAction<{ channelId: string; threadId: string }>) => {
 			const { channelId, threadId } = action.payload;
-			const channelData = state.byChannels[channelId];
+			const channelData = state.byChannels?.[channelId];
 
 			if (channelData && channelData.threads) {
 				channelData.threads = channelData.threads.filter((thread) => thread.id !== threadId);
