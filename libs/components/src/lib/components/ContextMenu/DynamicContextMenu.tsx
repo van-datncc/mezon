@@ -70,7 +70,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 	const className = {
 		'--contexify-menu-bgColor': 'var(--bg-theme-contexify)',
 		'--contexify-item-color': 'var(--text-theme-primary)',
-		'--contexify-activeItem-color': 'red',
+		'--contexify-activeItem-color': 'var(--text-secondary)',
 		'--contexify-activeItem-bgColor': warningStatus || 'var(--bg-item-hover)',
 		'--contexify-rightSlot-color': 'var(--text-secondary)',
 		'--contexify-activeRightSlot-color': 'var(--text-secondary)',

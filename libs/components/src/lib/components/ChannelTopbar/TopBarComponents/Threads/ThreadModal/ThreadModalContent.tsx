@@ -16,7 +16,7 @@ const ThreadModalContent = ({ message, thread }: ThreadModalContentProps) => {
 
 	return (
 		<div className="w-full overflow-x-hidden">
-			<p className="text-base font-normal dark:text-textThreadPrimary text-bgPrimary whitespace-nowrap overflow-x-hidden">
+			<p className="text-base font-normal text-theme-primary opacity-60 whitespace-nowrap overflow-x-hidden">
 				{(message?.content?.t as string) ??
 					(thread.last_sent_message && checkType
 						? safeJSONParse(thread.last_sent_message.content || '{}')?.t || ''

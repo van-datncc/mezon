@@ -46,7 +46,7 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 
 	const user = useSelector(selectMemberClanByUserId(selectedChannel?.creator_id as string));
 	const preferredUserName = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
-	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
+	const classNameSubtext = 'text-theme-primary opacity-60 text-sm';
 	const showName = <span className="font-medium">{name || username}</span>;
 
 	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
@@ -139,11 +139,11 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentThread?.id as string));
 	return (
 		<>
-			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
+			<div className="h-[75px] w-[75px] rounded-full bg-item-theme text-theme-primary flex items-center justify-center ">
 				{isPrivate === ChannelStatusEnum.isPrivate ? (
-					<Icons.ThreadIconLocker className="text-white w-10 h-10" />
+					<Icons.ThreadIconLocker className="w-10 h-10" />
 				) : (
-					<Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
+					<Icons.ThreadIcon defaultSize="w-10 h-10" />
 				)}
 			</div>
 			<div>

@@ -310,9 +310,9 @@ const ThreadBox = () => {
 	};
 
 	return (
-		<div className="flex flex-col flex-1 justify-end border-l dark:border-borderDivider border-bgLightTertiary pt-4">
+		<div className="flex flex-col flex-1 justify-end border-l border-color-primary pt-4">
 			{threadCurrentChannel && (
-				<div className={`overflow-y-auto bg-[#1E1E1E] max-w-widthMessageViewChat overflow-x-hidden flex-1`}>
+				<div className={`overflow-y-auto  max-w-widthMessageViewChat overflow-x-hidden flex-1`}>
 					<MemoizedChannelMessages
 						isThreadBox={true}
 						userIdsFromThreadBox={mapToMemberIds}
@@ -327,10 +327,10 @@ const ThreadBox = () => {
 				</div>
 			)}
 			{!threadCurrentChannel && (
-				<div className={`flex flex-col overflow-y-auto ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''} ww-full px-4`}>
+				<div className={`flex flex-col overflow-y-auto } ww-full px-4`}>
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
-							<div className="relative flex items-center justify-center mx-4 mt-4 w-16 h-16 dark:bg-bgInputDark bg-bgTextarea rounded-full pointer-events-none">
+							<div className="relative flex items-center justify-center mx-4 mt-4 w-16 h-16 bg-item-theme rounded-full pointer-events-none">
 								<Icons.ThreadIcon defaultSize="w-7 h-7" />
 								{isPrivate === 1 && (
 									<div className="absolute right-4 bottom-4">
@@ -345,7 +345,7 @@ const ThreadBox = () => {
 							value={nameValueThread ?? ''}
 							label="Thread Name"
 							placeholder={openThreadMessageState && valueThread?.content.t !== '' ? valueThread?.content.t : 'Enter Thread Name'}
-							className="h-10 p-[10px] dark:bg-bgTertiary bg-bgTextarea text-theme-primary text-base outline-none rounded-md placeholder:text-sm"
+							className="h-10 p-[10px] bg-item-theme text-theme-primary text-base outline-none rounded-md placeholder:text-sm"
 						/>
 						{!openThreadMessageState && <PrivateThread title="Private Thread" label="Only people you invite and moderators can see" />}
 						{valueThread && openThreadMessageState && <ChannelMessageThread user={currentClanUser} message={valueThread} />}
@@ -358,8 +358,8 @@ const ThreadBox = () => {
 			{checkAttachment && (
 				<div
 					className={`${
-						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
-					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''
+					} bg-item-theme max-h-full`}
 				>
 					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll`}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
@@ -378,11 +378,9 @@ const ThreadBox = () => {
 				</div>
 			)}
 			<div
-				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[46px]' : 'pb-[26px]'} px-4 dark:bg-bgPrimary bg-bgLightPrimary h-auto relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
+				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[46px]' : 'pb-[26px]'} px-4  h-auto relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
 			>
-				<div
-					className={`h-fit w-full dark:bg-channelTextarea bg-channelTextareaLight rounded-lg ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
-				>
+				<div className={`h-fit w-full bg-item-theme rounded-lg ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}>
 					<MentionReactInput
 						currentChannelId={currentInputChannelId}
 						handlePaste={onPastedFiles}
