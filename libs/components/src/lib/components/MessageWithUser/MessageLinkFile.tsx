@@ -150,7 +150,7 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 		<div
 			onMouseEnter={hoverOptButton}
 			onMouseLeave={() => setHoverShowOptButtonStatus(false)}
-			className={`break-all w-full cursor-default gap-3 flex items-center mt-[10px] py-3 pl-3 pr-3 rounded max-w-full ${hideTheInformationFile ? 'dark:border-[#232428] dark:bg-[#2B2D31] bg-white border-2' : ''}  relative`}
+			className={`break-all w-full cursor-default gap-3 flex items-center mt-[10px] py-3 pl-3 pr-3 rounded-lg max-w-full ${hideTheInformationFile ? 'bg-item-theme border-theme-primary ' : ''}  relative`}
 			role="button"
 		>
 			{message?.isSending ? (
@@ -165,30 +165,30 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 					<>
 						<div className="cursor-pointer flex-1" onClick={handleDownload} onKeyDown={handleDownload}>
 							<p className="text-blue-500 hover:underline">{attachmentData.filename}</p>
-							<p className="dark:text-textDarkTheme text-textLightTheme">size: {formatFileSize(attachmentData.size || 0)}</p>
+							<p className="text-theme-primary">size: {formatFileSize(attachmentData.size || 0)}</p>
 						</div>
 						{hoverShowOptButtonStatus && (
 							<div className="flex space-x-2">
 								<button
 									onClick={handleDownload}
-									className="rounded-md w-8 h-8 flex justify-center items-center cursor-pointer dark:hover:bg-[#393C40] hover:bg-gray-300"
+									className="rounded-md w-8 h-8 flex justify-center bg-secondary-button-hover border-theme-primary text-theme-primary-hover text-theme-primary items-center cursor-pointer "
 									title="Download"
 								>
 									<Icons.Download defaultSize="w-4 h-4" />
 								</button>
 								<button
 									onClick={handleOpenRemoveAttachementModal}
-									className="rounded-md w-8 h-8 flex justify-center items-center cursor-pointer  dark:hover:bg-[#393C40] hover:bg-gray-300"
+									className="rounded-md w-8 h-8 flex justify-center items-center cursor-pointer   bg-secondary-button-hover border-theme-primary text-theme-primary-hover text-theme-primary"
 									title="Remove"
 								>
-									<Icons.TrashIcon className="w-4 h-4 dark:text-[#AEAEAE] text-colorTextLightMode" />
+									<Icons.TrashIcon className="w-4 h-4 " />
 								</button>
 							</div>
 						)}
 						{isPDF && (
 							<button
 								onClick={openPDFViewer}
-								className="px-3 py-1 text-sm rounded transition-all duration-200 text-white bg-[#5865f2] hover:opacity-90"
+								className="px-3 py-1 text-sm rounded transition-all duration-200 text-white bg-button-primary hover:opacity-90"
 								title="View PDF"
 							>
 								View

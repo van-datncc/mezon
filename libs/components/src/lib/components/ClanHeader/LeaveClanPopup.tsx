@@ -11,13 +11,13 @@ const LeaveClanPopup = ({ handleCancel, handleLeave, leaveTitle, leaveName }: IL
 			<div className="fixed inset-0 bg-black opacity-80" />
 			<div className="relative z-10 w-[440px]">
 				<div className="bg-theme-setting-primary pt-[16px] px-[16px]">
-					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold pb-[16px]">Leave {leaveName}</div>
-					<div className="dark:text-[#dbdee1] text-textLightTheme pb-[20px]">
+					<div className=" text-[20px] font-semibold pb-[16px]">Leave {leaveName}</div>
+					<div className="pb-[20px]">
 						Are you sure you want to leave <b className="font-semibold">{leaveName}</b> ? You won’t be able to re-join this server unless
 						you are re-invited.
 					</div>
 				</div>
-				<div className="bg-theme-setting-nav dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium">
+				<div className="bg-theme-setting-nav  flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium">
 					<div onClick={handleCancel} className="hover:underline cursor-pointer">
 						Cancel
 					</div>

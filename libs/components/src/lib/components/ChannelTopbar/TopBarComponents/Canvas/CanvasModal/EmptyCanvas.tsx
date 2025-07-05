@@ -17,7 +17,7 @@ const EmptyCanvas = ({ onClick }: EmptyCanvasProps) => {
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[400px] p-12">
-			<button className="relative mx-auto mb-4 p-[22px] rounded-full bg-item-theme  cursor-default">
+			<button className="relative mx-auto mb-4 p-[22px] rounded-full cursor-default">
 				<Icons.ThreadEmpty className="w-9 h-9 " />
 				<Icons.EmptyUnreadStyle className="w-[104px] h-[80px] absolute top-0 left-[-10px] " />
 			</button>

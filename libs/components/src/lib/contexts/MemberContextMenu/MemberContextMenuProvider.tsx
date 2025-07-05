@@ -215,15 +215,17 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 	const appearanceTheme = useSelector(selectTheme);
 
 	const isLightMode = appearanceTheme === 'light';
+	const [warningStatus, setWarningStatus] = useState<string>('var(--bg-item-hover)');
 
 	const className: CSSProperties = {
 		'--contexify-menu-bgColor': 'var(--bg-theme-contexify)',
-		'--contexify-activeItem-bgColor': 'var(--bg-item-hover)',
+		'--contexify-item-color': 'var(--text-theme-primary)',
+		'--contexify-activeItem-color': 'var(--text-secondary)',
+		'--contexify-activeItem-bgColor': warningStatus || 'var(--bg-item-hover)',
 		'--contexify-rightSlot-color': 'var(--text-secondary)',
 		'--contexify-activeRightSlot-color': 'var(--text-secondary)',
 		'--contexify-arrow-color': 'var(--text-theme-primary)',
-		'--contexify-activeArrow-color': '#f80808',
-		'--contexify-itemContent-padding': '-3px',
+		'--contexify-activeArrow-color': 'var(--text-secondary)',
 		'--contexify-menu-radius': '2px',
 		'--contexify-activeItem-radius': '2px',
 		'--contexify-menu-minWidth': '188px',
@@ -237,21 +239,35 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 			<Menu id={MEMBER_CONTEXT_MENU_ID} style={className}>
 				{currentHandlers && (
 					<>
-						{shouldShow('profile') && <MemberMenuItem label="Profile" onClick={currentHandlers.handleViewProfile} />}
-
-						{shouldShow('message') && <MemberMenuItem label="Message" onClick={currentHandlers.handleMessage} />}
-						{shouldShow('addFriend') && <MemberMenuItem label="Add Friend" onClick={currentHandlers.handleAddFriend} />}
-						{shouldShow('removeFriend') && (
-							<MemberMenuItem label="Remove Friend" onClick={currentHandlers.handleRemoveFriend} isWarning={true} />
+						{shouldShow('profile') && (
+							<MemberMenuItem label="Profile" onClick={currentHandlers.handleViewProfile} setWarningStatus={setWarningStatus} />
 						)}
 
-						{!!shouldShow('kick') && <MemberMenuItem label="Kick" onClick={currentHandlers.handleKick} isWarning={true} />}
+						{shouldShow('message') && (
+							<MemberMenuItem label="Message" onClick={currentHandlers.handleMessage} setWarningStatus={setWarningStatus} />
+						)}
+						{shouldShow('addFriend') && (
+							<MemberMenuItem label="Add Friend" onClick={currentHandlers.handleAddFriend} setWarningStatus={setWarningStatus} />
+						)}
+						{shouldShow('removeFriend') && (
+							<MemberMenuItem
+								label="Remove Friend"
+								onClick={currentHandlers.handleRemoveFriend}
+								isWarning={true}
+								setWarningStatus={setWarningStatus}
+							/>
+						)}
+
+						{!!shouldShow('kick') && (
+							<MemberMenuItem label="Kick" onClick={currentHandlers.handleKick} isWarning={true} setWarningStatus={setWarningStatus} />
+						)}
 
 						{!!shouldShow('removeFromThread') && (
 							<MemberMenuItem
 								label={`Remove ${currentUser?.user?.username || 'User'} from thread`}
 								onClick={currentHandlers.handleRemoveFromThread}
 								isWarning={true}
+								setWarningStatus={setWarningStatus}
 							/>
 						)}
 					</>

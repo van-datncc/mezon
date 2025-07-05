@@ -95,7 +95,7 @@ export default function CallLogMessage({ userId, username, messageId, channelId,
 	const { icon, text, colorClass, bgClass } = iconMap[key] || {
 		icon: <Icons.OutGoingCall defaultSize="w-6 h-6" />,
 		text: `${username} started a ${callLog.isVideo ? 'video' : 'audio'} call`,
-		colorClass: 'dark:text-textPrimary text-colorTextLightMode',
+		colorClass: '',
 		bgClass: ''
 	};
 	const callLogMessage =
@@ -146,16 +146,16 @@ export default function CallLogMessage({ userId, username, messageId, channelId,
 	};
 
 	return (
-		<div className="w-full rounded-lg overflow-hidden text-left relative mt-2 text-textLightTheme dark:text-textDarkTheme">
-			<div className="w-fit max-w-[520px] border dark:bg-bgSecondary bg-bgLightSecondary dark:border-borderDivider border-contentTertiary rounded-lg shadow-lg">
-				<div className="w-full border-b dark:border-borderDivider border-contentTertiary px-5 py-4 flex flex-col gap-4">
+		<div className="w-full rounded-lg overflow-hidden text-left relative mt-2 text-theme-primary">
+			<div className="w-fit max-w-[520px] border bg-item-theme border-theme-primary rounded-lg shadow-lg">
+				<div className="w-full border-b border-color-primary px-5 py-4 flex flex-col gap-4">
 					<div className={`flex items-center justify-between bg-gradient-to-r rounded-t-lg`}>
 						<span className={`${colorClass} font-semibold`}>{text}</span>
 					</div>
 
 					<div className="flex gap-2 items-center">
-						<span className="text-white text-xl">{icon}</span>
-						<div className="text-sm text-gray-600 dark:text-gray-300">{callLogMessage}</div>
+						<span className=" text-xl">{icon}</span>
+						<div className="text-sm ">{callLogMessage}</div>
 					</div>
 				</div>
 				{shouldShowCallBack && (

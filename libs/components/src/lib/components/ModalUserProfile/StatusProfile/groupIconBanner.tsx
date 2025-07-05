@@ -50,7 +50,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Pending',
-						icon: <Icons.PendingFriend className="size-4 text-theme-primary" />
+						icon: <Icons.PendingFriend className="size-4 " />
 					}
 				];
 			case EStateFriend.MY_PENDING:
@@ -68,7 +68,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 				return [
 					{
 						title: 'Add friend',
-						icon: <Icons.AddPerson className="size-4 text-theme-primary" />
+						icon: <Icons.AddPerson className="size-4 " />
 					}
 				];
 		}
@@ -143,11 +143,13 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 			</div>
 			{buttonFriendProps.map((button, index) => (
 				<div
-					className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
+					className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer  ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
 					onClick={(e) => handleOnClickButtonFriend(e, index)}
 					key={button.title}
 				>
-					<span title={button.title}>{button.icon}</span>
+					<span className="text-white" title={button.title}>
+						{button.icon}
+					</span>
 
 					{openModal.openFriend && checkAddFriend === EStateFriend.FRIEND && <PopupFriend user={user} showPopupLeft={showPopupLeft} />}
 				</div>

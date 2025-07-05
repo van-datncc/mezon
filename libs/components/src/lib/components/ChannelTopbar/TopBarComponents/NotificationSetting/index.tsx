@@ -122,7 +122,7 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 	useOnClickOutside(modalRef, onClose, rootRef);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999]">
+		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-[99999999] bg-theme-setting-primary">
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px]">
 				<div className="flex flex-col pb-1 mb-1 border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0 ">
 					{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
