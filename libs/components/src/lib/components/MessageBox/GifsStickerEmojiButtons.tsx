@@ -82,32 +82,32 @@ const GifStickerEmojiButtons = memo(
 		const cursorPointer = isTopic || hasPermissionEdit;
 
 		return (
-			<div className="flex flex-row absolute h-11 items-center gap-1 mr-3 top-0 right-0 z-20">
+			<div className="flex flex-row absolute h-11 items-center gap-2 top-0 right-0 z-20">
 				{!isTopic && (
-					<div {...voiceLongPress} className={`w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-						<Icons.MicEnable className={`w-6 h-6 ${isRecording ? 'text-red-600' : 'text-theme-primary text-theme-primary-hover'}`} />
+					<div {...voiceLongPress} className={`w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
+						<Icons.MicEnable className={`w-5 h-5 ${isRecording ? 'text-red-600' : 'text-theme-primary text-theme-primary-hover'}`} />
 					</div>
 				)}
 
 				<div
 					onClick={handleOpenGifs}
-					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Gif defaultSize="w-6 h-6" />
+					<Icons.Gif defaultSize="w-5 h-5" />
 				</div>
 
 				<div
 					onClick={handleOpenStickers}
-					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-6 h-6 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Sticker defaultSize="w-6 h-6" />
+					<Icons.Sticker defaultSize="w-5 h-5" />
 				</div>
 
 				<div
 					onClick={handleOpenEmoji}
-					className={`w-6 h-6 text-theme-primary text-theme-primary-hover ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`w-5 h-5 text-theme-primary text-theme-primary-hover ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Smile defaultSize="w-6 h-6" />
+					<Icons.Smile defaultSize="w-5 h-5" />
 				</div>
 			</div>
 		);
