@@ -253,7 +253,7 @@ const ChannelLinkComponent = ({
 					{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 					<div className="relative mt-[-5px]">
 						{isPrivate === ChannelStatusEnum.isPrivate && <Icons.SpeakerLocked defaultSize="w-5 h-5 " />}
-						{!isPrivate && <Icons.Speaker defaultSize="w-5 5-5 " defaultFill='text-theme-primary' />}
+						{!isPrivate && <Icons.Speaker defaultSize="w-5 5-5 " defaultFill="text-theme-primary" />}
 					</div>
 					<p
 						className={`ml-2 w-full pointer-events-none text-base text-theme-primary  ${highLightVoiceChannel ? 'bg-item-theme text-theme-primary-hover font-semibold' : ''}`}
@@ -276,7 +276,7 @@ const ChannelLinkComponent = ({
 					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 
-						<div className={`relative text-theme-primary ${channel.type !== ChannelType.CHANNEL_TYPE_STREAMING ? 'mt-[-5px]' : ''}`}>
+						<div className={`relative text-theme-primary`}>
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 								<Icons.SpeakerLocked defaultSize="w-5 h-5 " />
 							)}

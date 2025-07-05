@@ -18,7 +18,7 @@ type ListDMChannelProps = {
 	listDM: string[];
 };
 
-const heightAroundComponent = 220;
+const heightAroundComponent = 232;
 const heightAppUpdate = 40;
 const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 const ListDMChannel = ({ listDM }: ListDMChannelProps) => {
