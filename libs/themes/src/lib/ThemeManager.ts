@@ -9,37 +9,37 @@ export const AVAILABLE_THEMES: ThemeConfig[] = [
 	{
 		name: 'dark',
 		displayName: 'Dark Theme',
-		color: 'linear-gradient(135deg, #1e3c72, #1e3c72)',
+		color: '#26272B',
 		cssFile: 'assets/themes/dark.css'
 	},
 	{
 		name: 'light',
 		displayName: 'Light Theme',
-		color: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)',
+		color: '#FFFFFF',
 		cssFile: 'assets/themes/light.css'
 	},
 	{
-		name: 'pink_blossom',
-		displayName: 'Pink Blossom',
-		color: 'linear-gradient(135deg, #ffdde1, #ee9ca7)',
-		cssFile: 'assets/themes/cyber.css'
+		name: 'sunrise',
+		displayName: 'Sunrise Theme',
+		color: 'linear-gradient(135deg, #e0c3fc, #fbc2eb, #fcd5ce, #fff1eb)',
+		cssFile: 'assets/themes/sunrise.css'
 	},
 	{
 		name: 'purple_haze',
 		displayName: 'Purple Haze',
-		color: 'linear-gradient(135deg, #e0c3fc, #8ec5fc)',
+		color: 'linear-gradient(135deg, #a78bfa, #f472b6, #60a5fa)',
 		cssFile: 'assets/themes/purple_haze.css'
 	},
 	{
 		name: 'redDark',
 		displayName: 'Red Dark',
-		color: 'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+		color: 'linear-gradient(135deg, #3b0a0a, #7f1d1d, #e11d48)',
 		cssFile: 'assets/themes/redDark.css'
 	},
 	{
 		name: 'Abyss Dark',
 		displayName: 'Abyss Dark',
-		color: 'linear-gradient(135deg, #f6d365, #fda085)',
+		color: 'linear-gradient(135deg, #0f172a, #1e3a8a, #6d28d9)',
 		cssFile: 'assets/themes/abyss_dark_.css'
 	}
 ];
