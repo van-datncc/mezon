@@ -166,7 +166,6 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			console.log('clanFooterEle: ', clanFooterEle);
 			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
