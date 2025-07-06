@@ -200,7 +200,7 @@ export const ChatBoxBottomBar = memo(
 		);
 
 		const getImageDimension = (imageUri: string): Promise<{ width: number; height: number }> => {
-			return new Promise((resolve, reject) => {
+			return new Promise((resolve) => {
 				Image.getSize(
 					imageUri,
 					(width, height) => {
@@ -208,7 +208,6 @@ export const ChatBoxBottomBar = memo(
 					},
 					(error) => {
 						console.error('Error getting image dimensions:', error);
-						reject(error);
 					}
 				);
 			});
@@ -218,7 +217,10 @@ export const ChatBoxBottomBar = memo(
 			try {
 				if (imageBase64) {
 					const now = Date.now();
-					const fileName = `paste_image_${now}.png`;
+					const mimeType = imageBase64.split(';')?.[0]?.split(':')?.[1] || 'image/jpeg';
+					const extension = mimeType?.split('/')?.[1]?.replace('jpeg', 'jpg')?.replace('svg+xml', 'svg') || 'jpg';
+
+					const fileName = `paste_image_${now}.${extension}`;
 					const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
 
 					await RNFS.writeFile(destPath, imageBase64.split(',')?.[1], 'base64');
@@ -228,11 +230,11 @@ export const ChatBoxBottomBar = memo(
 
 					const imageFile = {
 						filename: fileName,
-						filetype: 'image/png',
+						filetype: mimeType,
 						url: filePath,
 						size: fileInfo?.size,
-						width: width ?? 0,
-						height: height ?? 0
+						width: width ?? 250,
+						height: height ?? 250
 					};
 
 					dispatch(
