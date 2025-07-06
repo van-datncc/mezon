@@ -1,16 +1,16 @@
 /* Cyber Dark Theme */
 :root {
-	--bg-primary: #26272B;
+	--bg-primary: #26272b;
 	--bg-secondary: #313338;
-	
+
 	/* nền ngoài của phần footer */
 	--bg-outside-footer: #1a1a1a;
-	
+
 	/* nền trong của phần footer */
 	--bg-footer: #0f0f0f;
 
 	/* màu chat input */
-	--bg-surface: #383A40;
+	--bg-surface: #383a40;
 
 	/* màu ping member */
 	--bg-ping-member: #2d2d30;
@@ -27,19 +27,19 @@
 	--theme-text-color-dark: #e0e0e0;
 	--theme-setting-primary: #313338;
 	/* màu nav seting */
-	--theme-setting-nav: #2B2D31;
+	--theme-setting-nav: #2b2d31;
 	--private-theme: #2c4957;
 
 	--text-theme-primary: #e8e8e8;
 	--text-theme-primary-hover: #ffffff;
 
-	--bg-active-friend-list: #2B2D31;
+	--bg-active-friend-list: #2b2d31;
 	--bg-active-button: rgba(85, 85, 85, 0.25);
 	--color-text-active-button: #7eb1ff;
 	--bg-button-add-friend: #3366cc;
 
 	--border-color-primary: #3d3d3d;
-	--bg-theme-direct-message: #2B2D31;
+	--bg-theme-direct-message: #2b2d31;
 
 	--text-secondary: #cccccc;
 	/* màu click vào channel user */
@@ -61,11 +61,11 @@
 	--bg-hover-select-status: #2d3035;
 	/* mention */
 	--mention-primary: rgba(67, 97, 238, 0.24);
-	--mention-color: #3298FF;
+	--mention-color: #3298ff;
 	--bg-mention-hover: rgba(67, 98, 238, 0.39);
-	--color-mention-hover: #3298FF;
+	--color-mention-hover: #3298ff;
 	--bg-mention-evryone: #2eb08b63;
-	--color-mention-evryone: #2EB08C;
+	--color-mention-evryone: #2eb08c;
 	--bg-mention-everyone-hover: #2eb08b8c;
 	--color-mention-everyone-hover: #32b993;
 
@@ -73,11 +73,13 @@
 	--bg-secondary-button-hover: rgba(77, 77, 77, 0.3);
 	/* màu contexify */
 	--bg-theme-contexify: #252525;
-	--bg-count-page: #252525; 
-	--text-count-page: #cccccc; 
-	--bg-count-page-hover: #303030; 
-	--text-count-page-hover: #e0e0e0; 
-	--bg-count-page-active: #3366cc; 
+	--bg-count-page: #252525;
+	--text-count-page: #cccccc;
+	--bg-count-page-hover: #303030;
+	--text-count-page-hover: #e0e0e0;
+	--bg-count-page-active: #3366cc;
 	--text-count-page-active: #ffffff;
 	--bg-item-theme-hover: rgba(255, 255, 255, 0.08);
+	/* button primary */
+	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
 }

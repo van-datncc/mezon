@@ -110,16 +110,16 @@
 
 	/* mention */
 	--mention-primary: rgba(67, 97, 238, 0.24);
-	--mention-color: #3298FF;
+	--mention-color: #3298ff;
 	--bg-mention-hover: rgba(67, 98, 238, 0.39);
-	--color-mention-hover: #3298FF;
+	--color-mention-hover: #3298ff;
 	--bg-mention-evryone: #2eb08b63;
-	--color-mention-evryone: #2EB08C;
+	--color-mention-evryone: #2eb08c;
 	--bg-mention-everyone-hover: #2eb08b8c;
 	--color-mention-everyone-hover: #32b993;
 
 	--bg-highlight: color-mix(in oklab, hsl(36 100% 30% / 0.08) 100%, hsl(60 100% 50% / 0.08) 50%);
-	--bg-hover-select-status: #2B1351;
+	--bg-hover-select-status: #2b1351;
 	--bg-secondary-button-hover: hsl(258 50% 40% / 0.3);
 	/* màu contexify */
 	--bg-theme-contexify: rgb(49, 42, 95);
@@ -129,4 +129,6 @@
 	--text-count-page-hover: #c7d2fe; /* chữ hover sáng hơn (indigo-200) */
 	--bg-count-page-active: #6d28d9; /* nền active tím đậm mạnh (indigo-700) */
 	--text-count-page-active: #ffffff; /* chữ trắng nổi bật */
+	/* button primary */
+	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
 }

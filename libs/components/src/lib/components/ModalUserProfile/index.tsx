@@ -220,7 +220,7 @@ const ModalUserProfile = ({
 				statusOnline={statusOnline}
 			/>
 			<div className="px-[16px]">
-				<div className=" w-full border-theme-primary p-2 my-[16px] text-theme-primary text-theme-primary-hover shadow rounded-[10px] flex flex-col text-justify bg-item-theme  bg-item-theme-hover ">
+				<div className=" w-full border-theme-primary p-2 my-[16px] text-theme-primary text-theme-primary-hover shadow rounded-[10px] flex flex-col text-justify   bg-item-theme-hover ">
 					<div>
 						<p className="font-semibold tracking-wider text-xl one-line my-0">
 							{isUserRemoved
@@ -229,10 +229,7 @@ const ModalUserProfile = ({
 									? 'Anonymous'
 									: userById?.clan_nick || userById?.user?.display_name || userById?.user?.username}
 						</p>
-						<p className="text-lg font-semibold tracking-wide text-theme-primary my-0">
-							{isUserRemoved ? 'Unknown User' : usernameShow}
-						</p>
-
+						<p className="text-lg font-semibold tracking-wide text-theme-primary my-0">{isUserRemoved ? 'Unknown User' : usernameShow}</p>
 					</div>
 
 					{checkAddFriend === EStateFriend.MY_PENDING && !showPopupLeft && <PendingFriend user={userById as ChannelMembersEntity} />}

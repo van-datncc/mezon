@@ -14,7 +14,7 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
 const Button: React.FC<ButtonProps> = ({ variant, size, disabled, children, className, ...rest }) => {
 	return (
 		<button
-			className={`bg-buttonPrimary px-2 border border-buttonBorder text-white font-[500] rounded capitalize disabled:opacity-50 disabled:cursor-not-allowed hover:bg-buttonPrimaryHover ease-linear transition-all duration-150  ${className}`}
+			className={` p-2 font-[500] rounded capitalize disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-60 text-theme-primary-hover ease-linear transition-all duration-150  ${className}`}
 			{...rest}
 			disabled={disabled}
 		>

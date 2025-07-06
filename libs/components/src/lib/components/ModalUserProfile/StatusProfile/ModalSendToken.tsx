@@ -172,7 +172,7 @@ const ModalSendToken = ({
 
 				<div className="p-6 space-y-6 border-t-theme-primary">
 					<div className="space-y-3">
-						<p className="text-theme-primary text-gray-700 text-sm font-medium flex items-center gap-2">To</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">To</p>
 						<div className="relative">
 							<input
 								type="text"
@@ -242,7 +242,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<p className="text-theme-primary text-gray-700 text-sm font-medium flex items-center gap-2">Amount</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">Amount</p>
 						<div className="relative">
 							<input
 								ref={amountRef}
@@ -259,7 +259,7 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<p className="text-theme-primary text-gray-700 text-sm font-medium flex items-center gap-2">Note (Optional)</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">Note (Optional)</p>
 						<input
 							type="text"
 							defaultValue={noteSendToken}
