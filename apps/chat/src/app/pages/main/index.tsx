@@ -326,7 +326,7 @@ const SidebarMenu = memo(
 				id="menu"
 			>
 				<div
-					className={`top-0 left-0 right-0 flex flex-col items-center pt-4 pb-[80px] overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
+					className={`top-0 left-0 right-0 flex flex-col items-center pt-4 md:pb-[80px] pb-4 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
 				>
 					<div className="flex flex-col items-center">
 						<SidebarLogoItem />

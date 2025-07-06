@@ -164,7 +164,7 @@ const TopBarChannelText = memo(() => {
 	};
 	return (
 		<>
-			<div className="justify-start items-center gap-1 flex flex-1 max-w-[calc(100%_-_460px)] max-sbm:max-w-full">
+			<div className="justify-start items-center gap-1 flex flex-1 max-w-[calc(100%_-_460px)] text-theme-primary max-sbm:max-w-full">
 				<div className="flex sbm:hidden pl-3 px-2" onClick={openMenu} role="button">
 					<Icons.OpenMenu />
 				</div>

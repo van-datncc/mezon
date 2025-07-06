@@ -313,7 +313,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	return (
 		<div
-			className={`fixed bottom-3 left-[12px] border-theme-primary rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthProfile z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthChannelList' : 'hidden'} sbm:block `}
+			className={`fixed md:bottom-3 bottom-0 md:left-[12px] left-[72px] border-theme-primary md:rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthChannelList md:w-widthProfile z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthProfile' : 'hidden'} sbm:block `}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}

@@ -2587,9 +2587,9 @@ export const Download: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const OpenMenu: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const OpenMenu: React.FC<IconProps> = ({ defaultFill = 'currentColor', defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" fill={defaultFill} viewBox="0 0 297 297" className={defaultSize}>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297 297" className={defaultSize}>
 			<g>
 				<g>
 					<g>
