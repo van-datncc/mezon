@@ -75,14 +75,14 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 
 	return (
 		<ModalLayout onClose={onClose} className="bg-[#111111] text-theme-primary bg-opacity-80">
-			<div className="w-[480px]">
-				<div className="theme-base-color flex items-center justify-between px-6 pt-4 rounded-tl-[5px] rounded-tr-[5px]">
+			<div className="w-[480px] bg-theme-setting-primary">
+				<div className=" flex items-center justify-between px-6 pt-4 rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-bold uppercase">Create Category</div>
-					<button className="flex items-center justify-center opacity-50" onClick={onClose}>
+					<button className="flex items-center justify-center opacity-50 text-theme-primary-hover" onClick={onClose}>
 						<span className="text-4xl">×</span>
 					</button>
 				</div>
-				<div className="theme-base-color px-6 py-4">
+				<div className="bg-theme-setting-primary px-6 py-4">
 					<div className="flex flex-col">
 						<span className="font-[600] text-sm ">What is category's name?</span>
 						<InputField
@@ -119,12 +119,12 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 						category will automatically match to this setting
 					</p>
 				</div>
-				<div className="text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
-					<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">
+				<div className=" font-semibold text-sm flex  justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
+					<button onClick={onClose} className="">
 						Cancel
 					</button>
 					<button
-						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
+						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary  ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 						onClick={handleCreateCate}
 						disabled={checkCategoryName}
 					>

@@ -57,7 +57,7 @@ export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => 
 	return (
 		<div className="fixed  inset-0 flex items-center justify-center z-50">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 theme-base-color p-6 rounded-[5px] text-center">
+			<div className="relative z-10 bg-theme-setting-primary p-6 rounded-[5px] text-center">
 				<h2 className="text-[30px] font-semibold mb-4 ">Log Out</h2>
 				<p
 					className="dark:text-white-600 

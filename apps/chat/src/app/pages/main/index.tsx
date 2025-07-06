@@ -326,7 +326,7 @@ const SidebarMenu = memo(
 				id="menu"
 			>
 				<div
-					className={`top-0 left-0 right-0 flex flex-col items-center py-4 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
+					className={`top-0 left-0 right-0 flex flex-col items-center pt-4 pb-[80px] overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
 				>
 					<div className="flex flex-col items-center">
 						<SidebarLogoItem />
@@ -337,7 +337,6 @@ const SidebarMenu = memo(
 
 					<div className="mt-3">
 						<NavLinkComponent>
-
 							<div className="flex items-center justify-between text-theme-primary group" onClick={openCreateClanModal}>
 								<div className="w-[40px] h-[40px] rounded-xl theme-base-color flex justify-center items-center  cursor-pointer transition-all bg-add-clan-hover duration-200 size-12">
 									<p className="text-2xl font-semibold ">+</p>

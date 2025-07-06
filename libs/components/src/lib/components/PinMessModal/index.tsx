@@ -45,8 +45,8 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 			tabIndex={-1}
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
-			<div className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
-				<div className="dark:text-white text-black max-w-full">
+			<div className="w-fit h-fit bg-theme-setting-primary rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
+				<div className=" max-w-full">
 					<div className="p-4 pb-0">
 						<h3 className="font-semibold pb-4 text-xl">Pin It. Pin It Good.</h3>
 						<p>Hey, just double-checking that you want to pin this message to #{channelLabel} for posterity and greatness?</p>
@@ -64,7 +64,7 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 							/>
 						</ColorRoleProvider>
 					</div>
-					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4">
+					<div className="w-full  p-4 flex justify-end gap-x-4">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
 							Cancel
 						</button>

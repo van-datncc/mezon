@@ -98,7 +98,7 @@ const ListMemberInvite = (props: ModalParam) => {
 			</p>
 
 			<hr className="border-t-theme-primary"></hr>
-			<div className={`py-[10px] cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden `}>
+			<div className={`py-[10px] cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden thread-scroll `}>
 				{isInviteExternalCalling ? (
 					<div className="flex flex-col gap-3">
 						{filteredDataToInvite?.length > 0 ? (
