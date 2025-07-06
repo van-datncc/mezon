@@ -159,8 +159,8 @@ const MemberProfileCore = ({
 									${isListFriend ? ' inline-flex justify-start' : ''}
 									${positionType === MemberProfileType.DM_MEMBER_GROUP ? ` ${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'}  whitespace-nowrap overflow-x-hidden text-ellipsis` : ''}
 									${positionType === MemberProfileType.DM_LIST ? `${isOwnerClanOrGroup ? 'max-w-[150px]' : 'max-w-[176px]'} whitespace-nowrap overflow-x-hidden text-ellipsis text-theme-primary-hover` : ''}
-									${classParent === '' ? 'bg-transparent' : 'relative dark:bg-transparent bg-channelTextareaLight'}
-									${isUnReadDirect && !isMute ? ' font-semibold' : 'font-medium  '}
+									${classParent === '' ? 'bg-transparent' : 'relative '}
+									${isUnReadDirect && !isMute ? ' font-semibold text-theme-primary-active' : 'font-medium  '}
 								`}
 									title={name}
 								>
