@@ -270,7 +270,7 @@ const ChannelLinkComponent = ({
 					to={channelPath}
 					id={`${channel.category_id}-${channel.id}`}
 					onClick={handleClick}
-					className={`channel-link block  rounded-lg mt-2  ${classes[state]} ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
+					className={`channel-link block  rounded-lg mt-2 text-theme-primary-hover  ${classes[state]} ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
 					draggable="false"
 				>
 					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
@@ -301,7 +301,7 @@ const ChannelLinkComponent = ({
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p
-							className={`ml-2 w-full pointer-events-none text-theme-primary text-base focus:bg-bgModifierHover ${hightLightTextChannel ? ' font-semibold' : 'font-medium '}`}
+							className={`ml-2 w-full pointer-events-none text-base focus:bg-bgModifierHover ${hightLightTextChannel ? ' font-semibold text-theme-primary-active' : 'font-medium '}`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20
