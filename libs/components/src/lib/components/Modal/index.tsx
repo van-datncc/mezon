@@ -13,7 +13,7 @@ const Modal = ({ onClose, className, children }: ModalProps) => {
 	return (
 		<div
 			ref={modalRef}
-			className={`flex items-center justify-center fixed top-0 bottom-0 left-0 right-1 z-[100] dark:bg-bgModalDark bg-bgModalLight ${className}`}
+			className={`flex items-center justify-center fixed top-0 bottom-0 left-0 right-1 z-[100] bg-modal-overlay ${className}`}
 			onClick={onClose}
 		>
 			<div onClick={(e) => e.stopPropagation()}>{children}</div>
