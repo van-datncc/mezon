@@ -182,7 +182,7 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		const permissionGranted = await requestLocationPermission();
 		if (permissionGranted) {
 			try {
-				onCancel?.(false);
+				onCancel?.(true);
 				const { latitude, longitude } = await getCurrentPosition();
 				const store = await getStoreAsync();
 				let mode = ChannelStreamMode.STREAM_MODE_CHANNEL;
