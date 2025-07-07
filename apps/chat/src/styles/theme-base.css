@@ -307,3 +307,8 @@ input.bg-theme-input-primary::placeholder {
 .bg-outside-footer {
   background: var(--bg-outside-footer);
 }
+.focus-input:focus {
+	border-color: var(--focus-input);
+	outline: none;
+}
+

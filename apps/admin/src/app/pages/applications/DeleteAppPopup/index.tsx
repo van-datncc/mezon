@@ -27,7 +27,7 @@ const DeleteAppPopup = ({ togglePopup, appName, appId }: IDeleteAppPopup) => {
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50 bg-[#000000c9]">
 			<form className="relative z-10 w-[450px]" onSubmit={handleDeleteApp}>
-				<div className="bg-theme-setting-primary pt-[16px] px-[16px] flex flex-col gap-5 pb-5 rounded-t-md">
+				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px] flex flex-col gap-5 pb-5 rounded-t-md">
 					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold uppercase">Danger: Deleting Your App!</div>
 					<div>
 						To delete this application, please confirm the name (<span className="underline">{appName}</span>) below.
@@ -48,7 +48,7 @@ const DeleteAppPopup = ({ togglePopup, appName, appId }: IDeleteAppPopup) => {
 						/>
 					</div>
 				</div>
-				<div className="bg-theme-setting-nav dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
+				<div className="dark:bg-[#2b2d31] bg-[#f2f3f5] dark:text-textDarkTheme text-textLightTheme flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
 					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
 						Cancel
 					</div>
