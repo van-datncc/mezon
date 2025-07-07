@@ -136,18 +136,15 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 										theme={{
 											pages: {
 												previous: {
-													base:
-														'h-7 ml-0 mr-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
+													base: 'h-7 ml-0 mr-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
 													icon: 'h-5 w-5'
 												},
 												next: {
-													base:
-														'h-7 ml-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
+													base: 'h-7 ml-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
 													icon: 'h-5 w-5'
 												},
 												selector: {
-													base:
-														'w-7 h-7 mx-1 flex items-center justify-center rounded-full font-semibold text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
+													base: 'w-7 h-7 mx-1 flex items-center justify-center rounded-full font-semibold text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]'
 												}
 											}
 										}}
@@ -189,7 +186,7 @@ const SearchedItem = ({ searchMessage, searchChannel, user }: ISearchedItemProps
 	};
 
 	return (
-		<div className="flex items-center px-[5px] pb-[12px] bg-item-theme">
+		<div className="flex items-center px-[5px] pb-[12px] bg-item-theme relative group">
 			<button
 				onClick={handleClickJump}
 				className="absolute py-1 px-2 text-textLightTheme dark:text-textDarkTheme dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
