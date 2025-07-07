@@ -165,7 +165,7 @@ const TopBarChannelText = memo(() => {
 	return (
 		<>
 			<div className="justify-start items-center gap-1 flex flex-1 max-w-[calc(100%_-_460px)] text-theme-primary max-sbm:max-w-full">
-				<div className="flex sbm:hidden pl-3 px-2" onClick={openMenu} role="button">
+				<div className="flex sbm:hidden pl-3 px-2 text-theme-primary" onClick={openMenu} role="button">
 					<Icons.OpenMenu />
 				</div>
 				{channel ? (
@@ -289,7 +289,7 @@ const ChannelTopbarLabel = memo(
 
 		return (
 			<div className="none-draggable-area flex items-center text-lg gap-1 " onClick={onClick}>
-				<div className="w-6">{renderIcon()}</div>
+				<div className="w-4">{renderIcon()}</div>
 				<p className="text-base font-semibold leading-5 truncate text-theme-message">{label}</p>
 			</div>
 		);

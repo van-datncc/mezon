@@ -109,7 +109,7 @@ const ItemInviteDM = (props: ItemInviteDMProps) => {
 				srcImgProxy={type === ChannelType.CHANNEL_TYPE_GROUP ? 'assets/images/avatar-group.png' : createImgproxyUrl(avatar ?? '')}
 				src={type === ChannelType.CHANNEL_TYPE_GROUP ? 'assets/images/avatar-group.png' : avatar}
 			/>
-			<p style={{ marginRight: 'auto' }} className="px-[10px] flex-1 overflow-hidden text truncate">
+			<p style={{ marginRight: 'auto' }} className="px-[10px] flex-1 overflow-hidden text truncate text-theme-primary-active">
 				{label}
 			</p>
 			<button

@@ -24,7 +24,7 @@ const Topbar = memo(({ isHidden = false }: { isHidden?: boolean }) => {
 
 	return (
 		<div
-			className={`${isFriendPath || isHidden || (closeMenu && statusMenu) ? 'hidden' : ''} bg-theme-chat max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center w-widthThumnailAttachment flex-shrink fixed right-0 z-10 border-b-theme-primary text-theme-primary`}
+			className={`${isFriendPath || isHidden || (closeMenu && statusMenu) ? 'hidden' : ''} md:bg-theme-chat max-sbm:z-20 flex h-heightTopBar p-3 min-w-0 items-center w-widthThumnailAttachment flex-shrink fixed right-0 z-10 border-b-theme-primary text-theme-primary`}
 		>
 			<ChannelTopbar />
 		</div>

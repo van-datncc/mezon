@@ -119,7 +119,7 @@ function NotificationList({ rootRef }: NotificationProps) {
 	};
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowInbox w-[480px]">
+		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 z-[99999999] rounded-lg shadow-shadowBorder w-[480px]">
 			<div className="flex flex-col bg-theme-setting-primary text-[14px] rounded-lg w-1/2 min-w-[480px] max-w-[600px] z-50 overflow-hidden">
 				<div className="py-2 px-3 ">
 					<div className="flex flex-row items-center justify-between gap-2 font-bold text-[16px]">
