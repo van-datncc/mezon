@@ -299,7 +299,7 @@ const ForwardMessageModal = () => {
 	};
 
 	return (
-		<ModalLayout className="bg-bgModalDark" onClose={handleCloseModal}>
+		<ModalLayout onClose={handleCloseModal}>
 			<div className="bg-theme-setting-primary w-[550px] text-theme-primary pt-4 rounded">
 				<div>
 					<h1 className=" text-xl font-semibold text-center">Forward Message</h1>

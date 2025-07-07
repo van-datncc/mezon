@@ -48,7 +48,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 
 	const [openModalConfirmAge, closeModalConfirmAge] = useModal(() => {
 		return (
-			<ModalLayout className="bg-bgModalDark" onClose={handleCloseModal}>
+			<ModalLayout onClose={handleCloseModal}>
 				<div className="dark:bg-bgSecondary bg-bgLightMode pt-4 rounded flex flex-col items-center text-white w-[550px]">
 					<img src={'assets/images/cake.png'} alt="warning" width={200} height={200} />
 					<div className="text-center ml-6 mr-6">
