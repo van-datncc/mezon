@@ -153,7 +153,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		<ListGroupSearchModalContext.Provider value={{ itemRefs: itemRefs.current }}>
 			<div
 				ref={boxRef}
-				className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex text-theme-primary flex-col gap-[3px] pr-[5px]`}
+				className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex text-theme-primary flex-col gap-[3px] pr-[5px] thread-scroll`}
 			>
 				{!normalizeSearchText && listRecent.length > 0 && (
 					<>
