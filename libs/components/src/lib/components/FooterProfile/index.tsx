@@ -353,9 +353,9 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 					<Icons.HeadPhoneICon className="ml-auto w-[18px] h-[18px] opacity-80 text-theme-primary  bg-item-hover hidden" />
 					<div
 						onClick={openSetting}
-						className="cursor-pointer ml-auto p-1 group/setting opacity-80  text-theme-primary bg-item-hover hover:rounded-md"
+						className="cursor-pointer ml-auto p-1 group/setting opacity-80  text-theme-primary bg-item-hover hover:rounded-md "
 					>
-						<Icons.SettingProfile className="w-5 h-5 group-hover/setting:rotate-180 duration-500" />
+						<Icons.SettingProfile className="w-5 h-5  group-hover/setting:rotate-180 duration-500" />
 					</div>
 				</div>
 			</div>

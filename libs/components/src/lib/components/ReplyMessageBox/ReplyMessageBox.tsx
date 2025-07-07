@@ -33,7 +33,7 @@ export function ReplyMessageBox({ channelId, dataReferences, className }: Messag
 	return (
 		<div
 			className={classNames(
-				'flex flex-row items-center justify-between w-full  border-theme-primary bg-theme-setting-nav p-2 rounded-lg text-[14px]',
+				'flex flex-row items-center justify-between w-full   border-theme-primary bg-theme-setting-nav p-2 rounded-t-lg text-[14px]',
 				className
 			)}
 		>
