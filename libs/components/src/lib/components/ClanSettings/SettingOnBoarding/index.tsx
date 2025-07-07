@@ -71,7 +71,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			setOpenModalSaveChanges(false);
 			toast.success('Community enabled successfully!');
 		} catch (error) {
-			console.error("Error enabling community:", error);
+			console.error('Error enabling community:', error);
 			toast.error('Failed to enable community. Please try again.');
 		} finally {
 			setIsSaving(false);
@@ -130,7 +130,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 			setOpenModalSaveChanges(false);
 			toast.success('Changes saved successfully!');
 		} catch (error) {
-			console.error("Error saving changes:", error);
+			console.error('Error saving changes:', error);
 			toast.error('Failed to save changes. Please try again.');
 		} finally {
 			setIsSaving(false);
@@ -186,7 +186,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 			{/* Description Section */}
 			<div className="bg-theme-setting-nav p-4 rounded-lg mt-6 ">
-				<h4 className="text-lg font-semibold text-theme-primary mb-2">Description</h4>
+				<h4 className="text-lg font-semibold text-theme-primary-active mb-2">Description</h4>
 				<div className="relative">
 					<textarea
 						className="w-full h-32 bg-theme-setting-primary text-theme-primary rounded-md p-2 resize-none border border-theme-primary bg-theme-setting-primary focus-input"
@@ -201,13 +201,13 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 			{/* About Section */}
 			<div className="bg-theme-setting-nav p-4 rounded-lg mt-6 ">
-				<h4 className="text-lg font-semibold text-theme-primary mb-2">About</h4>
+				<h4 className="text-lg font-semibold text-theme-primary-active mb-2">About</h4>
 				<div className="relative">
 					<textarea
 						className="w-full h-32 bg-theme-setting-primary text-theme-primary rounded-md p-2 resize-none border border-theme-primary bg-theme-setting-primary focus-input"
 						placeholder="Tell us about your clan..."
 						value={about}
-						onChange={handleChangeAbout}	
+						onChange={handleChangeAbout}
 						maxLength={300}
 					/>
 					<div className="absolute bottom-2 right-2 text-sm text-theme-primary">{about.length}/300</div>
@@ -224,8 +224,8 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 						<div className="bg-theme-setting-primary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
 							<div className="flex justify-between items-center mb-6">
-								<h3 className="text-xl font-semibold text-theme-primary">Community Settings</h3>
-								<button onClick={() => setIsModalOpen(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+								<h3 className="text-xl font-semibold text-theme-primary-active">Community Settings</h3>
+								<button onClick={() => setIsModalOpen(false)} className=" hover:text-white ">
 									<Icons.CloseIcon className="w-6 h-6" />
 								</button>
 							</div>
@@ -268,7 +268,10 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					<div className="bg-white dark:bg-bgSecondary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
 						<div className="flex justify-between items-center mb-6">
 							<h3 className="text-xl font-semibold text-theme-primary">Community Settings</h3>
-							<button onClick={() => setIsModalOpen(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+							<button
+								onClick={() => setIsModalOpen(false)}
+								className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
+							>
 								<Icons.CloseIcon className="w-6 h-6" />
 							</button>
 						</div>
@@ -350,8 +353,10 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 	return (
 		<div className="flex flex-col gap-6 flex-1">
 			<div className="flex flex-col gap-2">
-				<div className="text-[20px] text-theme-primary font-semibold">On Boarding</div>
-				<div className="font-medium text-theme-primary">Give your members a simple starting experience with custom channels, roles and first steps.</div>
+				<div className="text-[20px] text-theme-primary-active font-semibold">On Boarding</div>
+				<div className="font-medium text-theme-primary">
+					Give your members a simple starting experience with custom channels, roles and first steps.
+				</div>
 				<div className="flex gap-2 items-center">
 					<div className="cursor-pointer text-blue-500 hover:underline">See examples</div>
 					<div className="w-1 h-1 rounded-full bg-gray-600" />
@@ -363,7 +368,14 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 				</div>
 			</div>
 			<GuideItemLayout
-				icon={<Image src={`assets/images/wumpus_addbba.svg`} width={40} height={40} className="aspect-square object-cover w-[40px] text-theme-primary bg-theme-setting-nav" />}
+				icon={
+					<Image
+						src={`assets/images/wumpus_addbba.svg`}
+						width={40}
+						height={40}
+						className="aspect-square object-cover w-[40px] text-theme-primary bg-theme-setting-nav"
+					/>
+				}
 				title="Recent Updates"
 				description={
 					<div className="font-medium text-sm text-theme-primary">
@@ -388,7 +400,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					description="You have 7 Default Channels"
 					className={` rounded-none ${showOnboardingHighlight ? 'border-2 border-red-500' : ''}`}
 					action={
-						<div className="w-[60px] h-[32px] flex justify-center items-center rounded-sm bg-indigo-600 text-white hover:bg-indigo-500 cursor-pointer">
+						<div className="w-[60px] h-[32px] flex justify-center items-center rounded-lg border-theme-primary bg-secondary-button-hover">
 							Edit
 						</div>
 					}
@@ -404,7 +416,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					action={
 						<div
 							onClick={() => handleGoToPage(EOnboardingStep.QUESTION)}
-							className="px-3 py-2 flex gap-2 justify-center items-center rounded-sm bg-indigo-600 text-white hover:bg-indigo-500 cursor-pointer"
+							className="px-3 py-2 flex gap-2 justify-center items-center rounded-lg bg-button-primary text-white hover:bg-indigo-500 cursor-pointer"
 						>
 							<div>Set up</div> <Icons.LongArrowRight className="w-3" />
 						</div>
@@ -420,7 +432,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					action={
 						<div className="flex items-center gap-4">
 							<div
-								className="w-[60px] h-[32px] flex justify-center items-center rounded-sm bg-indigo-600 text-white hover:bg-indigo-500  cursor-pointer"
+								className="w-[60px] h-[32px] flex justify-center items-center rounded-lg border-theme-primary bg-secondary-button-hover  cursor-pointer"
 								onClick={() => handleGoToPage(EOnboardingStep.MISSION)}
 							>
 								Edit

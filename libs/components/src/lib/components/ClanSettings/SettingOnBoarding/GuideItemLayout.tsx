@@ -41,7 +41,7 @@ export const GuideItemLayout = ({
 				</div>
 			)}
 			<div className={`flex flex-1 text-base flex-col h-full justify-start text-theme-primary`}>
-				{title && <div className="font-bold ">{title}</div>}
+				{title && <div className="font-bold text-theme-primary-active">{title}</div>}
 				{description && <div className="text-xs flex-1">{description}</div>}
 			</div>
 			{action && <div className="flex items-center h-full">{action}</div>}
