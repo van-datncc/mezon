@@ -33,8 +33,6 @@ export const HistoryTransactionScreen = () => {
 	const [activeTab, setActiveTab] = useState<FilterType>(TRANSACTION_FILTERS.ALL);
 	const [isLoadMore, setIsLoadMore] = useState(false);
 
-	console.log('count', count);
-
 	const totalPages = useMemo(() => (count === undefined ? 0 : Math.ceil(count / LIMIT_WALLET)), [count]);
 	const isNextPage = useMemo(() => page < totalPages, [page, totalPages]);
 	const [currentTransactionItem, setCurrentTransactionItem] = useState<string>('');
