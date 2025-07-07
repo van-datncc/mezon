@@ -200,7 +200,7 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
 				<code
-					className={`w-full whitespace-pre-wrap font-sans text-theme-primary ${isInPinMsg ? 'whitespace-pre-wrap  block break-words w-full' : ''}`}
+					className={`text-sm w-full whitespace-pre-wrap font-sans text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap  block break-words w-full' : ''}`}
 				>
 					{contentBacktick}
 				</code>

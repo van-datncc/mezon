@@ -143,7 +143,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 							)}
 							label=""
 							placement="right-start"
-								className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
+							className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
 						>
 							{notificationTypesList.map((notification) => (
 								<ItemPanel

@@ -12,7 +12,6 @@ import {
 	selectBuzzStateByChannelId,
 	selectCurrentMission,
 	selectEventsByChannelId,
-	selectTheme,
 	selectToCheckAppIsOpening,
 	threadsActions,
 	useAppDispatch,
@@ -91,7 +90,6 @@ const ChannelLinkComponent = ({
 		mouseY: 0,
 		distanceToBottom: 0
 	});
-	const theme = useSelector(selectTheme);
 
 	const buzzState = useAppSelector((state) => selectBuzzStateByChannelId(state, channel?.channel_id ?? ''));
 	const events = useAppSelector((state) => selectEventsByChannelId(state, channel.clan_id ?? '', channel?.channel_id ?? ''));
