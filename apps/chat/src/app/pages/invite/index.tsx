@@ -79,7 +79,7 @@ export default function InvitePage() {
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-cover bg-center">
-			<div className="bg-[#2F3136] rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
+			<div className="bg-theme-setting-primary rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
 				<div className="flex items-center justify-center mb-3">
 					<div className="relative w-12 h-12 flex items-center justify-center">
 						{selectInvite?.clan_logo ? (
@@ -93,7 +93,7 @@ export default function InvitePage() {
 				</div>
 
 				<div className="text-center mb-4 w-full">
-					<p className="text-gray-300 text-sm mb-1">You've been invited to join</p>
+					<p className="text-sm mb-1">You've been invited to join</p>
 					<h1
 						className="text-white text-3xl font-medium mb-3 truncate max-w-full"
 						style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -105,7 +105,7 @@ export default function InvitePage() {
 					<div className="flex justify-center gap-5 text-sm">
 						<div className="flex items-center">
 							<div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-							<span className="text-gray-300">{Number(selectInvite?.member_count || 1).toLocaleString()} Members</span>
+							<span className="">{Number(selectInvite?.member_count || 1).toLocaleString()} Members</span>
 						</div>
 						{/* <div className="flex items-center">
 							<div className="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
@@ -114,10 +114,10 @@ export default function InvitePage() {
 					</div>
 				</div>
 
-				<div className="w-full bg-[#202225] rounded-md p-3 mb-5 flex items-center">
+				<div className="w-full bg-input-secondary rounded-md p-3 mb-5 flex items-center">
 					<div>
-						<div className="text-gray-200 text-xs font-medium uppercase tracking-wide">Server Settings</div>
-						<div className="text-gray-400 text-xs">You can customize these at any time</div>
+						<div className=" text-xs font-medium uppercase tracking-wide">Server Settings</div>
+						<div className="text-xs">You can customize these at any time</div>
 					</div>
 				</div>
 
@@ -125,7 +125,7 @@ export default function InvitePage() {
 				<button
 					onClick={handleJoinChannel}
 					disabled={loading}
-					className={`text-white w-full py-[10px] text-base font-medium rounded-md ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#5865F2] hover:bg-[#4752C4]'}`}
+					className={`text-white w-full py-[10px] text-base font-medium rounded-md ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-button-primary hover:bg-opacity-85'}`}
 				>
 					{loading ? 'Joining...' : 'Accept Invite'}
 				</button>
