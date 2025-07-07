@@ -1,28 +1,17 @@
-import { useAppDispatch, userClanProfileActions } from '@mezon/store';
+import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
 import { ReactNode, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ModalLayout } from '../../../components';
 
 type ModalCustomStatusProps = {
 	name: string;
 	onClose: () => void;
-	customStatus?: string;
-	setCustomStatus: (customStatus: string) => void;
-	handleSaveCustomStatus?: () => void;
-	setResetTimerStatus: (minutes: number) => void;
-	setNoClearStatus: (noClear: boolean) => void;
+	status?: string;
 };
 
-const ModalCustomStatus = ({
-	name,
-	customStatus,
-	onClose,
-	setCustomStatus,
-	handleSaveCustomStatus,
-	setResetTimerStatus,
-	setNoClearStatus
-}: ModalCustomStatusProps) => {
+const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -50,9 +39,27 @@ const ModalCustomStatus = ({
 			setResetTimerStatus(minutes);
 		}
 	};
+	const currentClanId = useSelector(selectCurrentClanId);
+
+	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
+	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
+	const [customStatus, setCustomStatus] = useState<string>(status ?? '');
+
+	const handleSaveCustomStatus = () => {
+		dispatch(
+			channelMembersActions.updateCustomStatus({
+				clanId: currentClanId ?? '',
+				customStatus: customStatus || '',
+				minutes: resetTimerStatus,
+				noClear: noClearStatus
+			})
+		);
+		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
+		onClose();
+	};
 
 	return (
-		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
+		<ModalLayout onClose={onClose}>
 			<div className="bg-theme-surface pt-4 rounded w-[440px]">
 				<div>
 					<h1 className="text-theme-primary text-xl font-semibold text-center">Set a custom status</h1>
@@ -122,15 +129,11 @@ const ModalCustomStatus = ({
 						</Dropdown>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
-						<button
-							className="py-2 h-10 px-4 rounded bg-#58f76d hover:bg-#58f76d/80 focus:!ring-transparent text-theme-primary"
-							type="button"
-							onClick={onClose}
-						>
+						<button className="py-2 h-10 px-4 rounded   text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent text-white"
+							className="py-2 h-10 px-4 rounded bg-bgSelectItem  hover:!bg-bgSelectItemHover  text-white"
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>

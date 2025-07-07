@@ -28,6 +28,8 @@ const RenderAudioItem = React.memo(({ audioURL }: { audioURL: string }) => {
 	}, []);
 
 	useEffect(() => {
+		if (!audioURL) return;
+
 		const newSound = new Sound(audioURL, '', (error) => {
 			if (error) {
 				console.error('Failed to load sound:', error);

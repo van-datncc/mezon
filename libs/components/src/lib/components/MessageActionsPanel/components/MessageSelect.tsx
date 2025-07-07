@@ -153,7 +153,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 			dismissOnClick={!checkMultipleSelect}
 			label=""
 			renderTrigger={() => (
-				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm ">
+				<div className="w-full max-w-[400px] h-auto rounded-md flex p-3 justify-between items-center text-sm border-theme-primary ">
 					<div>
 						{selectedOptions.length > 0 && (
 							<div className="flex flex-wrap gap-2 mb-2">

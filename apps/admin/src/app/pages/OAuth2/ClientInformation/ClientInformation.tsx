@@ -124,7 +124,7 @@ const ResetSecretPopup = ({ handleClosePopup, currentApp, handleCopyKey }: IRese
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={handleClosePopup} className="fixed inset-0 bg-black opacity-80" />
 			<div className="relative z-10 w-[440px]">
-				<div className="bg-theme-setting-primary pt-[16px] px-[16px] rounded-t-md">
+				<div className="dark:bg-[#313338] bg-white pt-[16px] px-[16px] rounded-t-md">
 					<div className="dark:text-textDarkTheme text-textLightTheme text-[20px] font-semibold pb-[16px]">Regenerate Secret Key?</div>
 					<div className="flex flex-col gap-4">
 						<div className="dark:text-[#dbdee1] text-textLightTheme pb-[20px]">

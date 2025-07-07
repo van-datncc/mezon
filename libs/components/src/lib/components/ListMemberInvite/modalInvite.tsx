@@ -102,12 +102,12 @@ const ModalInvite = (props: ModalParam) => {
 				<>
 					<ListMemberInvite url={urlInvite} channelID={channelID} />
 					<div className="relative ">
-						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">
+						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold text-theme-primary-active">
 							Or, send a clan invite link to a friend
 						</p>
 						<input
 							type="text"
-							className="w-full h-11 border-theme-primary bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
+							className="w-full h-11 border-theme-primary text-theme-primary-active bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 							value={urlInvite}
 							readOnly
 						/>
@@ -125,7 +125,7 @@ const ModalInvite = (props: ModalParam) => {
 						</button>
 					</div>
 					<p className="pt-1 text-[14px] mb-12px inline-flex gap-x-2">
-						<span className="cursor-default ">Your invite link expires in {expire} </span>
+						<span className="cursor-default text-theme-primary-active ">Your invite link expires in {expire} </span>
 						<span className=" text-blue-600 cursor-pointer hover:underline" onClick={() => setModalEdit(true)}>
 							Edit invite link.
 						</span>
@@ -135,12 +135,12 @@ const ModalInvite = (props: ModalParam) => {
 				<>
 					<ListMemberInvite isInviteExternalCalling={isInviteExternalCalling} url={props.privateRoomLink as string} channelID={channelID} />
 					<div className="relative ">
-						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold">
+						<p className="pt-4 pb-1 text-[12px] mb-12px cursor-default uppercase font-semibold text-theme-primary-active">
 							Or, send a private room link to a friend
 						</p>
 						<input
 							type="text"
-							className="w-full h-11 border-theme-primary bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
+							className="w-full h-11 border-theme-primary text-theme-primary-active bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 							value={props.privateRoomLink as string}
 							readOnly
 						/>
@@ -169,10 +169,10 @@ const ModalInvite = (props: ModalParam) => {
 			classNameBox="max-w-[440px]"
 		>
 			<div className="space-y-2">
-					<h3 className="text-xs font-bold text-theme-primary">Expire After</h3>
+				<h3 className="text-xs font-bold text-theme-primary">Expire After</h3>
 				<select
 					name="expireAfter"
-					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+					className={`block w-full  border  rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 					onChange={(e) => {
 						setExpire(e.target.value);
 					}}
@@ -186,10 +186,10 @@ const ModalInvite = (props: ModalParam) => {
 				</select>
 			</div>
 			<div className="space-y-2">
-					<h3 className="text-xs font-bold text-theme-primary">Max Number of Uses</h3>
+				<h3 className="text-xs font-bold text-theme-primary">Max Number of Uses</h3>
 				<select
 					name="maxNumberofUses"
-					className={`block w-full dark:bg-black bg-bgModifierHoverLight dark:text-white text-black border dark:border-black rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+					className={`block w-full  rounded p-2 font-normal text-sm tracking-wide outline-none border-none ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 					onChange={(e) => {
 						setMax(e.target.value);
 					}}
@@ -203,10 +203,10 @@ const ModalInvite = (props: ModalParam) => {
 				</select>
 			</div>
 			<div className="flex justify-end gap-x-4">
-				<button className="px-4 py-2 rounded bg-slate-500 hover:bg-opacity-85" onClick={closeModalEdit}>
+				<button className="px-4 py-2 rounded-lg  border-theme-primary hover:bg-opacity-85" onClick={closeModalEdit}>
 					Cancel
 				</button>
-				<button className="px-4 py-2 rounded bg-primary hover:bg-opacity-85" onClick={closeModalEdit}>
+				<button className="px-4 py-2 rounded-lg text-white bg-primary hover:bg-opacity-85" onClick={closeModalEdit}>
 					Generate a New Link
 				</button>
 			</div>

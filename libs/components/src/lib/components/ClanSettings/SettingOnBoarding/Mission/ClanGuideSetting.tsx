@@ -65,7 +65,7 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 				/>
 
 				<OwnerGreeting />
-				<div className="w-full h-[1px] my-8 bg-gray-300 dark:bg-channelTextLabel"></div>
+				<div className="w-full h-[1px] my-8 text-theme-primary"></div>
 				<SectionDescription
 					title="New Member To Do's"
 					description={
@@ -80,7 +80,7 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 					<GuideItemLayout
 						hightLightIcon={true}
 						icon={<Icons.IconRemove fill="red" />}
-						className="px-3 py-[10px] bg-gray-100 dark:bg-transparent hover:bg-gray-200 dark:hover:bg-transparent border-2 border-gray-300 dark:border-channelTextarea rounded-md"
+						className="px-3 py-[10px] bg-item-theme hover:bg-item-theme-hover-status-hover border-2 border-gray-300 dark:border-channelTextarea rounded-md"
 						title="chat with the community"
 						description="in #general"
 					/>
@@ -98,10 +98,10 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 					<GuideItemLayout
 						hightLightIcon={true}
 						gap={16}
-						icon={<Icons.RuleIcon defaultFill="#ffffff" />}
+						icon={<Icons.RuleIcon className="text-theme-primary" />}
 						className="px-3"
 						description={
-							<div className="h-full flex items-center text-base text-gray-800 dark:text-white font-bold">Read the Rules </div>
+							<div className="h-full flex items-center text-base text-theme-primary font-bold">Read the Rules </div>
 						}
 					/>
 
@@ -160,8 +160,8 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 const SectionDescription = ({ title, description }: { title: string; description: ReactNode }) => {
 	return (
 		<>
-			<h2 className="text-indigo-600 dark:text-channelActiveColor text-xl font-bold">{title}</h2>
-			<div className="pt-2 pb-8 text-gray-700 dark:text-channelTextLabel">{description}</div>
+			<h2 className="text-theme-primary text-xl font-bold">{title}</h2>
+			<div className="pt-2 pb-8 text-theme-primary">{description}</div>
 		</>
 	);
 };
@@ -170,7 +170,7 @@ const OwnerGreeting = () => {
 	const clanOwner = useAppSelector((state) => selectMemberClanByUserId2(state, currenClan?.creator_id as string));
 	return (
 		<div className="p-[2px] flex items-center justify-center bg-gradient-to-br from-indigo-300 to-purple-300 dark:from-[#9e9e9e] dark:to-[#494949]">
-			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br from-indigo-50 via-purple-50 to-white dark:from-[#3d3f3d] dark:via-[#2d2f2e] dark:to-[#1a1d1e] rounded-md">
+			<div className="w-full p-4 pt-2 flex flex-col gap-2 bg-gradient-to-br bg-theme-setting-nav rounded-md">
 				<div className="flex  gap-3">
 					<div className="w-12 relative">
 						<img

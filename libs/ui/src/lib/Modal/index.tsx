@@ -49,13 +49,14 @@ const Modal = (props: ModalProps) => {
 				<div
 					ref={modalRef}
 					tabIndex={-1}
-					className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none base-theme-color bg-opacity-80  text-theme-primary hide-scrollbar overflow-hidden"
+					className="justify-center items-center flex overflow-x-hidden overflow-y-auto  fixed inset-0 z-50 outline-none focus:outline-none base-theme-color text-theme-primary hide-scrollbar overflow-hidden"
 				>
+					<div className="absolute inset-0 bg-black opacity-40"></div>
 					<div className={`relative w-full ${isInviteModal ? 'max-w-[480px]' : 'max-w-[684px]'} sm:h-auto ${classNameBox}`}>
 						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-theme-setting-primary outline-none focus:outline-none h-full sm:h-auto">
 							<div className={`flex items-start justify-between p-4 border-b-theme-primary rounded-t`}>
 								<div>
-									<h3 className="text-[22px] font-semibold cursor-default">{title}</h3>
+									<h3 className="text-[22px] font-semibold text-theme-primary-active cursor-default">{title}</h3>
 									{hasChannel && (
 										<div className="inline-flex gap-x-2">
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
@@ -89,7 +90,7 @@ const Modal = (props: ModalProps) => {
 						</div>
 					</div>
 				</div>
-				<div className="opacity-25 fixed inset-0 z-40 dark:bg-black bg-bgLightModeSecond"></div>
+				<div className="opacity-25 fixed inset-0 z-40 "></div>
 			</>
 		)
 	);

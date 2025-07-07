@@ -28,7 +28,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, messag
 			emoji_id: emojiId,
 			emoji: emojiShortCode,
 			count: 1,
-			message_sender_id: userId.userId ?? '',
+			message_sender_id: (message.sender_id || userId.userId) ?? '',
 			action_delete: false,
 			is_public: isPublicChannel(currentChannel),
 			clanId: message?.clan_id ?? '',

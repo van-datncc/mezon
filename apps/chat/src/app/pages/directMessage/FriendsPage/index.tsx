@@ -139,7 +139,7 @@ const FriendsPage = () => {
 		<div className="flex flex-col flex-1 shrink min-w-0  h-[100%]">
 			<div className={`draggable-area flex min-w-0 items-center bg-theme-chat  px-6 py-3 justify-start h-heightHeader border-b-theme-primary`}>
 				{closeMenuMobile && (
-					<div onClick={() => setStatusMenu(true)}>
+					<div className="text-theme-primary" onClick={() => setStatusMenu(true)}>
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
 				)}

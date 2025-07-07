@@ -394,7 +394,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	};
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : 'bg-item-hover'} relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : ' bg-item-hover'} relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}

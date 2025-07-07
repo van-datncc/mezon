@@ -185,16 +185,8 @@ const ChannelLinkComponent = ({
 		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 		channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
-	const notMuteAndUnread =
-		(channel?.is_mute === undefined ? true : !channel?.is_mute) && isUnReadChannel && notVoiceOrAppOrStreamChannel && !isActive;
-	const notMuteAndHasCountNoti =
-		(channel?.is_mute === undefined ? true : !channel?.is_mute) &&
-		numberNotification &&
-		numberNotification > 0 &&
-		notVoiceOrAppOrStreamChannel &&
-		!isActive;
-	const showWhiteDot = (notMuteAndUnread && !isActive) || (notMuteAndHasCountNoti && !isActive);
-	const hightLightTextChannel = activeChannelChannelText || notMuteAndUnread || notMuteAndHasCountNoti;
+	const showWhiteDot = isUnReadChannel && !isActive && notVoiceOrAppOrStreamChannel;
+	const hightLightTextChannel = activeChannelChannelText || isUnReadChannel;
 	const highLightVoiceChannel = isActive && !notVoiceOrAppOrStreamChannel;
 
 	const [openProfileItem, closeProfileItem] = useModal(() => {
@@ -236,7 +228,7 @@ const ChannelLinkComponent = ({
 			role="button"
 			onDragStart={(e) => dragStart(e)}
 			onDragEnd={(e) => dragEnter(e)}
-			className={`relative group z-10   ${showWhiteDot ? 'before:content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute  before:top-3' : ''}`}
+			className={`relative group z-10   ${showWhiteDot ? 'before:bg-[var(--text-secondary)] :content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute  before:top-3' : ''}`}
 		>
 			{channelType === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? (
 				<span
@@ -271,10 +263,13 @@ const ChannelLinkComponent = ({
 					className={`channel-link block  rounded-lg mt-2 text-theme-primary-hover  ${classes[state]} ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
 					draggable="false"
 				>
-					<span ref={channelLinkRef} className={`flex flex-row items-center rounded relative flex-1 pointer-events-none`}>
+					<span
+						ref={channelLinkRef}
+						className={`flex flex-row items-center rounded relative flex-1 pointer-events-none  ${hightLightTextChannel ? ' font-semibold text-theme-primary-active' : 'font-medium '}`}
+					>
 						{state === 'inactiveUnread' && <div className="absolute left-0 -ml-2 w-1 h-2 bg-white rounded-r-full"></div>}
 
-						<div className={`relative text-theme-primary`}>
+						<div className={`relative`}>
 							{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
 								<Icons.SpeakerLocked defaultSize="w-5 h-5 " />
 							)}
@@ -299,7 +294,7 @@ const ChannelLinkComponent = ({
 						</div>
 						{events[0] && <EventSchedule event={events[0]} className="ml-0.2 mt-0.5" />}
 						<p
-							className={`ml-2 w-full pointer-events-none text-base focus:bg-bgModifierHover ${hightLightTextChannel ? ' font-semibold text-theme-primary-active' : 'font-medium '}`}
+							className={`ml-2 w-full pointer-events-none text-base focus:bg-bgModifierHover`}
 							title={channel.channel_label && channel?.channel_label.length > 20 ? channel?.channel_label : undefined}
 						>
 							{channel.channel_label && channel?.channel_label.length > 20

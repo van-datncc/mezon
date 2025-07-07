@@ -384,7 +384,7 @@ const DisplayByCategories = React.memo(function DisplayByCategories({
 		<div>
 			<button
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
-				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] bg-item-theme z-10 "
+				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] z-10  bg-theme-setting-primary"
 			>
 				<p className={'uppercase text-left truncate'}>{categoryName}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>

@@ -95,7 +95,7 @@ const ThreadLink = React.forwardRef<ThreadLinkRef, ThreadLinkProps>(({ thread, i
 
 	return (
 		<div
-			className="flex flex-row items-center h-[34px] relative "
+			className={`flex flex-row items-center h-[34px] relative ${isUnReadChannel ? 'before:bg-[var(--text-secondary)] :content-[""] before:w-1 before:h-2 before:rounded-[0px_4px_4px_0px] before:absolute  before:top-3' : ''}`}
 			ref={panelRef}
 			role={'button'}
 			onContextMenu={(event) => handleMouseClick(event)}

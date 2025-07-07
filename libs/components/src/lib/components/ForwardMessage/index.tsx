@@ -299,7 +299,7 @@ const ForwardMessageModal = () => {
 	};
 
 	return (
-		<ModalLayout className="bg-bgModalDark" onClose={handleCloseModal}>
+		<ModalLayout onClose={handleCloseModal}>
 			<div className="bg-theme-setting-primary w-[550px] text-theme-primary pt-4 rounded">
 				<div>
 					<h1 className=" text-xl font-semibold text-center">Forward Message</h1>
@@ -312,7 +312,7 @@ const ForwardMessageModal = () => {
 						onChange={(e) => setSearchText(e.target.value)}
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
-					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] `}>
+					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] thread-scroll `}>
 						{!normalizedSearchText.startsWith('@') && !normalizedSearchText.startsWith('#') ? (
 							<>
 								<ListSearchForwardMessage
