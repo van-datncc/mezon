@@ -154,33 +154,30 @@ const ModalSendToken = ({
 
 	return (
 		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
-			<div className="dark:bg-bgPrimary bg-bgLightMode rounded-xl overflow-hidden w-[480px]">
+			<div className="bg-theme-chat rounded-xl overflow-hidden w-[480px]">
 				<div className="flex items-center justify-between p-6 border-b dark:border-gray-700 border-gray-200">
 					<div className="flex items-center gap-3">
-						<div className="w-10 h-10 rounded-full dark:bg-blue-600 bg-blue-500 flex items-center justify-center">
-							<Icons.DollarIcon isWhite className="w-5 h-5" />
+						<div className="w-10 h-10 rounded-full bg-button-add-friend text-theme-primary-hover flex items-center justify-center">
+							<Icons.DollarIcon className="w-5 h-5" defaultFill="text-theme-primary" />
 						</div>
 						<div>
-							<h1 className="dark:text-white text-gray-900 text-lg font-semibold">Send Tokens</h1>
-							<p className="dark:text-gray-400 text-gray-500 text-sm">Transfer tokens to another user</p>
+							<h1 className="text-theme-primary text-lg font-semibold">Send Tokens</h1>
+							<p className="text-theme-secondary">Transfer tokens to another user</p>
 						</div>
 					</div>
-					<button
-						onClick={onClose}
-						className="dark:text-gray-400 text-gray-500 hover:dark:text-white hover:text-gray-900 transition-colors"
-					>
+					<button onClick={onClose} className="text-theme-primary text-theme-primary-hover transition-colors">
 						<Icons.Close className="w-5 h-5" />
 					</button>
 				</div>
 
-				<div className="p-6 space-y-6">
+				<div className="p-6 space-y-6 border-t-theme-primary">
 					<div className="space-y-3">
-						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">To</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">To</p>
 						<div className="relative">
 							<input
 								type="text"
 								placeholder="Search users..."
-								className="w-full h-12 px-4 pr-10 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all placeholder:dark:text-gray-500 placeholder:text-gray-400"
+								className="w-full h-12 px-4 pr-10 bg-input-theme border-theme-primary rounded-xl outline-none focus:ring-2  transition-all "
 								value={searchTerm}
 								onClick={() => setIsDropdownOpen(true)}
 								onChange={handleChangeSearchTerm}
@@ -189,7 +186,7 @@ const ModalSendToken = ({
 							/>
 							{isDropdownOpen && (
 								<div
-									className="absolute z-20 w-full mt-2 dark:bg-gray-800 bg-white border dark:border-gray-600 border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll "
+									className="absolute z-20 w-full mt-2 base-theme-color border-b-theme-primary rounded-xl shadow-lg max-h-48 overflow-y-auto thread-scroll text-theme-primary bg-theme-surface "
 									ref={dropdownRef}
 								>
 									<div
@@ -231,14 +228,12 @@ const ModalSendToken = ({
 																className="w-8 h-8"
 																classNameText="text-xs w-8 h-8"
 															/>
-															<span className="dark:text-white text-gray-900 font-medium">{user.username}</span>
+															<span className=" font-medium">{user.username}</span>
 														</div>
 													</div>
 												);
 											})}
-										{filteredUsers.length === 0 && (
-											<div className="p-4 text-center dark:text-gray-400 text-gray-500">No users found</div>
-										)}
+										{filteredUsers.length === 0 && <div className="p-4 text-center text-">No users found</div>}
 									</div>
 								</div>
 							)}
@@ -247,39 +242,37 @@ const ModalSendToken = ({
 					</div>
 
 					<div className="space-y-3">
-						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">Amount</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">Amount</p>
 						<div className="relative">
 							<input
 								ref={amountRef}
 								type="text"
 								value={tokenNumber}
-								className="w-full h-12 px-4 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all text-lg font-medium"
+								className="w-full h-12 px-4 pr-10 bg-input-theme border-theme-primary rounded-xl outline-none focus:ring-2  transition-all "
 								placeholder="0"
 								onChange={handleChangeSendToken}
 								disabled={sendTokenInputsState.isSendTokenInputDisabled}
 							/>
-							<span className="absolute right-4 top-1/2 transform -translate-y-1/2 dark:text-gray-400 text-gray-500 font-medium">
-								VND
-							</span>
+							<span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-theme-primary font-medium">VND</span>
 						</div>
 						{error && <p className="text-red-500 text-sm">{error}</p>}
 					</div>
 
 					<div className="space-y-3">
-						<p className="dark:text-gray-300 text-gray-700 text-sm font-medium flex items-center gap-2">Note (Optional)</p>
+						<p className="text-theme-primary  text-sm font-medium flex items-center gap-2">Note (Optional)</p>
 						<input
 							type="text"
 							defaultValue={noteSendToken}
-							className="w-full h-12 px-4 dark:bg-gray-800 bg-gray-50 dark:text-white text-gray-900 border dark:border-gray-600 border-gray-300 rounded-xl outline-none focus:ring-2 dark:focus:ring-blue-500 focus:ring-blue-400 transition-all placeholder:dark:text-gray-500 placeholder:text-gray-400"
+							className="w-full h-12 px-4 pr-10 bg-input-theme border-theme-primary rounded-xl outline-none focus:ring-2  transition-all "
 							placeholder="Add a note..."
 							onChange={handleChangeNote}
 						/>
 					</div>
 				</div>
 
-				<div className="p-6 border-t dark:border-gray-700 border-gray-200 flex gap-3">
+				<div className="p-6 border-t-theme-primary flex gap-3">
 					<button
-						className="flex-1 h-12 px-4 rounded-xl border dark:border-gray-600 border-gray-300 dark:text-gray-300 text-gray-700 font-medium hover:dark:bg-gray-800 hover:bg-gray-50 transition-all"
+						className="flex-1 h-12 px-4 rounded-xl text-theme-primary border-theme-primary font-medium hover:opacity-80 transition-all"
 						type="button"
 						onClick={onClose}
 					>

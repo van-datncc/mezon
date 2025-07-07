@@ -47,14 +47,14 @@ const ModalDelEvent = (props: ModalDelEventProps) => {
 		>
 			<div
 				ref={panelRef}
-				className="w-fit h-fit dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden"
+				className="w-fit h-fit bg-theme-setting-primary rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden"
 			>
-				<div className="dark:text-white text-black w-[440px]">
+				<div className=" w-[440px]">
 					<div className="p-4 pb-0">
 						<h3 className="font-bold pb-4 text-xl">Cancel Event?</h3>
 						<p className="pb-4">Are you sure you want to cancel this event?</p>
 					</div>
-					<div className="w-full dark:bg-bgSecondary bg-bgLightSecondary p-4 flex justify-end gap-x-4 font-medium">
+					<div className="w-full  p-4 flex justify-end gap-x-4 font-medium">
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
 							Never Mind
 						</button>

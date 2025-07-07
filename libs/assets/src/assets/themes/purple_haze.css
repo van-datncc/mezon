@@ -1,0 +1,124 @@
+/* Cyber Chroma Glow Dark Theme */
+:root {
+  --bg-primary: linear-gradient(rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.7)) fixed 0 0 / cover,
+    linear-gradient(154.19deg,
+      hsl(183.39 86% 40%) 8%,
+      hsl(258.11 90% 46%) 32%,
+      hsl(298.49 91% 34%) 54%,
+      hsl(264.76 100% 66%) 78%,
+      hsl(206.7 75% 50%) 100%) fixed 0 0 / cover,
+    color-mix(in oklab, hsl(240 4.3% 15%) 100%, rgb(0, 255, 255) 15%);
+
+  --bg-secondary: linear-gradient(rgb(0 0 0 / 0.8), rgb(0 0 0 / 0.8)) fixed 0 0 / cover,
+    linear-gradient(154.19deg,
+      hsl(183, 44%, 51%) 8%,
+      hsl(258.11 90% 46%) 32%,
+      hsl(298, 86%, 61%) 54%,
+      hsl(264.76 100% 66%) 78%,
+      hsl(207, 82%, 58%) 100%) fixed 0 0 / cover;
+
+  --bg-outside-footer: linear-gradient(rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.6)) fixed 0 0 / cover,
+    linear-gradient(154.19deg,
+      hsl(183, 30%, 66%) 8%,
+      hsl(258.11, 50%, 62%) 32%,
+      hsl(298, 55%, 72%) 54%,
+      hsl(264.76, 60%, 74%) 78%,
+      hsl(207, 48%, 70%) 100%) fixed 0 0 / cover;
+  /* nền trong của phần footer */
+  --bg-footer: linear-gradient(rgb(0 0 0 / 0.9), rgb(0 0 0 / 0.9)) fixed 0 0 / cover,
+    linear-gradient(154.19deg,
+      hsl(183, 60%, 35%) 8%,
+      hsl(258.11, 100%, 38%) 32%,
+      hsl(298, 95%, 48%) 54%,
+      hsl(264.76, 100%, 58%) 78%,
+      hsl(207, 90%, 42%) 100%) fixed 0 0 / cover;
+  /* màu ping member */
+  --bg-ping-member: rgb(36, 43, 52);
+  --bg-tertiary: hsl(240 4% 30% / 0.2);
+  --bg-surface: linear-gradient(rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.65)) fixed 0 0 / cover,
+    linear-gradient(128.92deg,
+      hsl(183.39 86.341% 40.196%) 3.94%,
+      hsl(258.113 89.831% 46.275%) 26.1%,
+      hsl(298.491 90.857% 34.314%) 39.82%,
+      hsl(264.767 100% 66.275%) 56.89%,
+      hsl(206.702 75.494% 50.392%) 76.45%) fixed 0 0 / cover;
+  --bg-accent: hsl(258 50% 40% / 0.25);
+  --bg-hover: #23272a;
+  --bg-modal: rgba(0, 0, 0, 0.8);
+
+  --theme-input: hsl(240 4% 30% / 0.2);
+  --theme-border-input: color-mix(in oklab, hsl(240 4% 60% / 0.4) 100%, hsl(183 100% 80% / 0.3) 50%);
+  /* màu nền của clan */
+  --theme-base-color: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+  --theme-text-color-dark: rgb(229, 254, 255);
+  --theme-setting-primary: rgb(27, 28, 32);
+  --theme-setting-nav: rgb(21, 22, 24);
+  --private-theme: rgb(0, 214, 172);
+  /* màu text full */
+  --text-theme-primary: color-mix(in oklab, hsl(0, 0%, 100%) 100%, rgb(238, 238, 238) 38%);
+
+  --text-theme-message: oklab(0.906424 -0.000235766 -0.0028885);
+
+  --text-theme-primary-hover: color-mix(in oklab, hsl(0, 100%, 50%) 100%, rgb(255, 0, 0) 38%);
+
+  --bg-active-friend-list: linear-gradient(rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.75)) fixed 0 0 / cover,
+    linear-gradient(154.19deg, hsl(183.39 86% 40%) 8.62%, hsl(258.11 90% 46%) 48.07%, hsl(298.49 91% 34%) 76.04%) fixed 0 0 / cover;
+
+  --bg-active-button: hsl(258 50% 40% / 0.25);
+  --color-text-active-button: color-mix(in oklab, hsl(234.9 85% 64%) 100%, hsl(326 100% 50%) 50%);
+  --bg-button-add-friend: hsl(264 100% 60% / 1);
+
+  --border-color-primary: color-mix(in oklab,
+      color-mix(in oklab, #0eb5bf 50%, #218be0 50%) 30%,
+      color-mix(in oklab, hsl(240 4% 40% / 0.3) 100%, hsl(50 100% 90% / 0.3) 50%) 100%);
+  /* màu bên channel và user */
+  --bg-theme-direct-message: linear-gradient(rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.65)) fixed 0 0 / cover,
+    linear-gradient(154.19deg, hsl(202, 100%, 27%) 8.62%, hsl(298, 67%, 55%) 32%, hsl(258, 86%, 59%) 48.07%, hsl(298, 86%, 39%) 76.04%) fixed 0 0 / cover;
+  /* màu text bên channel và user khi active */
+  --text-secondary: color-mix(in oklab, hsl(0 0% 95%) 100%, #ccfaff 10%);
+  --bg-item-hover: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+  /* màu click vào member channel */
+  --bg-active-member-channel: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+  --bg-theme-input-primary: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5)) fixed 0 0 / cover,
+    linear-gradient(154.19deg, hsl(183.39 86% 40%) 8.62%, hsl(258.11 90% 46%) 48.07%, hsl(298.49 91% 34%) 76.04%) fixed 0 0 / cover;
+
+  --border-theme-primary: color-mix(in oklab, hsl(264 100% 66%) 100%, hsl(206 75% 50%) 30%);
+  --border-t-theme-primary: color-mix(in oklab, hsl(264 100% 66%) 100%, hsl(206 75% 50%) 30%);
+  --border-r-t-l-theme-primary: color-mix(in oklab, hsl(264 100% 66%) 100%, hsl(206 75% 50%) 30%);
+  --border-r-b-l-theme-primary: color-mix(in oklab, hsl(264 100% 66%) 100%, hsl(206 75% 50%) 30%);
+  --border-primary: hsl(240 4% 30% / 0.4);
+  --border-secondary: #00ffaa;
+  --border-focus: #00d4ff;
+  --border-divider: #00475e;
+  --border-hover: #00ccff;
+
+  /* mention */
+  --mention-primary: rgba(67, 97, 238, 0.24);
+  --mention-color: #3298ff;
+  --bg-mention-hover: rgba(67, 98, 238, 0.39);
+  --color-mention-hover: #3298ff;
+  --bg-mention-evryone: #2eb08b63;
+  --color-mention-evryone: #2eb08c;
+  --bg-mention-everyone-hover: #2eb08b8c;
+  --color-mention-everyone-hover: #32b993;
+
+  --bg-highlight: color-mix(in oklab, hsl(36 100% 30% / 0.08) 100%, hsl(60 100% 50% / 0.08) 50%);
+  --bg-hover-select-status: #2b1351;
+  --bg-secondary-button-hover: hsl(258 50% 40% / 0.3);
+  /* màu contexify */
+  --bg-theme-contexify: rgb(49, 42, 95);
+  --bg-count-page: #1b1d2b;
+  /* nền đậm hơi tím-xám */
+  --text-count-page: #a5b4fc;
+  /* chữ xanh tím neon nhẹ (giống Tailwind indigo-300) */
+  --bg-count-page-hover: #2c2e41;
+  /* hover sáng hơn nhẹ */
+  --text-count-page-hover: #c7d2fe;
+  /* chữ hover sáng hơn (indigo-200) */
+  --bg-count-page-active: #6d28d9;
+  /* nền active tím đậm mạnh (indigo-700) */
+  --text-count-page-active: #ffffff;
+  /* chữ trắng nổi bật */
+  /* button primary */
+  --bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+}

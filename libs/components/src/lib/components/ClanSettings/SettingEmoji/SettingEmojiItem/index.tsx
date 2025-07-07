@@ -65,12 +65,12 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 	};
 	return (
 		<div
-			className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px]  hover:bg-[#f9f9f9] dark:hover:bg-transparent'}
+			className={'flex flex-row w-full max-w-[700px] pr-5 relative h-[65px] '}
 			onMouseOver={handleHoverEmoji}
 			onMouseLeave={handleOnMouseLeave}
 			onBlur={handleOnMouseLeave}
 		>
-			<div className="w-full h-full flex flex-row gap-1 shadow-emoji_item dark:shadow-emoji_item_dark items-center">
+			<div className="w-full h-full flex flex-row gap-1 border-b-theme-primary items-center">
 				<div className={'w-14 h-8'}>
 					<div className={'w-8 h-8 overflow-hidden flex items-center justify-center select-none '}>
 						<img className={'w-auto max-h-full object-cover'} src={getSrcEmoji(emoji.id as string)} alt={emoji.shortname} />
@@ -80,14 +80,14 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 				<div className={'md:flex-1 relative max-md:w-[40%] max-[400px]:w-[30%]'}>
 					<div
 						className={
-							'h-[26px] px-1 w-fit max-md:w-full relative before:absolute after:absolute before:content-[":"] before:text-gray-400 after:content-[":"] after:text-gray-400 before:left-[-3px] after:right-[-3px]'
+							'h-[26px] px-1 w-fit max-md:w-full relative before:absolute after:absolute before:content-[":"]  after:content-[":"]  before:left-[-3px] after:right-[-3px]'
 						}
 					>
 						<p className={`max-w-[172px] w-full truncate overflow-hidden inline-block select-none`}>{emoji.shortname?.slice(1, -1)}</p>
 					</div>
 					{showEdit && (
 						<input
-							className={`w-full dark:bg-channelTextarea bg-channelTextareaLight dark:text-white text-black animate-faded_input h-[26px] top-0 mx-[2px] outline-none px-2 absolute rounded-[3px]`}
+							className={`w-full bg-theme-input-primary animate-faded_input h-[26px] top-0 mx-[2px] outline-none px-2 absolute rounded-[3px]`}
 							value={nameEmoji}
 							onChange={(e) => handleChangeEmojiName(e)}
 							onKeyDown={(e) => {
@@ -109,7 +109,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji }: SettingEmojiItemProp) => {
 					<div className={'absolute text-xs font-bold w-6 top-[-12px] right-[-12px]'}>
 						<button
 							onClick={handleDelete}
-							className="dark:border-black dark:shadow-[#000000] bg-white dark:bg-transparent text-red-600 shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%]"
+							className="border-theme-primary text-red-600 shadow-emoji_item-delete  text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[50%]"
 						>
 							X
 						</button>

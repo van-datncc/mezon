@@ -63,7 +63,7 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, message, isTopic }: User
 				<div className="flex flex-col justify-center ">
 					<div
 						onClick={(e) => e.stopPropagation()}
-						className={`z-50 w-[18rem] dark:bg-bgSecondary600 bg-white border-[#28272b] rounded-sm min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
+						className={`z-50 w-[18rem] bg-theme-setting-primary border-color-primary rounded-lg min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel?.emojiId} emojiName={emojiShowPanel?.emoji ?? ''} count={count} />
 						<div ref={ref} tabIndex={-1} className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none">
@@ -104,12 +104,11 @@ type PanelHeaderProps = {
 const PanelHeader: React.FC<PanelHeaderProps> = ({ emojiId, emojiName, count }) => {
 	return (
 		<div>
-			<div className="flex flex-row items-center m-2 dark:text-white text-black">
+			<div className="flex flex-row items-center p-2 text-theme-primary border-b-theme-primary">
 				<img src={getSrcEmoji(emojiId ?? '')} className="w-5 h-5 min-h-5 min-w-5" alt="" />
 				<p className="text-sm ml-2">{count}</p>
 				<p className="text-sm ml-2">{emojiName}</p>
 			</div>
-			<hr className="h-[0.1rem] dark:bg-blue-900 bg-[#E1E1E1] border-none" />
 		</div>
 	);
 };
@@ -155,7 +154,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			</div>
 
 			<NameComponent id={sender.sender_id ?? ''} name={user?.clan_nick || user?.user?.display_name || user?.user?.username} />
-			<p className="text-xs absolute right-8 dark:text-textDarkTheme text-textLightTheme">{sender.count}</p>
+			<p className="text-xs absolute right-8 ">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">
 					<Icons.Close defaultSize="w-3 h-3" />

@@ -53,19 +53,19 @@ const ModalCustomStatus = ({
 
 	return (
 		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
-			<div className="dark:bg-bgPrimary bg-bgLightMode pt-4 rounded w-[440px]">
+			<div className="bg-theme-surface pt-4 rounded w-[440px]">
 				<div>
-					<h1 className="dark:text-textDarkTheme  text-xl font-semibold text-center">Set a custom status</h1>
+					<h1 className="text-theme-primary text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
-				<div className="flex w-full flex-col gap-5 pt-4">
+				<div className="flex w-full flex-col gap-5 pt-4 bg-theme-surface">
 					<div className="px-4">
 						<div className="mb-2 block">
-							<p className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">What's cookin', {name}</p>
+							<p className="text-theme-primary text-xs uppercase font-semibold">What's cookin', {name}</p>
 						</div>
 						<input
 							type="text"
 							defaultValue={customStatus}
-							className="dark:text-[#B5BAC1] text-textLightTheme outline-none w-full h-10 p-[10px] dark:bg-bgInputDark bg-bgLightModeThird text-base rounded placeholder:text-sm"
+							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded placeholder:text-sm border-theme-primary"
 							placeholder="Support has arrived!"
 							maxLength={128}
 							autoFocus
@@ -74,20 +74,20 @@ const ModalCustomStatus = ({
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<p className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">Clear after</p>
+							<p className="text-theme-primary text-xs uppercase font-semibold">Clear after</p>
 						</div>
 						<Dropdown
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
-									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] list-none select-none">{timeSetReset}</li>
+								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+									<li className="text-[14px] text-theme-primary w-full py-[6px] list-none select-none">{timeSetReset}</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
 							label=""
 							placement="bottom-start"
-							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
+							className="bg-theme-setting-primary border-none py-0 w-[200px] [&>ul]:py-0"
 						>
 							<ItemSelect children="Today" onClick={() => setStatusTimer(0, false, 'Today')} />
 							<ItemSelect children="4 hours" onClick={() => setStatusTimer(240, false, '4 hours')} />
@@ -98,7 +98,7 @@ const ModalCustomStatus = ({
 					</div>
 					<div className="px-4">
 						<div className="mb-2 block">
-							<label htmlFor="status" className="dark:text-[#B5BAC1] text-textLightTheme text-xs uppercase font-semibold">
+							<label htmlFor="status" className="text-theme-primary text-xs uppercase font-semibold">
 								Status
 							</label>
 						</div>
@@ -106,8 +106,8 @@ const ModalCustomStatus = ({
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm h-9 dark:bg-bgInputDark bg-bgLightModeThird dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-[#000] px-3">
-									<li className="text-[14px] text-[#B5BAC1] w-full py-[6px] cursor-pointer list-none select-none">Online</li>
+								<div className="flex items-center justify-between rounded-sm h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+									<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none select-none">Online</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
 							)}
@@ -121,16 +121,16 @@ const ModalCustomStatus = ({
 							<ItemSelect children="Invisible" startIcon={<Icons.OfflineStatus />} />
 						</Dropdown>
 					</div>
-					<div className="flex justify-end p-4 rounded-b dark:bg-[#2B2D31] bg-[#dedede]">
+					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
 						<button
-							className="py-2 h-10 px-4 rounded bg-transparent dark:bg-transparent hover:!bg-transparent hover:!underline focus:!ring-transparent dark:text-textDarkTheme text-textLightTheme"
+							className="py-2 h-10 px-4 rounded bg-#58f76d hover:bg-#58f76d/80 focus:!ring-transparent text-theme-primary"
 							type="button"
 							onClick={onClose}
 						>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent"
+							className="py-2 h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent text-white"
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>
@@ -154,10 +154,10 @@ const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps)
 	return (
 		<div
 			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm dark:bg-bgInputDark bg-bgLightModeThird cursor-pointer  dark:hover:bg-zinc-700 hover:bg-bgLightMode dark:hover:[&>li]:text-[#fff] hover:[&>li]:text-[#000] px-3"
+			className="flex items-center justify-between h-11 rounded-sm bg-theme-setting-nav text-theme-primary-hover cursor-pointer text-theme-primary bg-item-theme-hover-status px-3"
 		>
 			{startIcon && <div className="flex items-center justify-center h-[18px] w-[18px] mr-2">{startIcon}</div>}
-			<li className="text-[14px] dark:text-[#B5BAC1] text-[#777777] w-full list-none leading-[44px]">{children}</li>
+			<li className="text-[14px] w-full list-none leading-[44px] ">{children}</li>
 			<Icons.Check className="w-[18px] h-[18px]" />
 		</div>
 	);

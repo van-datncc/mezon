@@ -1,5 +1,6 @@
 import { useApp } from '@mezon/core';
 import { selectTheme } from '@mezon/store';
+import { useTheme } from '@mezon/themes';
 import { Icons } from '@mezon/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -8,6 +9,7 @@ const ThemeOptions = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const { setAppearanceTheme, systemIsDark } = useApp();
 	const [themeChosen, setThemeChosen] = useState<string>(appearanceTheme);
+	const { themes, isLoading, error } = useTheme();
 
 	const onWindowMatch = () => {
 		if (themeChosen === 'system') {
@@ -35,40 +37,71 @@ const ThemeOptions = () => {
 		}
 	}, [themeChosen, appearanceTheme, setAppearanceTheme]);
 
+	const handleThemeColorClick = async (themeName: string) => {
+		if (isLoading) return;
+
+		try {
+			// Only update the theme selection, let useApp handle the actual theme loading
+			setThemeChosen(themeName);
+		} catch (error) {
+			console.error('Error changing theme:', error);
+		}
+	};
+
 	return (
-		<div className="pt-10">
-			<div className="dark:text-white text-black">Theme</div>
-			<div className="theme-container flex gap-[30px] mt-3">
-				<div
-					className={`light-theme aspect-square bg-white w-[60px] rounded-full border dark:border-white border-black border-solid cursor-pointer relative ${themeChosen === 'light' ? 'border-indigo-600 border-2' : ''}`}
-					onClick={() => setThemeChosen('light')}
-				>
-					<div
-						className={`checked-theme w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'light' ? 'block' : 'hidden'}`}
-					>
-						<Icons.CheckIcon />
+		<div className="pt-10 flex flex-col gap-2">
+			<div>Theme</div>
+
+			{error && (
+				<div className="mt-2 p-3 bg-red-100 border border-red-300 rounded-md">
+					<div className="flex items-center gap-2">
+						<div className="text-red-600">
+							<Icons.HashtagWarning className="w-4 h-4" />
+						</div>
+						<p className="text-sm text-red-700">{error}</p>
 					</div>
 				</div>
-				<div
-					className={`dark-theme aspect-square bg-bgSecondary w-[60px] rounded-full border border-solid cursor-pointer relative ${themeChosen === 'dark' ? 'border-indigo-600 border-2' : ''}`}
-					onClick={() => setThemeChosen('dark')}
-				>
-					<div
-						className={`checked-theme w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'dark' ? 'block' : 'hidden'}`}
-					>
-						<Icons.CheckIcon />
+			)}
+
+			{isLoading && (
+				<div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+					<div className="flex items-center gap-2">
+						<Icons.LoadingSpinner className="w-4 h-4 text-blue-600" />
+						<p className="text-sm text-blue-700">Switching theme...</p>
 					</div>
 				</div>
-				<div
-					className={`system-theme aspect-square bg-bgSecondary w-[60px] rounded-full border border-solid cursor-pointer flex justify-center items-center relative ${themeChosen === 'system' ? 'border-indigo-600 border-2' : ''}`}
-					onClick={() => setThemeChosen('system')}
-				>
-					<Icons.SpinArrowIcon />
-					<div
-						className={`checked-theme w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full ${themeChosen === 'system' ? 'block' : 'hidden'}`}
-					>
-						<Icons.CheckIcon />
-					</div>
+			)}
+
+			<div className="mt-3 flex flex-col">
+				<div className="flex flex-wrap gap-y-4 gap-x-[30px] mt-5">
+					{themes.map((theme) => (
+						<div key={theme.name} className="relative" onClick={() => handleThemeColorClick(theme.name)}>
+							<div
+								className={`
+									aspect-square rounded-full cursor-pointer w-[60px] h-[60px] transition-all
+									${appearanceTheme === theme.name ? 'border-2 border-indigo-600 shadow-lg' : 'border border-gray-300'}
+									${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:scale-105'}
+									${appearanceTheme === theme.name ? 'ring-2 ring-indigo-200' : ''}
+								`}
+								style={{
+									background: theme.color
+								}}
+								title={theme.displayName}
+							/>
+							<div
+								className={`
+									w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full transition-all
+									${appearanceTheme === theme.name ? 'block scale-100' : 'hidden scale-0'}
+								`}
+							>
+								<Icons.CheckIcon className="w-3 h-3 text-white" />
+							</div>
+
+							<div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity">
+								<div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">{theme.displayName}</div>
+							</div>
+						</div>
+					))}
 				</div>
 			</div>
 		</div>

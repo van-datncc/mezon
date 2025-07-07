@@ -64,45 +64,42 @@ const formatMarkdownHeadings = (text: string, isReply: boolean): React.ReactNode
 			switch (headingLevel) {
 				case 1:
 					formattedLines.push(
-						<h1
-							key={`h1-${index}`}
-							className={`${isReply ? 'text-sm' : 'text-4xl'} my-1 font-bold dark:text-white text-colorTextLightMode`}
-						>
+						<h1 key={`h1-${index}`} className={`${isReply ? 'text-sm' : 'text-4xl'} my-1 font-bold text-theme-message`}>
 							{headingText}
 						</h1>
 					);
 					break;
 				case 2:
 					formattedLines.push(
-						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h2 key={`h2-${index}`} className="text-3xl my-1 font-bold text-theme-message">
 							{headingText}
 						</h2>
 					);
 					break;
 				case 3:
 					formattedLines.push(
-						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h3 key={`h3-${index}`} className="text-2xl my-1 font-bold text-theme-message">
 							{headingText}
 						</h3>
 					);
 					break;
 				case 4:
 					formattedLines.push(
-						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h4 key={`h4-${index}`} className="text-xl my-1 font-bold text-theme-message">
 							{headingText}
 						</h4>
 					);
 					break;
 				case 5:
 					formattedLines.push(
-						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h5 key={`h5-${index}`} className="text-lg my-1 font-bold text-theme-message">
 							{headingText}
 						</h5>
 					);
 					break;
 				case 6:
 					formattedLines.push(
-						<h6 key={`h6-${index}`} className="text-base my-1 font-bold dark:text-white text-colorTextLightMode">
+						<h6 key={`h6-${index}`} className="text-base my-1 font-bold text-theme-message">
 							{headingText}
 						</h6>
 					);
@@ -434,7 +431,7 @@ export const MessageLine = ({
 			formattedContent.push(
 				<p
 					key={`edited-status-${lastindex}-end`}
-					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold dark:text-textDarkTheme text-textLightTheme w-[50px] select-none"
+					className="ml-[5px] inline opacity-50 text-[9px] self-center font-semibold text-theme-message w-[50px] select-none"
 				>
 					(edited)
 				</p>
@@ -480,7 +477,7 @@ export const MessageLine = ({
 							minHeight: 30
 						}
 			}
-			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-[#4E5057] dark:text-[#E6E6E6] hover:text-black dark:hover:!text-white cursor-pointer' : 'text-[#4E5057] dark:text-[#E6E6E6]'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
+			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-theme-message text-theme-message-hover cursor-pointer' : 'text-theme-message'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''}`}
 		>
 			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>

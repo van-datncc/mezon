@@ -30,13 +30,13 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	return (
 		<div className="self-stretch w-full h-[268px] flex-col justify-start items-start flex pt-[16px] pb-[16px] ml-2 mr-1 gap-[24px]">
 			<div className="w-full">
-				<p className="mb-3 ml-2 text-[#AEAEAE] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
+				<p className="mb-3 ml-2 font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
 					MEMBER - {memberGroups.length}
 				</p>
 				{
-					<div className={`flex flex-col text-[#AEAEAE] ${isElectron() ? 'pb-8' : ''}`}>
+					<div className={`flex flex-col  ${isElectron() ? 'pb-8' : ''}`}>
 						{memberGroups.map((user: ChannelMembersEntity) => (
-							<div key={user.id} className="p-2 rounded dark:hover:bg-bgModifierHover hover:bg-bgLightModeButton">
+							<div key={user.id} className="p-2 rounded bg-item-hover">
 								<MemberItem
 									user={user}
 									name={user.user?.display_name || user.user?.username}

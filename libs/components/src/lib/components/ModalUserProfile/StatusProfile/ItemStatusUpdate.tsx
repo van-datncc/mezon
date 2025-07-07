@@ -38,13 +38,18 @@ const ItemStatusUpdate = ({ children, dropdown, startIcon, type, onClick, disabl
 				</div>
 			)}
 			placement="right-start"
-			className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px]"
+			className=" bg-theme-contexify text-theme-primary border ml-2 py-[6px] px-[8px] w-[200px] border-theme-hover "
 		>
 			<ItemStatus children="For 30 Minutes" onClick={() => updateUserStatus(children, 30, false)} />
+			<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 			<ItemStatus children="For 1 hour" onClick={() => updateUserStatus(children, 60, false)} />
+			<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 			<ItemStatus children="For 3 hours" onClick={() => updateUserStatus(children, 30, false)} />
+			<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 			<ItemStatus children="For 8 hours" onClick={() => updateUserStatus(children, 30, false)} />
+			<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 			<ItemStatus children="For 24 hours" onClick={() => updateUserStatus(children, 30, false)} />
+			<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
 			<ItemStatus children="Forever" onClick={() => updateUserStatus(children, 0, true)} />
 		</Dropdown>
 	);

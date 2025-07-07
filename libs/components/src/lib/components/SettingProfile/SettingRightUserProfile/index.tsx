@@ -251,7 +251,7 @@ const SettingRightUser = ({
 	return (
 		<>
 			<div className="flex-1 flex z-0 gap-x-8 sbm:flex-row flex-col">
-				<div className="flex-1 dark:text-[#CCCCCC] text-black">
+				<div className="flex-1 ">
 					<div>
 						<label htmlFor="inputField" className="font-semibold tracking-wide text-sm">
 							DISPLAY NAME
@@ -261,7 +261,7 @@ const SettingRightUser = ({
 							id="inputField"
 							onChange={handleDisplayName}
 							type="text"
-							className="dark:bg-bgTertiary bg-[#F0F0F0] dark:text-white text-black rounded-[3px] w-full px-4 py-2 mt-2 focus:outline-none font-normal text-sm tracking-wide"
+							className="rounded-lg color-text-secondary bg-input-theme w-full px-4 py-2 mt-2 focus:outline-none font-normal text-sm tracking-wide border-theme-primary"
 							placeholder={valueDisplayName || name}
 							value={valueDisplayName}
 							maxLength={32}
@@ -272,13 +272,13 @@ const SettingRightUser = ({
 						<p className="font-semibold tracking-wide text-sm">AVATAR</p>
 						<div className="flex mt-[10px] gap-x-5">
 							<label>
-								<div className="text-white font-medium bg-[#155EEF] hover:bg-blue-500 rounded-[4px] p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]">
+								<div className="text-white font-medium bg-button-primary hover:bg-blue-500 rounded-lg p-[8px] pr-[10px] pl-[10px] cursor-pointer text-[14px]">
 									Change avatar
 								</div>
-								<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm text-slate-500 hidden" />
+								<input type="file" onChange={(e) => handleFile(e)} className="w-full text-sm  hidden" />
 							</label>
 							<button
-								className="dark:text-white text-black dark:bg-[#1E1E1E] bg-gray-300 font-medium rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
+								className="bg-theme-input text-theme-primary-hover bg-secondary-button-hover border-theme-primary  font-medium rounded-lg p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
 								onClick={handleRemoveButtonClick}
 							>
 								Remove avatar
@@ -286,7 +286,7 @@ const SettingRightUser = ({
 						</div>
 						<div className="mt-[30px] w-full">
 							<textarea
-								className={`dark:bg-bgTertiary bg-[#F0F0F0] rounded p-[10px] w-full outline-none min-h-[50px] max-h-[250px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
+								className={`rounded-lg bg-input-theme p-[10px] border-theme-primary w-full outline-none min-h-[50px] max-h-[250px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}
 								onChange={(e) => {
 									onchangeAboutUser(e);
 								}}
@@ -303,14 +303,14 @@ const SettingRightUser = ({
 					</div>
 
 					<div
-						className="mt-8 flex items-center dark:bg-bgTertiary bg-[#F0F0F0] p-4 rounded justify-between"
+						className="mt-8 flex items-center  bg-theme-input border-theme-primary p-4 rounded-lg justify-between"
 						onContextMenu={handleMouseClick}
 					>
 						<p className="font-semibold tracking-wide text-sm">Direct Message Icon</p>
-						<div className="flex gap-x-5">
+						<div className="flex gap-x-5  text-theme-primary text-theme-primary-hover bg-secondary-button-hover bg-button-secondary rounded-lg border-theme-primary">
 							<label
 								htmlFor="logo"
-								className="text-white relative font-medium flex items-center w-11 aspect-square justify-center bg-bgSecondary600 rounded cursor-pointer text-[14px]"
+								className=" relative  font-medium flex items-center w-11 aspect-square justify-center  rounded-lg cursor-pointer text-[14px]"
 							>
 								{logoCustom ? (
 									<img
@@ -327,7 +327,7 @@ const SettingRightUser = ({
 									name="logo"
 									id="logo"
 									onChange={handleChangeLogo}
-									className="w-full absolute top-0 left-0 h-full text-sm text-slate-500 hidden"
+									className="w-full absolute top-0 left-0 h-full text-sm hidden"
 								/>
 							</label>
 						</div>
@@ -335,7 +335,7 @@ const SettingRightUser = ({
 					<div className="mt-8">
 						<div className="flex mt-[10px] gap-x-5">
 							<button
-								className="dark:text-white text-black dark:bg-[#ee4545] bg-gray-300 font-medium rounded-[4px] p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
+								className="bg-[#ee4545] text-white hover:opacity-85 font-medium rounded-lg p-[8px] pr-[10px] pl-[10px] text-nowrap text-[14px]"
 								onClick={handleOpenModalDeleteAcc}
 							>
 								Delete account
@@ -343,8 +343,8 @@ const SettingRightUser = ({
 						</div>
 					</div>
 				</div>
-				<div className="flex-1  text-white">
-					<p className="mt-[20px] dark:text-[#CCCCCC] text-black font-semibold tracking-wide text-sm">PREVIEW</p>
+				<div className="flex-1 flex flex-col gap-2">
+					<p className="mt-[20px]  font-semibold tracking-wide text-sm">PREVIEW</p>
 					<PreviewSetting isLoading={isLoading} profiles={editProfile} isDM={isDM} />
 				</div>
 			</div>
@@ -352,13 +352,13 @@ const SettingRightUser = ({
 			(valueDisplayName !== currentDisplayName && flags) ||
 			(flagsRemoveAvartar !== false && flags) ||
 			(editAboutUser !== aboutMe && flags) ? (
-				<div className="flex flex-row gap-2 dark:bg-bgTertiary bg-white shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
+				<div className="flex flex-row gap-2 shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p className="text-[15px] dark:text-bgLightPrimary text-bgPrimary">Careful - you have unsaved changes!</p>
+						<p className="text-[15px] ">Careful - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
-							className="text-[15px] bg-gray-600 rounded-[4px] p-[8px]"
+							className="text-[15px] rounded-[4px] p-[8px]"
 							onClick={() => {
 								handleClose();
 							}}

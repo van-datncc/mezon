@@ -153,11 +153,11 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		<ListGroupSearchModalContext.Provider value={{ itemRefs: itemRefs.current }}>
 			<div
 				ref={boxRef}
-				className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex flex-col gap-[3px] pr-[5px]  ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+				className={`w-full max-h-[250px] overflow-x-hidden overflow-y-auto flex text-theme-primary flex-col gap-[3px] pr-[5px]`}
 			>
 				{!normalizeSearchText && listRecent.length > 0 && (
 					<>
-						<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2 ">Previous channels</div>
+						<div className="text-xs font-semibold uppercase text-theme-primary py-2 text-theme-primary-active">Previous channels</div>
 						<ListSearchModal
 							listSearch={listRecent}
 							focusItemId={focusItemId}
@@ -169,7 +169,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 				)}
 				{!normalizeSearchText && mentionList.length > 0 && (
 					<>
-						<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Mentions</div>
+						<div className="text-xs font-semibold uppercase py-2 text-theme-primary-active">Mentions</div>
 						<ListSearchModal
 							listSearch={mentionList}
 							onItemClick={handleItemClick}
@@ -181,7 +181,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 				)}
 				{!normalizeSearchText && unreadList.length > 0 && (
 					<>
-						<div className="text-xs dark:text-white text-textLightTheme font-semibold uppercase py-2">Unread channels</div>
+						<div className="text-xs font-semibold uppercase py-2 text-theme-primary-active">Unread channels</div>
 						<ListSearchModal
 							listSearch={unreadList}
 							onItemClick={handleItemClick}
@@ -201,11 +201,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 					/>
 				)}
 
-				{isNoResult && (
-					<span className=" flex flex-row justify-center dark:text-white text-colorTextLightMode">
-						Can't seem to find what you're looking for?
-					</span>
-				)}
+				{isNoResult && <span className=" flex flex-row justify-center">Can't seem to find what you're looking for?</span>}
 			</div>
 		</ListGroupSearchModalContext.Provider>
 	);

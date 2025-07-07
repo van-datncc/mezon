@@ -98,7 +98,7 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ currentCh
 		<div
 			tabIndex={-1}
 			onKeyDown={handleKeyDown}
-			className="w-[100vw] h-[100dvh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex justify-center items-center"
+			className="w-[100vw] h-[100dvh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex justify-center items-center text-theme-primary"
 		>
 			{isShowEmojiPanel && (
 				<div
@@ -125,10 +125,10 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ currentCh
 				</div>
 			)}
 
-			<div ref={panelRef} className="bg-white dark:bg-gray-800 p-4 rounded-lg w-[400px]">
+			<div ref={panelRef} className="bg-theme-setting-primary p-4 rounded-lg w-[400px]">
 				<div className="flex justify-between mb-4">
-					<h3 className="text-lg font-bold text-black dark:text-white">Enter your message buzz</h3>
-					<button onClick={handleClosePopup} className="text-gray-500 hover:text-red-500">
+					<h3 className="text-lg font-bold ">Enter your message buzz</h3>
+					<button onClick={handleClosePopup} className=" hover:text-red-500">
 						✕
 					</button>
 				</div>
@@ -139,7 +139,7 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ currentCh
 					<MentionsInput
 						inputRef={textareaRef}
 						value={inputRequest.valueTextInput ?? '{}'}
-						className={`w-[calc(100%_-_70px)] dark:bg-gray-700 bg-bgLightModeSecond border border-[#bebebe] dark:border-none rounded p-[10px] dark:text-white text-black customScrollLightMode ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
+						className={`w-[calc(100%_-_70px)] bg-theme-input border-theme-primary rounded-lg p-[10px]  customScrollLightMode ${appearanceTheme === ThemeApp.Light && 'lightModeScrollBarMention'}`}
 						onChange={handleChange}
 						forceSuggestionsAboveCursor={true}
 						style={appearanceTheme === ThemeApp.Light ? lightMentionsInputStyle : darkMentionsInputStyle}
@@ -164,13 +164,13 @@ const ModalInputMessageBuzz: React.FC<ModalInputMessageBuzzProps> = ({ currentCh
 									/>
 								);
 							}}
-							className="dark:bg-[#3B416B] bg-bgLightModeButton"
+							className=""
 							appendSpaceOnAdd={true}
 						/>
 					</MentionsInput>
 					<button
 						onClick={handleSendBuzzMsg}
-						className="w-[70px] flex justify-center items-center px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"
+						className="w-[70px] flex justify-center items-center px-4 py-2 bg-button-primary text-white rounded-md hover:bg-indigo-600"
 					>
 						Send
 					</button>

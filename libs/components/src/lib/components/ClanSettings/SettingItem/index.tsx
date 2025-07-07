@@ -16,7 +16,7 @@ const SettingItem = ({ name, active, onClick, handleMenu, setting }: SettingItem
 	const closeMenu = useSelector(selectCloseMenu);
 	return (
 		<button
-			className={`relative dark:text-textPrimary text-buttonProfile w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left ${active ? 'dark:bg-bgModifierHover bg-bgModifierHoverLight dark:text-white text-textSecondary400' : ''} dark:hover:bg-bgHover hover:bg-bgModifierHoverLight`}
+			className={`relative  w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left ${active ? 'bg-item-theme text-theme-primary-active ' : ''} bg-item-hover`}
 			onClick={() => {
 				onClick();
 				if (closeMenu) {
@@ -24,11 +24,7 @@ const SettingItem = ({ name, active, onClick, handleMenu, setting }: SettingItem
 				}
 			}}
 		>
-			{setting?.id === 'on-boarding' && (
-				<div className="absolute top-[4px] right-[8px] dark:text-channelTextLabel text-colorTextLightMode">
-					{currentClan?.is_onboarding ? 'ON' : 'OFF'}
-				</div>
-			)}
+			{setting?.id === 'on-boarding' && <div className="absolute top-[4px] right-[8px] ">{currentClan?.is_onboarding ? 'ON' : 'OFF'}</div>}
 			{name}
 		</button>
 	);

@@ -74,22 +74,22 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 	};
 
 	return (
-		<ModalLayout onClose={onClose} className="bg-[#111111] dark:text-contentPrimary text-black bg-opacity-80">
-			<div className="w-[480px]">
-				<div className="dark:bg-bgPrimary bg-bgLightModeSecond flex items-center justify-between px-6 pt-4 border-solid border-borderDefault rounded-tl-[5px] rounded-tr-[5px]">
+		<ModalLayout onClose={onClose} className="bg-[#111111] text-theme-primary bg-opacity-80">
+			<div className="w-[480px] bg-theme-setting-primary">
+				<div className=" flex items-center justify-between px-6 pt-4 rounded-tl-[5px] rounded-tr-[5px]">
 					<div className="text-[19px] font-bold uppercase">Create Category</div>
-					<button className="flex items-center justify-center opacity-50" onClick={onClose}>
-						<span className="text-4xl dark:hover:text-white hover:text-black">×</span>
+					<button className="flex items-center justify-center opacity-50 text-theme-primary-hover" onClick={onClose}>
+						<span className="text-4xl">×</span>
 					</button>
 				</div>
-				<div className="dark:bg-bgPrimary bg-bgLightModeSecond px-6 py-4">
+				<div className="bg-theme-setting-primary px-6 py-4">
 					<div className="flex flex-col">
 						<span className="font-[600] text-sm ">What is category's name?</span>
 						<InputField
 							type="text"
 							onChange={handleInputChange}
 							placeholder="Enter the category's name"
-							className="py-[8px] dark:bg-black bg-bgLightModeSecond text-[14px] mt-2 mb-0 border-blue-600 border"
+							className="py-[8px] border-theme-primary bg-theme-input-primary text-[14px] mt-2 mb-0 border-blue-600 border"
 							value={nameCate}
 						/>
 					</div>
@@ -97,7 +97,7 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 					<div className="flex flex-row justify-between my-2 items-center">
 						<div className="flex flex-row items-center">
 							<Icons.LockIcon />
-							<span className="dark:text-textSecondary text-textSecondary800 text-lg font-semibold">Private Category</span>
+							<span className="text-lg font-semibold">Private Category</span>
 						</div>
 						<div className="relative flex flex-wrap items-center">
 							<input
@@ -114,17 +114,17 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 							/>
 						</div>
 					</div>
-					<p className="dark:text-textSecondary text-textSecondary800 text-sm">
+					<p className="text-sm">
 						By making a category private, only select members and roles will be able to view this category. Synced channels in this
 						category will automatically match to this setting
 					</p>
 				</div>
-				<div className=" text-white font-semibold text-sm flex dark:bg-bgTertiary bg-bgLightMode justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
-					<button onClick={onClose} className="dark:text-textSecondary text-textSecondary800">
+				<div className=" font-semibold text-sm flex  justify-end flex-row items-center gap-4 py-4 px-6 rounded-bl-[5px] rounded-br-[5px]">
+					<button onClick={onClose} className="">
 						Cancel
 					</button>
 					<button
-						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
+						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary  ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 						onClick={handleCreateCate}
 						disabled={checkCategoryName}
 					>

@@ -91,16 +91,14 @@ const ListMemberInvite = (props: ModalParam) => {
 				value={searchTerm}
 				onChange={handleInputChange}
 				placeholder="Search for friends"
-				className="w-full h-10 mb-1 dark:bg-black bg-[#dfe0e2] rounded-[5px] px-[16px] py-[13px] text-[14px] outline-none"
+				className="w-full h-10 mb-1 bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 			/>
-			<p className="ml-[0px] mt-1 mb-4 dark:text-[#AEAEAE] text-black text-[15px] cursor-default">
+			<p className="ml-[0px] mt-1 mb-4  text-[15px] cursor-default">
 				This channel is private, only select members and roles can view this channel.
 			</p>
 
-			<hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t "></hr>
-			<div
-				className={`py-[10px] pr-2 cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'thread-scroll'}`}
-			>
+			<hr className="border-t-theme-primary"></hr>
+			<div className={`py-[10px] cursor-default overflow-y-auto max-h-[200px] overflow-x-hidden thread-scroll `}>
 				{isInviteExternalCalling ? (
 					<div className="flex flex-col gap-3">
 						{filteredDataToInvite?.length > 0 ? (
@@ -140,7 +138,7 @@ const ListMemberInvite = (props: ModalParam) => {
 					</div>
 				)}
 			</div>
-			<hr className="border-solid dark:border-borderDefault border-gray-200 rounded-t " />
+			<hr className="border-t-theme-primary rounded-t " />
 		</>
 	);
 };

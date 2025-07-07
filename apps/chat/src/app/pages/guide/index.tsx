@@ -6,10 +6,10 @@ function GuideMain() {
 	const currentClan = useSelector(selectCurrentClan);
 	const clanOwner = useSelector(selectMemberClanByUserId(currentClan?.creator_id as string));
 	return (
-		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll  scrollbar-hide flex flex-col items-center">
+		<div className="w-full h-full overflow-x-hidden p-8 overflow-y-scroll text-theme-primary scrollbar-hide flex flex-col items-center">
 			<div className="flex flex-col w-[104%]">
 				<div
-					className={`h-36 w-full object-cover ${currentClan?.banner ? '' : 'bg-gray-200 dark:bg-gray-800'} rounded-xl flex items-center justify-center`}
+					className={`h-36 w-full object-cover ${currentClan?.banner ? '' : 'bg-private-theme'} rounded-xl flex items-center justify-center`}
 				>
 					{currentClan?.banner ? <img src={currentClan.banner} className="w-full h-full object-cover  rounded-xl" /> : null}
 				</div>
@@ -21,11 +21,11 @@ function GuideMain() {
 					{currentClan?.logo ? (
 						<img src={currentClan.logo} className="w-full h-full object-cover  rounded-3xl" />
 					) : (
-						<p className="text-white text-4xl font-bold">{currentClan?.clan_name?.charAt(0)}</p>
+						<p className="text-4xl font-bold">{currentClan?.clan_name?.charAt(0)}</p>
 					)}
 				</div>
 				<div className=" flex gap-3 items-end h-28">
-					<div className="text-[32px] font-bold leading-8 text-gray-800 dark:text-white">
+					<div className="text-[32px] font-bold leading-8 ">
 						{currentClan?.clan_name ?? `${clanOwner?.user?.display_name ?? clanOwner?.user?.username}'s`} clan
 					</div>
 					<div className="relative h-6 w-6">
@@ -46,13 +46,15 @@ function GuideMain() {
 							viewBox="0 0 24 24"
 						>
 							<path
-								fill="#000000"
+								fill="currentColor"
 								d="m2.4 8.4 8.38-6.46a2 2 0 0 1 2.44 0l8.39 6.45a2 2 0 0 1-.79 3.54l-.32.07-.82 8.2a2 2 0 0 1-1.99 1.8H16a1 1 0 0 1-1-1v-5a3 3 0 0 0-6 0v5a1 1 0 0 1-1 1H6.31a2 2 0 0 1-1.99-1.8L3.5 12l-.32-.07a2 2 0 0 1-.79-3.54Z"
 							></path>
 						</svg>
 					</div>
 					<div className="flex-1 flex justify-end">
-						<div className="w-24 h-9 py-[2px] flex items-center justify-center rounded-md bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white cursor-pointer">Invite</div>
+						<div className="w-24 h-9 py-[2px] flex items-center justify-center rounded-lg border-theme-primary bg-theme-input text-theme-primary-hover bg-secondary-button-hover ">
+							Invite
+						</div>
 					</div>
 				</div>
 			</div>

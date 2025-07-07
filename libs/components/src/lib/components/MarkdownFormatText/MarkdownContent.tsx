@@ -101,7 +101,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={`inline dark:text-white text-colorTextLightMode ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={`inline bg-item-theme ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
 					onClick={() => onClickLink(content)}
@@ -130,7 +130,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 				!posInReply ? (
 					<TripleBackticks contentBacktick={content} isLightMode={isLightMode} isInPinMsg={isInPinMsg} />
 				) : (
-					<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
+					<div className={`py-[4px] relative bg-item-theme `}>
 						<pre
 							className={`w-full pre font-sans ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}
 							style={{ padding: 0 }}
@@ -159,11 +159,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 	const posInPinOrNotification = isInPinMsg || posInNotification;
 	return (
 		<span
-			className={
-				!posInPinOrNotification
-					? `${isLightMode ? 'prose-backtick single-markdown-light-mode ' : 'prose-backtick single-markdown'}`
-					: 'w-full'
-			}
+			className={!posInPinOrNotification ? 'color-mention bg-mention' : 'w-full'}
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
@@ -198,12 +194,16 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 	};
 
 	return (
-		<div className={`py-[4px] relative prose-backtick ${isLightMode ? 'triple-markdown-lightMode' : 'triple-markdown'} `}>
-			<pre className={`pre p-2  ${isInPinMsg ? `flex items-start  ${isLightMode ? 'pin-msg-modeLight' : 'pin-msg'}` : ''}`}>
-				<button className={`absolute right-1 top-1 ${isLightMode ? 'text-[#535353]' : 'text-[#E5E7EB]'} `} onClick={handleCopyClick}>
+		<div className={`py-[4px] relative bg-item-theme border-theme-primary rounded-lg `}>
+			<pre className={`pre whitespace-pre-wrap p-2  ${isInPinMsg ? `flex items-start ` : ''}`}>
+				<button className={`absolute right-1 top-1 `} onClick={handleCopyClick}>
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
-				<code className={`w-full font-sans ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}>{contentBacktick}</code>
+				<code
+					className={`text-sm w-full whitespace-pre-wrap font-sans text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap  block break-words w-full' : ''}`}
+				>
+					{contentBacktick}
+				</code>
 			</pre>
 		</div>
 	);

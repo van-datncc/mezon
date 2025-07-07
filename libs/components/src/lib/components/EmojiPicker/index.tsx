@@ -294,7 +294,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			<div
 				className={`w-11 max-sm:gap-x-1
 				flex flex-col max-sm:flex-row max-sm:justify-end gap-y-1
-				max-sm:w-full max-sbm:w-11 dark:bg-bgTertiary bg-bgLightModeSecond pt-1
+				max-sm:w-full max-sbm:w-11 bg-item-theme pt-1
 				px-1 md:items-start h-[25rem] pb-1 rounded max-sbm:flex-col
 				${!props.isReaction && 'md:ml-2 mb-2'}
         overflow-y-scroll
@@ -304,7 +304,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 					return (
 						<button
 							key={index}
-							className={`w-9 h-9 py-2 max-sm:px-1 flex flex-row justify-center dark:text-textPrimary items-center ${selectedCategory === item.name ? 'bg-[#41434A]' : 'hover:bg-[#41434A]'} rounded-md`}
+							className={`w-9 h-9 py-2 max-sm:px-1 flex flex-row justify-center text-theme-primary  items-center ${selectedCategory === item.name ? 'bg-item-theme' : 'bg-item-hover'} rounded-md`}
 							onClick={(e) => scrollToCategory(e, item.name)}
 						>
 							{item.icon}
@@ -384,7 +384,7 @@ const DisplayByCategories = React.memo(function DisplayByCategories({
 		<div>
 			<button
 				onClick={() => setEmojisPanelStatus(!emojisPanel)}
-				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] dark:bg-[#2B2D31] bg-bgLightModeSecond z-10 dark:text-white text-black"
+				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem] bg-item-theme z-10 "
 			>
 				<p className={'uppercase text-left truncate'}>{categoryName}</p>
 				<span className={`${emojisPanel ? ' rotate-90' : ''}`}>
@@ -444,7 +444,7 @@ const EmojisPanel = React.memo(function EmojisPanel({
 			{emojisData.map((item, index) => (
 				<button
 					key={index}
-					className={` relative ${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
+					className={` relative ${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md bg-item-hover hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
 					onClick={() => {
 						if (item.is_for_sale && !item.src) {
 							handleOpenUnlockItem(item);
@@ -477,7 +477,7 @@ const EmojisPanel = React.memo(function EmojisPanel({
 			))}
 			{isShowAddButton && (
 				<button
-					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  dark:hover:bg-[#41434A] hover:bg-bgLightModeButton hover:rounded-md  p-1 flex items-center justify-center w-full`}
+					className={`${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md  bg-item-hover hover:rounded-md  p-1 flex items-center justify-center w-full`}
 					onMouseEnter={() =>
 						onEmojiHover({
 							shortname: 'Upload a custom emoji',
@@ -486,7 +486,7 @@ const EmojisPanel = React.memo(function EmojisPanel({
 					}
 				>
 					<div onClick={onClickAddButton}>
-						<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
+						<Icons.AddIcon />
 					</div>
 				</button>
 			)}
@@ -504,13 +504,9 @@ const EmojiHover = React.memo(function EmojiHover({ emojiHoverShortCode, isReact
 	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div
-			className={`w-full max-h-12 flex-1 dark:bg-[#232428] bg-bgLightModeSecond flex flex-row items-center pl-1 gap-x-1 justify-start dark:text-white text-black ${!isReaction && 'mb-2 max-sbm:mb-0'} py-1`}
+			className={`w-full max-h-12 flex-1 bg-item-theme flex flex-row items-center pl-1 gap-x-1 justify-start  ${!isReaction && 'mb-2 max-sbm:mb-0'} py-1`}
 		>
-			{emojiId ? (
-				<img draggable="false" className="max-w-10 max-h-full" src={getSrcEmoji(emojiId)} />
-			) : (
-				<Icons.AddIcon fill={appearanceTheme === 'dark' ? '#AEAEAE' : '#4D4F57'} />
-			)}
+			{emojiId ? <img draggable="false" className="max-w-10 max-h-full" src={getSrcEmoji(emojiId)} /> : <Icons.AddIcon />}
 			{emojiHoverShortCode}
 		</div>
 	);

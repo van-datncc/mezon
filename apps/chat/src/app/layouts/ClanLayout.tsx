@@ -104,13 +104,13 @@ const ClanLayout = () => {
 	return (
 		<>
 			<div
-				className={`select-none h-dvh flex-col flex max-w-[272px] dark:bg-bgSecondary bg-bgLightSecondary relative overflow-hidden min-w-widthMenuMobile sbm:min-w-[272px]  ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : ''} ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
+				className={`select-none h-dvh flex-col flex max-w-[272px] bg-theme-direct-message border-left-theme-primary relative overflow-hidden min-w-widthMenuMobile sbm:min-w-[272px]  ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : ''} ${closeMenu ? (statusMenu ? 'flex' : 'hidden') : ''}`}
 			>
 				<ClanHeader name={currentClan?.clan_name} type="CHANNEL" bannerImage={currentClan?.banner} />
 				<ChannelList />
 			</div>
 			<div
-				className={`flex flex-1 shrink min-w-0 gap-2 h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'dark:bg-bgTertiary bg-bgLightTertiary' : ''}`}
+				className={`flex flex-1 shrink min-w-0 gap-2 bg-theme-chat h-heightWithoutTopBar mt-[50px] ${isVoiceFullScreen ? 'z-20' : ''} ${currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'bg-theme-secondary' : ''}`}
 			>
 				<div
 					className={`flex flex-col flex-1 shrink ${isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL ? 'max-sm:hidden' : ''} min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'group' : ''}`}
@@ -119,19 +119,19 @@ const ClanLayout = () => {
 				</div>
 
 				{isShowChatStream && currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING && memberPath !== currentURL && (
-					<div ref={chatStreamRef} className="flex flex-col flex-1 max-w-[480px] min-w-60 dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+					<div ref={chatStreamRef} className="flex flex-col flex-1 max-w-[480px] min-w-60 rounded-l-lg">
 						<ChatStream currentChannel={currentChannel} />
 					</div>
 				)}
 			</div>
 			{isShowCreateThread && !isShowCreateTopic && (
-				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownThreadBox} className="w-[510px] rounded-l-lg">
 					<ThreadsMain />
 				</div>
 			)}
 
 			{isShowCreateTopic && !isShowCreateThread && (
-				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] dark:bg-bgPrimary bg-bgLightPrimary rounded-l-lg">
+				<div onMouseDown={onMouseDownTopicBox} className="w-[510px] rounded-l-lg">
 					<TopicDiscussionMain />
 				</div>
 			)}

@@ -97,7 +97,7 @@ export const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
 
 	return (
 		<div
-			className="border border-colorTextLightMode dark:border-contentTertiary dark:text-contentTertiary text-colorTextLightMode rounded-md my-1 p-1 w-[70%] flex justify-between items-center bg-textPrimary dark:bg-bgSearchHover cursor-pointer hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white group/view-topic-btn"
+			className=" border-theme-primary text-theme-primary bg-item-theme text-theme-primary-hover rounded-lg my-1 p-1 w-[70%] flex justify-between items-center  cursor-pointer   group/view-topic-btn"
 			onClick={handleOpenTopic}
 		>
 			<div className="flex items-center gap-2 text-sm h-fit">
@@ -110,7 +110,7 @@ export const TopicViewButton = ({ message }: { message: IMessageWithUser }) => {
 				<div className="font-semibold text-blue-500 group-hover/view-topic-btn:text-blue-700">Creator</div>
 				<p>View topic</p>
 			</div>
-			<Icons.ArrowRight defaultFill={'#AEAEAE'} defaultSize={'w-4 h-4 min-w-4 hover:text-white text-borderDividerLight'} />
+			<Icons.ArrowRight />
 		</div>
 	);
 };

@@ -9,7 +9,7 @@ type ItemProfileProps = {
 const ItemProfile = ({ avatar, username, onClick }: ItemProfileProps) => {
 	return (
 		<div
-			className="flex items-center justify-between gap-2 rounded-sm dark:hover:bg-zinc-700 hover:bg-bgLightModeButton dark:hover:[&>*]:text-[#fff] hover:[&>*]:text-black px-2"
+			className="flex items-center justify-between gap-2 rounded-sm text-theme-primary-hover bg-theme-hover px-2"
 			onClick={onClick}
 		>
 			{avatar ? (
@@ -19,7 +19,7 @@ const ItemProfile = ({ avatar, username, onClick }: ItemProfileProps) => {
 					{username && username.charAt(0).toUpperCase()}
 				</div>
 			)}
-			<li className="text-[14px] dark:text-white text-colorTextLightMode w-full py-[6px] cursor-pointer list-none ">{username}</li>
+			<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none ">{username}</li>
 		</div>
 	);
 };

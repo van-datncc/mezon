@@ -323,7 +323,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const isDisabled = option === '' || errorOption || !isEventChanged;
 
 	return (
-		<div className="dark:bg-[#313339] bg-bgLightMode rounded-lg text-sm p-4">
+		<div className="bg-theme-setting-primary rounded-lg text-sm p-4 text-theme-primary">
 			<div className="flex gap-x-4 mb-4">
 				<HeaderEventCreate tabs={tabs} currentModal={currentModal} onHandleTab={(num: number) => handleCurrentModal(num)} />
 			</div>
@@ -359,7 +359,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 			{currentModal === Tabs_Option.REVIEW && (
 				<ReviewModal onClose={onClose} event={currentEvent} contentSubmit={contentSubmit} option={option} />
 			)}
-			<div className="flex justify-between mt-4 w-full text-white">
+			<div className="flex justify-between mt-4 w-full ">
 				<button
 					className={`py-2 text-[#84ADFF] font-bold ${(currentModal === Tabs_Option.LOCATION || errorTime) && 'hidden'}`}
 					onClick={() => handleBack(currentModal)}
@@ -368,7 +368,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 				</button>
 				<div className="flex justify-end gap-x-4 w-full">
 					<button
-						className="px-4 py-2 rounded bg-slate-500 font-semibold"
+						className="px-4 py-2 rounded-md border-theme-primary text-theme-primary-hover font-semibold"
 						onClick={() => {
 							onClose();
 							clearEventId();
@@ -379,7 +379,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 					{currentModal === Tabs_Option.REVIEW ? (
 						eventId !== '' ? (
 							<button
-								className={`px-4 py-2 rounded font-semibold bg-primary ${isDisabled && 'dark:text-slate-400 text-slate-500 bg-opacity-50 cursor-not-allowed'}`}
+								className={`px-4 py-2 rounded-md text-white font-semibold bg-primary ${isDisabled && ' bg-opacity-50 cursor-not-allowed'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
 								onClick={handleUpdate}
 							>
@@ -388,7 +388,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						) : (
 							<button
 								disabled={createStatus === 'loading'}
-								className={`px-4 py-2 rounded font-semibold bg-primary ${(option === '' || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+								className={`px-4 py-2 rounded font-semibold text-white bg-primary ${(option === '' || errorOption) && ' bg-opacity-50'}`}
 								// eslint-disable-next-line @typescript-eslint/no-empty-function
 								onClick={option === '' || errorOption ? () => {} : () => handleSubmit()}
 							>
@@ -397,7 +397,7 @@ const ModalCreate = (props: ModalCreateProps) => {
 						)
 					) : (
 						<button
-							className={`px-4 py-2 rounded font-semibold bg-primary ${(!buttonWork || errorTime || errorOption) && 'dark:text-slate-400 text-slate-500 bg-opacity-50'}`}
+							className={`px-4 py-2 rounded font-semibold text-white bg-primary ${(!buttonWork || errorTime || errorOption) && ' bg-opacity-50'}`}
 							onClick={() => handleNext(currentModal)}
 						>
 							Next

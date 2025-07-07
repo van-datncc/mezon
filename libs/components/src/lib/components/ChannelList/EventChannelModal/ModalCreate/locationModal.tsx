@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { FilterOptionOption } from 'react-select/dist/declarations/src/filters';
-import { customStyles, lightCustomStyles } from '../../../NotificationSetting';
+import { customStyles } from '../../../NotificationSetting';
 
 export type LocationModalProps = {
 	contentSubmit: ContenSubmitEventProps;
@@ -76,7 +76,7 @@ const LocationModal = (props: LocationModalProps) => {
 	const options = voicesChannel.map((voice) => ({
 		value: voice.id,
 		label: (
-			<div className="flex items-center gap-x-2 dark:text-white text-black">
+			<div className="flex items-center gap-x-2 ">
 				{voice.channel_private ? <Icons.SpeakerLocked /> : <Icons.Speaker />}
 				{voice.channel_label}
 			</div>
@@ -133,7 +133,7 @@ const LocationModal = (props: LocationModalProps) => {
 				return {
 					value: channel.id,
 					label: (
-						<div className="flex items-center gap-x-2 dark:text-white text-black">
+						<div className="flex items-center gap-x-2 ">
 							{icon}
 							{channel.channel_label}
 						</div>
@@ -156,8 +156,8 @@ const LocationModal = (props: LocationModalProps) => {
 	return (
 		<div ref={modalRef}>
 			<div className="flex flex-col mb-4">
-				<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Where is your event?</h3>
-				<p className="text-slate-400 text-center">So no one gets lost on where to go.</p>
+				<h3 className="text-xl text-center font-semibold ">Where is your event?</h3>
+				<p className=" text-center">So no one gets lost on where to go.</p>
 			</div>
 			<div className={`flex flex-col mb-4 ${errorVoice ? 'gap-y-2' : 'gap-y-4'}`}>
 				{displaySelectVoiceOrLocation && (
@@ -198,29 +198,29 @@ const LocationModal = (props: LocationModalProps) => {
 					options={options}
 					value={options.find((option) => option.value === contentSubmit.voiceChannel)}
 					onChange={handleChangeVoice}
-					styles={appearanceTheme === 'dark' ? customStyles : lightCustomStyles}
+					styles={customStyles}
 					placeholder="Search voice channels..."
 					filterOption={memoizedFilterOption}
 				/>
 			)}
 			{choiceLocation && (
 				<div>
-					<h3 className="uppercase text-[11px] font-semibold dark:text-white text-black ">Enter a location</h3>
+					<h3 className="uppercase text-[11px] font-semibold  ">Enter a location</h3>
 					<input
 						type="text"
 						name="location"
 						value={contentSubmit.address}
 						onChange={onChangeAddress}
 						placeholder="Add a location, link or something."
-						className={`font-[400] rounded w-full dark:text-white text-black outline-none text-[15px]border border-black px-4 py-3 focus:outline-none focus:border-white-500 dark:bg-black bg-bgModifierHoverLight ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
+						className={`font-[400] rounded w-full  outline-none text-[15px] border border-theme-primary px-4 py-3 focus:outline-none focus:border-white-500 bg-theme-input ${appearanceTheme === 'light' ? 'lightEventInputAutoFill' : ''}`}
 					/>
 				</div>
 			)}
 			{displaySelectAudiences && (
 				<>
 					<div className="flex flex-col mb-2 mt-3">
-						<h3 className="text-xl text-center font-semibold dark:text-white text-black ">Who are audiences?</h3>
-						<p className="text-slate-400 text-center">Choose members in the specified channel.</p>
+						<h3 className="text-xl text-center font-semibold  ">Who are audiences?</h3>
+						<p className=" text-center">Choose members in the specified channel.</p>
 					</div>
 
 					<Select
@@ -260,12 +260,12 @@ const TitleOptionEvent = ({
 	id: string;
 }) => {
 	return (
-		<label className="w-full dark:bg-[#2B2D31] bg-bgLightModeButton rounded flex justify-between items-center p-2" htmlFor={id}>
-			<div className="flex items-center gap-x-2">
+		<label className="w-full bg-item-theme rounded flex justify-between items-center p-2" htmlFor={id}>
+			<div className={`flex items-center gap-x-2 ${choose ? 'text-theme-primary-active' : ''} `}>
 				{icon}
 				<div>
-					<h4 className={`font-semibold ${choose ? 'dark:text-white text-black' : 'text-slate-400'}`}>{title}</h4>
-					<p className={choose ? 'dark:text-white text-black' : 'text-slate-400'}>{desc}</p>
+					<h4 className={`font-semibold`}>{title}</h4>
+					<p>{desc}</p>
 				</div>
 			</div>
 			<input type="radio" checked={choose} id={id} value={id} className="focus:outline-none focus:ring-0" onChange={onChange} />

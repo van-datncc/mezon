@@ -146,6 +146,7 @@ export const setNotificationSetting = createAsyncThunk(
 			}
 			if (!is_direct) {
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
+				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			}
 			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 			return response;
@@ -175,6 +176,7 @@ export const setMuteNotificationSetting = createAsyncThunk(
 				active: active
 			};
 			const response = await mezon.client.setMuteNotificationChannel(mezon.session, body);
+
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
@@ -182,6 +184,8 @@ export const setMuteNotificationSetting = createAsyncThunk(
 				thunkAPI.dispatch(
 					channelsActions.update({ clanId: clan_id, update: { changes: { is_mute: active === 0 }, id: channel_id as string } })
 				);
+
+				thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			} else {
 				thunkAPI.dispatch(directActions.update({ id: channel_id as string, changes: { is_mute: active === 0 } }));

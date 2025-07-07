@@ -18,9 +18,7 @@ export function ChannelTyping({ channelId, mode, isPublic, isDM }: ChannelTyping
 					<span className="absolute bottom-1 -left-1">
 						<Icons.IconLoadingTyping />
 					</span>
-					<span className="dark:text-textDarkTheme text-textPrimaryLight text-xs font-semibold mr-[2px] ">
-						{`${typingUsers[0].typingName}`}
-					</span>
+					<span className="text-theme-primary text-xs font-semibold mr-[2px] ">{`${typingUsers[0].typingName}`}</span>
 					is typing...
 				</>
 			);

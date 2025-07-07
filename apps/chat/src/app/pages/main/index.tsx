@@ -186,7 +186,7 @@ function MyApp() {
 			<MemoizedErrorModals />
 
 			<div
-				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative dark:bg-bgPrimary bg-bgLightModeSecond`}
+				className={`flex h-dvh min-[480px]:pl-[72px] ${closeMenu ? (statusMenu ? 'pl-[72px]' : '') : ''} overflow-hidden text-gray-100 relative  `}
 				onClick={handleClick}
 			>
 				{previewMode && <PreviewOnboardingMode />}
@@ -321,12 +321,12 @@ const SidebarMenu = memo(
 
 		return (
 			<div
-				className={`contain-strict h-dvh fixed z-10 left-0 top-0 w-[72px] dark:bg-bgSecondary500 bg-bgLightTertiary duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'max-sm:hidden') : ''}`}
+				className={`contain-strict  h-dvh fixed z-10 left-0 top-0 w-[72px]  duration-100 ${isWindowsDesktop || isLinuxDesktop ? 'mt-[21px]' : ''} ${isMacDesktop ? 'pt-[18px]' : ''} ${closeMenu ? (statusMenu ? '' : 'max-sm:hidden') : ''}`}
 				onClick={() => handleMenu}
 				id="menu"
 			>
 				<div
-					className={`top-0 left-0 right-0 flex flex-col items-center py-4 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
+					className={`top-0 left-0 right-0 flex flex-col items-center pt-4 md:pb-[80px] pb-4 overflow-y-auto hide-scrollbar ${isWindowsDesktop || isLinuxDesktop ? 'max-h-heightTitleBar h-heightTitleBar' : 'h-dvh'} `}
 				>
 					<div className="flex flex-col items-center">
 						<SidebarLogoItem />
@@ -337,12 +337,9 @@ const SidebarMenu = memo(
 
 					<div className="mt-3">
 						<NavLinkComponent>
-							<div
-								className="flex items-center justify-between text-contentSecondary rounded-md cursor-pointer hover:bg-bgLightModeButton group"
-								onClick={openCreateClanModal}
-							>
-								<div className="w-[40px] h-[40px] rounded-lg dark:bg-bgPrimary bg-[#E1E1E1] flex justify-center items-center cursor-pointer dark:group-hover:bg-slate-800 group-hover:bg-bgLightModeButton  transition-all duration-200 size-12">
-									<Icons.AddCircle className="dark:text-textThreadPrimary text-buttonProfile dark:hover:text-textPrimary hover:text-bgPrimary" />
+							<div className="flex items-center justify-between text-theme-primary group" onClick={openCreateClanModal}>
+								<div className="w-[40px] h-[40px] rounded-xl theme-base-color flex justify-center items-center  cursor-pointer transition-all bg-add-clan-hover duration-200 size-12">
+									<p className="text-2xl font-semibold ">+</p>
 								</div>
 							</div>
 						</NavLinkComponent>

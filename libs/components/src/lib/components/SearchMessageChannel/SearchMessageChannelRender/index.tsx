@@ -76,7 +76,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 	if (isLoading) {
 		return (
 			<>
-				<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+				<div className="w-1 h-full bg-theme-primary"></div>
 				<div className="flex flex-col w-[420px] h-full">
 					<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
 						<h3 className="select-none">Searching...</h3>
@@ -91,22 +91,22 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 
 	return (
 		<>
-			<div className="w-1 h-full dark:bg-bgPrimary bg-bgLightPrimary"></div>
+			<div className="w-1 h-full bg-theme-primary"></div>
 			<div className="flex flex-col w-[420px] h-full">
-				<div className="flex flex-row justify-between items-center h-14 p-4 text-textLightTheme dark:text-textPrimary bg-bgLightTertiary dark:bg-bgTertiary">
+				<div className="flex flex-row justify-between items-center h-14 p-4 text-theme-primary bg-theme-chat">
 					<h3 className="select-none">{`${totalResult < 1 ? 'No Results' : `${totalResult} Results`}`}</h3>
 				</div>
 				<MessageContextMenuProvider channelId={channelId}>
 					{groupedMessages.length > 0 ? (
 						<div
 							ref={messageContainerRef}
-							className={`flex flex-col flex-1 h-full p-4 bg-bgLightSecondary dark:bg-bgSecondary max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
+							className={`flex flex-col flex-1 h-full p-4 bg-outside-footer max-h-[calc(100vh_-_120px)] overflow-y-auto overflow-x-hidden ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 						>
 							<div className="flex flex-col flex-1 gap-[20px]">
 								{groupedMessages.map((group, groupIndex) => {
 									return (
 										<div key={groupIndex} className="flex flex-col">
-											<h3 className="mb-[8px] dark:text-white text-black font-medium text-ellipsis whitespace-nowrap overflow-hidden">
+											<h3 className="mb-[8px] text-theme-primary font-medium text-ellipsis whitespace-nowrap overflow-hidden">
 												# {group.label}
 											</h3>
 											<div key={groupIndex} className="flex flex-col gap-[8px]">
@@ -136,16 +136,18 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 										theme={{
 											pages: {
 												previous: {
-													base: 'h-7 ml-0 mr-1 flex items-center justify-center rounded font-semibold border border-none bg-bgLightSecondary px-3 py-2 leading-tight text-textLightTheme hover:bg-buttonLightTertiaryHover enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-bgSecondary600 enabled:dark:hover:text-white',
+													base:
+														'h-7 ml-0 mr-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
 													icon: 'h-5 w-5'
 												},
 												next: {
-													base: 'h-7 ml-1 flex items-center justify-center rounded font-semibold border border-none bg-bgLightSecondary px-3 py-2 leading-tight text-textLightTheme hover:bg-buttonLightTertiaryHover enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-bgSecondary600 enabled:dark:hover:text-white',
+													base:
+														'h-7 ml-1 flex items-center justify-center rounded font-semibold border border-none px-3 py-2 text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
 													icon: 'h-5 w-5'
 												},
 												selector: {
-													base: 'w-7 h-7 mx-1 flex items-center justify-center rounded-full font-semibold border border-none bg-bgLightSecondary py-2 leading-tight text-textLightTheme enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-none dark:bg-bgSecondary dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white',
-													active: 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 dark:border-none dark:bg-bgSelectItem dark:text-white'
+													base:
+														'w-7 h-7 mx-1 flex items-center justify-center rounded-full font-semibold text-theme-primary bg-[var(--bg-count-page)] hover:bg-[var(--bg-count-page-hover)] active:bg-[var(--bg-count-page-active)] hover:text-[var(--text-count-page-hover)] active:text-[var(--text-count-page-active)]',
 												}
 											}
 										}}
@@ -187,7 +189,7 @@ const SearchedItem = ({ searchMessage, searchChannel, user }: ISearchedItemProps
 	};
 
 	return (
-		<div className="flex items-center px-[5px] pb-[12px] dark:bg-bgPrimary bg-white rounded-[6px] w-full relative group">
+		<div className="flex items-center px-[5px] pb-[12px] bg-item-theme">
 			<button
 				onClick={handleClickJump}
 				className="absolute py-1 px-2 text-textLightTheme dark:text-textDarkTheme dark:bg-bgSecondary bg-bgLightTertiary top-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"

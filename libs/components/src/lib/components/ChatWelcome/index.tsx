@@ -46,7 +46,7 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 
 	const user = useSelector(selectMemberClanByUserId(selectedChannel?.creator_id as string));
 	const preferredUserName = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
-	const classNameSubtext = 'dark:text-zinc-400 text-colorTextLightMode text-sm';
+	const classNameSubtext = 'text-theme-primary opacity-60 text-sm';
 	const showName = <span className="font-medium">{name || username}</span>;
 
 	const isChannel = mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
@@ -110,16 +110,12 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 	return (
 		<>
 			<div
-				className={`h-[75px] w-[75px] rounded-full dark:bg-zinc-700 flex items-center justify-center ${!isChatStream ? 'bg-bgLightModeButton pl-2' : 'bg-gray-500'}`}
+				className={`h-[75px] w-[75px] rounded-full text-theme-primary  flex items-center justify-center ${!isChatStream ? 'bg-theme-primary' : ''}`}
 			>
-				{isChatStream ? (
-					<Icons.Chat defaultFill="#ffffff" defaultSize="w-10 h-10 " />
-				) : (
-					<Icons.Hashtag defaultFill="#ffffff" defaultSize="w-10 h-10 mb-2" />
-				)}
+				{isChatStream ? <Icons.Chat defaultSize="w-10 h-10 " /> : <Icons.Hashtag defaultSize="w-10 h-10" />}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					Welcome to #{name}
 				</p>
 			</div>
@@ -143,20 +139,20 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentThread?.id as string));
 	return (
 		<>
-			<div className="h-[75px] w-[75px] rounded-full bg-bgLightModeButton dark:bg-zinc-700 flex items-center justify-center pl-2">
+			<div className="h-[75px] w-[75px] rounded-full bg-item-theme text-theme-primary flex items-center justify-center ">
 				{isPrivate === ChannelStatusEnum.isPrivate ? (
-					<Icons.ThreadIconLocker className="text-white w-10 h-10" />
+					<Icons.ThreadIconLocker className="w-10 h-10" />
 				) : (
-					<Icons.ThreadIcon defaultFill="#ffffff" defaultSize="w-10 h-10" />
+					<Icons.ThreadIcon defaultSize="w-10 h-10" />
 				)}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					{isShowCreateThread ? name : currentThread?.channel_label}
 				</p>
 			</div>
 			<p className={classNameSubtext}>
-				Started by <span className="dark:text-white text-black font-medium">{username}</span>
+				Started by <span className="text font-medium">{username}</span>
 			</p>
 		</>
 	);
@@ -190,11 +186,11 @@ const WelComeDm = (props: WelComeDmProps) => {
 				classNameText="!text-4xl font-semibold"
 			/>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 dark:text-white text-black" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
 					{name}
 				</p>
 			</div>
-			{!isDmGroup && <p className="font-medium text-2xl dark:text-textDarkTheme text-textLightTheme">{username}</p>}
+			{!isDmGroup && <p className="font-medium text-2xl text-theme-primary">{username}</p>}
 			<div className="text-base">
 				<p className={classNameSubtext}>
 					{isDmGroup ? (
@@ -303,7 +299,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			)}
 			{title.map((button, index) => (
 				<button
-					className={`rounded  px-4 py-0.5 hover:bg-opacity-85 font-medium text-white ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-bgModifierHover' : 'bg-bgSelectItem'}`}
+					className={`rounded-lg   border border-theme-primary px-4 py-0.5 font-medium  ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-button-secondary text-theme-primary text-theme-primary-hover' : 'bg-button-add-friend text-white'}`}
 					onClick={() => handleOnClickButtonFriend(index)}
 					key={button}
 				>
@@ -314,7 +310,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			{(isFriend || didIBlockUser) && (
 				<button
 					onClick={didIBlockUser ? handleUnblockFriend : handleBlockFriend}
-					className="rounded bg-bgModifierHover px-4 py-0.5 hover:bg-opacity-85 font-medium text-white"
+					className="rounded-lg text-theme-primary-hover border border-theme-primary bg-button-secondary px-4 py-0.5 font-medium text-theme-primary"
 				>
 					{didIBlockUser ? 'Unblock' : 'Block'}
 				</button>

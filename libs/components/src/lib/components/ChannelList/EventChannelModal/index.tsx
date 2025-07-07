@@ -34,7 +34,7 @@ const EventModal = (props: EventModalProps) => {
 		>
 			<div className={`relative w-full sm:h-auto rounded-lg ${openModal ? 'max-w-[472px]' : 'max-w-[600px]'}`}>
 				{!openModal ? (
-					<div className="rounded-lg text-sm overflow-hidden">
+					<div className="rounded-lg text-sm overflow-hidden bg-theme-setting-primary text-theme-primary">
 						<StartEventModal
 							rootRef={modalRef}
 							onClose={onClose}

@@ -130,9 +130,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
 				<div
-					className={`${
-						checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
-					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg border-b-[1px] bg-theme-input' : ''} text-theme-primary max-h-full`}
 				>
 					<div
 						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${
@@ -158,7 +156,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			<AudioRecorderControl outerRecording={isRecording} onSendRecord={handleEndRecording} />
 			<div
 				className={`flex flex-inline items-start gap-2 box-content max-sm:mb-0
-			dark:bg-channelTextarea bg-channelTextareaLight rounded-lg relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
+			bg-theme-surface rounded-lg relative shadow-md border-theme-primary ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
 			${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
 				<FileSelectionButton
@@ -167,11 +165,8 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 					hasPermissionEdit={canSendMessage}
 				/>
 
-				<div className={`w-[calc(100%_-_52px)] dark:bg-channelTextarea bg-channelTextareaLight gap-3 flex items-center rounded-e-md`}>
-					<div
-						className={`w-full rounded-r-lg dark:bg-channelTextarea bg-channelTextareaLight gap-3 relative whitespace-pre-wrap`}
-						onContextMenu={handleChildContextMenu}
-					>
+				<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
+					<div className={`w-full rounded-r-lg  gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}
 							listMentions={props.listMentions}
@@ -195,7 +190,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 MessageBox.Skeleton = () => {
 	return (
 		<div className="self-stretch h-fit px-4 mb-[8px] mt-[8px] flex-col justify-end items-start gap-2 flex overflow-visible">
-			<form className="self-stretch p-4 dark:bg-neutral-950 bg-bgLightSecondary rounded-lg justify-start gap-2 inline-flex items-center">
+			<form className="self-stretch p-4 bg-theme-surface rounded-lg justify-start gap-2 inline-flex items-center">
 				<div className="flex flex-row h-full items-center">
 					<div className="flex flex-row  justify-end h-fit">
 						<Icons.AddCircle />
@@ -205,7 +200,7 @@ MessageBox.Skeleton = () => {
 				<div className="grow self-stretch justify-start items-center gap-2 flex">
 					<div
 						contentEditable
-						className="grow text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none dark:text-textDarkTheme text-textLightTheme"
+						className="grow text-sm placeholder-[#AEAEAE] h-fit border-none focus:border-none outline-none bg-transparent overflow-y-auto resize-none text-theme-primary"
 					/>
 				</div>
 				<div className="flex flex-row h-full items-center gap-1 mr-2 w-12 rounded-r-lg">

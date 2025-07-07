@@ -158,14 +158,10 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 			<div className="max-md:relative">
 				<ItemStatus
 					children={`Balance: ${formatNumber(Number(tokenInWallet), 'vi-VN', 'VND')}`}
-					startIcon={<Icons.Check className="text-[#969696] dark:text-[#cecece]" />}
+					startIcon={<Icons.Check className="text-theme-primary" />}
 					disabled={true}
 				/>
-				<ItemStatus
-					onClick={handleSendToken}
-					children="Transfer Funds"
-					startIcon={<Icons.SendMoney className="text-[#838383] dark:text-[#cecece]" />}
-				/>
+				<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney className="text-theme-primary" />} />
 				{/* <ItemStatus
 					onClick={handleOpenWithdrawModal}
 					children="Withdraw"
@@ -174,13 +170,13 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				<ItemStatus
 					onClick={handleOpenHistoryModal}
 					children="History Transaction"
-					startIcon={<Icons.History className="text-[#838383] dark:text-[#cecece]" />}
+					startIcon={<Icons.History className="text-theme-primary" />}
 				/>
 				<ItemStatus
 					onClick={handleWalletManagement}
 					children="Manage Wallet"
 					startIcon={
-						<span className="w-5 h-5 flex items-center justify-center text-[#838383] dark:text-[#cecece]">
+						<span className="w-5 h-5 flex items-center justify-center text-theme-primary">
 							{' '}
 							<WalletIcon />{' '}
 						</span>
@@ -190,7 +186,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				<ItemStatus
 					onClick={handleCustomStatus}
 					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
-					startIcon={<Icons.SmilingFace className="text-[#838383] dark:text-[#cecece]" />}
+					startIcon={<Icons.SmilingFace className="text-theme-primary" />}
 				/>
 				<Dropdown
 					trigger="click"
@@ -202,16 +198,16 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					)}
 					label=""
 					placement="right-start"
-					className="dark:!bg-bgSecondary600 !bg-white border ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
+					className=" bg-theme-contexify text-theme-primary ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full "
 				>
 					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} onClick={() => updateUserStatus('Online', 0, true)} />
-					<div className="w-full border-b-[1px] border-[#40444b] opacity-70 text-center my-2"></div>
+					<div className="w-full  border-b-theme-primary opacity-70 text-center my-2"></div>
 					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
 					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />
 					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
 				</Dropdown>
 			</div>
-			<div className="w-full border-b-[1px] dark:border-[#40444b] border-gray-200 opacity-70 text-center"></div>
+			<div className="w-full border-b-theme-primary opacity-70 text-center"></div>
 			{isElectron() && (
 				<Dropdown
 					trigger="click"
@@ -236,7 +232,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 			<ButtonCopy
 				copyText={userProfile?.user?.id || ''}
 				title="Copy User ID"
-				className="px-2 py-[6px] hover:!bg-[#E6EFFE] dark:hover:!bg-[#3F3F46]"
+				className=" px-2 py-[6px] !text-[var(--text-theme-primary)] bg-item-theme-hover"
 			/>
 			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}

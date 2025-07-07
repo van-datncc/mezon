@@ -33,11 +33,11 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 	}, [initSetting]);
 
 	return (
-		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 dark:bg-bgSecondary bg-[#F0F0F0] flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
+		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-theme-setting-nav   flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
-				<p className="dark:text-[#84ADFF] text-black font-bold text-sm tracking-wider">USER SETTINGS</p>
+				<p className="font-bold text-sm tracking-wider">USER SETTINGS</p>
 				<button
-					className={`dark:text-[#AEAEAE] text-black w-[170px] text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Account' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''}`}
+					className={` w-[170px] text-[16px] text-theme-primary-hover bg-item-hover font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Account' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'}`}
 					onClick={() => {
 						handleButtonClick('Account');
 						onItemClick && onItemClick('Account');
@@ -47,7 +47,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'Profiles' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 pl-2 ml-[-8px] font-medium ${selectedButton === 'Profiles' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Profiles');
 						onItemClick && onItemClick('Profiles');
@@ -57,31 +57,23 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<div className="hidden">
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Privacy & Safety
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Privacy & Safety</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Authorized Apps
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Authorized Apps</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Devices
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Devices</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Connections
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Connections</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
+					<button className="p-2 text-[16px] font-medium mb-[10px] w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
 						Friend Requests
 					</button>
 				</div>
-				<hr className="border-t border-solid border-borderDefault mt-4" />
-				<button className="pt-2 dark:text-[#84ADFF] text-black mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
+				<hr className="border-t-theme-primary mt-4" />
+				<button className="pt-2  mt-4 font-bold text-sm tracking-wider">APP SETTINGS</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'Appearance' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2  pl-2 ml-[-8px] font-medium ${selectedButton === 'Appearance' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Appearance');
 						onItemClick && onItemClick('Appearance');
@@ -91,7 +83,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black  pl-2 ml-[-8px] font-medium ${selectedButton === 'Notifications' ? 'dark:bg-[#232E3B] bg-gray-300 dark:text-white text-black' : ''} mt-1 w-[170px] text-left rounded-[5px]`}
+					className={`p-2 pl-2 ml-[-8px] font-medium ${selectedButton === 'Notifications' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px]`}
 					onClick={() => {
 						handleButtonClick('Notifications');
 						onItemClick && onItemClick('Notifications');
@@ -101,42 +93,26 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 				</button>
 				<div className="hidden">
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Accessibility
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Accessibility</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Voice & Video
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Voice & Video</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Text & Image
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Text & Image</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Notifications
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Notifications</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Keybinds
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Keybinds</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Language
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Language</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Streamer Mode
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Streamer Mode</button>
 					<br />
-					<button className="p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">
-						Advanced
-					</button>
+					<button className="p-2 text-[16px] font-medium w-[170px] rounded-[5px] text-left mt-1 ml-[-8px] ">Advanced</button>
 				</div>
-				<hr className="border-t border-solid border-borderDefault mt-4" />
+				<hr className="border-t-theme-primary mt-4" />
 				<br />
 				<button
-					className={`p-2 dark:text-[#AEAEAE] text-black text-[16px] font-medium ${selectedButton === 'Log Out' ? 'bg-[#232E3B]' : ''} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] `}
+					className={`p-2 text-[16px] font-medium ${selectedButton === 'Log Out' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'} mt-1 w-[170px] text-left rounded-[5px] ml-[-8px] `}
 					onClick={() => {
 						handleButtonClick('Log Out');
 						handleOpenModal();

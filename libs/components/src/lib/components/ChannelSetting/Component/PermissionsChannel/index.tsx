@@ -86,17 +86,17 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 
 	return (
 		<>
-			<div className="overflow-y-auto flex flex-col flex-1 shrink dark:bg-bgPrimary bg-bgLightModeSecond w-1/2 pt-[94px] sbm:pb-7 sbm:px-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
+			<div className="overflow-y-auto flex flex-col flex-1 shrink bg-theme-setting-primary w-1/2 pt-[94px] sbm:pb-7 sbm:px-[40px] p-4 overflow-x-hidden min-w-full sbm:min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar relative">
 				<div className="dark:text-white text-[15px] text-black">
 					<HeaderModal name={channel.category_name} />
 					<div className="rounded-md overflow-hidden mt-4">
-						<div className="dark:bg-bgTertiary bg-white flex justify-between items-start p-4">
+						<div className="bg-theme-setting-nav flex justify-between items-start p-4 border-theme-primary border-2 rounded-lg">
 							<div>
 								<div className="inline-flex mb-2">
-									<Icons.LockIcon />
-									<p className="ml-2 font-bold">Private Channel</p>
+									<Icons.LockIcon className="text-[var(--text-theme-primary)]" />
+									<p className="ml-2 font-bold text-theme-primary">Private Channel</p>
 								</div>
-								<p className="text-xs">
+								<p className="text-xs text-theme-primary">
 									By making a channel private, only select members and roles will be able to view this channel.
 								</p>
 							</div>
@@ -114,23 +114,23 @@ const PermissionsChannel = (props: PermissionsChannelProps) => {
 							/>
 						</div>
 						{valueToggle && (
-							<div className="p-4 dark:bg-bgSecondary bg-white">
+							<div className="p-4 bg-theme-setting-nav border-theme-primary">
 								<div className="flex justify-between items-center pb-4">
-									<p className="uppercase font-bold text-xs">Who can access this channel?</p>
+									<p className="uppercase font-bold text-xs text-theme-primary">Who can access this channel?</p>
 									<button className="bg-[#155EEF] hover:bg-blue-500 px-4 py-1 rounded text-white" onClick={openAddMemRoleModal}>
 										Add members or roles
 									</button>
 								</div>
 								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
 								<div className="py-4">
-									<p className="uppercase font-bold text-xs pb-4">Roles</p>
+									<p className="uppercase font-bold text-xs pb-4 text-theme-primary">Roles</p>
 									<div>
 										<ListRolePermission channel={channel} selectedRoleIds={selectedRoleIds} />
 									</div>
 								</div>
 								<hr className="border-t border-solid dark:border-borderDefault border-bgModifierHoverLight" />
 								<div className="py-4">
-									<p className="uppercase font-bold text-xs pb-4">Members</p>
+									<p className="uppercase font-bold text-xs pb-4 text-theme-primary">Members</p>
 									<div>
 										<ListMemberPermission channel={channel} selectedUserIds={selectedUserIds} />
 									</div>
@@ -176,12 +176,12 @@ const HeaderModal = memo((props: HeaderModalProps) => {
 	const { name = '' } = props;
 	return (
 		<>
-			<h3 className="mb-4 font-bold text-xl">Channel Permissions</h3>
-			<p className="mb-3">Use permissions to customise who can do what in this channel.</p>
+			<h3 className="mb-4 font-bold text-xl text-theme-primary ">Channel Permissions</h3>
+			<p className="mb-3 text-theme-primary">Use permissions to customise who can do what in this channel.</p>
 			<div className="flex mt-4 p-4">
 				<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />
-				<p>Permissions synced with category: </p>
-				<p className="font-bold pl-1"> {name}</p>
+				<p className="text-theme-primary">Permissions synced with category: </p>
+				<p className="font-bold pl-1 text-theme-primary"> {name}</p>
 			</div>
 		</>
 	);

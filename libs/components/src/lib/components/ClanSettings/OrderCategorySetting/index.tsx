@@ -93,9 +93,7 @@ const CategoryOrderSetting = () => {
 			{categoryListState.map((category, index) => (
 				<div
 					key={category.category_id}
-					className={`${
-						index !== categoryListState.length - 1 && 'border-b'
-					} cursor-grab hover:bg-bgLightTertiary hover:dark:bg-bgModifierHover border-borderDividerLight dark:border-borderDivider
+					className={`${index !== categoryListState.length - 1 && 'border-b'} cursor-grab bg-item-hover
 					${
 						hoveredIndex === index
 							? dragBorderPosition === EDragBorderPosition.BOTTOM
@@ -108,12 +106,12 @@ const CategoryOrderSetting = () => {
 					onDragEnter={() => handleDragEnter(index)}
 					onDragEnd={handleDragEnd}
 				>
-					<p className="p-2 truncate dark:text-textPrimary text-textPrimaryLight uppercase">{category.category_name}</p>
+					<p className="p-2 truncate uppercase">{category.category_name}</p>
 				</div>
 			))}
 			{hasChanged && (
 				<div className="flex flex-row justify-end gap-[20px] mt-10">
-					<button onClick={handleReset} className="rounded px-4 py-1.5 hover:underline dark:text-textPrimary text-textPrimaryLight">
+					<button onClick={handleReset} className="rounded px-4 py-1.5 hover:underline ">
 						Reset
 					</button>
 					<button onClick={handleSave} className="bg-blue-600 rounded-[4px] px-4 py-1.5 text-nowrap text-white">

@@ -21,7 +21,7 @@ const EventSchedule: React.FC<EventScheduleProps> = ({ event, className }) => {
 			? 'The event is happening now!'
 			: 'Event has ended.';
 
-	const cssEventStatus = eventIsUpcoming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : 'dark:text-zinc-400 text-colorTextLightMode';
+	const cssEventStatus = eventIsUpcoming ? 'text-purple-500' : eventIsOngoing ? 'text-green-500' : '';
 
 	const handleOpenVoiceChannel = () => {
 		if (channelVoice?.meeting_code) {

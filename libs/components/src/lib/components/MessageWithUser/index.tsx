@@ -143,7 +143,7 @@ function MessageWithUser({
 	const [openProfileItem, closeProfileItem] = useModal(() => {
 		return (
 			<div
-				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9 dark:bg-black bg-gray-200 w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in`}
+				className={`fixed z-50 max-[480px]:!left-16 max-[700px]:!left-9  w-[300px] max-w-[89vw] rounded-lg flex flex-col duration-300 ease-in-out animate-fly_in border-theme-primary bg-outside-footer `}
 				style={{
 					top: `${positionShortUser.current?.top}px`,
 					left: `${positionShortUser.current?.left}px`
@@ -184,14 +184,14 @@ function MessageWithUser({
 							'pt-3': !isCombine || (message.code !== TypeMessage.CreatePin && message.references?.[0]?.message_ref_id)
 						},
 						{
-							'dark:!bg-[#403D38] !bg-[#EAB3081A]':
+							'bg-highlight':
 								(hasIncludeMention || checkReplied) && !messageReplyHighlight && !checkMessageTargetToMoved && !isEphemeralMessage
 						},
 						{ '!bg-bgMessageReplyHighline': messageReplyHighlight },
-						{ 'dark:!bg-[#383B47] !bg-[#EAB3081A]': isHighlight },
-						{ '!bg-[#eab30833] dark:!bg-[#383B47]': checkMessageTargetToMoved },
+						{ 'bg-highlight': isHighlight },
+						{ '!bg-[#eab30833]': checkMessageTargetToMoved },
 						{
-							'dark:!bg-[#2D2B3A] !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
+							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
 						}
 					)}
 					create_time={message.create_time}
@@ -248,11 +248,11 @@ function MessageWithUser({
 						{!!message?.content?.fwd && (
 							<div
 								style={{ height: `${!isCombine ? 'calc(100% - 50px)' : '100%'}` }}
-								className="border-l-4 dark:border-[#414348] border-[#ebebeb] rounded absolute left-[45px] bottom-0"
+								className="border-l-4  rounded absolute left-[45px] bottom-0"
 							></div>
 						)}
 						{!!message?.content?.fwd && (
-							<div className="flex gap-1 items-center italic text-[#5e6068] dark:text-[#949ba4] font-medium w-full">
+							<div className="flex gap-1 items-center italic font-medium w-full">
 								<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 								<p>Forwarded</p>
 							</div>
@@ -280,7 +280,7 @@ function MessageWithUser({
 									isEphemeral={isEphemeralMessage}
 								/>
 								{isEphemeralMessage && (
-									<div className="flex items-center gap-1 mt-1 mb-1 text-xs text-gray-500 dark:text-gray-400 italic">
+									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic">
 										<Icons.EyeClose className="w-3 h-3" />
 										<span>Only visible to recipient</span>
 									</div>
@@ -346,8 +346,8 @@ function MessageWithUser({
 const MessageDateDivider = ({ message }: { message: MessagesEntity }) => {
 	const messageDate = !message.create_time ? '' : convertDateString(message.create_time as string);
 	return (
-		<div className="mt-5 mb-2 dark:bg-borderDivider w-full h-px flex items-center justify-center">
-			<span className="px-4 dark:bg-bgPrimary bg-bgLightPrimary text-zinc-400 text-xs font-semibold">{messageDate}</span>
+		<div className="mt-5 mb-2  w-full h-px flex items-center justify-center border-b-theme-primary">
+			<span className="px-4 bg-item text-theme-primary text-xs font-semibold bg-theme-primary rounded-lg ">{messageDate}</span>
 		</div>
 	);
 };
@@ -394,7 +394,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	};
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : ''} hover:dark:bg-[#2e3035] hover:bg-[#f7f7f7] relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : 'bg-item-hover'} relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}
@@ -404,9 +404,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			{isHover && (
 				<>
 					{!showMessageHead && create_time && (
-						<span className="absolute left-[24px] top-[4px] dark:text-zinc-400 text-colorTextLightMode text-[10px]">
-							{convertTimeHour(create_time)}
-						</span>
+						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[10px]">{convertTimeHour(create_time)}</span>
 					)}
 					{popup?.()}
 				</>

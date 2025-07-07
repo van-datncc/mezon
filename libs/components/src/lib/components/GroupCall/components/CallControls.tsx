@@ -16,7 +16,7 @@ export const CallControls = memo<CallControlsProps>(({ onCancel, loading, isVide
 				disabled={loading}
 				title="Cancel call"
 			>
-				<Icons.IconPhoneDM className="w-6 h-6" />
+				<Icons.IconPhoneDM defaultSize="size-5" />
 			</button>
 		</div>
 	);

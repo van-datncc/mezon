@@ -168,10 +168,10 @@ export const CreateNewChannelModal = () => {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
+			className="w-[100vw] h-[100vh] text-theme-primary overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
 			<div
-				className={`z-60 w-full h-full sm:w-4/5 sm:max-h-[630px] md:w-[684px] dark:bg-bgPrimary bg-bgLightModeSecond rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
+				className={`z-60 w-full h-full sm:w-4/5 sm:max-h-[630px] md:w-[684px] bg-theme-setting-primary  rounded-2xl flex-col justify-start  items-start gap-3 inline-flex relative shadow-lg`}
 			>
 				<div className="self-stretch flex-col justify-start items-start flex">
 					<div className="self-stretch px-5 pt-8 flex-col justify-start items-start gap-3 flex">
@@ -184,13 +184,13 @@ export const CreateNewChannelModal = () => {
 									</p>
 								</span>
 								<div className="absolute right-1 top-[-10px]">
-									<button onClick={handleCloseModal} className="hover:text-[#ffffff]">
+									<button onClick={handleCloseModal} className="">
 										<Icons.Close />
 									</button>
 								</div>
 							</div>
 
-							<div className=" dark:text-zinc-400 text-colorTextLightMode text-sm">Kindly set up a channel of your choice.</div>
+							<div className=" text-sm">Kindly set up a channel of your choice.</div>
 						</div>
 						<div
 							className={`flex flex-col gap-3 w-full max-h-[430px] pr-2 overflow-y-scroll ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
@@ -247,8 +247,8 @@ export const CreateNewChannelModal = () => {
 											placement={'bottom-start'}
 											label={''}
 											renderTrigger={() => (
-												<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm dark:bg-bgInputDark bg-bgLightModeThird border dark:text-textPrimary text-textPrimaryLight">
-													<div className={'dark:text-textPrimary text-textPrimary400 flex flex-row items-center'}>
+												<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm bg-item-theme bg-item-hover text-theme-primary-hover">
+													<div className={' flex flex-row items-center'}>
 														<p>{selectedApp?.appname || 'Choose an application'}</p>
 													</div>
 													<div>
@@ -256,19 +256,15 @@ export const CreateNewChannelModal = () => {
 													</div>
 												</div>
 											)}
-											className={
-												'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode dark:bg-bgTertiary px-2 z-20'
-											}
+											className={'h-fit max-h-[200px] text-xs overflow-y-scroll px-2 z-20'}
 										>
 											{allApps.apps?.map((app) => (
 												<Dropdown.Item
 													key={app.id}
-													className="flex flex-row items-center dark:text-textPrimary text-textPrimaryLight rounded-sm dark:hover:bg-bgModifierHover hover:bg-bgIconDark text-sm w-full py-2 px-4 text-left cursor-pointer"
+													className="flex flex-row items-center  rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer"
 													onClick={() => handleAppSelect(app)}
 												>
-													<p className="uppercase dark:text-textSecondary text-textSecondary800 font-semibold">
-														{app.appname}
-													</p>
+													<p className="uppercase font-semibold">{app.appname}</p>
 												</Dropdown.Item>
 											))}
 										</Dropdown>
@@ -361,14 +357,14 @@ const ChannelAppUrlTextField = forwardRef<ChannelAppUrlModalRef, ChannelAppUrlMo
 	return (
 		<div className="Frame408 self-stretch flex-col justify-start items-start gap-2 flex mt-1">
 			<ChannelLableModal labelProp={channelAppUrlProps} />
-			<div className="ContentContainer self-stretch h-11 flex-col items-start flex">
+			<div className="ContentContainer self-stretch h-11 flex-col items-start flex ">
 				<div
-					className={`InputContainer self-stretch h-11 px-4 py-3 dark:bg-neutral-950 bg-white rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
+					className={`InputContainer self-stretch h-11 px-4 py-3 bg-item-theme rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
 				>
 					<Icons.AppChannelIcon className="w-6 h-6" fill={theme} />
 					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">
 						<input
-							className="Input grow shrink basis-0 h-10 outline-none dark:bg-neutral-950 bg-white dark:text-white text-black text-sm font-normal placeholder-[#AEAEAE]"
+							className="Input grow shrink basis-0 h-10 outline-none bg-theme-input text-sm font-normal"
 							onChange={handleInputChange}
 							placeholder={placeholder}
 							value={value}

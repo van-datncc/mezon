@@ -460,7 +460,7 @@ const ScrollDownButton = memo(
 		return (
 			<button
 				onClick={handleScrollDownClick}
-				className={`dark:bg-bgPrimary bg-bgLightPrimary ${
+				className={`bg-theme-primary ${
 					isVisible ? 'opacity-100' : 'opacity-0'
 				} cursor-pointer absolute z-10 rounded-full bg-clip-padding border text-token-text-secondary border-token-border-light w-8 h-8 flex items-center justify-center bottom-5 right-[12px] transition-all duration-200 hover:scale-105 active:scale-95 active:shadow-inner`}
 			>
@@ -907,7 +907,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const scrollTimeoutId2 = useRef<NodeJS.Timeout | null>(null);
 		return (
-			<div className="w-full h-full relative messages-container select-text dark:bg-bgPrimary bg-bgLightPrimary">
+			<div className="w-full h-full relative messages-container select-text bg-theme-chat ">
 				<div
 					onScroll={handleScroll}
 					onWheelCapture={() => {

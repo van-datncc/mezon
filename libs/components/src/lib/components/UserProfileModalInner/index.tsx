@@ -172,7 +172,7 @@ const UserProfileModalInner = ({
 					style={{ backgroundColor: color }}
 					onClick={() => setGroupIconBanner(initOpenModal)}
 				>
-					<div className={`rounded-tl-lg rounded-tr-lg h-[60px] flex justify-end gap-x-2 p-2 `}>
+					<div className={`rounded-tl-lg rounded-tr-lg h-[60px]  flex justify-end gap-x-2 p-2 `}>
 						<GroupIconBanner
 							checkAddFriend={checkAddFriend}
 							openModal={openGroupIconBanner}
@@ -194,10 +194,10 @@ const UserProfileModalInner = ({
 							<div className="flex items-end pr-4">
 								<button
 									onClick={handleOpenEditOption}
-									className="relative flex items-center h-8 px-4 rounded-[3px] dark:bg-buttonProfile bg-buttonMessageHover dark:hover:bg-buttonMessageHover hover:bg-buttonProfile"
+									className="relative flex items-center h-8 px-4 rounded-[3px] text-theme-primary text-theme-primary-hover"
 								>
-									<Icons.PenEdit className="text-bgLightPrimary" />
-									<span className="text-sm text-bgLightPrimary font-semibold one-line">Edit Profile</span>
+									<Icons.PenEdit />
+									<span className="text-sm font-semibold one-line">Edit Profile</span>
 								</button>
 								{isOPenEditOption && (
 									<div
@@ -224,17 +224,19 @@ const UserProfileModalInner = ({
 						)}
 					</div>
 				</div>
-				<div className="dark:bg-bgProfileBody bg-bgLightPrimary pt-[60px] pb-4 px-4 rounded-b-md w-full flex-1">
+				<div className="bg-theme-contexify pt-[60px] pb-4 px-4 rounded-b-md w-full flex-1">
 					<div className="flex flex-col gap-3 h-full">
 						<div className="mt-4">
-							<h3 className="text-2xl font-semibold">
+							<h3 className="text-2xl font-semibold text-theme-primary">
 								{name || userById?.clan_nick || userById?.user?.display_name || userById?.user?.username || notify?.content?.username}
 							</h3>
-							<p className="text-sm font-normal">{usernameAva || userById?.user?.username || notify?.content?.username}</p>
+							<p className="text-sm font-normal text-theme-primary">
+								{usernameAva || userById?.user?.username || notify?.content?.username}
+							</p>
 						</div>
-						<div className="flex-1 dark:bg-bgSearchHover bg-bgLightSearchHover rounded-lg shadow-shadowInbox">
+						<div className="flex-1 bg-theme-setting-primary rounded-lg shadow-shadowInbox">
 							<ProfileTabs activeTab={activeTab} onActiveTabChange={handleActiveTabChange} />
-							<div className="p-4">
+							<div className="p-4 text-theme-primary	">
 								{activeTab === typeTab.ABOUT_ME && <AboutMe createTime={userById?.user?.create_time} />}
 								{activeTab === typeTab.ACTIVITY && <Activity />}
 								{activeTab === typeTab.MUTUAL_FRIENDS && <MutualFriends />}

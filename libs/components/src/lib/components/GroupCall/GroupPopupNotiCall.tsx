@@ -107,7 +107,7 @@ const GroupPopupNotiCall = ({ dataCall, userId }: ModalCallProps) => {
 							src={user?.clan_avatar || user?.user?.avatar_url}
 						/>
 						<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-							{isVideoCall ? <Icons.IconMeetDM className="w-4 h-4 text-white" /> : <Icons.IconPhoneDM className="w-4 h-4 text-white" />}
+							{isVideoCall ? <Icons.IconMeetDM className="w-4 h-4" /> : <Icons.IconPhoneDM defaultSize="size-5" />}
 						</div>
 					</div>
 				</div>
@@ -130,7 +130,7 @@ const GroupPopupNotiCall = ({ dataCall, userId }: ModalCallProps) => {
 						className="h-[56px] w-[56px] rounded-full bg-green-600 hover:bg-green-700 flex items-center justify-center cursor-pointer transition-colors"
 						onClick={handleJoinCall}
 					>
-						{isVideoCall ? <Icons.IconMeetDM /> : <Icons.IconPhoneDM />}
+						{isVideoCall ? <Icons.IconMeetDM defaultSize="size-5" /> : <Icons.IconPhoneDM defaultSize="size-5" />}
 					</button>
 				</div>
 			</div>

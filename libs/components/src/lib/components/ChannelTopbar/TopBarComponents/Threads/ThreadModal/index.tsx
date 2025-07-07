@@ -121,25 +121,25 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="absolute top-8 right-0  rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right dark:bg-bgSecondary bg-bgLightSecondary"
+			className="absolute top-8 right-0  rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right bg-theme-setting-primary"
 		>
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] lg:w-[540px] shadow-sm max-h-[calc(100vh_-_180px)] overflow-hidden">
-				<div className="dark:bg-bgTertiary bg-bgLightTertiary flex flex-row items-center justify-between p-[16px] h-12">
-					<div className="flex flex-row items-center border-r-[1px] dark:border-r-[#6A6A6A] border-r-[#E1E1E1] pr-[16px] gap-4">
+				<div className="bg-theme-setting-nav flex flex-row items-center justify-between border-b-theme-primary p-[16px] h-12">
+					<div className="flex flex-row items-center border-r-[1px] border-color-theme pr-[16px] gap-4">
 						<Icons.ThreadIcon />
-						<span className="text-base font-semibold cursor-default dark:text-white text-black">Threads</span>
+						<span className="text-base font-semibold cursor-default ">Threads</span>
 					</div>
 					<SearchThread channelId={currentChannelId} />
 					{canManageThread && (
 						<div className="flex flex-row items-center gap-4">
 							<button
 								onClick={handleCreateThread}
-								className=" px-3 text-center text-sm font-medium h-6 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover"
+								className=" px-3 text-white text-center text-sm font-medium h-6 rounded-lg bg-button-primary"
 							>
 								Create
 							</button>
-							<button onClick={onClose}>
-								<Icons.Close defaultSize="w-4 h-4 dark:text-[#CBD5E0] text-colorTextLightMode" />
+							<button onClick={onClose} className="text-color-theme-hover">
+								<Icons.Close defaultSize="w-4 h-4 " />
 							</button>
 						</div>
 					)}

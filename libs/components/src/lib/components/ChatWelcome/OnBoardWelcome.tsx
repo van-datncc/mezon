@@ -40,11 +40,11 @@ export function OnBoardWelcome({ nextMessageId }: OnBoardWelcomeProps) {
 	return (
 		<div className="w-full p-4 mb-0  flex-1 flex flex-col items-center gap-2">
 			{currentChannel?.type === ChannelType.CHANNEL_TYPE_APP ? (
-				<div className="w-[400px] p-4 dark:bg-bgSecondary bg-[#f0f0f0] rounded-lg">
+				<div className="w-[400px] p-4 bg-item-theme rounded-lg">
 					{currentClan?.banner ? (
 						<img src={currentClan?.banner} />
 					) : (
-							<div className="w-full h-28 font-bold text-2xl text-[#929292] dark:text-[#b4b4b4]  rounded-lg flex items-center justify-center">
+						<div className="w-full h-28 font-bold text-2xl text-theme-primary rounded-lg flex items-center justify-center">
 							<p className="[text-shadow:_0_1px_2px_#ffffff]">Click Launch App To Start</p>
 						</div>
 					)}
@@ -69,11 +69,11 @@ const Onboarditem = ({ icon, title, tick, onClick }: { icon: ReactNode; title: s
 	};
 	return (
 		<div
-			className="w-[400px] gap-4 h-[72px] items-center flex p-4 text-sm font-semibold dark:bg-[#232428] bg-bgLightSecondary hover:bg-bgLightSearchHover dark:hover:bg-[#393c41] rounded-lg"
+			className="w-[400px] gap-4 h-[72px] items-center flex p-4 text-sm font-semibold text-theme-primary text-theme-primary-hover bg-item-hover bg-item-theme rounded-lg hover:cursor-pointer"
 			onClick={handleOnClickItem}
 		>
 			{icon}
-			<div className="flex-1 dark:text-white text-black">{title}</div>
+			<div className="flex-1 ">{title}</div>
 			{tick ? (
 				<div className="flex items-center justify-center rounded-full aspect-square h-8 bg-green-600">
 					<Icons.Tick fill="white" />

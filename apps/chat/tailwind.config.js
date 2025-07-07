@@ -75,7 +75,7 @@ module.exports = {
         widthHeader: `calc(100% - 344px)`,
         widthMemberList: memberWidth,
         widthNoMemberList: memberWidth,
-        widthThumnailAttachment: `calc(100vw - ${clanWidth} - ${channelListWidth})`,
+        widthThumnailAttachment: `calc(100% - ${clanWidth} - ${channelListWidth})`,
         widthSearchMessage: `calc(100vw - ${clanWidth} - ${channelListWidth} - ${widthResultSearch})`,
         widthModalSearch: widthModalSearch,
         widthPinMess: `calc(100% - 16px)`,
@@ -85,7 +85,8 @@ module.exports = {
         "4/5": "80%",
         "9/10": "90%",
         widthTitleBar: '100%',
-        widthChannelList: channelListWidth
+        widthChannelList: channelListWidth,
+        widthProfile: '320px',
       },
       height: {
         heightMessageViewChat: heightMessageViewChat,
