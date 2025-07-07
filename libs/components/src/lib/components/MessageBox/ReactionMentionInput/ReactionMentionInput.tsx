@@ -876,7 +876,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							}
 						}
 					}}
-					className={`mentions min-h-11 cursor-not-allowed text-theme-primary`}
+					className={`mentions min-h-11 cursor-not-allowed text-theme-message`}
 					allowSpaceInQuery={true}
 					onKeyDown={onKeyDown}
 					forceSuggestionsAboveCursor={true}

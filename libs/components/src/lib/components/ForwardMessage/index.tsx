@@ -312,7 +312,7 @@ const ForwardMessageModal = () => {
 						onChange={(e) => setSearchText(e.target.value)}
 						onKeyDown={(e) => handleInputKeyDown(e)}
 					/>
-					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] `}>
+					<div className={`mt-4 mb-2 overflow-y-auto h-[300px] thread-scroll `}>
 						{!normalizedSearchText.startsWith('@') && !normalizedSearchText.startsWith('#') ? (
 							<>
 								<ListSearchForwardMessage

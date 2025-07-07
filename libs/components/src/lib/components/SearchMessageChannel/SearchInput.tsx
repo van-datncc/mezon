@@ -48,22 +48,18 @@ const SearchInput = ({
 	const renderSuggestionsContainer = useCallback(
 		(children: any) => (
 			<div
-				className={`absolute left-0 top-10 pb-3 ${valueInputSearch ? 'pt-0' : 'pt-3'} rounded dark:bg-bgProfileBody bg-bgLightPrimary z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
+				className={`absolute left-0 top-10 pb-3 bg-theme-setting-primary ${valueInputSearch ? 'pt-0' : 'pt-3'} rounded  z-[9999] w-widthModalSearch min-h-heightModalSearch shadow`}
 			>
 				{valueInputSearch && (
-					<div className="first:mt-0 mt-3 p-3 rounded-t dark:bg-bgSecondary600 border-b border-borderDivider last:border-b-0 last:bottom-b-0">
+					<div className="first:mt-0 mt-3 p-3 rounded-t border-b last:border-b-0 last:bottom-b-0">
 						<div className="flex items-center justify-between">
 							<div className="flex flex-row items-center flex-1 overflow-x-hidden">
-								<h3 className="text-xs font-medium text-textLightTheme dark:text-textPrimary uppercase mr-1 flex-shrink-0">
-									Search for:
-								</h3>
+								<h3 className="text-xs font-medium  uppercase mr-1 flex-shrink-0">Search for:</h3>
 								<p className="text-sm font-semibold w-full mr-[10px] whitespace-normal text-ellipsis overflow-x-hidden">
 									{valueDisplay}
 								</p>
 							</div>
-							<button className="px-1 h-5 w-10 text-xs text-textLightTheme dark:text-textPrimary font-semibold rounded bg-borderDividerLight dark:bg-borderDividerLight">
-								Enter
-							</button>
+							<button className="px-1 h-5 w-10 text-xs  font-semibold rounded bg-borderDividerLight ">Enter</button>
 						</div>
 					</div>
 				)}
@@ -87,7 +83,7 @@ const SearchInput = ({
 				}
 			}}
 			onChange={onChange}
-			className="none-draggable-area w-full mr-[10px] dark:bg-transparent bg-transparent text-theme-primary rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
+			className="none-draggable-area w-full mr-[10px] bg-transparent text-theme-primary rounded-md focus-visible:!border-0 focus-visible:!outline-none focus-visible:[&>*]:!outline-none"
 			allowSpaceInQuery={true}
 			singleLine={true}
 			onClick={onInputClick}
@@ -110,7 +106,7 @@ const SearchInput = ({
 						onClick={() => setIsShowSearchOptions('')}
 					/>
 				)}
-				className="dark:bg-[#3B416B] bg-bgLightModeButton"
+				className=""
 			/>
 
 			<Mention
@@ -128,7 +124,7 @@ const SearchInput = ({
 						onClick={() => setIsShowSearchOptions('')}
 					/>
 				)}
-				className="dark:bg-[#3B416B] bg-bgLightModeButton"
+				className=""
 			/>
 
 			<Mention
@@ -140,7 +136,7 @@ const SearchInput = ({
 				renderSuggestion={(suggestion: any, search: any, highlightedDisplay: any, index: any, focused: any) => (
 					<SelectItemUser search={search} isFocused={focused} title="has: " content={suggestion.display} key={suggestion.id} />
 				)}
-				className="dark:bg-[#3B416B] bg-bgLightModeButton"
+				className=""
 			/>
 		</MentionsInput>
 	);

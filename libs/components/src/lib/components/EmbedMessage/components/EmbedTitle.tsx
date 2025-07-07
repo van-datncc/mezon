@@ -6,11 +6,11 @@ interface EmbedTitleProps {
 
 export function EmbedTitle({ title, url, onClick }: EmbedTitleProps) {
 	return (
-		<div className="mt-2 h-fit">
+		<div className="mt-2 h-fit ">
 			{url ? (
 				<a
 					href={url}
-					className="font-semibold no-underline text-contentBrandLight hover:underline cursor-pointer"
+					className="font-semibold no-underline hover:underline cursor-pointer text-theme-message"
 					target={'_blank'}
 					rel="noreferrer"
 					onClick={(e) => {
@@ -23,7 +23,7 @@ export function EmbedTitle({ title, url, onClick }: EmbedTitleProps) {
 					{title}
 				</a>
 			) : (
-				<span className="font-semibold">{title}</span>
+				<span className="font-semibold text-theme-message">{title}</span>
 			)}
 		</div>
 	);

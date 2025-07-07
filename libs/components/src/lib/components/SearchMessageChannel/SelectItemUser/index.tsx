@@ -13,8 +13,8 @@ const SelectItemUser = ({ title, content, onClick, isFocused, search }: SelectIt
 	return (
 		<button onClick={onClick} className="flex flex-row justify-between items-center w-full cursor-pointer rounded relative p-2">
 			<div>
-				<span className="text-textPrimaryLight dark:text-textPrimary font-semibold">{title}</span>
-				<span className="text-textSecondary400 dark:text-textPrimary">{HighlightMatchBold(content ?? '', search ?? '')}</span>
+				<span className="text-theme-message font-semibold">{title}</span>
+				<span className="">{HighlightMatchBold(content ?? '', search ?? '')}</span>
 			</div>
 			{isFocused && (
 				<div className="absolute right-2">
