@@ -221,6 +221,7 @@ button.bg-button-add-friend {
 
 .text-theme-primary-active {
   color: var(--text-secondary);
+  font-variant: initial;
 }
 
 .text-theme-secondary {
