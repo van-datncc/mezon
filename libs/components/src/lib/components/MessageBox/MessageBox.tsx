@@ -1,5 +1,5 @@
 import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectCloseMenu, selectDataReferences, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
@@ -45,6 +45,10 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
+	const hasReplyMessage = useSelector((state) => {
+		const dataRefs = selectDataReferences(state, currentChannelId ?? '');
+		return !!dataRefs?.message_ref_id;
+	});
 
 	const { setOverUploadingState } = useDragAndDrop();
 
@@ -129,9 +133,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	return (
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
-				<div
-					className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg  bg-theme-input' : ''} text-theme-primary max-h-full`}
-				>
+				<div className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg  bg-theme-input' : ''} text-theme-primary max-h-full`}>
 					<div
 						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${
 							appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
@@ -156,7 +158,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			<AudioRecorderControl outerRecording={isRecording} onSendRecord={handleEndRecording} />
 			<div
 				className={`flex flex-inline items-start gap-2 box-content max-sm:mb-0
-			bg-theme-surface rounded-lg relative shadow-md border-theme-primary ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}
+			bg-theme-surface rounded-lg relative shadow-md border-theme-primary ${checkAttachment || hasReplyMessage ? 'rounded-t-none' : 'rounded-t-lg'}
 			${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
 			>
 				<FileSelectionButton

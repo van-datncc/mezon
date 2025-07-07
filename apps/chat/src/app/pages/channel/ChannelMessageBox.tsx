@@ -102,8 +102,8 @@ export function ChannelMessageBox({ channel, clanId, mode }: Readonly<ChannelMes
 	return (
 		<div className="mx-3 relative" ref={chatboxRef}>
 			{dataReferences.message_ref_id && (
-				<div className="relative z-1 pb-[4px]">
-					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
+				<div className="absolute left-0 right-0 bottom-8 z-9 pb-[4px]">
+					<ReplyMessageBox channelId={channelId ?? ''} dataReferences={dataReferences} className=" pb-[15px]" />
 				</div>
 			)}
 			<MessageBox

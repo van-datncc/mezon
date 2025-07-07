@@ -106,14 +106,16 @@
       const categoriesData = localStorage.getItem('persist:categories');
       const rememberChannelData = localStorage.getItem('remember_channel');
       const mezonSession = localStorage.getItem('mezon_session');
-
+      const hideNotificationContent = localStorage.getItem('hideNotificationContent');
+      const themeName = localStorage.getItem('current-theme');
       localStorage.clear();
 
       mezonSession && localStorage.setItem('mezon_session', mezonSession);
       authData && localStorage.setItem('persist:auth', authData);
       appData && localStorage.setItem('persist:apps', appData);
       clanData && localStorage.setItem('persist:clans', clanData);
-
+      hideNotificationContent && localStorage.setItem('hideNotificationContent', hideNotificationContent);
+      theme && localStorage.setItem('current-theme', themeName);
       categoriesData && localStorage.setItem('persist:categories', categoriesData);
       rememberChannelData && localStorage.setItem('remember_channel', rememberChannelData)
 
