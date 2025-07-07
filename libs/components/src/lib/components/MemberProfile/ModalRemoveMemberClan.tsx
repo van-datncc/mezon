@@ -20,7 +20,7 @@ const ModalRemoveMemberClan = ({ username, onClose, onRemoveMember }: ModalRemov
 	};
 
 	return (
-		<ModalLayout className="dark:bg-bgModalDark bg-bgModalLight" onClose={onClose}>
+		<ModalLayout onClose={onClose}>
 			<div className="dark:bg-bgPrimary bg-white pt-4 rounded w-[440px]">
 				<div className="px-4">
 					<h1 className="dark:text-white text-textLightTheme text-xl font-semibold">{`Kick ${username} from Clan 11`}</h1>

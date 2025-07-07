@@ -230,6 +230,7 @@ button.bg-button-add-friend {
 
 .text-theme-primary-active {
 	color: var(--text-secondary);
+	font-variant: initial;
 }
 
 .text-theme-secondary {
@@ -316,7 +317,13 @@ input.bg-theme-input-primary::placeholder {
 .bg-outside-footer {
 	background: var(--bg-outside-footer);
 }
+
 .focus-input:focus {
 	border-color: var(--focus-input);
 	outline: none;
+}
+
+/* Modal */
+.bg-modal-overlay {
+	background: var(--bg-modal);
 }
