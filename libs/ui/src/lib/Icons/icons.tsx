@@ -2196,7 +2196,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({ defaultFill, defaultSize = 
 export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`block  ${defaultSize}`}>
-			<g className="transform translate-y-[2px] translate-x-[-1.5px]">
+			<g>
 				<path
 					d="M17.4393 9.4715L17.6833 8.6585H11.7483C11.5857 8.6585 11.4231 8.49589 11.4231 8.33329V7.76419H9.14667L10.2036 3.86175H8.41496L7.35805 7.76419H3.37431L2.8865 9.4715H6.87024L6.05724 12.3983H2.1548L1.66699 14.1056H5.65073L4.51252 18.3333H6.30114L7.43935 14.1056H10.5288L9.39057 18.3333H11.1792L12.3174 14.1056H16.3011L16.7889 12.3983H12.8052L13.6182 9.4715H17.4393ZM10.9353 12.3983H7.84585L8.65886 9.4715H11.7483L10.9353 12.3983Z"
 					fill="currentColor"
@@ -6052,12 +6052,7 @@ export const GuideIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', classN
 	);
 };
 
-
-
-export const RuleIcon: React.FC<IconProps> = ({
-	defaultSize = 'w-5 h-5',
-	className,
-}) => {
+export const RuleIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', className }) => {
 	return (
 		<svg
 			role="img"
@@ -6077,7 +6072,6 @@ export const RuleIcon: React.FC<IconProps> = ({
 		</svg>
 	);
 };
-
 
 export const CheckMarkFilter: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', isWhite = false }) => {
 	return (
