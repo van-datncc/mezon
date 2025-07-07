@@ -1,6 +1,6 @@
 import { size } from '@mezon/mobile-ui';
 import { ClanSticker } from 'mezon-js';
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList } from 'react-native';
 import Sound from 'react-native-sound';
 import { SoundItem } from '../SoundItem';
@@ -18,6 +18,12 @@ export const SoundList = ({ soundList, ListHeaderComponent }: SoundListProps) =>
 	const row = useRef<{ [key: string]: { close: () => void } }>({}).current;
 	const [currentSoundId, setCurrentSoundId] = useState<string | null>(null);
 	const currentSoundRef = useRef<Sound | null>(null);
+
+	useEffect(() => {
+		return () => {
+			stopCurrentSound();
+		};
+	}, []);
 
 	const stopCurrentSound = useCallback(() => {
 		if (currentSoundRef.current) {
