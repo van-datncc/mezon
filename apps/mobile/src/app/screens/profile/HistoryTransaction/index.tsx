@@ -1,5 +1,4 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
-import { baseColor, Colors, size, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	fetchListWalletLedger,
 	selectAllAccount,
@@ -11,20 +10,17 @@ import {
 import { formatNumber } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
 import { ApiWalletLedger } from 'mezon-js/api.gen';
-import moment from 'moment';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { Pressable } from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
-import MezonIconCDN from '../../../componentUI/MezonIconCDN';
-import { IconCDN } from '../../../constants/icon_cdn';
+import { API_FILTER_PARAMS, FilterType, LIMIT_WALLET, TRANSACTION_FILTERS } from '../../../constants/transaction';
+import { TransactionItem } from './TransactionItem';
 import { style } from './styles';
-import { TransactionModal } from './TransactionModal';
 
-const limitWallet = 8;
 export const HistoryTransactionScreen = () => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation(['token']);
@@ -34,11 +30,14 @@ export const HistoryTransactionScreen = () => {
 	const userProfile = useSelector(selectAllAccount);
 	const count = useAppSelector((state) => selectCountWalletLedger(state));
 	const [page, setPage] = useState(1);
-	const [activeTab, setActiveTab] = useState('all');
+	const [activeTab, setActiveTab] = useState<FilterType>(TRANSACTION_FILTERS.ALL);
 	const [isLoadMore, setIsLoadMore] = useState(false);
 
-	const totalPages = count === undefined ? 0 : Math.ceil(count / limitWallet);
-	const isNextPage = page < totalPages;
+	console.log('count', count);
+
+	const totalPages = useMemo(() => (count === undefined ? 0 : Math.ceil(count / LIMIT_WALLET)), [count]);
+	const isNextPage = useMemo(() => page < totalPages, [page, totalPages]);
+	const [currentTransactionItem, setCurrentTransactionItem] = useState<string>('');
 
 	const refList = useRef<any>(null);
 	const tokenInWallet = useMemo(() => {
@@ -46,58 +45,29 @@ export const HistoryTransactionScreen = () => {
 	}, [userProfile?.wallet]);
 
 	useEffect(() => {
-		dispatch(fetchListWalletLedger({ page }));
-	}, [dispatch, page]);
+		dispatch(fetchListWalletLedger({ page, filter: API_FILTER_PARAMS[activeTab] }));
+	}, [page, activeTab]);
 
-	const loadMore = () => {
+	const loadMore = useCallback(() => {
 		if (isNextPage && !isLoadMore) {
-			setIsLoadMore(true);
-			dispatch(fetchListWalletLedger({ page: page + 1 })).finally(() => {
-				setPage(page + 1);
+			dispatch(fetchListWalletLedger({ page: page + 1, filter: API_FILTER_PARAMS[activeTab] })).finally(() => {
+				setPage((prev) => prev + 1);
 				setIsLoadMore(false);
 			});
 		}
-	};
+	}, [page, isNextPage, isLoadMore]);
 
-	useEffect(() => {
-		dispatch(fetchListWalletLedger({ page: page }));
+	const onPressItem = useCallback(async (id: string) => {
+		setCurrentTransactionItem(id);
 	}, []);
 
-	const toggleDetails = (transactionId: string, isMinus: boolean) => {
-		const data = {
-			children: <TransactionModal transactionId={transactionId} isMinus={isMinus} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
-	};
-
-	const valueText = (value: number) => {
-		if (value > 0) return `+${formatNumber(value, 'vi-VN', 'VND')}`;
-		else return `${formatNumber(value, 'vi-VN', 'VND')}`;
-	};
-
-	const renderItem = ({ item }: { item: ApiWalletLedger }) => {
-		return (
-			<Pressable key={`token_receiver_${item.id}`} style={styles.userItem} onPress={() => toggleDetails(item.transaction_id, item?.value < 0)}>
-				<View style={{ transform: [{ rotateY: item?.value < 0 ? '180deg' : '0deg' }] }}>
-					<MezonIconCDN
-						icon={IconCDN.moneyTransferIcon}
-						color={item?.value > 0 ? baseColor.bgSuccess : baseColor.buzzRed}
-						width={size.s_24}
-						height={size.s_24}
-					/>
-				</View>
-				<View style={styles.userRowItem}>
-					<View style={styles.userRowHeader}>
-						<Text style={styles.title}>{moment(item?.create_time).format('DD/MM/YYYY')}</Text>
-						<Text style={[styles.title, { color: item?.value > 0 ? baseColor.bgSuccess : baseColor.buzzRed, fontWeight: 'bold' }]}>
-							{valueText(item.value)}
-						</Text>
-					</View>
-					<Text style={styles.code}>{t('historyTransaction.transactionCode', { code: item?.transaction_id })}131231231231231232</Text>
-				</View>
-			</Pressable>
-		);
-	};
+	const renderItem = useCallback(
+		({ item }: { item: ApiWalletLedger }) => {
+			const isExpand = currentTransactionItem === item?.transaction_id;
+			return <TransactionItem item={item} key={`token_receiver_${item.id}`} onPress={onPressItem} isExpand={isExpand} />;
+		},
+		[currentTransactionItem]
+	);
 
 	const ViewLoadMore = () => {
 		return (
@@ -107,10 +77,12 @@ export const HistoryTransactionScreen = () => {
 		);
 	};
 
-	const onChangeActiveTab = (tab: string) => {
+	const onChangeActiveTab = useCallback((tab: FilterType) => {
+		setCurrentTransactionItem('');
 		setActiveTab(tab);
+		setPage(1);
 		refList?.current?.scrollToOffset({ offset: 0, animated: false });
-	};
+	}, []);
 
 	return (
 		<View style={styles.container}>
@@ -133,38 +105,44 @@ export const HistoryTransactionScreen = () => {
 			</LinearGradient>
 			<Text style={styles.heading}>{t('historyTransaction.title')}</Text>
 			<View style={styles.tabFilter}>
-				<Pressable style={[styles.itemFilter, activeTab === 'all' && styles.itemFilterActive]} onPress={() => onChangeActiveTab('all')}>
-					<Text style={[styles.textFilter, activeTab === 'all' && { color: 'white' }]}>{t('all')}</Text>
+				<Pressable
+					style={[styles.itemFilter, activeTab === TRANSACTION_FILTERS.ALL && styles.itemFilterActive]}
+					onPress={() => onChangeActiveTab('all')}
+				>
+					<Text style={[styles.textFilter, activeTab === TRANSACTION_FILTERS.ALL && { color: 'white' }]}>{t('all')}</Text>
 				</Pressable>
 				<Pressable
-					style={[styles.itemFilter, activeTab === 'incoming' && styles.itemFilterActive]}
-					onPress={() => onChangeActiveTab('incoming')}
+					style={[styles.itemFilter, activeTab === TRANSACTION_FILTERS.RECEIVED && styles.itemFilterActive]}
+					onPress={() => onChangeActiveTab(TRANSACTION_FILTERS.RECEIVED)}
 				>
-					<Text style={[styles.textFilter, activeTab === 'incoming' && { color: 'white' }]}>{t('inComing')}</Text>
+					<Text style={[styles.textFilter, activeTab === TRANSACTION_FILTERS.RECEIVED && { color: 'white' }]}>{t('inComing')}</Text>
 				</Pressable>
 				<Pressable
-					style={[styles.itemFilter, activeTab === 'outgoing' && styles.itemFilterActive]}
-					onPress={() => onChangeActiveTab('outgoing')}
+					style={[styles.itemFilter, activeTab === TRANSACTION_FILTERS.SENT && styles.itemFilterActive]}
+					onPress={() => onChangeActiveTab(TRANSACTION_FILTERS.SENT)}
 				>
-					<Text style={[styles.textFilter, activeTab === 'outgoing' && { color: 'white' }]}>{t('outGoing')}</Text>
+					<Text style={[styles.textFilter, activeTab === TRANSACTION_FILTERS.SENT && { color: 'white' }]}>{t('outGoing')}</Text>
 				</Pressable>
 			</View>
-			<FlashList
-				ref={refList}
-				data={walletLedger?.filter((item) => {
-					if (activeTab === 'all') return true;
-					if (activeTab === 'incoming') return item.value > 0;
-					if (activeTab === 'outgoing') return item.value < 0;
-					return false;
-				})}
-				renderItem={renderItem}
-				removeClippedSubviews={true}
-				showsVerticalScrollIndicator={false}
-				estimatedItemSize={size.s_50}
-				onEndReached={loadMore}
-				onEndReachedThreshold={0.5}
-				ListFooterComponent={isLoadMore ? <ViewLoadMore /> : null}
-			/>
+			<View style={{ flexGrow: 1 }}>
+				<FlashList
+					ref={refList}
+					key={`walletLedger_${userProfile?.user?.id}`}
+					data={walletLedger?.filter((item) => {
+						if (activeTab === TRANSACTION_FILTERS.ALL) return true;
+						if (activeTab === TRANSACTION_FILTERS.RECEIVED) return item.value > 0;
+						if (activeTab === TRANSACTION_FILTERS.SENT) return item.value < 0;
+						return false;
+					})}
+					renderItem={renderItem}
+					removeClippedSubviews={true}
+					showsVerticalScrollIndicator={false}
+					estimatedItemSize={size.s_50}
+					onEndReached={loadMore}
+					onEndReachedThreshold={0.5}
+					ListFooterComponent={isLoadMore ? <ViewLoadMore /> : null}
+				/>
+			</View>
 		</View>
 	);
 };
