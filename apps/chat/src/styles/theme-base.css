@@ -89,10 +89,7 @@ button.bg-button-add-friend {
 	background: var(--bg-item-hover);
 }
 
-/* tin nhắn system không có hover effect */
-.message-list-item.no-hover:hover {
-  background: none !important;
-}
+
 
 .bg-item-theme {
 	background: var(--bg-active-member-channel);
