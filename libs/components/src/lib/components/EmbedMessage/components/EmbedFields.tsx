@@ -53,7 +53,7 @@ export function EmbedFields({ fields, message_id, senderId, channelId, observeIn
 						>
 							<div className="flex flex-col gap-1 break-all">
 								<div className="font-semibold text-sm">{field.name}</div>
-								<div className="text-textSecondary800 dark:text-textSecondary text-sm">{field.value}</div>
+								<div className=" text-sm">{field.value}</div>
 							</div>
 							{field.inputs && (
 								<div className="flex flex-col gap-1 w-max-[500px]">

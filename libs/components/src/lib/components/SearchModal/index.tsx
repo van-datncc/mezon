@@ -323,7 +323,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 
 	return (
 		<ModalLayout onClose={onClose} className="focus-visible:[&>*]:outline-none">
-			<div className="bg-theme-setting-primary !w-[640px] px-6 py-4 rounded-[6px]  ">
+			<div className="bg-theme-setting-primary !w-[640px] px-6 py-4 rounded-[6px] shadow-lg  ">
 				<div className="flex flex-col">
 					<InputField
 						type="text"

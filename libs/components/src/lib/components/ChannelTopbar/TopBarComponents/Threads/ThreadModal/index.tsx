@@ -121,7 +121,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="absolute top-8 right-0  rounded-md dark:shadow-shadowBorder shadow-shadowInbox z-30 origin-top-right bg-theme-setting-primary"
+			className="absolute top-8 right-0  rounded-md shadow-shadowInbox z-30 origin-top-right bg-theme-setting-primary text-theme-message"
 		>
 			<div className="flex flex-col rounded-md min-h-[400px] md:w-[480px] lg:w-[540px] shadow-sm max-h-[calc(100vh_-_180px)] overflow-hidden">
 				<div className="bg-theme-setting-nav flex flex-row items-center justify-between border-b-theme-primary p-[16px] h-12">

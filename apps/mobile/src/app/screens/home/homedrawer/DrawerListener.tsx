@@ -1,20 +1,14 @@
 import { useSeenMessagePool } from '@mezon/core';
 import {
 	channelMembersActions,
-	channelMetaActions,
 	channelsActions,
-	clansActions,
-	listChannelRenderAction,
-	listChannelsByUserActions,
-	selectAnyUnreadChannels,
+	ChannelsEntity,
 	selectChannelById,
 	selectCurrentChannel,
-	selectFetchChannelStatus,
 	selectLastMessageByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { TIME_OFFSET } from '@mezon/utils';
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef } from 'react';
@@ -25,41 +19,36 @@ function useChannelSeen(channelId: string) {
 	const dispatch = useAppDispatch();
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId));
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
-	const statusFetchChannel = useSelector(selectFetchChannelStatus);
-	const resetBadgeCount = !useSelector(selectAnyUnreadChannels);
 
 	const { markAsReadSeen } = useSeenMessagePool();
-	useEffect(() => {
-		const mode =
-			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_THREAD;
-		if (lastMessage) {
-			const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
-			markAsReadSeen(lastMessage, mode, numberNotification);
+	const handleReadMessage = useCallback(() => {
+		if (!lastMessage) {
+			return;
 		}
-	}, [lastMessage, channelId, markAsReadSeen, currentChannel?.type, currentChannel?.count_mess_unread]);
+		const mode =
+			currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING
+				? ChannelStreamMode.STREAM_MODE_CHANNEL
+				: ChannelStreamMode.STREAM_MODE_THREAD;
+		markAsReadSeen(lastMessage, mode, currentChannel?.count_mess_unread || 0);
+	}, [lastMessage, currentChannel, markAsReadSeen]);
 
 	useEffect(() => {
-		if (!statusFetchChannel) return;
-		const numberNotification = currentChannel?.count_mess_unread ? currentChannel?.count_mess_unread : 0;
-		if (numberNotification && numberNotification > 0) {
+		if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
+			const channelWithActive = { ...currentChannel, active: 1 };
 			dispatch(
-				listChannelRenderAction.removeBadgeFromChannel({
-					clanId: currentChannel.clan_id as string,
-					channelId: currentChannel.channel_id as string
+				channelsActions.upsertOne({
+					clanId: currentChannel?.clan_id || '',
+					channel: channelWithActive as ChannelsEntity
 				})
 			);
-			dispatch(
-				channelsActions.updateChannelBadgeCount({ clanId: currentChannel?.clan_id ?? '', channelId: channelId, count: 0, isReset: true })
-			);
-			dispatch(listChannelsByUserActions.resetBadgeCount({ channelId: channelId }));
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: numberNotification * -1 }));
 		}
-		const timestamp = Date.now() / 1000;
-		dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp: timestamp + TIME_OFFSET }));
-		if (!numberNotification && resetBadgeCount) {
-			dispatch(clansActions.updateClanBadgeCount({ clanId: currentChannel?.clan_id ?? '', count: 0, isReset: true }));
+	}, [currentChannel?.id]);
+
+	useEffect(() => {
+		if (lastMessage) {
+			handleReadMessage();
 		}
-	}, [currentChannel?.id, statusFetchChannel, channelId, currentChannel, dispatch, resetBadgeCount]);
+	}, [lastMessage, handleReadMessage]);
 }
 
 function DrawerListener() {
