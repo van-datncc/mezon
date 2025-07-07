@@ -488,15 +488,20 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 							<View style={styles.action}>
 								<View style={styles.actionMore}>
 									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleShare}>
-										<MezonIconCDN icon={IconCDN.shareIcon} width={size.s_24} height={size.s_24} />
+										<MezonIconCDN icon={IconCDN.shareIcon} width={size.s_24} height={size.s_24} color={themeValue.textStrong} />
 										<Text style={styles.textActionMore}>{t('share')}</Text>
 									</TouchableOpacity>
 									<TouchableOpacity activeOpacity={1} style={styles.buttonActionMore} onPress={handleSaveImage}>
-										<MezonIconCDN icon={IconCDN.downloadIcon} width={size.s_24} height={size.s_24} />
+										<MezonIconCDN
+											icon={IconCDN.downloadIcon}
+											width={size.s_24}
+											height={size.s_24}
+											color={themeValue.textStrong}
+										/>
 										<Text style={styles.textActionMore}>{t('saveImage')}</Text>
 									</TouchableOpacity>
 									<TouchableOpacity style={styles.buttonActionMore} onPress={handleSendNewToken}>
-										<Icons.ArrowLeftRightIcon />
+										<Icons.ArrowLeftRightIcon color={themeValue.textStrong} />
 										<Text style={styles.textActionMore}>{t('sendNewToken')}</Text>
 									</TouchableOpacity>
 								</View>
