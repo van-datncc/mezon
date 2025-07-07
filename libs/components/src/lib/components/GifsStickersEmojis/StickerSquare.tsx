@@ -251,7 +251,7 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({
 		<div>
 			<button
 				onClick={handleToggleButton}
-				className="w-full flex flex-row justify-start bg-item-theme items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem]  z-10  max-h-full"
+				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 gap-[2px] sticky top-[-0.5rem]  z-10  max-h-full bg-theme-setting-primary"
 			>
 				<p className="uppercase">{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}</p>
 				<span className={`${isShowStickerList ? ' rotate-90' : ''}`}>

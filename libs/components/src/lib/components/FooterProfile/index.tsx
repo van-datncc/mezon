@@ -1,13 +1,11 @@
-import { useAuth, useDirect, useMenu, useSendInviteMessage, useSettingFooter } from '@mezon/core';
+import { useAuth, useDirect, useSendInviteMessage, useSettingFooter } from '@mezon/core';
 import {
 	ChannelsEntity,
 	TOKEN_FAILED_STATUS,
 	TOKEN_SUCCESS_STATUS,
 	authActions,
-	channelMembersActions,
 	giveCoffeeActions,
 	selectAccountCustomStatus,
-	selectCurrentClanId,
 	selectGroupCallJoined,
 	selectInfoSendToken,
 	selectIsElectronDownloading,
@@ -17,7 +15,6 @@ import {
 	selectShowModalCustomStatus,
 	selectShowModalSendToken,
 	selectStatusMenu,
-	selectTheme,
 	selectVoiceJoined,
 	useAppDispatch,
 	userClanProfileActions
@@ -49,16 +46,12 @@ export type FooterProfileProps = {
 
 function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProps) {
 	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId);
 	const showModalCustomStatus = useSelector(selectShowModalCustomStatus);
 	const showModalSendToken = useSelector(selectShowModalSendToken);
 	const infoSendToken = useSelector(selectInfoSendToken);
-	const appearanceTheme = useSelector(selectTheme);
 	const userStatusProfile = useSelector(selectAccountCustomStatus);
 	const statusMenu = useSelector(selectStatusMenu);
 	const myProfile = useAuth();
-
-	const { setStatusMenu } = useMenu();
 
 	const userCustomStatus: { status: string; user_status: EUserStatus } = useMemo(() => {
 		const metadata = myProfile.userProfile?.user?.metadata;
@@ -76,15 +69,12 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 			return safeJSONParse(unescapedJSON || '{}')?.status;
 		}
 	}, [myProfile, myProfile.userProfile?.user?.metadata]);
-	const [customStatus, setCustomStatus] = useState<string>(userCustomStatus.status ?? '');
 	const [token, setToken] = useState<number>(0);
 	const [selectedUserId, setSelectedUserId] = useState<string>('');
 	const [note, setNote] = useState<string>('Transfer funds');
 	const [extraAttribute, setExtraAttribute] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 	const [userSearchError, setUserSearchError] = useState<string | null>(null);
-	const [resetTimerStatus, setResetTimerStatus] = useState<number>(0);
-	const [noClearStatus, setNoClearStatus] = useState<boolean>(false);
 	const [sendTokenInputsState, setSendTokenInputsState] = useState<{
 		isSendTokenInputDisabled: boolean;
 		isUserSelectionDisabled: boolean;
@@ -103,7 +93,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	const handleCloseModalCustomStatus = () => {
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
-		setCustomStatus(userCustomStatus.status ?? '');
 		closeSetCustomStatus();
 	};
 
@@ -111,19 +100,6 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 	const openSetting = () => {
 		setIsUserProfile(true);
 		setIsShowSettingFooterStatus(true);
-	};
-
-	const handleSaveCustomStatus = () => {
-		dispatch(
-			channelMembersActions.updateCustomStatus({
-				clanId: currentClanId ?? '',
-				customStatus: customStatus,
-				minutes: resetTimerStatus,
-				noClear: noClearStatus
-			})
-		);
-		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
-		closeSetCustomStatus();
 	};
 
 	const handleCloseModalSendToken = () => {
@@ -261,22 +237,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 		);
 	}, [userStatusProfile, rootRef.current, avatar, name]);
 
-	const handleCloseMenu = useCallback(() => {
-		setStatusMenu(false);
-	}, [setStatusMenu]);
-
 	const [openSetCustomStatus, closeSetCustomStatus] = useModal(() => {
-		return (
-			<ModalCustomStatus
-				setCustomStatus={setCustomStatus}
-				customStatus={userCustomStatus.status || ''}
-				handleSaveCustomStatus={handleSaveCustomStatus}
-				name={name}
-				onClose={handleCloseModalCustomStatus}
-				setNoClearStatus={setNoClearStatus}
-				setResetTimerStatus={setResetTimerStatus}
-			/>
-		);
+		return <ModalCustomStatus status={userCustomStatus.status || ''} name={name} onClose={handleCloseModalCustomStatus} />;
 	}, [userCustomStatus.status]);
 
 	const [openModalSendToken, closeModalSendToken] = useModal(() => {
@@ -342,8 +304,8 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						</div>
 						<div className="flex flex-col overflow-hidden flex-1">
 							<p className="text-sm font-medium truncate max-w-[150px] max-sbm:max-w-[100px] text-theme-secondary">{name}</p>
-							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[200px] max-sbm:max-w-[150px]">
-								{customStatus}
+							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">
+								{userCustomStatus.status}
 							</p>
 						</div>
 					</div>
