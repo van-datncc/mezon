@@ -159,7 +159,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 	const posInPinOrNotification = isInPinMsg || posInNotification;
 	return (
 		<span
-			className={!posInPinOrNotification ? 'color-mention bg-mention' : 'w-full'}
+			className={!posInPinOrNotification ? 'text-theme-primary-active rounded-md bg-item-theme p-2' : 'w-full'}
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
