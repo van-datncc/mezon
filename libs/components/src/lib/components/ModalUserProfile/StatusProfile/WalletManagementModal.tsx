@@ -414,10 +414,10 @@ const WalletManagementModal: React.FC<WalletManagementModalProps> = ({ isOpen, o
 							<div className="flex items-start gap-3">
 								<Icons.InfoIcon className="w-5 h-5 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" />
 								<div>
-									<p className="font-bold text-orange-800 dark:text-orange-200 mb-2">
+										<p className="font-bold text-theme-primary mb-2">
 										DO NOT share your private key or recovery phrase!
 									</p>
-									<ul className="text-orange-700 dark:text-orange-300 text-sm space-y-1">
+										<ul className="text-theme-primary text-sm space-y-1">
 										<li>• These give full access to your wallet and funds</li>
 										<li>• Mezon will never ask for your private key</li>
 										<li>• Private keys are encrypted and stored locally</li>

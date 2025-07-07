@@ -81,7 +81,7 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 						</div>
 					)}
 					placement="bottom-end"
-					className={`bg-theme-setting-primary  border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+					className={`dark:bg-black bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 				>
 					{loading ? (
 						<div className="text-center text-gray-500">Loading...</div>
