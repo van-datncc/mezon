@@ -340,7 +340,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
 						<div className="flex flex-col overflow-hidden">
-							<p className="text-base font-medium truncate max-w-[150px] max-sbm:max-w-[100px]">{name}</p>
+							<p className="text-sm font-medium truncate max-w-[150px] max-sbm:max-w-[100px] text-theme-secondary">{name}</p>
 							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">
 								{customStatus}
 							</p>

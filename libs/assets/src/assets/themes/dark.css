@@ -1,85 +1,88 @@
 /* Cyber Dark Theme */
 :root {
-	--bg-primary: #26272b;
-	--bg-secondary: #313338;
+  --bg-primary: #26272b;
+  --bg-secondary: #313338;
 
-	/* nền ngoài của phần footer */
-	--bg-outside-footer: #1a1a1a;
+  /* nền ngoài của phần footer */
+  --bg-outside-footer: #1a1a1a;
 
-	/* nền trong của phần footer */
-	--bg-footer: #0f0f0f;
+  /* nền trong của phần footer */
+  --bg-footer: #0f0f0f;
 
-	/* màu chat input */
-	--bg-surface: #383a40;
+  /* màu chat input */
+  --bg-surface: #383a40;
 
-	/* màu ping member */
-	--bg-ping-member: #2d2d30;
-	--bg-tertiary: rgba(70, 70, 70, 0.2);
-	--bg-accent: rgba(75, 75, 75, 0.25);
-	--bg-hover: #2c2c2c;
-	--bg-modal: rgba(0, 0, 0, 0.85);
+  /* màu ping member */
+  --bg-ping-member: #2d2d30;
+  --bg-tertiary: rgba(70, 70, 70, 0.2);
+  --bg-accent: rgba(75, 75, 75, 0.25);
+  --bg-hover: #2c2c2c;
+  --bg-modal: rgba(0, 0, 0, 0.85);
 
-	--theme-input: rgba(77, 77, 77, 0.2);
-	--theme-border-input: rgba(120, 120, 120, 0.4);
+  --theme-input: rgba(77, 77, 77, 0.2);
+  --theme-border-input: rgba(120, 120, 120, 0.4);
 
-	/* màu nền của clan */
-	--theme-base-color: rgba(255, 255, 255, 0.06);
-	--theme-text-color-dark: #e0e0e0;
-	--theme-setting-primary: #313338;
-	/* màu nav seting */
-	--theme-setting-nav: #2b2d31;
-	--private-theme: #2c4957;
+  /* màu nền của clan */
+  --theme-base-color: rgba(255, 255, 255, 0.06);
+  --theme-text-color-dark: #e0e0e0;
+  --theme-setting-primary: #313338;
+  /* màu nav seting */
+  --theme-setting-nav: #2b2d31;
+  --private-theme: #2c4957;
 
-	--text-theme-primary: color-mix(in oklab, hsl(214 8.1% 61.2% / 1) 100%, #000 0.01%);
-	--text-theme-primary-hover: rgb(255 255 255 / 1);
+  --text-theme-primary: oklab(0.694091 0.00173712 -0.0100561);
+  --text-theme-primary-hover: rgb(255 255 255 / 1);
 
-	--bg-active-friend-list: #2b2d31;
-	--bg-active-button: rgba(85, 85, 85, 0.25);
-	--color-text-active-button: #7eb1ff;
-	--bg-button-add-friend: #3366cc;
+  --text-theme-message: oklab(0.906424 -0.000235766 -0.0028885);
 
-	--border-color-primary: #3d3d3d;
-	--bg-theme-direct-message: #2b2d31;
 
-	--text-secondary: rgb(255 255 255 / 1);
-	/* màu click vào channel user */
-	--bg-item-hover: rgba(255, 255, 255, 0.08);
-	/* màu click vào member channel */
-	--bg-active-member-channel: rgba(255, 255, 255, 0.08);
+  --bg-active-friend-list: #2b2d31;
+  --bg-active-button: rgba(85, 85, 85, 0.25);
+  --color-text-active-button: #7eb1ff;
+  --bg-button-add-friend: #3366cc;
 
-	--bg-theme-input-primary: #161616;
+  --border-color-primary: #3d3d3d;
+  --bg-theme-direct-message: #2b2d31;
 
-	--border-theme-primary: #444444;
-	--border-t-theme-primary: #444444;
-	--border-r-t-l-theme-primary: #444444;
-	--border-r-b-l-theme-primary: #444444;
-	--border-primary: rgba(100, 100, 100, 0.4);
-	--border-secondary: #5a8cd9;
-	--border-focus: #6a9fe8;
-	--border-divider: #2b2b2b;
-	--border-hover: #4177c9;
-	--bg-hover-select-status: #2d3035;
-	/* mention */
-	--mention-primary: rgba(67, 97, 238, 0.24);
-	--mention-color: #3298ff;
-	--bg-mention-hover: rgba(67, 98, 238, 0.39);
-	--color-mention-hover: #3298ff;
-	--bg-mention-evryone: #2eb08b63;
-	--color-mention-evryone: #2eb08c;
-	--bg-mention-everyone-hover: #2eb08b8c;
-	--color-mention-everyone-hover: #32b993;
+  --text-secondary: oklab(0.999994 0.0000455678 0.0000200868);
+  /* màu click vào channel user */
+  --bg-item-hover: rgba(255, 255, 255, 0.08);
+  /* màu click vào member channel */
+  --bg-active-member-channel: rgba(255, 255, 255, 0.08);
 
-	--bg-highlight: rgba(77, 120, 204, 0.08);
-	--bg-secondary-button-hover: rgba(77, 77, 77, 0.3);
-	/* màu contexify */
-	--bg-theme-contexify: #252525;
-	--bg-count-page: #252525;
-	--text-count-page: #cccccc;
-	--bg-count-page-hover: #303030;
-	--text-count-page-hover: #e0e0e0;
-	--bg-count-page-active: #3366cc;
-	--text-count-page-active: #ffffff;
-	--bg-item-theme-hover: rgba(255, 255, 255, 0.08);
-	/* button primary */
-	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+  --bg-theme-input-primary: #161616;
+
+  --border-theme-primary: #444444;
+  --border-t-theme-primary: #444444;
+  --border-r-t-l-theme-primary: #444444;
+  --border-r-b-l-theme-primary: #444444;
+  --border-primary: rgba(100, 100, 100, 0.4);
+  --border-secondary: #5a8cd9;
+  --border-focus: #6a9fe8;
+  --border-divider: #2b2b2b;
+  --border-hover: #4177c9;
+  --bg-hover-select-status: #2d3035;
+  /* mention */
+  --mention-primary: rgba(67, 97, 238, 0.24);
+  --mention-color: #3298ff;
+  --bg-mention-hover: rgba(67, 98, 238, 0.39);
+  --color-mention-hover: #3298ff;
+  --bg-mention-evryone: #2eb08b63;
+  --color-mention-evryone: #2eb08c;
+  --bg-mention-everyone-hover: #2eb08b8c;
+  --color-mention-everyone-hover: #32b993;
+
+  --bg-highlight: rgba(77, 120, 204, 0.08);
+  --bg-secondary-button-hover: rgba(77, 77, 77, 0.3);
+  /* màu contexify */
+  --bg-theme-contexify: #252525;
+  --bg-count-page: #252525;
+  --text-count-page: #cccccc;
+  --bg-count-page-hover: #303030;
+  --text-count-page-hover: #e0e0e0;
+  --bg-count-page-active: #3366cc;
+  --text-count-page-active: #ffffff;
+  --bg-item-theme-hover: rgba(255, 255, 255, 0.08);
+  /* button primary */
+  --bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
 }

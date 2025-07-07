@@ -290,7 +290,7 @@ const ChannelTopbarLabel = memo(
 		return (
 			<div className="none-draggable-area flex items-center text-lg gap-1 " onClick={onClick}>
 				<div className="w-6">{renderIcon()}</div>
-				<p className="text-base font-semibold leading-5 truncate">{label}</p>
+				<p className="text-base font-semibold leading-5 truncate text-theme-message">{label}</p>
 			</div>
 		);
 	}
