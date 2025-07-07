@@ -1,4 +1,4 @@
-import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUserClans } from '@mezon/store';
+import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUsersByUser } from '@mezon/store';
 import { ButtonLoading, Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -41,7 +41,7 @@ const ModalSendToken = ({
 	infoSendToken,
 	isButtonDisabled
 }: ModalSendTokenProps) => {
-	const usersClan = useSelector(selectAllUserClans);
+	const usersClan = useSelector(selectAllUsersByUser);
 	const friends = useSelector(selectAllFriends);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState(infoSendToken?.receiver_name || '');
