@@ -29,7 +29,7 @@
 
   --bg-accent        : hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
   --bg-hover         : #dfe1e5;
-  --bg-modal         : rgba(0, 0, 0, 0.5);
+  --bg-modal         : rgba(0, 0, 0, 0.54);
   /* button primary */
   --bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
 

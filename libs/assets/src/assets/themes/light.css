@@ -1,7 +1,7 @@
 /* Cyber Theme CSS Variables */
 :root {
   /* background */
-  --bg-primary: #f5f7fa;
+  --bg-primary  : #f5f7fa;
   --bg-secondary: #ffffff;
 
   /* nền ngoài của phần chat */
@@ -12,76 +12,76 @@
 
   /* màu ping member */
   --bg-ping-member: #fff8e1;
-  --bg-tertiary: rgba(155, 155, 155, 0.12);
-  --bg-surface: #fbfbfb;
+  --bg-tertiary   : rgba(155, 155, 155, 0.12);
+  --bg-surface    : #fbfbfb;
 
   --bg-accent: rgba(155, 155, 155, 0.16);
-  --bg-hover: #ebedf0;
-  --bg-modal: rgba(0, 0, 0, 0.5);
+  --bg-hover : #ebedf0;
+  --bg-modal : rgba(0, 0, 0, 0.54);
 
   /* input */
-  --theme-input: rgba(155, 155, 155, 0.12);
-  --theme-border-input: rgba(155, 155, 155, 0.25);
-  --theme-base-color: linear-gradient(rgba(197, 194, 194, 0.5), rgba(197, 194, 194, 0.5));
-  --theme-setting-primary: #f9f9f9;
-  --theme-setting-nav: #e8eaed;
-  --private-theme: rgb(144, 224, 176);
+  --theme-input             : rgba(155, 155, 155, 0.12);
+  --theme-border-input      : rgba(155, 155, 155, 0.25);
+  --theme-base-color        : linear-gradient(rgba(197, 194, 194, 0.5), rgba(197, 194, 194, 0.5));
+  --theme-setting-primary   : #f9f9f9;
+  --theme-setting-nav       : #e8eaed;
+  --private-theme           : rgb(144, 224, 176);
   /* button primary */
-  --bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
-  --text-theme-primary: oklab(0.51633 0.00309466 -0.0153829);
-  --bg-active-friend-list: #ebedf0;
-  --bg-active-button: rgba(67, 97, 238, 0.12);
+  --bg-button-primary       : hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+  --text-theme-primary      : oklab(0.51633 0.00309466 -0.0153829);
+  --bg-active-friend-list   : #ebedf0;
+  --bg-active-button        : rgba(67, 97, 238, 0.12);
   --color-text-active-button: #4361ee;
-  --bg-button-add-friend: #4361ee;
-  --border-color-primary: #e0e0e0;
-  --bg-theme-direct-message: #f8f9fa;
+  --bg-button-add-friend    : #4361ee;
+  --border-color-primary    : #e0e0e0;
+  --bg-theme-direct-message : #f8f9fa;
 
   --text-theme-message: oklab(0.322425 0.00154591 -0.010555);
 
-  --text-secondary: oklab(0.310123 0.00108959 -0.00894994);
-  --border-theme-primary: rgba(155, 155, 155, 0.2);
-  --border-t-theme-primary: rgba(155, 155, 155, 0.2);
+  --text-secondary            : oklab(0.310123 0.00108959 -0.00894994);
+  --border-theme-primary      : rgba(155, 155, 155, 0.2);
+  --border-t-theme-primary    : rgba(155, 155, 155, 0.2);
   --border-r-t-l-theme-primary: rgba(155, 155, 155, 0.2);
   --border-r-b-l-theme-primary: rgba(155, 155, 155, 0.2);
-  --bg-button-secondary: #f0f2f5;
-  --bg-theme-input-primary: #ffffff;
-  --text-theme-primary-hover: #4361ee;
-  --bg-item-hover: rgba(67, 97, 238, 0.08);
+  --bg-button-secondary       : #f0f2f5;
+  --bg-theme-input-primary    : #ffffff;
+  --text-theme-primary-hover  : #4361ee;
+  --bg-item-hover             : rgba(67, 97, 238, 0.08);
 
   /* màu click vào member channel */
   --bg-active-member-channel: rgba(67, 97, 238, 0.12);
-  --bg-hover-select-status: #e2e6f3;
+  --bg-hover-select-status  : #e2e6f3;
 
   /* border */
-  --border-primary: #dadce0;
+  --border-primary  : #dadce0;
   --border-secondary: #4361ee;
-  --border-focus: #4361ee;
-  --border-divider: #e8eaed;
-  --border-hover: #4361ee;
+  --border-focus    : #4361ee;
+  --border-divider  : #e8eaed;
+  --border-hover    : #4361ee;
 
   /* mention */
-  --mention-primary: rgba(67, 97, 238, 0.16);
-  --mention-color: #4361ee;
-  --bg-mention-hover: rgba(67, 97, 238, 0.24);
-  --color-mention-hover: #3051d8;
-  --bg-mention-evryone: rgba(46, 176, 140, 0.16);
-  --color-mention-evryone: #2eb08c;
-  --bg-mention-everyone-hover: rgba(46, 176, 140, 0.24);
+  --mention-primary             : rgba(67, 97, 238, 0.16);
+  --mention-color               : #4361ee;
+  --bg-mention-hover            : rgba(67, 97, 238, 0.24);
+  --color-mention-hover         : #3051d8;
+  --bg-mention-evryone          : rgba(46, 176, 140, 0.16);
+  --color-mention-evryone       : #2eb08c;
+  --bg-mention-everyone-hover   : rgba(46, 176, 140, 0.24);
   --color-mention-everyone-hover: #269d7c;
 
   /* highlight */
-  --bg-highlight: rgba(255, 213, 79, 0.16);
+  --bg-highlight             : rgba(255, 213, 79, 0.16);
   --bg-secondary-button-hover: #e8eaed;
 
   /* màu contexify */
   --bg-theme-contexify: #ffffff;
 
   /* màu count page */
-  --bg-count-page: #edf2ff;
-  --text-count-page: #3051d8;
-  --bg-count-page-hover: #dce6ff;
-  --text-count-page-hover: #2344c0;
-  --bg-count-page-active: #4361ee;
+  --bg-count-page         : #edf2ff;
+  --text-count-page       : #3051d8;
+  --bg-count-page-hover   : #dce6ff;
+  --text-count-page-hover : #2344c0;
+  --bg-count-page-active  : #4361ee;
   --text-count-page-active: #ffffff;
-  --bg-item-theme-hover: rgba(67, 97, 238, 0.08);
+  --bg-item-theme-hover   : rgba(67, 97, 238, 0.08);
 }
