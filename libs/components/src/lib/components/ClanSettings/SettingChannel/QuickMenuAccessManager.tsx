@@ -114,7 +114,7 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 		<div className="quick-menu-access-manager">
 			<div className="flex items-center justify-between mb-6">
 				<div>
-					<h3 className="text-xl font-semibold text-theme-primary mb-1">Quick Menu Commands</h3>
+					<h3 className="text-xl font-semibold text-theme-primary-active mb-1">Quick Menu Commands</h3>
 					<p className="text-sm text-theme-primary">Create custom slash commands for this channel</p>
 				</div>
 				<button

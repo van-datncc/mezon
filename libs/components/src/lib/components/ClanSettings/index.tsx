@@ -112,7 +112,9 @@ const ClanSetting = (props: ModalSettingProps) => {
 						<div className="w-[740px] pl-7 sbm:pl-10 pr-7">
 							<div className="relative max-h-full sbm:min-h-heightRolesEdit min-h-heightRolesEditMobile text-theme-primary">
 								{!(currentSetting?.id === ItemSetting.INTEGRATIONS) ? (
-									<h2 className="text-xl font-semibold mb-5 sbm:mt-[60px] mt-[10px]">{currentSetting?.name}</h2>
+									<h2 className="text-xl font-semibold mb-5 sbm:mt-[60px] mt-[10px] text-theme-primary-active">
+										{currentSetting?.name}
+									</h2>
 								) : (
 									''
 								)}

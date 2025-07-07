@@ -55,7 +55,9 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	return (
 		<div className="flex flex-row flex-1 justify-end">
 			<div className="w-[220px] py-[60px] pl-5 pr-[6px]">
-				<p className=" pl-[10px] pb-[6px] font-bold text-sm tracking-wider uppercase truncate">{currentClan?.clan_name}</p>
+				<p className=" pl-[10px] pb-[6px] font-bold text-sm tracking-wider uppercase truncate text-theme-primary-active">
+					{currentClan?.clan_name}
+				</p>
 				{sideBarListItemWithPermissions.map((sidebarItem) => (
 					<div key={sidebarItem.title} className={`${sidebarItem.listItem.length > 0 ? 'mt-[5px] border-b-theme-primary' : ''}`}>
 						{sidebarItem.title && sidebarItem.listItem.length > 0 && (
