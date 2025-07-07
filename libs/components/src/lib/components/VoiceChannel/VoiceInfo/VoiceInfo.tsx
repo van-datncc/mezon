@@ -144,7 +144,7 @@ const VoiceInfo = React.memo(() => {
 	}, []);
 	return (
 		<div
-			className={`flex flex-col gap-2 border-b-2 dark:border-borderDefault border-gray-300 px-4 py-2 hover:bg-gray-550/[0.16] shadow-sm transition
+			className={`flex flex-col gap-2 rounded-lg border-b-2 border-theme-primary px-4 py-2 hover:bg-gray-550/[0.16] shadow-sm transition
 			bg-theme-chat w-full group`}
 		>
 			<div className="flex justify-between items-center">
