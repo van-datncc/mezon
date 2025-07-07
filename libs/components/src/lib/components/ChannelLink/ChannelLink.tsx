@@ -185,7 +185,7 @@ const ChannelLinkComponent = ({
 		channel.type !== ChannelType.CHANNEL_TYPE_STREAMING &&
 		channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 	const activeChannelChannelText = isActive && notVoiceOrAppOrStreamChannel;
-	const showWhiteDot = isUnReadChannel && !isActive;
+	const showWhiteDot = isUnReadChannel && !isActive && notVoiceOrAppOrStreamChannel;
 	const hightLightTextChannel = activeChannelChannelText || isUnReadChannel;
 	const highLightVoiceChannel = isActive && !notVoiceOrAppOrStreamChannel;
 
