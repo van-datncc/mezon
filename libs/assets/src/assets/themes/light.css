@@ -24,7 +24,7 @@
   --theme-border-input: rgba(155, 155, 155, 0.25);
   --theme-base-color: linear-gradient(rgba(197, 194, 194, 0.5), rgba(197, 194, 194, 0.5));
   --theme-setting-primary: #f9f9f9;
-  --theme-setting-nav: #e8eaed;
+  --theme-setting-nav: #F0F0F0;
   --private-theme: rgb(144, 224, 176);
   /* button primary */
   --bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
@@ -49,7 +49,7 @@
   --bg-item-hover: rgba(67, 97, 238, 0.08);
 
   /* màu click vào member channel */
-  --bg-active-member-channel: rgba(67, 97, 238, 0.12);
+  --bg-active-member-channel: linear-gradient(rgba(78, 78, 78, 0.103), rgba(165, 165, 165, 0.151));
   --bg-hover-select-status: #e2e6f3;
 
   /* border */
