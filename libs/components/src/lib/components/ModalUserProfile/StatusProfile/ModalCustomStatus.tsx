@@ -55,10 +55,11 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 			})
 		);
 		dispatch(userClanProfileActions.setShowModalCustomStatus(false));
+		onClose();
 	};
 
 	return (
-		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
+		<ModalLayout onClose={onClose}>
 			<div className="bg-theme-surface pt-4 rounded w-[440px]">
 				<div>
 					<h1 className="text-theme-primary text-xl font-semibold text-center">Set a custom status</h1>
@@ -128,15 +129,11 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						</Dropdown>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
-						<button
-							className="py-2 h-10 px-4 rounded bg-#58f76d hover:bg-#58f76d/80 focus:!ring-transparent text-theme-primary"
-							type="button"
-							onClick={onClose}
-						>
+						<button className="py-2 h-10 px-4 rounded   text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem dark:bg-bgSelectItem hover:!bg-bgSelectItemHover focus:!ring-transparent text-white"
+							className="py-2 h-10 px-4 rounded bg-bgSelectItem  hover:!bg-bgSelectItemHover  text-white"
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>

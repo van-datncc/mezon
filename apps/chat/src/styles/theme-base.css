@@ -112,7 +112,7 @@ button.bg-button-add-friend {
 .bg-add-clan-hover:hover,
 .bg-add-clan-hover:active p {
   background: var(--bg-button-add-friend);
-  color: #ffffff;
+  color     : #ffffff;
 }
 
 .bg-theme-hover {
@@ -129,7 +129,7 @@ button.bg-button-add-friend {
 
 /* button */
 .btn-theme-primary {
-  color: var(--text-theme-primary);
+  color     : var(--text-theme-primary);
   transition: all 0.2s ease-in-out;
 }
 
@@ -221,6 +221,7 @@ button.bg-button-add-friend {
 
 .text-theme-primary-active {
   color: var(--text-secondary);
+  font-variant: initial;
 }
 
 .text-theme-secondary {
@@ -242,7 +243,7 @@ button.bg-button-add-friend {
 /* hover mention */
 .hover-mention:hover {
   background-color: var(--bg-mention-hover);
-  color: var(--color-mention-hover);
+  color           : var(--color-mention-hover);
 }
 
 /* placeholder */
@@ -263,14 +264,14 @@ input.bg-theme-input-primary::placeholder {
 }
 
 .custom-contexify-menu {
-  --contexify-menu-bgColor: var(--bg-theme-contexify);
-  --contexify-item-color: var(--text-theme-primary);
-  --contexify-activeItem-color: red;
-  --contexify-activeItem-bgColor: var(--bg-item-hover);
-  --contexify-rightSlot-color: var(--text-secondary);
+  --contexify-menu-bgColor         : var(--bg-theme-contexify);
+  --contexify-item-color           : var(--text-theme-primary);
+  --contexify-activeItem-color     : red;
+  --contexify-activeItem-bgColor   : var(--bg-item-hover);
+  --contexify-rightSlot-color      : var(--text-secondary);
   --contexify-activeRightSlot-color: var(--text-secondary);
-  --contexify-arrow-color: var(--text-theme-primary);
-  --contexify-activeArrow-color: var(--text-secondary);
+  --contexify-arrow-color          : var(--text-theme-primary);
+  --contexify-activeArrow-color    : var(--text-secondary);
 }
 
 .border-r-t-l-theme-primary {
@@ -283,17 +284,17 @@ input.bg-theme-input-primary::placeholder {
 
 .bg-count-page {
   background-color: var(--bg-count-page);
-  color: var(--text-count-page);
+  color           : var(--text-count-page);
 }
 
 .bg-count-page-hover:hover {
   background-color: var(--bg-count-page-hover);
-  color: var(--text-count-page-hover);
+  color           : var(--text-count-page-hover);
 }
 
 .bg-count-page-active {
   background-color: var(--bg-count-page-active);
-  color: var(--text-count-page-active);
+  color           : var(--text-count-page-active);
 }
 
 .bg-footer-profile {
@@ -307,8 +308,14 @@ input.bg-theme-input-primary::placeholder {
 .bg-outside-footer {
   background: var(--bg-outside-footer);
 }
+
 .focus-input:focus {
-	border-color: var(--focus-input);
-	outline: none;
+  border-color: var(--focus-input);
+  outline     : none;
 }
 
+
+/* Modal */
+.bg-modal-overlay {
+  background: var(--bg-modal);
+}

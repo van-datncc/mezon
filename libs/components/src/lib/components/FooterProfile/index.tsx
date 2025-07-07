@@ -276,7 +276,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 
 	return (
 		<div
-			className={`fixed md:bottom-3 bottom-0 md:left-[12px] left-[72px] border-theme-primary md:rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthChannelList md:w-widthProfile z-10 ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthProfile' : 'hidden'} sbm:block `}
+			className={`fixed md:bottom-3 bottom-0 md:left-[12px] left-[72px] border-theme-primary md:rounded-xl shadow-lg bg-theme-surface min-h-14 w-widthChannelList md:w-widthProfile z-10 overflow-hidden ${statusMenu ? '!w-[calc(100vw_-_72px)] sbm:!w-widthProfile' : 'hidden'} sbm:block `}
 			id="clan-footer"
 		>
 			{isInCall && <StreamInfo type={ESummaryInfo.CALL} />}
@@ -302,7 +302,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 						<div className="absolute bottom-1 left-6">
 							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
-						<div className="flex flex-col overflow-hidden">
+						<div className="flex flex-col overflow-hidden flex-1">
 							<p className="text-sm font-medium truncate max-w-[150px] max-sbm:max-w-[100px] text-theme-secondary">{name}</p>
 							<p className="text-[11px] text-left line-clamp-1 leading-[14px] truncate max-w-[150px] max-sbm:max-w-[100px]">
 								{userCustomStatus.status}

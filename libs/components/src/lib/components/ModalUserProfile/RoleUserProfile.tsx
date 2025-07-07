@@ -113,7 +113,7 @@ const RoleUserProfile = ({ userID }: RoleUserProfileProps) => {
 					<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-theme-input-primary hoverIconBlackImportant ml-1">
 						<Tooltip
 							overlay={
-								<div className={'flex flex-col items-start gap-1 ' + `${isLightMode ? 'tooltipLightMode' : 'tooltip'}`}>
+								<div className={'flex flex-col items-start gap-1 bg-theme-surface '}>
 									{userRolesClan.slice(6, userRolesClan.length).map((userRole, index) => (
 										<RoleClanItem
 											key={`${userRole.id}_role`}
@@ -215,7 +215,7 @@ const RoleClanItem = ({
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
 	return (
-		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-private-theme text-theme-primary hoverIconBlackImportant">
+		<span className="inline-flex gap-x-1 items-center text-xs rounded p-1 bg-item-theme  text-theme-primary hoverIconBlackImportant">
 			{hasPermissionEditRole ? (
 				<>
 					<button
