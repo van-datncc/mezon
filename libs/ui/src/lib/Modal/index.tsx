@@ -89,7 +89,7 @@ const Modal = (props: ModalProps) => {
 						</div>
 					</div>
 				</div>
-				<div className="opacity-25 fixed inset-0 z-40 dark:bg-black bg-bgLightModeSecond"></div>
+				<div className="opacity-25 fixed inset-0 z-40 "></div>
 			</>
 		)
 	);
