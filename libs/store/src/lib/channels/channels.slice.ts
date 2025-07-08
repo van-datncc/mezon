@@ -981,12 +981,12 @@ export const channelsSlice = createSlice({
 				state.byClans[clanId] = getInitialClanState();
 			}
 			//For the case: There is no changes in channel label
-			if (!update.changes.channel_label) {
+			if (!update?.changes?.channel_label) {
 				const newUpdateValue: Update<ChannelsEntity, string> = {
 					id: update.id,
 					changes: {
 						...update.changes,
-						channel_label: state.byClans[clanId].entities?.entities?.[update.id].channel_label
+						channel_label: state.byClans[clanId].entities?.entities?.[update.id]?.channel_label
 					}
 				};
 				channelsAdapter.updateOne(state.byClans[clanId].entities, newUpdateValue);
