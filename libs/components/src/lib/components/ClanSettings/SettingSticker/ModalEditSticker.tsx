@@ -233,8 +233,20 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	return (
 		<>
-			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col  '}>
-				<div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>
+			<div
+				ref={modalRef}
+				tabIndex={-1}
+				className={'relative w-full flex flex-col max-w-[684px] flex-1 bg-theme-setting-primary rounded-lg overflow-hidden '}
+			>
+				<div className="flex-1 flex items-center justify-end border-b-theme-primary rounded-t p-4">
+					<Button
+						className="rounded-full aspect-square w-6 h-6 text-5xl leading-3 !p-0 opacity-50 text-theme-primary-hover"
+						onClick={handleCloseModal}
+					>
+						×
+					</Button>
+				</div>
+				<div className={`w-full flex-1 flex flex-col  overflow-y-auto gap-4 relative px-5 py-4 bg-transparent hide-scrollbar`}>
 					<div className={`flex flex-col gap-2 items-center select-none `}>
 						<p className="text-2xl font-semibold ">Upload a file</p>
 						<p className="text-base">File should be APNG, PNG, or GIF (512KB max)</p>
@@ -300,18 +312,18 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							</div>
 						</div>
 					</div>
-				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
-					<div className="flex items-center flex-1 h-full gap-2">
-						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
-						<label htmlFor="sale_item" className="">
-							This is for sale
-						</label>
+					<div className={`w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
+						<div className="flex items-center flex-1 h-full gap-2">
+							<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
+							<label htmlFor="sale_item" className="">
+								This is for sale
+							</label>
+						</div>
+						<Button className="px-2 py-1 border-none hover:underline hover:bg-transparent bg-transparent" onClick={handleCloseModal}>
+							Never Mind
+						</Button>
+						<ButtonLoading className="px-2 py-1 h-9 w-32" label="Save Changes" disabled={validateSaveChange} onClick={onSaveChange} />
 					</div>
-					<Button className="px-2 py-1 border-none hover:underline hover:bg-transparent bg-transparent" onClick={handleCloseModal}>
-						Never Mind
-					</Button>
-					<ButtonLoading className="px-2 py-1 h-9 w-32" label="Save Changes" disabled={validateSaveChange} onClick={onSaveChange} />
 				</div>
 			</div>
 

@@ -1,8 +1,9 @@
 import { selectCurrentClanId, selectStickersByClanId, settingClanStickerActions, useAppDispatch } from '@mezon/store';
-import { Button, Icons, Modal } from '@mezon/ui';
+import { Button, Icons } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
 import { RefObject, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ModalLayout } from '../../../components';
 import ModalSticker, { EGraphicType } from './ModalEditSticker';
 import SettingStickerItem from './SettingStickerItem';
 
@@ -62,14 +63,11 @@ const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> })
 					</div>
 				</div>
 			</div>
-			<Modal
-				showModal={showModalSticker}
-				onClose={handleCloseModal}
-				classNameBox={'max-w-[600px]'}
-				children={
+			{showModalSticker && (
+				<ModalLayout onClose={handleCloseModal}>
 					<ModalSticker key={editSticker?.id} graphic={editSticker} handleCloseModal={handleCloseModal} type={EGraphicType.STICKER} />
-				}
-			/>
+				</ModalLayout>
+			)}
 		</>
 	);
 };
