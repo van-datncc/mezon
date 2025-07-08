@@ -167,7 +167,7 @@ const ModalSendToken = ({
 	const amountRef = useRef<HTMLInputElement | null>(null);
 
 	return (
-		<ModalLayout className="bg-bgModalDark" onClose={onClose}>
+		<ModalLayout onClose={onClose}>
 			<div className="bg-theme-chat rounded-xl overflow-hidden w-[480px]">
 				<div className="flex items-center justify-between p-6 border-b dark:border-gray-700 border-gray-200">
 					<div className="flex items-center gap-3">
