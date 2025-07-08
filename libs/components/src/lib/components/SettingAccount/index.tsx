@@ -65,7 +65,7 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 		<div
 			className={`"overflow-y-auto flex flex-col  flex-1 shrink  pt-[94px] pb-7 pr-[10px] sbm:pl-[40px] pl-[10px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar text-sm"`}
 		>
-			<h1 className="text-xl font-semibold tracking-wider mb-8">My Account</h1>
+			<h1 className="text-xl font-semibold tracking-wider text-theme-primary-active  mb-8">My Account</h1>
 			<div className="w-full rounded-lg overflow-hidden bg-theme-setting-nav">
 				<div style={{ backgroundColor: color }} className="h-[100px]  "></div>
 				<div className="flex justify-between relative -top-5 px-4 flex-col sbm:flex-row sbm:items-center">

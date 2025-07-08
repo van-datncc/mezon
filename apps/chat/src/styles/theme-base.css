@@ -89,8 +89,6 @@ button.bg-button-add-friend {
 	background: var(--bg-item-hover);
 }
 
-
-
 .bg-item-theme {
 	background: var(--bg-active-member-channel);
 }
@@ -144,7 +142,7 @@ button.bg-button-add-friend {
 	background: var(--bg-option-theme) !important;
 }
 .bg-highlight-no-hover {
-  background: var(--bg-highlight) !important;
+	background: var(--bg-highlight) !important;
 }
 
 /* button */
@@ -213,6 +211,10 @@ button.bg-button-add-friend {
 
 .bg-mention-everyone {
 	background-color: var(--bg-mention-evryone);
+}
+.button-add-friend-active {
+	background-color: var(--bg-button-add-friend-active);
+	color: var(--text-button-add-friend-active);
 }
 
 .color-mention-hover {

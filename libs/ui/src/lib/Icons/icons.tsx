@@ -256,6 +256,14 @@ export function HeadPhoneICon(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
+export function DotIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg role="img" width="24" height="24" viewBox="0 0 4 4" {...props}>
+			<circle cx="2" cy="2" r="2" fill="currentColor"></circle>
+		</svg>
+	);
+}
+
 export function MicIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
 		<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>

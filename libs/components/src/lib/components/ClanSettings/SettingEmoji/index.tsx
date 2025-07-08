@@ -53,7 +53,7 @@ const SettingEmoji = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> }) =
 				</div>
 				<div
 					onClick={handleCreateEmoji}
-					className="h-[38px] font-semibold rounded bg-buttonPrimary text-contentPrimary w-28 relative flex flex-row items-center justify-center hover:bg-contentBrand cursor-pointer"
+					className="h-[38px] font-semibold rounded-lg bg-button-primary text-white w-28 relative flex flex-row items-center justify-center hover:opacity-80 cursor-pointer"
 				>
 					Upload emoji
 				</div>

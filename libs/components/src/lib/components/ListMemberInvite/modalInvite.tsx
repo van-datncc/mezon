@@ -114,7 +114,7 @@ const ModalInvite = (props: ModalParam) => {
 						<button
 							className="absolute right-0 bottom-0 mb-1 text-white font-semibold text-sm px-8 py-1.5
 							shadow outline-none focus:outline-none ease-linear transition-all duration-150
-							bg-primary hover:bg-blue-800 text-[16px] leading-6 rounded mr-[8px]"
+							bg-button-primary hover:opacity-80  text-[16px] leading-6 rounded-lg mr-[8px]"
 							onClick={() => {
 								handleCopyToClipboard(urlInvite);
 								onClose();
