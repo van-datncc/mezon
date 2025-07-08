@@ -252,14 +252,17 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 		}
 	];
 
-	const muteOrUnMuteChannel = (active: ENotificationActive) => {
+	const muteOrUnMuteChannel = async (active: ENotificationActive) => {
 		const body = {
 			channel_id: messageInfo?.channel_id || '',
 			notification_type: getNotificationChannelSelected?.notification_setting_type || 0,
 			clan_id: currentClan?.clan_id || '',
 			active
 		};
-		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+		const response = await dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+		if (response?.meta?.requestStatus === 'fulfilled') {
+			dispatch(notificationSettingActions.updateNotiState({ channelId: messageInfo?.channel_id || '', active }));
+		}
 	};
 
 	const handleEnableOrDisableE2EE = async () => {

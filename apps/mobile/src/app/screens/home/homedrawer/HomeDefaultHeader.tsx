@@ -19,8 +19,9 @@ import { style } from './styles';
 
 const HomeDefaultHeader = React.memo(
 	({ navigation, openBottomSheet, onOpenDrawer }: { navigation: any; openBottomSheet: () => void; onOpenDrawer: () => void }) => {
+		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
-		const styles = style(themeValue);
+		const styles = style(themeValue, isTabletLandscape);
 		const currentChannel = useSelector(selectCurrentChannel);
 		const parent = useAppSelector((state) => selectChannelById(state, currentChannel?.parent_id || ''));
 		const anonymousMode = useSelector(selectAnonymousMode);
@@ -76,7 +77,6 @@ const HomeDefaultHeader = React.memo(
 			});
 			navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET });
 		};
-		const isTabletLandscape = useTabletLandscape();
 
 		const navigateToSearchPage = () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
