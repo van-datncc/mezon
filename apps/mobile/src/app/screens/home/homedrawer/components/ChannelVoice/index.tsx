@@ -39,7 +39,7 @@ const { CustomAudioModule, KeepAwake, KeepAwakeIOS, AudioSessionModule } = Nativ
 type AudioOutput = {
 	id: string;
 	name: string;
-	type: 'speaker' | 'earpiece' | 'bluetooth' | 'headphones';
+	type: 'speaker' | 'earpiece' | 'bluetooth' | 'headphones' | 'default' | 'force_speaker';
 };
 
 const ConnectionMonitor = memo(() => {
@@ -251,13 +251,12 @@ function ChannelVoice({
 	const { sendSignalingToParticipants } = useSendSignaling();
 
 	// Get available audio outputs
-	const getAvailableAudioOutputs = useCallback(async (isHaveBluetooth): Promise<AudioOutput[]> => {
+	const getAvailableAudioOutputs = useCallback(async (isHaveBluetooth?: boolean): Promise<AudioOutput[]> => {
 		try {
 			const outputs: AudioOutput[] = [
 				{ id: 'earpiece', name: 'Earpiece', type: 'earpiece' },
 				{ id: 'speaker', name: 'Speaker', type: 'speaker' }
 			];
-
 			if (isHaveBluetooth) {
 				outputs.push({ id: 'bluetooth', name: 'Bluetooth', type: 'bluetooth' });
 			}
@@ -309,6 +308,9 @@ function ChannelVoice({
 					const currentOutput = await AudioSessionModule.getCurrentAudioOutput();
 					setCurrentAudioOutput(currentOutput);
 				}
+			} else {
+				const outputs = await getAvailableAudioOutputs();
+				setAvailableAudioOutputs(outputs);
 			}
 		} catch (error) {
 			console.error('Error setting up audio detection:', error);
@@ -316,8 +318,12 @@ function ChannelVoice({
 	}, [getAvailableAudioOutputs, switchAudioOutput]);
 
 	const onOpenTooltip = useCallback(async () => {
-		const bluetoothConnected = await AudioSessionModule.isBluetoothConnected();
-		getAvailableAudioOutputs(bluetoothConnected).then(setAvailableAudioOutputs);
+		if (Platform.OS === 'android' && AudioSessionModule) {
+			const bluetoothConnected = await AudioSessionModule.isBluetoothConnected();
+			getAvailableAudioOutputs(bluetoothConnected).then(setAvailableAudioOutputs);
+		} else {
+			getAvailableAudioOutputs().then(setAvailableAudioOutputs);
+		}
 	}, [getAvailableAudioOutputs]);
 
 	useEffect(() => {
@@ -377,13 +383,11 @@ function ChannelVoice({
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (Platform.OS === 'android') {
-			try {
-				checkPermissions();
-				setupAudioDetection();
-			} catch (error) {
-				console.error('Error setting up audio detection:', error);
-			}
+		try {
+			checkPermissions();
+			setupAudioDetection();
+		} catch (error) {
+			console.error('Error setting up audio detection:', error);
 		}
 
 		// Cleanup function

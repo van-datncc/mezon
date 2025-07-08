@@ -60,8 +60,11 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 	}, []);
 
 	const colorSenderName = useMemo(() => {
-		return userRolesClan.highestPermissionRoleColor || DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
-	}, [userRolesClan.highestPermissionRoleColor]);
+		return (
+			(userRolesClan?.highestPermissionRoleColor?.startsWith('#') ? userRolesClan.highestPermissionRoleColor : themeValue.text) ||
+			DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR
+		);
+	}, [themeValue.text, userRolesClan.highestPermissionRoleColor]);
 
 	return (
 		<View style={styles.container}>

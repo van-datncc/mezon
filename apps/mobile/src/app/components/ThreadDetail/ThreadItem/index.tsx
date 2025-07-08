@@ -85,21 +85,25 @@ const ThreadItem = ({ thread }: IThreadItemProps) => {
 			}}
 			style={styles.threadItemWrapper}
 		>
-			<View style={{ flex: 1, flexGrow: 1, flexShrink: 1 }}>
+			<View style={{ flex: 1 }}>
 				<Text style={styles.threadName}>{thread?.channel_label}</Text>
 				<View style={styles.threadContent}>
-					{username && (
-						<Text numberOfLines={1} style={styles.textThreadCreateBy}>
-							{username}
+					<View style={styles.username}>
+						{username && (
+							<Text numberOfLines={1} style={styles.textThreadCreateBy}>
+								{username}
+							</Text>
+						)}
+						<Text numberOfLines={1} ellipsizeMode="tail" style={styles.messageContent}>
+							{lastSentMessage}
 						</Text>
-					)}
-					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.messageContent}>
-						{lastSentMessage}
-					</Text>
-					<Text style={styles.bullet}>•</Text>
-					<Text numberOfLines={1} style={styles.createTime}>
-						{timeMessage}
-					</Text>
+					</View>
+					<View style={styles.dateString}>
+						<Text style={styles.bullet}>•</Text>
+						<Text numberOfLines={1} style={styles.createTime}>
+							{timeMessage}
+						</Text>
+					</View>
 				</View>
 			</View>
 			<AngleRightIcon width={25} height={25} color={themeValue.textDisabled} />

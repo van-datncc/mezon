@@ -9,11 +9,11 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_10,
 			backgroundColor: colors.secondary,
 			top: size.s_20,
-			right: -size.s_10
+			right: -size.s_30
 		},
 		toolTipContainer: {
 			position: 'absolute',
-			height: 'auto',
+			height: size.s_30,
 			width: size.s_30,
 			borderRadius: size.s_30,
 			top: 0,
@@ -23,14 +23,13 @@ export const style = (colors: Attributes) =>
 		},
 		iconTooltip: {
 			borderRadius: size.s_30,
-			justifyContent: 'space-between',
+			height: size.s_30,
+			justifyContent: 'center',
 			alignItems: 'center',
-			zIndex: 1000,
-			left: size.s_10,
-			flexDirection: 'row'
+			zIndex: 1000
 		},
 		tooltipButton: {
-			height: size.s_20,
-			width: size.s_20
+			height: size.s_30,
+			width: size.s_30
 		}
 	});
