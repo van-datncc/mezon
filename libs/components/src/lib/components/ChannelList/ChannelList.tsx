@@ -41,7 +41,7 @@ import { Events } from './ChannelListComponents';
 import ChannelListItem from './ChannelListItem';
 export type ChannelListProps = { className?: string };
 export type CategoriesState = Record<string, boolean>;
-const clanTopbarEle = 64;
+const clanTopbarEle = 50;
 
 function ChannelList() {
 	const isOpenModal = useAppSelector((state) => selectIsOpenCreateNewChannel(state));
@@ -166,7 +166,9 @@ const RowVirtualizerDynamic = memo(({ permissions }: { permissions: IChannelLink
 	useEffect(() => {
 		const calculateHeight = () => {
 			const clanFooterEle = document.getElementById('clan-footer');
-			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 2;
+			const rect = clanFooterEle?.getBoundingClientRect();
+			const distanceFromBottom = window.innerHeight - (rect?.bottom || 0);
+			const totalHeight = clanTopbarEle + (clanFooterEle?.clientHeight || 0) + 8 + distanceFromBottom;
 			const outsideHeight = totalHeight;
 			const titleBarHeight = isWindowsDesktop || isLinuxDesktop ? 21 : 0;
 			setHeight(window.innerHeight - outsideHeight - titleBarHeight);
