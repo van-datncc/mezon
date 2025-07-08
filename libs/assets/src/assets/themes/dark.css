@@ -101,4 +101,6 @@
 
 	/* oklab(0.751834 0.00131807 -0.008479) */
 	--bg-markdown-code: #252731;
+	--border-highlight-react-theme: #5865F2;
+	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
 }

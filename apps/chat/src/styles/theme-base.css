@@ -349,3 +349,9 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-markdown-code);
 }
 
+.highlight-react-theme {
+	background: var(--bg-highlight-react-theme);
+	border: 1px solid var(--border-highlight-react-theme);
+	backdrop-filter: blur(2px);
+}
+

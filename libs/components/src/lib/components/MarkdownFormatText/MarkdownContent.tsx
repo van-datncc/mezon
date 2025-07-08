@@ -166,7 +166,7 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
-				className={`w-full font-sans ${posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
+				className={`w-full font-sans px-2 ${posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
 					} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'break-spaces' }}
 			>
