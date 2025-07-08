@@ -255,6 +255,23 @@ export const notificationSettingSlice = createSlice({
 					active: 1
 				}
 			});
+		},
+		updateNotiState: (
+			state,
+			action: PayloadAction<{
+				channelId: string;
+				active: number;
+			}>
+		) => {
+			const { channelId, active } = action.payload;
+
+			if (!state.byChannels[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+
+			if (state.byChannels[channelId]?.notificationSetting) {
+				state.byChannels[channelId].notificationSetting.active = active;
+			}
 		}
 	},
 	extraReducers: (builder) => {
