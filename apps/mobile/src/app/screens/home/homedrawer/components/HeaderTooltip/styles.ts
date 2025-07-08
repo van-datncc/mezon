@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_10,
 			backgroundColor: colors.secondary,
 			top: size.s_20,
-			right: -size.s_10
+			right: -size.s_30
 		},
 		toolTipContainer: {
 			position: 'absolute',

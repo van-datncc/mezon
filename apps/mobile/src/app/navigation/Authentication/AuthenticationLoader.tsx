@@ -260,6 +260,9 @@ export const AuthenticationLoader = () => {
 						const store = await getStoreAsync();
 						store.dispatch(directActions.setDmGroupCurrentId(''));
 						store.dispatch(appActions.setIsFromFCMMobile(true));
+						DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+							isShow: false
+						});
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 						requestAnimationFrame(async () => {

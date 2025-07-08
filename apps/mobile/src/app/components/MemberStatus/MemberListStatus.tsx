@@ -211,8 +211,8 @@ export const MemberListStatus = React.memo(() => {
 					removeClippedSubviews={true}
 					showsVerticalScrollIndicator={false}
 					stickySectionHeadersEnabled={false}
-					initialNumToRender={10}
-					maxToRenderPerBatch={10}
+					initialNumToRender={5}
+					maxToRenderPerBatch={5}
 					windowSize={5}
 				/>
 			) : null}

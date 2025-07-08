@@ -20,9 +20,11 @@ export const InfoUserMessage = ({ createTime, isShow, onPress, onLongPress, send
 	const { themeValue } = useTheme();
 	const colorSenderName = useMemo(() => {
 		return mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
-			? userRolesClan.highestPermissionRoleColor
+			? userRolesClan?.highestPermissionRoleColor?.startsWith('#')
+				? userRolesClan.highestPermissionRoleColor
+				: themeValue.text
 			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
-	}, [mode, userRolesClan.highestPermissionRoleColor]);
+	}, [mode, themeValue.text, userRolesClan.highestPermissionRoleColor]);
 
 	const imageRoleUrl = useMemo(() => {
 		return mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD

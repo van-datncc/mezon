@@ -4,12 +4,14 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		toolTip: {
+			flex: 1,
 			height: '100%',
+			width: '100%',
 			padding: 0,
 			borderRadius: size.s_10,
 			backgroundColor: colors.secondary,
-			top: size.s_20,
-			right: -size.s_10
+			top: size.s_50,
+			right: 0
 		},
 		toolTipContainer: {
 			position: 'absolute',
