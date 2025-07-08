@@ -49,6 +49,7 @@ type MessageContextMenuContextValue = {
 	onVisibilityChange: (status: boolean) => void;
 	openDeleteMessageModal: () => void;
 	openPinMessageModal: () => void;
+	selectedMessageId: string | null;
 };
 
 export type MessageContextMenuProps = {
@@ -81,7 +82,8 @@ export const MessageContextMenuContext = createContext<MessageContextMenuContext
 	},
 	openPinMessageModal: () => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
-	}
+	},
+	selectedMessageId: null
 });
 
 const getMessage = (appState: RootState, isTopic: boolean, messageId: string) => {
@@ -110,6 +112,7 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 	const [imageSrc, setImageSrc] = useState<string>(SHOW_POSITION.NONE);
 	const [posShortProfile, setPosShortProfile] = useState<posShortProfileOpt>({});
 	const [isTopic, setIsTopic] = useState<boolean>(false);
+	const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
 
 	const [openDeleteMessageModal, closeDeleteMessageModal] = useModal(() => {
 		const store = getStore();
@@ -205,6 +208,9 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 
 	const onVisibilityChange = useCallback((status: boolean) => {
 		setIsMenuVisible(status);
+		if (!status) {
+			setSelectedMessageId(null);
+		}
 	}, []);
 	const setImageURL = useCallback((src: string) => {
 		setImageSrc(src);
@@ -236,6 +242,7 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 			messageIdRef.current = messageId;
 			setElementTarget(event.target as HTMLElement);
 			setIsTopic(isTopic);
+			setSelectedMessageId(messageId);
 
 			const niceProps = {
 				messageId,
@@ -257,7 +264,8 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 			setPosShortProfile,
 			onVisibilityChange,
 			openDeleteMessageModal,
-			openPinMessageModal
+			openPinMessageModal,
+			selectedMessageId
 		}),
 		[
 			showMessageContextMenu,
@@ -269,7 +277,8 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 			setPosShortProfile,
 			onVisibilityChange,
 			openDeleteMessageModal,
-			openPinMessageModal
+			openPinMessageModal,
+			selectedMessageId
 		]
 	);
 

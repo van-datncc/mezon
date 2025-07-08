@@ -357,7 +357,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 					{isShowMemberList && !isChannelMezonVoice && !isChannelStream && (
 						<div
 							onContextMenu={(event) => event.preventDefault()}
-							className={`bg-active-friend-list text-theme-primary relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
+							className={`border-l border-solid border-color-primary text-theme-primary relative overflow-y-scroll hide-scrollbar ${currentChannel?.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE ? 'hidden' : 'flex'} ${closeMenu && !statusMenu && isShowMemberList ? 'w-full' : 'w-widthMemberList'}`}
 							id="memberList"
 						>
 							<MemberList />

@@ -1,27 +1,9 @@
-import {
-	ChannelMessageOpt,
-	ChatWelcome,
-	MessageContextMenuProps,
-	MessageWithSystem,
-	MessageWithUser,
-	OnBoardWelcome,
-	useMessageContextMenu
-} from '@mezon/components';
-import { useAuth } from '@mezon/core';
-import {
-	MessagesEntity,
-	selectBlockedUsersForMessage,
-	selectChannelDraftMessage,
-	selectIdMessageRefEdit,
-	selectOpenEditMessageState,
-	useAppSelector
-} from '@mezon/store';
+import { ChannelMessageOpt, ChatWelcome, MessageContextMenuProps, MessageWithSystem, MessageWithUser, OnBoardWelcome } from '@mezon/components';
+import { MessagesEntity } from '@mezon/store';
 import { FOR_10_MINUTES, ObserveFn, TypeMessage, UsersClanEntity } from '@mezon/utils';
 import { isSameDay } from 'date-fns';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import MessageWithBlocked from './MessageWithBlocked';
+import React, { memo, useCallback } from 'react';
 
 export type MessageProps = {
 	channelId: string;
@@ -44,6 +26,15 @@ export type MessageProps = {
 	wrapperClassName?: string;
 	user: UsersClanEntity;
 	observeIntersectionForLoading?: ObserveFn;
+	showMessageContextMenu: (
+		event: React.MouseEvent<HTMLElement>,
+		messageId: string,
+		mode: ChannelStreamMode,
+		isTopic: boolean,
+		props?: Partial<MessageContextMenuProps>
+	) => void;
+	isSelected?: boolean;
+	isEditing?: boolean;
 };
 
 export type MessageRef = {
@@ -73,16 +64,11 @@ export const ChannelMessage: ChannelMessageComponent = ({
 	isTopic = false,
 	canSendMessage,
 	user,
-	observeIntersectionForLoading
+	observeIntersectionForLoading,
+	showMessageContextMenu,
+	isSelected,
+	isEditing
 }: Readonly<MessageProps>) => {
-	const { userProfile } = useAuth();
-	const openEditMessageState = useSelector(selectOpenEditMessageState);
-	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const { showMessageContextMenu } = useMessageContextMenu();
-	const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
-
-	const isEditing = channelDraftMessage?.message_id === messageId ? openEditMessageState : openEditMessageState && idMessageRefEdit === messageId;
-
 	const isSameUser = message?.user?.id === previousMessage?.user?.id;
 	const isTimeGreaterThan60Minutes =
 		!!message?.create_time && Date.parse(message.create_time) - Date.parse(previousMessage?.create_time) < FOR_10_MINUTES;
@@ -134,28 +120,27 @@ export const ChannelMessage: ChannelMessageComponent = ({
 		message?.code === TypeMessage.AuditLog;
 
 	const isMessageIndicator = message.code === TypeMessage.Indicator;
-	const blockedUsers = useSelector(selectBlockedUsersForMessage);
 
-	const isMessageFromBlockedUser = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_DM) return false;
+	// const isMessageFromBlockedUser = useMemo(() => {
+	// 	if (mode === ChannelStreamMode.STREAM_MODE_DM) return false;
 
-		const userId = userProfile?.user?.id;
-		const senderId = message?.sender_id;
-		if (!blockedUsers?.length || !userId || !senderId) return false;
+	// 	const userId = userProfile?.user?.id;
+	// 	const senderId = message?.sender_id;
+	// 	if (!blockedUsers?.length || !userId || !senderId) return false;
 
-		return blockedUsers.some(
-			(blockedUser) =>
-				(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
-				(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
-		);
-	}, [mode, userProfile?.user?.id, message?.sender_id, blockedUsers]);
+	// 	return blockedUsers.some(
+	// 		(blockedUser) =>
+	// 			(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
+	// 			(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
+	// 	);
+	// }, [mode, userProfile?.user?.id, message?.sender_id, blockedUsers]);
 
-	if (isMessageFromBlockedUser) {
-		if (previousMessage?.sender_id !== message?.sender_id) {
-			return <MessageWithBlocked />;
-		}
-		return null;
-	}
+	// if (isMessageFromBlockedUser) {
+	// 	if (previousMessage?.sender_id !== message?.sender_id) {
+	// 		return <MessageWithBlocked />;
+	// 	}
+	// 	return null;
+	// }
 
 	return isMessageIndicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (
 		<>
@@ -184,24 +169,26 @@ export const ChannelMessage: ChannelMessageComponent = ({
 			isTopic={isTopic}
 			observeIntersectionForLoading={observeIntersectionForLoading}
 			user={user}
+			isSelected={isSelected}
 		/>
 	);
 };
 
-export const MemorizedChannelMessage = memo(
-	ChannelMessage,
-	(prev, curr) =>
+export const MemorizedChannelMessage = memo(ChannelMessage, (prev, curr) => {
+	return (
 		prev.messageId + prev?.message?.update_time === curr.messageId + curr?.message?.update_time &&
 		prev.channelId === curr.channelId &&
 		prev.messageReplyHighlight === curr.messageReplyHighlight &&
 		prev.checkMessageTargetToMoved === curr.checkMessageTargetToMoved &&
-		// prev.message.content === curr.message.content &&
 		prev.previousMessage?.id === curr.previousMessage?.id &&
 		prev.message?.code === curr.message?.code &&
 		prev.message?.references?.[0]?.content === curr.message?.references?.[0]?.content &&
 		prev.avatarDM === curr.avatarDM &&
 		prev.channelLabel === curr.channelLabel &&
-		prev.isHighlight === curr.isHighlight
-);
+		prev.isHighlight === curr.isHighlight &&
+		prev.isSelected === curr.isSelected &&
+		prev.isEditing === curr.isEditing
+	);
+});
 
 MemorizedChannelMessage.displayName = 'MemorizedChannelMessage';

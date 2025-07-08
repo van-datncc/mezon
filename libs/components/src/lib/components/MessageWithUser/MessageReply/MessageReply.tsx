@@ -86,7 +86,7 @@ const MessageReply: React.FC<MessageReplyProps> = ({ message, onClick, mode, isA
 								<div className=" flex flex-row items-center">
 									<div
 										onClick={getIdMessageToJump}
-										className="text-[14px] pr-1 mr-[-5px] dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
+										className="text-[14px] pr-1 dark:hover:text-white dark:text-[#A8BAB8] text-[#818388]  hover:text-[#060607] cursor-pointer italic   w-fit one-line break-all pt-0"
 									>
 										Click to see attachment
 									</div>
