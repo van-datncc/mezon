@@ -6,7 +6,7 @@ import { memo, useMemo, useRef } from 'react';
 import { AvatarImage } from '../../components';
 import { useDirectMessageContextMenu } from '../../contexts/DirectMessageContextMenu';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
-import StatusUser from '../StatusUser';
+import StatusUser, { StatusUser2 } from '../StatusUser';
 
 export type MemberProfileProps = {
 	avatar: string;
@@ -244,15 +244,15 @@ export const BaseMemberProfile = (props: BaseMemberProfileProps) => {
 export const UserStatusIconDM = ({ status }: { status?: EUserStatus }) => {
 	switch (status) {
 		case EUserStatus.ONLINE:
-			return <Icons.OnlineStatus />;
+			return <StatusUser2 status="online" />;
 		case EUserStatus.IDLE:
 			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-[10px] h-[10px]" />;
 		case EUserStatus.DO_NOT_DISTURB:
-			return <Icons.MinusCircleIcon className=" w-[10px] h-[10px]" />;
+			return <StatusUser2 status="dnd" />;
 		case EUserStatus.INVISIBLE:
 			return <Icons.OfflineStatus />;
 		default:
-			return <Icons.OnlineStatus />;
+			return <StatusUser2 status="online" />;
 	}
 };
 
@@ -260,20 +260,20 @@ export const UserStatusIconClan = ({ status, online }: { status?: EUserStatus; o
 	const normalizedStatus = typeof status === 'object' && status !== null ? (status as UserStatus).status?.toUpperCase() : status?.toUpperCase();
 
 	if (!online) {
-		return <Icons.OfflineStatus />;
+		return <StatusUser2 status="offline" />;
 	}
 
 	switch (normalizedStatus) {
 		case 'IDLE':
 			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-[10px] h-[10px]" />;
 		case 'DO NOT DISTURB':
-			return <Icons.MinusCircleIcon className=" w-[10px] h-[10px]" />;
+			return <StatusUser2 status="dnd" />;
 		case 'INVISIBLE':
-			return <Icons.OfflineStatus />;
+			return <StatusUser2 status="offline" />;
 	}
 
 	if (online) {
-		return <Icons.OnlineStatus />;
+		return <StatusUser2 status="online" />;
 	}
 
 	return <Icons.OfflineStatus />;

@@ -1,5 +1,5 @@
 import { ELoadMoreDirection, IBeforeRenderCb } from '@mezon/chat-scroll';
-import { MessageContextMenuProvider, MessageWithUser } from '@mezon/components';
+import { MessageContextMenuProvider, MessageWithUser, useMessageContextMenu } from '@mezon/components';
 import { useMessageObservers, usePermissionChecker } from '@mezon/core';
 import {
 	MessagesEntity,
@@ -8,11 +8,13 @@ import {
 	getStore,
 	messagesActions,
 	selectAllAccount,
+	selectChannelDraftMessage,
 	selectCurrentChannelId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
 	selectHasMoreBottomByChannelId2,
 	selectHasMoreMessageByChannelId2,
+	selectIdMessageRefEdit,
 	selectIdMessageToJump,
 	selectIsJumpingToPresent,
 	selectIsMessageIdExist,
@@ -23,6 +25,7 @@ import {
 	selectMessageIdsByChannelId2,
 	selectMessageIsLoading,
 	selectMessageNotified,
+	selectOpenEditMessageState,
 	selectScrollOffsetByChannelId,
 	selectShowScrollDownButton,
 	selectTheme,
@@ -553,6 +556,17 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		const jumpToPresent = useAppSelector((state) => selectIsJumpingToPresent(state, channelId));
 		const firstMsgOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
 
+		const openEditMessageState = useSelector(selectOpenEditMessageState);
+		const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
+		const channelDraftMessage = useAppSelector((state) => selectChannelDraftMessage(state, channelId));
+
+		const getIsEditing = useCallback(
+			(messageId: string) => {
+				return channelDraftMessage?.message_id === messageId ? openEditMessageState : openEditMessageState && idMessageRefEdit === messageId;
+			},
+			[channelDraftMessage?.message_id, openEditMessageState, idMessageRefEdit]
+		);
+
 		const scrollOffsetRef = useRef<number>(0);
 
 		useSyncEffect(() => {
@@ -858,10 +872,15 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 
 		const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], channelId);
 
+		const { showMessageContextMenu, selectedMessageId } = useMessageContextMenu();
+
 		const renderedMessages = useMemo(() => {
 			return messageIds.map((messageId, index) => {
 				const checkMessageTargetToMoved = msgIdJumpHightlight.current === messageId && messageId !== lastMessageId;
 				const messageReplyHighlight = (dataReferences?.message_ref_id && dataReferences?.message_ref_id === messageId) || false;
+				const isSelected = selectedMessageId === messageId;
+				const isEditing = getIsEditing(messageId);
+
 				return (
 					<MemorizedChannelMessage
 						key={messageId}
@@ -884,6 +903,9 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						canSendMessage={canSendMessage}
 						observeIntersectionForLoading={observeIntersectionForLoading}
 						user={currentClanUser}
+						showMessageContextMenu={showMessageContextMenu}
+						isSelected={isSelected}
+						isEditing={isEditing}
 					/>
 				);
 			});
@@ -902,6 +924,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			lastMessageUnreadId,
 			mode,
 			username,
+			selectedMessageId,
+			getIsEditing,
 			forceRender
 		]);
 
