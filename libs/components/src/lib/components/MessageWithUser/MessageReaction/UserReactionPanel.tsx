@@ -69,7 +69,7 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, message, isTopic }: User
 						<div
 							ref={ref}
 							tabIndex={-1}
-							className="max-h-40 overflow-y-auto hide-scrollbar bg-item-theme-hover-status focus-visible:outline-none"
+							className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none"
 						>
 							{emojiShowPanel?.senders.map((sender: SenderInfoOptionals, index: number) => {
 								if (sender.count && sender.count > 0) {
@@ -142,7 +142,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 	const user = useUserById(sender.sender_id);
 
 	return (
-		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
+		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative bg-item-theme-hover-status ">
 			<div className="w-8 h-8">
 				<AvatarImage
 					className="w-8 h-8"

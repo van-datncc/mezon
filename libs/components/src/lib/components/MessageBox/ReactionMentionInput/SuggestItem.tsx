@@ -32,6 +32,7 @@ type SuggestItemProps = {
 	count?: number;
 	isUnread?: boolean;
 	color?: string;
+
 };
 
 const SuggestItem = ({
@@ -139,7 +140,7 @@ const SuggestItem = ({
 
 	return (
 		<div className={`flex flex-row items-center h-[24px] ${wrapSuggestItemStyle ?? 'justify-between'}`}>
-			<div className="flex flex-row items-center gap-2 py-[3px]">
+			<div className="flex flex-row items-center gap-2 py-[3px] text-theme-primary-hover text-theme-primary-hover">
 				{showAvatar && (
 					<div>
 						{color ? (
@@ -151,7 +152,7 @@ const SuggestItem = ({
 								srcImgProxy={createImgproxyUrl(avatarUrl ?? '')}
 								src={avatarUrl}
 								className="size-4"
-								classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
+									classNameText="text-[9px] min-w-5 min-h-5 pt-[3px] "
 							/>
 						)}
 					</div>
@@ -164,7 +165,7 @@ const SuggestItem = ({
 				{display && (
 					<span className={`text-[15px] font-thin text-theme-primary one-line flex items-center`} style={{ color: color }}>
 						<span
-							className={`${isUnread || (count && count > 0) ? 'text-theme-primary font-semibold' : 'font-medium text-theme-primary'}`}
+							className={`${isUnread || (count && count > 0) ? 'text-theme-primary font-semibold' : 'font-medium text-theme-primary '}`}
 						>
 							{isHightLight ? HighlightMatchBold(display ?? '', valueHightLight ?? '') : display}
 						</span>

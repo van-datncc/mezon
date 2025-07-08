@@ -88,6 +88,9 @@ button.bg-button-add-friend {
 .bg-item-hover:hover {
 	background: var(--bg-item-hover);
 }
+.bg-item-hover-chat:hover {
+	background: var(--bg-item-hover-chat);
+}
 
 .bg-item-theme {
 	background: var(--bg-active-member-channel);
@@ -298,10 +301,12 @@ input.bg-theme-input-primary::placeholder {
 
 .border-r-t-l-theme-primary {
 	border-top-left-radius: var(--border-r-t-l-theme-primary);
+	border-top-right-radius: var(--border-r-t-l-theme-primary);
 }
 
 .border-r-b-l-theme-primary {
 	border-bottom-left-radius: var(--border-r-b-l-theme-primary);
+	border-bottom-right-radius: var(--border-r-b-l-theme-primary);
 }
 
 .bg-count-page {
@@ -340,3 +345,7 @@ input.bg-theme-input-primary::placeholder {
 .bg-modal-overlay {
 	background: var(--bg-modal);
 }
+.bg-markdown-code {
+	background: var(--bg-markdown-code);
+}
+
