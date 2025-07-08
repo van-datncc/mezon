@@ -440,18 +440,14 @@ const EmojisPanel = React.memo(function EmojisPanel({
 	}, [itemUnlock]);
 
 	const onClickEmoji = useCallback((item: IEmoji) => {
-		if (item.is_for_sale && !item.src) {
-			handleOpenUnlockItem(item);
-			return;
+		const { is_for_sale, src, shortname, id } = item;
+		if (!id || !shortname) return;
+
+		if (is_for_sale) {
+			return src ? onEmojiSelect(getIdSaleItemFromSource(src), shortname || '') : handleOpenUnlockItem(item);
 		}
 
-		if (item.is_for_sale && item.src) {
-			const idSale = getIdSaleItemFromSource(item.src);
-			onEmojiSelect(idSale, item.shortname || '');
-			return;
-		}
-
-		onEmojiSelect(item.id || '', item.shortname || '');
+		onEmojiSelect(id, shortname);
 	}, []);
 
 	return (
