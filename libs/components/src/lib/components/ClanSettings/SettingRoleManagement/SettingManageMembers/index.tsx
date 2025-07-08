@@ -74,7 +74,7 @@ const SettingManageMembers = ({ RolesClan, hasPermissionEdit }: { RolesClan: Rol
 		<div>
 			<div className="w-full flex gap-x-3 pr-5">
 				<InputField
-					className="flex-grow text-[15px] w-full py-1 px-2 font-normal border-theme-primary rounded"
+					className="flex-grow text-[15px] w-full py-1 px-2 font-normal border-theme-primary bg-input-secondary"
 					type="text"
 					placeholder="Search Members"
 					value={searchTerm}

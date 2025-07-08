@@ -22,7 +22,7 @@ const InputField: React.FC<InputProps> = ({ type, className, maxLength, label, r
 			</div>
 			<input
 				type={type}
-				className={`font-[400] text-theme-message bg-item-theme px-[16px] rounded-lg w-full border-theme-primary  ${needOutline ? '' : 'outline-none'}  ${className} `}
+				className={`font-[400] text-theme-message px-[16px] rounded-lg w-full  ${needOutline ? '' : 'outline-none'}  ${className} `}
 				{...rest}
 				maxLength={maxLength}
 				multiple

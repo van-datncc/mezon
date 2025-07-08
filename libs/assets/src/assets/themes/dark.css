@@ -85,7 +85,7 @@
 	/* button primary */
 	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
 	/* modal */
-	--bg-modal-theme: color-mix(in oklab, hsl(240 calc(1 * 6.494%) 15.098% /1) 100%, #000 0%);
+	--bg-modal-theme: rgb(54 57 62 / 1);
 	/* input secondary */
 	--bg-input-secondary: #202225;
 	/* option  */

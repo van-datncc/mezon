@@ -79,7 +79,7 @@ export default function InvitePage() {
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-cover bg-center">
-			<div className="bg-theme-setting-primary rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
+			<div className="bg-theme-setting-primary text-theme-primary rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
 				<div className="flex items-center justify-center mb-3">
 					<div className="relative w-12 h-12 flex items-center justify-center">
 						{selectInvite?.clan_logo ? (
@@ -95,7 +95,7 @@ export default function InvitePage() {
 				<div className="text-center mb-4 w-full">
 					<p className="text-sm mb-1">You've been invited to join</p>
 					<h1
-						className="text-white text-3xl font-medium mb-3 truncate max-w-full"
+						className="text-theme-primary-active text-3xl font-medium mb-3 truncate max-w-full"
 						style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
 						title={selectInvite?.clan_name || 'Mezon Clan'}
 					>

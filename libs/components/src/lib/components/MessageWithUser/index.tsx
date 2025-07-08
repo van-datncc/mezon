@@ -252,7 +252,7 @@ function MessageWithUser({
 							></div>
 						)}
 						{!!message?.content?.fwd && (
-							<div className="flex gap-1 items-center italic font-medium w-full">
+							<div className="flex gap-1 items-center italic font-medium w-full text-theme-primary opacity-60">
 								<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 								<p>Forwarded</p>
 							</div>
