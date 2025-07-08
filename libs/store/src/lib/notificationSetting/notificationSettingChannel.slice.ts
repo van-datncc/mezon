@@ -265,11 +265,11 @@ export const notificationSettingSlice = createSlice({
 		) => {
 			const { channelId, active } = action.payload;
 
-			if (!state.byChannels[channelId]) {
+			if (!state?.byChannels?.[channelId]) {
 				state.byChannels[channelId] = getInitialChannelState();
 			}
 
-			if (state.byChannels[channelId]?.notificationSetting) {
+			if (state?.byChannels?.[channelId]?.notificationSetting) {
 				state.byChannels[channelId].notificationSetting.active = active;
 			}
 		}
