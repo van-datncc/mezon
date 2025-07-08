@@ -54,7 +54,7 @@ const Webhooks = ({ allWebhooks, currentChannel, isClanSetting }: IWebhooksProps
 				<>
 					<div
 						onClick={handleAddWebhook}
-						className="py-2 px-4 bg-[#5865f2] rounded-sm mb-[24px] w-fit text-[14px] font-semibold cursor-pointer"
+						className="py-2 px-4 bg-blue-500 hover:bg-blue-600  rounded-md mb-[24px] w-fit text-[14px] font-semibold cursor-pointer text-white"
 					>
 						New Webhook
 					</div>
@@ -69,7 +69,7 @@ const Webhooks = ({ allWebhooks, currentChannel, isClanSetting }: IWebhooksProps
 					<div className="font-medium ">You have no webhooks!</div>
 					<div
 						onClick={handleAddWebhook}
-						className="py-2 px-4 bg-[#5865f2] rounded-sm mb-[24px] w-fit text-[14px] font-semibold cursor-pointer"
+							className="py-2 px-4 bg-blue-500 hover:bg-blue-600 rounded-md mb-[24px] w-fit text-[14px] font-semibold cursor-pointer text-white"
 					>
 						New Webhook
 					</div>

@@ -26,7 +26,7 @@ const ClanWebhookItemModal = ({ webhookItem }: IClanWebhookItemModalProps) => {
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberClanByUserId(webhookItem.creator_id as string));
 	return (
-		<div className="dark:bg-[#2b2d31] bg-bgLightMode p-[20px] border dark:border-black rounded-md mb-[20px]">
+		<div className="bg-theme-setting-nav border-theme-primary p-[20px] border  rounded-md mb-[20px]">
 			<div className="flex gap-[20px] items-center">
 				<img src={webhookItem.avatar} alt="Webhook avatar" className="aspect-square w-[50px] rounded-full" />
 				<div className="flex w-full justify-between items-center dark:text-textDarkTheme text-textLightTheme">
@@ -217,7 +217,7 @@ const ExpendedClanWebhookModal = ({ webhookItem }: IExpendedClanWebhookModal) =>
 									}
 									type="text"
 									value={dataForUpdate.webhookNameInput}
-									className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none h-[50px]"
+									className="w-full bg-theme-setting-primary text-theme-primary rounded-sm outline-none h-[50px] px-[10px]"
 								/>
 							</div>
 							<div className="w-1/2 dark:text-[#b5bac1] text-textLightTheme">
@@ -234,7 +234,7 @@ const ExpendedClanWebhookModal = ({ webhookItem }: IExpendedClanWebhookModal) =>
 							<div className="flex items-center gap-[20px]">
 								<div
 									onClick={() => handleCopyUrl(webhookItem.url as string)}
-									className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+									className="font-medium px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md  cursor-pointer "
 								>
 									Copy Webhook URL
 								</div>
@@ -250,7 +250,7 @@ const ExpendedClanWebhookModal = ({ webhookItem }: IExpendedClanWebhookModal) =>
 					<div className="flex items-center gap-[20px]">
 						<div
 							onClick={() => handleCopyUrl(webhookItem.url as string)}
-							className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+							className="font-medium px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md  cursor-pointer"
 						>
 							Copy Clan Webhook URL
 						</div>
