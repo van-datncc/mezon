@@ -1,7 +1,6 @@
-import { useUserById } from '@mezon/core';
 import { ReplyIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { messagesActions, useAppDispatch } from '@mezon/store-mobile';
+import { ChannelMembersEntity, getStore, messagesActions, selectMemberClanByUserId2, useAppDispatch } from '@mezon/store-mobile';
 import { safeJSONParse } from 'mezon-js';
 import { ApiMessageRef } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
@@ -28,10 +27,15 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('message');
-	const messageSender = useUserById(messageReferences?.message_sender_id);
 	const avatarSender = useMemo(() => {
-		return messageReferences?.mesages_sender_avatar || messageSender?.clan_avatar || messageSender?.user?.avatar_url || '';
-	}, [messageReferences, messageSender]);
+		if (messageReferences?.mesages_sender_avatar) {
+			return messageReferences?.mesages_sender_avatar;
+		}
+		const store = getStore();
+		const state = store.getState();
+		const messageSender = selectMemberClanByUserId2(state, messageReferences?.message_sender_id ?? '') as unknown as ChannelMembersEntity;
+		return messageSender?.clan_avatar || messageSender?.user?.avatar_url || '';
+	}, [messageReferences]);
 
 	const handleJumpToMessage = (messageId: string) => {
 		requestAnimationFrame(async () => {
