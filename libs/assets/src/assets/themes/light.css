@@ -46,7 +46,8 @@
 	--bg-button-secondary: #f0f2f5;
 	--bg-theme-input-primary: #ffffff;
 	--text-theme-primary-hover: #4361ee;
-	--bg-item-hover: rgba(67, 97, 238, 0.08);
+	--bg-item-hover: rgb(238, 238, 239);
+	--bg-item-hover-chat: rgba(67, 97, 238, 0.08);
 
 	/* màu click vào member channel */
 	--bg-active-member-channel: linear-gradient(rgba(78, 78, 78, 0.103), rgba(165, 165, 165, 0.151));
@@ -89,4 +90,8 @@
 	/* option  */
 	--bg-option-theme: #ffffff;
 	--bg-option-active: #e6e6e8;
+
+	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
+	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
+	--bg-markdown-code: #F2F3F5;
 }

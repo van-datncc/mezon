@@ -61,6 +61,10 @@ export const customStyles = {
 	input: (provided: any) => ({
 		...provided,
 		color: 'var(--text-secondary)'
+	}),
+	singleValue: (provided: any) => ({
+		...provided,
+		color: 'var(--text-secondary)'
 	})
 };
 

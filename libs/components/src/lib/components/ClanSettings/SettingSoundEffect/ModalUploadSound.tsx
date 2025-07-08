@@ -166,9 +166,9 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 				<div className="absolute inset-0"></div>
 
 				<div className="relative">
-					<div className="relative px-4 pt-4 pb-3 border-b border-gray-300 dark:border-[#42464d]">
+					<div className="relative px-4 pt-4 pb-3 border-b-theme-primary">
 						<div className="text-center">
-							<h2 className="text-lg font-bold">{sound ? 'Edit Sound Effect' : 'Upload Sound Effect'}</h2>
+							<h2 className="text-lg font-bold text-theme-primary-active">{sound ? 'Edit Sound Effect' : 'Upload Sound Effect'}</h2>
 							<p className=" text-xs">Supports MP3, WAV formats • Max 1MB</p>
 						</div>
 					</div>
@@ -177,7 +177,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 						<div className="flex-1 flex flex-col overflow-hidden overflow-y-auto gap-3">
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
-									<span className="text-xs font-bold uppercase">Preview</span>
+									<span className="text-xs font-bold uppercase text-theme-primary-active">Preview</span>
 								</div>
 
 								<div className="flex items-center justify-center rounded-lg border-theme-primary overflow-hidden min-h-[140px] md:h-36">
@@ -198,7 +198,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 
 							<div className="flex flex-col md:flex-row gap-3 ">
 								<div className="w-full md:w-1/2 flex flex-col gap-1">
-									<p className="text-xs font-bold uppercase">Audio File</p>
+									<p className="text-xs font-bold uppercase text-theme-primary-active">Audio File</p>
 									<div
 										className={`
                                             relative group transition-all duration-200
@@ -224,7 +224,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 														? 'border-color-primary'
 														: isDragOver
 															? 'border-[#5865f2] bg-[#4752c440] '
-															: 'border-gray-300 bg-gray-200  hover:border-[#5865f2] hover:bg-[#4752c420]'
+															: 'border-color-primary   hover:border-[#5865f2] '
 												}
                                             `}
 										>
@@ -267,7 +267,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 								</div>
 
 								<div className="w-full md:w-1/2 flex flex-col gap-1">
-									<p className="text-xs font-bold uppercase">Sound Name</p>
+									<p className="text-xs font-bold uppercase text-theme-primary-active	">Sound Name</p>
 									<div className="relative border-theme-primary bg-item-theme rounded-md h-[60px] flex items-center">
 										<input
 											type="text"
@@ -275,7 +275,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 											value={name}
 											maxLength={30}
 											onChange={(e) => setName(e.target.value)}
-											className="w-full h-full px-3 py-2 bg-theme-input border-none rounded-md text-sm focus:outline-none focus:ring-0 focus:border-none "
+											className="w-full h-full px-3 py-2 bg-transparent text-theme-messaga=e border-none rounded-md text-sm focus:outline-none focus:ring-0 focus:border-none "
 										/>
 										<div className="absolute right-3 top-1/2 transform -translate-y-1/2">
 											<span className={`text-xs font-medium ${name.length > 25 ? 'text-[#faa61a]' : ''}`}>

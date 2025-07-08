@@ -42,12 +42,14 @@ const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> })
 						will automatically resize static PNG and animated GIF stickers for you.
 					</p>
 				</div>
-				<div className="flex p-4 bg-item-theme rounded-lg">
+				<div className="flex p-4 bg-item-theme rounded-lg border-theme-primary">
 					<div className="flex-1 w-full flex flex-col">
 						<p className="text-base font-bold">Upload it here!</p>
 						<p className="text-xs ">Let's customize the amazing stickers with your interest</p>
 					</div>
-					<Button onClick={handleOpenModalUpload}>upload sticker</Button>
+					<Button className="bg-button-primary text-white hover:opacity-80 rounded-lg" onClick={handleOpenModalUpload}>
+						upload sticker
+					</Button>
 				</div>
 				<div className="w-full flex flex-wrap gap-y-5 lg:gap-x-[calc((100%_-_116px_*_5)/4)] max-sbm:justify-evenly md:gap-x-[calc((100%_-_116px_*_4)/3)] gap-x-[calc((100%_-_116px_*_3)/2)]">
 					{listSticker.map((sticker) => (

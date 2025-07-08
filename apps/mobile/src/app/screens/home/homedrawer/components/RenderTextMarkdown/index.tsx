@@ -542,6 +542,7 @@ export const RenderTextMarkdownContent = ({
 										</Text>
 									</View>
 								</View>
+								{s !== 0 && e !== t?.length && '\n'}
 							</Text>
 						);
 						break;

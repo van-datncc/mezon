@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		bottom: 0,
+		zIndex: 1002,
 		backgroundColor: 'rgba(0, 0, 0, 0.3)',
 		justifyContent: 'center',
 		alignItems: 'center'
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
 	modalContent: {
 		width: '100%',
 		height: '100%',
+		zIndex: 1002,
 		backgroundColor: 'transparent'
 	}
 });

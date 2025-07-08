@@ -2,7 +2,7 @@ import { Attributes, Colors, Fonts, Metrics, baseColor, horizontalScale, size, v
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 const inputWidth = width * 0.6;
-export const style = (colors: Attributes) =>
+export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 	StyleSheet.create({
 		mainList: {
 			height: '100%',
@@ -695,7 +695,8 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_6
 		},
 		iconBell: {
-			paddingRight: size.s_14
+			paddingRight: size.s_14,
+			padding: isTabletLandscape ? size.s_10 : 0
 		},
 		friendActions: {
 			flexDirection: 'row',

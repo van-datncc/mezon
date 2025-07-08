@@ -71,9 +71,7 @@ const AudioOutputOptions = ({ onSelectOutput, availableOutputs, currentOutput }:
 
 	return (
 		<View style={styles.optionContainer}>
-			{availableOutputs?.map((output, index) => (
-				<OutputItem output={output} key={`audio_output_${output.id}_${index}`} />
-			))}
+			{availableOutputs?.map((output, index) => <OutputItem output={output} key={`audio_output_${output.id}_${index}`} />)}
 		</View>
 	);
 };

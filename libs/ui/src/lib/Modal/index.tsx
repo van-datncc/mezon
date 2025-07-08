@@ -49,9 +49,9 @@ const Modal = (props: ModalProps) => {
 				<div
 					ref={modalRef}
 					tabIndex={-1}
-					className="justify-center items-center flex overflow-x-hidden overflow-y-auto  fixed inset-0 z-50 outline-none focus:outline-none base-theme-color text-theme-primary hide-scrollbar overflow-hidden"
+					className="justify-center items-center flex overflow-x-hidden overflow-y-auto  fixed inset-0 z-50 outline-none focus:outline-none text-theme-primary hide-scrollbar overflow-hidden"
 				>
-					<div className="absolute inset-0 bg-black opacity-40"></div>
+					<div className="fixed inset-0 bg-black opacity-80"></div>
 					<div className={`relative w-full ${isInviteModal ? 'max-w-[480px]' : 'max-w-[684px]'} sm:h-auto ${classNameBox}`}>
 						<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-theme-setting-primary outline-none focus:outline-none h-full sm:h-auto">
 							<div className={`flex items-start justify-between p-4 border-b-theme-primary rounded-t`}>
