@@ -81,7 +81,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoryIcons = useMemo(
 		() => [
 			<Icons.Star defaultSize="w-7 h-7" />,
-			<Icons.MarketIcons />,
 			<Icons.ClockHistory defaultSize="w-7 h-7" />,
 			...categoryEmoji.map((emoji) =>
 				emoji.clan_logo !== '' ? (
@@ -103,11 +102,14 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	);
 
 	const categoriesWithIcons: { name: string; icon: JSX.Element }[] = useMemo(() => {
-		categoriesEmoji.splice(1, 0, FOR_SALE_CATE);
 		const categories = categoriesEmoji.map((category, index) => ({
 			name: category,
 			icon: categoryIcons[index]
 		}));
+		categories.splice(1, 0, {
+			name: FOR_SALE_CATE,
+			icon: <Icons.MarketIcons />
+		});
 
 		return categories;
 	}, [categoriesEmoji, categoryIcons]);
@@ -416,7 +418,6 @@ const EmojisPanel = React.memo(function EmojisPanel({
 }: DisplayByCategoriesProps) {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestionContext();
-	const appearanceTheme = useSelector(selectTheme);
 	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const isShowAddButton = useMemo(() => {
 		return hasClanPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
