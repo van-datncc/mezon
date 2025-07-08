@@ -1,6 +1,7 @@
+import { usePermissionChecker } from '@mezon/core';
 import { useTheme } from '@mezon/mobile-ui';
 import { selectAllRolesClan, selectMemberClanByUserId2, useAppSelector } from '@mezon/store-mobile';
-import { UsersClanEntity } from '@mezon/utils';
+import { EPermission, UsersClanEntity } from '@mezon/utils';
 import { useMemo } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import MezonIconCDN from '../../../../../../src/app/componentUI/MezonIconCDN';
@@ -18,6 +19,9 @@ export function UserItem({ userID, onMemberSelect }: IUserItem) {
 	const styles = style(themeValue);
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, userID));
 	const rolesClan = useAppSelector(selectAllRolesClan);
+	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
+	const [isManageClan] = usePermissionChecker([EPermission.manageClan]);
+	const canEditRoles = useMemo(() => isClanOwner || isManageClan, [isClanOwner, isManageClan]);
 
 	const clanUserRole = useMemo(() => {
 		return (
@@ -32,7 +36,7 @@ export function UserItem({ userID, onMemberSelect }: IUserItem) {
 	}, [userID, rolesClan]);
 
 	const onPressMemberItem = () => {
-		onMemberSelect(user);
+		canEditRoles && onMemberSelect(user);
 	};
 
 	return (
