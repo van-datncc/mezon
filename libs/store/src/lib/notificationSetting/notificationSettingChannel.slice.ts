@@ -269,8 +269,9 @@ export const notificationSettingSlice = createSlice({
 				state.byChannels[channelId] = getInitialChannelState();
 			}
 
-			if (state?.byChannels?.[channelId]?.notificationSetting) {
-				state.byChannels[channelId].notificationSetting.active = active;
+			const notificationSetting = state?.byChannels?.[channelId]?.notificationSetting;
+			if (notificationSetting) {
+				notificationSetting.active = active;
 			}
 		}
 	},
