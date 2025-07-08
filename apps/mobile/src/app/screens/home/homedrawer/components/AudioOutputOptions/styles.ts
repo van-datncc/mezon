@@ -4,6 +4,10 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		optionContainer: {
+			flex: 1,
+			flexShrink: 1,
+			flexGrow: 1,
+			minWidth: size.s_150,
 			backgroundColor: colors.primary
 		},
 		wrapperOption: {

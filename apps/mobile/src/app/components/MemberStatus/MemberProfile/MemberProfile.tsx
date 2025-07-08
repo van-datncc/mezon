@@ -58,7 +58,9 @@ export function MemberProfile({
 
 	const colorUserName = useMemo(() => {
 		return ![ChannelType?.CHANNEL_TYPE_DM, ChannelType?.CHANNEL_TYPE_GROUP]?.includes(currentChannel?.type)
-			? userColorRolesClan
+			? userColorRolesClan?.startsWith('#')
+				? userColorRolesClan
+				: themeValue.text
 			: DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR;
 	}, [userColorRolesClan, currentChannel?.type]);
 

@@ -91,8 +91,8 @@ export default function EmojiSelectorContainer({
 				)
 			: [];
 		return [
-			<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.starIcon} color={themeValue.textStrong} />,
+			<MezonIconCDN icon={IconCDN.shopSparkleIcon} color={themeValue.textStrong} />,
 			<MezonIconCDN icon={IconCDN.clockIcon} color={themeValue.textStrong} />,
 			...clanEmojis,
 			<SmilingFaceIcon height={size.s_24} width={size.s_24} color={themeValue.textStrong} />,
