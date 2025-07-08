@@ -98,6 +98,9 @@ button.bg-button-add-friend {
 .bg-item-theme-hover:hover {
 	background: var(--bg-active-member-channel);
 }
+.bg-item-theme-hover-important:hover {
+	background: var(--bg-active-member-channel) !important;
+}
 
 .bg-item-theme-hover-status:hover {
 	background: var(--bg-hover-select-status);
@@ -136,6 +139,9 @@ button.bg-button-add-friend {
 }
 .bg-option-theme {
 	background: var(--bg-option-theme);
+}
+.bg-option-theme-important {
+	background: var(--bg-option-theme) !important;
 }
 .bg-highlight-no-hover {
   background: var(--bg-highlight) !important;
