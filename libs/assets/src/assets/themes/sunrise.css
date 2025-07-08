@@ -55,7 +55,7 @@
 	--theme-setting-nav: color-mix(in oklab, hsl(240 calc(1 * 4.348%) 95.49% /1) 100%, rgb(255, 247, 204) 50%);
 	--private-theme: rgb(144, 224, 176);
 
-	--text-theme-primary: rgb(60, 41, 52);
+	--text-theme-primary: oklab(0.51633 0.00309466 -0.0153829);
 
 	--text-theme-message: oklab(0.322425 0.00154591 -0.010555);
 
