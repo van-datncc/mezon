@@ -25,7 +25,10 @@ export const style = (colors: Attributes) =>
 		},
 		input: {
 			color: colors.text,
-			flex: 1
+			flex: 1,
+			textAlignVertical: 'center',
+			height: size.s_40,
+			paddingVertical: 0
 		},
 		listSearchIcon: {
 			backgroundColor: colors.primary,
