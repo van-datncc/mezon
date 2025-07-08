@@ -194,8 +194,8 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 	};
 
 	return (
-		<div className={`py-[4px] relative bg-item-theme border-theme-primary rounded-lg `}>
-			<pre className={`pre whitespace-pre-wrap p-2  ${isInPinMsg ? `flex items-start ` : ''}`}>
+		<div className={`py-[4px] relative`}>
+			<pre className={`pre whitespace-pre-wrap p-3 bg-item-theme border-theme-primary rounded-lg ${isInPinMsg ? `flex items-start ` : ''}`}>
 				<button className={`absolute right-1 top-1 `} onClick={handleCopyClick}>
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
