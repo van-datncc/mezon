@@ -40,7 +40,7 @@ const WebhookItemModal = ({ webhookItem, currentChannel, isClanSetting }: IWebho
 	const [isExpand, setIsExpand] = useState(false);
 	const webhookOwner = useSelector(selectMemberClanByUserId(webhookItem.creator_id as string));
 	return (
-		<div className="dark:bg-[#2b2d31] bg-bgLightMode p-[20px] border dark:border-black rounded-md mb-[20px]">
+		<div className="bg-theme-setting-nav border-theme-primary p-[20px]  rounded-md mb-[20px]">
 			<div className="flex gap-[20px] items-center">
 				<img src={webhookItem.avatar} alt="Webhook avatar" className="aspect-square w-[50px] rounded-full" />
 				<div className="flex w-full justify-between items-center dark:text-textDarkTheme text-textLightTheme">
@@ -217,7 +217,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IE
 									}
 									type="text"
 									value={dataForUpdate.webhookNameInput}
-									className="w-full dark:text-[#b5bac1] text-textLightTheme dark:bg-[#1e1f22] bg-bgLightModeThird p-[10px] rounded-sm outline-none h-[50px]"
+									className="w-full bg-theme-setting-primary text-theme-primary rounded-sm outline-none h-[50px] px-[10px]"
 								/>
 							</div>
 							<div className="w-1/2 dark:text-[#b5bac1] text-textLightTheme">
@@ -239,7 +239,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IE
 							<div className="flex items-center gap-[20px]">
 								<div
 									onClick={() => handleCopyUrl(webhookItem.url as string)}
-									className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+									className="font-medium px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md  cursor-pointer"
 								>
 									Copy Webhook URL
 								</div>
@@ -255,7 +255,7 @@ const ExpendedWebhookModal = ({ webhookItem, currentChannel, isClanSetting }: IE
 					<div className="flex items-center gap-[20px]">
 						<div
 							onClick={() => handleCopyUrl(webhookItem.url as string)}
-							className="font-medium px-4 py-2 dark:bg-[#4e5058] bg-[#808084] dark:hover:bg-[#808084] hover:bg-[#4e5058] rounded-sm cursor-pointer"
+							className="font-medium px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md  cursor-pointer"
 						>
 							Copy Webhook URL
 						</div>
@@ -317,16 +317,16 @@ const WebhookItemChannelDropdown = ({
 		<Dropdown
 			trigger="click"
 			renderTrigger={() => (
-				<div className="w-full h-[50px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
+				<div className="w-full h-[50px] rounded-md bg-theme-setting-primary flex flex-row px-3 justify-between items-center">
 					<p className="truncate max-w-[90%]">{dropdownValue}</p>
 					<div>
-						<Icons.ArrowDownFill />
+						<Icons.ArrowDownFill className="text-theme-primary" />	
 					</div>
 				</div>
 			)}
 			label=""
 			placement="bottom-end"
-			className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+			className={`bg-option-theme-important  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 		>
 			{parentChannelsInClan.map((channel) => {
 				if (webhookItem.channel_id !== channel.channel_id) {
@@ -334,7 +334,7 @@ const WebhookItemChannelDropdown = ({
 						<Dropdown.Item
 							key={channel.channel_id}
 							children={channel.channel_label ?? ''}
-							className="truncate"
+							className="truncate bg-theme-setting-primary text-theme-primary bg-item-theme-hover-important"
 							onClick={() => {
 								setDataForUpdate({
 									...dataForUpdate,

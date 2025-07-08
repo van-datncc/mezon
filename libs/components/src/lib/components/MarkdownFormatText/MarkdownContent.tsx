@@ -101,7 +101,10 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={`inline bg-item-theme ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div
+			className={`${!isLink ? 'inline bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''
+				}`}
+		>
 			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
 					onClick={() => onClickLink(content)}
@@ -159,13 +162,12 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 	const posInPinOrNotification = isInPinMsg || posInNotification;
 	return (
 		<span
-			className={!posInPinOrNotification ? 'color-mention bg-mention' : 'w-full'}
+			className={!posInPinOrNotification ? 'text-theme-primary-active rounded-md bg-markdown-code p-2' : 'w-full'}
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
-				className={`w-full font-sans ${
-					posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
-				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
+				className={`w-full font-sans ${posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
+					} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
 				style={{ wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: posInPinOrNotification ? 'normal' : 'break-spaces' }}
 			>
 				{contentBacktick.trim() === '' ? contentBacktick : contentBacktick.trim()}
@@ -194,13 +196,13 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 	};
 
 	return (
-		<div className={`py-[4px] relative bg-item-theme border-theme-primary rounded-lg `}>
-			<pre className={`pre whitespace-pre-wrap p-2  ${isInPinMsg ? `flex items-start ` : ''}`}>
+		<div className={`py-[4px] relative`}>
+			<pre className={`pre whitespace-pre-wrap p-3 bg-markdown-code border-theme-primary rounded-lg ${isInPinMsg ? `flex items-start ` : ''}`}>
 				<button className={`absolute right-1 top-1 `} onClick={handleCopyClick}>
 					{copied ? <Icons.PasteIcon /> : <Icons.CopyIcon />}
 				</button>
 				<code
-					className={`text-sm w-full whitespace-pre-wrap font-sans text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap  block break-words w-full' : ''}`}
+					className={`text-sm w-full whitespace-pre-wrap font-code text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}
 				>
 					{contentBacktick}
 				</code>

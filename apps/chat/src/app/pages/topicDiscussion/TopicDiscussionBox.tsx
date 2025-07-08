@@ -151,7 +151,7 @@ const TopicDiscussionBox = () => {
 			)}
 			{dataReferences.message_ref_id && (
 				<div className="relative z-1 pb-[4px] w-[450px] ml-3">
-					<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} className="pb-[15px]" />
+					<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
 				</div>
 			)}
 			<div className="flex flex-col flex-1">

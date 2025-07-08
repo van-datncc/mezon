@@ -166,7 +166,7 @@ function ClanHeader({ name, type }: ClanHeaderProps) {
 					<input
 						ref={inputRef}
 						placeholder="Find or start a conversation"
-						className={`font-[400] px-[16px] rounded-lg outline-none text-[14px] w-full h-[36px] bg-theme-input color-text-secondary border-theme-primary`}
+						className={`font-[500] px-[16px] rounded-lg outline-none text-[14px] w-full h-[36px] bg-theme-input color-text-secondary border-theme-primary`}
 						type="text"
 						onFocus={handleInputFocus}
 					/>

@@ -184,7 +184,7 @@ function MessageWithUser({
 							'pt-3': !isCombine || (message.code !== TypeMessage.CreatePin && message.references?.[0]?.message_ref_id)
 						},
 						{
-							'bg-highlight':
+							'bg-highlight-no-hover':
 								(hasIncludeMention || checkReplied) && !messageReplyHighlight && !checkMessageTargetToMoved && !isEphemeralMessage
 						},
 						{ '!bg-bgMessageReplyHighline': messageReplyHighlight },
@@ -252,7 +252,7 @@ function MessageWithUser({
 							></div>
 						)}
 						{!!message?.content?.fwd && (
-							<div className="flex gap-1 items-center italic font-medium w-full">
+							<div className="flex gap-1 items-center italic font-medium w-full text-theme-primary opacity-60">
 								<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 								<p>Forwarded</p>
 							</div>
@@ -394,7 +394,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	};
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : 'bg-item-hover'} relative message-container ${className || ''}`}
+			className={`message-list-item ${isSearchMessage ? 'w-full' : ' '} bg-item-hover  relative message-container ${className || ''}`}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}

@@ -26,7 +26,7 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 		}
 		switch (type) {
 			case ETypeUpdateSystemMessage.HIDE_AUDIT_LOG:
-				setUpdateSystemMessageRequest({ ...updateSystem, hide_audit_log: checked ? '1' : '0' });
+				setUpdateSystemMessageRequest({ ...updateSystem, hide_audit_log: checked ? '0' : '1' });
 				break;
 			case ETypeUpdateSystemMessage.SETUP_TIPS:
 				setUpdateSystemMessageRequest({ ...updateSystem, setup_tips: checked ? '1' : '0' });
@@ -112,7 +112,7 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 			/>
 			<ToggleItem
 				label={'Send a log when an action is applied to the clan'}
-				value={updateSystem?.hide_audit_log === '1'}
+				value={updateSystem?.hide_audit_log !== '1'}
 				handleToggle={(e) => handleToggleSetting(e, ETypeUpdateSystemMessage.HIDE_AUDIT_LOG)}
 			/>
 		</div>

@@ -32,7 +32,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { ChannelStreamMode } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Platform, Pressable, TextInput, View } from 'react-native';
+import { DeviceEventEmitter, Image, Platform, Pressable, TextInput, View } from 'react-native';
 import { TriggersConfig, useMentions } from 'react-native-controlled-mentions';
 import RNFS from 'react-native-fs';
 import { useSelector } from 'react-redux';
@@ -199,21 +199,42 @@ export const ChatBoxBottomBar = memo(
 			[textChange]
 		);
 
+		const getImageDimension = (imageUri: string): Promise<{ width: number; height: number }> => {
+			return new Promise((resolve) => {
+				Image.getSize(
+					imageUri,
+					(width, height) => {
+						resolve({ width, height });
+					},
+					(error) => {
+						console.error('Error getting image dimensions:', error);
+					}
+				);
+			});
+		};
+
 		const handlePasteImage = async (imageBase64: string) => {
 			try {
 				if (imageBase64) {
 					const now = Date.now();
-					const fileName = `paste_image_${now}.png`;
-					const tempPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+					const mimeType = imageBase64.split(';')?.[0]?.split(':')?.[1] || 'image/jpeg';
+					const extension = mimeType?.split('/')?.[1]?.replace('jpeg', 'jpg')?.replace('svg+xml', 'svg') || 'jpg';
 
-					await RNFS.writeFile(tempPath, imageBase64?.split(',')?.[1], 'base64');
-					const fileInfo = await RNFS.stat(tempPath);
+					const fileName = `paste_image_${now}.${extension}`;
+					const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
+
+					await RNFS.writeFile(destPath, imageBase64.split(',')?.[1], 'base64');
+					const fileInfo = await RNFS.stat(destPath);
+					const filePath = `file://${fileInfo?.path}`;
+					const { width, height } = await getImageDimension(filePath);
 
 					const imageFile = {
 						filename: fileName,
-						filetype: 'image/png',
-						url: `file://${fileInfo?.path}`,
-						size: fileInfo?.size
+						filetype: mimeType,
+						url: filePath,
+						size: fileInfo?.size,
+						width: width ?? 250,
+						height: height ?? 250
 					};
 
 					dispatch(
@@ -249,6 +270,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback((mode: IModeKeyboardPicker) => {

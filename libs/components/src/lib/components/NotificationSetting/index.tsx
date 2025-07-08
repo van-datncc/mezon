@@ -29,16 +29,18 @@ export type ModalParam = {
 export const customStyles = {
 	control: (provided: any) => ({
 		...provided,
-		backgroundColor: 'var(--bg-tertiary)'
+		backgroundColor: 'var(--bg-tertiary)',
+		borderRadius: '8px',
+		color: 'var(--text-secondary)'
 	}),
 	menu: (provided: any) => ({
 		...provided,
-		backgroundColor: 'var(--bg-tertiary)'
+		backgroundColor: 'var(--bg-option-theme)'
 	}),
 	option: (provided: any, state: any) => ({
 		...provided,
-		backgroundColor: state.isFocused ? '#000' : '#000',
-		color: '#000'
+		backgroundColor: state.isFocused ? 'var(--bg-option-active)' : '',
+		color: 'var(--text-secondary)'
 	}),
 	multiValue: (provided: any) => ({
 		...provided,
@@ -46,7 +48,7 @@ export const customStyles = {
 	}),
 	multiValueLabel: (provided: any) => ({
 		...provided,
-		color: 'black'
+		color: 'var(--text-secondary)'
 	}),
 	multiValueRemove: (provided: any) => ({
 		...provided,
@@ -57,6 +59,10 @@ export const customStyles = {
 		}
 	}),
 	input: (provided: any) => ({
+		...provided,
+		color: 'var(--text-secondary)'
+	}),
+	singleValue: (provided: any) => ({
 		...provided,
 		color: 'var(--text-secondary)'
 	})
@@ -212,7 +218,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 		>
 			<div>
 				<div className={`${appearanceTheme === 'light' ? 'customScrollLightMode' : ''}`}>
-					<div className="text-xs font-bold  uppercase mb-2">CLAN NOTIFICATION SETTINGS</div>
+					<div className="text-xs font-bold  uppercase mb-2 text-theme-primary-active">CLAN NOTIFICATION SETTINGS</div>
 					<div className="space-y-2">
 						{notificationTypesList.map((notificationType, index) => (
 							<div key={index} className="flex items-center gap-x-3 p-[12px]  rounded text-sm">
@@ -231,9 +237,9 @@ const ModalNotificationSetting = (props: ModalParam) => {
 					</div>
 
 					<hr className="border-zinc-500 my-4" />
-					<div className="text-xs font-bold  uppercase mb-2">NOTIFICATION OVERRIDES</div>
+					<div className="text-xs font-bold  uppercase mb-2 text-theme-primary-active">NOTIFICATION OVERRIDES</div>
 					<div className="text-sm font-normal  mb-2">Add a channel to override its default notification settings</div>
-					<div className={'lightModeScrollBarMention'}>
+					<div className="bg-theme-setting-primary">
 						<Creatable
 							isClearable
 							onChange={handleChange}
@@ -243,15 +249,15 @@ const ModalNotificationSetting = (props: ModalParam) => {
 							styles={customStyles}
 						/>
 					</div>
-					<div className={`mt-4 overflow-visible  'customScrollLightMode'  `}>
+					<div className={`mt-4 overflow-visible bg-theme-setting-primary `}>
 						<table className="w-full mt-4 hide-scrollbar overflow-hidden space-y-2">
 							<thead>
-								<tr className="grid grid-cols-7">
-									<th className="text-xs font-bold  uppercase mb-2 col-span-3">CHANNEL OR CATEGORY</th>
-									<th className="text-xs font-bold  uppercase mb-2 col-span-1">ALL</th>
-									<th className="text-xs font-bold  uppercase mb-2 col-span-1">MENTIONS</th>
-									<th className="text-xs font-bold  uppercase mb-2 col-span-1">NOTHING</th>
-									<th className="text-xs font-bold  uppercase mb-2 col-span-1">Mute</th>
+								<tr className="grid grid-cols-7 text-theme-primary-active">
+									<th className="text-xs font-bold  uppercase mb-2 text-theme-primary-active col-span-3">CHANNEL OR CATEGORY</th>
+									<th className="text-xs font-bold  uppercase mb-2 text-theme-primary-active col-span-1">ALL</th>
+									<th className="text-xs font-bold  uppercase mb-2 text-theme-primary-active col-span-1">MENTIONS</th>
+									<th className="text-xs font-bold  uppercase mb-2 text-theme-primary-active col-span-1">NOTHING</th>
+									<th className="text-xs font-bold  uppercase mb-2 text-theme-primary-active col-span-1">Mute</th>
 								</tr>
 							</thead>
 							<tbody>

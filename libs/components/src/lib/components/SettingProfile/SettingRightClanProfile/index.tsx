@@ -1,6 +1,7 @@
 import { selectAllClans } from '@mezon/store';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import Select from 'react-select';
 import SettingUserClanProfileEdit from './SettingUserClanProfileEdit';
 
 interface SettingUserClanProfileEditProps {
@@ -12,9 +13,11 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 	const [flagOption, setFlagOption] = useState<boolean>(false);
 	const [selectedClanId, setSelectedClanId] = useState<string | undefined>(clanId as string);
 
-	const handleClanChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedClanId(event.target.value);
-	};
+	console.log('clans', selectedClanId);
+	console.log(
+		'clans',
+		clans.find((clan) => clan.id === selectedClanId)
+	);
 
 	return (
 		<div className="flex flex-col">
@@ -22,19 +25,66 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 				<p className="">Show who you are with different profiles for each of your clans</p>
 			</div>
 			<p className="mt-[20px] font-bold text-sm  tracking-wide">CHOOSE A CLAN</p>
-			<select
+
+			<Select
+				className=" mt-1 text-theme-primary-active bg-input-secondary rounded-lg	"
+				classNamePrefix="select"
+				value={
+					clans.find((clan) => clan.id === selectedClanId)
+						? { value: selectedClanId, label: clans.find((clan) => clan.id === selectedClanId)?.clan_name }
+						: null
+				}
+				isDisabled={flagOption}
+				isLoading={false}
+				isClearable={false}
+				isRtl={false}
+				isSearchable={true}
 				name="clan"
-				className="block rounded-lg w-full mt-1 bg-item-theme px-4 py-3 font-normal text-sm tracking-wide outline-none border-theme-primary"
-				disabled={flagOption}
-				value={selectedClanId}
-				onChange={handleClanChange}
-			>
-				{clans.map((clan) => (
-					<option key={clan.id} value={clan.id} style={{ width: '200px' }} className=" text-theme-primary rounded-lg bg-item-hover">
-						{clan.clan_name}
-					</option>
-				))}
-			</select>
+				options={clans.map((clan) => ({ value: clan.id, label: clan.clan_name }))}
+				onChange={(option: any) => setSelectedClanId(option.value)}
+				styles={{
+					control: (provided: any) => ({
+						...provided,
+						backgroundColor: 'var(--bg-tertiary)',
+						borderRadius: '8px',
+						color: 'red'
+					}),
+					menu: (provided: any) => ({
+						...provided,
+						backgroundColor: 'var(--bg-option-theme)'
+					}),
+					option: (provided: any, state: any) => ({
+						...provided,
+						backgroundColor: state.isFocused ? 'var(--bg-option-active)' : '',
+						color: 'var(--text-secondary)'
+					}),
+					multiValue: (provided: any) => ({
+						...provided,
+						backgroundColor: 'var(--bg-tertiary)'
+					}),
+					multiValueLabel: (provided: any) => ({
+						...provided,
+						color: 'var(--text-secondary)'
+					}),
+					multiValueRemove: (provided: any) => ({
+						...provided,
+						color: 'red',
+						':hover': {
+							backgroundColor: 'var(--bg-tertiary)',
+							color: 'var(--text-secondary)'
+						}
+					}),
+					input: (provided: any) => ({
+						...provided,
+						color: 'var(--text-secondary)'
+					}),
+					singleValue: (provided: any) => ({
+						...provided,
+						color: 'var(--text-secondary)'
+					})
+				}}
+			/>
+
 			<SettingUserClanProfileEdit flagOption={flagOption} setFlagOption={setFlagOption} clanId={selectedClanId ?? ''} />
 		</div>
 	);

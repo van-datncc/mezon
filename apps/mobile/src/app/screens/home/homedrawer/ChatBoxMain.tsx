@@ -44,6 +44,7 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 			if (value?.type === EMessageActionType.EditMessage) {
 				saveMessageActionNeedToResolve(value);
 			} else {
+				if (!value?.targetMessage?.channel_id) return;
 				resetCachedMessageActionNeedToResolve(value?.targetMessage?.channel_id);
 			}
 		});
@@ -68,6 +69,7 @@ export const ChatBoxMain = memo((props: IChatBoxProps) => {
 	};
 	const deleteMessageActionNeedToResolve = useCallback(() => {
 		setMessageActionNeedToResolve(null);
+		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 	}, []);
 
 	return (

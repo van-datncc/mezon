@@ -66,7 +66,11 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, message, isTopic }: User
 						className={`z-50 w-[18rem] bg-theme-setting-primary border-color-primary rounded-lg min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel?.emojiId} emojiName={emojiShowPanel?.emoji ?? ''} count={count} />
-						<div ref={ref} tabIndex={-1} className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none">
+						<div
+							ref={ref}
+							tabIndex={-1}
+							className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none"
+						>
 							{emojiShowPanel?.senders.map((sender: SenderInfoOptionals, index: number) => {
 								if (sender.count && sender.count > 0) {
 									return (
@@ -138,7 +142,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 	const user = useUserById(sender.sender_id);
 
 	return (
-		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative">
+		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative bg-item-theme-hover-status ">
 			<div className="w-8 h-8">
 				<AvatarImage
 					className="w-8 h-8"
@@ -154,7 +158,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 			</div>
 
 			<NameComponent id={sender.sender_id ?? ''} name={user?.clan_nick || user?.user?.display_name || user?.user?.username} />
-			<p className="text-xs absolute right-8 ">{sender.count}</p>
+			<p className="text-xs absolute right-8 text-theme-primary-hover text-theme-primary ">{sender.count}</p>
 			{sender.sender_id === userId.userId && sender.count && sender.count > 0 && (
 				<div onClick={handleRemoveEmojiSender} className="right-1 absolute cursor-pointer">
 					<Icons.Close defaultSize="w-3 h-3" />

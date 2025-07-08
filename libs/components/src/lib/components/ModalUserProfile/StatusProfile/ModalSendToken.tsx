@@ -1,4 +1,4 @@
-import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUserClans } from '@mezon/store';
+import { FriendsEntity, ISendTokenDetailType, selectAllFriends, selectAllUsersByUser, UsersEntity } from '@mezon/store';
 import { ButtonLoading, Icons } from '@mezon/ui';
 import { createImgproxyUrl, formatNumber } from '@mezon/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -25,6 +25,13 @@ type ModalSendTokenProps = {
 	isButtonDisabled: boolean;
 };
 
+type User = {
+	id: string;
+	username: string;
+	avatar_url: string;
+	search_key?: string;
+	display_name?: string;
+};
 const ModalSendToken = ({
 	onClose,
 	token,
@@ -41,7 +48,7 @@ const ModalSendToken = ({
 	infoSendToken,
 	isButtonDisabled
 }: ModalSendTokenProps) => {
-	const usersClan = useSelector(selectAllUserClans);
+	const usersClan = useSelector(selectAllUsersByUser);
 	const friends = useSelector(selectAllFriends);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [searchTerm, setSearchTerm] = useState(infoSendToken?.receiver_name || '');
@@ -94,16 +101,18 @@ const ModalSendToken = ({
 		setNoteSendToken(value);
 	};
 
-	const mergeUniqueUsers = (usersClan: any[], directMessages: any[]) => {
-		const userMap = new Map();
+	const mergeUniqueUsers = (usersClan: UsersEntity[], directMessages: FriendsEntity[]) => {
+		const userMap: Map<string, User> = new Map();
 
 		usersClan.forEach((itemUserClan) => {
 			const userId = itemUserClan?.id ?? '';
 			if (userId && !userMap.has(userId)) {
 				userMap.set(userId, {
 					id: userId,
-					username: itemUserClan?.user?.username ?? '',
-					avatar_url: itemUserClan?.user?.avatar_url ?? ''
+					username: itemUserClan?.username ?? '',
+					avatar_url: itemUserClan?.avatar_url ?? '',
+					search_key: itemUserClan.list_nick_names?.join('./'),
+					display_name: itemUserClan.display_name
 				});
 			}
 		});
@@ -114,7 +123,8 @@ const ModalSendToken = ({
 				userMap.set(userId, {
 					id: userId,
 					username: (itemDM?.user?.display_name || itemDM?.user?.username) ?? '',
-					avatar_url: itemDM?.user?.avatar_url ?? ''
+					avatar_url: itemDM?.user?.avatar_url ?? '',
+					display_name: (itemDM?.user?.display_name || itemDM?.user?.username) ?? ''
 				});
 			}
 		});
@@ -124,7 +134,11 @@ const ModalSendToken = ({
 
 	const mergedUsers = mergeUniqueUsers(usersClan, friends);
 
-	const filteredUsers = mergedUsers.filter((user: any) => user.username?.toLowerCase().includes(searchTerm.toLowerCase()) && user.id !== userId);
+	const filteredUsers = mergedUsers.filter(
+		(user) =>
+			(user.username?.toLowerCase().includes(searchTerm.toLowerCase()) || user.search_key?.includes(searchTerm.toLowerCase())) &&
+			user.id !== userId
+	);
 
 	const rowVirtualizer = useVirtualizer({
 		count: filteredUsers?.length,
@@ -272,14 +286,14 @@ const ModalSendToken = ({
 
 				<div className="p-6 border-t-theme-primary flex gap-3">
 					<button
-						className="flex-1 h-12 px-4 rounded-xl text-theme-primary border-theme-primary font-medium hover:opacity-80 transition-all"
+						className="flex-1 h-12 px-4 rounded-xl text-theme-primary border-theme-primary font-medium  transition-all"
 						type="button"
 						onClick={onClose}
 					>
 						Cancel
 					</button>
 					<ButtonLoading
-						className="flex-1 h-12 px-4 rounded-xl text-white font-medium"
+						className="flex-1 h-12 px-4 rounded-xl bg-indigo-500 hover:bg-indigo-600 hover:text-white  text-white font-medium"
 						onClick={handleSendToken}
 						disabled={isButtonDisabled || !selectedUserId || token <= 0}
 						label="Send Tokens"

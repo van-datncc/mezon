@@ -95,7 +95,7 @@ function AllNotificationItem({ notify }: NotifyMentionProps) {
 			</button>
 			{parseNotify.category === NotificationCategory.MENTIONS && (
 				<button
-					className="absolute py-1 px-2 bottom-[10px] z-50 right-3 text-[10px] rounded-[6px] transition-all duration-300 group-hover:block hidden"
+					className="absolute py-1 px-2 bottom-[10px] z-50 right-3 text-[10px] rounded-lg border-theme-primary transition-all duration-300 group-hover:block hidden"
 					onClick={handleClickJump}
 				>
 					Jump

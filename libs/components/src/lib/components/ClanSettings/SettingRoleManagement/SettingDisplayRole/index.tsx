@@ -71,12 +71,12 @@ const SettingDisplayRole = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 
 	return (
 		<div className="grid grid-cols-1 gap-4">
-			<div className="w-full flex flex-col text-[15px] dark:text-textSecondary text-textSecondary800 pr-5">
-				<div className="text-xs font-bold uppercase mb-2">
+			<div className="w-full flex flex-col text-[15px] pr-5">
+				<div className="text-xs font-bold uppercase text-theme-primary-active mb-2">
 					Role name<b className="text-red-600">*</b>
 				</div>
 				<input
-					className={`dark:bg-bgTertiary bg-bgLightModeThird text-[15px] w-full p-[7px] font-normal border dark:border-bgTertiary border-bgLightModeThird rounded outline-none ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}
+					className={` text-[15px] w-full  p-[7px] font-normal border-theme-primary text-theme-message bg-input-secondary rounded-lg outline-none ${hasPermissionEdit ? '' : 'cursor-not-allowed'}`}
 					type="text"
 					value={nameRole}
 					onChange={handleDisplayName}

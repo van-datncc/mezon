@@ -177,9 +177,7 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 					className="text-theme-primary flex items-center px-0.5 w-full font-title tracking-wide text-theme-primary-hover capitalize text-sm font-medium"
 				>
 					{categoryExpandState ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
-					<span className="one-line">
-						{category.category_name.toLowerCase()}
-					</span>
+					<span className="one-line uppercase">{category.category_name}</span>
 				</button>
 
 				{!category.isFavor && (
