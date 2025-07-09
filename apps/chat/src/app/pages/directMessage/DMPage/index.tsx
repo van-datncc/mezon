@@ -281,7 +281,6 @@ const DirectMessage = () => {
 									style={{ height: 44 }}
 									className="opacity-80 bg-theme-input  ml-4 mb-4 py-2 pl-2 w-widthInputViewChannelPermission text-theme-primary rounded one-line"
 								>
-									{' '}
 									You do not have permission to send message
 								</div>
 							) : (
