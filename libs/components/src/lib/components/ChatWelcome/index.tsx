@@ -299,7 +299,7 @@ const StatusFriend = memo((props: StatusFriendProps) => {
 			)}
 			{title.map((button, index) => (
 				<button
-					className={`rounded-lg   border border-theme-primary px-4 py-0.5 font-medium  ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-button-secondary text-theme-primary text-theme-primary-hover' : 'bg-button-add-friend text-white'}`}
+					className={`rounded-lg   border border-theme-primary px-4 py-0.5 font-medium  ${checkAddFriend === EStateFriend.OTHER_PENDING ? 'cursor-not-allowed' : ''} ${checkAddFriend === EStateFriend.FRIEND ? 'bg-button-secondary text-theme-primary text-theme-primary-hover' : 'btn-primary btn-primary-hover'}`}
 					onClick={() => handleOnClickButtonFriend(index)}
 					key={button}
 				>

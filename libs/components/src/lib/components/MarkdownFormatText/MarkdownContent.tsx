@@ -101,7 +101,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={`${!isLink ? 'inline bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={` inline${!isLink ? ' bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
 					onClick={() => onClickLink(content)}

@@ -66,26 +66,24 @@
 	--bg-mention-everyone-hover: #2eb08b8c;
 	--color-mention-everyone-hover: #32b993;
 
-	--bg-highlight: rgba(77, 120, 204, 0.08);
-	--bg-secondary-button-hover: rgba(77, 77, 77, 0.3);
-	/* contexify */
-	--bg-theme-contexify: #252525;
-	--bg-count-page: #252525;
-	--text-count-page: #cccccc;
-	--bg-count-page-hover: #303030;
-	--text-count-page-hover: #e0e0e0;
-	--bg-count-page-active: #3366cc;
-	--text-count-page-active: #ffffff;
-	--bg-item-theme-hover: rgba(255, 255, 255, 0.08);
-	/* button primary */
-	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
-	/* modal */
-	--bg-modal-theme: color-mix(in oklab, hsl(240 calc(1 * 6.494%) 15.098% /1) 100%, #000 0%);
-	/* input secondary */
-	--bg-input-secondary: #202225;
-	/* option  */
-	--bg-option-theme: #28282d;
-	--bg-option-active: #3e3e44;
+  --bg-highlight: rgba(232, 202, 82, 0.08);
+  --bg-secondary-button-hover: rgba(77, 77, 77, 0.3);
+  /* contexify */
+  --bg-theme-contexify: #252525;
+  --bg-count-page: #252525;
+  --text-count-page: #cccccc;
+  --bg-count-page-hover: #303030;
+  --text-count-page-hover: #e0e0e0;
+  --bg-count-page-active: #3366cc;
+  --text-count-page-active: #ffffff;
+  --bg-item-theme-hover: rgba(255, 255, 255, 0.08);
+  /* modal */
+  --bg-modal-theme: color-mix(in oklab, hsl(240 calc(1 * 6.494%) 15.098% /1) 100%, #000 0%);
+  /* input secondary */
+  --bg-input-secondary: #202225;
+  /* option  */
+  --bg-option-theme: #28282d;
+  --bg-option-active: #3e3e44;
 
 	/* button add friend */
 	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
@@ -104,4 +102,6 @@
 	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
   /* oklab(0.751834 0.00131807 -0.008479) */
   --bg-markdown-code: #2B2D31;
+  --bg-button-primary-hover: #4654C0;
+	--button-theme-primary: #5265EC;
 }

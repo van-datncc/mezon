@@ -245,14 +245,14 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					<button
 						color="gray"
 						onClick={onClose}
-						className="px-4 py-2 mr-5 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
+						className="px-4 py-2 mr-5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300"
 					>
 						Cancel
 					</button>
 					<ButtonLoading
 						label="Done"
 						onClick={handleAddMember}
-						className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300"
+						className="px-4 py-2 rounded-lg btn-primary btn-primary-hover"
 					/>
 				</div>
 			</div>

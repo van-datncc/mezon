@@ -292,7 +292,7 @@ export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, o
 						<button
 							onClick={() => onClickSendSound(sound)}
 							title="Send sound"
-							className="flex items-center gap-2 px-4 py-1.5 bg-button-primary text-white rounded-full hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 mt-2"
+							className="flex items-center gap-2 px-4 py-1.5 btn-primary btn-primary-hover rounded-full  transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 mt-2"
 						>
 							<Icons.ArrowRight defaultFill="white" className="w-4 h-4" />
 						</button>

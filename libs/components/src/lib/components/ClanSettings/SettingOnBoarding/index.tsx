@@ -236,7 +236,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 								</button>
 								<button
 									onClick={handleConfirm}
-									className="px-4 py-2 rounded-md bg-button-primary text-white flex items-center justify-center min-w-[100px]"
+									className="px-4 py-2 rounded-lg btn-primary btn-primary-hover flex items-center justify-center min-w-[100px]"
 									disabled={isSaving}
 								>
 									{isSaving ? (
@@ -275,7 +275,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 							</button>
 							<button
 								onClick={handleConfirm}
-								className="px-4 py-2 rounded-md bg-button-primary hover:opacity-80 text-white flex items-center justify-center min-w-[100px]"
+								className="px-4 py-2 rounded-lg btn-primary btn-primary-hover flex items-center justify-center min-w-[100px]"
 								disabled={isSaving}
 							>
 								{isSaving ? (
@@ -405,7 +405,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 					action={
 						<div
 							onClick={() => handleGoToPage(EOnboardingStep.QUESTION)}
-							className="px-3 py-2 flex gap-2 justify-center items-center rounded-lg bg-button-primary text-white hover:bg-indigo-500 cursor-pointer"
+							className="px-3 py-2 flex gap-2 justify-center items-center rounded-lg btn-primary btn-primary-hover  cursor-pointer"
 						>
 							<div>Set up</div> <Icons.LongArrowRight className="w-3" />
 						</div>

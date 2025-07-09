@@ -244,7 +244,7 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 								<button
 									type="submit"
 									disabled={loading || !formData.menu_name?.trim()}
-									className="bg-button-primary disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-md font-medium transition-colors duration-200 flex items-center gap-2"
+									className="btn-primary-hover btn-primary disabled:bg-gray-600 disabled:cursor-not-allowed  px-6 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
 								>
 									{loading && (
 										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="animate-spin">
