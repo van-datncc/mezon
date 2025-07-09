@@ -2736,7 +2736,7 @@ export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
 			height="18"
 			fill="none"
 			viewBox="0 0 24 24"
-			className=" group-hover:text-white"
+			className="text-theme-primary-hover"
 		>
 			<path
 				fill="currentColor"

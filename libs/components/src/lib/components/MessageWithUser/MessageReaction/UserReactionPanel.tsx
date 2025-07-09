@@ -138,7 +138,7 @@ const SenderItem: React.FC<SenderItemProps> = ({ sender, emojiShowPanel, userId,
 	const user = useUserById(sender.sender_id);
 
 	return (
-		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative bg-item-theme-hover-status ">
+		<div className="m-2 flex flex-row justify-start mb-2 items-center gap-2 relative  ">
 			<div className="w-8 h-8">
 				<AvatarImage
 					className="w-8 h-8"

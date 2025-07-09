@@ -280,7 +280,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							>
 								<p className="select-none flex-1 truncate">{editingGraphic.fileName ?? 'Choose a file'}</p>
 								{!graphic && (
-									<button className="bg-button-primary hover:opacity-80 rounded-[4px] py-[2px] px-2 text-nowrap relative select-none text-white overflow-hidden">
+									<button className="btn-primary btn-primary-hover rounded-lg py-[2px] px-2 text-nowrap relative select-none overflow-hidden">
 										Browse
 										<input
 											className="absolute w-full h-full cursor-pointer top-0 right-0 z-10 opacity-0 file:cursor-pointer"
@@ -325,8 +325,8 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							Never Mind
 						</Button>
 						<ButtonLoading
-							className="px-2 py-1 h-9 w-32 bg-button-primary text-white hover:opacity-80 rounded-lg"
-							label="Save Changes"
+							className="px-2 py-1 h-9 min-w-fit btn-primary btn-primary-hover rounded-lg"
+							label="Upload"
 							disabled={validateSaveChange}
 							onClick={onSaveChange}
 						/>
