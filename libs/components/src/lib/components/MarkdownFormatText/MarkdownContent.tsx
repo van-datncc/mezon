@@ -101,7 +101,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={`${!isLink ? 'inline bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={` inline${!isLink ? ' bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
 					onClick={() => onClickLink(content)}
@@ -206,7 +206,7 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 				</button>
 				<code
 					style={{ fontFamily: 'sans-serif' }}
-					className={`text-sm w-full !font-mono  whitespace-pre-wrap text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}
+					className={`text-sm w-full   whitespace-pre-wrap text-theme-message ${isInPinMsg ? 'whitespace-pre-wrap block break-words w-full' : ''}`}
 				>
 					{contentBacktick}
 				</code>

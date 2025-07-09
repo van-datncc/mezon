@@ -33,9 +33,9 @@ export const ReactionMember = React.memo((props: IReactionMemberProps) => {
 	return (
 		<TouchableOpacity style={styles.memberWrapper} onPress={showUserInformation}>
 			<View style={styles.imageWrapper}>
-				{reactionMember?.user?.avatar_url ? (
+				{reactionMember?.clan_avatar || reactionMember?.user?.avatar_url ? (
 					<ImageNative
-						url={createImgproxyUrl(reactionMember?.clan_avatar ?? reactionMember?.user?.avatar_url ?? '', {
+						url={createImgproxyUrl((reactionMember?.clan_avatar || reactionMember?.user?.avatar_url) ?? '', {
 							width: 50,
 							height: 50,
 							resizeType: 'fit'

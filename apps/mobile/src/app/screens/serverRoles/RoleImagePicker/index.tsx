@@ -22,7 +22,7 @@ function RoleImagePicker({ roleId }: { roleId: string }) {
 	const handleOnLoad = async (url) => {
 		if (url) {
 			const response = await updateRole(activeRole?.clan_id, activeRole?.id, activeRole?.title, activeRole?.color || '', [], [], [], [], url);
-			if (response === true) {
+			if (response) {
 				return;
 			} else {
 				Toast.show({
@@ -38,7 +38,7 @@ function RoleImagePicker({ roleId }: { roleId: string }) {
 
 	const handleRemoveIcon = async () => {
 		const response = await updateRole(activeRole?.clan_id, activeRole?.id, activeRole?.title, activeRole?.color || '', [], [], [], [], '');
-		if (response === true) {
+		if (response) {
 			return;
 		} else {
 			Toast.show({

@@ -34,7 +34,7 @@ function RoleCoLourComponent({ roleId }: { roleId: string }) {
 				[],
 				[]
 			);
-			if (response === true) {
+			if (response) {
 				setRoleColorSelected(colorSelected);
 			} else {
 				Toast.show({

@@ -2,11 +2,10 @@
 :root {
 	--bg-primary: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(20, 7, 48) 61.92%);
 
-	--bg-secondary:linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(20, 7, 48) 61.92%)
-	;
+	--bg-secondary: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(20, 7, 48) 61.92%);
 
-	--bg-surface: linear-gradient(rgba(0, 0, 0, 0.65), rgba(14, 13, 13, 0.65)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(51, 26, 105) 61.92%)
-	;
+	--bg-surface: linear-gradient(rgba(0, 0, 0, 0.65), rgba(14, 13, 13, 0.65)),
+		linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(51, 26, 105) 61.92%);
 
 	--bg-ping-member: rgb(23, 30, 50);
 	--bg-tertiary: hsl(240 10% 25% / 0.2);
@@ -29,8 +28,8 @@
 
 	--text-theme-message: oklab(0.906424 -0.000235766 -0.0028885);
 
-	--bg-active-friend-list: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(20, 7, 48) 61.92%)
-	;
+	--bg-active-friend-list: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+		linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(20, 7, 48) 61.92%);
 
 	--bg-active-button: hsl(240 50% 25% / 0.25);
 	--color-text-active-button: color-mix(in oklab, hsl(240 100% 70%) 100%, hsl(240 100% 90%) 50%);
@@ -42,8 +41,8 @@
 		color-mix(in oklab, hsl(240 0% 40% / 0.3), hsl(240 100% 90% / 0.3)) 100%
 	);
 
-	--bg-theme-direct-message: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(63, 34, 207) 61.92%)
-	;
+	--bg-theme-direct-message: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
+		linear-gradient(48.17deg, rgb(83, 72, 202) 11.21%, rgb(63, 34, 207) 61.92%);
 
 	--bg-item-hover: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
 	--bg-item-hover-chat: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
@@ -74,7 +73,7 @@
 	--bg-mention-everyone-hover: #2758828c;
 	--color-mention-everyone-hover: #5fa2ff;
 
-	--bg-highlight: color-mix(in oklab, hsla(240, 73%, 61%, 0.08), hsla(240, 92%, 67%, 0.08));
+	--bg-highlight: color-mix(in oklab, hsla(57, 84%, 67%, 0.08), hsla(78, 92%, 67%, 0.08));
 	--bg-secondary-button-hover: hsl(240 50% 25% / 0.3);
 
 	/* hover chọn trạng thái */
@@ -102,6 +101,15 @@
 	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
 	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
 	--bg-markdown-code: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
-	--border-highlight-react-theme: #5865F2;
+
+	/* scroll bar */
+	--bg-scroll-bar: #b4b2ab;
+	--thread-scroll: #787881;
+	/* pop up */
+	--bg-theme-pop: color-mix(in oklab, hsl(232.5 calc(1 * 6.557%) 23.922% /1) 100%, rgb(0, 14, 26) 50%);
+	--border-highlight-react-theme: #5865f2;
 	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
+	--bg-input-secondary: color-mix(in oklab, hsl(0 calc(1 * 0%) 0% /0.2) 100%, hsl(244.61538461538458 100% 5.098039215686274% /0.2) 50%);
+	--bg-button-primary-hover: #4654C0;
+	--button-theme-primary: #5265EC;
 }

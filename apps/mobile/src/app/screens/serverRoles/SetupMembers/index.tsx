@@ -2,7 +2,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllRolesClan, selectAllUserClans, selectRoleByRoleId } from '@mezon/store-mobile';
+import { selectAllRolesClan, selectAllUserClans } from '@mezon/store-mobile';
 import { EPermission, UsersClanEntity } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,9 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 	const [searchMemberText, setSearchMemberText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
-	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
+	const clanRole = useMemo(() => {
+		return rolesClan?.find((r) => r?.id === roleId);
+	}, [roleId, rolesClan]);
 	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
@@ -124,7 +126,7 @@ export const SetupMembers = ({ navigation, route }: MenuClanScreenProps<SetupMem
 			[],
 			[]
 		);
-		if (response === true) {
+		if (response) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING);
 			Toast.show({
 				type: 'success',

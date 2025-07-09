@@ -9,7 +9,6 @@ import {
 	rolesClanActions,
 	selectAllUserChannel,
 	selectAllUserClans,
-	selectEveryoneRole,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -36,7 +35,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const everyoneRole = useSelector(selectEveryoneRole);
 	const allClanMembers = useSelector(selectAllUserClans);
 	const [isChannelPublic, setIsChannelPublic] = useState<boolean>(isPublicChannel(channel));
 
@@ -63,8 +61,8 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		if (channel?.channel_private) {
 			return listOfChannelRole?.filter((role) => typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1);
 		}
-		return [everyoneRole];
-	}, [listOfChannelRole, channel?.channel_private, everyoneRole]);
+		return [];
+	}, [listOfChannelRole, channel?.channel_private]);
 
 	const combineWhoCanAccessList = useMemo(() => {
 		return [
