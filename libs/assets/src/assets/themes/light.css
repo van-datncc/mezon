@@ -102,4 +102,6 @@
 	--thread-scroll: #787881;
 	/* pop up */
 	--bg-theme-pop: #f5f5f5;
+	--border-highlight-react-theme: #5865f2;
+	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
 }

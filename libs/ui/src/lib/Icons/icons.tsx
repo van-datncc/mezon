@@ -2048,7 +2048,7 @@ export function Plus(props: React.HTMLAttributes<SVGElement>) {
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`text-theme-primary ${defaultSize}`}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={` text-theme-primary text-theme-primary-hover ${defaultSize}`}>
 			<g id="Live area">
 				<path
 					fill="currentColor"

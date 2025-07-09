@@ -60,7 +60,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 
 	return (
 		<ModalLayout onClose={onClose}>
-			<div className="bg-theme-surface pt-4 rounded w-[440px]">
+			<div className="bg-theme-surface pt-4 rounded w-[440px] ">
 				<div>
 					<h1 className="text-theme-primary text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
@@ -72,8 +72,8 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						<input
 							type="text"
 							defaultValue={customStatus}
-							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded-lg placeholder:text-sm border-theme-primary"
-							placeholder="Support has arrived!"
+							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded placeholder:text-sm border-theme-primary"
+							placeholder="What on your mind?"
 							maxLength={128}
 							autoFocus
 							onChange={handleChangeCustomStatus}
@@ -120,7 +120,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							)}
 							label=""
 							placement="bottom-start"
-							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
+							className="bg-theme-setting-primary border-none py-0 w-[200px] [&>ul]:py-0"
 						>
 							<ItemSelect children="Online" startIcon={<Icons.OnlineStatus />} />
 							<ItemSelect children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />

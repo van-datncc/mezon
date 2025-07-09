@@ -100,4 +100,8 @@
 	--thread-scroll: #787881;
 	/* pop up */
 	--bg-theme-pop: color-mix(in oklab, hsl(240 calc(1 * 6.494%) 15.098% /1) 100%, #000 0%);
+	--border-highlight-react-theme: #5865F2;
+	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
+  /* oklab(0.751834 0.00131807 -0.008479) */
+  --bg-markdown-code: oklab(0.298112 0.00109589 -0.00903481);
 }
