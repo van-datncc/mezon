@@ -9,7 +9,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { UsersClanEntity } from '@mezon/utils';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import ListMemberInviteItem from './ListMemberInviteItem';
@@ -27,7 +27,12 @@ const ListMemberInvite = (props: ModalParam) => {
 	const [sendIds, setSendIds] = useState<Record<string, boolean>>({});
 	const [filteredListDMBySearch, setFilterListSearch] = useState<DirectEntity[] | undefined>(listDMInvite);
 
-	const handleFilterListSearch = () => {
+	const handleFilterListSearch = useCallback(() => {
+		if (!searchTerm.trim()) {
+			setFilterListSearch(listDMInvite);
+			return;
+		}
+
 		const listSearch = listDMInvite?.filter((dmGroup) => {
 			if (dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())) {
 				return dmGroup.usernames?.toString()?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -35,7 +40,15 @@ const ListMemberInvite = (props: ModalParam) => {
 			return dmGroup.channel_label?.toLowerCase().includes(searchTerm.toLowerCase());
 		});
 		setFilterListSearch(listSearch);
-	};
+	}, [searchTerm, listDMInvite]);
+
+	useEffect(() => {
+		if (!searchTerm.trim()) {
+			setFilterListSearch(listDMInvite);
+		} else {
+			handleFilterListSearch();
+		}
+	}, [listDMInvite, searchTerm, handleFilterListSearch]);
 
 	const throttledSetSearchTerm = useThrottledCallback(handleFilterListSearch, 300);
 	const handleInputChange = useCallback(
