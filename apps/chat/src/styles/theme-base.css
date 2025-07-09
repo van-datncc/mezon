@@ -360,6 +360,12 @@ input.bg-theme-input-primary::placeholder {
   outline: none;
 }
 
+.highlight-react-theme {
+	background: var(--bg-highlight-react-theme);
+	border: 1px solid var(--border-highlight-react-theme);
+	backdrop-filter: blur(2px);
+}
+
 
 .status-user-background {
   background: var(--bg-primary);

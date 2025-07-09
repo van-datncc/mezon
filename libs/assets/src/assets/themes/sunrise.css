@@ -99,6 +99,12 @@
       hsl(36.894 calc(1 * 100%) 31.569% /0.0784313725490196) 100%,
       hsl(50.588235294117645 100% 90% /0.0784313725490196) 50%);
 
+	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
+	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
+	--bg-markdown-code: #eee6d5;
+	--border-highlight-react-theme: #5865F2;
+	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
+
 
   --bg-secondary-button-hover: hsl(240 calc(1 * 4%) 60.784% /0.2784313725490196);
 
