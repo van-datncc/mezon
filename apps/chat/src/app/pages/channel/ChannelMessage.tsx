@@ -166,7 +166,8 @@ export const MemorizedChannelMessage = memo(ChannelMessage, (prev, curr) => {
 		prev.channelLabel === curr.channelLabel &&
 		prev.isHighlight === curr.isHighlight &&
 		prev.isSelected === curr.isSelected &&
-		prev.isEditing === curr.isEditing
+		prev.isEditing === curr.isEditing &&
+		prev.message?.isError === curr.message?.isError
 	);
 });
 

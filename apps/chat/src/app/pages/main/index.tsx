@@ -5,6 +5,7 @@ import {
 	FooterProfile,
 	ForwardMessageModal,
 	GroupCallManager,
+	InternetStatusPopover,
 	MessageContextMenuProvider,
 	MessageModalImage,
 	ModalCreateClan,
@@ -228,6 +229,8 @@ function MyApp() {
 				{isShowFirstJoinPopup && <FirstJoinPopup openCreateClanModal={openCreateClanModal} onclose={() => setIsShowFirstJoinPopup(false)} />}
 				{isShowPopupQuickMess && <PopupQuickMess />}
 			</div>
+
+			<InternetStatusPopover />
 		</div>
 	);
 }
@@ -598,11 +601,9 @@ const MessageModalImageWrapper = () => {
 const MemoizedErrorModals: React.FC = React.memo(() => {
 	const toastError = useSelector(selectToastErrors);
 
-	return (
-		<>
-			{toastError.map((error) => (
-				<ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />
-			))}
-		</>
-	);
+	if (!toastError || toastError?.length < 1) {
+		return null;
+	}
+	const error = toastError[0];
+	return <ModalUnknowChannel key={error.id} isError={true} errMessage={error.message} idErr={error.id} />;
 });

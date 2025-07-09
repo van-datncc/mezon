@@ -386,19 +386,8 @@ input:-webkit-autofill:active {
 		outline: 3px solid #eab3081a;
 	}
 
-	&.is-sending {
-		.textChat {
-			opacity: 0.6;
-			pointer-events: none;
-		}
-	}
-
-	&.is-error {
-		.prose {
-			* {
-				color: #ff0000;
-			}
-		}
+	&.is-error div {
+		color: #ef4444 !important;
 	}
 
 	// start style markdown
