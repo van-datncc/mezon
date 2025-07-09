@@ -272,7 +272,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					placeholder={channelLabel}
 					value={channelLabel}
 					onChange={handleDisplayChannelLabel}
-					className="pl-3 py-2 w-full border-0 outline-none rounded"
+					className="pl-3 border-theme-primary bg-input-secondary  py-2 w-full  outline-none rounded-lg"
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 				/>
 				{checkValidate && <p className="text-[#e44141] text-xs italic font-thin">{checkValidate}</p>}
@@ -287,7 +287,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 							placeholder={appUrl}
 							value={appUrl}
 							onChange={handleDisplayAppUrl}
-							className="pl-3 py-2 w-full border-0 outline-none rounded"
+							className="pl-3 py-2 w-full border-theme-primary outline-none rounded-lg bg-input-secondary"
 						/>
 						{checkValidateUrl && <p className="text-[#e44141] text-xs italic font-thin">{messages.INVALID_URL}</p>}
 					</>
@@ -390,11 +390,18 @@ const BottomBlock = ({
 						className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 					>
 						{slowModeValues.map((item, index) => {
-							return <Dropdown.Item onClick={() => setSlowDropdown(item)} key={index} children={item} className="truncate text-theme-primary bg-theme-setting-nav" />;
+							return (
+								<Dropdown.Item
+									onClick={() => setSlowDropdown(item)}
+									key={index}
+									children={item}
+									className="truncate text-theme-primary bg-theme-setting-nav"
+								/>
+							);
 						})}
 					</Dropdown>
 				</div>
-				<div className='text-theme-primary'>
+				<div className="text-theme-primary">
 					Members will be restricted to sending one message and creating one thread per specified interval, unless they have 'Manage
 					Channel' or 'Manage Messages' permissions.
 				</div>
@@ -415,7 +422,7 @@ const BottomBlock = ({
 						onChange={handleCheckboxAgeRestricted}
 					/>
 				</div>
-				<div className='text-theme-primary'>
+				<div className="text-theme-primary">
 					Users will need to confirm they are of legal age to view the content in this channel. Age-restricted channels are exempt from the
 					explicit content filter.
 				</div>
@@ -467,11 +474,20 @@ const BottomBlock = ({
 						className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
 					>
 						{hideInactivityTimes.map((item, index) => {
-							return <Dropdown.Item onClick={() => setHideTimeDropdown(item)} key={index} children={item} className="truncate !bg-var(--theme-setting-nav)" />;
+							return (
+								<Dropdown.Item
+									onClick={() => setHideTimeDropdown(item)}
+									key={index}
+									children={item}
+									className="truncate !bg-var(--theme-setting-nav)"
+								/>
+							);
 						})}
 					</Dropdown>
 				</div>
-				<div className='text-theme-primary'>New threads will not show in the channel list after being inactive for the specified duration.</div>
+				<div className="text-theme-primary">
+					New threads will not show in the channel list after being inactive for the specified duration.
+				</div>
 			</div>
 			<div className="flex justify-center pb-10">
 				<Image src={logoImgSrc} width={48} height={48} className="object-cover w-[280px]" />

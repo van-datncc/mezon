@@ -2048,7 +2048,7 @@ export function Plus(props: React.HTMLAttributes<SVGElement>) {
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={` text-theme-primary text-theme-primary-hover ${defaultSize}`}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`  ${defaultSize}`}>
 			<g id="Live area">
 				<path
 					fill="currentColor"
@@ -2472,6 +2472,7 @@ export const EscIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
 				fill={defaultFill}
+				stroke="currentColor"
 				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm4.7-15.7a1 1 0 0 0-1.4 0L12 10.58l-3.3-3.3a1 1 0 0 0-1.4 1.42L10.58 12l-3.3 3.3a1 1 0 1 0 1.42 1.4L12 13.42l3.3 3.3a1 1 0 0 0 1.4-1.42L13.42 12l3.3-3.3a1 1 0 0 0 0-1.4Z"
 			></path>
