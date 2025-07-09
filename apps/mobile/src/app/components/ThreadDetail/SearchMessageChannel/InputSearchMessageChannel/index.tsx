@@ -6,7 +6,17 @@ import { useNavigation } from '@react-navigation/native';
 import debounce from 'lodash.debounce';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, TouchableOpacity, View } from 'react-native';
+import {
+	NativeSyntheticEvent,
+	Platform,
+	Pressable,
+	StatusBar,
+	Text,
+	TextInput,
+	TextInputKeyPressEventData,
+	TouchableOpacity,
+	View
+} from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
@@ -144,10 +154,12 @@ const InputSearchMessageChannel = ({
 						}}
 					/>
 				}
-				contentStyle={{ minWidth: 220, padding: 0, borderRadius: size.s_10, backgroundColor: Colors.primary }}
+				contentStyle={{ minWidth: size.s_220, padding: 0, borderRadius: size.s_10, backgroundColor: Colors.primary }}
 				arrowSize={{ width: 0, height: 0 }}
 				placement="bottom"
 				onClose={() => setIsVisibleToolTip(false)}
+				showChildInTooltip={false}
+				topAdjustment={Platform.OS === 'android' ? -StatusBar.currentHeight : 0}
 			>
 				<TouchableOpacity
 					activeOpacity={0.7}
