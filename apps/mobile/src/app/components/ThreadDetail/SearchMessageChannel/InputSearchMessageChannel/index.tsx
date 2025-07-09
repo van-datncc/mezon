@@ -4,7 +4,7 @@ import { DirectEntity } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import debounce from 'lodash.debounce';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, TouchableOpacity, View } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
@@ -21,6 +21,7 @@ type InputSearchMessageChannelProps = {
 	currentChannel: IChannel | DirectEntity;
 	optionFilter: IOption;
 	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
+	nameChannel?: string;
 };
 
 const InputSearchMessageChannel = ({
@@ -29,7 +30,8 @@ const InputSearchMessageChannel = ({
 	inputValue,
 	userMention,
 	optionFilter,
-	onKeyPress
+	onKeyPress,
+	nameChannel
 }: InputSearchMessageChannelProps) => {
 	const [textInput, setTextInput] = useState<string>(inputValue);
 	const [isVisibleToolTip, setIsVisibleToolTip] = useState<boolean>(false);
@@ -39,6 +41,18 @@ const InputSearchMessageChannel = ({
 
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+
+	const shouldShowBadge = useMemo(
+		() => nameChannel || optionFilter?.title || userMention?.display,
+		[nameChannel, optionFilter?.title, userMention?.display]
+	);
+
+	const badgeText = useMemo(() => {
+		if (optionFilter?.title || userMention?.display) {
+			return `${optionFilter?.title || ''} ${userMention?.display || ''}`;
+		}
+		return `${t('in')} ${nameChannel || ''}`;
+	}, [optionFilter?.title, userMention?.display, nameChannel]);
 
 	const debouncedOnChangeText = useCallback(
 		debounce((e) => {
@@ -83,18 +97,18 @@ const InputSearchMessageChannel = ({
 				<View style={{ marginRight: size.s_6 }}>
 					<MezonIconCDN icon={IconCDN.magnifyingIcon} width={20} height={20} color={Colors.textGray} />
 				</View>
-				{optionFilter?.title || userMention?.display ? (
+				{shouldShowBadge ? (
 					<View
 						style={{
 							backgroundColor: themeValue.badgeHighlight,
 							borderRadius: size.s_18,
 							paddingHorizontal: size.s_10,
 							paddingVertical: size.s_2,
-							maxWidth: 200
+							maxWidth: size.s_80
 						}}
 					>
 						<Text numberOfLines={1} style={styles.textBadgeHighLight}>
-							{`${optionFilter?.title || ''} ${userMention?.display || ''}`}
+							{badgeText}
 						</Text>
 					</View>
 				) : null}
@@ -152,4 +166,4 @@ const InputSearchMessageChannel = ({
 	);
 };
 
-export default InputSearchMessageChannel;
+export default memo(InputSearchMessageChannel);

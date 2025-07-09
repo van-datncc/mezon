@@ -15,6 +15,7 @@ type RootStackParamList = {
 	SearchMessageChannel: {
 		typeSearch: ETypeSearch;
 		currentChannel: IChannel | DirectEntity;
+		nameChannel?: string;
 	};
 };
 
@@ -29,7 +30,7 @@ const Backspace = 'Backspace';
 export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
-	const { currentChannel, typeSearch } = route?.params || {};
+	const { currentChannel, typeSearch, nameChannel } = route?.params || {};
 	const { themeValue } = useTheme();
 	const [userMention, setUserMention] = useState<IUerMention>();
 	const [isSearchMessagePage, setSearchMessagePage] = useState<boolean>(true);
@@ -115,6 +116,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
 					currentChannel={currentChannel}
+					nameChannel={nameChannel}
 				/>
 				{isSearchMessagePage ? (
 					<SearchMessagePage
