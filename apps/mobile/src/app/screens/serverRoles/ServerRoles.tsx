@@ -1,7 +1,7 @@
 import { usePermissionChecker } from '@mezon/core';
 import { Text, size, useTheme } from '@mezon/mobile-ui';
-import { RolesClanEntity, selectAllRolesClan, selectEveryoneRole } from '@mezon/store-mobile';
-import { EPermission } from '@mezon/utils';
+import { RolesClanEntity, selectAllRolesClan } from '@mezon/store-mobile';
+import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, Platform, Pressable, TouchableOpacity, View } from 'react-native';
@@ -22,8 +22,6 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 		EPermission.manageClan,
 		EPermission.clanOwner
 	]);
-	const everyoneRole = useSelector(selectEveryoneRole);
-
 	const allClanRoles = useMemo(() => {
 		if (!rolesClan || rolesClan?.length === 0) return [];
 		return (rolesClan || []).map((role) => ({ ...role, isView: !(hasAdminPermission || hasManageClanPermission || isClanOwner) }));
@@ -41,11 +39,11 @@ export const ServerRoles = ({ navigation }: MenuClanScreenProps<ClanSettingsScre
 	}, [navigation, t, themeValue.textStrong]);
 
 	const navigateToRoleEveryone = () => {
-		navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS, { roleId: everyoneRole?.id });
+		navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_PERMISSIONS, { roleId: EVERYONE_ROLE_ID });
 	};
 
 	const navigateToRoleDetail = (clanRole: RolesClanEntity) => {
-		navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_DETAIL, { roleId: clanRole?.id });
+		navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_DETAIL, { role: clanRole });
 	};
 	return (
 		<View style={{ backgroundColor: themeValue.primary, flex: 1, paddingHorizontal: size.s_14 }}>

@@ -18,7 +18,7 @@ import {
 import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import { PERMISSIONS, request } from 'react-native-permissions';
@@ -247,6 +247,7 @@ function ChannelVoice({
 	const [currentAudioOutput, setCurrentAudioOutput] = useState<string>('earpiece');
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
+	const isRequestingPermission = useRef(false);
 
 	const { sendSignalingToParticipants } = useSendSignaling();
 
@@ -360,6 +361,9 @@ function ChannelVoice({
 
 	useEffect(() => {
 		const subscription = AppState.addEventListener('change', async (state) => {
+			if (isRequestingPermission?.current || Platform.OS === 'ios') {
+				return;
+			}
 			if (state === 'background') {
 				if (Platform.OS === 'android') {
 					const isPipSupported = await NativeModules.PipModule.isPipSupported();
@@ -401,10 +405,13 @@ function ChannelVoice({
 	const checkPermissions = async () => {
 		if (Platform.OS === 'android') {
 			try {
+				isRequestingPermission.current = true;
 				await request(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT);
 				await request(PERMISSIONS.ANDROID.RECORD_AUDIO);
 			} catch (error) {
 				console.error('Permission request failed:', error);
+			} finally {
+				isRequestingPermission.current = false;
 			}
 		}
 	};

@@ -1,4 +1,4 @@
-import { Attributes, baseColor, Fonts } from '@mezon/mobile-ui';
+import { Attributes, baseColor, Colors, Fonts, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
@@ -26,5 +26,17 @@ export const style = (colors: Attributes) =>
 		altTextLight: {
 			fontSize: Fonts.size.h5,
 			fontWeight: 'normal'
+		},
+		avatarMessageBoxDefault: {
+			width: '100%',
+			height: '100%',
+			borderRadius: size.s_50,
+			backgroundColor: colors.colorAvatarDefault,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
+		textAvatarMessageBoxDefault: {
+			fontSize: size.s_14,
+			color: Colors.white
 		}
 	});
