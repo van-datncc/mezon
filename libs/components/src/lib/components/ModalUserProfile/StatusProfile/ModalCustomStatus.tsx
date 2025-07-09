@@ -60,7 +60,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 
 	return (
 		<ModalLayout onClose={onClose}>
-			<div className="bg-theme-surface pt-4 rounded w-[440px]">
+			<div className="bg-theme-surface pt-4 rounded w-[440px] ">
 				<div>
 					<h1 className="text-theme-primary text-xl font-semibold text-center">Set a custom status</h1>
 				</div>
@@ -73,7 +73,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							type="text"
 							defaultValue={customStatus}
 							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded placeholder:text-sm border-theme-primary"
-							placeholder="Support has arrived!"
+							placeholder="What on your mind?"
 							maxLength={128}
 							autoFocus
 							onChange={handleChangeCustomStatus}
@@ -101,31 +101,6 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							<ItemSelect children="1 hours" onClick={() => setStatusTimer(60, false, '1 hours')} />
 							<ItemSelect children="30 minutes" onClick={() => setStatusTimer(30, false, '30 minutes')} />
 							<ItemSelect children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
-						</Dropdown>
-					</div>
-					<div className="px-4">
-						<div className="mb-2 block">
-							<label htmlFor="status" className="text-theme-primary text-xs uppercase font-semibold">
-								Status
-							</label>
-						</div>
-						<Dropdown
-							trigger="click"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
-									<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none select-none">Online</li>
-									<Icons.ArrowDown defaultFill="#fff" />
-								</div>
-							)}
-							label=""
-							placement="bottom-start"
-							className="dark:bg-[#232428] bg-bgLightModeThird border-none py-0 w-[200px] [&>ul]:py-0"
-						>
-							<ItemSelect children="Online" startIcon={<Icons.OnlineStatus />} />
-							<ItemSelect children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
-							<ItemSelect children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />
-							<ItemSelect children="Invisible" startIcon={<Icons.OfflineStatus />} />
 						</Dropdown>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
