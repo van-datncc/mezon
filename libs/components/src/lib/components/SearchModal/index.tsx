@@ -322,8 +322,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 	);
 
 	return (
-		<ModalLayout onClose={onClose} className="fixed inset-0 focus-visible:[&>*]:outline-none">
-			<div className="fixed inset-0 bg-black opacity-60"></div>
+		<ModalLayout onClose={onClose}>
 			<div className=" relative z-10 !w-[640px] px-6 py-4 rounded-[6px] shadow-shadowBorder bg-modal-theme">
 				<div className="flex flex-col">
 					<InputField

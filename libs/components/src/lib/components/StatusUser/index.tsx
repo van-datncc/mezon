@@ -82,7 +82,7 @@ const renderStatusIcon = ({
 	}
 
 	if (status?.status === false) {
-		return <Icons.OfflineStatus defaultSize={sizeStatusIcon} />;
+		return <StatusUser2 status="offline" />;
 	}
 
 	if (status?.status) {
@@ -94,7 +94,7 @@ const renderStatusIcon = ({
 			return <Icons.IconMobileDevice defaultSize="w-3 h-3" />;
 		}
 
-		return <Icons.OnlineStatus defaultSize={sizeStatusIcon} />;
+		return <StatusUser2 status="online" />;
 	}
 
 	return <Icons.OfflineStatus defaultSize={sizeStatusIcon} />;
@@ -105,3 +105,20 @@ const StatusUser = (props: StatusUserProps) => {
 };
 
 export default memo(StatusUser);
+
+type Status = 'online' | 'idle' | 'dnd' | 'offline';
+
+const statusColors: Record<Status, string> = {
+	online: 'bg-green-500',
+	idle: 'bg-yellow-500',
+	dnd: 'bg-red-500',
+	offline: 'bg-gray-400'
+};
+
+export const StatusUser2: React.FC<{ status: Status }> = ({ status }) => {
+	return (
+		<span className="absolute bottom-0 right-0 w-[12px] h-[12px] status-user-background rounded-full p-[2px]">
+			<span className={`block w-full h-full rounded-full ${statusColors[status]} relative`}></span>
+		</span>
+	);
+};

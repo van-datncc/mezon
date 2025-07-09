@@ -720,25 +720,6 @@ input:-webkit-autofill:active {
 	color: rgb(17, 24, 39);
 }
 
-.customScrollLightMode {
-	// scrollbar-width: thin;
-	// scrollbar-color: white #E1E1E1;
-}
-
-.customScrollLightMode::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
-}
-
-.customScrollLightMode::-webkit-scrollbar-track {
-	background: #ebedef;
-}
-
-.customScrollLightMode::-webkit-scrollbar-thumb {
-	background-color: #c4c9ce;
-	border-radius: 4px;
-}
-
 // custom dark - small light mode
 .customSmallScrollLightMode::-webkit-scrollbar {
 	width: 4px;

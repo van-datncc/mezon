@@ -109,6 +109,7 @@ const ChannelBannerAndEvents = memo(({ currentClan }: { currentClan: ClansEntity
 			)}
 			<div id="channel-list-top" className="self-stretch h-fit flex-col justify-start items-start gap-1 p-2 flex">
 				<Events />
+				<hr className="w-full ml-[3px] border-t-theme-primary"></hr>
 			</div>
 		</>
 	);
