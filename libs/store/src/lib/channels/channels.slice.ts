@@ -728,19 +728,23 @@ export const fetchChannels = createAsyncThunk(
 
 			const currentChannelId = state.channels?.byClans[clanId]?.currentChannelId;
 
-			if (currentChannelId && !response?.channeldesc?.some((item) => item.channel_id === currentChannelId)) {
-				const data = await thunkAPI
-					.dispatch(
-						threadsActions.fetchThread({
-							channelId: '0',
-							clanId,
-							threadId: currentChannelId
-						})
-					)
-					.unwrap();
-				if (data?.threads?.length > 0) {
-					response.channeldesc.push({ ...data.threads[0], active: 1 } as ChannelsEntity);
+			try {
+				if (currentChannelId && !response?.channeldesc?.some((item) => item.channel_id === currentChannelId)) {
+					const data = await thunkAPI
+						.dispatch(
+							threadsActions.fetchThread({
+								channelId: '0',
+								clanId,
+								threadId: currentChannelId
+							})
+						)
+						.unwrap();
+					if (data?.threads?.length > 0) {
+						response.channeldesc.push({ ...data.threads[0], active: 1 } as ChannelsEntity);
+					}
 				}
+			} catch (error) {
+				// ignore
 			}
 
 			const listChannelRender = selectListChannelRenderByClanId(thunkAPI.getState(), clanId);

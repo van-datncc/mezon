@@ -11,6 +11,23 @@ const JITTER_RANGE = 1000;
 const FAST_RETRY_ATTEMPTS = 5;
 export const SESSION_STORAGE_KEY = 'mezon_session';
 
+const waitForNetworkAndDelay = async (delayMs: number): Promise<void> => {
+	if (!navigator.onLine) {
+		return new Promise((resolve) => {
+			const handleOnline = () => {
+				window.removeEventListener('online', handleOnline);
+				resolve();
+			};
+			window.addEventListener('online', handleOnline);
+		});
+	}
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve();
+		}, delayMs);
+	});
+};
+
 type MezonContextProviderProps = {
 	children: React.ReactNode;
 	mezon: CreateMezonClientOptions;
@@ -393,7 +410,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 							retryTime = Math.min(exponentialTime, MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
 						}
 
-						await new Promise((resolve) => setTimeout(resolve, retryTime));
+						await waitForNetworkAndDelay(retryTime);
 					}
 				}
 

@@ -347,7 +347,7 @@ export const channelMembers = createSlice({
 			channelIds.forEach((channelId) => {
 				const channelEntity = state.memberChannels[channelId];
 				if (channelEntity) {
-					channelEntity.ids = channelEntity.ids.filter((id) => id !== userId);
+					state.memberChannels[channelId].ids = channelEntity.ids.filter((id) => id !== userId);
 				}
 			});
 		},

@@ -195,7 +195,9 @@ function MessageWithUser({
 						{
 							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
 						},
-						{ 'bg-item-msg-selected': isSelected }
+						{ 'bg-item-msg-selected': isSelected },
+						{ 'pointer-events-none': message.isSending },
+						{ 'is-error pointer-events-none': message.isError }
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
