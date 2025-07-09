@@ -182,10 +182,10 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 	useEscapeKeyClose(modalRef, onClose);
 
 	return (
-		<div ref={modalRef} tabIndex={-1} className="fixed  inset-0 flex items-center justify-center z-50 text-white">
+		<div ref={modalRef} tabIndex={-1} className="fixed  inset-0 flex items-center justify-center z-50 ">
 			<div className="fixed inset-0 bg-black opacity-80"></div>
-			<div className="relative z-10 p-6 rounded-[5px] w-[440px] text-[15px]">
-				<h2 className="text-[24px] font-semibold text-center">Add members or roles</h2>
+			<div className="relative z-10 p-6 bg-theme-setting-primary text-theme-primary rounded-[5px] w-[440px] text-[15px]">
+				<h2 className="text-[24px] font-semibold text-center text-theme-primary-active">Add members or roles</h2>
 				<div className="flex justify-center">
 					{isPrivate === ChannelStatusEnum.isPrivate &&
 						(channel.type === ChannelType.CHANNEL_TYPE_GMEET_VOICE || channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) && (
@@ -208,7 +208,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 					<InputField
 						type="text"
 						placeholder="e.g. Moderators, @wumpus"
-						className="pl-3 py-[6px] w-full border-0 outline-none rounded"
+						className="pl-3 py-[6px] w-full text-theme-message rounded-lg outline-none bg-input-secondary"
 						onChange={handleValueSearch}
 						maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 					/>

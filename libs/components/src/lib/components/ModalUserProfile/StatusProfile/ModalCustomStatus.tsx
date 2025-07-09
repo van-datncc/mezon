@@ -87,7 +87,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+								<div className="flex items-center justify-between rounded-lg cursor-pointer h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
 									<li className="text-[14px] text-theme-primary w-full py-[6px] list-none select-none">{timeSetReset}</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
@@ -103,12 +103,37 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							<ItemSelect children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
 						</Dropdown>
 					</div>
+					<div className="px-4">
+						<div className="mb-2 block">
+							<label htmlFor="status" className="text-theme-primary text-xs uppercase font-semibold">
+								Status
+							</label>
+						</div>
+						<Dropdown
+							trigger="click"
+							dismissOnClick={false}
+							renderTrigger={() => (
+								<div className="flex items-center justify-between rounded-lg h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+									<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none select-none">Online</li>
+									<Icons.ArrowDown defaultFill="#fff" />
+								</div>
+							)}
+							label=""
+							placement="bottom-start"
+							className="bg-theme-setting-primary border-none py-0 w-[200px] [&>ul]:py-0"
+						>
+							<ItemSelect children="Online" startIcon={<Icons.OnlineStatus />} />
+							<ItemSelect children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
+							<ItemSelect children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />
+							<ItemSelect children="Invisible" startIcon={<Icons.OfflineStatus />} />
+						</Dropdown>
+					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
-						<button className="py-2 h-10 px-4 rounded   text-theme-primary" type="button" onClick={onClose}>
+						<button className="py-2 h-10 px-4 rounded  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem  hover:!bg-bgSelectItemHover  text-white"
+							className="py-2 h-10 px-4 rounded bg-button-primary hover:opacity-80 text-white"
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>

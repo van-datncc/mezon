@@ -110,12 +110,12 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 	return (
 		<>
 			<div
-				className={`h-[75px] w-[75px] rounded-full text-theme-primary  flex items-center justify-center ${!isChatStream ? 'bg-theme-primary' : ''}`}
+				className={`h-[75px] w-[75px] rounded-full text-theme-primary-active  flex items-center justify-center ${!isChatStream ? 'bg-theme-primary' : ''}`}
 			>
 				{isChatStream ? <Icons.Chat defaultSize="w-10 h-10 " /> : <Icons.Hashtag defaultSize="w-10 h-10" />}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary-active" style={{ wordBreak: 'break-word' }}>
 					Welcome to #{name}
 				</p>
 			</div>
