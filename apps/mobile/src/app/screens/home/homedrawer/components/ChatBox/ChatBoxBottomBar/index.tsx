@@ -270,6 +270,7 @@ export const ChatBoxBottomBar = memo(
 					isReset: true
 				})
 			);
+			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, channelId]);
 
 		const handleKeyboardBottomSheetMode = useCallback((mode: IModeKeyboardPicker) => {

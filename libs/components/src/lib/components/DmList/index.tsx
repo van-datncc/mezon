@@ -31,8 +31,8 @@ function DirectMessageList() {
 					<CreateMessageGroupModal />
 				</div>
 			</div>
-			<div className={`flex-1 font-medium text-gray-300 px-2`}>
-				<div className="flex flex-col gap-1 text-[#AEAEAE] text-center relative">
+			<div className={`flex-1 font-medium  px-2`}>
+				<div className="flex flex-col gap-1 text-center relative">
 					<ListDMChannel listDM={dmGroupChatList} />
 				</div>
 			</div>
@@ -91,7 +91,7 @@ const FriendsButton = memo(({ navigateToFriend }: { navigateToFriend: boolean })
 
 	return (
 		<button
-			className={`py-2 px-3 rounded-lg text-theme-primary-hover w-full flex gap-4 items-center ${pathname.includes('friends') ? 'text-theme-secondary bg-button-secondary' : 'text-theme-primary'}`}
+			className={`py-2 px-3 rounded-lg font-medium text-theme-primary-hover w-full flex gap-4 items-center ${pathname.includes('friends') ? 'text-theme-secondary bg-button-secondary' : 'text-theme-primary'}`}
 			onClick={handleOpenFriendList}
 		>
 			<Icons.IconFriends />

@@ -200,7 +200,7 @@ const ListMember = () => {
 							<div className="flex items-center px-4 h-full">
 								{typeof user === 'object' && 'onlineSeparate' in user ? (
 									<p className="text-theme-primary text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">
-										Member - {lisMembers.onlineCount}
+										Online - {lisMembers.onlineCount}
 									</p>
 								) : typeof user === 'object' && 'offlineSeparate' in user ? (
 									<p className="text-theme-primary text-[14px] font-semibold flex items-center gap-[4px] font-title text-xs tracking-wide uppercase">

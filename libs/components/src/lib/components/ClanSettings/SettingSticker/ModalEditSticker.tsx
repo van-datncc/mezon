@@ -233,14 +233,26 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 
 	return (
 		<>
-			<div ref={modalRef} tabIndex={-1} className={'relative w-full h-[468px] flex flex-col  '}>
-				<div className={`w-full flex-1 flex flex-col overflow-hidden overflow-y-auto gap-4`}>
+			<div
+				ref={modalRef}
+				tabIndex={-1}
+				className={'relative w-full flex flex-col max-w-[684px] flex-1 bg-theme-setting-primary rounded-lg overflow-hidden '}
+			>
+				<div className="flex-1 flex items-center justify-end border-b-theme-primary rounded-t p-4">
+					<Button
+						className="rounded-full aspect-square w-6 h-6 text-5xl leading-3 !p-0 opacity-50 text-theme-primary-hover"
+						onClick={handleCloseModal}
+					>
+						×
+					</Button>
+				</div>
+				<div className={`w-full flex-1 flex flex-col  overflow-y-auto gap-4 relative px-5 py-4 bg-transparent hide-scrollbar`}>
 					<div className={`flex flex-col gap-2 items-center select-none `}>
-						<p className="text-2xl font-semibold ">Upload a file</p>
+						<p className="text-2xl font-semibold text-theme-primary-active">Upload a file</p>
 						<p className="text-base">File should be APNG, PNG, or GIF (512KB max)</p>
 					</div>
 					<div className={'flex flex-col select-none '}>
-						<p className="text-xs font-bold h-6 uppercase">PREVIEW</p>
+						<p className="text-xs font-bold h-6 uppercase text-theme-primary-active">PREVIEW</p>
 						<div className={'flex items-center justify-center rounded-lg border-theme-primary overflow-hidden'}>
 							<div className={'relative h-56 w-[50%] flex items-center justify-center bg-item-theme '}>
 								{editingGraphic.source ? (
@@ -260,13 +272,15 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 					</div>
 					<div className={'flex flex-row gap-4 '}>
 						<div className={'w-1/2 flex flex-col gap-2'}>
-							<p className={`text-xs font-bold uppercase select-none`}>FILE {graphic && ' (THIS CANNOT BE EDITED)'}</p>
+							<p className={`text-xs font-bold uppercase select-none text-theme-primary-active`}>
+								FILE {graphic && ' (THIS CANNOT BE EDITED)'}
+							</p>
 							<div
-								className={` border-theme-primary flex flex-row rounded justify-between items-center py-[6px] px-3  ${editingGraphic.fileName && 'cursor-not-allowed'}`}
+								className={` border-theme-primary flex flex-row rounded-lg justify-between items-center py-[6px] px-3  ${editingGraphic.fileName && 'cursor-not-allowed'}`}
 							>
 								<p className="select-none flex-1 truncate">{editingGraphic.fileName ?? 'Choose a file'}</p>
 								{!graphic && (
-									<button className="hover:bg-hoverPrimary bg-primary rounded-[4px] py-[2px] px-2 text-nowrap relative select-none text-white overflow-hidden">
+									<button className="bg-button-primary hover:opacity-80 rounded-[4px] py-[2px] px-2 text-nowrap relative select-none text-white overflow-hidden">
 										Browse
 										<input
 											className="absolute w-full h-full cursor-pointer top-0 right-0 z-10 opacity-0 file:cursor-pointer"
@@ -283,16 +297,16 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							</div>
 						</div>
 						<div className={'w-1/2 flex flex-col gap-2'}>
-							<p className={`text-xs font-bold uppercase select-none`}>Sticker Name</p>
+							<p className={`text-xs font-bold uppercase select-none text-theme-primary-active`}>Sticker Name</p>
 							<div
 								className={
-									'border-theme-primary flex flex-row rounded justify-between items-center p-2 pl-3  box-border overflow-hidden'
+									'border-theme-primary bg-input-secondary flex flex-row rounded-lg justify-between items-center p-2 pl-3  box-border overflow-hidden'
 								}
 							>
 								<InputField
 									type="string"
 									placeholder="ex. cat hug"
-									className={'px-[8px] bg-theme-input'}
+									className={'px-[8px] bg-transparent '}
 									value={editingGraphic.shortname}
 									onChange={handleChangeShortName}
 									onKeyDown={handleOnEnter}
@@ -300,18 +314,23 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 							</div>
 						</div>
 					</div>
-				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
-					<div className="flex items-center flex-1 h-full gap-2">
-						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
-						<label htmlFor="sale_item" className="">
-							This is for sale
-						</label>
+					<div className={`w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
+						<div className="flex items-center flex-1 h-full gap-2">
+							<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
+							<label htmlFor="sale_item" className="">
+								This is for sale
+							</label>
+						</div>
+						<Button className="px-2 py-1 border-none hover:underline hover:bg-transparent bg-transparent" onClick={handleCloseModal}>
+							Never Mind
+						</Button>
+						<ButtonLoading
+							className="px-2 py-1 h-9 w-32 bg-button-primary text-white hover:opacity-80 rounded-lg"
+							label="Save Changes"
+							disabled={validateSaveChange}
+							onClick={onSaveChange}
+						/>
 					</div>
-					<Button className="px-2 py-1 border-none hover:underline hover:bg-transparent bg-transparent" onClick={handleCloseModal}>
-						Never Mind
-					</Button>
-					<ButtonLoading className="px-2 py-1 h-9 w-32" label="Save Changes" disabled={validateSaveChange} onClick={onSaveChange} />
 				</div>
 			</div>
 

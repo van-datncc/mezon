@@ -142,6 +142,7 @@ module.exports = {
 
       fontFamily: {
         ggSans: ['gg sans', 'sans-serif'],
+        code: ['Fira Code', 'monospace'],
       },
       screens: {
         'mobile-s': '320px',

@@ -4,17 +4,19 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		toolTip: {
+			flex: 1,
 			height: '100%',
+			width: '100%',
 			padding: 0,
 			borderRadius: size.s_10,
 			backgroundColor: colors.secondary,
-			top: size.s_20,
-			right: -size.s_30
+			top: size.s_50,
+			right: 0
 		},
 		toolTipContainer: {
 			position: 'absolute',
-			height: size.s_30,
-			width: size.s_30,
+			width: size.s_40,
+			height: size.s_40,
 			borderRadius: size.s_30,
 			top: 0,
 			right: 0,
@@ -22,14 +24,22 @@ export const style = (colors: Attributes) =>
 			flex: 1
 		},
 		iconTooltip: {
+			width: size.s_40,
+			height: size.s_40,
 			borderRadius: size.s_30,
-			height: size.s_30,
 			justifyContent: 'center',
 			alignItems: 'center',
-			zIndex: 1000
+			alignSelf: 'center',
+			backgroundColor: colors.border
+		},
+		iconTooltipActive: {
+			backgroundColor: colors.white
 		},
 		tooltipButton: {
-			height: size.s_30,
-			width: size.s_30
+			alignItems: 'center',
+			justifyContent: 'center',
+			borderRadius: size.s_40,
+			width: size.s_40,
+			height: size.s_40
 		}
 	});

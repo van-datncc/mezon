@@ -184,7 +184,7 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 		navigation.goBack();
 	};
 
-	const handleScheduleMute = (duration: number) => {
+	const handleScheduleMute = async (duration: number) => {
 		if (duration !== Infinity) {
 			const now = new Date();
 			const unmuteTime = new Date(now.getTime() + duration);
@@ -197,7 +197,12 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 				time_mute: unmuteTimeISO,
 				...(isCurrentChannel && { is_current_channel: false })
 			};
-			dispatch(notificationSettingActions.setNotificationSetting(body));
+			const response = await dispatch(notificationSettingActions.setNotificationSetting(body));
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				dispatch(
+					notificationSettingActions.updateNotiState({ channelId: currentChannel?.channel_id || '', active: ENotificationActive.OFF })
+				);
+			}
 		} else {
 			const body = {
 				channel_id: currentChannel?.channel_id || '',
@@ -206,7 +211,12 @@ const MuteThreadDetailModal = ({ route }: MuteThreadDetailModalProps) => {
 				active: ENotificationActive.OFF,
 				...(isCurrentChannel && { is_current_channel: false })
 			};
-			dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+			const response = await dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				dispatch(
+					notificationSettingActions.updateNotiState({ channelId: currentChannel?.channel_id || '', active: ENotificationActive.OFF })
+				);
+			}
 		}
 		navigateToThreadDetail();
 	};

@@ -143,16 +143,19 @@ const FriendsPage = () => {
 						<Icons.OpenMenu defaultSize="w-6 h-6" />
 					</div>
 				)}
-				<div className={`gap-7 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
-					<div className="flex flex-row gap-2 items-center text-theme-primary">
+				<div className={`gap-3 flex overflow-x-scroll hide-scrollbar ${closeMenuMobile ? 'ml-7' : ''}`}>
+					<div className="flex flex-row gap-2 items-center text-theme-primary-active font-medium">
 						<Icons.IconFriends />
 						Friend
 					</div>
-					<div className="flex flex-row gap-4 border-l-[1px] pl-6 ">
+					<div className="flex flex-row gap-2 items-center text-theme-primary">
+						<Icons.DotIcon className="w-1 h-1" />
+					</div>
+					<div className="flex flex-row gap-4 pr-4">
 						{tabData.map((tab, index) => (
 							<div key={index} className="relative flex items-center justify-center">
 								<button
-									className={`px-3 py-[6px] rounded-lg text-theme-primary text-theme-primary-hover shadow-none border-none bg-button-hover ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-active-button text-theme-primary-active' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
+									className={`px-3 py-[6px] font-medium rounded-lg text-theme-primary text-theme-primary-hover shadow-none border-none bg-button-hover ${currentTabStatus === tab.value && !openModalAddFriend ? 'bg-active-button text-theme-primary-active' : ''} ${tab.value === 'pending' && quantityPendingRequest !== 0 ? 'pr-[30px]' : ''}`}
 									tabIndex={index}
 									onClick={() => handleChangeTab(tab.value)}
 								>
@@ -166,7 +169,10 @@ const FriendsPage = () => {
 							</div>
 						))}
 					</div>
-					<Button onClick={handleOpenRequestFriend} className="whitespace-nowrap bg-button-add-friend text-white ">
+					<Button
+						onClick={handleOpenRequestFriend}
+						className={`whitespace-nowrap  px-2 rounded-lg font-medium   ${openModalAddFriend ? ' cursor-not-allowed button-add-friend-active' : 'bg-button-primary text-white'}`}
+					>
 						Add Friend
 					</Button>
 				</div>
@@ -198,14 +204,14 @@ const FriendsPage = () => {
 					)}
 					{openModalAddFriend && (
 						<div className="p-8">
-							<div className="w-full flex flex-col gap-3 border-b ">
-								<span className="font-[700] text-theme-primary">ADD FRIEND</span>
+							<div className="w-full flex flex-col gap-3 border-b-theme-primary">
+								<span className="font-[700] text-theme-primary-active">ADD FRIEND</span>
 								<span className="font-[400] text-theme-primary text-[14px]">You can add friends with their Mezon usernames</span>
 								<div className="relative">
 									<InputField
 										onChange={(e) => handleChange('username', e.target.value)}
 										type="text"
-										className={` mb-2 mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
+										className={` mb-2 bg-input-secondary rounded-lg mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
 										value={requestAddFriend.usernames}
 										placeholder="You can add friends with their Mezon usernames"
 										needOutline={true}
@@ -214,7 +220,7 @@ const FriendsPage = () => {
 										<div className="text-red-500 dark:text-red-400 text-[14px] pb-5">You're already friends with that user!</div>
 									)}
 									<Button
-										className="absolute top-3 right-2 text-[14px] py-[5px]"
+										className="absolute bg-button-primary text-white rounded-lg px-2 top-3 right-2 text-[14px] py-[5px]"
 										disabled={!requestAddFriend.usernames?.length}
 										onClick={handleAddFriend}
 									>

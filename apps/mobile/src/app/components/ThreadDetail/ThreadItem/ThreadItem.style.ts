@@ -12,11 +12,45 @@ export const style = (colors: Attributes) =>
 			borderTopColor: colors.borderDim,
 			borderTopWidth: 0.2
 		},
-		threadName: { fontSize: size.label, color: colors.textStrong, fontWeight: '500' },
-		threadContent: { flexDirection: 'row', alignItems: 'center' },
-		textThreadCreateBy: { fontSize: size.medium, color: colors.textDisabled, fontWeight: '500', width: '40%' },
-		bullet: { marginHorizontal: 5, fontSize: size.s_18, color: colors.textDisabled, marginLeft: size.s_10 },
-		createTime: { fontSize: size.medium, color: colors.textDisabled, fontWeight: '500' },
+		threadName: {
+			fontSize: size.label,
+			color: colors.textStrong,
+			fontWeight: '500'
+		},
+		threadContent: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			justifyContent: 'space-between'
+		},
+		username: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_6,
+			maxWidth: '65%'
+		},
+		dateString: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: size.s_6,
+			maxWidth: '35%'
+		},
+		textThreadCreateBy: {
+			fontSize: size.medium,
+			color: colors.textDisabled,
+			fontWeight: '500',
+			width: 'auto'
+		},
+		bullet: {
+			marginHorizontal: 5,
+			fontSize: size.s_18,
+			color: colors.textDisabled,
+			marginLeft: size.s_10
+		},
+		createTime: {
+			fontSize: size.medium,
+			color: colors.textDisabled,
+			fontWeight: '500'
+		},
 		messageContent: {
 			marginLeft: size.s_6,
 			fontSize: size.medium,

@@ -35,7 +35,7 @@ const HeaderTooltip = ({ onPressOption, options }: ITooltipHeaderProps) => {
 					content={<ChannelHeaderOptions onPressOption={onPressOptionTooltip} options={options} />}
 					contentStyle={styles.toolTip}
 					arrowSize={{ width: 0, height: 0 }}
-					placement="center"
+					placement="left"
 					onClose={() => setIsShowTooltip(false)}
 					closeOnBackgroundInteraction={true}
 					disableShadow={true}

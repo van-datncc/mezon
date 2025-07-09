@@ -18,20 +18,29 @@ import {
 import { IMessageTypeCallLog, WEBRTC_SIGNALING_TYPES } from '@mezon/utils';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { AppState, BackHandler, DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
+import { PERMISSIONS, request } from 'react-native-permissions';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../../../components/CallingGroupModal';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import { EMessageBSToShow } from '../../enums';
+import AudioOutputTooltip from '../AudioOutputTooltip';
 import { ContainerMessageActionModal } from '../MessageItemBS/ContainerMessageActionModal';
-import BluetoothManager from './BluetoothManager';
 import { CallReactionHandler } from './CallReactionHandler';
 import RoomView from './RoomView';
 import { style } from './styles';
-const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
+
+const { CustomAudioModule, KeepAwake, KeepAwakeIOS, AudioSessionModule } = NativeModules;
+
+// Audio output types
+type AudioOutput = {
+	id: string;
+	name: string;
+	type: 'speaker' | 'earpiece' | 'bluetooth' | 'headphones' | 'default' | 'force_speaker';
+};
 
 const ConnectionMonitor = memo(() => {
 	const connectionState = useConnectionState();
@@ -97,15 +106,26 @@ const ConnectionMonitor = memo(() => {
 
 type headerProps = {
 	channel: ChannelsEntity;
+	onOpenTooltip: () => void;
 	onPressMinimizeRoom: () => void;
-	onToggleSpeaker: (boolean) => void;
-	isSpeakerOn: boolean;
+	switchAudioOutput: (outputType: string) => void;
 	isFromNativeCall: boolean;
 	isGroupCall?: boolean;
+	availableAudioOutputs: AudioOutput[];
+	currentAudioOutput: string;
 };
 
 const HeaderRoomView = memo(
-	({ channel, onPressMinimizeRoom, onToggleSpeaker, isSpeakerOn, isFromNativeCall = false, isGroupCall = false }: headerProps) => {
+	({
+		channel,
+		onPressMinimizeRoom,
+		switchAudioOutput,
+		isFromNativeCall = false,
+		isGroupCall = false,
+		availableAudioOutputs,
+		currentAudioOutput,
+		onOpenTooltip
+	}: headerProps) => {
 		const { themeValue } = useTheme();
 		const styles = style(themeValue);
 		const { cameraTrack, isCameraEnabled, localParticipant } = useLocalParticipant();
@@ -187,17 +207,12 @@ const HeaderRoomView = memo(
 							<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
 						</TouchableOpacity>
 					)}
-					<TouchableOpacity
-						onPress={() => onToggleSpeaker(!isSpeakerOn)}
-						style={[styles.buttonCircle, isSpeakerOn && styles.buttonCircleActive]}
-					>
-						<MezonIconCDN
-							icon={isSpeakerOn ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
-							height={size.s_17}
-							width={isSpeakerOn ? size.s_17 : size.s_20}
-							color={isSpeakerOn ? themeValue.border : themeValue.white}
-						/>
-					</TouchableOpacity>
+					<AudioOutputTooltip
+						onSelectOutput={switchAudioOutput}
+						availableOutputs={availableAudioOutputs}
+						currentOutput={currentAudioOutput}
+						onOpenTooltip={onOpenTooltip}
+					/>
 				</View>
 			</View>
 		);
@@ -228,11 +243,88 @@ function ChannelVoice({
 	const { themeValue } = useTheme();
 	const channel = useAppSelector((state) => selectChannelById2(state, channelId));
 	const [focusedScreenShare, setFocusedScreenShare] = useState<TrackReference | null>(null);
-	const [isSpeakerOn, setIsSpeakerOn] = useState<boolean>(false);
+	const [availableAudioOutputs, setAvailableAudioOutputs] = useState<AudioOutput[]>([]);
+	const [currentAudioOutput, setCurrentAudioOutput] = useState<string>('earpiece');
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const dispatch = useAppDispatch();
 
 	const { sendSignalingToParticipants } = useSendSignaling();
+
+	// Get available audio outputs
+	const getAvailableAudioOutputs = useCallback(async (isHaveBluetooth?: boolean): Promise<AudioOutput[]> => {
+		try {
+			const outputs: AudioOutput[] = [
+				{ id: 'earpiece', name: 'Earpiece', type: 'earpiece' },
+				{ id: 'speaker', name: 'Speaker', type: 'speaker' }
+			];
+			if (isHaveBluetooth) {
+				outputs.push({ id: 'bluetooth', name: 'Bluetooth', type: 'bluetooth' });
+			}
+
+			return outputs;
+		} catch (error) {
+			console.error('Error getting available audio outputs:', error);
+			return [
+				{ id: 'earpiece', name: 'Earpiece', type: 'earpiece' },
+				{ id: 'speaker', name: 'Speaker', type: 'speaker' }
+			];
+		}
+	}, []);
+
+	// Switch audio output
+	const switchAudioOutput = useCallback(async (outputType: string) => {
+		try {
+			if (Platform.OS === 'android' && AudioSessionModule) {
+				await AudioSessionModule.setAudioDevice(outputType);
+				setCurrentAudioOutput(outputType);
+			} else if (Platform.OS === 'ios') {
+				// Use existing iOS logic
+				const newSpeakerState = outputType === 'speaker';
+				await AudioSession.configureAudio({
+					ios: {
+						defaultOutput: newSpeakerState ? 'speaker' : 'earpiece'
+					}
+				});
+				InCallManager.setSpeakerphoneOn(newSpeakerState);
+				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
+				setCurrentAudioOutput(outputType);
+			}
+		} catch (error) {
+			console.error('Error switching audio output:', error);
+		}
+	}, []);
+
+	// Setup audio detection and event listeners
+	const setupAudioDetection = useCallback(async () => {
+		try {
+			if (Platform.OS === 'android' && AudioSessionModule) {
+				await AudioSessionModule.startAudioSession();
+				const bluetoothConnected = await AudioSessionModule.isBluetoothConnected();
+				const outputs = await getAvailableAudioOutputs(bluetoothConnected);
+				setAvailableAudioOutputs(outputs);
+				if (bluetoothConnected) {
+					await switchAudioOutput('bluetooth');
+				} else {
+					const currentOutput = await AudioSessionModule.getCurrentAudioOutput();
+					setCurrentAudioOutput(currentOutput);
+				}
+			} else {
+				const outputs = await getAvailableAudioOutputs();
+				setAvailableAudioOutputs(outputs);
+			}
+		} catch (error) {
+			console.error('Error setting up audio detection:', error);
+		}
+	}, [getAvailableAudioOutputs, switchAudioOutput]);
+
+	const onOpenTooltip = useCallback(async () => {
+		if (Platform.OS === 'android' && AudioSessionModule) {
+			const bluetoothConnected = await AudioSessionModule.isBluetoothConnected();
+			getAvailableAudioOutputs(bluetoothConnected).then(setAvailableAudioOutputs);
+		} else {
+			getAvailableAudioOutputs().then(setAvailableAudioOutputs);
+		}
+	}, [getAvailableAudioOutputs]);
 
 	useEffect(() => {
 		const activateKeepAwake = async (platform: string) => {
@@ -266,27 +358,6 @@ function ChannelVoice({
 		};
 	}, []);
 
-	const onToggleSpeaker = async (status = undefined) => {
-		try {
-			const newSpeakerState = status !== undefined ? status : !isSpeakerOn;
-			if (Platform.OS === 'ios') {
-				await AudioSession.configureAudio({
-					ios: {
-						defaultOutput: newSpeakerState ? 'speaker' : 'earpiece'
-					}
-				});
-				InCallManager.setSpeakerphoneOn(newSpeakerState);
-				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
-			} else {
-				CustomAudioModule.setSpeaker(newSpeakerState, null);
-			}
-
-			setIsSpeakerOn(newSpeakerState);
-		} catch (error) {
-			console.error('Failed to toggle speaker:', error);
-		}
-	};
-
 	useEffect(() => {
 		const subscription = AppState.addEventListener('change', async (state) => {
 			if (state === 'background') {
@@ -312,55 +383,29 @@ function ChannelVoice({
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (Platform.OS === 'android') {
-			try {
-				checkPermissions();
-				// Check initial state
-				BluetoothManager.isBluetoothHeadsetConnected().then((connected) => {
-					if (connected) toggleSpeakerByStatusBluetooth(connected);
-				});
-
-				// Listen for changes
-				BluetoothManager.startListeningForConnectionChanges((connected) => {
-					if (connected) toggleSpeakerByStatusBluetooth(connected);
-				});
-			} catch (error) {
-				console.error('Error setting up Bluetooth:', error);
-			}
+		try {
+			checkPermissions();
+			setupAudioDetection();
+		} catch (error) {
+			console.error('Error setting up audio detection:', error);
 		}
-		// Cleanup
+
+		// Cleanup function
 		return () => {
-			if (Platform.OS === 'android') {
-				BluetoothManager.stopListeningForConnectionChanges();
+			if (Platform.OS === 'android' && AudioSessionModule) {
+				AudioSessionModule.stopAudioSession?.();
 			}
 		};
 	}, []);
 
 	const checkPermissions = async () => {
-		try {
-			const hasPermissions = await BluetoothManager.requestPermissions();
-			if (hasPermissions) {
-				await checkHeadsetStatus();
+		if (Platform.OS === 'android') {
+			try {
+				await request(PERMISSIONS.ANDROID.BLUETOOTH_CONNECT);
+				await request(PERMISSIONS.ANDROID.RECORD_AUDIO);
+			} catch (error) {
+				console.error('Permission request failed:', error);
 			}
-		} catch (error) {
-			console.error('Error checking permissions:', error);
-		}
-	};
-
-	const checkHeadsetStatus = async () => {
-		try {
-			const connected = await BluetoothManager.isBluetoothHeadsetConnected();
-			if (connected) toggleSpeakerByStatusBluetooth(connected);
-		} catch (error) {
-			console.error('Error checking headset status:', error);
-		}
-	};
-
-	const toggleSpeakerByStatusBluetooth = async (connected: boolean) => {
-		if (connected) {
-			await onToggleSpeaker(false);
-		} else {
-			await onToggleSpeaker(true);
 		}
 	};
 
@@ -457,11 +502,13 @@ function ChannelVoice({
 					{isAnimationComplete && !focusedScreenShare && !isPiPMode && (
 						<HeaderRoomView
 							channel={channel}
-							isSpeakerOn={isSpeakerOn}
 							onPressMinimizeRoom={onPressMinimizeRoom}
-							onToggleSpeaker={onToggleSpeaker}
+							switchAudioOutput={switchAudioOutput}
 							isFromNativeCall={isFromNativeCall}
 							isGroupCall={isGroupCall}
+							availableAudioOutputs={availableAudioOutputs}
+							currentAudioOutput={currentAudioOutput}
+							onOpenTooltip={onOpenTooltip}
 						/>
 					)}
 					<ConnectionMonitor />

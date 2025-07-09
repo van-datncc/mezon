@@ -24,6 +24,7 @@ import {
 	RECENT_EMOJI_CATEGORY,
 	RequestInput,
 	SubPanelName,
+	getIdSaleItemFromSource,
 	getSrcEmoji,
 	isPublicChannel
 } from '@mezon/utils';
@@ -81,7 +82,6 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	const categoryIcons = useMemo(
 		() => [
 			<Icons.Star defaultSize="w-7 h-7" />,
-			<Icons.MarketIcons />,
 			<Icons.ClockHistory defaultSize="w-7 h-7" />,
 			...categoryEmoji.map((emoji) =>
 				emoji.clan_logo !== '' ? (
@@ -103,11 +103,14 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 	);
 
 	const categoriesWithIcons: { name: string; icon: JSX.Element }[] = useMemo(() => {
-		categoriesEmoji.splice(1, 0, FOR_SALE_CATE);
 		const categories = categoriesEmoji.map((category, index) => ({
 			name: category,
 			icon: categoryIcons[index]
 		}));
+		categories.splice(1, 0, {
+			name: FOR_SALE_CATE,
+			icon: <Icons.MarketIcons />
+		});
 
 		return categories;
 	}, [categoriesEmoji, categoryIcons]);
@@ -416,7 +419,6 @@ const EmojisPanel = React.memo(function EmojisPanel({
 }: DisplayByCategoriesProps) {
 	const { valueInputToCheckHandleSearch } = useGifsStickersEmoji();
 	const { shiftPressedState } = useEmojiSuggestionContext();
-	const appearanceTheme = useSelector(selectTheme);
 	const [hasClanPermission] = usePermissionChecker([EPermission.manageClan]);
 	const isShowAddButton = useMemo(() => {
 		return hasClanPermission && showAddButton && categoryName === EEmojiCategory.CUSTOM;
@@ -437,6 +439,17 @@ const EmojisPanel = React.memo(function EmojisPanel({
 		return <ModalBuyItem onCancel={closeModalBuy} onConfirm={handleConfirmBuyItem} />;
 	}, [itemUnlock]);
 
+	const onClickEmoji = useCallback((item: IEmoji) => {
+		const { is_for_sale, src, shortname, id } = item;
+		if (!id || !shortname) return;
+
+		if (is_for_sale) {
+			return src ? onEmojiSelect(getIdSaleItemFromSource(src), shortname || '') : handleOpenUnlockItem(item);
+		}
+
+		onEmojiSelect(id, shortname);
+	}, []);
+
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
@@ -445,21 +458,7 @@ const EmojisPanel = React.memo(function EmojisPanel({
 				<button
 					key={index}
 					className={` relative ${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md bg-item-hover hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
-					onClick={() => {
-						if (item.is_for_sale && !item.src) {
-							handleOpenUnlockItem(item);
-							return;
-						}
-
-						if (item.is_for_sale && item.src) {
-							const fileName = item.src.split('/').pop() || '';
-							const idFromSource = fileName.split('.').slice(0, -1).join('.') || '';
-							onEmojiSelect(idFromSource, item.shortname || '');
-							return;
-						}
-
-						onEmojiSelect(item.id || '', item.shortname || '');
-					}}
+					onClick={() => onClickEmoji(item)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img

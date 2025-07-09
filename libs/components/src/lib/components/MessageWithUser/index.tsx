@@ -60,6 +60,7 @@ export type MessageWithUserProps = {
 	isTopic?: boolean;
 	observeIntersectionForLoading?: ObserveFn;
 	user: UsersClanEntity;
+	isSelected?: boolean;
 };
 
 function MessageWithUser({
@@ -79,7 +80,8 @@ function MessageWithUser({
 	messageReplyHighlight,
 	isTopic,
 	user,
-	observeIntersectionForLoading
+	observeIntersectionForLoading,
+	isSelected
 }: Readonly<MessageWithUserProps>) {
 	const userId = user?.user?.id as string;
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
@@ -88,6 +90,8 @@ function MessageWithUser({
 	const checkAnonymous = message?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
+
+	console.log('render', message?.id);
 
 	const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
 
@@ -176,7 +180,7 @@ function MessageWithUser({
 					onContextMenu={!isEphemeralMessage ? onContextMenu : () => {}}
 					messageId={message.id}
 					className={classNames(
-						'fullBoxText relative group',
+						'fullBoxText relative group dark:font-normal font-medium',
 						{
 							'mt-[10px]': !isCombine
 						},
@@ -192,7 +196,8 @@ function MessageWithUser({
 						{ '!bg-[#eab30833]': checkMessageTargetToMoved },
 						{
 							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
-						}
+						},
+						{ 'bg-item-msg-selected': isSelected }
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
@@ -252,7 +257,7 @@ function MessageWithUser({
 							></div>
 						)}
 						{!!message?.content?.fwd && (
-							<div className="flex gap-1 items-center italic font-medium w-full">
+							<div className="flex gap-1 items-center italic font-medium w-full text-theme-primary opacity-60">
 								<Icons.ForwardRightClick defaultSize="w-4 h-4" />
 								<p>Forwarded</p>
 							</div>
@@ -392,9 +397,16 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			setIsHover(false);
 		}, 100);
 	};
+
 	return (
 		<div
-			className={`message-list-item ${isSearchMessage ? 'w-full' : ' '} bg-item-hover  relative message-container ${className || ''}`}
+			className={classNames(
+				'message-list-item relative message-container',
+				{
+					'w-full': isSearchMessage
+				},
+				className
+			)}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onContextMenu={onContextMenu}

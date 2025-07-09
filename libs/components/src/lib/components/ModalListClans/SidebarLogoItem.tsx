@@ -81,7 +81,7 @@ const SidebarLogoItem = () => {
 			</button>
 			{quantityPendingRequest > 0 ? (
 				<div
-					className={`flex items-center text-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-2px] right-[-2px] outline-theme-primary  ${
+					className={`flex items-center text-center justify-center text-[12px] font-bold rounded-full bg-colorDanger absolute bottom-[-2px] right-[-2px]  ${
 						quantityPendingRequest >= 10 ? 'w-[22px] h-[16px]' : 'w-[16px] h-[16px]'
 					}`}
 				>

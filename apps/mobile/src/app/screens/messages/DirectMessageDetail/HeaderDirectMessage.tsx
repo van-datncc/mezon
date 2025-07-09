@@ -114,10 +114,16 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	}, [currentDmGroup?.type]);
 
 	const navigateToThreadDetail = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+			isShow: false
+		});
 		navigation.navigate(APP_SCREEN.MENU_THREAD.STACK, { screen: APP_SCREEN.MENU_THREAD.BOTTOM_SHEET, params: { directMessage: currentDmGroup } });
 	}, [currentDmGroup, navigation]);
 
 	const handleBack = useCallback(() => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+			isShow: false
+		});
 		if (APP_SCREEN.MESSAGES.NEW_GROUP === from) {
 			navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 			return;
@@ -126,6 +132,9 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	}, [from, navigation]);
 
 	const goToCall = () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+			isShow: false
+		});
 		if (isTypeDMGroup) {
 			const data = {
 				channelId: currentDmGroup.channel_id || '',

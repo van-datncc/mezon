@@ -39,7 +39,7 @@ const SettingRightProfile = ({ menuIsOpen, isDM }: SettingRightProfileProps) => 
 			className={`overflow-y-auto flex flex-col flex-1 shrink  w-1/2 pt-[94px] pb-7 sbm:pr-[10px] pr-[40px] pl-[40px] overflow-x-hidden ${menuIsOpen === true ? 'min-w-[700px]' : ''} 2xl:min-w-[900px] max-w-[740px] hide-scrollbar z-20`}
 		>
 			<div className="">
-				<h1 className="text-xl font-semibold tracking-wider">Profiles</h1>
+				<h1 className="text-xl font-semibold tracking-wider text-theme-primary-active">Profiles</h1>
 				<div className="flex flex-row gap-4 mt-6 mb-4">
 					<button
 						onClick={handleUserSettingsClick}

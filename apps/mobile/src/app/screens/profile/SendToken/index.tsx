@@ -397,7 +397,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 									<Text style={[styles.value, { fontSize: size.s_20 }]}>
 										{/*eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
 										{/*@ts-expect-error*/}
-										{selectedUser?.username || jsonObject?.receiver_name || 'Unknown'}
+										{selectedUser?.username || jsonObject?.receiver_name || 'KOMU'}
 									</Text>
 								</View>
 
