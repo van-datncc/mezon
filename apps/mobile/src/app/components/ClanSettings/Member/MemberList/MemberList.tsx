@@ -41,7 +41,7 @@ export const MemberList = memo((props: IMemberListProps) => {
 	);
 
 	return (
-		<View style={{ backgroundColor: themeValue.secondary, flex: 1 }}>
+		<View style={{ backgroundColor: themeValue.primary, flex: 1 }}>
 			<View style={{ paddingHorizontal: size.s_12 }}>
 				<MezonInput onTextChange={debouncedSetSearchText} placeHolder={'Search Member'} />
 			</View>

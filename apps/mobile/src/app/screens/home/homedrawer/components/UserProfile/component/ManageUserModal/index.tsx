@@ -4,7 +4,6 @@ import { Colors, Text, baseColor, size, useTheme, verticalScale } from '@mezon/m
 import {
 	ChannelMembersEntity,
 	selectAllRolesClan,
-	selectCurrentChannelId,
 	selectCurrentClan,
 	selectUserMaxPermissionLevel,
 	useAppDispatch,
