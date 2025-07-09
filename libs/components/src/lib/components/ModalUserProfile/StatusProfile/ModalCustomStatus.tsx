@@ -72,7 +72,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						<input
 							type="text"
 							defaultValue={customStatus}
-							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded placeholder:text-sm border-theme-primary"
+							className="text-theme-primary bg-theme-direct-message outline-none w-full h-10 p-[10px] text-base rounded-lg placeholder:text-sm border-theme-primary"
 							placeholder="Support has arrived!"
 							maxLength={128}
 							autoFocus
@@ -87,7 +87,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm cursor-pointer h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+								<div className="flex items-center justify-between rounded-lg cursor-pointer h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
 									<li className="text-[14px] text-theme-primary w-full py-[6px] list-none select-none">{timeSetReset}</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
@@ -113,7 +113,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							trigger="click"
 							dismissOnClick={false}
 							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-sm h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
+								<div className="flex items-center justify-between rounded-lg h-9 text-theme-primary-hover bg-theme-direct-message px-3 text-theme-primary">
 									<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none select-none">Online</li>
 									<Icons.ArrowDown defaultFill="#fff" />
 								</div>
@@ -129,11 +129,11 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						</Dropdown>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
-						<button className="py-2 h-10 px-4 rounded   text-theme-primary" type="button" onClick={onClose}>
+						<button className="py-2 h-10 px-4 rounded  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-bgSelectItem  hover:!bg-bgSelectItemHover  text-white"
+							className="py-2 h-10 px-4 rounded bg-button-primary hover:opacity-80 text-white"
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>

@@ -89,7 +89,15 @@
 		color-mix(in oklab, hsl(240 4% 40% / 0.3) 100%, hsl(50 100% 90% / 0.3) 50%) 100%
 	);
 	/* màu bên channel và user */
-	--bg-theme-direct-message: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), linear-gradient(128.92deg, rgb(14, 181, 191) 3.94%, rgb(76, 12, 224) 26.1%, rgb(163, 8, 167) 39.82%, rgb(154, 83, 255) 56.89%, rgb(33, 139, 224) 76.45%);
+	--bg-theme-direct-message: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
+		linear-gradient(
+			128.92deg,
+			rgb(14, 181, 191) 3.94%,
+			rgb(76, 12, 224) 26.1%,
+			rgb(163, 8, 167) 39.82%,
+			rgb(154, 83, 255) 56.89%,
+			rgb(33, 139, 224) 76.45%
+		);
 	/* màu text bên channel và user khi active */
 	--text-secondary: #f7ffff;
 	--bg-item-hover: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
@@ -146,4 +154,10 @@
 	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
 	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
 	--bg-markdown-code: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+
+	/* scroll bar */
+	--bg-scroll-bar: #b4b2ab;
+	--thread-scroll: #787881;
+	/* pop up */
+	--bg-theme-pop: #f5f5f5;
 }

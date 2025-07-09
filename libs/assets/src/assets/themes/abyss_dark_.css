@@ -103,4 +103,10 @@
 	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
 	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
 	--bg-markdown-code: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+
+	/* scroll bar */
+	--bg-scroll-bar: #b4b2ab;
+	--thread-scroll: #787881;
+	/* pop up */
+	--bg-theme-pop: #f5f5f5;
 }

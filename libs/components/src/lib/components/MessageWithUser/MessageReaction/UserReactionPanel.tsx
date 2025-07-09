@@ -60,17 +60,13 @@ const UserReactionPanel = forwardRef(({ emojiShowPanel, message, isTopic }: User
 		// eslint-disable-next-line react/jsx-no-useless-fragment
 		<>
 			{count > 0 && (
-				<div className="flex flex-col justify-center ">
+				<div className=" flex flex-col justify-center  ">
 					<div
 						onClick={(e) => e.stopPropagation()}
-						className={`z-50 w-[18rem] bg-theme-setting-primary border-color-primary rounded-lg min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
+						className={`z-50 w-[18rem] bg-theme-pop border-color-primary rounded-lg min-h-5 max-h-[25rem] ${window.innerWidth < 640 ? 'flex flex-col justify-center' : 'p-1 bottom-0'}`}
 					>
 						<PanelHeader emojiId={emojiShowPanel?.emojiId} emojiName={emojiShowPanel?.emoji ?? ''} count={count} />
-						<div
-							ref={ref}
-							tabIndex={-1}
-							className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none"
-						>
+						<div ref={ref} tabIndex={-1} className="max-h-40 overflow-y-auto hide-scrollbar focus-visible:outline-none">
 							{emojiShowPanel?.senders.map((sender: SenderInfoOptionals, index: number) => {
 								if (sender.count && sender.count > 0) {
 									return (

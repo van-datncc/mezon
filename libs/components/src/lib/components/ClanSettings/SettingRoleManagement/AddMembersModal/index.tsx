@@ -122,7 +122,7 @@ export const AddMembersModal: React.FC<ModalProps> = ({ isOpen, RolesClan, onClo
 						</p>
 						<div className="w-full flex mb-3">
 							<InputField
-								className="flex-grow rounded w-full p-2 focus:outline-none focus:border-white-500 text-base"
+								className="flex-grow rounded w-full p-2 focus:outline-none  text-base"
 								type="text"
 								placeholder="Search Permissions"
 								value={searchTerm}

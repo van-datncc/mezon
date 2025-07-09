@@ -47,7 +47,7 @@ const SettingSticker = ({ parentRef }: { parentRef: RefObject<HTMLDivElement> })
 						<p className="text-base font-bold">Upload it here!</p>
 						<p className="text-xs ">Let's customize the amazing stickers with your interest</p>
 					</div>
-					<Button className="bg-button-primary text-white hover:opacity-80 rounded-lg" onClick={handleOpenModalUpload}>
+					<Button className="bg-button-primary text-white hover:opacity-80 px-4  rounded-lg" onClick={handleOpenModalUpload}>
 						upload sticker
 					</Button>
 				</div>

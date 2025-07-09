@@ -315,7 +315,7 @@ const ModalSticker = ({ graphic, handleCloseModal, type }: ModalEditStickerProps
 						</div>
 					</div>
 				</div>
-				<div className={`absolute w-full h-[54px] bottom-0 flex items-center justify-end select-none gap-2`}>
+				<div className={` w-full h-[54px] px-4 flex items-center justify-end select-none gap-2`}>
 					<div className="flex items-center flex-1 h-full gap-2">
 						<Checkbox ref={isForSaleRef} id="sale_item" className="accent-blue-600 w-4 h-4" />
 						<label htmlFor="sale_item" className="">
