@@ -24,6 +24,7 @@ import {
 	RECENT_EMOJI_CATEGORY,
 	RequestInput,
 	SubPanelName,
+	getIdSaleItemFromSource,
 	getSrcEmoji,
 	isPublicChannel
 } from '@mezon/utils';
@@ -438,6 +439,17 @@ const EmojisPanel = React.memo(function EmojisPanel({
 		return <ModalBuyItem onCancel={closeModalBuy} onConfirm={handleConfirmBuyItem} />;
 	}, [itemUnlock]);
 
+	const onClickEmoji = useCallback((item: IEmoji) => {
+		const { is_for_sale, src, shortname, id } = item;
+		if (!id || !shortname) return;
+
+		if (is_for_sale) {
+			return src ? onEmojiSelect(getIdSaleItemFromSource(src), shortname || '') : handleOpenUnlockItem(item);
+		}
+
+		onEmojiSelect(id, shortname);
+	}, []);
+
 	return (
 		<div
 			className={`  grid grid-cols-9 ml-1 gap-1   ${valueInputToCheckHandleSearch !== '' ? 'overflow-y-scroll overflow-x-hidden hide-scrollbar max-h-[352px]' : ''}`}
@@ -446,21 +458,7 @@ const EmojisPanel = React.memo(function EmojisPanel({
 				<button
 					key={index}
 					className={` relative ${shiftPressedState ? 'border-none outline-none' : ''} text-2xl  emoji-button  rounded-md bg-item-hover hover:rounded-md  p-1 flex items-center justify-center w-full aspect-square`}
-					onClick={() => {
-						if (item.is_for_sale && !item.src) {
-							handleOpenUnlockItem(item);
-							return;
-						}
-
-						if (item.is_for_sale && item.src) {
-							const fileName = item.src.split('/').pop() || '';
-							const idFromSource = fileName.split('.').slice(0, -1).join('.') || '';
-							onEmojiSelect(idFromSource, item.shortname || '');
-							return;
-						}
-
-						onEmojiSelect(item.id || '', item.shortname || '');
-					}}
+					onClick={() => onClickEmoji(item)}
 					onMouseEnter={() => onEmojiHover(item)}
 				>
 					<img
