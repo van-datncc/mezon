@@ -80,9 +80,11 @@ const AudioOutputTooltip = ({ onOpenTooltip, onSelectOutput, availableOutputs, c
 					disableShadow={true}
 					closeOnContentInteraction={true}
 				>
-					<TouchableOpacity onPress={toggleTooltip} style={[styles.iconTooltip]}>
-						<MezonIconCDN icon={getAudioIcon()} {...getIconSize()} color={themeValue.white} />
-					</TouchableOpacity>
+					{!isShowTooltip && (
+						<TouchableOpacity onPress={toggleTooltip} style={[styles.iconTooltip]}>
+							<MezonIconCDN icon={getAudioIcon()} {...getIconSize()} color={themeValue.white} />
+						</TouchableOpacity>
+					)}
 				</Tooltip>
 			</View>
 		</View>

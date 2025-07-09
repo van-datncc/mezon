@@ -7,7 +7,6 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectCurrentClanId,
-	selectEveryoneRole,
 	selectRolesByChannelId,
 	useAppDispatch,
 	useAppSelector
@@ -31,7 +30,6 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 	const [searchText, setSearchText] = useState('');
 	const debouncedSetSearchText = debounce((text) => setSearchText(text), 300);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const everyoneRole = useSelector(selectEveryoneRole);
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
 	const [selectedMemberIdList, setSelectedMemberIdList] = useState<string[]>([]);
@@ -52,10 +50,8 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 
 	const listOfRoleCanAdd = useMemo(() => {
 		const addedRoleIdList = listOfChannelRole?.map((role) => role?.id) || [];
-		return allClanRoles
-			?.filter((role) => !addedRoleIdList.includes(role?.id) && everyoneRole?.id !== role?.id)
-			?.map((role) => ({ ...role, type: EOverridePermissionType.Role }));
-	}, [listOfChannelRole, allClanRoles, everyoneRole?.id]);
+		return allClanRoles?.filter((role) => !addedRoleIdList.includes(role?.id))?.map((role) => ({ ...role, type: EOverridePermissionType.Role }));
+	}, [listOfChannelRole, allClanRoles]);
 
 	const disableAddButton = useMemo(() => {
 		return !(selectedMemberIdList.length || selectedRoleIdList.length);

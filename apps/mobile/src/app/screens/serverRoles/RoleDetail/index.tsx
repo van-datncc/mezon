@@ -1,7 +1,7 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon, isEqual } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { rolesClanActions, selectRoleByRoleId, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store-mobile';
+import { rolesClanActions, selectUserMaxPermissionLevel, useAppDispatch } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +24,8 @@ enum EActionType {
 
 type RoleDetailScreen = typeof APP_SCREEN.MENU_CLAN.ROLE_DETAIL;
 export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetailScreen>) => {
-	const roleId = route.params?.roleId;
+	const clanRole = route.params?.role;
+	const roleId = clanRole?.id;
 	const { t } = useTranslation('clanRoles');
 	const [originRoleName, setOriginRoleName] = useState('');
 	const [currentRoleName, setCurrentRoleName] = useState('');
@@ -32,7 +33,6 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 	const dispatch = useAppDispatch();
 	const { updateRole } = useRoles();
 	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
-	const clanRole = useSelector(selectRoleByRoleId(roleId));
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	const isNotChange = useMemo(() => {
@@ -113,7 +113,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 			[],
 			[]
 		);
-		if (response === true) {
+		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {

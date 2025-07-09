@@ -1,7 +1,7 @@
 import { usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, Text, size, useTheme } from '@mezon/mobile-ui';
-import { selectAllPermissionsDefault, selectAllRolesClan, selectEveryoneRole, selectRoleByRoleId } from '@mezon/store-mobile';
+import { selectAllPermissionsDefault, selectAllRolesClan } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,23 +26,21 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const [searchPermissionText, setSearchPermissionText] = useState('');
 	const { themeValue } = useTheme();
 	const { updateRole } = useRoles();
-	const everyoneRole = useSelector(selectEveryoneRole);
 	const [hasAdminPermission, hasManageClanPermission, isClanOwner] = usePermissionChecker([
 		EPermission.administrator,
 		EPermission.manageClan,
 		EPermission.clanOwner
 	]);
 
-	const clanRole = useSelector(selectRoleByRoleId(roleId)); //Note: edit role
+	const clanRole = useMemo(() => {
+		return rolesClan?.find((r) => r?.id === roleId);
+	}, [rolesClan, roleId]);
+
 	const defaultPermissionList = useSelector(selectAllPermissionsDefault);
 
 	const isEditRoleMode = useMemo(() => {
 		return Boolean(roleId);
 	}, [roleId]);
-
-	const isEveryoneRole = useMemo(() => {
-		return everyoneRole?.id === clanRole?.id;
-	}, [everyoneRole?.id, clanRole?.id]);
 
 	//Note: create new role
 	const newRole = useMemo(() => {
@@ -50,9 +48,9 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	}, [rolesClan]);
 
 	const isCanEditRole = useMemo(() => {
-		if (isEveryoneRole && !newRole) return false;
+		if (!newRole) return false;
 		return hasAdminPermission || isClanOwner || hasManageClanPermission;
-	}, [hasAdminPermission, hasManageClanPermission, isClanOwner, isEveryoneRole, newRole]);
+	}, [hasAdminPermission, hasManageClanPermission, isClanOwner, newRole]);
 
 	const getDisablePermission = useCallback(
 		(slug: string) => {
@@ -89,7 +87,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 			[],
 			removePermissionList
 		);
-		if (response === true) {
+		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {
@@ -172,7 +170,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 
 	const handleNextStep = async () => {
 		const response = await updateRole(newRole?.clan_id, newRole?.id, newRole?.title, newRole?.color || '', [], selectedPermissions, [], []);
-		if (response === true) {
+		if (response) {
 			navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS);
 			// Toast.show({
 			// 	type: 'success',

@@ -1,7 +1,7 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { createImgproxyUrl } from '@mezon/utils';
 import React, { memo } from 'react';
-import { StyleProp, TextStyle, View } from 'react-native';
+import { StyleProp, Text, TextStyle, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Images from '../../../assets/Images';
 import ImageNative from '../../components/ImageNative';
@@ -40,6 +40,14 @@ export default memo(function MezonClanAvatar({
 				style={styles.image}
 				resizeMode={'cover'}
 			/>
+		);
+	}
+
+	if (alt && !image && alt !== 'Anonymous') {
+		return (
+			<View style={styles.avatarMessageBoxDefault}>
+				<Text style={styles.textAvatarMessageBoxDefault}>{alt?.charAt?.(0)}</Text>
+			</View>
 		);
 	}
 	return (

@@ -1,5 +1,5 @@
 import { ETypeSearch, ICategoryChannelOption } from '@mezon/mobile-components';
-import { ChannelsEntity, DirectEntity, EventManagementEntity, NotiChannelCategorySettingEntity } from '@mezon/store-mobile';
+import { ChannelsEntity, DirectEntity, EventManagementEntity, NotiChannelCategorySettingEntity, RolesClanEntity } from '@mezon/store-mobile';
 import { ChannelThreads, ICategoryChannel, IChannel, IMessageWithUser, OptionEvent } from '@mezon/utils';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -265,7 +265,7 @@ type MenuClanStackParamList = {
 		roleId: string;
 	};
 	[APP_SCREEN.MENU_CLAN.ROLE_DETAIL]: {
-		roleId: string;
+		role: RolesClanEntity;
 	};
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_SETTING]: undefined;
 	[APP_SCREEN.MENU_CLAN.NOTIFICATION_OVERRIDES]: undefined;
