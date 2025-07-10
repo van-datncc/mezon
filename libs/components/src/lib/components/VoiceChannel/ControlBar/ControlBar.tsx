@@ -163,6 +163,9 @@ export function ControlBar({
 
 	useEffect(() => {
 		if (!showScreen && isDesktop) {
+			if (screenTrackRef.current?.track) {
+				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+			}
 			dispatch(voiceActions.setStreamScreen(null));
 		}
 	}, [dispatch, showScreen]);
@@ -253,7 +256,6 @@ export function ControlBar({
 			if (!showScreen) {
 				dispatch(voiceActions.setShowSelectScreenModal(true));
 			} else {
-				console.log(false);
 				dispatch(voiceActions.setShowScreen(false));
 			}
 		}
@@ -269,7 +271,7 @@ export function ControlBar({
 				dispatch(voiceActions.setShowScreen(enabled));
 			}
 		},
-		[dispatch]
+		[dispatch, stream]
 	);
 
 	const screenShareTracks = useTracks(
