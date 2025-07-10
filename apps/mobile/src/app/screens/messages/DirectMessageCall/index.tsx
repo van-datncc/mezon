@@ -38,6 +38,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	const signalingData = useAppSelector((state) => selectSignalingDataByUserId(state, userProfile?.user?.id || ''));
 	const isRemoteVideo = useSelector(selectRemoteVideo);
 	const navigation = useNavigation<any>();
+	const [isMirror, setIsMirror] = useState<boolean>(true);
 
 	const {
 		callState,
@@ -48,7 +49,8 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		toggleSpeaker,
 		toggleAudio,
 		toggleVideo,
-		handleSignalingMessage
+		handleSignalingMessage,
+		switchCamera
 	} = useWebRTCCallMobile({
 		dmUserId: receiverId,
 		userId: userProfile?.user?.id as string,
@@ -98,6 +100,11 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		} catch (err) {
 			/* empty */
 		}
+	};
+
+	const handleSwitchCamera = async () => {
+		await switchCamera();
+		setIsMirror(!isMirror);
 	};
 
 	useEffect(() => {
@@ -181,16 +188,25 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 							<MezonIconCDN icon={IconCDN.chevronSmallLeftIcon} />
 						</TouchableOpacity>
 					</View>
-					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_20 }}>
-						<TouchableOpacity
-							onPress={toggleSpeaker}
-							style={[styles.buttonCircle, localMediaControl.speaker && styles.buttonCircleActive]}
-						>
-							<MezonIconCDN
-								icon={localMediaControl.speaker ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
-								color={localMediaControl.speaker ? themeValue.border : themeValue.white}
-							/>
-						</TouchableOpacity>
+					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
+						{callState.localStream && localMediaControl?.camera && (
+							<View>
+								<TouchableOpacity onPress={handleSwitchCamera} style={[styles.buttonCircle]}>
+									<MezonIconCDN icon={IconCDN.cameraFront} height={size.s_24} width={size.s_24} color={themeValue.white} />
+								</TouchableOpacity>
+							</View>
+						)}
+						<View>
+							<TouchableOpacity
+								onPress={toggleSpeaker}
+								style={[styles.buttonCircle, localMediaControl.speaker && styles.buttonCircleActive]}
+							>
+								<MezonIconCDN
+									icon={localMediaControl.speaker ? IconCDN.channelVoice : IconCDN.voiceLowIcon}
+									color={localMediaControl.speaker ? themeValue.border : themeValue.white}
+								/>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 			)}
@@ -208,7 +224,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 					)}
 					{callState.localStream && localMediaControl?.camera ? (
 						<View style={styles.card}>
-							<RTCView streamURL={callState.localStream.toURL()} style={{ flex: 1 }} mirror={true} objectFit={'cover'} />
+							<RTCView streamURL={callState.localStream.toURL()} style={{ flex: 1 }} mirror={isMirror} objectFit={'cover'} />
 						</View>
 					) : (
 						<View style={[styles.card, styles.cardNoVideo]}>
