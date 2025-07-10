@@ -271,7 +271,7 @@ export function ControlBar({
 				dispatch(voiceActions.setShowScreen(enabled));
 			}
 		},
-		[dispatch, stream]
+		[dispatch]
 	);
 
 	const screenShareTracks = useTracks(
