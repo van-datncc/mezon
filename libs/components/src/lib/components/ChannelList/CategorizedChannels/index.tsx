@@ -36,16 +36,6 @@ interface DeleteCategoryModalProps {
 	closeDeleteModal: () => void;
 }
 
-function capitalizeFirstLetter(str: string) {
-	if (typeof str !== 'string' || str.length === 0) {
-		return '';
-	}
-	const lowercasedStr = str.toLowerCase();
-	const firstChar = lowercasedStr.charAt(0).toUpperCase();
-	const restOfString = lowercasedStr.slice(1);
-	return firstChar + restOfString;
-}
-
 const DeleteCategoryModal: React.FC<DeleteCategoryModalProps> = ({ category, closeDeleteModal }) => {
 	const { handleDeleteCategory } = useCategory();
 	const currentChannel = useSelector(selectCurrentChannel);
@@ -187,7 +177,7 @@ const CategorizedItem: React.FC<CategorizedChannelsProps> = ({ category }) => {
 					className="text-theme-primary flex items-center px-0.5 w-full font-title tracking-wide text-theme-primary-hover capitalize text-sm font-medium"
 				>
 					{categoryExpandState ? <Icons.ArrowDown /> : <Icons.ArrowRight />}
-					<span className="one-line">{capitalizeFirstLetter(category.category_name)}</span>
+					<span className="one-line">{category.category_name}</span>
 				</button>
 
 				{!category.isFavor && (
