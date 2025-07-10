@@ -376,3 +376,10 @@ input.bg-theme-input-primary::placeholder {
 .bg-markdown-code {
 	background: var(--bg-markdown-code);
 }
+.btn-primary {
+  background: var(--button-theme-primary);
+  color: white;
+}
+.btn-primary-hover:hover {
+  background: var(--bg-button-primary-hover);
+}

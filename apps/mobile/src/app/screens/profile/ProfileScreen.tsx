@@ -18,7 +18,6 @@ import moment from 'moment';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../componentUI/MezonAvatar';
@@ -26,6 +25,7 @@ import { MezonButton } from '../../componentUI/MezonButton';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
 import { CustomStatusUser, EUserStatus } from '../../components/CustomStatusUser';
+import ImageNative from '../../components/ImageNative';
 import { SendTokenUser } from '../../components/SendTokenUser';
 import { IconCDN } from '../../constants/icon_cdn';
 import { useMixImageColor } from '../../hooks/useMixImageColor';
@@ -224,12 +224,12 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 									style={styles.imgWrapper}
 								/>
 							) : (
-								<FastImage
-									source={{
-										uri: createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })
-									}}
-									style={styles.imgWrapper}
-								/>
+								<View style={styles.imgWrapper}>
+									<ImageNative
+										url={createImgproxyUrl(userProfile?.user?.avatar_url ?? '', { width: 300, height: 300, resizeType: 'fit' })}
+										style={styles.imgWrapper}
+									/>
+								</View>
 							)
 						) : (
 							<View

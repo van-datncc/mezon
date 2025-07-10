@@ -85,8 +85,7 @@
 	--text-count-page-hover: #ffe5e5;
 	--bg-count-page-active: #6e0e0e;
 	--text-count-page-active: #ffffff;
-	/* button primary */
-	--bg-button-primary: hsl(234.935 calc(1 * 85.556%) 64.706% /1);
+
 	/* modal */
 	--bg-modal-theme: color-mix(in oklab, hsl(232.5 calc(1 * 6.557%) 23.922% /1) 100%, rgb(26, 0, 0) 50%);
 	/* option  */
@@ -105,4 +104,7 @@
 	--border-highlight-react-theme: #5865f2;
 	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
 	--bg-input-secondary: color-mix(in oklab, hsl(0 calc(1 * 0%) 0% /0.2) 100%, hsl(0 100% 5.098039215686274% /0.2) 50%);
+	--bg-button-primary-hover: #4654C0;
+	--button-theme-primary: #5265EC;
+	
 }

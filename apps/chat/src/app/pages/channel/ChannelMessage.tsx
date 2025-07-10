@@ -121,27 +121,6 @@ export const ChannelMessage: ChannelMessageComponent = ({
 
 	const isMessageIndicator = message.code === TypeMessage.Indicator;
 
-	// const isMessageFromBlockedUser = useMemo(() => {
-	// 	if (mode === ChannelStreamMode.STREAM_MODE_DM) return false;
-
-	// 	const userId = userProfile?.user?.id;
-	// 	const senderId = message?.sender_id;
-	// 	if (!blockedUsers?.length || !userId || !senderId) return false;
-
-	// 	return blockedUsers.some(
-	// 		(blockedUser) =>
-	// 			(blockedUser?.source_id === userId && blockedUser?.user?.id === senderId) ||
-	// 			(blockedUser?.source_id === senderId && blockedUser?.user?.id === userId)
-	// 	);
-	// }, [mode, userProfile?.user?.id, message?.sender_id, blockedUsers]);
-
-	// if (isMessageFromBlockedUser) {
-	// 	if (previousMessage?.sender_id !== message?.sender_id) {
-	// 		return <MessageWithBlocked />;
-	// 	}
-	// 	return null;
-	// }
-
 	return isMessageIndicator && mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? (
 		<>
 			<OnBoardWelcome nextMessageId={nextMessageId} />
@@ -187,7 +166,8 @@ export const MemorizedChannelMessage = memo(ChannelMessage, (prev, curr) => {
 		prev.channelLabel === curr.channelLabel &&
 		prev.isHighlight === curr.isHighlight &&
 		prev.isSelected === curr.isSelected &&
-		prev.isEditing === curr.isEditing
+		prev.isEditing === curr.isEditing &&
+		prev.message?.isError === curr.message?.isError
 	);
 });
 

@@ -88,7 +88,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 	const handleMarkAsRead = useCallback(() => {
 		handleMarkAsReadChannel(channel);
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-	}, [channel.channel_id, channel?.clan_id]);
+	}, [channel, handleMarkAsReadChannel]);
 
 	const handleCopyLink = () => {
 		Clipboard.setString(process.env.NX_CHAT_APP_REDIRECT_URI + `/chat/clans/${channel?.clan_id}/channels/${channel?.channel_id}`);
@@ -395,7 +395,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 		} finally {
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
-	}, [currentSystemMessage?.channel_id, channel?.channel_id, channel?.clan_id]);
+	}, [dispatch, channel?.channel_id, channel?.clan_id, currentSystemMessage?.channel_id, t]);
 
 	const handleConfirmLeaveThread = useCallback(async () => {
 		await dispatch(
@@ -407,7 +407,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 			})
 		);
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-	}, []);
+	}, [channel?.channel_private, channel?.id, channel?.parent_id, currentClan?.id, dispatch]);
 
 	return (
 		<View style={styles.container}>

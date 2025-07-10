@@ -15,7 +15,7 @@ export const DeleteModal: React.FC<ModalProps> = ({ handleDelete, onClose }) => 
 					<button
 						color="gray"
 						onClick={onClose}
-						className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400 focus:outline-none focus:ring focus:border-blue-300 rounded"
+						className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400 focus:outline-none rounded-lg"
 					>
 						Cancel
 					</button>
@@ -25,7 +25,7 @@ export const DeleteModal: React.FC<ModalProps> = ({ handleDelete, onClose }) => 
 							handleDelete();
 							onClose();
 						}}
-						className="px-4 py-2 bg-blue-700 text-white hover:bg-blue-500 focus:outline-none focus:ring focus:border-blue-300 rounded"
+						className="px-4 py-2 btn-primary btn-primary-hover focus:outline-none  rounded-lg"
 					>
 						Delete
 					</button>

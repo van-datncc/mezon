@@ -70,7 +70,7 @@ export const ModalAddPinMess = (props: ModalAddPinMessProps) => {
 						</button>
 						<button
 							onClick={handlePinMessageAndCloseModal}
-							className="px-4 py-2 hover:bg-opacity-80 rounded bg-button-primary text-white font-medium"
+							className="px-4 py-2 hover:bg-opacity-80 rounded-lg btn-primary-hover btn-primary font-medium"
 						>
 							Oh yeah. Pin it
 						</button>

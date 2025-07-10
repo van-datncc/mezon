@@ -417,7 +417,7 @@ const UserProfile = React.memo(
 								</View>
 							)}
 							{!!userById?.user?.about_me && (
-								<View style={{ padding: size.s_16 }}>
+								<View style={{ paddingVertical: size.s_16 }}>
 									<Text style={[styles.aboutMe]}>{t('aboutMe.headerTitle')}</Text>
 									<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
 								</View>

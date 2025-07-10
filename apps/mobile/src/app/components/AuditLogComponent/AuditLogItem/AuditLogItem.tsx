@@ -1,11 +1,10 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectChannelById, selectMemberClanByUserId, selectRoleByRoleId, useAppSelector } from '@mezon/store-mobile';
+import { selectChannelById, selectMemberClanByUserId, useAppSelector } from '@mezon/store-mobile';
 import { ActionLog, convertTimeString, getAvatarForPrioritize } from '@mezon/utils';
 import { ApiAuditLog } from 'mezon-js/api.gen';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { style } from './styles';
 
@@ -22,7 +21,6 @@ export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 	const styles = style(themeValue);
 	const userMention = useAppSelector(selectMemberClanByUserId(data?.entity_id ?? ''));
 	const usernameMention = userMention?.user?.username;
-	const clanRole = useSelector(selectRoleByRoleId(data?.entity_id ?? ''));
 	const channel = useAppSelector((state) => selectChannelById(state, data?.channel_id || ''));
 	const { t } = useTranslation('auditLog');
 	const isAddAction =
@@ -37,7 +35,7 @@ export const AuditLogItem = memo(({ data }: AuditLogItemProps) => {
 	const targetEntity =
 		data?.action_log === ActionLog.ADD_MEMBER_CHANNEL_ACTION_AUDIT || data?.action_log === ActionLog.REMOVE_MEMBER_CHANNEL_ACTION_AUDIT
 			? usernameMention
-			: clanRole?.title;
+			: '';
 
 	return (
 		<View

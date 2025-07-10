@@ -27,7 +27,7 @@ type IMessageContentProps = {
 	isEphemeral?: boolean;
 };
 
-const MessageContent = ({ message, mode, isSearchMessage, isEphemeral }: IMessageContentProps) => {
+const MessageContent = ({ message, mode, isSearchMessage, isEphemeral, isSending }: IMessageContentProps) => {
 	const lines = message?.content?.t;
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 	const isOnlyContainEmoji = isValidEmojiData(contentUpdatedMention);
@@ -79,6 +79,7 @@ const MessageContent = ({ message, mode, isSearchMessage, isEphemeral }: IMessag
 			mode={mode}
 			onCopy={handleCopyMessage}
 			isEphemeral={isEphemeral}
+			isSending={isSending}
 		/>
 	);
 };
@@ -122,7 +123,8 @@ export default memo(
 		prev.mode === curr.mode &&
 		prev.isSearchMessage === curr.isSearchMessage &&
 		prev.isInTopic === curr.isInTopic &&
-		prev.isEphemeral === curr.isEphemeral
+		prev.isEphemeral === curr.isEphemeral &&
+		prev.isSending === curr.isSending
 );
 
 const MessageText = ({
@@ -133,7 +135,8 @@ const MessageText = ({
 	isOnlyContainEmoji,
 	isSearchMessage,
 	onCopy,
-	isEphemeral
+	isEphemeral,
+	isSending
 }: {
 	message: IMessageWithUser;
 	lines: string;
@@ -143,6 +146,7 @@ const MessageText = ({
 	isOnlyContainEmoji?: boolean;
 	onCopy?: (event: React.ClipboardEvent<HTMLDivElement>, startIndex: number, endIndex: number) => void;
 	isEphemeral?: boolean;
+	isSending?: boolean;
 }) => {
 	let patchedContent = content;
 	if ((!content?.mk || content.mk.length === 0) && Array.isArray(content?.lk) && content.lk.length > 0) {
@@ -193,6 +197,7 @@ const MessageText = ({
 					onCopy={onCopy}
 					messageId={message.id}
 					isEphemeral={isEphemeral}
+					isSending={isSending}
 				/>
 			) : null}
 		</>

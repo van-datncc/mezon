@@ -129,11 +129,11 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						</Dropdown>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b bg-theme-surface">
-						<button className="py-2 h-10 px-4 rounded  hover:underline text-theme-primary" type="button" onClick={onClose}>
+						<button className="py-2 h-10 px-4 rounded-lg  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
 						<button
-							className="py-2 h-10 px-4 rounded bg-button-primary hover:opacity-80 text-white"
+							className="py-2 h-10 px-4 rounded-lg btn-primary-hover btn-primary hover:opacity-80 "
 							type="button"
 							onClick={handleSaveCustomStatus}
 						>

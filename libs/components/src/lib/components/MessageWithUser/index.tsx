@@ -91,8 +91,6 @@ function MessageWithUser({
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
 
-	console.log('render', message?.id);
-
 	const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
 
 	const hasIncludeMention = (() => {
@@ -197,7 +195,9 @@ function MessageWithUser({
 						{
 							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
 						},
-						{ 'bg-item-msg-selected': isSelected }
+						{ 'bg-item-msg-selected': isSelected },
+						{ 'pointer-events-none': message.isSending },
+						{ 'is-error pointer-events-none': message.isError }
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
