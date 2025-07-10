@@ -78,8 +78,8 @@ export default function InvitePage() {
 	}, [userJoined, navigate, clanId, channeId]);
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-cover bg-center">
-			<div className="bg-theme-setting-primary text-theme-primary rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
+		<div className="min-h-screen flex items-center justify-center bg-cover bg-center bg-theme-primary">
+			<div className="bg-theme-setting-primary border-theme-primary text-theme-primary rounded-md p-6 w-full max-w-[440px] flex flex-col items-center shadow-xl">
 				<div className="flex items-center justify-center mb-3">
 					<div className="relative w-12 h-12 flex items-center justify-center">
 						{selectInvite?.clan_logo ? (

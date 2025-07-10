@@ -253,7 +253,7 @@ button.bg-button-add-friend {
 }
 
 .text-theme-primary-hover:hover {
-	color: var(--text-secondary);
+	color: var(--text-secondary) !important;
 }
 
 .text-theme-primary-active {
@@ -287,11 +287,11 @@ button.bg-button-add-friend {
 }
 
 /* placeholder */
-.bg-input-theme input,
-.bg-theme-input-primary input,
-.bg-theme-input input,
-input.bg-input-theme,
-input.bg-theme-input,
+.bg-input-theme input::placeholder,
+.bg-theme-input-primary input::placeholder,
+.bg-theme-input input::placeholder,
+input.bg-input-theme::placeholder,
+input.bg-theme-input::placeholder,
 input.bg-theme-input-primary::placeholder {
 	color: var(--text-theme-primary);
 }
@@ -368,7 +368,6 @@ input.bg-theme-input-primary::placeholder {
 	backdrop-filter: blur(2px);
 }
 
-
 .status-user-background {
 	background: var(--bg-primary);
 }
@@ -377,9 +376,12 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-markdown-code);
 }
 .btn-primary {
-  background: var(--button-theme-primary);
+  background: var(--button-theme-primary) !important;
   color: white;
 }
 .btn-primary-hover:hover {
-  background: var(--bg-button-primary-hover);
+	background: var(--bg-button-primary-hover);
+}
+.border-color-avatar {
+	border-color: var(--bg-outside-footer);
 }

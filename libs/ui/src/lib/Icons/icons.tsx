@@ -29,9 +29,9 @@ export const OnlineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[1
 	);
 };
 
-export const OfflineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
+export const OfflineStatus: React.FC<IconProps> = ({ className = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
 			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);

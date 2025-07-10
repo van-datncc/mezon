@@ -179,7 +179,7 @@ const HeaderModal = memo((props: HeaderModalProps) => {
 	const { name = '' } = props;
 	return (
 		<>
-			<h3 className="mb-4 font-bold text-xl text-theme-primary ">Channel Permissions</h3>
+			<h3 className="mb-4 font-bold text-xl text-theme-primary-active ">Channel Permissions</h3>
 			<p className="mb-3 text-theme-primary">Use permissions to customise who can do what in this channel.</p>
 			<div className="flex mt-4 p-4">
 				<Icons.SyncIcon defaultFill="#F0B033" defaultSize="mr-2" />

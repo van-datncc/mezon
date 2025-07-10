@@ -246,13 +246,36 @@ export const UserStatusIconDM = ({ status }: { status?: EUserStatus }) => {
 		case EUserStatus.ONLINE:
 			return <StatusUser2 status="online" />;
 		case EUserStatus.IDLE:
-			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-[10px] h-[10px]" />;
+			return (
+				<span className="flex justify-end items-end h-full">
+					<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-3 h-3 bg-theme-primary p-[2px] rounded-full" />
+				</span>
+			);
 		case EUserStatus.DO_NOT_DISTURB:
 			return <StatusUser2 status="dnd" />;
 		case EUserStatus.INVISIBLE:
-			return <Icons.OfflineStatus />;
+			return (
+				<span className="flex justify-end items-end h-full">
+					<Icons.OfflineStatus className=" w-3 h-3 bg-theme-primary p-[2px] rounded-full" />
+				</span>
+			);
 		default:
 			return <StatusUser2 status="online" />;
+	}
+};
+
+export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
+	switch (status) {
+		case EUserStatus.ONLINE:
+			return <StatusUser2 status="online" className="w-5 h-5 p-1" />;
+		case EUserStatus.IDLE:
+			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-5 h-5 bg-theme-primary p-1 rounded-full" />;
+		case EUserStatus.DO_NOT_DISTURB:
+			return <StatusUser2 status="dnd" className="w-5 h-5 p-1" />;
+		case EUserStatus.INVISIBLE:
+			return <Icons.OfflineStatus className="w-5 h-5 bg-theme-primary p-1 rounded-full" />;
+		default:
+			return <StatusUser2 status="online" className="w-5 h-5 p-1" />;
 	}
 };
 
