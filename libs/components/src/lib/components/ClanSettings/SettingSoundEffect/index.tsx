@@ -88,7 +88,7 @@ const SettingSoundEffect = () => {
 					<p className="text-xs mt-1">Personalize sound effects for your clan!</p>
 				</div>
 				<button
-					className="btn-primary btn-primary-hover rounded-lg  px-2 font-semibold hover:opacity-80 transition duration-200 shadow-sm hover:shadow-md capitalize"
+					className="btn-primary btn-primary-hover rounded-lg  px-2 font-semibold transition duration-200 shadow-sm hover:shadow-md capitalize"
 					onClick={() => setShowModal(true)}
 				>
 					<span className="flex items-center gap-2">Upload sound</span>

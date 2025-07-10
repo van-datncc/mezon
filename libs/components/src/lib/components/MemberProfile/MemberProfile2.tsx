@@ -44,6 +44,8 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 
 	const isOffline = !userMeta?.online;
 
+	
+
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
 			<div onContextMenu={handleContextMenu} onClick={handleClick} className="cursor-pointer flex items-center gap-[9px] relative">

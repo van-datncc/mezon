@@ -104,7 +104,7 @@ const ListMemberInvite = (props: ModalParam) => {
 				value={searchTerm}
 				onChange={handleInputChange}
 				placeholder="Search for friends"
-				className="w-full h-10 mb-1 bg-theme-input rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
+				className="w-full h-10 mb-1 bg-theme-input  border-theme-primary rounded-lg px-[16px] py-[13px] text-[14px] outline-none"
 			/>
 			<p className="ml-[0px] mt-1 mb-4  text-[15px] cursor-default">
 				This channel is private, only select members and roles can view this channel.

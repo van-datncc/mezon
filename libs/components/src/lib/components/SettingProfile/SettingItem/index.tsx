@@ -35,7 +35,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 	return (
 		<div className=" overflow-y-auto w-1/6 xl:w-1/4 min-w-56 bg-theme-setting-nav   flex justify-end pt-96 pr-2 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 2xl:flex-grow hide-scrollbar flex-grow">
 			<div className="w-170px ">
-				<p className="font-bold text-sm tracking-wider">USER SETTINGS</p>
+				<p className="font-bold text-sm tracking-wider text-theme-primary-active">USER SETTINGS</p>
 				<button
 					className={` w-[170px] text-[16px] text-theme-primary-hover bg-item-hover font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-4  ${selectedButton === 'Account' ? 'bg-button-secondary text-theme-primary-active' : 'text-theme-primary'}`}
 					onClick={() => {
