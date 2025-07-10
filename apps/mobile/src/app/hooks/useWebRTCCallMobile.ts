@@ -645,6 +645,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				await track.applyConstraints({
 					facingMode: { exact: currentFacing === 'user' ? 'environment' : 'user' }
 				});
+				return true;
 			}
 		} catch (error) {
 			console.error('Switch camera failed:', error);

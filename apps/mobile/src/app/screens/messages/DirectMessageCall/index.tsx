@@ -103,8 +103,10 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	};
 
 	const handleSwitchCamera = async () => {
-		await switchCamera();
-		setIsMirror(!isMirror);
+		const result = await switchCamera();
+		if (result) {
+			setIsMirror(!isMirror);
+		}
 	};
 
 	useEffect(() => {
