@@ -219,7 +219,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					)}
 					label=""
 					placement="right-start"
-					className="dark:!bg-[#232428] bg-white border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
+					className="bg-theme-contexify border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
 					{!allAccount ? (
 						<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />
@@ -257,22 +257,22 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 			}}
 			className="w-[100dvw] h-[100dvh] bg-black z-30 flex items-center justify-center bg-opacity-60 fixed top-0"
 		>
-			<form className="space-y-2 bg-black p-12 rounded-lg w-[400px]">
-				<label htmlFor="email" className="block text-sm font-medium text-black dark:text-gray-300">
+			<form className="space-y-2 bg-theme-setting-primary p-12 rounded-lg w-[400px]">
+				<label htmlFor="email" className="block text-sm font-medium text-theme-primary-active">
 					Email<span className="text-red-500">*</span>
 				</label>
 				<div className="space-y-2">
 					<input
 						ref={inputEmail}
 						id="email"
-						className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1e1e1e] dark:border-gray-600 dark:placeholder-gray-400 text-black dark:text-white"
+						className="w-full px-3 py-2 border rounded-md border-theme-primary  text-theme-primary-active bg-theme-input"
 						type="email"
 						placeholder="Enter your email"
 					/>
 				</div>
 				<div className="min-h-[20px]"></div>
 				<div className="space-y-2">
-					<label htmlFor="password" className="block text-sm font-medium text-gray-900 dark:text-gray-200">
+					<label htmlFor="password" className="block text-sm font-medium text-theme-primary-active">
 						Password<span className="text-red-500">*</span>
 					</label>
 					<div className="relative">
@@ -281,10 +281,7 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 							id="password"
 							type="password"
 							className="w-full px-3 py-2 rounded-md pr-10 border-theme-primary
-							
-						
-						
-						focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 "
+						focus:outline-none focus:ring-2 text-theme-primary-active bg-theme-input "
 							autoComplete="off"
 							placeholder="Enter your password"
 						/>
@@ -316,7 +313,8 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 				<div className="min-h-[20px]"></div>
 				<button
 					type="submit"
-					className="w-full px-4 py-2 font-medium focus:outline-none text-white cursor-pointer bg-[#1024D4] rounded-lg  text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
+					className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] btn-primary  whitespace-nowrap 
+ btn-primary-hover"
 					onClick={handleAddAccount}
 				>
 					Log In
