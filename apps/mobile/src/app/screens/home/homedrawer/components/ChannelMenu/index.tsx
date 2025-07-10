@@ -1,11 +1,20 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
-import { ActionEmitEvent, ENotificationActive, ENotificationChannelId } from '@mezon/mobile-components';
+import {
+	ActionEmitEvent,
+	ENotificationActive,
+	ENotificationChannelId,
+	STORAGE_DATA_CLAN_CHANNEL_CACHE,
+	getUpdateOrAddClanChannelCache,
+	save
+} from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
+	channelUsersActions,
 	channelsActions,
 	fetchSystemMessageByClanId,
+	getStoreAsync,
 	listChannelRenderAction,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
@@ -166,6 +175,56 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 	};
 
+	const handleJoinChannel = async () => {
+		const channelId = currentSystemMessage.channel_id || '';
+		const clanId = channel?.clan_id || '';
+		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+		const store = await getStoreAsync();
+		requestAnimationFrame(async () => {
+			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
+		});
+		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+	};
+
+	const handleConfirmLeaveChannel = useCallback(async () => {
+		try {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+			dispatch(appActions.setLoadingMainMobile(true));
+			const body = {
+				channelId: channel.id,
+				userId: currentUserId,
+				channelType: channel.type,
+				clanId: channel.clan_id
+			};
+			const response = await dispatch(channelUsersActions.removeChannelUsers(body));
+			if (response?.meta?.requestStatus === 'rejected') {
+				throw new Error(response?.meta?.requestStatus);
+			}
+			navigation.navigate(APP_SCREEN.HOME);
+			await sleep(500);
+			handleJoinChannel();
+		} catch (error) {
+			Toast.show({ type: 'error', text1: t('modalConFirmLeaveChannel.error', { error }) });
+		} finally {
+			dispatch(appActions.setLoadingMainMobile(false));
+		}
+	}, [channel?.channel_private, channel?.clan_id, channel?.id, channel?.type, currentUserId]);
+
+	const handlePressLeaveChannel = () => {
+		const data = {
+			children: (
+				<MezonConfirm
+					onConfirm={handleConfirmLeaveChannel}
+					title={t('modalConFirmLeaveChannel.title')}
+					confirmText={t('modalConFirmLeaveChannel.yesButton')}
+					content={t('modalConFirmLeaveChannel.textConfirm')}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	};
+
 	const notificationMenu: IMezonMenuItemProps[] = [
 		{
 			title: isChannel
@@ -262,6 +321,15 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 				color: Colors.textRed
 			},
 			isShow: isCanManageChannel
+		},
+		{
+			title: t('menu.organizationMenu.leaveChannel'),
+			icon: <MezonIconCDN icon={IconCDN.leaveGroupIcon} color={Colors.textRed} />,
+			onPress: handlePressLeaveChannel,
+			textStyle: {
+				color: Colors.textRed
+			},
+			isShow: channel?.creator_id !== currentUserId && channel?.channel_private === 1
 		}
 	];
 
@@ -313,7 +381,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 					}
 				});
 			},
-			isShow: channel?.creator_id === currentUserId
+			isShow: channel?.creator_id === currentUserId || isCanManageThread
 		},
 		{
 			title: t('menu.manageThreadMenu.deleteThread'),
@@ -336,7 +404,7 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 			textStyle: {
 				color: Colors.textRed
 			},
-			isShow: channel?.creator_id === currentUserId
+			isShow: channel?.creator_id === currentUserId || isCanManageThread
 		}
 		// {
 		// 	title: t('menu.manageThreadMenu.copyLink'),
