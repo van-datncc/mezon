@@ -337,6 +337,42 @@ export const processMarkdownEntities = (text: string | undefined, entities: ApiM
 		.filter(Boolean) as IMarkdownOnMessage[];
 };
 
+export const processBoldEntities = (entities: MentionItem[], markdown: IMarkdownOnMessage[]) => {
+	const boldMarkdownArr: IMarkdownOnMessage[] = [];
+
+	let indexMark = 0;
+	let markLength = 0;
+	const rawMentionsSort = [...(entities || [])].sort((a, b) => a.plainTextIndex - b.plainTextIndex);
+	for (let i = 0; i < rawMentionsSort.length; i++) {
+		const mention = rawMentionsSort[i];
+		const mark = markdown[indexMark];
+
+		if (mark && mention.plainTextIndex - markLength > (mark.s || 0)) {
+			switch (mark.type) {
+				case EBacktickType.CODE:
+					markLength += 2;
+					break;
+				case EBacktickType.PRE:
+					markLength += 6;
+					break;
+				default:
+			}
+			indexMark += 1;
+			i--;
+			continue;
+		}
+
+		if (mention.childIndex === ETypeMEntion.BOLD) {
+			boldMarkdownArr.push({
+				type: EBacktickType.BOLD,
+				s: mention.plainTextIndex - markLength,
+				e: mention.plainTextIndex + mention.display.length - markLength
+			});
+		}
+	}
+	return boldMarkdownArr;
+};
+
 function addSymbolsAndIdsLengthOfMention(value: number, mentionType: number) {
 	let newValue = value;
 	if (mentionType === ETypeMEntion.HASHTAG || mentionType === ETypeMEntion.MENTION) {
