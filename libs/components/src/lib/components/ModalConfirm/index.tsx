@@ -47,7 +47,7 @@ const ModalConfirm = ({
 			<div className="fixed inset-0 bg-black opacity-80 " />
 			<div className="relative z-10 w-[440px]" onClick={(e) => e.stopPropagation()}>
 				<div className="bg-theme-setting-primary pt-[16px] px-[16px] rounded-t-md">
-					<div className=" text-theme-primary text-[20px] font-semibold pb-[16px]">
+					<div className=" text-theme-primary-active text-[20px] font-semibold pb-[16px]">
 						<span className="capitalize mr-1">{title}</span>
 						{customModalName ? customModalName : modalName}
 					</div>

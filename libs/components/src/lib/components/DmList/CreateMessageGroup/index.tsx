@@ -226,19 +226,19 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 			ref={modalRef}
 			tabIndex={-1}
 			onMouseDown={(e) => e.stopPropagation()}
-			className={`absolute top-8 right-0 z-50 outline-none bg-theme-setting-primary border-theme-primary w-[440px] rounded shadow shadow-neutral-800 ${classNames}`}
+			className={`absolute top-8 right-0 z-50 outline-none bg-theme-setting-primary border-theme-primary w-[440px] text-theme-primary rounded shadow shadow-neutral-800 ${classNames}`}
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
 		>
 			<div className="cursor-default text-start">
 				<div className="p-4">
-					<h3 className="text-xl ">Select Friends</h3>
+					<h3 className="text-xl text-theme-primary-active">Select Friends</h3>
 					<p className=" pt-1">{`You can add ${numberCanAdd} more friends.`}</p>
 					<InputField
 						type="text"
 						placeholder="Type the username of a friend"
-						className="h-[34px] text-[16px] mt-[20px]"
+						className="h-[34px] text-[16px] mt-[20px] border-theme-primary "
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 						autoFocus={true}
@@ -267,7 +267,9 @@ const CreateMessageGroup = ({ onClose, classNames, currentDM, rootRef }: CreateM
 											className="size-8"
 											classNameText="text-[9px] min-w-5 min-h-5 pt-[3px]"
 										/>
-										<span className={`text-base font-medium  one-line`}>{friend.user?.display_name}</span>
+										<span className={`text-base font-medium text-theme-primary-active one-line`}>
+											{friend.user?.display_name}
+										</span>
 										<span className="  font-medium">{friend.user?.username}</span>
 									</div>
 									<div className="relative flex flex-row justify-center">

@@ -80,10 +80,10 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 	return (
 		<div className="fixed inset-0 z-[1000] flex items-center justify-center">
 			<div className="absolute inset-0 bg-black/10 backdrop-blur-sm transition-opacity" onClick={onCloseAndReset} />
-			<div className="relative bg-[#313338] rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+			<div className="relative bg-theme-setting-primary border-theme-primary rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
 				<button
 					onClick={onCloseAndReset}
-					className="absolute top-4 right-4 z-10 text-[#b5bac1] hover:text-white transition-colors p-1 rounded-full hover:bg-[#41434a]"
+					className="absolute top-4 right-4 z-10 text-theme-primary text-theme-primary-hover transition-colors p-1 rounded-full "
 				>
 					<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
 						<path
@@ -102,8 +102,8 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 
 						{isError ? (
 							<div className="space-y-2">
-								<h3 className="text-xl font-semibold text-white">{errMessage || 'Oops! Something Went Wrong'}</h3>
-								<p className="text-[#b5bac1] text-sm leading-relaxed">
+								<h3 className="text-xl font-semibold text-theme-primary-active">{errMessage || 'Oops! Something Went Wrong'}</h3>
+								<p className="text-theme-primary text-sm leading-relaxed">
 									{errorConfig.type === 'permission'
 										? "You don't have the necessary permissions to access this content. Please contact an administrator if you believe this is an error."
 										: "We encountered an issue while trying to access this content. Let's get you back on track."}
@@ -111,8 +111,8 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 							</div>
 						) : (
 							<div className="space-y-2">
-								<h3 className="text-xl font-semibold text-white">Access Denied</h3>
-								<p className="text-[#b5bac1] text-sm leading-relaxed">
+								<h3 className="text-xl font-semibold text-theme-primary-active">Access Denied</h3>
+								<p className="text-theme-primary text-sm leading-relaxed">
 									You don't have permission to access this channel or clan. Please check with the server administrator if you
 									believe this is an error.
 								</p>
@@ -121,7 +121,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 					</div>
 				</div>
 
-				<div className="bg-[#2b2d31] px-6 py-4 flex gap-3">
+				<div className="bg-theme-setting-nav px-6 py-4 flex gap-3">
 					{isError ? (
 						<>
 							<button
@@ -132,7 +132,7 @@ function ModalUnknowChannel(props: ModalUnknowChannelProps) {
 							</button>
 							<button
 								onClick={onCloseAndReset}
-								className="px-4 py-2.5 text-[#b5bac1] hover:text-white hover:bg-[#41434a] rounded transition-colors duration-200"
+								className="px-4 py-2.5 text-theme-primary hover:underline rounded transition-colors duration-200"
 							>
 								Cancel
 							</button>

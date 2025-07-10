@@ -161,11 +161,11 @@ const UserProfileModalInner = ({
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="outline-none w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center dark:text-contentTertiary text-black"
+			className="outline-none w-[100vw] h-[100vh] fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center text-theme-primary"
 		>
 			<div
 				ref={userProfileRef}
-				className="w-[600px] h-[90vh] dark:bg-bgPrimary bg-bgLightModeThird rounded-lg flex-col justify-start items-start inline-flex"
+				className="w-[600px] h-[90vh] bg-theme-setting-primary rounded-lg flex-col justify-start items-start inline-flex"
 			>
 				<div
 					className={`relative flex justify-end w-full h-[210px] rounded-t-md ${!color && 'dark:bg-bgAvatarDark bg-bgAvatarLight'}`}
@@ -197,12 +197,12 @@ const UserProfileModalInner = ({
 									className="relative flex items-center h-8 px-4 rounded-[3px] text-theme-primary text-theme-primary-hover"
 								>
 									<Icons.PenEdit />
-									<span className="text-sm font-semibold one-line">Edit Profile</span>
+									<span className="text-sm font-semibold one-line text-theme-primary-active">Edit Profile</span>
 								</button>
 								{isOPenEditOption && (
 									<div
 										ref={panelRef}
-										className={`absolute left-[calc(100%_+_10px)] top-[38px] dark:bg-bgSearchHover bg-gray-100 rounded-sm p-2 z-[1] mr-2 w-fit shadow-lg outline-none`}
+										className={`absolute left-[calc(100%_+_10px)] top-[38px] bg-theme-setting-primary rounded-sm p-2 z-[1] mr-2 w-fit shadow-lg outline-none`}
 									>
 										{modeResponsive === ModeResponsive.MODE_CLAN && (
 											<ItemPanel children="Edit Clan Profile" onClick={handleOpenClanProfileSetting} />

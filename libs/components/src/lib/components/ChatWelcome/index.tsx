@@ -147,7 +147,7 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 				)}
 			</div>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary-active" style={{ wordBreak: 'break-word' }}>
 					{isShowCreateThread ? name : currentThread?.channel_label}
 				</p>
 			</div>
@@ -186,7 +186,7 @@ const WelComeDm = (props: WelComeDmProps) => {
 				classNameText="!text-4xl font-semibold"
 			/>
 			<div>
-				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary" style={{ wordBreak: 'break-word' }}>
+				<p className="text-xl md:text-3xl font-bold pt-1 text-theme-primary-active" style={{ wordBreak: 'break-word' }}>
 					{name}
 				</p>
 			</div>

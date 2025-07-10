@@ -40,7 +40,7 @@ const ItemAttachment = (props: ItemAttachmentProps) => {
 						}
 					}}
 				/>
-				{!isSelected && <div className="absolute inset-0 bg-black opacity-50 rounded"></div>}
+				{!isSelected && <div className="absolute inset-0 bg-black opacity-80 rounded"></div>}
 			</div>
 		</div>
 	);
