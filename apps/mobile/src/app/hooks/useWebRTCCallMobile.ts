@@ -635,6 +635,23 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
+	const switchCamera = async () => {
+		try {
+			const track = callState?.localStream?.getVideoTracks()?.[0];
+			if (!track) return;
+			const currentFacing = track?.getSettings()?.facingMode;
+
+			if (currentFacing) {
+				await track.applyConstraints({
+					facingMode: { exact: currentFacing === 'user' ? 'environment' : 'user' }
+				});
+				return true;
+			}
+		} catch (error) {
+			console.error('Switch camera failed:', error);
+		}
+	};
+
 	return {
 		callState,
 		localMediaControl,
@@ -644,6 +661,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		toggleAudio,
 		toggleVideo,
 		toggleSpeaker,
+		switchCamera,
 		handleSignalingMessage
 	};
 }
