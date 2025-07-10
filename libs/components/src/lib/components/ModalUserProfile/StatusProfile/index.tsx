@@ -323,7 +323,8 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 				<div className="min-h-[20px]"></div>
 				<button
 					type="submit"
-					className="w-full px-4 py-2 font-medium focus:outline-none text-white cursor-pointer bg-[#1024D4] rounded-lg  text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
+					className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] btn-primary  whitespace-nowrap 
+ btn-primary-hover"
 					onClick={handleAddAccount}
 				>
 					Log In
