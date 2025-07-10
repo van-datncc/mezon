@@ -299,7 +299,7 @@ function FooterProfile({ name, status, avatar, userId, isDM }: FooterProfileProp
 							srcImgProxy={createImgproxyUrl(avatar ?? '')}
 							src={avatar}
 						/>
-						<div className="absolute bottom-1 left-0 w-[32px] h-[32px] ">
+						<div className="absolute bottom-0 left-0 w-[32px] h-[32px] ">
 							<UserStatusIconDM status={userCustomStatus?.user_status} />
 						</div>
 						<div className="flex flex-col overflow-hidden flex-1">

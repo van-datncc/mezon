@@ -54,6 +54,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
 	const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
+	const [dropdownOpen, setDropdownOpen] = useState(false);
 
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
@@ -192,7 +193,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					trigger="click"
 					dismissOnClick={true}
 					renderTrigger={() => (
-						<div className="capitalize">
+						<div className="capitalize text-theme-primary">
 							<ItemStatus children={status} dropdown startIcon={statusIcon(status)} />
 						</div>
 					)}
@@ -200,8 +201,14 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					placement="right-start"
 					className=" bg-theme-contexify text-theme-primary ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full "
 				>
-					<ItemStatus children="Online" startIcon={<Icons.OnlineStatus />} onClick={() => updateUserStatus('Online', 0, true)} />
-					<div className="w-full  border-b-theme-primary opacity-70 text-center my-2"></div>
+					<ItemStatus
+						children="Online"
+						startIcon={<Icons.OnlineStatus />}
+						onClick={() => {
+							updateUserStatus('Online', 0, true);
+						}}
+					/>
+					<div className="w-full border-b-theme-primary opacity-70 text-center my-2"></div>
 					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
 					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />
 					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
@@ -219,7 +226,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					)}
 					label=""
 					placement="right-start"
-					className="bg-theme-contexify border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
+					className="bg-theme-setting-primary border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
 					{!allAccount ? (
 						<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />
@@ -255,24 +262,24 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 			onClick={(e) => {
 				e.stopPropagation();
 			}}
-			className="w-[100dvw] h-[100dvh] bg-black z-30 flex items-center justify-center bg-opacity-60 fixed top-0"
+			className="w-[100dvw] h-[100dvh] bg-theme-setting-primary z-30 flex items-center justify-center bg-opacity-60 fixed top-0"
 		>
-			<form className="space-y-2 bg-theme-setting-primary p-12 rounded-lg w-[400px]">
-				<label htmlFor="email" className="block text-sm font-medium text-theme-primary-active">
+			<form className="space-y-2 bg-theme-surface p-12 rounded-lg w-[400px]">
+				<label htmlFor="email" className="block text-sm font-medium text-theme-primary">
 					Email<span className="text-red-500">*</span>
 				</label>
 				<div className="space-y-2">
 					<input
 						ref={inputEmail}
 						id="email"
-						className="w-full px-3 py-2 border rounded-md border-theme-primary  text-theme-primary-active bg-theme-input"
+						className="w-full px-3 py-2 rounded-md border-theme-primary focus:outline-none focus:ring-2 focus:ring-blue-500 bg-input-secondary text-theme-message"
 						type="email"
 						placeholder="Enter your email"
 					/>
 				</div>
 				<div className="min-h-[20px]"></div>
 				<div className="space-y-2">
-					<label htmlFor="password" className="block text-sm font-medium text-theme-primary-active">
+					<label htmlFor="password" className="block text-sm font-medium text-theme-primary">
 						Password<span className="text-red-500">*</span>
 					</label>
 					<div className="relative">
@@ -280,12 +287,15 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 							ref={inputPassword}
 							id="password"
 							type="password"
-							className="w-full px-3 py-2 rounded-md pr-10 border-theme-primary
-						focus:outline-none focus:ring-2 text-theme-primary-active bg-theme-input "
+							className="w-full px-3 py-2 rounded-md pr-10 text-theme-message bg-input-secondary border-theme-primary
+							
+						
+						
+						focus:outline-none focus:ring-2 focus:ring-blue-500  "
 							autoComplete="off"
 							placeholder="Enter your password"
 						/>
-						<button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+						<button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-primary">
 							<svg
 								aria-hidden="true"
 								role="img"

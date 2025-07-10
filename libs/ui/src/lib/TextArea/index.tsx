@@ -9,7 +9,7 @@ const TextArea: React.FC<TextAreaProps> = ({ className, refTextArea, ...rest }) 
 	return (
 		<div>
 			<textarea
-				className={`bg-theme-input font-[400] py-[12px] px-[14px] rounded w-full border-theme-primary outline-none ${className}`}
+				className={`bg-input-secondary text-theme-message font-[400] py-[12px] px-[14px] rounded w-full border-theme-primary outline-none ${className}`}
 				ref={refTextArea}
 				{...rest}
 			/>

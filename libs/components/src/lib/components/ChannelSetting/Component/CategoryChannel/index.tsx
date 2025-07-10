@@ -40,11 +40,11 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-theme-setting-primary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
-			<div className="dark:text-white text-black text-[15px] flex flex-col gap-4">
-				<h3 className="font-bold text-xl text-theme-primary">Category</h3>
+			<div className="text-theme-primary text-[15px] flex flex-col gap-4">
+				<h3 className="font-bold text-xl text-theme-primary-active">Category</h3>
 
 				<p className="text-xs font-bold text-theme-primary">Channel name</p>
-				<div className="bg-theme-setting-nav border-theme-primary  pl-3 py-2 w-full  outline-none text-theme-primary">
+				<div className="bg-input-secondary border-theme-primary rounded-lg pl-3 py-2 w-full  outline-none text-theme-message">
 					{realTimeChannel.channel_label}
 				</div>
 				<p className="text-xs font-bold text-theme-primary mt-4">Category</p>
@@ -52,7 +52,7 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 					trigger="click"
 					dismissOnClick={false}
 					renderTrigger={() => (
-						<div className="w-full  h-12 rounded-md border-theme-primary text-theme-primary bg-theme-setting-primary  flex flex-row px-3 justify-between items-center uppercase">
+						<div className="w-full  h-12 rounded-md border-theme-primary text-theme-message bg-input-secondary  flex flex-row px-3 justify-between items-center uppercase">
 							<p>{realTimeChannel.category_name}</p>
 							<div>
 								<Icons.ArrowDownFill />
