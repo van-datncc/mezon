@@ -10,7 +10,7 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontSize: size.s_14,
 			fontWeight: '900',
-			height: size.s_50,
+			paddingVertical: size.s_14,
 			borderBottomColor: colors.border,
 			borderBottomWidth: 4,
 			paddingHorizontal: size.s_10,
