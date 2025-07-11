@@ -1,6 +1,7 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChannelsEntity } from '@mezon/store-mobile';
 import {
+	EBacktickType,
 	ETokenMessage,
 	IEmojiOnMessage,
 	IExtendedMessage,
@@ -100,7 +101,11 @@ export const createFormattedString = (data: IExtendedMessage) => {
 				formatContentDraft += contentInElement;
 				break;
 			case ETokenMessage.MARKDOWNS:
-				formatContentDraft += '```' + contentInElement?.replace(/^```|```$/g, '') + '```';
+				if (element?.type === EBacktickType.LINKYOUTUBE || element?.type === EBacktickType.LINK) {
+					formatContentDraft += contentInElement?.replace(/^```|```$/g, '');
+				} else {
+					formatContentDraft += '```' + contentInElement?.replace(/^```|```$/g, '') + '```';
+				}
 				break;
 			default:
 				formatContentDraft += contentInElement;
