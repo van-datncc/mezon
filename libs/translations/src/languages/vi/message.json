@@ -123,5 +123,7 @@
     "emoji": "Biểu cảm",
     "gif": "GIFs",
     "sticker": "Nhãn dán"
-  }
+  },
+  "turnOffAnonymous": "Tắt ẩn danh",
+  "turnOnAnonymous": "Bật ẩn danh"
 }

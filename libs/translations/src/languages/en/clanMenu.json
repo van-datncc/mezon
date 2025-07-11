@@ -46,6 +46,7 @@
     },
     "common": {
         "search": "Search",
-        "community": "Community"
+        "community": "Community",
+        "searchMembers": "Search Members"
     }
 }

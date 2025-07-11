@@ -123,5 +123,7 @@
         "emoji": "Emojis",
         "gif": "GIFs",
         "sticker": "Stickers"
-    }
+    },
+    "turnOffAnonymous": "Turn off Anonymous",
+    "turnOnAnonymous": "Turn on Anonymous"
 }
