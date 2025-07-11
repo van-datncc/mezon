@@ -18,9 +18,9 @@ const ChatHeader = ({ currentChannel }: ChatStreamProps) => {
 	};
 
 	return (
-		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[50px]  bg-gray-300 dark:bg-gray-800">
+		<div className="flex flex-row items-center justify-between px-4 h-[58px] min-h-[50px]  bg-theme-primary">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
-				<Icons.Chat defaultSize="w-6 h-6 dark:text-channelTextLabel" />
+				<Icons.Chat defaultSize="w-6 h-6 text-theme-primary" />
 				<span className="text-base font-semibold text-theme-primary">
 					{currentChannel?.channel_label && currentChannel?.channel_label.length > 50
 						? `${currentChannel?.channel_label.substring(0, 50)}...`
