@@ -1442,7 +1442,7 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function Speaker({ defaultFill, defaultSize = 'w-5 h-5', className }: IconProps) {
 	return (
 		<svg
 			width="18"
@@ -1450,7 +1450,7 @@ export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''} ${className}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
