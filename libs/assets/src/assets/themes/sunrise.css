@@ -36,10 +36,9 @@
 	--bg-tertiary: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
 	--bg-surface: color-mix(in oklab, hsl(0, 0%, 98.431%) 100%, #000 0%);
 
-  --bg-accent: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
-  --bg-hover: #dfe1e5;
-  --bg-modal: rgba(0, 0, 0, 0.54);
-
+	--bg-accent: hsl(240 calc(1 * 4%) 60.784% /0.1607843137254902);
+	--bg-hover: #dfe1e5;
+	--bg-modal: rgba(0, 0, 0, 0.54);
 
 	/* input */
 
@@ -139,18 +138,16 @@
 	/* option  */
 	--bg-option-theme: #fffcef;
 	--bg-option-active: #e6e4dc;
-  /* mention */
-  --mention-primary: rgba(67, 97, 238, 0.24);
-  --mention-color: #3298ff;
-  --bg-mention-hover: rgba(67, 98, 238, 0.39);
-  --color-mention-hover: #3298ff;
-  --bg-mention-evryone: #2eb08b63;
-  --color-mention-evryone: #2eb08c;
-  --bg-mention-everyone-hover: #2eb08b8c;
-  --color-mention-everyone-hover: #32b993;
-  --bg-highlight: color-mix(in oklab,
-      hsla(108, 30%, 32%, 0.116) 100%,
-      hsla(28, 40%, 32%, 0.165) 50%);
+	/* mention */
+	--mention-primary: rgba(67, 97, 238, 0.24);
+	--mention-color: #3298ff;
+	--bg-mention-hover: rgba(67, 98, 238, 0.39);
+	--color-mention-hover: #3298ff;
+	--bg-mention-evryone: #2eb08b63;
+	--color-mention-evryone: #2eb08c;
+	--bg-mention-everyone-hover: #2eb08b8c;
+	--color-mention-everyone-hover: #32b993;
+	--bg-highlight: color-mix(in oklab, hsla(108, 30%, 32%, 0.116) 100%, hsla(28, 40%, 32%, 0.165) 50%);
 
 	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
 	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
@@ -165,37 +162,39 @@
 		hsl(0 calc(1 * 0%) 0% /0.0784313725490196) 100%,
 		hsl(50.588235294117645 100% 90% /0.0784313725490196) 50%
 	);
-	--border-highlight-react-theme: #5865F2;
+	--border-highlight-react-theme: #5865f2;
 	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
 
+	--bg-secondary-button-hover: hsl(240 calc(1 * 4%) 60.784% /0.2784313725490196);
 
-  --bg-secondary-button-hover: hsl(240 calc(1 * 4%) 60.784% /0.2784313725490196);
+	/* màu contexify */
+	--bg-theme-contexify: rgb(255, 252, 238);
+	/* màu count page */
+	--bg-count-page: #e6f0ff;
+	/* nền nhẹ xanh lam */
+	--text-count-page: #1e3a8a;
+	/* chữ xanh đậm nhẹ (như Tailwind blue-900) */
+	--bg-count-page-hover: #d0e2ff;
+	/* hover xanh hơn tí */
+	--text-count-page-hover: #1e40af;
+	/* chữ hover xanh sáng hơn tí */
+	--bg-count-page-active: #235eef;
+	/* nền active xanh rõ */
+	--text-count-page-active: #ffffff;
+	/* chữ trắng nổi bật */
+	--text-theme-primary-hover: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
+	/* modal */
+	--bg-modal-theme: color-mix(in oklab, hsl(0 calc(1 * 0%) 100% /1) 100%, rgb(255, 247, 204) 50%);
+	/* option  */
+	--bg-option-theme: #fffcef;
+	--bg-option-active: #e6e4dc;
 
-  /* màu contexify */
-  --bg-theme-contexify: rgb(255, 252, 238);
-  /* màu count page */
-  --bg-count-page: #e6f0ff;
-  /* nền nhẹ xanh lam */
-  --text-count-page: #1e3a8a;
-  /* chữ xanh đậm nhẹ (như Tailwind blue-900) */
-  --bg-count-page-hover: #d0e2ff;
-  /* hover xanh hơn tí */
-  --text-count-page-hover: #1e40af;
-  /* chữ hover xanh sáng hơn tí */
-  --bg-count-page-active: #235eef;
-  /* nền active xanh rõ */
-  --text-count-page-active: #ffffff;
-  /* chữ trắng nổi bật */
-  --text-theme-primary-hover: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
-  /* modal */
-  --bg-modal-theme: color-mix(in oklab, hsl(0 calc(1 * 0%) 100% /1) 100%, rgb(255, 247, 204) 50%);
-  /* option  */
-  --bg-option-theme: #fffcef;
-  --bg-option-active: #e6e4dc;
-
-  --bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
-  --text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
-  --bg-markdown-code: #eee6d5;
-  --bg-button-primary-hover: #4654C0;
-	--button-theme-primary: #5265EC;
+	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
+	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
+	--bg-markdown-code: #eee6d5;
+	--bg-button-primary-hover: #4654c0;
+	--button-theme-primary: #5265ec;
+	/* border-avatar */
+	--border-color-avatar: #f4ebe9;
+	/* notice region */
 }
