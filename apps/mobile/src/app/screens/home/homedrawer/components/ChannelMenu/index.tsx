@@ -3,10 +3,7 @@ import { useMarkAsRead, usePermissionChecker } from '@mezon/core';
 import {
 	ActionEmitEvent,
 	ENotificationActive,
-	ENotificationChannelId,
-	STORAGE_DATA_CLAN_CHANNEL_CACHE,
-	getUpdateOrAddClanChannelCache,
-	save
+	ENotificationChannelId
 } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
@@ -14,7 +11,6 @@ import {
 	channelUsersActions,
 	channelsActions,
 	fetchSystemMessageByClanId,
-	getStoreAsync,
 	listChannelRenderAction,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
@@ -175,17 +171,6 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 		dispatch(notificationSettingActions.setMuteNotificationSetting(body));
 	};
 
-	const handleJoinChannel = async () => {
-		const channelId = currentSystemMessage.channel_id || '';
-		const clanId = channel?.clan_id || '';
-		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		const store = await getStoreAsync();
-		requestAnimationFrame(async () => {
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		});
-		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-	};
-
 	const handleConfirmLeaveChannel = useCallback(async () => {
 		try {
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
@@ -202,8 +187,6 @@ export default function ChannelMenu({ channel }: IChannelMenuProps) {
 				throw new Error(response?.meta?.requestStatus);
 			}
 			navigation.navigate(APP_SCREEN.HOME);
-			await sleep(500);
-			handleJoinChannel();
 		} catch (error) {
 			Toast.show({ type: 'error', text1: t('modalConFirmLeaveChannel.error', { error }) });
 		} finally {

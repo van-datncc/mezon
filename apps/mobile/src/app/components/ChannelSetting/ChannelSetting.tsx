@@ -343,7 +343,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			}
 
 			navigation.navigate(APP_SCREEN.HOME);
-			handleJoinChannel();
 		} catch (error) {
 			Toast.show({ type: 'error', text1: t('confirm.leave.error', { error }) });
 		} finally {
