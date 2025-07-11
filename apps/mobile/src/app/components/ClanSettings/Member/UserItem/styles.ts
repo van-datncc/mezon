@@ -54,12 +54,16 @@ export const style = (colors: Attributes) =>
 			backgroundColor: Colors.bgToggleOnBtn
 		},
 		icon: {
-			width: 30,
-			height: 20,
+			width: size.s_30,
+			height: size.s_20,
 			flexBasis: 20
 		},
 		content: {
 			flexBasis: size.s_10,
 			flexGrow: 1
+		},
+		roleIcon: {
+			height: size.s_10,
+			width: size.s_10
 		}
 	});
