@@ -8,7 +8,6 @@ import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment/moment';
 import React, { useCallback, useContext, useEffect, useRef } from 'react';
 import { AppState, Platform } from 'react-native';
-import BootSplash from 'react-native-bootsplash';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { checkNotificationPermission, processNotification, setupCallKeep } from '../../utils/pushNotificationHelpers';
@@ -144,7 +143,6 @@ export const FCMNotificationLoader = ({ notifyInit }: { notifyInit: any }) => {
 	};
 
 	const onNotificationOpenedApp = async () => {
-		await BootSplash.hide({ fade: true });
 		try {
 			if (Platform.OS === 'android') {
 				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
