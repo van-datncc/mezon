@@ -7,14 +7,14 @@ import {
 	selectCurrentUserId,
 	selectMemberClanByUserId,
 	soundEffectActions,
-	useAppDispatch
+	useAppDispatch,
+	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ClanSticker } from 'mezon-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalUploadSound from './ModalUploadSound';
-
 interface ExtendedClanSticker extends ClanSticker {
 	media_type?: MediaType;
 }
@@ -36,17 +36,14 @@ const SettingSoundEffect = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [selectedSound, setSelectedSound] = useState<SoundType | null>(null);
 	const dispatch = useAppDispatch();
-	const currentClanId = useSelector(selectCurrentClanId) || '';
-	const currentUserId = useSelector(selectCurrentUserId) || '';
-	const currentClan = useSelector(selectCurrentClan);
-	const userProfile = useSelector(selectAllAccount);
+	const currentClanId = useAppSelector(selectCurrentClanId) || '';
+	const currentUserId = useAppSelector(selectCurrentUserId) || '';
+	const currentClan = useAppSelector(selectCurrentClan);
+	const userProfile = useAppSelector(selectAllAccount);
 
-	const sounds = useSelector((state: any) => selectAudioByClanId(state, currentClanId));
+	const sounds = useAppSelector((state: any) => selectAudioByClanId(state, currentClanId));
 
-	const isClanOwner = useMemo(() => {
-		return currentClan?.creator_id === userProfile?.user?.id;
-	}, [currentClan, userProfile]);
-
+	const isClanOwner = currentClan?.creator_id === userProfile?.user?.id;
 
 
 	const soundList: SoundType[] = sounds.map(sound => ({
