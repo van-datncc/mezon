@@ -81,4 +81,12 @@ function ChannelItem({ data, isUnRead, isActive }: IChannelItemProps) {
 		</TouchableOpacity>
 	);
 }
-export default React.memo(ChannelItem);
+export default React.memo(ChannelItem, (prevProps, nextProps) => {
+	return (
+		prevProps?.data?.channel_label === nextProps?.data?.channel_label &&
+		prevProps?.data?.channel_id === nextProps?.data?.channel_id &&
+		prevProps?.data?.count_mess_unread === nextProps?.data?.count_mess_unread &&
+		prevProps?.isUnRead === nextProps?.isUnRead &&
+		prevProps?.isActive === nextProps?.isActive
+	);
+});
