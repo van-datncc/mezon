@@ -353,7 +353,7 @@ export const selectClanMemberWithStatusIds = createSelector(
 			...item,
 			user: {
 				...item.user,
-				online: !!metas[item.id]?.online,
+				online: metas[item.id]?.status !== EUserStatus.INVISIBLE && !!metas[item.id]?.online,
 				is_mobile: !!metas[item.id]?.isMobile
 			}
 		})) as UsersClanEntity[];

@@ -10,15 +10,15 @@ export function findParentByClass(element: HTMLElement, className: string): HTML
 }
 function _toggleDisableHoverImpl(element: HTMLDivElement | null, timeoutId: React.MutableRefObject<NodeJS.Timeout | null>) {
 	if (!element) return;
-	timeoutId.current && clearTimeout(timeoutId.current);
-	element.classList.add('disable-hover');
-	const removeHover = () => {
-		element.classList.remove('disable-hover');
-	};
+	// timeoutId.current && clearTimeout(timeoutId.current);
+	// element.classList.add('disable-hover');
+	// const removeHover = () => {
+	// 	element.classList.remove('disable-hover');
+	// };
 
-	timeoutId.current = setTimeout(() => {
-		requestAnimationFrame(removeHover);
-	}, 300);
+	// timeoutId.current = setTimeout(() => {
+	// 	requestAnimationFrame(removeHover);
+	// }, 300);
 }
 
 export const toggleDisableHover = _toggleDisableHoverImpl;
