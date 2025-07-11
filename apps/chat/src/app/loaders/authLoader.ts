@@ -39,15 +39,18 @@ function getRedirectTo(initialPath?: string): string {
 }
 
 const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
+	if (!navigator.onLine) {
+		return new Promise((resolve) => {
+			const handleOnline = () => {
+				window.removeEventListener('online', handleOnline);
+				resolve();
+			};
+			window.addEventListener('online', handleOnline);
+		});
+	}
+
 	return new Promise((resolve) => {
-		const handleOnline = () => {
-			clearTimeout(timeoutId);
-			window.removeEventListener('online', handleOnline);
-			resolve();
-		};
-		window.addEventListener('online', handleOnline);
-		const timeoutId = setTimeout(() => {
-			window.removeEventListener('online', handleOnline);
+		setTimeout(() => {
 			resolve();
 		}, delayMs);
 	});
