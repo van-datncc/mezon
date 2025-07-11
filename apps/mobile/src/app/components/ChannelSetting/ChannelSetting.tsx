@@ -1,13 +1,12 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { usePermissionChecker } from '@mezon/core';
-import { ActionEmitEvent, CheckIcon, getUpdateOrAddClanChannelCache, isEqual, save, STORAGE_DATA_CLAN_CHANNEL_CACHE } from '@mezon/mobile-components';
+import { ActionEmitEvent, CheckIcon, isEqual } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
-	channelsActions,
 	channelUsersActions,
+	channelsActions,
 	fetchSystemMessageByClanId,
-	getStoreAsync,
 	selectAllChannels,
 	selectChannelById,
 	selectClanSystemMessage,
@@ -16,7 +15,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { checkIsThread, EOverriddenPermission, EPermission } from '@mezon/utils';
+import { EOverriddenPermission, EPermission, checkIsThread } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -211,7 +210,7 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 					textStyle: { color: 'red' },
 					onPress: () => handlePressDeleteChannel(),
 					icon: <MezonIconCDN icon={IconCDN.trashIcon} color={Colors.textRed} />,
-					isShow: isChannel ? isCanManageChannel : (isCanManageThread || channel?.creator_id === currentUserId)
+					isShow: isChannel ? isCanManageChannel : isCanManageThread || channel?.creator_id === currentUserId
 				},
 				{
 					title: isChannel ? t('fields.channelDelete.leave') : t('fields.threadLeave.leave'),
@@ -301,17 +300,6 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
 	}, [channel?.channel_id, channel?.clan_id, channel?.parent_id, currentSystemMessage?.channel_id]);
-
-	const handleJoinChannel = useCallback(async () => {
-		const channelId = isChannel ? currentSystemMessage?.channel_id : channel?.parent_id || '';
-		const clanId = channel?.clan_id || '';
-		const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-		const store = await getStoreAsync();
-		requestAnimationFrame(async () => {
-			store.dispatch(channelsActions.joinChannel({ clanId: clanId ?? '', channelId: channelId, noFetchMembers: false }));
-		});
-		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
-	}, [isChannel, currentSystemMessage?.channel_id, channel?.clan_id, channel?.parent_id]);
 
 	const handleConfirmLeaveThread = useCallback(async () => {
 		try {
