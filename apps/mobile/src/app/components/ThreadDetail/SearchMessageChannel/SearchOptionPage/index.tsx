@@ -60,6 +60,7 @@ function SearchOptionPage({ searchText, onSelect, optionFilter }: ISeachOptionPa
 							renderItem={({ item }) => <UserInfoSearch userData={item} onSelectUserInfo={onSelect} />}
 							estimatedItemSize={100}
 							removeClippedSubviews={true}
+							keyboardShouldPersistTaps="handled"
 						/>
 					) : (
 						<EmptySearchPage emptyDescription="Unfortunately, we could not find any suggestions" />
