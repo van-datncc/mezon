@@ -347,7 +347,7 @@ export function ControlBar({
 	);
 
 	return (
-		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-sbm:!hidden max-md:flex-col">
+		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-md:flex-col">
 			<div className="flex justify-start gap-4 max-md:hidden">
 				{!isGroupCall && (
 					<>
