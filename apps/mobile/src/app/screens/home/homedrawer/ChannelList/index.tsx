@@ -142,7 +142,7 @@ const ChannelList = () => {
 						}
 					}
 				}}
-				disableVirtualization
+				disableVirtualization={false}
 				contentContainerStyle={{
 					backgroundColor: themeValue.secondary,
 					paddingBottom: size.s_6

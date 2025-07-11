@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { Dimensions, Platform, View } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
@@ -28,6 +29,14 @@ const RootStack = createStackNavigator();
 
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
+		useEffect(() => {
+			const timeout = setTimeout(async () => {
+				await BootSplash.hide({ fade: true });
+			}, 1);
+
+			return () => clearTimeout(timeout);
+		}, []);
+
 		return (
 			<View style={{ flex: 1 }}>
 				<RootStack.Navigator
