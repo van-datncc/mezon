@@ -111,6 +111,7 @@ const ModalCreateClans = (props: ModalCreateClansProps) => {
 				navigate(toClanPage(res.clan_id));
 			}
 		}
+		handleClose();
 	};
 
 	const handleClose = useCallback(() => {
