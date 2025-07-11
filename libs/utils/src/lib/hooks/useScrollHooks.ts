@@ -12,14 +12,12 @@ export enum LoadMoreDirection {
 	Around
 }
 
-// update later
-
 export const MESSAGE_LIST_SENSITIVE_AREA = 1500;
 
 const FAB_THRESHOLD = 50;
-const NOTCH_THRESHOLD = 1; // Notch has zero height so we at least need a 1px margin to intersect
+const NOTCH_THRESHOLD = 1;
 const CONTAINER_HEIGHT_DEBOUNCE = 200;
-const TOOLS_FREEZE_TIMEOUT = 350; // Approximate message sending animation duration
+const TOOLS_FREEZE_TIMEOUT = 350;
 
 export function useScrollHooks(
 	type: string,
@@ -30,7 +28,7 @@ export function useScrollHooks(
 	isUnread: boolean,
 	onScrollDownToggle: BooleanToVoidFunction,
 	onNotchToggle: BooleanToVoidFunction,
-	isReady: boolean,
+	isReady: RefObject<boolean>,
 	loadViewportMessages: ({ direction }: { direction: LoadMoreDirection }) => void
 ) {
 	const [loadMoreBackwards, loadMoreForwards] = useMemo(
@@ -49,7 +47,7 @@ export function useScrollHooks(
 	const fabTriggerRef = useRef<HTMLDivElement>(null);
 
 	const toggleScrollTools = useLastCallback(() => {
-		if (!isReady) return;
+		if (!isReady.current) return;
 
 		if (!messageIds?.length) {
 			onScrollDownToggle(false);
@@ -142,7 +140,7 @@ export function useScrollHooks(
 	useOnIntersect(fabTriggerRef, observeIntersectionForNotch);
 
 	useEffect(() => {
-		if (isReady) {
+		if (isReady.current) {
 			toggleScrollTools();
 		}
 	}, [isReady, toggleScrollTools]);
@@ -157,12 +155,7 @@ export function useScrollHooks(
 		}, TOOLS_FREEZE_TIMEOUT);
 	});
 
-	// Workaround for FAB and notch flickering with tall incoming message
 	useSyncEffect(freezeShortly, [freezeShortly, messageIds]);
-
-	// Workaround for notch flickering when opening Composer Embedded Message
-	// const getContainerHeightDebounced = useDebouncedSignal(getContainerHeight, CONTAINER_HEIGHT_DEBOUNCE);
-	// useSignalEffect(freezeShortly, [freezeShortly, getContainerHeightDebounced]);
 
 	return {
 		withHistoryTriggers,
