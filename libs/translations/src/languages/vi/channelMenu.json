@@ -31,7 +31,8 @@
           "title": "",
           "edit": "Chỉnh sửa kênh",
           "deleteChannel": "Xóa kênh",
-          "duplicateChannel": "Nhân bản kênh"
+          "duplicateChannel": "Nhân bản kênh",
+          "leaveChannel": "Rời kênh"
       },
       "devMode": {
           "title": "Chế độ phát triển",
@@ -67,6 +68,12 @@
     "title": "Rời chủ đề",
     "yesButton": "Rời chủ đề",
     "textConfirm": "Bạn có chắc chắn muốn rời khỏi chủ đề này không? Bạn sẽ không thể nhận được tin nhắn từ chuỗi này khi đã rời khỏi."
+  },
+  "modalConFirmLeaveChannel": {
+    "title": "Rời kênh",
+    "yesButton": "Rời kênh",
+    "textConfirm": "Bạn có chắc chắn muốn rời khỏi kênh này không? Bạn sẽ không thể nhận được tin nhắn từ kênh này khi đã rời khỏi.",
+    "error": "Rời kênh lỗi: {{error}}"
   },
   "btnBadgeCount": "Mới",
   "favoriteChannel": "KÊNH YÊU THÍCH"
