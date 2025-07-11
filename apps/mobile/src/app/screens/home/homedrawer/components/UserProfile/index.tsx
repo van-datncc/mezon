@@ -125,6 +125,9 @@ const UserProfile = React.memo(
 
 		const directMessageWithUser = useCallback(
 			async (userId: string) => {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+					isShow: false
+				});
 				const directMessage = listDM?.find?.((dm) => {
 					const userIds = dm?.user_id;
 					return Array.isArray(userIds) && userIds.length === 1 && userIds[0] === userId;
@@ -275,6 +278,9 @@ const UserProfile = React.memo(
 		}, [userById?.user?.about_me, showAction, showRole, userRolesClan, isDMGroup, isCheckOwner, isChannelOwner]);
 
 		const handleTransferFunds = () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+				isShow: false
+			});
 			const payload = JSON.stringify({
 				receiver_id: userId ? userId : user?.id,
 				receiver_name: user?.user?.username || userById?.user?.username || user?.username,
