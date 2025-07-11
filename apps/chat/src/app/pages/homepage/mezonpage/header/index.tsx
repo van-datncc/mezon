@@ -77,6 +77,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 							<NavLink href="#home" section="home" label="Home" />
 							<NavLink href="#overview" section="overview" label="Overview" />
 							<NavLink href="#feature" section="feature" label="Features" />
+
 							<a
 								href={'developers/applications'}
 								target="_blank"
@@ -109,21 +110,30 @@ const HeaderMezon = memo((props: HeaderProps) => {
 							>
 								Discover
 							</a>
+							<a
+								href={'blogs/'}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+							>
+								Blogs
+							</a>
 						</div>
-					</div>					<div className="w-fit">
+					</div>
+					<div className="w-fit">
 						<Link
-							className="hidden md:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
+							className="hidden lg:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
 							to={'/mezon'}
 							onClick={() => trackHeaderLoginClick(isLogin ? 'Open Mezon' : 'Login')}
 						>
 							{isLogin ? 'Open Mezon' : 'Login'}
 						</Link>
-						<Icons.HomepageMenu className="hidden w-[40px] max-md:block" onClick={toggleSideBar} />
+						<Icons.HomepageMenu className="hidden w-[40px] max-lg:block" onClick={toggleSideBar} />
 					</div>
 				</div>
 
 				{!sideBarIsOpen && (
-					<div className="hidden max-md:block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#1024D4] rounded-[50%] filter blur-[75px] mix-blend-color-dodge"></div>
+					<div className="hidden max-lg:block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#1024D4] rounded-[50%] filter blur-[75px] mix-blend-color-dodge"></div>
 				)}
 			</div>
 		</div>
