@@ -8,11 +8,9 @@ export interface ToggleItemProps {
 }
 
 const ToggleItem: React.FC<ToggleItemProps> = ({ label, value = "false", handleToggle, className }) => {
-    // Khi value là "true" thì checked là true (bật), ngược lại là false (tắt)
     const isChecked = value === "true";
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Khi được check thì trả về "true", ngược lại trả về "false"
         const newValue = e.target.checked ? "true" : "false";
         handleToggle?.(newValue);
     };
