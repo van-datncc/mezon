@@ -376,7 +376,7 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-markdown-code);
 }
 .btn-primary {
-  background: var(--button-theme-primary) !important;
+  background: var(--button-theme-primary);
   color: white;
 }
 .btn-primary-hover:hover {
