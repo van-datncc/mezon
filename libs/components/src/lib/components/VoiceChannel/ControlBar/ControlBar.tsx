@@ -49,6 +49,7 @@ interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	isExternalCalling?: boolean;
 	currentChannel?: ReactionChannelInfo;
 	isShowMember?: boolean;
+	isGridView?: boolean;
 }
 
 export function ControlBar({
@@ -60,7 +61,8 @@ export function ControlBar({
 	onFullScreen,
 	isExternalCalling,
 	currentChannel,
-	isShowMember = true
+	isShowMember = true,
+	isGridView = true
 }: ControlBarProps) {
 	const dispatch = useAppDispatch();
 	const isTooLittleSpace = useMediaQuery('max-width: 760px');
@@ -371,7 +373,9 @@ export function ControlBar({
 						>
 							<div>
 								<Icons.VoiceEmojiControlIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'}`}
 								/>
 							</div>
 						</Tooltip>
@@ -394,7 +398,9 @@ export function ControlBar({
 						>
 							<div>
 								<Icons.VoiceSoundControlIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'}`}
 								/>
 							</div>
 						</Tooltip>
@@ -483,13 +489,17 @@ export function ControlBar({
 						{isOpenPopOut ? (
 							<span>
 								<Icons.VoicePopOutIcon
-									className={`cursor-pointer rotate-180 ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer rotate-180  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'}`}
 								/>
 							</span>
 						) : (
 							<span>
 								<Icons.VoicePopOutIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+										className={`  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'} cursor-pointer `}
 								/>
 							</span>
 						)}
@@ -500,13 +510,17 @@ export function ControlBar({
 					{isFullScreen ? (
 						<span>
 							<Icons.ExitFullScreen
-								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								className={`  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+									? 'text-theme-primary text-theme-primary-hover'
+									: 'text-gray-300 hover:text-white'}  cursor-pointer `}
 							/>
 						</span>
 					) : (
 						<span>
 							<Icons.FullScreen
-								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'}`}
 							/>
 						</span>
 					)}

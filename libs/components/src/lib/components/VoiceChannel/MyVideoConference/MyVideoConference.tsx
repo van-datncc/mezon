@@ -48,6 +48,7 @@ export function MyVideoConference({
 }: MyVideoConferenceProps) {
 	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
+	const [isGridView, setIsGridView] = useState<boolean>(true);
 	const { activeSoundReactions, handleSoundReaction } = useSoundReactions();
 
 	const tracksFromHook = useTracks(
@@ -125,15 +126,18 @@ export function MyVideoConference({
 
 	useEffect(() => {
 		setIsFocused(!!focusTrack);
+		setIsGridView(!focusTrack);
 	}, [focusTrack]);
 
 	const toggleViewMode = () => {
 		if (isFocused) {
 			layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
+			setIsGridView(true);
 		} else {
 			const firstTrack = screenShareTracks[0] || tracks.find(isTrackReference) || tracks[0];
 			if (firstTrack) {
 				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: firstTrack });
+				setIsGridView(false);
 			}
 		}
 	};
@@ -247,17 +251,23 @@ export function MyVideoConference({
 									{!isExternalCalling ? (
 										<Icons.Speaker
 											defaultSize="w-6 h-6"
-											defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}
+											defaultFill={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+												? 'text-theme-primary '
+												: 'text-gray-300 '}`}
 										/>
 									) : (
 										<Icons.SpeakerLocked
 											defaultSize="w-6 h-6"
-											defaultFill={`${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}
+												defaultFill={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+													? 'text-theme-primary '
+													: 'text-gray-300 '}`}
 										/>
 									)}
 								</span>
 								<p
-									className={`text-base font-semibold cursor-default one-line ${isShowMember ? 'text-[#535353] dark:text-[#B5BAC1]' : 'text-white'}`}
+									className={`text-base font-semibold cursor-default one-line ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary '
+										: 'text-gray-300 '}`}
 								>
 									{channelLabel}
 								</p>
@@ -267,11 +277,13 @@ export function MyVideoConference({
 									<div className="relative leading-5 h-5" ref={inboxRef}>
 										<button
 											title="Inbox"
-											className="focus-visible:outline-none"
+											className={`focus-visible:outline-none  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+												? 'text-theme-primary text-theme-primary-hover'
+												: 'text-gray-300 hover:text-white'}`}
 											onClick={handleShowInbox}
 											onContextMenu={(e) => e.preventDefault()}
 										>
-											<Icons.Inbox defaultSize="size-5" />
+											<Icons.Inbox defaultSize="size-6" />
 											{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
 										</button>
 										{isShowInbox && <NotificationList rootRef={inboxRef} />}
@@ -297,11 +309,15 @@ export function MyVideoConference({
 									<span onClick={toggleViewMode} className="cursor-pointer">
 										{focusTrack ? (
 											<Icons.VoiceGridIcon
-												className={`${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+												className={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+													? 'text-theme-primary text-theme-primary-hover'
+													: 'text-gray-300 hover:text-white'}`}
 											/>
 										) : (
 											<Icons.VoiceFocusIcon
-												className={`${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+													className={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+														? 'text-theme-primary text-theme-primary-hover'
+														: 'text-gray-300 hover:text-white'}`}
 											/>
 										)}
 									</span>
@@ -314,7 +330,10 @@ export function MyVideoConference({
 									style={{ marginLeft: 8 }}
 								>
 									<Icons.Chat
-										defaultFill={isShowMember ? 'text-colorTextLightMode dark:text-[#B5BAC1]' : 'text-white'}
+										defaultSize="w-5 h-5"
+										defaultFill={(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'}
 										className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'}
 									/>
 								</button>
@@ -332,6 +351,7 @@ export function MyVideoConference({
 							onFullScreen={onFullScreen}
 							currentChannel={currentChannel}
 							isShowMember={isShowMember}
+							isGridView={isGridView}
 						/>
 					</div>
 				</div>
