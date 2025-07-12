@@ -29,7 +29,7 @@ export const StartEventModal = (props: StartEventModalProps) => {
 						</h4>
 					</div>
 					<div className="w-[0.1px] h-4 bg-gray-400"></div>
-					<div className="bg-primary px-2 py-1 rounded-md text-white font-medium cursor-pointer" onClick={onOpenCreate}>
+					<div className="btn-primary btn-primary-hover  px-2 py-1 rounded-lg text-white font-medium cursor-pointer" onClick={onOpenCreate}>
 						Create Event
 					</div>
 				</div>
