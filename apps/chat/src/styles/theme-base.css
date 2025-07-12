@@ -383,5 +383,5 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-button-primary-hover);
 }
 .border-color-avatar {
-	border-color: var(--bg-outside-footer);
+	border-color: var(--border-color-avatar);
 }
