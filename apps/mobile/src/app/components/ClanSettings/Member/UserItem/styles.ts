@@ -8,7 +8,7 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
-			gap: size.s_10,
+			gap: size.s_6,
 			paddingLeft: size.s_10,
 			backgroundColor: colors.primary
 		},
@@ -54,12 +54,16 @@ export const style = (colors: Attributes) =>
 			backgroundColor: Colors.bgToggleOnBtn
 		},
 		icon: {
-			width: 30,
-			height: 20,
-			flexBasis: 20
+			width: size.s_30,
+			height: size.s_20,
+			flexBasis: size.s_20
 		},
-		content: {
+		content: { 
 			flexBasis: size.s_10,
 			flexGrow: 1
+		},
+		roleIcon: {
+			height: size.s_10,
+			width: size.s_10
 		}
 	});

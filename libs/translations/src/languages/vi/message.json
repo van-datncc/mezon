@@ -77,6 +77,7 @@
   "findThePerfectReaction": "Tìm biểu cảm hoàn hảo",
   "findThePerfectGif": "Tìm ảnh động hoàn hảo",
   "findThePerfectSticker": "Tìm nhãn dán hoàn hảo",
+  "searchResult": "Kết quả tìm kiếm",
   "pinMessage": "Ghim tin nhắn",
   "unpinMessage": "Bỏ ghim tin nhắn",
   "confirmPinMessage": "Bạn có chắc muốn ghim tin nhắn này không?",
@@ -122,5 +123,7 @@
     "emoji": "Biểu cảm",
     "gif": "GIFs",
     "sticker": "Nhãn dán"
-  }
+  },
+  "turnOffAnonymous": "Tắt ẩn danh",
+  "turnOnAnonymous": "Bật ẩn danh"
 }

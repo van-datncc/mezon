@@ -85,14 +85,14 @@ export const EMOJI_GIVE_COFFEE = {
 };
 export const SYSTEM_NAME = 'System';
 export const SYSTEM_SENDER_ID = '0';
-export const HEIGHT_PANEL_PROFILE = 480;
+export const HEIGHT_PANEL_PROFILE = 520;
 export const WIDTH_PANEL_PROFILE = 300;
 export const HEIGHT_PANEL_PROFILE_DM = 314;
 export const ACTIVITY_PANEL_HEIGHT = 73;
 export const WIDTH_CLAN_SIDE_BAR = 72;
 export const WIDTH_CHANNEL_LIST_BOX = 272;
 
-export const DEFAULT_ROLE_COLOR = 'text-theme-primary';
+export const DEFAULT_ROLE_COLOR = '#99aab5';
 export const DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR = '#17ac86';
 
 export const CHANNEL_INPUT_ID = 'editorReactMentionChannel';

@@ -7,7 +7,8 @@ const styles = StyleSheet.create({
 	},
 	widthTab: { width: Dimensions.get('window').width },
 	wrapper: {
-		flex: 1
+		flex: 1,
+		alignItems: 'center'
 	}
 });
 

@@ -11,7 +11,7 @@ import {
 	RibbonIcon,
 	SmilingFaceIcon
 } from '@mezon/mobile-components';
-import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { emojiSuggestionActions, getStore, selectCurrentChannelId, selectDmGroupCurrentId } from '@mezon/store-mobile';
 import { FOR_SALE_CATE, IEmoji, RECENT_EMOJI_CATEGORY } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -179,7 +179,7 @@ export default function EmojiSelectorContainer({
 						onFocus={handleBottomSheetExpand}
 						placeholder={t('findThePerfectReaction')}
 						style={styles.textInput}
-						placeholderTextColor={Colors.textGray}
+						placeholderTextColor={themeValue.textDisabled}
 						onChangeText={debouncedSetSearchText}
 					/>
 				</View>
@@ -195,7 +195,7 @@ export default function EmojiSelectorContainer({
 				{ id: 'listCategoryArea', name: 'listCategoryArea' },
 				{
 					id: 'haveResults',
-					name: 'Search results',
+					name: t('searchResult'),
 					emojis: emojisSearch
 				}
 			];
@@ -204,7 +204,7 @@ export default function EmojiSelectorContainer({
 				{ id: 'listCategoryArea', name: 'listCategoryArea' },
 				{
 					id: 'noResult',
-					name: 'Search results',
+					name: t('searchResult'),
 					emojis: []
 				}
 			];

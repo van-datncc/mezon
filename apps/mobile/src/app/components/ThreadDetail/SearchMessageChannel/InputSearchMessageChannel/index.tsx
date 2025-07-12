@@ -61,7 +61,7 @@ const InputSearchMessageChannel = ({
 		if (optionFilter?.title || userMention?.display) {
 			return `${optionFilter?.title || ''} ${userMention?.display || ''}`;
 		}
-		return `${t('in')} ${nameChannel || ''}`;
+		return `in: ${nameChannel || ''}`;
 	}, [optionFilter?.title, userMention?.display, nameChannel]);
 
 	const debouncedOnChangeText = useCallback(
@@ -71,13 +71,16 @@ const InputSearchMessageChannel = ({
 		[]
 	);
 
-	const handleTextChange = (e) => {
-		setTextInput(e);
-		debouncedOnChangeText(e);
-		if (!e?.length) {
-			onChangeOptionFilter(null);
-		}
-	};
+	const handleTextChange = useCallback(
+		(e) => {
+			setTextInput(e);
+			debouncedOnChangeText(e);
+			if (!e?.length) {
+				onChangeOptionFilter(null);
+			}
+		},
+		[debouncedOnChangeText, onChangeOptionFilter]
+	);
 
 	const clearTextInput = () => {
 		setTextInput('');
@@ -114,7 +117,8 @@ const InputSearchMessageChannel = ({
 							borderRadius: size.s_18,
 							paddingHorizontal: size.s_10,
 							paddingVertical: size.s_2,
-							maxWidth: size.s_80
+							maxWidth: size.s_100,
+							marginRight: Platform.OS === 'ios' ? size.s_6 : 0
 						}}
 					>
 						<Text numberOfLines={1} style={styles.textBadgeHighLight}>

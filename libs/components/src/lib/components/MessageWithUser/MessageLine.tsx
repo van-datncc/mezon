@@ -479,7 +479,7 @@ export const MessageLine = ({
 							minHeight: 30
 						}
 			}
-			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-theme-message text-theme-message-hover cursor-pointer' : 'text-theme-message'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] dark:text-[#8B9DF2]' : ''} ${isSending ? 'opacity-50' : ''}
+			className={`w-full ${isJumMessageEnabled ? 'whitespace-pre-line gap-1 text-theme-message text-theme-message-hover cursor-pointer' : 'text-theme-message'} ${isEphemeral ? 'opacity-80 italic text-[#5865F2] ' : ''} ${isSending ? 'opacity-50' : ''}
 
       `}
 		>

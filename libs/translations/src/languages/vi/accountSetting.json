@@ -22,11 +22,11 @@
         "yesConfirm": "Có"
     },
     "setPasswordAccount": {
-        "title": "Đặt Mật Khẩu",
+        "title": "Đặt mật khẩu",
         "email": "Email",
-        "password": "Mật Khẩu",
-        "confirmPassword": "Xác Nhận Mật Khẩu",
-        "confirm": "Xác Nhận",
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "confirm": "Xác nhận",
         "description": "Mật khẩu của bạn phải có ít nhất 8 ký tự và bao gồm ít nhất một chữ cái viết hoa, một chữ cái viết thường, một chữ số và một ký tự đặc biệt (ví dụ: !@#$%^&*).",
         "error": {
             "characters": "Mật khẩu phải có ít nhất 8 ký tự",

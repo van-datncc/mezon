@@ -52,7 +52,7 @@ const AgeRestricted = ({ closeAgeRestricted }: { closeAgeRestricted: () => void 
 				<div className="bg-theme-setting-primary  pt-4 rounded flex flex-col items-center text-theme-primary w-[550px]">
 					<img src={'assets/images/cake.png'} alt="warning" width={200} height={200} />
 					<div className="text-center ml-6 mr-6">
-						<h2 className="text-2xl font-bold text-center mb-4">Please confirm your birthday</h2>
+						<h2 className="text-2xl font-bold text-center mb-4 text-theme-primary-active">Please confirm your birthday</h2>
 						<p> To keep our users safe, we need to verify your age. We will only ask you for this once.</p>
 					</div>
 					<input

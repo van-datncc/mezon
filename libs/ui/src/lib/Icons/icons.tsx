@@ -1370,12 +1370,15 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
+export const Inbox: React.FC<IconProps & { className?: string }> = ({
+	defaultSize = 'size-5',
+	className = '',
+}) => {
 	return (
 		<svg
 			x="0"
 			y="0"
-			className={defaultSize}
+			className={`${defaultSize} ${className}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -1388,10 +1391,11 @@ export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
 				fillRule="evenodd"
 				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
 				clipRule="evenodd"
-			></path>
+			/>
 		</svg>
 	);
 };
+
 
 export const Help: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-6 h-6' }) => {
 	const [isWhite, setIsWhite] = useState<boolean>(false);
@@ -1442,7 +1446,7 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function Speaker({ defaultFill, defaultSize = 'w-5 h-5', className }: IconProps) {
 	return (
 		<svg
 			width="18"
@@ -1450,7 +1454,7 @@ export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''} ${className}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -1567,7 +1571,7 @@ export function AddCircle(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false }) => {
+export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false, className = '' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1576,7 +1580,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className}`}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1673,7 +1677,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 	);
 };
 
-export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
+export const Sticker: React.FC<IconProps> = ({ className = '', defaultFill = '#AEAEAE' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1682,7 +1686,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className} `}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1854,10 +1858,10 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 	);
 };
 
-export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', className = '' }) => {
 	return (
 		<svg
-			className={`${defaultSize} text-theme-primary text-theme-primary-hover`}
+			className={`${defaultSize} text-theme-primary text-theme-primary-hover ${className}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -5532,7 +5536,7 @@ export function Chat({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill="none"
+			fill="currentColor"
 			viewBox="0 0 24 24"
 			className={` ${defaultSize} ${defaultFill ? defaultFill : 'dark:hover:text-white hover:text-black dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>

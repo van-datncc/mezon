@@ -104,7 +104,10 @@
 	--border-highlight-react-theme: #5865f2;
 	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
 	--bg-input-secondary: color-mix(in oklab, hsl(0 calc(1 * 0%) 0% /0.2) 100%, hsl(0 100% 5.098039215686274% /0.2) 50%);
-	--bg-button-primary-hover: #4654C0;
-	--button-theme-primary: #5265EC;
-	
+	--bg-button-primary-hover: #4654c0;
+	--button-theme-primary: #5265ec;
+
+	/* border-avatar */
+	--border-color-avatar: #561c1e;
+
 }

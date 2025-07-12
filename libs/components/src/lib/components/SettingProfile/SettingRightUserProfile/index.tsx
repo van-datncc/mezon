@@ -352,13 +352,13 @@ const SettingRightUser = ({
 			(valueDisplayName !== currentDisplayName && flags) ||
 			(flagsRemoveAvartar !== false && flags) ||
 			(editAboutUser !== aboutMe && flags) ? (
-				<div className="flex flex-row gap-2 shadow-shadowInbox absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded transform z-10">
+				<div className="flex flex-row gap-2 border-theme-primary shadow-sm bg-modal-theme absolute max-w-[815px] w-full left-1/2 translate-x-[-50%] bottom-4 min-w-96 h-fit p-3 rounded-lg transform z-10">
 					<div className="flex-1 flex items-center text-nowrap">
-						<p className="text-[15px] ">Careful - you have unsaved changes!</p>
+						<p className="text-theme-message">Careful - you have unsaved changes!</p>
 					</div>
 					<div className="flex flex-row justify-end gap-3">
 						<button
-							className="text-[15px] rounded-[4px] p-[8px]"
+							className="rounded-[4px] px-2 hover:underline"
 							onClick={() => {
 								handleClose();
 							}}
@@ -367,7 +367,7 @@ const SettingRightUser = ({
 						</button>
 
 						<button
-							className="text-[15px] bg-blue-600 rounded-[4px] p-[8px] text-nowrap"
+							className=" btn-primary btn-primary-hover rounded-lg px-2 text-nowrap py-1  "
 							onClick={() => {
 								handleUpdateUser();
 								handleSaveClose();
