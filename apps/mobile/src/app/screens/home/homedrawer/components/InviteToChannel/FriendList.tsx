@@ -193,7 +193,7 @@ export const FriendList = React.memo(
 				},
 				{
 					title: t('iconTitle.twitter'),
-					icon: <MezonIconCDN icon={IconCDN.brandTwitterIcon} color={themeValue.text} />,
+					icon: <MezonIconCDN icon={IconCDN.brandTwitterIcon} color={themeValue.text} width={18} height={18} />,
 					onPress: () => addInviteLinkToClipboard()
 				}
 			];

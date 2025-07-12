@@ -77,6 +77,7 @@
     "findThePerfectReaction": "Find the perfect reaction",
     "findThePerfectGif": "Find the perfect GIF",
     "findThePerfectSticker": "Find the perfect sticker",
+    "searchResult": "Search results",
     "pinMessage": "Pin Message",
     "unpinMessage": "Unpin Message",
     "confirmPinMessage": "Are you sure you want to pin this message?",
@@ -122,5 +123,7 @@
         "emoji": "Emojis",
         "gif": "GIFs",
         "sticker": "Stickers"
-    }
+    },
+    "turnOffAnonymous": "Turn off Anonymous",
+    "turnOnAnonymous": "Turn on Anonymous"
 }

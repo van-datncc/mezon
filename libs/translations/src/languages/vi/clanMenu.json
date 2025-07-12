@@ -46,6 +46,7 @@
     },
     "common": {
         "search": "Tìm kiếm",
-        "community": "Cộng đồng"
+        "community": "Cộng đồng",
+        "searchMembers": "Tìm kiếm thành viên"
     }
 }
