@@ -24,7 +24,7 @@ export function useImage() {
 				} else {
 					const response = await RNFetchBlob.config({
 						fileCache: true,
-						appendExt: type
+						appendExt: type || 'png'
 					}).fetch('GET', imageUrl);
 
 					if (response.info().status === 200) {
