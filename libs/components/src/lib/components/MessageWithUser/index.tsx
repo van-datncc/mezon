@@ -168,6 +168,7 @@ function MessageWithUser({
 		);
 	}, [message]);
 
+
 	return (
 		<>
 			{message && showDivider && <MessageDateDivider message={message} />}
@@ -193,7 +194,7 @@ function MessageWithUser({
 						{ 'bg-highlight': isHighlight },
 						{ '!bg-[#eab30833]': checkMessageTargetToMoved },
 						{
-							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
+							' bg-item-theme border-l-4  border-[#A78BFA] ': isEphemeralMessage
 						},
 						{ 'bg-item-msg-selected': isSelected },
 						{ 'pointer-events-none': message.isSending },
@@ -285,7 +286,7 @@ function MessageWithUser({
 									isEphemeral={isEphemeralMessage}
 								/>
 								{isEphemeralMessage && (
-									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic">
+									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic text-theme-primary opacity-60">
 										<Icons.EyeClose className="w-3 h-3" />
 										<span>Only visible to recipient</span>
 									</div>
