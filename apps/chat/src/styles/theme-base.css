@@ -376,12 +376,12 @@ input.bg-theme-input-primary::placeholder {
 	background: var(--bg-markdown-code);
 }
 .btn-primary {
-  background: var(--button-theme-primary) !important;
+  background: var(--button-theme-primary);
   color: white;
 }
 .btn-primary-hover:hover {
 	background: var(--bg-button-primary-hover);
 }
 .border-color-avatar {
-	border-color: var(--bg-outside-footer);
+	border-color: var(--border-color-avatar);
 }

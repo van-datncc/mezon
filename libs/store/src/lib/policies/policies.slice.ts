@@ -1,6 +1,6 @@
 import { IPermissionUser, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiPermission } from 'mezon-js/api.gen';
+import { ApiPermission, ApiRole } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { ThunkConfigWithError } from '../errors';
 import { MezonValueContext, ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
@@ -27,6 +27,7 @@ export interface PoliciesState extends EntityState<PermissionUserEntity, string>
 	error?: string | null;
 	PermissionsUserId?: string | null;
 	cache?: CacheMetadata;
+	permissionUser: ApiRole[];
 }
 
 export const policiesAdapter = createEntityAdapter<PermissionUserEntity>();
@@ -120,7 +121,7 @@ export const fetchPermission = createAsyncThunk('policies/fetchPermission', asyn
 
 export const initialPoliciesState: PoliciesState = policiesAdapter.getInitialState({
 	loadingStatus: 'not loaded',
-	PermissionsUser: [],
+	permissionUser: [],
 	error: null
 });
 
@@ -158,7 +159,7 @@ export const policiesSlice = createSlice({
 				state.loadingStatus = 'loading';
 			})
 			.addCase(fetchPermissionsUser.fulfilled, (state: PoliciesState, action: PayloadAction<IPermissionUser[]>) => {
-				policiesAdapter.setAll(state, action.payload);
+				state.permissionUser = action.payload;
 				state.loadingStatus = 'loaded';
 			})
 			.addCase(fetchPermissionsUser.rejected, (state: PoliciesState, action) => {
@@ -224,15 +225,14 @@ export const getPoliciesDefaultState = (rootState: { ['policiesDefaultSlice']: P
 
 export const selectAllPermissionsUser = createSelector(getPoliciesState, selectAll);
 
-export const selectUserMaxPermissionLevel = createSelector(selectAllPermissionsUser, (userPermissions) => {
+export const selectUserMaxPermissionLevel = createSelector([getPoliciesState], (state) => {
 	let maxPermissionLevel: number | null = null;
-	for (const permission of userPermissions) {
+	for (const permission of state.permissionUser) {
 		if (Number.isInteger(permission?.max_level_permission)) {
 			const permissionLevel = permission.max_level_permission as number;
 			maxPermissionLevel = maxPermissionLevel === null ? permissionLevel : Math.max(maxPermissionLevel, permissionLevel);
 		}
 	}
-
 	return maxPermissionLevel ?? null;
 });
 
