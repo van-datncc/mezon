@@ -30,11 +30,9 @@ const RootStack = createStackNavigator();
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
 		useEffect(() => {
-			const timeout = setTimeout(async () => {
-				await BootSplash.hide({ fade: true });
-			}, 1);
-
-			return () => clearTimeout(timeout);
+			requestAnimationFrame(async () => {
+				await BootSplash.hide({ fade: false });
+			});
 		}, []);
 
 		return (
