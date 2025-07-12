@@ -1571,7 +1571,7 @@ export function AddCircle(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false }) => {
+export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false, className = '' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1580,7 +1580,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className}`}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1677,7 +1677,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 	);
 };
 
-export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
+export const Sticker: React.FC<IconProps> = ({ className = '', defaultFill = '#AEAEAE' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1686,7 +1686,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className} `}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1858,10 +1858,10 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 	);
 };
 
-export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', className = '' }) => {
 	return (
 		<svg
-			className={`${defaultSize} text-theme-primary text-theme-primary-hover`}
+			className={`${defaultSize} text-theme-primary text-theme-primary-hover ${className}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
