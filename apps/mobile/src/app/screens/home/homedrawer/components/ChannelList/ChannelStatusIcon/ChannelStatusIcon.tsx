@@ -30,7 +30,6 @@ export const ChannelStatusIcon = ({ channel, isUnRead }: { channel: ChannelsEnti
 						height={size.s_18}
 						width={size.s_18}
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-						customStyle={{ marginBottom: size.s_2 }}
 					/>
 				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate &&
@@ -42,15 +41,16 @@ export const ChannelStatusIcon = ({ channel, isUnRead }: { channel: ChannelsEnti
 						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
 					/>
 				)}
-			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-				<MezonIconCDN
-					icon={IconCDN.channelText}
-					height={size.s_18}
-					width={size.s_18}
-					color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
-					customStyle={{ marginBottom: size.s_2 }}
-				/>
-			)}
+			{channel?.channel_private !== ChannelStatusEnum.isPrivate &&
+				channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
+				!isAgeRestrictedChannel && (
+					<MezonIconCDN
+						icon={IconCDN.channelText}
+						height={size.s_18}
+						width={size.s_18}
+						color={isUnRead ? themeValue.channelUnread : themeValue.channelNormal}
+					/>
+				)}
 			{channel?.channel_private !== ChannelStatusEnum.isPrivate && channel?.type === ChannelType.CHANNEL_TYPE_STREAMING && (
 				<MezonIconCDN
 					icon={IconCDN.channelStream}
