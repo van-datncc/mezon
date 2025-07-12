@@ -126,7 +126,6 @@ export function MyVideoConference({
 
 	useEffect(() => {
 		setIsFocused(!!focusTrack);
-		// Cập nhật isGridView khi focusTrack thay đổi
 		setIsGridView(!focusTrack);
 	}, [focusTrack]);
 
