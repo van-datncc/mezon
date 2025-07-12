@@ -135,7 +135,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 			{checkAttachment && (
 				<div className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg  bg-theme-input' : ''} text-theme-primary max-h-full`}>
 					<div
-						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll ${
+						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll relative z-0 ${
 							appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
 						}`}
 					>
