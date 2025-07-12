@@ -20,17 +20,21 @@ function HeaderTabSearch({ onPress, tabList, activeTab }: IHeaderTabSearchProps)
 			}}
 		>
 			{tabList?.map((tab: ITabList, index: number) => (
-				<Pressable key={index.toString()} onPress={() => onPress(tab?.index)}>
+				<Pressable key={index.toString()} onPress={() => onPress(tab?.index)} style={{ width: '33.33%' }}>
 					<View
 						style={{
-							paddingHorizontal: size.s_20,
 							paddingBottom: size.s_10,
 							paddingVertical: size.s_20,
 							borderBottomColor: Colors.bgViolet,
-							borderBottomWidth: tab?.index === activeTab ? size.s_2 : 0
+							borderBottomWidth: tab?.index === activeTab ? size.s_2 : 0,
+							alignItems: 'center'
 						}}
 					>
-						<Text style={{ color: tab?.index === activeTab ? baseColor.blurple : themeValue.text }}>
+						<Text
+							style={{ color: tab?.index === activeTab ? baseColor.blurple : themeValue.text }}
+							numberOfLines={1}
+							ellipsizeMode="middle"
+						>
 							{tab.title} {tab?.quantitySearch ? `(${tab?.quantitySearch})` : ''}
 						</Text>
 					</View>

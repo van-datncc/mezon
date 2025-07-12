@@ -77,7 +77,6 @@ const HeaderMezon = memo((props: HeaderProps) => {
 							<NavLink href="#home" section="home" label="Home" />
 							<NavLink href="#overview" section="overview" label="Overview" />
 							<NavLink href="#feature" section="feature" label="Features" />
-
 							<a
 								href={'developers/applications'}
 								target="_blank"

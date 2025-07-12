@@ -47,14 +47,12 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		setSearchText(text);
 	}, []);
 
-	const handleOptionFilter = useCallback(
-		(option) => {
-			setOptionFilter(option);
-			setUserMention(null);
-			if (option) setSearchMessagePage(false);
-		},
-		[optionFilter]
-	);
+	const handleOptionFilter = useCallback((option) => {
+		setOptionFilter(option);
+		setUserMention(null);
+		if (option) setSearchMessagePage(false);
+	}, []);
+
 	const handleSelectUserInfo = useCallback((user) => {
 		setUserMention(user);
 		setSearchMessagePage(true);
@@ -67,24 +65,19 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const handleSearchMessage = () => {
 		const filter: SearchFilter[] = [];
 
+		filter.push({ field_name: 'channel_id', field_value: currentChannel?.id }, { field_name: 'clan_id', field_value: currentClanId as string });
+
 		if (optionFilter && userMention) {
-			filter.push(
-				{
-					field_name: optionFilter?.value,
-					field_value: optionFilter?.value === 'mention' ? `"user_id":"${userMention.id}"` : userMention?.display
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			);
-		} else {
-			filter.push(
-				{
-					field_name: 'content',
-					field_value: searchText
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			);
+			filter.push({
+				field_name: optionFilter?.value,
+				field_value: optionFilter?.value === 'mention' ? `"user_id":"${userMention.id}"` : userMention?.display
+			});
+		}
+		if (searchText?.trim()) {
+			filter.push({
+				field_name: 'content',
+				field_value: searchText
+			});
 		}
 		const payload = {
 			filters: filter,
