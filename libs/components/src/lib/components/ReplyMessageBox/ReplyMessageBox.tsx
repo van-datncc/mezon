@@ -40,7 +40,7 @@ export function ReplyMessageBox({ channelId, dataReferences, className }: Messag
 			<div className="text-theme-primary">
 				Replying to <span className=" text-theme-primary-active font-semibold">{nameShowed}</span>
 			</div>
-			<button className="relative" onClick={handleRemoveReply}>
+			<button className="relative text-theme-primary-active" onClick={handleRemoveReply}>
 				<Icons.Close />
 			</button>
 		</div>
