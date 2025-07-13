@@ -14,15 +14,11 @@ function FailLoginModal() {
 					<div className="p-4 relative w-[400px]">
 						<div className="flex flex-col items-center gap-y-3 ">
 							<Icons.IconClockChannel />
-							<h3 className="font-bold text-2xl dark:text-white text-black">Oops! Login Failed</h3>
+							<h3 className="font-bold text-2xl text-theme-primary-active">Oops! Login Failed</h3>
 						</div>
 					</div>
 					<div className="w-full bg-theme-setting-primary p-4">
-						<button
-							className="px-4 py-2 hover:bg-opacity-85 rounded w-full bg-primary"
-							onClick={() => retryLogin()}
-							style={{ color: 'white' }}
-						>
+						<button className="px-4 py-2 btn-primary-hover rounded-lg w-full btn-primary" onClick={() => retryLogin()}>
 							Retry Login
 						</button>
 					</div>
