@@ -57,6 +57,7 @@ export const MediaDeviceSelect: (props: MediaDeviceSelectProps & React.RefAttrib
 		ref
 	) {
 		const room = useMaybeRoomContext();
+		const previousActiveDeviceId = React.useRef<string>('default');
 		const handleError = React.useCallback(
 			(e: Error) => {
 				if (room) {
@@ -87,14 +88,15 @@ export const MediaDeviceSelect: (props: MediaDeviceSelectProps & React.RefAttrib
 		}, [onDeviceListChange, devices]);
 
 		React.useEffect(() => {
-			if (activeDeviceId && activeDeviceId !== '') {
+			if (activeDeviceId !== previousActiveDeviceId.current) {
 				onActiveDeviceChange?.(activeDeviceId);
 			}
+			previousActiveDeviceId.current = activeDeviceId;
 		}, [activeDeviceId]);
 
 		const handleActiveDeviceChange = async (deviceId: string) => {
 			try {
-				await setActiveMediaDevice(deviceId, { exact: exactMatch });
+				await setActiveMediaDevice(deviceId, { exact: exactMatch ?? true });
 			} catch (e) {
 				if (e instanceof Error) {
 					onDeviceSelectError?.(e);
@@ -111,47 +113,44 @@ export const MediaDeviceSelect: (props: MediaDeviceSelectProps & React.RefAttrib
 		function isActive(deviceId: string, activeDeviceId: string, index: number) {
 			return deviceId === activeDeviceId || (!hasDefault && index === 0 && activeDeviceId === 'default');
 		}
-    function isComunication(deviceId: string) {
-			return deviceId.toLowerCase().includes('communications');
-		}
 
 		return (
 			<ul ref={ref} {...mergedProps}>
-				{devices.map((device, index) => {
-          return !isComunication(device.deviceId) ? (
-            <li
-              key={device.deviceId}
-              id={device.deviceId}
-              data-lk-active={isActive(device.deviceId, activeDeviceId, index)}
-              aria-selected={isActive(device.deviceId, activeDeviceId, index)}
-              role="option"
-            >
-              <button className="lk-button" onClick={() => handleActiveDeviceChange(device.deviceId)}>
-                {device.label}
-              </button>
-            </li>
-          ) : null;
-        })}
+				{devices.map((device, index) => (
+					<li
+						key={device.deviceId}
+						id={device.deviceId}
+						data-lk-active={isActive(device.deviceId, activeDeviceId, index)}
+						aria-selected={isActive(device.deviceId, activeDeviceId, index)}
+						role="option"
+					>
+						<button className="lk-button" onClick={() => handleActiveDeviceChange(device.deviceId)}>
+							{device.label}
+						</button>
+					</li>
+				))}
 			</ul>
 		);
 	});
 
-  function mergeProps(...args: Record<string, any>[]) {
-    return args.reduce((acc, props) => {
-      Object.entries(props).forEach(([key, value]) => {
-        if (key === "className" && typeof value === "string") {
-          acc[key] = acc[key] ? `${acc[key]} ${value}` : value;
-        } else if (typeof acc[key] === "function" && typeof value === "function") {
-          const prevFn = acc[key];
-          acc[key] = (...eventArgs: any[]) => {
-            prevFn(...eventArgs);
-            value(...eventArgs);
-          };
-        } else {
-          acc[key] = value !== undefined ? value : acc[key];
-        }
-      });
-      return acc;
-    }, {} as Record<string, any>);
-  }
-  
+function mergeProps(...args: Record<string, any>[]) {
+	return args.reduce(
+		(acc, props) => {
+			Object.entries(props).forEach(([key, value]) => {
+				if (key === 'className' && typeof value === 'string') {
+					acc[key] = acc[key] ? `${acc[key]} ${value}` : value;
+				} else if (typeof acc[key] === 'function' && typeof value === 'function') {
+					const prevFn = acc[key];
+					acc[key] = (...eventArgs: any[]) => {
+						prevFn(...eventArgs);
+						value(...eventArgs);
+					};
+				} else {
+					acc[key] = value !== undefined ? value : acc[key];
+				}
+			});
+			return acc;
+		},
+		{} as Record<string, any>
+	);
+}

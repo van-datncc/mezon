@@ -29,7 +29,7 @@ import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 import ItemStatusUpdate from './ItemStatusUpdate';
-import WalletManagementModal, { WalletIcon } from './WalletManagementModal';
+import WalletManagementModal from './WalletManagementModal';
 
 type StatusProfileProps = {
 	userById: ChannelMembersEntity | null;
@@ -173,7 +173,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					children="History Transaction"
 					startIcon={<Icons.History className="text-theme-primary" />}
 				/>
-				<ItemStatus
+				{/* <ItemStatus
 					onClick={handleWalletManagement}
 					children="Manage Wallet"
 					startIcon={
@@ -182,7 +182,7 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 							<WalletIcon />{' '}
 						</span>
 					}
-				/>
+				/> */}
 
 				<ItemStatus
 					onClick={handleCustomStatus}
@@ -288,9 +288,9 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 							id="password"
 							type="password"
 							className="w-full px-3 py-2 rounded-md pr-10 text-theme-message bg-input-secondary border-theme-primary
-							
-						
-						
+
+
+
 						focus:outline-none focus:ring-2 focus:ring-blue-500  "
 							autoComplete="off"
 							placeholder="Enter your password"
@@ -323,7 +323,7 @@ const AddAccountModal = ({ handleSetAccount }: { handleSetAccount: (email: strin
 				<div className="min-h-[20px]"></div>
 				<button
 					type="submit"
-					className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] btn-primary  whitespace-nowrap 
+					className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] btn-primary  whitespace-nowrap
  btn-primary-hover"
 					onClick={handleAddAccount}
 				>

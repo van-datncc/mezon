@@ -9,15 +9,12 @@ import {
 	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
-import { selectCurrentClan, topicsActions, useAppDispatch, voiceActions } from '@mezon/store';
+import { useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { LocalParticipant, LocalTrackPublication, RoomEvent, Track } from 'livekit-client';
-import Tooltip from 'rc-tooltip';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RedDot } from '../../ChannelTopbar';
-import NotificationList from '../../NotificationList';
-import { ControlBar } from '../ControlBar/ControlBar';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { NotificationTooltip } from '../../NotificationList/NotificationTooltip';
+import ControlBar from '../ControlBar/ControlBar';
 import { CarouselLayout } from './FocusLayout/CarouselLayout/CarouselLayout';
 import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
 import { GridLayout } from './GridLayout/GridLayout';
@@ -46,7 +43,6 @@ export function MyVideoConference({
 	onToggleChat,
 	currentChannel
 }: MyVideoConferenceProps) {
-	const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 	const [isGridView, setIsGridView] = useState<boolean>(true);
 	const { activeSoundReactions, handleSoundReaction } = useSoundReactions();
@@ -69,60 +65,13 @@ export function MyVideoConference({
 
 	const focusTrack = usePinnedTracks(layoutContext)?.[0];
 
-	useEffect(() => {
-		// If screen share tracks are published, and no pin is set explicitly, auto set the screen share.
-		if (screenShareTracks.some((track) => track.publication.isSubscribed) && lastAutoFocusedScreenShareTrack.current === null) {
-			layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: screenShareTracks[0] });
-			lastAutoFocusedScreenShareTrack.current = screenShareTracks[0];
-		} else if (
-			lastAutoFocusedScreenShareTrack.current &&
-			!screenShareTracks.some((track) => track.publication.trackSid === lastAutoFocusedScreenShareTrack.current?.publication?.trackSid)
-		) {
-			layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
-			lastAutoFocusedScreenShareTrack.current = null;
-		}
-
-		if (focusTrack && !isTrackReference(focusTrack)) {
-			const updatedFocusTrack = tracks.find(
-				(tr) => tr.participant.identity === focusTrack.participant.identity && tr.source === focusTrack.source
-			);
-			if (updatedFocusTrack !== focusTrack && isTrackReference(updatedFocusTrack)) {
-				layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: updatedFocusTrack });
-			}
-		}
-	}, [screenShareTracks, focusTrack?.publication?.trackSid, tracks, layoutContext?.pin]);
-
 	const [isShowMember, setIsShowMember] = useState<boolean>(true);
 
 	const handleShowMember = useCallback(() => {
 		setIsShowMember((prevState) => !prevState);
 	}, []);
 
-	const [isHovered, setIsHovered] = useState(false);
-
-	const handleMouseEnter = () => {
-		setIsHovered(true);
-	};
-
-	const handleMouseLeave = () => {
-		setIsHovered(false);
-		setIsShowInbox(false);
-	};
-
 	const dispatch = useAppDispatch();
-	const [isShowInbox, setIsShowInbox] = useState<boolean>(false);
-	const currentClan = useSelector(selectCurrentClan);
-	const inboxRef = useRef<HTMLDivElement | null>(null);
-
-	useEffect(() => {
-		if (isShowInbox) {
-			dispatch(topicsActions.fetchTopics({ clanId: currentClan?.clan_id as string }));
-		}
-	}, [isShowInbox]);
-
-	const handleShowInbox = () => {
-		setIsShowInbox(!isShowInbox);
-	};
 
 	useEffect(() => {
 		setIsFocused(!!focusTrack);
@@ -141,20 +90,6 @@ export function MyVideoConference({
 			}
 		}
 	};
-
-	const handleClickOutside = (event: MouseEvent) => {
-		if (!inboxRef.current) return;
-		if (!inboxRef.current.contains(event.target as Node)) {
-			setIsShowInbox(false);
-		}
-	};
-
-	useEffect(() => {
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, []);
 
 	const userTracks = tracks.filter((track) => track.source !== 'screen_share' && track.source !== 'screen_share_audio');
 	const room = useRoomContext();
@@ -191,11 +126,7 @@ export function MyVideoConference({
 		<div className="lk-video-conference flex-1">
 			<ReactionCallHandler currentChannel={currentChannel} onSoundReaction={handleSoundReaction} />
 			<LayoutContextProvider value={layoutContext}>
-				<div
-					className="lk-video-conference-inner relative bg-gray-100 dark:bg-black"
-					onMouseEnter={handleMouseEnter}
-					onMouseLeave={handleMouseLeave}
-				>
+				<div className="lk-video-conference-inner relative bg-gray-100 dark:bg-black group">
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper bg-gray-300 dark:bg-black !h-full !py-[68px]">
 							<GridLayout tracks={tracks}>
@@ -212,117 +143,77 @@ export function MyVideoConference({
 									</CarouselLayout>
 								)}
 							</FocusLayoutContainer>
-							{isHovered && (
-								<Tooltip
-									key={+isShowMember}
-									placement="top"
-									overlay={
-										<span className="bg-[#2B2B2B] p-2 rounded !text-[16px]">
-											{isShowMember ? 'Hide Members' : 'Show Members'}
-										</span>
-									}
-									overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
-									getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
-									destroyTooltipOnHide
-								>
-									<div
-										className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[140px]'}
-											transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px]`}
-										onClick={handleShowMember}
-									>
-										{isShowMember ? <Icons.VoiceArowDownIcon /> : <Icons.VoiceArowUpIcon />}
-										<p className="flex gap-1">
-											<span>
-												<Icons.MemberList defaultFill="text-white" />
-											</span>
-											<span className="pr-[6px]">{userTracks.length}</span>
-										</p>
-									</div>
-								</Tooltip>
-							)}
+							<div
+								className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[140px]'}
+                        transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px]
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto`}
+								onClick={handleShowMember}
+							>
+								{isShowMember ? <Icons.VoiceArowDownIcon /> : <Icons.VoiceArowUpIcon />}
+								<p className="flex gap-1">
+									<span>
+										<Icons.MemberList defaultFill="text-white" />
+									</span>
+									<span className="pr-[6px]">{userTracks.length}</span>
+								</p>
+							</div>
 						</div>
 					)}
-					<div
-						className={`absolute top-0 left-0 w-full transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-					>
+					<div className="absolute top-0 left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
 						<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5 ">
 							<div className="flex justify-start gap-2">
 								<span>
 									{!isExternalCalling ? (
 										<Icons.Speaker
 											defaultSize="w-6 h-6"
-											defaultFill={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-												? 'text-theme-primary '
-												: 'text-gray-300 '}`}
+											defaultFill={` ${
+												(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+													? 'text-theme-primary '
+													: 'text-gray-300 '
+											}`}
 										/>
 									) : (
 										<Icons.SpeakerLocked
 											defaultSize="w-6 h-6"
-												defaultFill={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											defaultFill={` ${
+												(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
 													? 'text-theme-primary '
-													: 'text-gray-300 '}`}
+													: 'text-gray-300 '
+											}`}
 										/>
 									)}
 								</span>
 								<p
-									className={`text-base font-semibold cursor-default one-line ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-										? 'text-theme-primary '
-										: 'text-gray-300 '}`}
+									className={`text-base font-semibold cursor-default one-line ${
+										(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary '
+											: 'text-gray-300 '
+									}`}
 								>
 									{channelLabel}
 								</p>
 							</div>
 							<div className="flex justify-start gap-4">
-								{!isExternalCalling && !propTracks && (
-									<div className="relative leading-5 h-5" ref={inboxRef}>
-										<button
-											title="Inbox"
-											className={`focus-visible:outline-none  ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-												? 'text-theme-primary text-theme-primary-hover'
-												: 'text-gray-300 hover:text-white'}`}
-											onClick={handleShowInbox}
-											onContextMenu={(e) => e.preventDefault()}
-										>
-											<Icons.Inbox defaultSize="size-6" />
-											{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
-										</button>
-										{isShowInbox && <NotificationList rootRef={inboxRef} />}
-									</div>
-								)}
-
-								<Tooltip
-									showArrow={{ className: '!top-[6px]' }}
-									key={+focusTrack}
-									placement="bottomRight"
-									align={{
-										offset: [11, -4]
-									}}
-									overlay={
-										<span className={`${isShowMember ? 'bg-[#2B2B2B]' : 'bg-[#2B2B2B]'} rounded p-[6px] text-[14px]`}>
-											{focusTrack ? 'Grid' : 'Focus'}
-										</span>
-									}
-									overlayInnerStyle={{ background: 'none', boxShadow: 'none' }}
-									overlayClassName="whitespace-nowrap z-50 !p-0 !pt-4"
-									getTooltipContainer={() => document.getElementById('livekitRoom') || document.body}
-								>
-									<span onClick={toggleViewMode} className="cursor-pointer">
-										{focusTrack ? (
-											<Icons.VoiceGridIcon
-												className={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+								{!isExternalCalling && !propTracks && <NotificationTooltip isGridView={isGridView} isShowMember={isShowMember} />}
+								<span onClick={toggleViewMode} className="cursor-pointer">
+									{focusTrack ? (
+										<Icons.VoiceGridIcon
+											className={` ${
+												(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
 													? 'text-theme-primary text-theme-primary-hover'
-													: 'text-gray-300 hover:text-white'}`}
-											/>
-										) : (
-											<Icons.VoiceFocusIcon
-													className={` ${(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-														? 'text-theme-primary text-theme-primary-hover'
-														: 'text-gray-300 hover:text-white'}`}
-											/>
-										)}
-									</span>
-								</Tooltip>
-
+													: 'text-gray-300 hover:text-white'
+											}`}
+										/>
+									) : (
+										<Icons.VoiceFocusIcon
+											className={` ${
+												(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+													? 'text-theme-primary text-theme-primary-hover'
+													: 'text-gray-300 hover:text-white'
+											}`}
+										/>
+									)}
+								</span>
 								<button
 									className="relative focus-visible:outline-none"
 									title="Chat"
@@ -331,9 +222,11 @@ export function MyVideoConference({
 								>
 									<Icons.Chat
 										defaultSize="w-5 h-5"
-										defaultFill={(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-											? 'text-theme-primary text-theme-primary-hover'
-											: 'text-gray-300 hover:text-white'}
+										defaultFill={
+											(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+												? 'text-theme-primary text-theme-primary-hover'
+												: 'text-gray-300 hover:text-white'
+										}
 										className={isShowChatVoice ? 'text-white' : 'text-white hover:text-gray-200'}
 									/>
 								</button>
@@ -341,9 +234,7 @@ export function MyVideoConference({
 						</div>
 					</div>
 					<div
-						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 ${
-							isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'
-						}`}
+						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto`}
 					>
 						<ControlBar
 							isExternalCalling={isExternalCalling}
