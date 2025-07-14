@@ -861,7 +861,7 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			references,
 			false,
 			false,
-			avatarToUse,
+			avatarToUse || undefined,
 			TypeMessage.Ephemeral
 		);
 
