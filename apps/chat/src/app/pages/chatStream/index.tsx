@@ -2,6 +2,7 @@ import { useEscapeKey } from '@mezon/core';
 import { appActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
+import { memo } from 'react';
 import ChannelMain from '../channel';
 
 type ChatStreamProps = {
@@ -13,7 +14,7 @@ const ChatHeader = ({ currentChannel }: ChatStreamProps) => {
 	const dispatch = useAppDispatch();
 
 	const handleCloseModal = () => {
-		dispatch(appActions.setIsShowChatStream(false))
+		dispatch(appActions.setIsShowChatStream(false));
 		dispatch(appActions.setIsShowChatVoice(false));
 	};
 
@@ -36,7 +37,6 @@ const ChatHeader = ({ currentChannel }: ChatStreamProps) => {
 
 const ChatStream = ({ currentChannel }: ChatStreamProps) => {
 	const dispatch = useAppDispatch();
-
 	useEscapeKey(() => dispatch(appActions.setIsShowChatStream(false)));
 
 	return (
@@ -47,4 +47,4 @@ const ChatStream = ({ currentChannel }: ChatStreamProps) => {
 	);
 };
 
-export default ChatStream;
+export default memo(ChatStream);

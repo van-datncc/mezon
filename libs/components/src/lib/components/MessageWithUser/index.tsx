@@ -168,7 +168,6 @@ function MessageWithUser({
 		);
 	}, [message]);
 
-
 	return (
 		<>
 			{message && showDivider && <MessageDateDivider message={message} />}
@@ -387,7 +386,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 		}
 		hoverTimeout.current = setTimeout(() => {
 			setIsHover(true);
-		}, 100);
+		}, 200);
 	};
 
 	const handleMouseLeave = () => {

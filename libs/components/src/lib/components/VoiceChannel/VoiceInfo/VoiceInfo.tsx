@@ -6,13 +6,12 @@ import {
 	selectShowCamera,
 	selectShowMicrophone,
 	selectShowScreen,
-	selectTheme,
 	selectVoiceInfo,
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ParticipantMeetState, handleCopyLink, useMediaPermissions } from '@mezon/utils';
+import { ParticipantMeetState, useMediaPermissions } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelType } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
@@ -25,8 +24,6 @@ const VoiceInfo = React.memo(() => {
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const { toChannelPage, toDmGroupPage, navigate } = useAppNavigation();
-
-	const appearanceTheme = useSelector(selectTheme);
 
 	const currentVoiceInfo = useSelector(selectVoiceInfo);
 	const isGroupCallActive = useSelector(selectIsGroupCallActive);
@@ -95,8 +92,6 @@ const VoiceInfo = React.memo(() => {
 
 	const voiceAddress = `${currentVoiceInfo?.channelLabel} / ${currentVoiceInfo?.clanName}`;
 
-	const isLightMode = appearanceTheme === 'light';
-
 	const showScreen = useSelector(selectShowScreen);
 	const showCamera = useSelector(selectShowCamera);
 	const showMicrophone = useSelector(selectShowMicrophone);
@@ -111,27 +106,24 @@ const VoiceInfo = React.memo(() => {
 	}, [showScreen]);
 
 	const handleToggleShareCamera = useCallback(() => {
-		dispatch(voiceActions.setShowCamera(!showCamera));
-	}, [showCamera]);
+		const btnControl = document.getElementById('btn-meet-camera');
+		if (!btnControl) {
+			return;
+		}
+		const enable = btnControl.dataset.lkEnabled?.toLowerCase() === 'true';
+		btnControl?.click();
+		dispatch(voiceActions.setShowCamera(!enable));
+	}, []);
 
 	const handleToggleOpenMicro = useCallback(() => {
-		dispatch(voiceActions.setShowMicrophone(!showMicrophone));
-	}, [showMicrophone]);
-
-	const handleCopyVoiceLink = useCallback(() => {
-		if (currentVoiceInfo) {
-			const isGroupCall = currentVoiceInfo.clanId === '0' || isGroupCallActive;
-
-			let linkVoice: string;
-			if (isGroupCall) {
-				linkVoice = `${process.env.NX_DOMAIN_URL}/chat/direct/message/${currentVoiceInfo.channelId}/${ChannelType.CHANNEL_TYPE_GROUP}`;
-			} else {
-				linkVoice = `${process.env.NX_DOMAIN_URL}/chat/clans/${currentVoiceInfo.clanId}/channels/${currentVoiceInfo.channelId}`;
-			}
-
-			handleCopyLink(linkVoice);
+		const btnControl = document.getElementById('btn-meet-micro');
+		if (!btnControl) {
+			return;
 		}
-	}, [currentVoiceInfo, isGroupCallActive]);
+		const enable = btnControl.dataset.lkEnabled?.toLowerCase() === 'true';
+		btnControl?.click();
+		dispatch(voiceActions.setShowMicrophone(!enable));
+	}, []);
 
 	const linkVoice = useMemo(() => {
 		if (currentVoiceInfo) {

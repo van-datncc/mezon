@@ -10,14 +10,12 @@ import {
 	getStore,
 	getStoreAsync,
 	groupCallActions,
-	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentDM,
 	selectDefaultNotificationCategory,
@@ -27,7 +25,6 @@ import {
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
-	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsShowPinBadgeByChannelId,
@@ -51,7 +48,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
-import NotificationList from '../NotificationList';
+import { NotificationTooltip } from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import FileModal from './TopBarComponents/FilesModal';
@@ -815,35 +812,7 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 }
 
 export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boolean; isVoiceChannel?: boolean }) {
-	const dispatch = useAppDispatch();
-	const isShowInbox = useSelector(selectIsShowInbox);
-	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const currentClan = useSelector(selectCurrentClan);
-
-	const handleShowInbox = () => {
-		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
-	};
-
-	useEffect(() => {
-		if (isShowInbox) {
-			dispatch(topicsActions.fetchTopics({ clanId: currentClan?.clan_id as string }));
-		}
-	}, [isShowInbox]);
-
-	return (
-		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<button
-				title="Inbox"
-				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
-				onClick={handleShowInbox}
-				onContextMenu={(e) => e.preventDefault()}
-			>
-				<Icons.Inbox defaultSize="size-5" />
-				{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
-			</button>
-			{isShowInbox && <NotificationList rootRef={inboxRef} />}
-		</div>
-	);
+	return <NotificationTooltip />;
 }
 
 export function RedDot() {
