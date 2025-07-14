@@ -62,7 +62,7 @@ const ParticipantItem = ({ participant, tracks, setFocusedScreenShare, isGridLay
 					)}
 					{!isPiPMode && (
 						<View style={[styles.focusIcon, styles.focusIconAbsolute]}>
-							<Icons.ArrowSaltIcon height={size.s_14} />
+							<Icons.ArrowSaltIcon height={size.s_14} color={themeValue.white} />
 						</View>
 					)}
 				</TouchableOpacity>
