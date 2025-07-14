@@ -1,4 +1,4 @@
-import { VideoTrack } from '@livekit/react-native';
+import { useLocalParticipant, useTracks, VideoTrack } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectMemberClanByUserName, useAppSelector } from '@mezon/store-mobile';
 import { Track } from 'livekit-client';
@@ -9,7 +9,9 @@ import { IconCDN } from '../../../../../../../../src/app/constants/icon_cdn';
 import MezonAvatar from '../../../../../../componentUI/MezonAvatar';
 import { style } from '../styles';
 
-const FocusedScreenPopup = ({ sortedParticipants, tracks, localParticipant }) => {
+const FocusedScreenPopup = ({ sortedParticipants }) => {
+	const { localParticipant } = useLocalParticipant();
+	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare, Track.Source.ScreenShareAudio]);
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const otherParticipants = sortedParticipants.filter((p) => p.identity !== localParticipant.identity);
