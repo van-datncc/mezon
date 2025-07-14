@@ -63,6 +63,12 @@ function ForwardMessageItem({
 						</Text>
 					</View>
 				);
+			case ChannelType.CHANNEL_TYPE_THREAD:
+				return (
+					<View style={{ width: size.s_16, height: size.s_34, justifyContent: 'center' }}>
+						<MezonIconCDN icon={IconCDN.threadIcon} width={16} height={16} color={themeValue.white} />
+					</View>
+				);
 			default:
 				break;
 		}
@@ -101,7 +107,7 @@ function ForwardMessageItem({
 						iconStyle={{ borderRadius: 5 }}
 						innerIconStyle={{
 							borderWidth: 1.5,
-							borderColor: isChecked ? Colors.bgButton : Colors.white,
+							borderColor: isChecked ? Colors.bgButton : themeValue.white,
 							borderRadius: 5,
 							opacity: 1
 						}}
