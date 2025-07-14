@@ -107,7 +107,11 @@ const ForwardMessageScreen = () => {
 			.map(mapDirectMessageToForwardObject);
 
 		const listTextChannel = listChannels
-			?.filter((channel) => channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && channel?.channel_label)
+			?.filter(
+				(channel) =>
+					(channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel?.type === ChannelType.CHANNEL_TYPE_THREAD) &&
+					channel?.channel_label
+			)
 			.map(mapChannelToForwardObject);
 
 		return [...listTextChannel, ...listGroupForward, ...listDMForward];
@@ -115,7 +119,7 @@ const ForwardMessageScreen = () => {
 
 	const filteredForwardObjects = useMemo(() => {
 		if (searchText?.trim()?.charAt(0) === '#') {
-			return allForwardObject.filter((ob) => ob.type === ChannelType.CHANNEL_TYPE_CHANNEL);
+			return allForwardObject.filter((ob) => ob?.type === ChannelType.CHANNEL_TYPE_CHANNEL || ob?.type === ChannelType.CHANNEL_TYPE_THREAD);
 		}
 		return allForwardObject.filter((ob) => normalizeString(ob?.name).includes(normalizeString(searchText)));
 	}, [searchText, allForwardObject]);
@@ -167,6 +171,11 @@ const ForwardMessageScreen = () => {
 							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isPublic, message);
 						}
 						break;
+					case ChannelType.CHANNEL_TYPE_THREAD:
+						for (const message of combineMessages) {
+							sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_THREAD, isPublic, message);
+						}
+						break;
 					default:
 						break;
 				}
@@ -199,6 +208,9 @@ const ForwardMessageScreen = () => {
 						break;
 					case ChannelType.CHANNEL_TYPE_CHANNEL:
 						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_CHANNEL, isChannelPublic, message);
+						break;
+					case ChannelType.CHANNEL_TYPE_THREAD:
+						sendForwardMessage(clanId, channelId, ChannelStreamMode.STREAM_MODE_THREAD, isChannelPublic, message);
 						break;
 					default:
 						break;
@@ -256,17 +268,18 @@ const ForwardMessageScreen = () => {
 				inputWrapperStyle={{ backgroundColor: themeValue.primary, paddingHorizontal: size.s_6 }}
 			/>
 
-			<View style={{ marginTop: size.s_24, flex: 1 }}>
+			<View style={{ marginTop: size.s_12, marginBottom: size.s_12, flex: 1 }}>
 				<FlashList
 					keyExtractor={(item) => `${item.channelId}_${item.type}`}
 					estimatedItemSize={70}
 					data={filteredForwardObjects}
 					renderItem={renderForwardObject}
+					keyboardShouldPersistTaps="handled"
 				/>
 			</View>
 
 			<TouchableOpacity
-				style={[styles.btn, !selectedForwardObjectsRef.current?.length && { backgroundColor: themeValue.charcoal }]}
+				style={[styles.btn, !selectedForwardObjectsRef.current?.length && { backgroundColor: themeValue.textDisabled }]}
 				onPress={handleForward}
 			>
 				<Text style={styles.btnText}>

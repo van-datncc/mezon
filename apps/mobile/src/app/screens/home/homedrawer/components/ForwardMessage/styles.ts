@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: Colors.bgViolet,
-		paddingVertical: size.s_16,
+		paddingVertical: size.s_14,
 		borderRadius: 50,
 		marginHorizontal: size.s_10,
 		marginBottom: size.s_24
