@@ -194,14 +194,12 @@ const AppDetailRight = ({ appDetail, appId }: IAppDetailRightProps) => {
 	};
 
 	const handleOpenSaveChangeForBotShadow = (value: string) => {
-		console.log("Value type:", typeof value, "Value:", value);
 
 		const checked = value === "true";
 		setChangeBotShadow(checked);
 		setShadowModified(true);
 		setOpenSaveChange(true);
 
-		console.log("Toggle value:", value, "Checked:", checked);
 	};
 
 	const handleOpenSaveChangeForUrl = (e: ChangeEvent<HTMLInputElement>) => {
