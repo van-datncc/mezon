@@ -2,7 +2,7 @@ import { BottomSheetMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { useChatSending, useGifsStickersEmoji } from '@mezon/core';
 import { debounce, isEmpty } from '@mezon/mobile-components';
 import { Colors, Fonts, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { MediaType, selectAnonymousMode, selectCurrentChannel, selectDmGroupCurrent } from '@mezon/store-mobile';
+import { MediaType, selectAnonymousMode, selectCurrentChannel, selectCurrentTopicId, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageSendPayload, checkIsThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
@@ -66,6 +66,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const [searchText, setSearchText] = useState<string>('');
 	const { t } = useTranslation('message');
 	const [stickerMode, setStickerMode] = useState<MediaType>(MediaType.STICKER);
+	const currentTopicId = useSelector(selectCurrentTopicId);
 
 	const dmMode = currentDirectMessage
 		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
@@ -73,7 +74,8 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
-		channelOrDirect: currentDirectMessage || currentChannel
+		channelOrDirect: currentDirectMessage || currentChannel,
+		fromTopic: !!currentTopicId
 	});
 
 	const handleSend = useCallback(

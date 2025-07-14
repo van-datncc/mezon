@@ -35,6 +35,7 @@ import {
 	ThreadStatus,
 	checkIsThread,
 	filterEmptyArrays,
+	getMobileUploadedAttachments,
 	sleep,
 	uniqueUsers
 } from '@mezon/utils';
@@ -352,6 +353,14 @@ export const ChatMessageSending = memo(
 					throw new Error('Client is not initialized');
 				}
 
+				const uploadedFiles = await getMobileUploadedAttachments({
+					attachments,
+					channelId,
+					clanId: channelOrDirect?.clan_id || '',
+					client,
+					session
+				});
+
 				await socket.writeChatMessage(
 					channelOrDirect?.clan_id || '',
 					channelOrDirect?.channel_id as string,
@@ -359,7 +368,7 @@ export const ChatMessageSending = memo(
 					isPublic,
 					content,
 					mentions,
-					attachments,
+					uploadedFiles,
 					references,
 					false,
 					false,
