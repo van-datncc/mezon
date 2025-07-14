@@ -10,7 +10,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			paddingHorizontal: size.s_12,
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			marginHorizontal: size.s_22,
+			marginHorizontal: size.s_10,
 			marginBottom: size.s_8
 		},
 

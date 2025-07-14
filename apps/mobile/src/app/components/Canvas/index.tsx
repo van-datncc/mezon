@@ -1,58 +1,52 @@
 import { useAuth } from '@mezon/core';
-import { size, useTheme } from '@mezon/mobile-ui';
-import { canvasAPIActions, selectCanvasCursors, selectCanvasIdsByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { LIMIT, normalizeString } from '@mezon/utils';
+import { size } from '@mezon/mobile-ui';
+import { canvasAPIActions, selectCanvasIdsByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { normalizeString } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import CanvasItem from './CanvasItem';
 import CanvasSearch from './CanvasSearch';
 import { style } from './styles';
 
 const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string }) => {
-	const isTabletLandscape = useTabletLandscape();
-	const { themeValue } = useTheme();
-	const styles = style(themeValue, isTabletLandscape);
+	const styles = style();
 	const navigation = useNavigation<any>();
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
 	const [searchText, setSearchText] = useState('');
-	const [canvasPage, setCanvasPage] = useState(1);
-	const pagesRef = useRef<number[]>([]);
 
 	useEffect(() => {
-		fetchCanvas(canvasPage);
-	}, [canvasPage]);
+		fetchCanvas();
+	}, []);
 
-	const fetchCanvas = async (page: number) => {
+	const fetchCanvas = async () => {
 		if (channelId && clanId) {
 			const body = {
 				channel_id: channelId,
 				clan_id: clanId,
-				page: page,
-				noCache: true
+				noCache: false
 			};
 			await dispatch(canvasAPIActions.getChannelCanvasList(body));
 		}
 	};
 
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, channelId));
-	const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, channelId ?? ''));
-	const pages = useMemo(() => {
-		if (!!countCanvas && countCanvas > 0) {
-			const totalPages = countCanvas === undefined ? 0 : Math.ceil(countCanvas / LIMIT);
-			const pageArray = Array.from({ length: totalPages }, (_, index) => index + 1);
-			pagesRef.current = pageArray;
-			return pageArray;
-		}
-		return pagesRef?.current;
-	}, [countCanvas]);
+	// const { countCanvas } = useAppSelector((state) => selectCanvasCursors(state, channelId ?? ''));
+	// const pages = useMemo(() => {
+	// 	if (!!countCanvas && countCanvas > 0) {
+	// 		const totalPages = countCanvas === undefined ? 0 : Math.ceil(countCanvas / LIMIT);
+	// 		const pageArray = Array.from({ length: totalPages }, (_, index) => index + 1);
+	// 		pagesRef.current = pageArray;
+	// 		return pageArray;
+	// 	}
+	// 	return pagesRef?.current;
+	// }, [countCanvas]);
 
 	const filterCanvas = useMemo(() => {
 		return canvases?.filter((canvas) =>
@@ -110,18 +104,17 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 		<View>
 			<CanvasSearch onSearchTextChange={handleSearchChange} />
 			<ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
-				<View style={styles.container}>
-					{!!filterCanvas?.length && (
-						<FlashList
-							data={filterCanvas}
-							keyExtractor={(item, index) => `canvas_${index}_${item?.id}`}
-							renderItem={renderItem}
-							estimatedItemSize={size.s_50}
-						/>
-					)}
-				</View>
+				{!!filterCanvas?.length && (
+					<FlashList
+						data={filterCanvas}
+						keyExtractor={(item, index) => `canvas_${index}_${item?.id}`}
+						renderItem={renderItem}
+						estimatedItemSize={size.s_50}
+						removeClippedSubviews={true}
+					/>
+				)}
 			</ScrollView>
-			<ScrollView horizontal style={styles.horizontalScrollView}>
+			{/* <ScrollView horizontal style={styles.horizontalScrollView}>
 				{pages?.length > 1 &&
 					pages?.map((item) => (
 						<TouchableOpacity
@@ -132,7 +125,7 @@ const Canvas = memo(({ channelId, clanId }: { channelId: string; clanId: string 
 							<Text style={styles.pageNumber}>{item.toString()}</Text>
 						</TouchableOpacity>
 					))}
-			</ScrollView>
+			</ScrollView> */}
 		</View>
 	);
 });

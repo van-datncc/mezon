@@ -1,63 +1,67 @@
-import { Metrics, size, useTheme } from '@mezon/mobile-ui';
-import { AppDispatch, PinMessageEntity, pinMessageActions, selectPinMessageByChannelId, useAppSelector } from '@mezon/store-mobile';
+import { useTheme } from '@mezon/mobile-ui';
+import { PinMessageEntity, pinMessageActions, selectPinMessageByChannelId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { IExtendedMessage } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
-import { memo, useEffect } from 'react';
-import { Dimensions, Platform, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useDispatch } from 'react-redux';
-import useTabletLandscape from '../../hooks/useTabletLandscape';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, View } from 'react-native';
 import EmptyPinMessage from './EmptyPinMessage';
 import { style } from './PinMessage';
 import PinMessageItem from './PinMessageItem';
 
 const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => {
-	const isTabletLandscape = useTabletLandscape();
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const styles = style();
 	const listPinMessages = useAppSelector((state) => selectPinMessageByChannelId(state, currentChannelId as string));
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useAppDispatch();
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
+		const fetchPinMessages = async () => {
+			setIsLoading(true);
+			await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
+			setIsLoading(false);
+		};
+		fetchPinMessages();
 	}, [currentChannelId, dispatch]);
 
 	const handleUnpinMessage = (message: PinMessageEntity) => {
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId, message_id: message.id }));
+		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId, message_id: message?.id }));
 	};
 
-	return (
-		<View>
-			<ScrollView
-				style={{ height: (isTabletLandscape ? Dimensions.get('screen').height : Metrics.screenHeight) / (Platform.OS === 'ios' ? 1.4 : 1.3) }}
-				contentContainerStyle={{ paddingBottom: size.s_50 }}
-				showsVerticalScrollIndicator={false}
-			>
-				<View style={styles.containerPinMessage}>
-					{listPinMessages?.length ? (
-						listPinMessages.map((pinMessage) => {
-							let contentString = pinMessage?.content;
-							if (typeof contentString === 'string') {
-								try {
-									contentString = safeJSONParse(contentString);
-								} catch (e) {
-									console.error('Failed to parse content JSON:', e);
-								}
-							}
+	const renderItem = useCallback(({ item }: { item: PinMessageEntity }) => {
+		let contentString = item?.content;
+		if (typeof contentString === 'string') {
+			try {
+				contentString = safeJSONParse(contentString);
+			} catch (e) {
+				console.error('Failed to parse content JSON:', e);
+			}
+		}
 
-							return (
-								<PinMessageItem
-									pinMessageItem={pinMessage}
-									contentMessage={contentString as IExtendedMessage}
-									handleUnpinMessage={handleUnpinMessage}
-								/>
-							);
-						})
-					) : (
-						<EmptyPinMessage />
-					)}
-				</View>
-			</ScrollView>
+		return <PinMessageItem pinMessageItem={item} contentMessage={contentString as IExtendedMessage} handleUnpinMessage={handleUnpinMessage} />;
+	}, []);
+
+	const renderEmptyComponent = useCallback(() => {
+		if (isLoading) {
+			return <ActivityIndicator size="large" color={themeValue.text} style={{ alignItems: 'center' }} />;
+		}
+		return <EmptyPinMessage />;
+	}, [isLoading, themeValue.text]);
+
+	return (
+		<View style={{ flex: 1 }}>
+			<FlatList
+				data={listPinMessages}
+				renderItem={renderItem}
+				keyExtractor={(item, index) => `pin_message_${index}_${item?.id}`}
+				ListEmptyComponent={renderEmptyComponent}
+				contentContainerStyle={styles.containerPinMessage}
+				showsVerticalScrollIndicator={false}
+				removeClippedSubviews={true}
+				maxToRenderPerBatch={5}
+				windowSize={15}
+				initialNumToRender={1}
+			/>
 		</View>
 	);
 });
