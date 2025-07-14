@@ -350,10 +350,10 @@ const RoomView = ({
 				{!isPiPMode && (
 					<View style={[styles.wrapperHeaderFocusSharing]}>
 						<TouchableOpacity style={[styles.focusIcon]} onPress={() => handleOpenEmojiPicker()}>
-							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_16} width={size.s_24} color={'white'} />
+							<MezonIconCDN icon={IconCDN.reactionIcon} height={size.s_16} width={size.s_24} color={themeValue.white} />
 						</TouchableOpacity>
 						<TouchableOpacity style={styles.focusIcon} onPress={() => setFocusedScreenShare(null)}>
-							<Icons.ArrowShrinkIcon height={size.s_16} />
+							<Icons.ArrowShrinkIcon height={size.s_16} color={themeValue.white} />
 						</TouchableOpacity>
 					</View>
 				)}
