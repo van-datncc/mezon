@@ -844,6 +844,11 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
 		}
 
+		let avatarToUse = avatar;
+		if (avatarToUse?.endsWith('croppedWEBP')) {
+			avatarToUse = undefined;
+		}
+
 		await socket.writeEphemeralMessage(
 			receiverId,
 			clanId,
@@ -856,7 +861,7 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			references,
 			false,
 			false,
-			undefined,
+			avatarToUse,
 			TypeMessage.Ephemeral
 		);
 
