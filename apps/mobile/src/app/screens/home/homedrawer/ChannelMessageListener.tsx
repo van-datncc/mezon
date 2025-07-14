@@ -9,6 +9,7 @@ import {
 	selectAllRolesClan,
 	selectAllUserClans,
 	selectCurrentClanId,
+	selectCurrentTopicId,
 	selectDmGroupCurrentId,
 	selectGrouplMembers,
 	useAppDispatch
@@ -69,6 +70,11 @@ const ChannelMessageListener = React.memo(() => {
 				const clanIdStore = selectCurrentClanId(store.getState());
 				const currentDirectId = selectDmGroupCurrentId(store.getState());
 				const currentClanId = currentDirectId ? '0' : clanIdStore;
+				const topicIdStore = selectCurrentTopicId(store.getState());
+
+				if (topicIdStore) {
+					navigation.goBack();
+				}
 
 				if (type === ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel?.meeting_code) {
 					const urlVoice = `${linkGoogleMeet}${channel?.meeting_code}`;

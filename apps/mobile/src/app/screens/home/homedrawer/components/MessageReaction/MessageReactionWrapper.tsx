@@ -1,9 +1,11 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import { selectCurrentTopicId } from '@mezon/store-mobile';
 import { EmojiDataOptionals, TypeMessage, calculateTotalCount } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { DeviceEventEmitter, Keyboard, Pressable, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../../src/app/constants/icon_cdn';
 import { IMessageReactionProps } from '../../types';
@@ -35,6 +37,7 @@ export const MessageReactionWrapper = React.memo((props: IMessageReactionProps) 
 		message?.code === TypeMessage.AuditLog;
 
 	const userId = props?.userId;
+	const currentTopicId = useSelector(selectCurrentTopicId);
 
 	const removeEmoji = useCallback(
 		async (emojiData: EmojiDataOptionals) => {
@@ -51,10 +54,10 @@ export const MessageReactionWrapper = React.memo((props: IMessageReactionProps) 
 				senderId: userId ?? '',
 				countToRemove: countToRemove,
 				actionDelete: true,
-				topicId: message.topic_id || ''
+				topicId: currentTopicId || ''
 			} as IReactionMessageProps);
 		},
-		[message?.channel_id, message.topic_id, message?.id, mode, userId]
+		[message?.channel_id, message.topic_id, message?.id, mode, userId, currentTopicId]
 	);
 
 	const onReactItemLongPress = useCallback(
@@ -94,10 +97,11 @@ export const MessageReactionWrapper = React.memo((props: IMessageReactionProps) 
 					message={message}
 					mode={mode}
 					styles={styles}
+					topicId={currentTopicId}
 				/>
 			);
 		});
-	}, [messageReactions, userId, preventAction, message, mode, styles, onReactItemLongPress]);
+	}, [messageReactions, userId, preventAction, message, mode, styles, onReactItemLongPress, currentTopicId]);
 	return (
 		<View style={[styles.reactionWrapper, styles.reactionSpace, isMessageSystem && { paddingTop: 0, marginLeft: size.s_40 }]}>
 			{!messageReactions?.length &&
