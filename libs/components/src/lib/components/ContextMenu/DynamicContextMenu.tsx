@@ -5,7 +5,6 @@ import {
 	selectCurrentChannel,
 	selectCurrentTopicId,
 	selectMessageByMessageId,
-	selectTheme,
 	useAppSelector
 } from '@mezon/store';
 import { ContextMenuItem, IEmoji, IMessageWithUser, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
@@ -26,7 +25,6 @@ type Props = {
 };
 
 export default function DynamicContextMenu({ menuId, items, messageId, message, isTopic }: Props) {
-	const appearanceTheme = useSelector(selectTheme);
 	const emojiConverted = useEmojiConverted();
 
 	const { directId } = useAppParams();

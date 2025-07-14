@@ -134,7 +134,7 @@ export function useChatReaction({ isMobile = false, isClanViewMobile = undefined
 				emoji_id,
 				emoji,
 				count,
-				messageSenderId: userId as string,
+				messageSenderId: message_sender_id || (userId as string),
 				actionDelete: action_delete,
 				isPublic: payload.is_public,
 				userId: userId as string,
