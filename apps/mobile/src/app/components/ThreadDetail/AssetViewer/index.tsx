@@ -1,8 +1,8 @@
 import { attachmentActions, channelMembersActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import Canvas from '../../Canvas';
 import ChannelFiles from '../../ChannelFiles';
@@ -14,7 +14,6 @@ import { threadDetailContext } from '../MenuThreadDetail';
 import styles from './style';
 
 export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) => {
-	const ref = useRef<ScrollView>();
 	const { t } = useTranslation(['common']);
 	const currentChannel = useContext(threadDetailContext);
 	const [tabActive, setTabActive] = useState<number>(0);
@@ -64,38 +63,36 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 		<View style={styles.wrapper}>
 			<AssetsHeader tabActive={tabActive} onChange={handelHeaderTabChange} tabList={headerTablist} />
 			<View style={styles.container}>
-				<ScrollView horizontal pagingEnabled ref={ref} scrollEventThrottle={100}>
-					{tabActive === 0 ? (
-						<MemberListStatus />
-					) : tabActive === 1 ? (
-						<MediaChannel channelId={channelId} />
-					) : tabActive === 4 ? (
-						<Canvas
-							channelId={
-								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
-									? currentChannel?.channel_id
-									: channelId
-							}
-							clanId={currentClanId}
-						/>
-					) : tabActive === 2 ? (
-						<ChannelFiles
-							currentChannelId={
-								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
-									? currentChannel?.channel_id
-									: channelId
-							}
-						/>
-					) : (
-						<PinMessage
-							currentChannelId={
-								[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
-									? currentChannel?.channel_id
-									: channelId
-							}
-						/>
-					)}
-				</ScrollView>
+				{tabActive === 0 ? (
+					<MemberListStatus />
+				) : tabActive === 1 ? (
+					<MediaChannel channelId={channelId} />
+				) : tabActive === 4 ? (
+					<Canvas
+						channelId={
+							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+								? currentChannel?.channel_id
+								: channelId
+						}
+						clanId={currentClanId}
+					/>
+				) : tabActive === 2 ? (
+					<ChannelFiles
+						currentChannelId={
+							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+								? currentChannel?.channel_id
+								: channelId
+						}
+					/>
+				) : (
+					<PinMessage
+						currentChannelId={
+							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+								? currentChannel?.channel_id
+								: channelId
+						}
+					/>
+				)}
 			</View>
 		</View>
 	);
