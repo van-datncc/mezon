@@ -590,7 +590,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		}
 
 		if (pin.operation === 1) {
-			dispatch(pinMessageActions.clearPinMessagesCacheThunk(pin.channel_id));
+			dispatch(pinMessageActions.clearChannelCache(pin.channel_id));
 		}
 	}, []);
 
@@ -602,7 +602,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				message_id: unpin_message_event.message_id
 			})
 		);
-		dispatch(pinMessageActions.clearPinMessagesCacheThunk(unpin_message_event.channel_id));
+		dispatch(
+			pinMessageActions.removePinMessage({
+				channelId: unpin_message_event.channel_id,
+				pinId: unpin_message_event.message_id
+			})
+		);
 	}, []);
 
 	const oneventnotiuserchannel = useCallback(
