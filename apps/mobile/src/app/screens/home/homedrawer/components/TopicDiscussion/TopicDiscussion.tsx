@@ -123,7 +123,7 @@ export default function TopicDiscussion() {
 					isPublic={isPublicChannel(currentChannel)}
 					topicChannelId={currentTopicId}
 				/>
-				<PanelKeyboard currentChannelId={currentTopicId} currentClanId={currentChannel?.clan_id} />
+				<PanelKeyboard currentChannelId={currentTopicId || currentChannel?.channel_id} currentClanId={currentChannel?.clan_id} />
 			</KeyboardAvoidingView>
 		</View>
 	);
