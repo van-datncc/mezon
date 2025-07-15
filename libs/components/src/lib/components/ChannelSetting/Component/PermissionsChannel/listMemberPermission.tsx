@@ -1,10 +1,9 @@
-import { useAppNavigation, useAuth } from '@mezon/core';
+import { useAppNavigation, useAuth, useCustomNavigate } from '@mezon/core';
 import { channelUsersActions, removeChannelUsersPayload, selectAllUserChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
 
 type ListMemberPermissionProps = {
@@ -17,7 +16,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const dispatch = useAppDispatch();
 	const rawMembers = useSelector(selectAllUserChannel(channel.channel_id || ''));
 	const currentClanId = useSelector(selectCurrentClanId);
-	const navigate = useNavigate();
+	const navigate = useCustomNavigate();
 	const userProfile = useAuth();
 	const { toMembersPage } = useAppNavigation();
 	const deleteMember = async (userId: string) => {
