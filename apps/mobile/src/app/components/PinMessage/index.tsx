@@ -15,14 +15,20 @@ const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => 
 	const dispatch = useAppDispatch();
 	const [isLoading, setIsLoading] = useState(false);
 
-	useEffect(() => {
-		const fetchPinMessages = async () => {
+	const fetchPinMessages = useCallback(async () => {
+		try {
 			setIsLoading(true);
 			await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId }));
+		} catch (error) {
+			console.error('Failed to fetch pin messages:', error);
+		} finally {
 			setIsLoading(false);
-		};
+		}
+	}, [currentChannelId]);
+
+	useEffect(() => {
 		fetchPinMessages();
-	}, [currentChannelId, dispatch]);
+	}, [fetchPinMessages]);
 
 	const handleUnpinMessage = (message: PinMessageEntity) => {
 		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId, message_id: message?.id }));
@@ -43,7 +49,7 @@ const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => 
 
 	const renderEmptyComponent = useCallback(() => {
 		if (isLoading) {
-			return <ActivityIndicator size="large" color={themeValue.text} style={{ alignItems: 'center' }} />;
+			return <ActivityIndicator size="large" color={themeValue.text} style={{ alignItems: 'center', marginTop: '50%' }} />;
 		}
 		return <EmptyPinMessage />;
 	}, [isLoading, themeValue.text]);
