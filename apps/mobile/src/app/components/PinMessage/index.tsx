@@ -49,7 +49,7 @@ const PinMessage = memo(({ currentChannelId }: { currentChannelId: string }) => 
 
 	const renderEmptyComponent = useCallback(() => {
 		if (isLoading) {
-			return <ActivityIndicator size="large" color={themeValue.text} style={{ alignItems: 'center', marginTop: '50%' }} />;
+			return <ActivityIndicator size="large" color={themeValue.text} style={styles.loading} />;
 		}
 		return <EmptyPinMessage />;
 	}, [isLoading, themeValue.text]);
