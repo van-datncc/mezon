@@ -162,7 +162,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 					hasPermissionEdit={canSendMessage}
 				/>
 
-				<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
+				<div className={`w-[calc(100%_-_50px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
 					<div className={`w-full rounded-r-lg  gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}

@@ -1,12 +1,12 @@
 import { Attributes, baseColor, size } from '@mezon/mobile-ui';
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		container: {
 			backgroundColor: colors.secondary,
-			width: Dimensions.get('screen').width - size.s_20 * 2,
-			marginHorizontal: size.s_20
+			paddingHorizontal: size.s_10,
+			paddingBottom: size.s_10
 		},
 
 		text: {
@@ -19,7 +19,7 @@ export const style = (colors: Attributes) =>
 		},
 		box: {
 			backgroundColor: colors.primary,
-			marginTop: 10,
+			marginTop: size.s_10,
 			borderRadius: 15,
 			width: '100%',
 			minHeight: size.s_80
@@ -29,14 +29,14 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			justifyContent: 'space-between',
 			alignItems: 'center',
-			padding: 10,
+			padding: size.s_10,
 			backgroundColor: colors.primary,
 			borderRadius: 15,
-			marginBottom: 10
+			marginBottom: size.s_10
 		},
 
 		iconWrapper: {
-			padding: 10,
+			padding: size.s_10,
 			backgroundColor: baseColor.blurple,
 			borderRadius: 50
 		},
@@ -46,7 +46,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			flexDirection: 'row',
-			gap: 10
+			gap: size.s_10
 		},
 		actionItem: {
 			flexDirection: 'row',
@@ -54,7 +54,7 @@ export const style = (colors: Attributes) =>
 			gap: size.s_12,
 			backgroundColor: colors.secondary,
 			padding: size.s_10,
-			borderRadius: size.s_12,
+			borderRadius: 12,
 			marginBottom: size.s_10
 		},
 		actionTitle: {
