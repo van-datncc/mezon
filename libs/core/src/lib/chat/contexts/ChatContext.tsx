@@ -590,7 +590,22 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		}
 
 		if (pin.operation === 1) {
-			dispatch(pinMessageActions.clearChannelCache(pin.channel_id));
+			dispatch(
+				pinMessageActions.addPinMessage({
+					channelId: pin.channel_id,
+					pinMessage: {
+						id: pin.message_id,
+						attachment: pin.message_attachment,
+						avatar: pin.message_sender_avatar,
+						channel_id: pin.channel_id,
+						content: pin.message_content,
+						create_time: pin.message_created_time,
+						message_id: pin.message_id,
+						username: pin.message_sender_username,
+						sender_id: pin.message_sender_id
+					}
+				})
+			);
 		}
 	}, []);
 
