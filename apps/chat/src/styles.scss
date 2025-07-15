@@ -108,17 +108,20 @@
 }
 
 @media (max-width: 480px) {
-	#editorReactMentionChannel::placeholder {
+	#editorReactMentionChannel::placeholder,
+	#editorReactMention::placeholder {
 		height: 0;
 		overflow: hidden;
 	}
 }
 
-#editorReactMentionChannel::-webkit-scrollbar {
+#editorReactMentionChannel::-webkit-scrollbar,
+#editorReactMention::-webkit-scrollbar {
 	width: 4px;
 }
 
-#editorReactMentionChannel::-webkit-scrollbar-thumb {
+#editorReactMentionChannel::-webkit-scrollbar-thumb,
+#editorReactMention::-webkit-scrollbar-thumb {
 	background: var(--bg-scroll-bar);
 	border-radius: 5px;
 }
