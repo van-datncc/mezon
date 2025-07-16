@@ -388,7 +388,8 @@ export const isShowNotification = (
 export const navigateToNotification = async (store: any, notification: any, navigation: any, isTabletLandscape = false, time?: number) => {
 	const link = notification?.data?.link;
 	const topicId = notification?.data?.topic;
-	if (link) {
+	const isDirectDM = !!notification?.data?.channel && link?.includes('direct/friends');
+	if (link && !isDirectDM) {
 		const linkMatch = link.match(clanAndChannelIdLinkRegex);
 
 		// IF is notification to channel
@@ -457,6 +458,20 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				}, 4000);
 			}
 		}
+	} else if (isDirectDM) {
+		const channelDMId = notification?.data?.channel;
+		if (navigation) {
+			await store.dispatch(directActions.setDmGroupCurrentId(channelDMId));
+			if (isTabletLandscape) {
+				navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+			} else {
+				navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: channelDMId });
+			}
+		}
+		setTimeout(() => {
+			store.dispatch(appActions.setIsFromFCMMobile(false));
+			save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
+		}, 4000);
 	} else {
 		setTimeout(() => {
 			store.dispatch(appActions.setIsFromFCMMobile(false));
