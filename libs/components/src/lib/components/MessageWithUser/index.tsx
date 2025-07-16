@@ -416,7 +416,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			{isHover && (
 				<>
 					{!showMessageHead && create_time && (
-						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[10px]">{convertTimeHour(create_time)}</span>
+						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[11px]">{convertTimeHour(create_time)}</span>
 					)}
 					{popup?.()}
 				</>

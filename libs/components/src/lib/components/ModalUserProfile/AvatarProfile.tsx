@@ -41,8 +41,6 @@ const AvatarProfile = ({
 		dispatch(userClanProfileActions.setShowModalCustomStatus(true));
 	};
 
-	console.log('statusOnline', statusOnline);
-
 	const handleClearCustomStatus = () => {
 		dispatch(channelMembersActions.updateCustomStatus({ clanId: currentClanId ?? '', customStatus: '', minutes: 0, noClear: true }));
 	};

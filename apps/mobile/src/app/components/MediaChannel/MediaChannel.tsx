@@ -27,8 +27,8 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, []);
 
-	const renderItem = ({ item, index }) => (
-		<View style={{ height: widthImage, width: widthImage, margin: size.s_4 }} key={`${index}_item_media_channel`}>
+	const renderItem = ({ item }: { item: AttachmentEntity }) => (
+		<View style={{ height: widthImage, width: widthImage, margin: size.s_4 }}>
 			<MediaItem data={item} onPress={openImage} />
 		</View>
 	);
@@ -42,7 +42,7 @@ const MediaChannel = memo(({ channelId }: { channelId: string }) => {
 					data={attachments}
 					style={{ width: widthScreen }}
 					numColumns={3}
-					keyExtractor={(item, index) => `${index}_item_media_channel`}
+					keyExtractor={(item, index) => `item_media_channel_${index}_${item?.id}`}
 					renderItem={renderItem}
 					contentContainerStyle={styles.contentContainer}
 					removeClippedSubviews={true}

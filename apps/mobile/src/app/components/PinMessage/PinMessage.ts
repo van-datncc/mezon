@@ -1,11 +1,13 @@
-import { Attributes, size } from '@mezon/mobile-ui';
-import { Dimensions, StyleSheet } from 'react-native';
+import { size } from '@mezon/mobile-ui';
+import { StyleSheet } from 'react-native';
 
-export const style = (colors: Attributes) =>
+export const style = () =>
 	StyleSheet.create({
 		containerPinMessage: {
-			width: Dimensions.get('screen').width,
-			paddingHorizontal: size.s_12,
-			paddingBottom: size.s_16
+			paddingHorizontal: size.s_12
+		},
+		loading: {
+			alignItems: 'center',
+			marginTop: size.s_20
 		}
 	});
