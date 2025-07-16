@@ -197,7 +197,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					});
 					return;
 				}
-				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji, userId);
+				handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message.id, EMOJI_GIVE_COFFEE.emoji_id, EMOJI_GIVE_COFFEE.emoji);
 				const response = await createDirectMessageWithUser(message?.sender_id, message?.user?.name, message?.user?.username, message?.avatar);
 				if (response?.channel_id) {
 					sendInviteMessage(
@@ -570,14 +570,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	]);
 
 	const handleReact = useCallback(
-		async (mode, messageId, emoji_id: string, emoji: string, senderId) => {
+		async (mode, messageId, emoji_id: string, emoji: string) => {
 			if (currentChannel?.parent_id !== '0' && currentChannel?.active === ThreadStatus.activePublic) {
 				await dispatch(
 					threadsActions.updateActiveCodeThread({ channelId: currentChannel?.channel_id ?? '', activeCode: ThreadStatus.joined })
 				);
 				joinningToThread(currentChannel, [userId ?? '']);
 			}
-
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_REACTION_MESSAGE_ITEM, {
 				id: emoji_id,
 				mode: mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL,
@@ -586,7 +585,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				channelId: message?.channel_id ?? '',
 				emojiId: emoji_id ?? '',
 				emoji: emoji?.trim() ?? '',
-				senderId: senderId ?? '',
+				senderId: message?.sender_id ?? '',
 				countToRemove: 1,
 				actionDelete: false,
 				topicId: currentTopicId || ''
@@ -594,20 +593,13 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 
 			onClose();
 		},
-		[currentChannel, dispatch, joinningToThread, message?.channel_id, message?.clan_id, message?.topic_id, onClose, userId]
+		[currentChannel, currentTopicId, dispatch, joinningToThread, message?.channel_id, message?.clan_id, message?.sender_id, onClose, userId]
 	);
 
 	const renderMessageItemActions = () => {
 		return (
 			<View style={styles.messageActionsWrapper}>
-				<RecentEmojiMessageAction
-					messageId={message.id}
-					mode={mode}
-					type={type}
-					userId={userId}
-					handleReact={handleReact}
-					setIsShowEmojiPicker={setIsShowEmojiPicker}
-				/>
+				<RecentEmojiMessageAction messageId={message.id} mode={mode} handleReact={handleReact} setIsShowEmojiPicker={setIsShowEmojiPicker} />
 				<View style={styles.messageActionGroup}>
 					{messageActionList.frequent.map((action) => {
 						return (
@@ -649,9 +641,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				await socketRef.current.writeVoiceReaction([emoji_id], channelId);
 				return;
 			}
-			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij, userId);
+			await handleReact(mode ?? ChannelStreamMode.STREAM_MODE_CHANNEL, message?.id, emoji_id, emoij);
 		},
-		[channelId, handleReact, isOnlyEmojiPicker, message, mode, socketRef, userId]
+		[channelId, handleReact, isOnlyEmojiPicker, message, mode, socketRef]
 	);
 
 	return (
