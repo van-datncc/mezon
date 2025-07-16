@@ -1,7 +1,5 @@
 import { ArrowLeftIcon, FilterSearchIcon, IOption, IUerMention } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import debounce from 'lodash.debounce';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -28,7 +26,6 @@ type InputSearchMessageChannelProps = {
 	onChangeOptionFilter: (option: IOption) => void;
 	inputValue: string;
 	userMention: IUerMention;
-	currentChannel: IChannel | DirectEntity;
 	optionFilter: IOption;
 	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
 	nameChannel?: string;
@@ -40,7 +37,6 @@ const InputSearchMessageChannel = ({
 	onChangeOptionFilter,
 	inputValue,
 	userMention,
-	currentChannel,
 	optionFilter,
 	onKeyPress,
 	nameChannel,
@@ -96,7 +92,7 @@ const InputSearchMessageChannel = ({
 			setTextInput('');
 			onChangeText('');
 		}
-	}, [isClearSearch, currentChannel]);
+	}, [isClearSearch, nameChannel]);
 
 	useEffect(() => {
 		if (optionFilter || userMention) {

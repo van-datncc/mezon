@@ -111,7 +111,6 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 					onChangeText={handleSearchText}
 					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
-					currentChannel={currentChannel}
 					nameChannel={nameChannel}
 					isClearSearch={isClearSearch}
 				/>
