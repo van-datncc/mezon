@@ -45,7 +45,7 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 				styles={{
 					control: (provided: any) => ({
 						...provided,
-						backgroundColor: 'var(--bg-tertiary)',
+						backgroundColor: 'var(--bg-input-secondary)',
 						borderRadius: '8px',
 						color: 'red'
 					}),

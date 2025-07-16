@@ -412,7 +412,8 @@ function MessageContextMenu({
 					channelId: message?.channel_id,
 					messageId: message?.id,
 					mode: message?.mode || 0,
-					badge_count: 0
+					badge_count: 0,
+					message_time: message.create_time_seconds
 				})
 			);
 			dispatch(

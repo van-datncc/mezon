@@ -2,7 +2,7 @@ import type { CaptureOptionsBySource, ToggleSource } from '@livekit/components-c
 import { useTrackToggle } from '@livekit/components-react';
 import { Icons } from '@mezon/ui';
 import { Track, TrackPublishOptions } from 'livekit-client';
-import { ButtonHTMLAttributes, ForwardedRef, ReactNode, RefAttributes, forwardRef } from 'react';
+import React, { ButtonHTMLAttributes, ForwardedRef, ReactNode, RefAttributes, forwardRef } from 'react';
 
 export interface TrackToggleProps<T extends ToggleSource> extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
 	source: T;
@@ -16,11 +16,18 @@ export interface TrackToggleProps<T extends ToggleSource> extends Omit<ButtonHTM
 export const TrackToggle: <T extends ToggleSource>(props: TrackToggleProps<T> & RefAttributes<HTMLButtonElement>) => ReactNode = forwardRef(
 	function TrackToggle<T extends ToggleSource>({ ...props }: TrackToggleProps<T>, ref: ForwardedRef<HTMLButtonElement>) {
 		const { buttonProps, enabled } = useTrackToggle(props);
+		const [isClient, setIsClient] = React.useState(false);
+		React.useEffect(() => {
+			setIsClient(true);
+		}, []);
+
 		return (
-			<button ref={ref} {...buttonProps}>
-				{getSourceIcon(props.source, enabled)}
-				{props.children}
-			</button>
+			isClient && (
+				<button ref={ref} {...buttonProps}>
+					{getSourceIcon(props.source, enabled)}
+					{props.children}
+				</button>
+			)
 		);
 	}
 );

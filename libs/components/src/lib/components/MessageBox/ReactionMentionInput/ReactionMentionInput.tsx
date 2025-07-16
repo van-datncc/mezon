@@ -32,8 +32,6 @@ import {
 import {
 	CHANNEL_INPUT_ID,
 	ChannelMembersEntity,
-	EBacktickType,
-	ETypeMEntion,
 	GENERAL_INPUT_ID,
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -60,6 +58,7 @@ import {
 	formatMentionsToString,
 	getDisplayMention,
 	parseHtmlAsFormattedText,
+	processBoldEntities,
 	processMarkdownEntities,
 	searchMentionsHashtag,
 	threadError,
@@ -254,17 +253,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
-			const boldMarkdownArr: IMarkdownOnMessage[] = [];
-
-			checkedRequest?.mentionRaw?.forEach((mention: any) => {
-				if (mention.childIndex === ETypeMEntion.BOLD) {
-					boldMarkdownArr.push({
-						type: EBacktickType.BOLD,
-						s: mention.plainTextIndex,
-						e: mention.plainTextIndex + mention.display.length
-					});
-				}
-			});
+			const boldMarkdownArr = processBoldEntities(checkedRequest.mentionRaw, mk);
 
 			const { adjustedMentionsPos, adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 			const payload: {

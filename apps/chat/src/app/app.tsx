@@ -158,7 +158,6 @@ export function App() {
 			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 				<PopupManagerProvider>
 					<PermissionProvider>
-						{/* <ThemeDemo /> */}
 						<AppInitializer />
 						<Routes />
 					</PermissionProvider>

@@ -103,23 +103,26 @@
 }
 
 .app-scroll::-webkit-scrollbar-thumb {
-	background: #1a1b1e;
+	background: var(--bg-scroll-bar);
 	border-radius: 5px;
 }
 
 @media (max-width: 480px) {
-	#editorReactMentionChannel::placeholder {
+	#editorReactMentionChannel::placeholder,
+	#editorReactMention::placeholder {
 		height: 0;
 		overflow: hidden;
 	}
 }
 
-#editorReactMentionChannel::-webkit-scrollbar {
+#editorReactMentionChannel::-webkit-scrollbar,
+#editorReactMention::-webkit-scrollbar {
 	width: 4px;
 }
 
-#editorReactMentionChannel::-webkit-scrollbar-thumb {
-	background: #1a1b1e;
+#editorReactMentionChannel::-webkit-scrollbar-thumb,
+#editorReactMention::-webkit-scrollbar-thumb {
+	background: var(--bg-scroll-bar);
 	border-radius: 5px;
 }
 
@@ -128,7 +131,7 @@
 }
 
 #react-select-3-listbox::-webkit-scrollbar-thumb {
-	background: #1a1b1e;
+	background: var(--bg-scroll-bar);
 	border-radius: 5px;
 }
 
@@ -375,6 +378,8 @@ input:-webkit-autofill:active {
 	contain: strict;
 	// content-visibility: auto;
 	// contain-intrinsic-size: auto 500px;
+	transform: translate3d(0, 0, 0);
+	transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
 	.force-messages-scroll & {
 		margin-top: 100vh !important;
 	}
@@ -386,19 +391,8 @@ input:-webkit-autofill:active {
 		outline: 3px solid #eab3081a;
 	}
 
-	&.is-sending {
-		.textChat {
-			opacity: 0.6;
-			pointer-events: none;
-		}
-	}
-
-	&.is-error {
-		.prose {
-			* {
-				color: #ff0000;
-			}
-		}
+	&.is-error div {
+		color: #ef4444 !important;
 	}
 
 	// start style markdown
@@ -406,121 +400,6 @@ input:-webkit-autofill:active {
 		max-width: unset;
 		padding-right: 0;
 		line-height: 1.375rem;
-	}
-}
-
-.prose-backtick {
-	max-width: unset;
-	padding-right: 0;
-	line-height: 1.375rem;
-	max-width: 100%;
-
-	&.single-markdown-light-mode {
-		line-height: 1.6rem;
-		display: inline-block;
-		/* Ensure the span behaves inline */
-
-		code {
-			color: #535353;
-			border: 1px solid #e3e5e8 !important;
-			background-color: #f2f3f5;
-			border-radius: 6px;
-			padding: 3px 6px;
-			font-weight: 400;
-			font-size: 14px;
-			display: inline;
-			/* Keep the code inline */
-			white-space: break-spaces;
-			/* Prevent wrapping inside the code block */
-		}
-
-		code::before {
-			content: '';
-		}
-
-		code::after {
-			content: '';
-		}
-	}
-
-	&.single-markdown {
-		line-height: 1.6rem;
-		display: inline-block;
-		/* Ensure the span behaves inline */
-
-		code {
-			color: #e6e6e6;
-			border: 1px solid #1e1f22 !important;
-			background-color: #2b2d31;
-			border-radius: 6px;
-			padding: 3px 6px;
-			font-weight: 400;
-			font-size: 14px;
-			display: inline;
-			/* Keep the code inline */
-			white-space: nowrap;
-			/* Prevent wrapping inside the code block */
-		}
-
-		code::before {
-			content: '';
-		}
-
-		code::after {
-			content: '';
-		}
-	}
-
-	&.triple-markdown {
-		pre {
-			position: relative;
-			margin: 0;
-			white-space: break-spaces;
-			padding-right: 26px;
-			min-width: 70%;
-			max-width: 100%;
-			padding: 10px;
-			border: 1px solid #1e1f22 !important;
-			background-color: #2b2d31;
-			border-radius: 6px;
-
-			code {
-				font-size: 14px;
-				font-weight: 400;
-				border-radius: 6px;
-				padding: 3px 6px;
-				color: #e6e6e6;
-				display: inline-block;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-		}
-	}
-
-	&.triple-markdown-lightMode {
-		pre {
-			position: relative;
-			margin: 0;
-			white-space: break-spaces;
-			padding-right: 26px;
-			min-width: 70%;
-			max-width: 100%;
-			padding: 10px;
-			border: 1px solid #e3e5e8 !important;
-			background-color: #f2f3f5;
-			border-radius: 6px;
-
-			code {
-				font-size: 14px;
-				border-radius: 6px;
-				padding: 3px 6px;
-				color: #535353;
-				font-weight: 400;
-				display: inline-block;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-		}
 	}
 }
 
@@ -554,6 +433,10 @@ input:-webkit-autofill:active {
 .pin-msg-modeLight:before,
 .pin-msg-modeLight:after {
 	content: '';
+}
+
+.rc-tooltip:has(.bg-theme-pop) {
+	opacity: 1 !important;
 }
 
 // css video
@@ -594,38 +477,38 @@ input:-webkit-autofill:active {
 }
 
 .pre::-webkit-scrollbar-thumb:hover {
-	background: #787881;
-}
-
-// thread-scroll
-.thread-scroll::-webkit-scrollbar {
-	width: 4px;
-}
-.scroll-big::-webkit-scrollbar {
-	width: 7px;
-}
-
-.thread-scroll::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-.thread-scroll::-webkit-scrollbar-thumb {
-	background: transparent;
-	border-radius: 5px;
-}
-
-.thread-scroll.show-scroll::-webkit-scrollbar-thumb {
-	background: #787881;
-}
-
-.thread-scroll:hover::-webkit-scrollbar-thumb {
-	background: #787881;
+	background: var(--thread-scroll);
 }
 
 .thread-scroll {
 	overflow-y: scroll;
 	overflow-x: hidden;
+
+	pointer-events: auto;
+	scrollbar-color: transparent transparent;
+	scrollbar-width: thin;
+
+	transition: scrollbar-color 0.3s ease;
+
+	-webkit-overflow-scrolling: touch;
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 0.375rem;
+		background-color: transparent;
+		box-shadow: 0 0 1px rgba(255, 255, 255, 0.01);
+	}
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		scrollbar-color: var(--thread-scroll) transparent;
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--thread-scroll);
+		}
+	}
 }
+
 .mentions__suggestions__list::-webkit-scrollbar {
 	width: 4px;
 }
@@ -634,39 +517,11 @@ input:-webkit-autofill:active {
 }
 
 .mentions__suggestions__list::-webkit-scrollbar-thumb {
-	background: #787881;
+	background: var(--thread-scroll);
 	border-radius: 5px;
 }
 
 // editor-scroll
-
-// attachment-scroll-dark
-
-.attachment-scroll::-webkit-scrollbar-thumb {
-	background: #787881;
-	border-radius: 5px;
-}
-
-.attachment-scroll::-webkit-scrollbar {
-	height: 5px;
-}
-
-.attachment-scroll::-webkit-scrollbar-track {
-	background: #2b2d31;
-}
-
-// attachment-scroll-light
-.attachment-scroll-light::-webkit-scrollbar {
-	height: 5px;
-}
-
-.attachment-scroll-light::-webkit-scrollbar-track {
-	background: #d3d5d7;
-}
-
-.attachment-scroll-light::-webkit-scrollbar-thumb {
-	background: #7f8081;
-}
 
 // css tagLink of markdown
 .tagLink {
@@ -1692,4 +1547,9 @@ input {
 .Toastify__toast--warning::before,
 .Toastify__toast--info::before {
 	display: none;
+}
+
+.notification-tooltip {
+	padding: 0;
+	opacity: 1;
 }

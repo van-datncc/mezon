@@ -3,7 +3,7 @@ import { useTheme } from '@mezon/mobile-ui';
 import { DirectEntity, searchMessagesActions, selectCurrentClanId, useAppDispatch } from '@mezon/store-mobile';
 import { IChannel, SIZE_PAGE_SEARCH, SearchFilter } from '@mezon/utils';
 import { RouteProp } from '@react-navigation/native';
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, memo, useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import StatusBarHeight from '../../StatusBarHeight/StatusBarHeight';
@@ -15,6 +15,7 @@ type RootStackParamList = {
 	SearchMessageChannel: {
 		typeSearch: ETypeSearch;
 		currentChannel: IChannel | DirectEntity;
+		nameChannel?: string;
 	};
 };
 
@@ -29,7 +30,7 @@ const Backspace = 'Backspace';
 export const SearchMessageChannelContext = createContext(null);
 
 const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
-	const { currentChannel, typeSearch } = route?.params || {};
+	const { currentChannel, typeSearch, nameChannel } = route?.params || {};
 	const { themeValue } = useTheme();
 	const [userMention, setUserMention] = useState<IUerMention>();
 	const [isSearchMessagePage, setSearchMessagePage] = useState<boolean>(true);
@@ -46,14 +47,12 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		setSearchText(text);
 	}, []);
 
-	const handleOptionFilter = useCallback(
-		(option) => {
-			setOptionFilter(option);
-			setUserMention(null);
-			if (option) setSearchMessagePage(false);
-		},
-		[optionFilter]
-	);
+	const handleOptionFilter = useCallback((option) => {
+		setOptionFilter(option);
+		setUserMention(null);
+		if (option) setSearchMessagePage(false);
+	}, []);
+
 	const handleSelectUserInfo = useCallback((user) => {
 		setUserMention(user);
 		setSearchMessagePage(true);
@@ -66,24 +65,19 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	const handleSearchMessage = () => {
 		const filter: SearchFilter[] = [];
 
+		filter.push({ field_name: 'channel_id', field_value: currentChannel?.id }, { field_name: 'clan_id', field_value: currentClanId as string });
+
 		if (optionFilter && userMention) {
-			filter.push(
-				{
-					field_name: optionFilter?.value,
-					field_value: optionFilter?.value === 'mention' ? `"user_id":"${userMention.id}"` : userMention?.display
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			);
-		} else {
-			filter.push(
-				{
-					field_name: 'content',
-					field_value: searchText
-				},
-				{ field_name: 'channel_id', field_value: currentChannel?.id },
-				{ field_name: 'clan_id', field_value: currentClanId as string }
-			);
+			filter.push({
+				field_name: optionFilter?.value,
+				field_value: optionFilter?.value === 'mention' ? `"user_id":"${userMention?.id}"` : userMention?.display
+			});
+		}
+		if (searchText?.trim()) {
+			filter.push({
+				field_name: 'content',
+				field_value: searchText
+			});
 		}
 		const payload = {
 			filters: filter,
@@ -91,11 +85,13 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 			size: SIZE_PAGE_SEARCH
 		};
 		setFiltersSearch(filter);
-		if (((optionFilter && userMention) || isSearchMessagePage) && !!currentChannel?.id) {
+
+		if ((searchText?.trim() || (optionFilter && userMention)) && !!currentChannel?.id) {
 			dispatch(searchMessagesActions.setCurrentPage(1));
 			dispatch(searchMessagesActions.fetchListSearchMessage(payload));
 		}
 	};
+
 	const handleKeyPress = (e) => {
 		if (e.nativeEvent.key === Backspace && !searchText?.length) {
 			setUserMention(null);
@@ -115,14 +111,15 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 					onChangeOptionFilter={handleOptionFilter}
 					userMention={userMention}
 					currentChannel={currentChannel}
+					nameChannel={nameChannel}
 				/>
 				{isSearchMessagePage ? (
 					<SearchMessagePage
-						isSearchMessagePage={isSearchMessagePage}
 						userMention={userMention}
 						currentChannel={currentChannel}
 						searchText={searchText}
 						typeSearch={typeSearch}
+						isSearchMessage={Boolean(searchText?.trim())}
 					/>
 				) : (
 					<SearchOptionPage
@@ -137,4 +134,4 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	);
 };
 
-export default SearchMessageChannel;
+export default memo(SearchMessageChannel);

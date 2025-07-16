@@ -607,20 +607,21 @@ type UpdateMessageArgs = {
 	messageId: string;
 	mode: number;
 	badge_count: number;
+	message_time?: number;
 };
 
 export const updateLastSeenMessage = createAsyncThunk(
 	'messages/updateLastSeenMessage',
-	async ({ clanId, channelId, messageId, mode, badge_count }: UpdateMessageArgs, thunkAPI) => {
+	async ({ clanId, channelId, messageId, mode, badge_count, message_time }: UpdateMessageArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, now, badge_count);
+			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, message_time ?? now, badge_count);
 			resetChannelBadgeCount(thunkAPI.dispatch, {
 				clanId,
 				channelId,
 				badgeCount: badge_count,
-				timestamp: now,
+				timestamp: message_time ?? now,
 				messageId
 			});
 		} catch (e) {
@@ -685,84 +686,72 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 	const checkEnableE2EE = checkE2EE(clanId, channelId, thunkAPI);
 
 	async function doSend() {
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
+		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 
-			const session = mezon.sessionRef.current;
-			const client = mezon.clientRef.current;
-			const socket = mezon.socketRef.current;
+		const session = mezon.sessionRef.current;
+		const client = mezon.clientRef.current;
+		const socket = mezon.socketRef.current;
 
-			if (!client || !session || !socket || !channelId) {
-				throw new Error('Client is not initialized');
-			}
-
-			let uploadedFiles: ApiMessageAttachment[] = [];
-			// Check if there are attachments
-			if (attachments && attachments.length > 0) {
-				if (isMobile) {
-					uploadedFiles = await getMobileUploadedAttachments({ attachments, channelId, clanId, client, session });
-				} else {
-					uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
-				}
-			}
-
-			if (checkEnableE2EE) {
-				const state = thunkAPI.getState() as RootState;
-				const currentDM = selectCurrentDM(state);
-				const keys = selectE2eeByUserIds(state, currentDM.user_id as string[]);
-
-				const missingKeys = keys.filter((entity) => !entity?.PK);
-				if (missingKeys.length > 0) {
-					throw new Error(
-						"Some participants haven't set up encryption yet. Please wait for them to complete setup before sending encrypted messages."
-					);
-				}
-
-				const pubKeys = await getPublicKeys(keys.filter((item) => item?.PK).map((item) => item.PK));
-				const otherUserPublicKeys: PublicKeyMaterial[] = pubKeys;
-				if (content?.t) {
-					const encryptedMessage = await MessageCrypt.encryptMessage(content.t, otherUserPublicKeys, senderId);
-					content = { ...content, t: encryptedMessage, e2ee: 1 };
-				}
-			}
-
-			const res = await socket.writeChatMessage(
-				clanId,
-				channelId,
-				mode,
-				isPublic,
-				content,
-				mentions,
-				uploadedFiles,
-				references,
-				anonymous,
-				mentionEveryone,
-				'',
-				code
-			);
-
-			return res;
-		} catch (error) {
-			console.error('Failed to send message:', error);
-			throw error;
+		if (!client || !session || !socket || !channelId) {
+			throw new Error('Client is not initialized');
 		}
+
+		let uploadedFiles: ApiMessageAttachment[] = [];
+		if (attachments && attachments.length > 0) {
+			if (isMobile) {
+				uploadedFiles = await getMobileUploadedAttachments({ attachments, channelId, clanId, client, session });
+			} else {
+				uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
+			}
+		}
+
+		if (checkEnableE2EE) {
+			const state = thunkAPI.getState() as RootState;
+			const currentDM = selectCurrentDM(state);
+			const keys = selectE2eeByUserIds(state, currentDM.user_id as string[]);
+
+			const missingKeys = keys.filter((entity) => !entity?.PK);
+			if (missingKeys.length > 0) {
+				throw new Error(
+					"Some participants haven't set up encryption yet. Please wait for them to complete setup before sending encrypted messages."
+				);
+			}
+
+			const pubKeys = await getPublicKeys(keys.filter((item) => item?.PK).map((item) => item.PK));
+			const otherUserPublicKeys: PublicKeyMaterial[] = pubKeys;
+			if (content?.t) {
+				const encryptedMessage = await MessageCrypt.encryptMessage(content.t, otherUserPublicKeys, senderId);
+				content = { ...content, t: encryptedMessage, e2ee: 1 };
+			}
+		}
+
+		const res = await socket.writeChatMessage(
+			clanId,
+			channelId,
+			mode,
+			isPublic,
+			content,
+			mentions,
+			uploadedFiles,
+			references,
+			anonymous,
+			mentionEveryone,
+			'',
+			code
+		);
+
+		return res;
 	}
 
-	async function sendWithRetry(retryCount: number, fakeMess: MessagesEntity): ReturnType<typeof doSend> {
+	async function sendWithRetry(retryCount: number): ReturnType<typeof doSend> {
 		try {
 			const res = await doSend();
 			return res;
 		} catch (error) {
 			if (retryCount > 0) {
-				const r = await sendWithRetry(retryCount - 1, fakeMess);
+				const r = await sendWithRetry(retryCount - 1);
 				return r;
 			} else {
-				thunkAPI.dispatch(
-					messagesActions.newMessage({
-						...fakeMess,
-						isSending: undefined
-					})
-				);
 				throw error;
 			}
 		}
@@ -796,23 +785,27 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 			thunkAPI.dispatch(messagesActions.addNewMessage(fakeMess));
 		}
 
-		const res = await sendWithRetry(1, fakeMess);
+		try {
+			const res = await sendWithRetry(1);
 
-		if (!isViewingOlderMessages) {
-			const timestamp = Date.now() / 1000;
-			thunkAPI.dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
+			if (!isViewingOlderMessages) {
+				const timestamp = Date.now() / 1000;
+				thunkAPI.dispatch(channelMetaActions.setChannelLastSeenTimestamp({ channelId, timestamp }));
 
-			const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
+				const mess = { ...fakeMess, id: res.message_id, create_time: res.create_time };
 
-			thunkAPI.dispatch(messagesActions.markAsSent({ id, mess }));
+				thunkAPI.dispatch(messagesActions.markAsSent({ id, mess }));
+			}
+		} catch (error) {
+			thunkAPI.dispatch(messagesActions.markAsError({ messageId: id, channelId }));
+			captureSentryError(error, 'messages/sendMessage');
+			throw error;
 		}
 	}
 
 	try {
 		await fakeItUntilYouMakeIt();
 	} catch (error) {
-		thunkAPI.dispatch(messagesActions.markAsError({ messageId: id, channelId }));
-		captureSentryError(error, 'messages/sendMessage');
 		return thunkAPI.rejectWithValue('Error sending message');
 	}
 });
@@ -851,6 +844,11 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			uploadedFiles = await getWebUploadedAttachments({ attachments, channelId, clanId, client, session });
 		}
 
+		let avatarToUse = avatar;
+		if (avatarToUse?.endsWith('croppedWEBP')) {
+			avatarToUse = undefined;
+		}
+
 		await socket.writeEphemeralMessage(
 			receiverId,
 			clanId,
@@ -863,7 +861,7 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			references,
 			false,
 			false,
-			undefined,
+			avatarToUse || undefined,
 			TypeMessage.Ephemeral
 		);
 

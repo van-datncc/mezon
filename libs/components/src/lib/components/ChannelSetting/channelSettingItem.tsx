@@ -161,7 +161,7 @@ const ChannelSettingItemButton = ({
 	};
 	return (
 		<button
-			className={`text-theme-primary text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-2 bg-item-theme-hover ${selectedButton === tabName ? 'bg-item-theme' : ''}`}
+			className={`text-theme-primary text-[16px] font-medium rounded-[5px] text-left ml-[-8px] p-2 mt-2 bg-item-theme-hover ${selectedButton === tabName ? 'bg-item-theme text-theme-primary-active' : ''}`}
 			onClick={handleOnClickTabChannelSetting}
 		>
 			{tabName}

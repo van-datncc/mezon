@@ -1,4 +1,4 @@
-import { VideoTrack } from '@livekit/react-native';
+import { useTracks, VideoTrack } from '@livekit/react-native';
 import { Icons } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsPiPMode, selectMemberClanByUserName, useAppSelector } from '@mezon/store-mobile';
@@ -62,7 +62,7 @@ const ParticipantItem = ({ participant, tracks, setFocusedScreenShare, isGridLay
 					)}
 					{!isPiPMode && (
 						<View style={[styles.focusIcon, styles.focusIconAbsolute]}>
-							<Icons.ArrowSaltIcon height={size.s_14} />
+							<Icons.ArrowSaltIcon height={size.s_14} color={themeValue.white} />
 						</View>
 					)}
 				</TouchableOpacity>
@@ -137,7 +137,8 @@ const ParticipantItem = ({ participant, tracks, setFocusedScreenShare, isGridLay
 	);
 };
 
-const ParticipantScreen = ({ sortedParticipants, tracks, setFocusedScreenShare }) => {
+const ParticipantScreen = ({ sortedParticipants, setFocusedScreenShare }) => {
+	const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare, Track.Source.ScreenShareAudio]);
 	const isPiPMode = useAppSelector((state) => selectIsPiPMode(state));
 	const videoTrackCount = sortedParticipants.reduce((count, participant) => {
 		if (participant.isScreenShareEnabled) count += 1;

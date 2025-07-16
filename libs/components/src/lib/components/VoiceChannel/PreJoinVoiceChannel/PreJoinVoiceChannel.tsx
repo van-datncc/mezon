@@ -15,8 +15,8 @@ export const PreJoinVoiceChannel: React.FC<PreJoinVoiceChannelProps> = ({ channe
 
 	return (
 		<div
-			className={`w-full h-full bg-gray-300 dark:bg-black flex justify-center items-center 
-				${isCurrentChannel ? 'hidden' : ''} 
+			className={`w-full h-full bg-gray-300 dark:bg-black flex justify-center items-center
+				${isCurrentChannel ? 'hidden' : ''}
 				${statusMenu ? 'max-sbm:hidden' : ''}`}
 		>
 			<div className="flex flex-col justify-center items-center gap-4 w-full text-white">

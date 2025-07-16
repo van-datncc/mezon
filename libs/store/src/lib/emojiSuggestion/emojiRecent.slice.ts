@@ -69,8 +69,8 @@ export const fetchEmojiRecent = createAsyncThunk('emoji/fetchEmojiRecent', async
 		}
 		thunkAPI.dispatch(
 			emojiRecentActions.setLastEmojiRecent({
-				emoji_recents_id: response.emoji_recents[0].emoji_recents_id,
-				emoji_id: response.emoji_recents[0].emoji_id
+				emoji_recents_id: response.emoji_recents[0]?.emoji_recents_id,
+				emoji_id: response.emoji_recents[0]?.emoji_id
 			})
 		);
 		return {

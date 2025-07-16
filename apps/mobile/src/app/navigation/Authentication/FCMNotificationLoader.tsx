@@ -12,7 +12,7 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 import NotificationPreferences from '../../utils/NotificationPreferences';
 import { checkNotificationPermission, processNotification, setupCallKeep } from '../../utils/pushNotificationHelpers';
 
-export const FCMNotificationLoader = () => {
+export const FCMNotificationLoader = ({ notifyInit }: { notifyInit: any }) => {
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
 	const { onchannelmessage } = useContext(ChatContext);
@@ -77,46 +77,20 @@ export const FCMNotificationLoader = () => {
 
 	const setupNotificationListeners = async (navigation, isTabletLandscape = false) => {
 		try {
-			messaging()
-				.getInitialNotification()
-				.then(async (remoteMessage) => {
-					if (remoteMessage?.data && Platform.OS === 'ios') {
-						mapMessageNotificationToSlice([remoteMessage?.data]);
-					}
-					notifee
-						.getInitialNotification()
-						.then(async (resp) => {
-							if (resp) {
-								const store = await getStoreAsync();
-								save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-								store.dispatch(appActions.setIsFromFCMMobile(true));
-								if (resp) {
-									await processNotification({
-										notification: { ...resp?.notification, data: resp?.notification?.data },
-										navigation,
-										time: 1,
-										isTabletLandscape
-									});
-								}
-							}
-						})
-						.catch((err) => {
-							console.error('*** err getInitialNotification', err);
-						});
-					if (remoteMessage) {
-						const store = await getStoreAsync();
-						save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
-						store.dispatch(appActions.setIsFromFCMMobile(true));
-						if (remoteMessage?.notification?.title) {
-							await processNotification({
-								notification: { ...remoteMessage?.notification, data: remoteMessage?.data },
-								navigation,
-								time: 1,
-								isTabletLandscape
-							});
-						}
-					}
+			if (notifyInit) {
+				if (notifyInit?.data && Platform.OS === 'ios') {
+					mapMessageNotificationToSlice([notifyInit?.data]);
+				}
+				const store = await getStoreAsync();
+				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, true);
+				store.dispatch(appActions.setIsFromFCMMobile(true));
+				await processNotification({
+					notification: notifyInit,
+					navigation,
+					time: 1,
+					isTabletLandscape
 				});
+			}
 
 			messaging().onNotificationOpenedApp(async (remoteMessage) => {
 				if (remoteMessage?.data && Platform.OS === 'ios') {
@@ -167,10 +141,22 @@ export const FCMNotificationLoader = () => {
 			await setupCallKeep();
 		}
 	};
+	const deleteAllChannelGroupsNotifee = async () => {
+		try {
+			const channelGroups = await notifee.getChannelGroups(); // Fetch all channel groups
+			for (const group of channelGroups) {
+				await notifee.deleteChannel(group.id);
+				await notifee.deleteChannelGroup(group.id);
+			}
+		} catch (error) {
+			console.error('Error deleting channel groups:', error);
+		}
+	};
 
 	const onNotificationOpenedApp = async () => {
 		try {
 			if (Platform.OS === 'android') {
+				await deleteAllChannelGroupsNotifee();
 				const notificationDataPushed = await NotificationPreferences.getValue('notificationDataPushed');
 				const notificationDataPushedParse = safeJSONParse(notificationDataPushed || '[]');
 				mapMessageNotificationToSlice(notificationDataPushedParse ? notificationDataPushedParse.slice(0, 30) : []);
@@ -183,8 +169,11 @@ export const FCMNotificationLoader = () => {
 				mapMessageNotificationToSlice(notificationDataPushedParse ? notificationDataPushedParse.slice(0, 30) : []);
 			}
 			await notifee.cancelAllNotifications();
+			await notifee.cancelDisplayedNotifications();
 		} catch (error) {
+			await deleteAllChannelGroupsNotifee();
 			await notifee.cancelAllNotifications();
+			await notifee.cancelDisplayedNotifications();
 			console.error('Error processing notifications:', error);
 		}
 	};

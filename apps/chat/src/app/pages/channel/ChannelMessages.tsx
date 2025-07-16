@@ -620,7 +620,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			isUnread,
 			onScrollDownToggle,
 			onNotchToggle,
-			isReady.current,
+			isReady,
 			(event: { direction: LoadMoreDirection }) => {
 				onChange(event.direction);
 			}

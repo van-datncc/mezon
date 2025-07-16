@@ -5,6 +5,7 @@ import { accountActions, selectAnonymousMode, selectChannelById, selectCurrentCh
 import { ChannelStatusEnum, TypeMessage, sleep } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -22,6 +23,7 @@ const HomeDefaultHeader = React.memo(
 		const isTabletLandscape = useTabletLandscape();
 		const { themeValue } = useTheme();
 		const styles = style(themeValue, isTabletLandscape);
+		const { t } = useTranslation('message');
 		const currentChannel = useSelector(selectCurrentChannel);
 		const parent = useAppSelector((state) => selectChannelById(state, currentChannel?.parent_id || ''));
 		const anonymousMode = useSelector(selectAnonymousMode);
@@ -33,7 +35,7 @@ const HomeDefaultHeader = React.memo(
 		const headerOptions: IOption[] = [
 			{
 				title: 'anonymous',
-				content: anonymousMode ? 'Turn off Anonymous' : 'Turn on Anonymous',
+				content: anonymousMode ? t('turnOffAnonymous') : t('turnOnAnonymous'),
 				value: OptionChannelHeader.Anonymous,
 				icon: <MezonIconCDN icon={IconCDN.anonymous} color={themeValue.text} height={size.s_18} width={size.s_18} />
 			},
@@ -86,7 +88,8 @@ const HomeDefaultHeader = React.memo(
 				screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 				params: {
 					typeSearch: ETypeSearch.SearchChannel,
-					currentChannel
+					currentChannel,
+					nameChannel: currentChannel?.channel_label
 				}
 			});
 		};

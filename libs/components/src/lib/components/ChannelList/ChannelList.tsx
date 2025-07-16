@@ -439,29 +439,26 @@ export default ChannelListMem;
 const ChannelListSkeleton = memo(() => {
 	return (
 		<div className="px-2 py-1 space-y-3">
-			<div className="h-[136px] dark:bg-skeleton-dark bg-skeleton-white rounded-md animate-pulse" />
+			<div className="h-[136px] dark:bg-skeleton-dark bg-skeleton-white rounded-md" />
 
 			<div className="space-y-2 p-2">
-				<div className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded w-20 animate-pulse" />
+				<div className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded w-20" />
 			</div>
 
 			{Array.from({ length: 3 }).map((_, categoryIndex) => (
 				<div key={`category-${categoryIndex}`} className="space-y-2">
 					<div className="flex items-center justify-between px-2">
 						<div className="flex items-center space-x-2">
-							<div className="w-3 h-3 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse" />
-							<div className="h-3 dark:bg-skeleton-dark bg-skeleton-white rounded w-24 animate-pulse" />
+							<div className="w-3 h-3 dark:bg-skeleton-dark bg-skeleton-white rounded" />
+							<div className="h-3 dark:bg-skeleton-dark bg-skeleton-white rounded w-24" />
 						</div>
 					</div>
 
 					{Array.from({ length: 4 }).map((_, channelIndex) => (
 						<div key={`channel-${categoryIndex}-${channelIndex}`} className="flex items-center space-x-3 px-6 py-1">
-							<div className="w-4 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse" />
-							<div
-								className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse"
-								style={{ width: `${60 + Math.random() * 40}%` }}
-							/>
-							<div className="w-5 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse" />
+							<div className="w-4 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded" />
+							<div className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded" style={{ width: `${60 + Math.random() * 40}%` }} />
+							<div className="w-5 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded" />
 						</div>
 					))}
 				</div>
@@ -469,11 +466,8 @@ const ChannelListSkeleton = memo(() => {
 
 			{Array.from({ length: 2 }).map((_, index) => (
 				<div key={`single-channel-${index}`} className="flex items-center space-x-3 px-2 py-1">
-					<div className="w-4 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse" />
-					<div
-						className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded animate-pulse"
-						style={{ width: `${50 + Math.random() * 30}%` }}
-					/>
+					<div className="w-4 h-4 dark:bg-skeleton-dark bg-skeleton-white rounded" />
+					<div className="h-4 dark:bg-skeleton-dark bg-skeleton-white rounded" style={{ width: `${50 + Math.random() * 30}%` }} />
 				</div>
 			))}
 		</div>

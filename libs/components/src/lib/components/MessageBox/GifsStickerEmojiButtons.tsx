@@ -20,7 +20,6 @@ const GifStickerEmojiButtons = memo(
 		const { setSubPanelActive, subPanelActive } = useGifsStickersEmoji();
 		const { setShowCategories, setClickedTrendingGif, setButtonArrowBack } = useGifs();
 		const { setValueInputSearch } = useGifsStickersEmoji();
-
 		const handleOpenGifs = useCallback(
 			(e: React.MouseEvent<HTMLDivElement>) => {
 				e.stopPropagation();
@@ -82,32 +81,37 @@ const GifStickerEmojiButtons = memo(
 		const cursorPointer = isTopic || hasPermissionEdit;
 
 		return (
-			<div className="flex flex-row absolute h-11 items-center gap-2 top-0 right-0 z-20">
+			<div className="flex flex-row absolute h-11 items-center gap-2 top-0 right-3 z-20">
 				{!isTopic && (
 					<div {...voiceLongPress} className={`w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-						<Icons.MicEnable className={`w-5 h-5 ${isRecording ? 'text-red-600' : 'text-theme-primary text-theme-primary-hover'}`} />
+						<Icons.MicEnable className={`w-5 h-5 ${isRecording ? 'text-red-600' : 'text-theme-primary text-theme-primary-hover'} `} />
 					</div>
 				)}
 
 				<div
 					onClick={handleOpenGifs}
-					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`block text-theme-primary-hover
+						} max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Gif defaultSize="w-5 h-5" />
+					<Icons.Gif className={`w-5 h-5 ${subPanelActive === SubPanelName.GIFS ? 'text-theme-primary-active' : 'text-theme-primary'}`} />
 				</div>
 
 				<div
 					onClick={handleOpenStickers}
-					className={`block text-theme-primary text-theme-primary-hover max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`block text-theme-primary-hover  max-sm:hidden w-5 h-5 ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Sticker defaultSize="w-5 h-5" />
+					<Icons.Sticker
+						className={`w-5 h-5 ${subPanelActive === SubPanelName.STICKERS ? 'text-theme-primary-active' : 'text-theme-primary'}`}
+					/>
 				</div>
 
 				<div
 					onClick={handleOpenEmoji}
-					className={`w-5 h-5 text-theme-primary text-theme-primary-hover ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+					className={`w-5 h-5 text-theme-primary-hover  ${cursorPointer ? 'cursor-pointer' : 'cursor-not-allowed'}`}
 				>
-					<Icons.Smile defaultSize="w-5 h-5" />
+					<Icons.Smile
+						className={`w-5 h-5 ${subPanelActive === SubPanelName.EMOJI ? 'text-theme-primary-active' : 'text-theme-primary'}`}
+					/>
 				</div>
 			</div>
 		);

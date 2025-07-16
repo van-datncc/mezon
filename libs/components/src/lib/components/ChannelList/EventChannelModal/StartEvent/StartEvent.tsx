@@ -1,7 +1,6 @@
-import { useEscapeKeyClose, useEventManagementQuantity } from '@mezon/core';
+import { useEventManagementQuantity } from '@mezon/core';
 import { selectCurrentClanId, selectEventsByClanId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { RefObject } from 'react';
 import { useSelector } from 'react-redux';
 import ListEventManagement from './ListEventManagement';
 
@@ -9,7 +8,6 @@ type StartEventModalProps = {
 	onClose: () => void;
 	onOpenCreate: () => void;
 	onEventUpdateId: (eventId: string) => void;
-	rootRef: RefObject<HTMLElement>;
 };
 
 export const StartEventModal = (props: StartEventModalProps) => {
@@ -17,7 +15,6 @@ export const StartEventModal = (props: StartEventModalProps) => {
 	const { numberEventManagement } = useEventManagementQuantity();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const allEventManagement = useAppSelector((state) => selectEventsByClanId(state, currentClanId as string));
-	useEscapeKeyClose(props.rootRef, onClose);
 
 	return (
 		<>
@@ -32,7 +29,7 @@ export const StartEventModal = (props: StartEventModalProps) => {
 						</h4>
 					</div>
 					<div className="w-[0.1px] h-4 bg-gray-400"></div>
-					<div className="bg-primary px-2 py-1 rounded-md text-white font-medium cursor-pointer" onClick={onOpenCreate}>
+					<div className="btn-primary btn-primary-hover  px-2 py-1 rounded-lg text-white font-medium cursor-pointer" onClick={onOpenCreate}>
 						Create Event
 					</div>
 				</div>

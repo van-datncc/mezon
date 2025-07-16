@@ -9,7 +9,6 @@ import {
 	rolesClanActions,
 	selectAllUserChannel,
 	selectAllUserClans,
-	selectEveryoneRole,
 	selectRolesByChannelId,
 	useAppDispatch
 } from '@mezon/store-mobile';
@@ -36,7 +35,6 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation('channelSetting');
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
-	const everyoneRole = useSelector(selectEveryoneRole);
 	const allClanMembers = useSelector(selectAllUserClans);
 	const [isChannelPublic, setIsChannelPublic] = useState<boolean>(isPublicChannel(channel));
 
@@ -63,8 +61,8 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 		if (channel?.channel_private) {
 			return listOfChannelRole?.filter((role) => typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1);
 		}
-		return [everyoneRole];
-	}, [listOfChannelRole, channel?.channel_private, everyoneRole]);
+		return [];
+	}, [listOfChannelRole, channel?.channel_private]);
 
 	const combineWhoCanAccessList = useMemo(() => {
 		return [
@@ -162,7 +160,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 						padding: size.s_14,
 						alignItems: 'center',
 						borderRadius: size.s_14,
-						backgroundColor: themeValue.primary,
+						backgroundColor: themeValue.secondary,
 						marginBottom: size.s_16
 					}}
 				>
@@ -185,7 +183,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 								padding: size.s_14,
 								alignItems: 'center',
 								borderRadius: size.s_14,
-								backgroundColor: themeValue.primary,
+								backgroundColor: themeValue.secondary,
 								marginVertical: size.s_16
 							}}
 						>
@@ -201,7 +199,7 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 
 			<View style={{ gap: size.s_10, marginBottom: size.s_10, flex: 1 }}>
 				<Text color={themeValue.textDisabled}>{t('channelPermission.whoCanAccess')}</Text>
-				<View style={{ backgroundColor: themeValue.primary, borderRadius: size.s_14, flex: 1 }}>
+				<View style={{ backgroundColor: themeValue.secondary, borderRadius: size.s_14, flex: 1 }}>
 					<FlashList
 						data={combineWhoCanAccessList}
 						keyboardShouldPersistTaps={'handled'}

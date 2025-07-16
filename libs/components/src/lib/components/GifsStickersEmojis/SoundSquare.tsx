@@ -171,8 +171,8 @@ function SoundSquare({ channel, mode, onClose, isTopic = false, onSoundSelect }:
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="outline-none flex h-full w-full md:w-[500px] max-sm:ml-1 pt-3">
-			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem] rounded md:ml-2">
-				<div className="w-16 flex flex-col gap-y-2 bg-item-theme pt-3 px-1.5 md:items-start pb-3 rounded-l-lg items-center min-h-[25rem] shadow-sm">
+			<div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-[25rem]  md:ml-2">
+				<div className="w-16 flex flex-col gap-y-2 bg-theme-setting-nav pt-3 px-1.5 md:items-start pb-3  items-center min-h-[25rem] shadow-sm rounded-l-lg">
 					{categoryLogo.map((cat) => (
 						<button
 							title={cat.type}
@@ -199,7 +199,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false, onSoundSelect }:
 					))}
 				</div>
 			</div>
-			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar bg-item-theme" ref={containerRef}>
+			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar bg-item-theme rounded-r-lg" ref={containerRef}>
 				{valueInputToCheckHandleSearch ? (
 					<SoundPanel soundList={searchedSounds} onClickSendSound={onClickSendSound} />
 				) : (
@@ -246,9 +246,9 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 			<div className="mb-3">
 				<button
 					onClick={handleToggleButton}
-					className="w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem]  max-h-full"
+					className=" w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem]  bg-theme-setting-nav max-h-full"
 				>
-					<p className="uppercase font-semibold text-xs tracking-wider">
+					<p className="uppercase font-semibold text-xs tracking-wider text-theme-primary-active">
 						{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}
 					</p>
 					<span className={`transition-transform duration-200 ${isShowSoundList ? 'rotate-90' : ''}`}>
@@ -283,7 +283,7 @@ export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, o
 						<div className="flex items-center justify-between mb-3">
 							<p
 								title={sound.filename}
-								className="font-medium truncate w-full text-center  text-ellipsis whitespace-nowrap overflow-hidden max-w-20 px-2 rounded py-1 bg-item-hover transition-colors cursor-pointer"
+								className="font-medium truncate w-full text-center  text-ellipsis whitespace-nowrap overflow-hidden max-w-20 px-2 rounded py-1 bg-item-hover transition-colors cursor-pointer text-theme-primary-active"
 							>
 								{sound.filename}
 							</p>
@@ -292,7 +292,7 @@ export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, o
 						<button
 							onClick={() => onClickSendSound(sound)}
 							title="Send sound"
-							className="flex items-center gap-2 px-4 py-1.5 bg-button-primary text-white rounded-full hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 mt-2"
+							className="flex items-center gap-2 px-4 py-1.5 btn-primary btn-primary-hover rounded-full  transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 mt-2"
 						>
 							<Icons.ArrowRight defaultFill="white" className="w-4 h-4" />
 						</button>

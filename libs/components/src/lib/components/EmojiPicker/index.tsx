@@ -505,7 +505,7 @@ const EmojiHover = React.memo(function EmojiHover({ emojiHoverShortCode, isReact
 	const appearanceTheme = useSelector(selectTheme);
 	return (
 		<div className={`w-full max-h-12 flex-1 bg-item-theme flex flex-row items-center pl-1 gap-x-1 justify-start py-1`}>
-			{emojiId ? <img draggable="false" className="max-w-10 max-h-full" src={getSrcEmoji(emojiId)} /> : <Icons.AddIcon />}
+			{emojiId ? <img draggable="false" className="max-w-10 max-h-full" src={getSrcEmoji(emojiId)} /> : null}
 			{emojiHoverShortCode}
 		</div>
 	);

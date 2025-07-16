@@ -29,9 +29,9 @@ export const OnlineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[1
 	);
 };
 
-export const OfflineStatus: React.FC<IconProps> = ({ defaultSize = 'w-[11px] h-[10px]' }) => {
+export const OfflineStatus: React.FC<IconProps> = ({ className = 'w-[11px] h-[10px]' }) => {
 	return (
-		<svg viewBox="-0.5 -0.5 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
+		<svg viewBox="-0.5 -0.5 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className}>
 			<rect x="1.5" y="1.5" width="9" height="9" rx="4.5" stroke="#AEAEAE" strokeWidth="3" />
 		</svg>
 	);
@@ -1140,21 +1140,27 @@ export const CanvasIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => 
 
 export const TopicIcon: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5' }) => {
 	return (
-		<svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`${defaultSize}`}>
+		<svg
+			width="24"
+			height="24"
+			fill="currentColor"
+			stroke="currentColor"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			className={`${defaultSize}`}
+		>
 			<g id="SVGRepo_iconCarrier">
 				<path
-					fillRule="evenodd"
-					clipRule="evenodd"
 					d="M5.5 12C5.49988 14.613 6.95512 17.0085 9.2741 18.2127C11.5931 19.4169 14.3897 19.2292 16.527 17.726L19.5 18V12C19.5 8.13401 16.366 5 12.5 5C8.63401 5 5.5 8.13401 5.5 12Z"
-					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
+					fill="none"
 				/>
 				<path
 					d="M9.5 13.25C9.08579 13.25 8.75 13.5858 8.75 14C8.75 14.4142 9.08579 14.75 9.5 14.75V13.25ZM13.5 14.75C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25V14.75ZM9.5 10.25C9.08579 10.25 8.75 10.5858 8.75 11C8.75 11.4142 9.08579 11.75 9.5 11.75V10.25ZM15.5 11.75C15.9142 11.75 16.25 11.4142 16.25 11C16.25 10.5858 15.9142 10.25 15.5 10.25V11.75ZM9.5 14.75H13.5V13.25H9.5V14.75ZM9.5 11.75H15.5V10.25H9.5V11.75Z"
-					stroke="currentColor"
 					strokeWidth="1.5"
+					fill="currentColor"
 				/>
 			</g>
 		</svg>
@@ -1364,12 +1370,12 @@ export const ThreeDot: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', default
 	);
 };
 
-export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
+export const Inbox: React.FC<IconProps & { className?: string }> = ({ defaultSize = 'size-5', className = '' }) => {
 	return (
 		<svg
 			x="0"
 			y="0"
-			className={defaultSize}
+			className={`${defaultSize} ${className}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -1382,7 +1388,7 @@ export const Inbox: React.FC<IconProps> = ({ defaultSize = 'size-5' }) => {
 				fillRule="evenodd"
 				d="M5 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H5ZM4 5.5C4 4.67 4.67 4 5.5 4h13c.83 0 1.5.67 1.5 1.5v6c0 .83-.67 1.5-1.5 1.5h-2.65c-.5 0-.85.5-.85 1a3 3 0 1 1-6 0c0-.5-.35-1-.85-1H5.5A1.5 1.5 0 0 1 4 11.5v-6Z"
 				clipRule="evenodd"
-			></path>
+			/>
 		</svg>
 	);
 };
@@ -1436,7 +1442,7 @@ export const Emoji: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSiz
 	);
 };
 
-export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
+export function Speaker({ defaultFill, defaultSize = 'w-5 h-5', className }: IconProps) {
 	return (
 		<svg
 			width="18"
@@ -1444,7 +1450,7 @@ export function Speaker({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			viewBox="0 0 18 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={`${defaultSize} ${defaultFill ? defaultFill : ''}`}
+			className={`${defaultSize} ${defaultFill ? defaultFill : ''} ${className}`}
 		>
 			<g id="Live area" clipPath="url(#clip0_2155_1604)">
 				<g id="Vector">
@@ -1561,7 +1567,7 @@ export function AddCircle(props: React.HTMLAttributes<SVGElement>) {
 	);
 }
 
-export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false }) => {
+export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = false, className = '' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1570,7 +1576,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className}`}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1667,7 +1673,7 @@ export const Gif: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', isWhite = fa
 	);
 };
 
-export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
+export const Sticker: React.FC<IconProps> = ({ className = '', defaultFill = '#AEAEAE' }) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -1676,7 +1682,7 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 			width="24"
 			height="24"
 			preserveAspectRatio="xMidYMid meet"
-			className="text-theme-primary text-theme-primary-hover"
+			className={`text-theme-primary text-theme-primary-hover ${className} `}
 			style={{ width: '100%', height: '100%', transform: 'translate3d(0px, 0px, 0px)', contentVisibility: 'visible' }}
 		>
 			<defs>
@@ -1848,10 +1854,10 @@ export const Sticker: React.FC<IconProps> = ({ defaultFill = '#AEAEAE' }) => {
 	);
 };
 
-export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5' }) => {
+export const Smile: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-5 h-5', className = '' }) => {
 	return (
 		<svg
-			className={`${defaultSize} text-theme-primary text-theme-primary-hover`}
+			className={`${defaultSize} text-theme-primary text-theme-primary-hover ${className}`}
 			aria-hidden="true"
 			role="img"
 			xmlns="http://www.w3.org/2000/svg"
@@ -2042,7 +2048,7 @@ export function Plus(props: React.HTMLAttributes<SVGElement>) {
 
 export const Close: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultSize = 'w-4 h-4' }) => {
 	return (
-		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={` text-theme-primary text-theme-primary-hover ${defaultSize}`}>
+		<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={`  ${defaultSize}`}>
 			<g id="Live area">
 				<path
 					fill="currentColor"
@@ -2466,6 +2472,7 @@ export const EscIcon: React.FC<IconProps> = ({ defaultFill = '#AEAEAE', defaultS
 			<circle cx="12" cy="12" r="10" fill="transparent"></circle>
 			<path
 				fill={defaultFill}
+				stroke="currentColor"
 				fillRule="evenodd"
 				d="M12 23a11 11 0 1 0 0-22 11 11 0 0 0 0 22Zm4.7-15.7a1 1 0 0 0-1.4 0L12 10.58l-3.3-3.3a1 1 0 0 0-1.4 1.42L10.58 12l-3.3 3.3a1 1 0 1 0 1.42 1.4L12 13.42l3.3 3.3a1 1 0 0 0 1.4-1.42L13.42 12l3.3-3.3a1 1 0 0 0 0-1.4Z"
 			></path>
@@ -2729,7 +2736,7 @@ export function CreateCategoryIcon(props: React.HTMLAttributes<SVGElement>) {
 			height="18"
 			fill="none"
 			viewBox="0 0 24 24"
-			className=" group-hover:text-white"
+			className="text-theme-primary-hover"
 		>
 			<path
 				fill="currentColor"
@@ -5525,7 +5532,7 @@ export function Chat({ defaultFill, defaultSize = 'w-5 h-5' }: IconProps) {
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
-			fill="none"
+			fill="currentColor"
 			viewBox="0 0 24 24"
 			className={` ${defaultSize} ${defaultFill ? defaultFill : 'dark:hover:text-white hover:text-black dark:text-channelTextLabel text-colorTextLightMode'}`}
 		>
@@ -6648,14 +6655,14 @@ export const FileIcon: React.FC<IconProps> = ({ isWhite, defaultSize = 'w-5 h-5'
 			className={defaultSize}
 			data-testid="geist-icon"
 			height="16"
-			stroke-linejoin="round"
+			strokeLinejoin="round"
 			style={{ color: 'currentColor' }}
 			viewBox="0 0 16 16"
 			width="16"
 		>
 			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
+				fillRule="evenodd"
+				clipRule="evenodd"
 				d="M10.8591 1.70735C10.3257 1.70735 9.81417 1.91925 9.437 2.29643L3.19455 8.53886C2.56246 9.17095 2.20735 10.0282 2.20735 10.9222C2.20735 11.8161 2.56246 12.6734 3.19455 13.3055C3.82665 13.9376 4.68395 14.2927 5.57786 14.2927C6.47178 14.2927 7.32908 13.9376 7.96117 13.3055L14.2036 7.06304L14.7038 6.56287L15.7041 7.56321L15.204 8.06337L8.96151 14.3058C8.06411 15.2032 6.84698 15.7074 5.57786 15.7074C4.30875 15.7074 3.09162 15.2032 2.19422 14.3058C1.29682 13.4084 0.792664 12.1913 0.792664 10.9222C0.792664 9.65305 1.29682 8.43592 2.19422 7.53852L8.43666 1.29609C9.07914 0.653606 9.95054 0.292664 10.8591 0.292664C11.7678 0.292664 12.6392 0.653606 13.2816 1.29609C13.9241 1.93857 14.2851 2.80997 14.2851 3.71857C14.2851 4.62718 13.9241 5.49858 13.2816 6.14106L13.2814 6.14133L7.0324 12.3835C7.03231 12.3836 7.03222 12.3837 7.03213 12.3838C6.64459 12.7712 6.11905 12.9888 5.57107 12.9888C5.02297 12.9888 4.49731 12.7711 4.10974 12.3835C3.72217 11.9959 3.50444 11.4703 3.50444 10.9222C3.50444 10.3741 3.72217 9.8484 4.10974 9.46084L4.11004 9.46054L9.877 3.70039L10.3775 3.20051L11.3772 4.20144L10.8767 4.70131L5.11008 10.4612C5.11005 10.4612 5.11003 10.4612 5.11 10.4613C4.98779 10.5835 4.91913 10.7493 4.91913 10.9222C4.91913 11.0951 4.98782 11.2609 5.11008 11.3832C5.23234 11.5054 5.39817 11.5741 5.57107 11.5741C5.74398 11.5741 5.9098 11.5054 6.03206 11.3832L6.03233 11.3829L12.2813 5.14072C12.2814 5.14063 12.2815 5.14054 12.2816 5.14045C12.6586 4.7633 12.8704 4.25185 12.8704 3.71857C12.8704 3.18516 12.6585 2.6736 12.2813 2.29643C11.9041 1.91925 11.3926 1.70735 10.8591 1.70735Z"
 				fill="currentColor"
 			></path>
@@ -7029,7 +7036,7 @@ export function VoiceArowDownIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function VoiceGridIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
 				fill="currentColor"
 				d="M15 11a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5ZM2 20c0 1.1.9 2 2 2h5a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5ZM13 20c0 1.1.9 2 2 2h5a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-5a2 2 0 0 0-2 2v5ZM2 9c0 1.1.9 2 2 2h5a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5Z"
@@ -7040,7 +7047,7 @@ export function VoiceGridIcon(props: React.HTMLAttributes<SVGElement>) {
 
 export function VoiceFocusIcon(props: React.HTMLAttributes<SVGElement>) {
 	return (
-		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" {...props}>
+		<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" {...props}>
 			<path
 				fill="currentColor"
 				d="M2 4c0-1.1.9-2 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4ZM2 15c0-1.1.9-2 2-2h5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5ZM15 13a2 2 0 0 0-2 2v5c0 1.1.9 2 2 2h5a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-5Z"

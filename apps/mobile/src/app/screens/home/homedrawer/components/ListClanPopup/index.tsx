@@ -1,22 +1,11 @@
 import { ActionEmitEvent, PlusAltIcon, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import {
-	clansActions,
-	ClansEntity,
-	directActions,
-	getStoreAsync,
-	RootState,
-	selectCurrentStreamInfo,
-	selectOrderedClans,
-	useAppDispatch,
-	videoStreamActions
-} from '@mezon/store-mobile';
+import { clansActions, ClansEntity, directActions, getStoreAsync, selectOrderedClans, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import { NestableDraggableFlatList, RenderItemParams } from 'react-native-draggable-flatlist';
-import { useSelector, useStore } from 'react-redux';
-import { useWebRTCStream } from '../../../../../components/StreamContext/StreamContext';
+import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { ClanIcon } from '../ClanIcon';
@@ -30,8 +19,6 @@ export const ListClanPopup = React.memo(() => {
 	const navigation = useNavigation();
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
-	const store = useStore();
-	const { disconnect } = useWebRTCStream();
 	const clans = useSelector(selectOrderedClans);
 	useEffect(() => {
 		return () => {
@@ -45,16 +32,6 @@ export const ListClanPopup = React.memo(() => {
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, []);
-
-	const handleLeaveChannel = useCallback(async () => {
-		const currentStreamInfo = selectCurrentStreamInfo(store.getState() as RootState);
-		if (currentStreamInfo) {
-			dispatch(videoStreamActions.stopStream());
-			disconnect();
-			// const idStreamByMe = streamChannelMember?.find((member) => member?.user_id === userProfile?.user?.id)?.id;
-			// dispatch(usersStreamActions.remove(idStreamByMe));
-		}
-	}, [disconnect, dispatch, store]);
 
 	const handleDragEnd = useCallback(
 		({ data }) => {
@@ -80,7 +57,6 @@ export const ListClanPopup = React.memo(() => {
 				promises.push(store.dispatch(clansActions.changeCurrentClan({ clanId: clanId })));
 				await Promise.all(promises);
 			});
-			handleLeaveChannel();
 		},
 		[isTabletLandscape, navigation]
 	);
@@ -92,10 +68,11 @@ export const ListClanPopup = React.memo(() => {
 	return (
 		<View style={styles.clansBox}>
 			<NestableDraggableFlatList
-				initialNumToRender={5}
-				maxToRenderPerBatch={5}
-				windowSize={5}
+				initialNumToRender={10}
+				maxToRenderPerBatch={10}
+				windowSize={10}
 				scrollEnabled={true}
+				removeClippedSubviews={true}
 				data={clans?.map?.((clan) => ({ ...clan, key: clan?.id })) || []}
 				keyExtractor={(clan, index) => `${clan?.clan_id}_${index}_clan_item`}
 				onDragEnd={handleDragEnd}

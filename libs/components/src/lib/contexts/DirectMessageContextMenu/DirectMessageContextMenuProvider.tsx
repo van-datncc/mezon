@@ -144,7 +144,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		<DirectMessageContextMenuContext.Provider value={contextValue}>
 			{children}
 
-			<Menu id={contextMenuId} style={menuStyles} animation={false}>
+			<Menu id={contextMenuId} style={menuStyles} className="z-50 rounded-lg border-theme-primary" animation={false}>
 				{currentHandlers && (
 					<>
 						{isDm && <MemberMenuItem label="Profile" onClick={currentHandlers.handleViewProfile} setWarningStatus={setWarningStatus} />}
@@ -189,7 +189,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 							/>
 						)}
 
-						{channelId && (
+						{/* {channelId && (
 							<MemberMenuItem
 								label={getChannelE2ee ? 'Disable E2EE' : 'Enable E2EE'}
 								onClick={currentHandlers.handleEnableE2EE}
@@ -206,7 +206,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								}
 								setWarningStatus={setWarningStatus}
 							/>
-						)}
+						)} */}
 
 						{contextMenuId !== DMCT_GROUP_CHAT_ID &&
 							channelId &&

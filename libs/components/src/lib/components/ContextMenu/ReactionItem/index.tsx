@@ -43,7 +43,7 @@ const ReactionItem: React.FC<IReactionItem> = ({ emojiShortCode, emojiId, messag
 			onClick={handleClickEmoji}
 			className={
 				isOption
-					? 'h-full p-1 cursor-pointer rounded-sm transform hover:scale-110 transition-transform duration-100'
+					? 'h-full p-1 shadow-sm cursor-pointer  rounded-lg  transform hover:scale-110 transition-transform duration-100'
 					: `${isAddReactionPanel ? 'w-5' : 'w-10 h-10 rounded-full flex justify-center items-center  '} cursor-pointer`
 			}
 		>

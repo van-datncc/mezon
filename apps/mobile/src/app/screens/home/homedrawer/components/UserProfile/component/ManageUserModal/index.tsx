@@ -4,7 +4,6 @@ import { Colors, Text, baseColor, size, useTheme, verticalScale } from '@mezon/m
 import {
 	ChannelMembersEntity,
 	selectAllRolesClan,
-	selectCurrentChannelId,
 	selectCurrentClan,
 	selectUserMaxPermissionLevel,
 	useAppDispatch,
@@ -41,7 +40,6 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 	const { t } = useTranslation('message');
 	const maxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
 	const dispatch = useAppDispatch();
-	const currentChannelId = useSelector(selectCurrentChannelId);
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
 	const activeRoleOfUser = useMemo(() => {
@@ -81,7 +79,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 			dispatch(
 				usersClanActions.addRoleIdUser({
 					id: roleId,
-					channelId: currentChannelId,
+					clanId: currentClan?.clan_id,
 					userId: user?.user?.id
 				})
 			);
@@ -97,7 +95,7 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 			dispatch(
 				usersClanActions.removeRoleIdUser({
 					id: roleId,
-					channelId: currentChannelId,
+					clanId: currentClan?.clan_id,
 					userId: user?.user?.id
 				})
 			);

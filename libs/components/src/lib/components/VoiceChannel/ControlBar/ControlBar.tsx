@@ -1,14 +1,7 @@
-import {
-	ControlBarControls,
-	useLocalParticipant,
-	useLocalParticipantPermissions,
-	usePersistentUserChoices,
-	useTracks
-} from '@livekit/components-react';
+import { useLocalParticipant, useLocalParticipantPermissions, usePersistentUserChoices, useTracks } from '@livekit/components-react';
 import {
 	selectGroupCallJoined,
 	selectShowCamera,
-	selectShowMicrophone,
 	selectShowScreen,
 	selectShowSelectScreenModal,
 	selectStreamScreen,
@@ -25,7 +18,7 @@ import { EmojiSuggestionProvider } from '@mezon/core';
 import isElectron from 'is-electron';
 import { LocalTrackPublication, RoomEvent, ScreenSharePresets, Track, VideoPresets } from 'livekit-client';
 import Tooltip from 'rc-tooltip';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { usePopup } from '../../DraggablePopup/usePopup';
@@ -41,29 +34,26 @@ import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
 interface ControlBarProps extends React.HTMLAttributes<HTMLDivElement> {
 	onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
-	variation?: 'minimal' | 'verbose' | 'textOnly';
-	controls?: ControlBarControls;
 	saveUserChoices?: boolean;
 	onLeaveRoom: () => void;
 	onFullScreen: () => void;
 	isExternalCalling?: boolean;
 	currentChannel?: ReactionChannelInfo;
 	isShowMember?: boolean;
+	isGridView?: boolean;
 }
 
-export function ControlBar({
-	variation,
-	controls,
+const ControlBar = ({
 	saveUserChoices = true,
 	onDeviceError,
 	onLeaveRoom,
 	onFullScreen,
 	isExternalCalling,
 	currentChannel,
-	isShowMember = true
-}: ControlBarProps) {
+	isShowMember = true,
+	isGridView = true
+}: ControlBarProps) => {
 	const dispatch = useAppDispatch();
-	const isTooLittleSpace = useMediaQuery('max-width: 760px');
 	const audioScreenTrackRef = useRef<LocalTrackPublication | null>(null);
 
 	const { hasCameraAccess, hasMicrophoneAccess } = useMediaPermissions();
@@ -74,14 +64,11 @@ export function ControlBar({
 
 	const screenTrackRef = useRef<LocalTrackPublication | null>(null);
 	const isDesktop = isElectron();
-	const defaultVariation = isTooLittleSpace ? 'minimal' : 'verbose';
-	variation ??= defaultVariation;
 	const stream = useSelector(selectStreamScreen);
-	const visibleControls = { leave: true, ...controls };
+	const visibleControls = { leave: true } as any;
 
 	const showScreen = useSelector(selectShowScreen);
 	const showCamera = useSelector(selectShowCamera);
-	const showMicrophone = useSelector(selectShowMicrophone);
 
 	const isFullScreen = useSelector(selectVoiceFullScreen);
 	const isShowSelectScreenModal = useSelector(selectShowSelectScreenModal);
@@ -163,6 +150,9 @@ export function ControlBar({
 
 	useEffect(() => {
 		if (!showScreen && isDesktop) {
+			if (screenTrackRef.current?.track) {
+				localParticipant.localParticipant.unpublishTrack(screenTrackRef.current.track);
+			}
 			dispatch(voiceActions.setStreamScreen(null));
 		}
 	}, [dispatch, showScreen]);
@@ -253,7 +243,6 @@ export function ControlBar({
 			if (!showScreen) {
 				dispatch(voiceActions.setShowSelectScreenModal(true));
 			} else {
-				console.log(false);
 				dispatch(voiceActions.setShowScreen(false));
 			}
 		}
@@ -345,7 +334,7 @@ export function ControlBar({
 	);
 
 	return (
-		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-sbm:!hidden max-md:flex-col">
+		<div className="lk-control-bar !flex !justify-between !border-none !bg-transparent max-md:flex-col">
 			<div className="flex justify-start gap-4 max-md:hidden">
 				{!isGroupCall && (
 					<>
@@ -369,7 +358,11 @@ export function ControlBar({
 						>
 							<div>
 								<Icons.VoiceEmojiControlIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer  ${
+										(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'
+									}`}
 								/>
 							</div>
 						</Tooltip>
@@ -392,19 +385,22 @@ export function ControlBar({
 						>
 							<div>
 								<Icons.VoiceSoundControlIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer  ${
+										(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'
+									}`}
 								/>
 							</div>
 						</Tooltip>
 					</>
 				)}
 			</div>
-			<div className="flex justify-center gap-3 flex-1">
+			<div className="flex justify-center gap-3 flex-1 max-md:scale-75">
 				{visibleControls.microphone && (
 					<div className="relative rounded-full bg-gray-300 dark:bg-black">
 						<TrackToggle
-							key={+showMicrophone}
-							initialState={showMicrophone}
+							id="btn-meet-micro"
 							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Microphone}
 							onChange={microphoneOnChange}
@@ -421,7 +417,7 @@ export function ControlBar({
 				{visibleControls.camera && (
 					<div className="relative rounded-full ">
 						<TrackToggle
-							key={+showCamera}
+							id="btn-meet-camera"
 							initialState={showCamera}
 							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'}`}
 							source={Track.Source.Camera}
@@ -481,13 +477,21 @@ export function ControlBar({
 						{isOpenPopOut ? (
 							<span>
 								<Icons.VoicePopOutIcon
-									className={`cursor-pointer rotate-180 ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`cursor-pointer rotate-180  ${
+										(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'
+									}`}
 								/>
 							</span>
 						) : (
 							<span>
 								<Icons.VoicePopOutIcon
-									className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+									className={`  ${
+										(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+											? 'text-theme-primary text-theme-primary-hover'
+											: 'text-gray-300 hover:text-white'
+									} cursor-pointer `}
 								/>
 							</span>
 						)}
@@ -498,13 +502,21 @@ export function ControlBar({
 					{isFullScreen ? (
 						<span>
 							<Icons.ExitFullScreen
-								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								className={`  ${
+									(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'
+								}  cursor-pointer `}
 							/>
 						</span>
 					) : (
 						<span>
 							<Icons.FullScreen
-								className={`cursor-pointer ${isShowMember ? 'hover:text-black dark:hover:text-white text-[#535353] dark:text-[#B5BAC1]' : 'text-white hover:text-gray-200'}`}
+								className={`cursor-pointer ${
+									(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
+										? 'text-theme-primary text-theme-primary-hover'
+										: 'text-gray-300 hover:text-white'
+								}`}
 							/>
 						</span>
 					)}
@@ -512,48 +524,9 @@ export function ControlBar({
 			</div>
 		</div>
 	);
-}
+};
 
-function useMediaQuery(query: string): boolean {
-	const getMatches = (query: string): boolean => {
-		// Prevents SSR issues
-		if (typeof window !== 'undefined') {
-			return window.matchMedia(query).matches;
-		}
-		return false;
-	};
-
-	const [matches, setMatches] = useState<boolean>(getMatches(query));
-
-	function handleChange() {
-		setMatches(getMatches(query));
-	}
-
-	useEffect(() => {
-		const matchMedia = window.matchMedia(query);
-
-		// Triggered at the first client-side load and if query changes
-		handleChange();
-
-		// Listen matchMedia
-		if (matchMedia.addListener) {
-			matchMedia.addListener(handleChange);
-		} else {
-			matchMedia.addEventListener('change', handleChange);
-		}
-
-		return () => {
-			if (matchMedia.removeListener) {
-				matchMedia.removeListener(handleChange);
-			} else {
-				matchMedia.removeEventListener('change', handleChange);
-			}
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [query]);
-
-	return matches;
-}
+export default memo(ControlBar);
 
 const supportsScreenSharing = () => {
 	return typeof navigator !== 'undefined' && navigator.mediaDevices && !!navigator.mediaDevices.getDisplayMedia;

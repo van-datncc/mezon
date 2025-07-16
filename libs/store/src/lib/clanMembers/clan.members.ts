@@ -118,20 +118,13 @@ export const UsersClanSlice = createSlice({
 	name: USERS_CLANS_FEATURE_KEY,
 	initialState: initialUsersClanState,
 	reducers: {
-		setAll: (state, action: PayloadAction<{ clanId: string; users: UsersClanEntity[] }>) => {
-			const { clanId, users } = action.payload;
-			if (!state.byClans[clanId]) {
-				state.byClans[clanId] = getInitialClanState();
-			}
-
-			UsersClanAdapter.setAll(state.byClans[clanId].entities, users);
-		},
 		add: (state, action: PayloadAction<{ clanId: string; user: UsersClanEntity }>) => {
 			const { clanId, user } = action.payload;
 
 			if (!state.byClans[clanId]) {
 				state.byClans[clanId] = getInitialClanState();
 			}
+
 			UsersClanAdapter.addOne(state.byClans[clanId].entities, user);
 		},
 		upsertMany: (state, action: PayloadAction<{ clanId: string; users: UsersClanEntity[] }>) => {
@@ -141,12 +134,7 @@ export const UsersClanSlice = createSlice({
 			}
 			UsersClanAdapter.upsertMany(state.byClans[clanId].entities, users);
 		},
-		updateMany: (state, action: PayloadAction<{ clanId: string; updates: Update<UsersClanEntity, string>[] }>) => {
-			const { clanId, updates } = action.payload;
-			if (state.byClans[clanId]) {
-				UsersClanAdapter.updateMany(state.byClans[clanId].entities, updates);
-			}
-		},
+
 		remove: (state, action: PayloadAction<{ clanId: string; userId: string }>) => {
 			const { clanId, userId } = action.payload;
 			if (state.byClans[clanId]) {
@@ -348,6 +336,7 @@ export const selectMembersClanCount = createSelector(
 const getName = (user: UsersClanEntity) =>
 	user.clan_nick?.toLowerCase() || user.user?.display_name?.toLowerCase() || user.user?.username?.toLowerCase() || '';
 
+// CHECK
 export const selectClanMemberWithStatusIds = createSelector(
 	selectAllUserClans,
 	selectClanMembersMetaEntities,
@@ -364,7 +353,7 @@ export const selectClanMemberWithStatusIds = createSelector(
 			...item,
 			user: {
 				...item.user,
-				online: !!metas[item.id]?.online,
+				online: metas[item.id]?.status !== EUserStatus.INVISIBLE && !!metas[item.id]?.online,
 				is_mobile: !!metas[item.id]?.isMobile
 			}
 		})) as UsersClanEntity[];

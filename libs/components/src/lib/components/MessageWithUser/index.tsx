@@ -91,8 +91,6 @@ function MessageWithUser({
 	const checkAnonymousOnReplied = message?.references && message?.references[0]?.message_sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 	const showMessageHead = !(message?.references?.length === 0 && isCombine && !isShowFull);
 
-	console.log('render', message?.id);
-
 	const checkReplied = userId && message?.references && message?.references[0]?.message_sender_id === userId;
 
 	const hasIncludeMention = (() => {
@@ -195,9 +193,11 @@ function MessageWithUser({
 						{ 'bg-highlight': isHighlight },
 						{ '!bg-[#eab30833]': checkMessageTargetToMoved },
 						{
-							' !bg-[#F3F0FF] border-l-4 border-l-[#5865F2] dark:border-l-[#5865F2] opacity-80': isEphemeralMessage
+							' bg-item-theme border-l-4  border-[#A78BFA] ': isEphemeralMessage
 						},
-						{ 'bg-item-msg-selected': isSelected }
+						{ 'bg-item-msg-selected': isSelected },
+						{ 'pointer-events-none': message.isSending },
+						{ 'is-error pointer-events-none': message.isError }
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
@@ -285,7 +285,7 @@ function MessageWithUser({
 									isEphemeral={isEphemeralMessage}
 								/>
 								{isEphemeralMessage && (
-									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic">
+									<div className="flex items-center gap-1 mt-1 mb-1 text-xs italic text-theme-primary opacity-60">
 										<Icons.EyeClose className="w-3 h-3" />
 										<span>Only visible to recipient</span>
 									</div>
@@ -386,7 +386,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 		}
 		hoverTimeout.current = setTimeout(() => {
 			setIsHover(true);
-		}, 100);
+		}, 200);
 	};
 
 	const handleMouseLeave = () => {
@@ -416,7 +416,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			{isHover && (
 				<>
 					{!showMessageHead && create_time && (
-						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[10px]">{convertTimeHour(create_time)}</span>
+						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[11px]">{convertTimeHour(create_time)}</span>
 					)}
 					{popup?.()}
 				</>

@@ -123,23 +123,12 @@ type SetChannelPinMessagesPayload = {
 	message?: IMessageWithUser;
 };
 
-export const clearPinMessagesCacheThunk = createAsyncThunk('pinmessage/clearCache', async (channelId: string, thunkAPI) => {
-	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		// Clear the cache from store instead of memoized function
-		thunkAPI.dispatch(pinMessageActions.clearChannelCache(channelId));
-	} catch (error) {
-		captureSentryError(error, 'pinmessage/clearCache');
-		return thunkAPI.rejectWithValue(error);
-	}
-});
-
 export const setChannelPinMessage = createAsyncThunk(
 	'pinmessage/setChannelPinMessage',
 	async ({ clan_id, channel_id, message_id, message }: SetChannelPinMessagesPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const body = {
+			const body: ApiPinMessageRequest = {
 				clan_id: clan_id,
 				channel_id: channel_id,
 				message_id: message_id
@@ -166,7 +155,12 @@ export const deleteChannelPinMessage = createAsyncThunk(
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
 			}
-			thunkAPI.dispatch(pinMessageActions.remove(message_id));
+			thunkAPI.dispatch(
+				pinMessageActions.removePinMessage({
+					channelId: channel_id,
+					pinId: message_id
+				})
+			);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/deleteChannelPinMessage');
@@ -175,37 +169,46 @@ export const deleteChannelPinMessage = createAsyncThunk(
 	}
 );
 
-type UpdatePinMessage = {
+export type UpdatePinMessage = {
 	clanId: string;
 	channelId: string;
 	messageId: string;
 	isPublic: boolean;
 	mode: number;
+	avatar: string;
+	senderId: string;
+	senderUsername: string;
+	content: string;
+	attachment: string;
+	createdTime: string;
 };
 
 export const joinPinMessage = createAsyncThunk(
 	'messages/joinPinMessage',
-	async ({ clanId, channelId, messageId, isPublic, mode }: UpdatePinMessage, thunkAPI) => {
+	async (
+		{ clanId, channelId, messageId, isPublic, mode, senderId, senderUsername, avatar, createdTime, content, attachment }: UpdatePinMessage,
+		thunkAPI
+	) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, mode, isPublic, messageId, now, 1);
+			await mezon.socketRef.current?.writeLastPinMessage(
+				clanId,
+				channelId,
+				mode,
+				isPublic,
+				messageId,
+				now,
+				1,
+				avatar,
+				senderId,
+				senderUsername,
+				content,
+				attachment,
+				createdTime
+			);
 		} catch (error) {
 			captureSentryError(error, 'pinmessage/joinPinMessage');
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
-
-export const updateLastPin = createAsyncThunk(
-	'messages/updateLastPinMessage',
-	async ({ clanId, channelId, messageId, isPublic }: UpdatePinMessage, thunkAPI) => {
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const now = Math.floor(Date.now() / 1000);
-			await mezon.socketRef.current?.writeLastPinMessage(clanId, channelId, 0, isPublic, messageId, now, 0);
-		} catch (error) {
-			captureSentryError(error, 'pinmessage/updateLastPinMessage');
 			return thunkAPI.rejectWithValue(error);
 		}
 	}
@@ -234,6 +237,23 @@ export const pinMessageSlice = createSlice({
 			if (state.byChannels[channelId]) {
 				delete state.byChannels[channelId];
 			}
+		},
+		addPinMessage: (state: PinMessageState, action: PayloadAction<{ channelId: string; pinMessage: PinMessageEntity }>) => {
+			const { channelId, pinMessage } = action.payload;
+			if (!state.byChannels[channelId]) {
+				return;
+			}
+
+			state.byChannels[channelId].pinMessages?.push(pinMessage);
+		},
+		removePinMessage: (state: PinMessageState, action: PayloadAction<{ channelId: string; pinId: string }>) => {
+			const { channelId, pinId } = action.payload;
+			if (!state.byChannels[channelId]) {
+				return;
+			}
+			const pinList = state.byChannels[channelId].pinMessages?.filter((pin) => pin.id !== pinId);
+			state.byChannels[channelId].pinMessages = pinList;
+			state.byChannels[channelId].cache = createCacheMetadata(CHANNEL_PIN_MESSAGES_CACHED_TIME);
 		}
 	},
 	extraReducers: (builder) => {
@@ -294,9 +314,7 @@ export const pinMessageActions = {
 	fetchChannelPinMessages,
 	setChannelPinMessage,
 	deleteChannelPinMessage,
-	updateLastPin,
-	joinPinMessage,
-	clearPinMessagesCacheThunk
+	joinPinMessage
 };
 
 /*

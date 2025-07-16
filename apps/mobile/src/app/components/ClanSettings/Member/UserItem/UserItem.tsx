@@ -7,6 +7,7 @@ import { Pressable, Text, View } from 'react-native';
 import MezonIconCDN from '../../../../../../src/app/componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../src/app/constants/icon_cdn';
 import MezonAvatar from '../../../../componentUI/MezonAvatar';
+import ImageNative from '../../../ImageNative';
 import { style } from './styles';
 
 interface IUserItem {
@@ -45,18 +46,20 @@ export function UserItem({ userID, onMemberSelect }: IUserItem) {
 				<MezonAvatar avatarUrl={user?.user?.avatar_url || ''} username={user?.user?.username} />
 				<View style={[styles.rightContent]}>
 					<View style={styles.content}>
-						<Text style={styles.displayName}>{user?.user?.display_name || ''}</Text>
+						<Text style={styles.displayName}>{user?.clan_nick || user?.user?.display_name || ''}</Text>
 						<Text style={styles.username}>{user?.user?.username || ''}</Text>
 
-						<View style={styles.roleWrapper}>
-							{clanUserRole?.length > 0 &&
-								clanUserRole.map((role, index) => (
+						{clanUserRole?.length > 0 && (
+							<View style={styles.roleWrapper}>
+								{clanUserRole.map((role, index) => (
 									<View key={'role_' + role.title + index.toString()} style={styles.roleContainer}>
-										<View style={styles.roleCircle}></View>
+										<View style={[styles.roleCircle, role?.color && { backgroundColor: role?.color }]}></View>
+										{role?.role_icon && <ImageNative url={role?.role_icon} style={styles.roleIcon} />}
 										<Text style={styles.roleTitle}>{role.title}</Text>
 									</View>
 								))}
-						</View>
+							</View>
+						)}
 					</View>
 					<View style={styles.icon}>
 						<MezonIconCDN icon={IconCDN.chevronSmallRightIcon} color={themeValue.text} height={20} width={20} />

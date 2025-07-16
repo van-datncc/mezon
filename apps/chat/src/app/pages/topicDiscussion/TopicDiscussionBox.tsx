@@ -133,7 +133,7 @@ const TopicDiscussionBox = () => {
 						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
 					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
 				>
-					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll `}>
+					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
 								<Fragment key={index}>

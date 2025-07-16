@@ -5,7 +5,7 @@ import { ApiUserActivity } from 'mezon-js/api.gen';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-
+import { UserStatusIcon } from '../MemberProfile/MemberProfile';
 type AvatarProfileProps = {
 	avatar?: string;
 	username?: string;
@@ -54,22 +54,25 @@ const AvatarProfile = ({
 	const activityStatus = customStatus || activityNames[activityByUserId?.activity_type as number];
 
 	return (
-		<div className=" text-black flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
+		<div className=" text-theme-primary flex flex-1 flex-row gap-[6px] mt-[-50px] px-[16px]">
 			<div className="relative h-fit">
 				<AvatarImage
 					alt={username || ''}
 					username={username}
-					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px]  border-theme-primary object-cover my-0 ${styleAvatar}`}
+					className={`w-[90px] h-[90px] min-w-[90px] min-h-[90px] xl:w-[90px] xl:h-[90px] rounded-[50px] border-[6px] border-color-avatar object-cover my-0 ${styleAvatar}`}
 					srcImgProxy={createImgproxyUrl(avatar ?? '', { width: 300, height: 300, resizeType: 'fit' })}
 					src={avatar}
 					isAnonymous={isAnonymous}
 					classNameText="!text-5xl"
 				/>
+				<div className="absolute bottom-1 right-2">
+					<UserStatusIcon status={statusOnline} />
+				</div>
 			</div>
 
 			{(customStatus || (userStatus?.status && activityByUserId)) && (
 				<div className="flex flex-col gap-[12px] mt-[30px] relative w-full h-[85px]">
-					<div className="bg-theme-primary w-[12px] h-[12px] rounded-full shadow-md"></div>
+					<div className="bg-theme-surface w-[12px] h-[12px] rounded-full shadow-md"></div>
 					<div className="relative flex-1">
 						<div className=" w-[20px] h-[20px] rounded-full absolute top-[-11px] left-[16px] shadow-md"></div>
 						<div className="absolute w-fit max-w-full shadow-lg rounded-[12px] group">
@@ -78,16 +81,16 @@ const AvatarProfile = ({
 									{activityStatus}
 								</span>
 								{isFooterProfile && (
-									<div className="absolute -top-4 right-1 hidden group-hover:flex gap-[1px] dark:text-[#d1d4d6] text-[#303236] rounded-full bg-white dark:bg-bgPrimary border dark:border-[#1e1e1e] p-[2px] shadow-md">
+									<div className="absolute -top-4 right-1 hidden group-hover:flex gap-[1px] text-theme-primary rounded-full bg-theme-surface border-theme-primary p-[2px] shadow-md">
 										<div
 											onClick={handleCustomStatus}
-											className="pl-2 pr-1 py-1 w-fit hover:bg-bgLightModeButton dark:hover:bg-[#25272a] rounded-l-full cursor-pointer"
+											className="pl-2 pr-1 py-1 w-fit bg-item-hover rounded-l-full cursor-pointer"
 										>
 											<Icons.EditMessageRightClick defaultSize="w-4 h-4" />
 										</div>
 										<div
 											onClick={handleClearCustomStatus}
-											className="pl-1 pr-2 py-1 w-fit hover:bg-bgLightModeButton dark:hover:bg-[#25272a] rounded-r-full text-red-600 cursor-pointer"
+											className="pl-1 pr-2 py-1 w-fit bg-item-hover rounded-r-full text-red-600 cursor-pointer"
 										>
 											<Icons.DeleteMessageRightClick defaultSize="w-4 h-4" />
 										</div>

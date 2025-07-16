@@ -45,7 +45,7 @@ export const MemberItem = memo((props: IMemberItemProps) => {
 	const onDeleteMember = useCallback(async () => {
 		const response = await updateRole(role?.clan_id, role?.id, role?.title, role?.color || '', [], [], [member?.id], []);
 
-		if (response === true) {
+		if (response) {
 			Toast.show({
 				type: 'success',
 				props: {

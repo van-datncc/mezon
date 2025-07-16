@@ -16,6 +16,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectCurrentTopicId,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
@@ -77,6 +78,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -147,8 +149,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup
 	});
 
-	const [isCanManageThread, isCanManageChannel, canSendMessage] = usePermissionChecker(
-		[EOverriddenPermission.manageThread, EPermission.manageChannel, EOverriddenPermission.sendMessage],
+	const [isClanOwner, isCanManageThread, isCanManageChannel, canSendMessage] = usePermissionChecker(
+		[EPermission.clanOwner, EOverriddenPermission.manageThread, EPermission.manageChannel, EOverriddenPermission.sendMessage],
 		currentChannelId ?? ''
 	);
 	const [isAllowDelMessage] = usePermissionChecker([EOverriddenPermission.deleteMessage], message?.channel_id ?? '');
@@ -301,15 +303,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	};
 
 	const downloadAndSaveMedia = async (media) => {
-		const url = media.url;
+		const url = media?.url;
 		const filetype = media?.filetype;
 
-		const type = filetype.split('/');
+		const type = filetype?.split?.('/');
 		try {
-			const filePath = await downloadImage(url, type[1]);
+			const filePath = await downloadImage(url, type?.[1]);
 
 			if (filePath) {
-				await saveImageToCameraRoll('file://' + filePath, type[0]);
+				await saveImageToCameraRoll('file://' + filePath, type?.[0], true);
 			}
 		} catch (error) {
 			console.error(`Error downloading or saving media from URL: ${url}`, error);
@@ -317,14 +319,19 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	};
 
 	const handleActionSaveImage = async () => {
-		const media = message?.attachments?.length > 0 ? message?.attachments : message?.content?.embed?.map((item) => item?.image);
-		dispatch(appActions.setLoadingMainMobile(true));
-		if (media && media.length > 0) {
-			const promises = media?.map(downloadAndSaveMedia);
-			await Promise.all(promises);
+		try {
+			const media = message?.attachments?.length > 0 ? message?.attachments : message?.content?.embed?.map((item) => item?.image);
+			dispatch(appActions.setLoadingMainMobile(true));
+			if (media && media.length > 0) {
+				const promises = media?.map(downloadAndSaveMedia);
+				await Promise.all(promises);
+			}
+		} catch (error) {
+			console.error('Error saving image:', error);
+		} finally {
+			dispatch(appActions.setLoadingMainMobile(false));
+			onClose();
 		}
-		dispatch(appActions.setLoadingMainMobile(false));
-		onClose();
 	};
 
 	const handleActionReportMessage = () => {
@@ -480,7 +487,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		const isMyMessage = userId === message?.user?.id;
 		const isMessageError = message?.isError;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
-		const isHideCreateThread = isDM || !isCanManageThread || !isCanManageChannel || currentChannel?.parent_id !== '0';
+		const isHideCreateThread = isDM || ((!isCanManageThread || !isCanManageChannel) && !isClanOwner) || currentChannel?.parent_id !== '0';
 		const isHideThread = currentChannel?.parent_id !== '0';
 		const isHideDeleteMessage = !((isAllowDelMessage && !isDM) || isMyMessage);
 		const isHideTopicDiscussion =
@@ -551,6 +558,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		isCanManageThread,
 		isCanManageChannel,
 		currentChannel?.parent_id,
+		isClanOwner,
 		isAllowDelMessage,
 		canSendMessage,
 		currentChannelId,
@@ -581,7 +589,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				senderId: senderId ?? '',
 				countToRemove: 1,
 				actionDelete: false,
-				topicId: message.topic_id || ''
+				topicId: currentTopicId || ''
 			} as IReactionMessageProps);
 
 			onClose();

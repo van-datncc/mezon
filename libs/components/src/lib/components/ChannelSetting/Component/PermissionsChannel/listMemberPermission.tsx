@@ -1,12 +1,5 @@
-import { useCheckOwnerForUser } from '@mezon/core';
-import {
-	channelUsersActions,
-	removeChannelUsersPayload,
-	selectAllAccount,
-	selectAllUserChannel,
-	selectCurrentClanId,
-	useAppDispatch
-} from '@mezon/store';
+import { useAppNavigation, useAuth, useCustomNavigate } from '@mezon/core';
+import { channelUsersActions, removeChannelUsersPayload, selectAllUserChannel, selectCurrentClanId, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { IChannel, createImgproxyUrl, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
 import { useMemo } from 'react';
@@ -21,19 +14,21 @@ type ListMemberPermissionProps = {
 const ListMemberPermission = (props: ListMemberPermissionProps) => {
 	const { channel } = props;
 	const dispatch = useAppDispatch();
-	const userProfile = useSelector(selectAllAccount);
 	const rawMembers = useSelector(selectAllUserChannel(channel.channel_id || ''));
 	const currentClanId = useSelector(selectCurrentClanId);
-
+	const navigate = useCustomNavigate();
+	const userProfile = useAuth();
+	const { toMembersPage } = useAppNavigation();
 	const deleteMember = async (userId: string) => {
-		if (userId !== userProfile?.user?.id) {
-			const body: removeChannelUsersPayload = {
-				channelId: channel.id,
-				userId: userId,
-				channelType: channel.type,
-				clanId: currentClanId as string
-			};
-			await dispatch(channelUsersActions.removeChannelUsers(body));
+		const body: removeChannelUsersPayload = {
+			channelId: channel.id,
+			userId: userId,
+			channelType: channel.type,
+			clanId: currentClanId as string
+		};
+		await dispatch(channelUsersActions.removeChannelUsers(body));
+		if (currentClanId && userId === userProfile.userId) {
+			navigate(toMembersPage(currentClanId));
 		}
 	};
 
@@ -56,6 +51,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 			clanAvatar={user.clanAvatar}
 			avatar={user.avatar_url}
 			onDelete={() => deleteMember(user.id as string)}
+			channelOwner={channel.creator_id === user.id}
 		/>
 	));
 };
@@ -70,23 +66,22 @@ type ItemMemberPermissionProps = {
 	clanName?: string;
 	clanAvatar?: string;
 	onDelete: () => void;
+	channelOwner?: boolean;
 };
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
-	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', onDelete } = props;
-	const [checkClanOwner] = useCheckOwnerForUser();
-	const isClanOwner = checkClanOwner(id);
+	const { id = '', username = '', displayName = '', clanName = '', clanAvatar = '', avatar = '', onDelete, channelOwner } = props;
 	const namePrioritize = getNameForPrioritize(clanName, displayName, username);
 	const avatarPrioritize = getAvatarForPrioritize(clanAvatar, avatar);
 
 	const handleDelete = () => {
-		if (!isClanOwner) {
+		if (!channelOwner) {
 			onDelete();
 		}
 	};
 
 	return (
-		<div className={`flex justify-between py-2 rounded`} key={id}>
+		<div className={`flex justify-between py-2 rounded text-theme-primary`} key={id}>
 			<div className="flex gap-x-2 items-center">
 				<AvatarImage
 					alt={username}
@@ -96,16 +91,13 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 					src={avatarPrioritize}
 					classNameText="text-[9px] pt-[3px]"
 				/>
-				<p className="text-sm font-semibold">{namePrioritize}</p>
-				<p className="text-contentTertiary font-light">{username}</p>
+				<p className="text-sm font-semibold text-theme-primary-active">{namePrioritize}</p>
+				<p className=" font-light">{username}</p>
 			</div>
 			<div className="flex items-center gap-x-2">
-				<p className="text-xs text-[#AEAEAE]">{isClanOwner && 'Clan Owner'}</p>
-				<div onClick={handleDelete} role="button">
-					<Icons.EscIcon
-						defaultSize={`${isClanOwner ? 'cursor-not-allowed' : 'cursor-pointer'} size-[15px]`}
-						defaultFill={isClanOwner ? '#4C4D55' : '#AEAEAE'}
-					/>
+				<p className="text-xs ">{channelOwner && 'Channel Owner'}</p>
+				<div onClick={handleDelete} role="button" className={`${channelOwner ? 'cursor-not-allowed' : 'cursor-pointer hover:text-red-500'}`}>
+					<Icons.EscIcon defaultSize={` size-[15px]`} defaultFill={channelOwner ? 'text-theme-primary-active' : ''} />
 				</div>
 			</div>
 		</div>

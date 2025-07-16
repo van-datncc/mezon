@@ -224,7 +224,7 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 					{hasClanPermission && (
 						<Tooltip
 							overlay={
-								<div className="rounded p-1  max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
+								<div className="rounded-lg p-1 bg-theme-contexify border-theme-primary  max-h-52 overflow-y-auto overflow-x-hidden scrollbar-hide">
 									<div className="flex flex-col gap-1 max-w-72">
 										{<ListOptionRole userId={userId} rolesClanEntity={rolesClanEntity} userRolesClan={userRolesClan} />}
 									</div>
@@ -287,21 +287,27 @@ const ListOptionRole = ({
 	for (const key in rolesClanEntity) {
 		if (key !== EVERYONE_ROLE_ID && (isClanOwner || Number(maxPermissionLevel) > Number(rolesClanEntity[key]?.max_level_permission || -1))) {
 			roleElements.push(
-				<div className="flex gap-2 items-center h-6 justify-between px-2" key={key}>
+				<div
+					className="flex gap-2 items-center h-6 justify-between px-2 rounded-lg bg-item-hover cursor-pointer"
+					key={key}
+					onClick={() => handleAddRoleMemberList(rolesClanEntity[key])}
+				>
 					<div
 						className="text-transparent size-3 rounded-full"
 						style={{ backgroundColor: rolesClanEntity[key].color || DEFAULT_ROLE_COLOR }}
 					/>
-					<span className="text-xs font-medium px-1 truncate flex-1" style={{ lineHeight: '15px' }}>
+					<span className="text-xs font-medium px-1 truncate flex-1 text-theme-primary" style={{ lineHeight: '15px' }}>
 						{rolesClanEntity[key].title}
 					</span>
 					<div className="relative flex flex-row justify-center">
 						<input
 							checked={!!userRolesClan.usersRole[key]}
 							type="checkbox"
-							className={`peer appearance-none forced-colors:appearance-auto relative w-4 h-4 border dark:border-textPrimary border-gray-600 rounded-md focus:outline-none`}
+							className={`peer appearance-none cursor-pointer forced-colors:appearance-auto relative w-4 h-4 border-theme-primary rounded-md focus:outline-none`}
 							onChange={() => handleAddRoleMemberList(rolesClanEntity[key])}
 							key={key}
+							// Prevent click event propagation to parent to avoid double triggering
+							onClick={(e) => e.stopPropagation()}
 						/>
 						<Icons.Check className="absolute invisible peer-checked:visible forced-colors:hidden w-4 h-4 pointer-events-none" />
 					</div>

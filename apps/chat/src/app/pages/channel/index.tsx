@@ -247,13 +247,6 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 		setIsShowAgeRestricted(false);
 	};
 	const isShowCreateThread = useSelector((state) => selectIsShowCreateThread(state, currentChannel?.id));
-	const setIsShowCreateThread = useCallback(
-		(isShowCreateThread: boolean) => {
-			dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannel?.id, isShowCreateThread }));
-			dispatch(topicsActions.setIsShowCreateTopic(false));
-		},
-		[currentChannel?.id, dispatch]
-	);
 
 	const appChannel = useAppSelector((state) => selectAppChannelById(state, channelId as string));
 
