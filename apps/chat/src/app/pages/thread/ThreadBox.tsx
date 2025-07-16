@@ -181,6 +181,24 @@ const ThreadBox = () => {
 		},
 		[createThread, currentClanId, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
 	);
+	const handleSendWithLimitCheck = useCallback(
+		async (
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>,
+			value?: ThreadValue
+		): Promise<boolean> => {
+			if (content?.t && content.t.length > 4000) {
+				toast.error('Message exceeds the 4000-character limit');
+				return false;
+			}
+			await handleSend(content, mentions, attachments, references, value);
+			return true;
+		},
+		[handleSend]
+	);
+
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -286,7 +304,13 @@ const ThreadBox = () => {
 						mentionRaw: []
 					};
 					const checkedRequest = request ? request : emptyRequest;
+					if (checkedRequest.content.length > 4000) {
+						toast.error('Message exceeds the 4000-character limit');
+						event.preventDefault();
+						return;
+					}
 					const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
+
 					const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 					const { adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 					const payload = {
@@ -296,6 +320,7 @@ const ThreadBox = () => {
 						mk
 					};
 					event.preventDefault();
+
 					await handleSend(filterEmptyArrays(payload), request?.mentionRaw || [], attachmentData, valueThread?.references, {
 						nameValueThread: nameValueThread ?? valueThread?.content.t,
 						isPrivate
@@ -384,7 +409,7 @@ const ThreadBox = () => {
 					<MentionReactInput
 						currentChannelId={currentInputChannelId}
 						handlePaste={onPastedFiles}
-						onSend={handleSend}
+						onSend={handleSendWithLimitCheck}
 						onTyping={handleTypingDebounced}
 						listMentions={UserMentionList({
 							channelID: currentChannel?.channel_id as string,
