@@ -129,9 +129,7 @@ const TopicDiscussionBox = () => {
 			)}
 			{checkAttachment && (
 				<div
-					className={`${
-						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] dark:border-[#42444B] border-borderLightTabs' : ''
-					} dark:bg-channelTextarea bg-channelTextareaLight max-h-full`}
+					className={`${checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''} bg-theme-setting-primary max-h-full`}
 				>
 					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
@@ -155,7 +153,7 @@ const TopicDiscussionBox = () => {
 				</div>
 			)}
 			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 bg-theme-chat   h-auto relative">
+				<div className="flex-shrink-0 flex flex-col pb-4 px-3 bg-theme-chat  h-auto relative">
 					<MentionReactInput
 						handlePaste={onPastedFiles}
 						onSend={handleSend}
