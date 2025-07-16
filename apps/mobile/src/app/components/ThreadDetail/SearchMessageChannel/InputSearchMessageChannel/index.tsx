@@ -32,6 +32,7 @@ type InputSearchMessageChannelProps = {
 	optionFilter: IOption;
 	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
 	nameChannel?: string;
+	isClearSearch?: boolean;
 };
 
 const InputSearchMessageChannel = ({
@@ -39,9 +40,11 @@ const InputSearchMessageChannel = ({
 	onChangeOptionFilter,
 	inputValue,
 	userMention,
+	currentChannel,
 	optionFilter,
 	onKeyPress,
-	nameChannel
+	nameChannel,
+	isClearSearch = false
 }: InputSearchMessageChannelProps) => {
 	const [textInput, setTextInput] = useState<string>(inputValue);
 	const [isVisibleToolTip, setIsVisibleToolTip] = useState<boolean>(false);
@@ -87,6 +90,13 @@ const InputSearchMessageChannel = ({
 		onChangeText('');
 		onChangeOptionFilter(null);
 	};
+
+	useEffect(() => {
+		if (isClearSearch) {
+			setTextInput('');
+			onChangeText('');
+		}
+	}, [isClearSearch, currentChannel]);
 
 	useEffect(() => {
 		if (optionFilter || userMention) {
