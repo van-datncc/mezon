@@ -16,7 +16,7 @@ Sentry.init({
 		Sentry.httpClientIntegration()
 	],
 	tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-	tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/, /^https:\/\/.*\.mezon\.ai/],
+	tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
 	replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.05 : 0.1,
 	replaysOnErrorSampleRate: 1.0,
 	initialScope: {
