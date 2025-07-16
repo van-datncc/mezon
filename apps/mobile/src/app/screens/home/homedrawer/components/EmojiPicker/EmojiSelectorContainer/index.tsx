@@ -55,9 +55,9 @@ export default function EmojiSelectorContainer({
 		const currentChannelId = selectCurrentChannelId(store.getState() as any);
 		const currentTopicId = selectCurrentTopicId(store.getState() as any);
 
-		const channel_id = currentTopicId ? currentTopicId : currentChannelId;
+		const channelId = currentTopicId ? currentTopicId : currentChannelId;
 
-		return currentDirectId ? currentDirectId : channel_id;
+		return currentDirectId ? currentDirectId : channelId;
 	}, []);
 
 	const getEmojisByCategories = useMemo(
