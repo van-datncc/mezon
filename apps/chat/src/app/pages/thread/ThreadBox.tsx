@@ -56,6 +56,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
+import { CONSTANT } from './constant';
 
 const ThreadBox = () => {
 	const dispatch = useAppDispatch();
@@ -103,7 +104,7 @@ const ThreadBox = () => {
 
 	const createThread = useCallback(
 		async (value: ThreadValue, messageContent?: IMessageSendPayload) => {
-			if (value.nameValueThread.length <= 3) {
+			if (value.nameValueThread.length <= CONSTANT.MINIMUM_CHAT_NAME_LENGTH) {
 				toast('Thread name must be longer than 3 characters');
 				return;
 			}
@@ -180,6 +181,23 @@ const ThreadBox = () => {
 			}
 		},
 		[createThread, currentClanId, dispatch, sendMessageThread, threadCurrentChannel, sessionUser]
+	);
+	const handleSendWithLimitCheck = useCallback(
+		async (
+			content: IMessageSendPayload,
+			mentions?: Array<ApiMessageMention>,
+			attachments?: Array<ApiMessageAttachment>,
+			references?: Array<ApiMessageRef>,
+			value?: ThreadValue
+		): Promise<boolean> => {
+			if (content?.t && content.t.length > CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH) {
+				toast.error('Message exceeds the 4000-character limit');
+				return false;
+			}
+			await handleSend(content, mentions, attachments, references, value);
+			return true;
+		},
+		[handleSend]
 	);
 
 	const handleTyping = useCallback(() => {
@@ -286,7 +304,13 @@ const ThreadBox = () => {
 						mentionRaw: []
 					};
 					const checkedRequest = request ? request : emptyRequest;
+					if (checkedRequest.content.length > CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH) {
+						toast.error(`Message exceeds the ${CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH}-character limit`);
+						event.preventDefault();
+						return;
+					}
 					const { text, entities } = parseHtmlAsFormattedText(hasToken ? checkedRequest.content : checkedRequest.content.trim());
+
 					const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 					const { adjustedHashtagPos, adjustedEmojiPos } = adjustPos(mk, mentionList, hashtagList, emojiList, text);
 					const payload = {
@@ -296,6 +320,7 @@ const ThreadBox = () => {
 						mk
 					};
 					event.preventDefault();
+
 					await handleSend(filterEmptyArrays(payload), request?.mentionRaw || [], attachmentData, valueThread?.references, {
 						nameValueThread: nameValueThread ?? valueThread?.content.t,
 						isPrivate
@@ -386,7 +411,7 @@ const ThreadBox = () => {
 					<MentionReactInput
 						currentChannelId={currentInputChannelId}
 						handlePaste={onPastedFiles}
-						onSend={handleSend}
+						onSend={handleSendWithLimitCheck}
 						onTyping={handleTypingDebounced}
 						listMentions={UserMentionList({
 							channelID: currentChannel?.channel_id as string,
