@@ -361,7 +361,7 @@ const ThreadBox = () => {
 						checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''
 					} bg-item-theme max-h-full`}
 				>
-					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll`}>
+					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll`}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
 								<Fragment key={index}>

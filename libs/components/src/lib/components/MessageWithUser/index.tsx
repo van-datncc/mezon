@@ -168,7 +168,6 @@ function MessageWithUser({
 		);
 	}, [message]);
 
-
 	return (
 		<>
 			{message && showDivider && <MessageDateDivider message={message} />}
@@ -387,7 +386,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 		}
 		hoverTimeout.current = setTimeout(() => {
 			setIsHover(true);
-		}, 100);
+		}, 200);
 	};
 
 	const handleMouseLeave = () => {
@@ -417,7 +416,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 			{isHover && (
 				<>
 					{!showMessageHead && create_time && (
-						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[10px]">{convertTimeHour(create_time)}</span>
+						<span className="absolute text-theme-primary left-[24px] top-[4px] text-[11px]">{convertTimeHour(create_time)}</span>
 					)}
 					{popup?.()}
 				</>

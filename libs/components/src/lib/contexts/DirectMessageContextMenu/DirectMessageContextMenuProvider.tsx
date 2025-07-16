@@ -189,7 +189,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 							/>
 						)}
 
-						{channelId && (
+						{/* {channelId && (
 							<MemberMenuItem
 								label={getChannelE2ee ? 'Disable E2EE' : 'Enable E2EE'}
 								onClick={currentHandlers.handleEnableE2EE}
@@ -206,7 +206,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								}
 								setWarningStatus={setWarningStatus}
 							/>
-						)}
+						)} */}
 
 						{contextMenuId !== DMCT_GROUP_CHAT_ID &&
 							channelId &&

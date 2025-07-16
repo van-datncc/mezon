@@ -10,14 +10,12 @@ import {
 	getStore,
 	getStoreAsync,
 	groupCallActions,
-	notificationActions,
 	pinMessageActions,
 	searchMessagesActions,
 	selectChannelById,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
-	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentDM,
 	selectDefaultNotificationCategory,
@@ -27,7 +25,6 @@ import {
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
-	selectIsShowInbox,
 	selectIsShowMemberList,
 	selectIsShowMemberListDM,
 	selectIsShowPinBadgeByChannelId,
@@ -51,7 +48,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
-import NotificationList from '../NotificationList';
+import { NotificationTooltip } from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
 import FileModal from './TopBarComponents/FilesModal';
@@ -353,14 +350,14 @@ const ChannelTopbarTools = memo(
 				{!isStream ? (
 					<div className="items-center gap-2 flex">
 						<div className="relative items-center gap-4 hidden sbm:flex sbm:flex-row-reverse">
-							<FileButton isLightMode={appearanceTheme === 'light'} />
-							<MuteButton isLightMode={appearanceTheme === 'light'} />
-							<InboxButton isLightMode={appearanceTheme === 'light'} />
+							<FileButton />
+							<MuteButton />
+							<InboxButton />
 							<PinButton mode={ChannelStreamMode.STREAM_MODE_CHANNEL} styleCss={'text-theme-primary text-theme-primary-hover'} />
 							<div onClick={setTurnOffThreadMessage}>
-								<ChannelListButton isLightMode={appearanceTheme === 'light'} />
+								<ChannelListButton />
 							</div>
-							{!isApp && <ThreadButton isLightMode={appearanceTheme === 'light'} />}
+							{!isApp && <ThreadButton />}
 							<CanvasButton onClick={fetchCanvasChannel} />
 						</div>
 						<div className="sbm:hidden mr-5" onClick={closeMenuOnMobile}>
@@ -368,7 +365,7 @@ const ChannelTopbarTools = memo(
 						</div>
 					</div>
 				) : (
-					<>{isShowChatStream && <ChatButton isLightMode={appearanceTheme === 'light'} closeMenuOnMobile={closeMenuOnMobile} />}</>
+					<>{isShowChatStream && <ChatButton closeMenuOnMobile={closeMenuOnMobile} />}</>
 				)}
 			</div>
 		);
@@ -634,7 +631,7 @@ const DmTopbarTools = memo(() => {
 	);
 });
 
-function FileButton({ isLightMode }: { isLightMode: boolean }) {
+function FileButton() {
 	const [isShowFile, setIsShowFile] = useState<boolean>(false);
 
 	const fileRef = useRef<HTMLDivElement | null>(null);
@@ -690,7 +687,7 @@ function CanvasButton({ onClick }: { onClick?: () => void }) {
 	);
 }
 
-function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
+function ThreadButton() {
 	const isShowThread = useSelector(selectIsThreadModalVisible);
 
 	const threadRef = useRef<HTMLDivElement | null>(null);
@@ -716,7 +713,7 @@ function ThreadButton({ isLightMode }: { isLightMode: boolean }) {
 	);
 }
 
-function MuteButton({ isLightMode }: { isLightMode: boolean }) {
+function MuteButton() {
 	const [isMuteBell, setIsMuteBell] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, currentChannel?.id || ''));
@@ -814,36 +811,8 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 	);
 }
 
-export function InboxButton({ isLightMode, isVoiceChannel }: { isLightMode?: boolean; isVoiceChannel?: boolean }) {
-	const dispatch = useAppDispatch();
-	const isShowInbox = useSelector(selectIsShowInbox);
-	const inboxRef = useRef<HTMLDivElement | null>(null);
-	const currentClan = useSelector(selectCurrentClan);
-
-	const handleShowInbox = () => {
-		dispatch(notificationActions.setIsShowInbox(!isShowInbox));
-	};
-
-	useEffect(() => {
-		if (isShowInbox) {
-			dispatch(topicsActions.fetchTopics({ clanId: currentClan?.clan_id as string }));
-		}
-	}, [isShowInbox]);
-
-	return (
-		<div className="relative leading-5 h-5" ref={inboxRef}>
-			<button
-				title="Inbox"
-				className="focus-visible:outline-none text-theme-primary text-theme-primary-hover"
-				onClick={handleShowInbox}
-				onContextMenu={(e) => e.preventDefault()}
-			>
-				<Icons.Inbox defaultSize="size-5" />
-				{(currentClan?.badge_count ?? 0) > 0 && <RedDot />}
-			</button>
-			{isShowInbox && <NotificationList rootRef={inboxRef} />}
-		</div>
-	);
+export function InboxButton({ isVoiceChannel }: { isVoiceChannel?: boolean }) {
+	return <NotificationTooltip />;
 }
 
 export function RedDot() {
@@ -856,7 +825,7 @@ export function RedDot() {
 	);
 }
 
-function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
+function ChannelListButton() {
 	const dispatch = useDispatch();
 	const isActive = useSelector(selectIsShowMemberList);
 	const { setStatusMenu } = useMenu();
@@ -882,7 +851,7 @@ function ChannelListButton({ isLightMode }: { isLightMode?: boolean }) {
 	);
 }
 
-function ChatButton({ isLightMode, closeMenuOnMobile }: { isLightMode?: boolean; closeMenuOnMobile?: () => void }) {
+function ChatButton({ closeMenuOnMobile }: { closeMenuOnMobile?: () => void }) {
 	const dispatch = useDispatch();
 	const handleClick = () => {
 		dispatch(appActions.setIsShowChatStream(true));

@@ -1,5 +1,5 @@
 import { useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
-import { referencesActions, selectCloseMenu, selectDataReferences, selectStatusMenu, selectTheme, useAppDispatch } from '@mezon/store';
+import { referencesActions, selectCloseMenu, selectDataReferences, selectStatusMenu, useAppDispatch } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import {
@@ -42,7 +42,6 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	const dispatch = useAppDispatch();
 	const { sessionRef, clientRef } = useMezon();
 	const { currentChannelId, currentClanId } = props;
-	const appearanceTheme = useSelector(selectTheme);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentChannelId ?? '');
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(props.currentChannelId);
 	const hasReplyMessage = useSelector((state) => {
@@ -134,11 +133,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
 				<div className={`${checkAttachment ? 'px-3 pb-1 pt-5 rounded-t-lg  bg-theme-input' : ''} text-theme-primary max-h-full`}>
-					<div
-						className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto attachment-scroll relative z-0 ${
-							appearanceTheme === 'light' ? 'attachment-scroll-light' : ''
-						}`}
-					>
+					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll relative z-0 `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
 								<Fragment key={index}>
@@ -167,7 +162,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 					hasPermissionEdit={canSendMessage}
 				/>
 
-				<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
+				<div className={`w-[calc(100%_-_50px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
 					<div className={`w-full rounded-r-lg  gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
 						<MentionReactInput
 							handlePaste={onPastedFiles}

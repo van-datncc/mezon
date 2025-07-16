@@ -6,14 +6,12 @@ import { EmojiSuggestionProvider, useAppParams, useAuth } from '@mezon/core';
 import {
 	appActions,
 	generateMeetToken,
-	getStoreAsync,
+	getStore,
 	handleParticipantVoiceState,
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectIsShowChatVoice,
 	selectIsShowSettingFooter,
-	selectShowCamera,
-	selectShowMicrophone,
 	selectShowModelEvent,
 	selectStatusMenu,
 	selectTokenJoinVoice,
@@ -39,14 +37,13 @@ const ChannelVoice = memo(
 		const [loading, setLoading] = useState<boolean>(false);
 		const dispatch = useAppDispatch();
 		const serverUrl = process.env.NX_CHAT_APP_MEET_WS_URL;
-		const showMicrophone = useSelector(selectShowMicrophone);
-		const showCamera = useSelector(selectShowCamera);
 		const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 		const isShowChatVoice = useSelector(selectIsShowChatVoice);
 		const currentChannel = useSelector(selectCurrentChannel);
 		const isChannelMezonVoice = currentChannel?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE;
 		const containerRef = useRef<HTMLDivElement | null>(null);
 		const { userProfile } = useAuth();
+
 		const participantMeetState = async (state: ParticipantMeetState, clanId?: string, channelId?: string): Promise<void> => {
 			if (!clanId || !channelId || !userProfile?.user?.id) return;
 
@@ -59,9 +56,10 @@ const ChannelVoice = memo(
 				})
 			);
 		};
+
 		const handleJoinRoom = async () => {
 			dispatch(voiceActions.setOpenPopOut(false));
-			const store = await getStoreAsync();
+			const store = getStore();
 			const currentClan = selectCurrentClan(store.getState());
 			if (!currentClan || !currentChannel?.meeting_code) return;
 			setLoading(true);
@@ -76,7 +74,7 @@ const ChannelVoice = memo(
 
 				if (result) {
 					if (isJoined && voiceInfo) {
-						handleLeaveRoom();
+						await handleLeaveRoom();
 					}
 
 					await participantMeetState(ParticipantMeetState.JOIN, currentChannel?.clan_id as string, currentChannel?.channel_id as string);
@@ -101,18 +99,23 @@ const ChannelVoice = memo(
 				setLoading(false);
 			}
 		};
+
 		const handleLeaveRoom = useCallback(async () => {
 			if (!voiceInfo?.clanId || !voiceInfo?.channelId) return;
 			dispatch(voiceActions.resetVoiceSettings());
 			await participantMeetState(ParticipantMeetState.LEAVE, voiceInfo.clanId, voiceInfo.channelId);
-		}, [dispatch, voiceInfo]);
+		}, [voiceInfo]);
+
 		const handleFullScreen = useCallback(() => {
 			dispatch(voiceActions.setFullScreen(!isVoiceFullScreen));
-		}, [dispatch, isVoiceFullScreen]);
+		}, [isVoiceFullScreen]);
+
 		const isShow = isJoined && voiceInfo?.clanId === currentChannel?.clan_id && voiceInfo?.channelId === currentChannel?.channel_id;
-		const toggleChat = () => {
+
+		const toggleChat = useCallback(() => {
 			dispatch(appActions.setIsShowChatVoice(!isShowChatVoice));
-		};
+		}, []);
+
 		const isShowSettingFooter = useSelector(selectIsShowSettingFooter);
 		const showModalEvent = useSelector(selectShowModelEvent);
 		const { channelId } = useAppParams();
@@ -150,8 +153,8 @@ const ChannelVoice = memo(
 							id="livekitRoom11"
 							key={token}
 							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
-							audio={showMicrophone}
-							video={showCamera}
+							audio={false}
+							video={false}
 							token={token}
 							serverUrl={serverUrl}
 							data-lk-theme="default"
@@ -161,6 +164,7 @@ const ChannelVoice = memo(
 									channelLabel={currentChannel?.channel_label as string}
 									onLeaveRoom={handleLeaveRoom}
 									onFullScreen={handleFullScreen}
+									onJoinRoom={handleJoinRoom}
 									isShowChatVoice={isShowChatVoice}
 									onToggleChat={toggleChat}
 									currentChannel={currentChannel}

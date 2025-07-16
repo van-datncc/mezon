@@ -184,10 +184,11 @@ const UserProfilePopup = ({ username, userID, channelId, mode, isDm, positionSho
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? '' : '1'
 		)
 	)[0];
+
 	const userGetByNameOrId = useMemo(() => {
 		return getUserByUserId || getUserByUsername;
 	}, [getUserByUserId, getUserByUsername]);
-	const userId = userGetByNameOrId?.id;
+	const userId = userGetByNameOrId?.id ?? userID;
 
 	const currentChannel = useSelector(selectCurrentChannel);
 	const positionStyle = currentChannel?.type === ChannelType.CHANNEL_TYPE_STREAMING ? { right: `120px` } : { left: `${positionShortUser?.left}px` };

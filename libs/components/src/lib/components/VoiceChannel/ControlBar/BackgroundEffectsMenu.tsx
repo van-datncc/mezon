@@ -1,4 +1,4 @@
-import { BackgroundBlur, VirtualBackground } from '@livekit/track-processors';
+import { BackgroundBlur, VirtualBackground, supportsBackgroundProcessors, supportsModernBackgroundProcessors } from '@livekit/track-processors';
 import { Icons } from '@mezon/ui';
 import { LocalParticipant, Track } from 'livekit-client';
 import { useEffect, useRef, useState } from 'react';
@@ -14,14 +14,18 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 	const [isOpen, setIsOpen] = useState(false);
 	const [activeEffect, setActiveEffect] = useState<'none' | 'blur' | 'background'>('none');
 	const [isLoading, setIsLoading] = useState(false);
+	const [isSupported, setIsSupported] = useState(false);
+	const [supportsModern, setSupportsModern] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 
-	const blurProcessorRef = useRef<any>(null);
-	const bgProcessorRef = useRef<any>(null);
+	const currentProcessorRef = useRef<any>(null);
 
 	useEffect(() => {
-		blurProcessorRef.current = BackgroundBlur(10, { delegate: 'GPU' });
-		bgProcessorRef.current = VirtualBackground(darkGradientBackgroundUrl, { delegate: 'GPU' });
+		const supported = supportsBackgroundProcessors();
+		const modern = supportsModernBackgroundProcessors();
+
+		setIsSupported(supported);
+		setSupportsModern(modern);
 
 		return () => {
 			const videoTrackPublication = participant.getTrackPublication(Track.Source.Camera);
@@ -32,6 +36,11 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 	}, [participant]);
 
 	const applyBlur = async () => {
+		if (!isSupported) {
+			console.error('Background processors are not supported in this browser');
+			return;
+		}
+
 		setIsLoading(true);
 
 		try {
@@ -41,10 +50,12 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 				return;
 			}
 
-			if (videoTrackPublication.track.getProcessor()?.name !== 'background-blur') {
-				await videoTrackPublication.track.stopProcessor();
-				await videoTrackPublication.track.setProcessor(blurProcessorRef.current);
-			}
+			await videoTrackPublication.track.stopProcessor();
+
+			const blurProcessor = BackgroundBlur(30);
+			currentProcessorRef.current = blurProcessor;
+
+			await videoTrackPublication.track.setProcessor(blurProcessor);
 
 			setActiveEffect('blur');
 			setIsOpen(false);
@@ -56,6 +67,11 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 	};
 
 	const applyVirtualBackground = async () => {
+		if (!isSupported) {
+			console.error('Background processors are not supported in this browser');
+			return;
+		}
+
 		setIsLoading(true);
 
 		try {
@@ -65,10 +81,12 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 				return;
 			}
 
-			if (videoTrackPublication.track.getProcessor()?.name !== 'virtual-background') {
-				await videoTrackPublication.track.stopProcessor();
-				await videoTrackPublication.track.setProcessor(bgProcessorRef.current);
-			}
+			await videoTrackPublication.track.stopProcessor();
+
+			const bgProcessor = VirtualBackground(darkGradientBackgroundUrl);
+			currentProcessorRef.current = bgProcessor;
+
+			await videoTrackPublication.track.setProcessor(bgProcessor);
 
 			setActiveEffect('background');
 			setIsOpen(false);
@@ -86,6 +104,7 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 			const videoTrackPublication = participant.getTrackPublication(Track.Source.Camera);
 			if (videoTrackPublication?.track) {
 				await videoTrackPublication.track.stopProcessor();
+				currentProcessorRef.current = null;
 				setActiveEffect('none');
 				setIsOpen(false);
 			}
@@ -112,6 +131,10 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 		};
 	}, [isOpen]);
 
+	if (!isSupported) {
+		return null;
+	}
+
 	return (
 		<div className="relative" ref={menuRef}>
 			<button
@@ -125,7 +148,10 @@ export const BackgroundEffectsMenu: React.FC<BackgroundEffectsMenuProps> = ({ pa
 
 			{isOpen && (
 				<div className="absolute bottom-12 right-0 bg-zinc-800 rounded-lg p-2 shadow-lg z-50 w-48">
-					<div className="text-white text-sm font-medium mb-2">Background Effects</div>
+					<div className="text-white text-sm font-medium mb-2">
+						Background Effects
+						{supportsModern && <span className="ml-2 text-xs text-green-400">Enhanced</span>}
+					</div>
 					<div className="space-y-2">
 						<button
 							onClick={applyBlur}

@@ -16,6 +16,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
+	selectCurrentTopicId,
 	selectDmGroupCurrent,
 	selectDmGroupCurrentId,
 	selectMessageEntitiesByChannelId,
@@ -77,6 +78,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(currentDmId ?? ''));
+	const currentTopicId = useSelector(selectCurrentTopicId);
 	const navigation = useNavigation<any>();
 	const { createDirectMessageWithUser } = useDirect();
 	const { sendInviteMessage } = useSendInviteMessage();
@@ -587,7 +589,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				senderId: senderId ?? '',
 				countToRemove: 1,
 				actionDelete: false,
-				topicId: message.topic_id || ''
+				topicId: currentTopicId || ''
 			} as IReactionMessageProps);
 
 			onClose();

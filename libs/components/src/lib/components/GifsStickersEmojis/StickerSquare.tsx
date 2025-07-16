@@ -250,9 +250,9 @@ const CategorizedStickers: React.FC<ICategorizedStickerProps> = ({ stickerList, 
 				className="w-full flex flex-row justify-start items-center pl-1 mb-1 mt-0 py-1 sticky top-[-0.5rem]  z-10  max-h-full bg-theme-setting-primary"
 			>
 				{logo !== '' ? (
-					<img src={logo} className="w-4 !h-4 flex items-center justify-center rounded-full" />
+					<img src={logo} className="w-4 !h-4 flex items-center justify-center rounded-full object-cover" />
 				) : (
-					<div className="dark:text-textDarkTheme text-xs text-textLightTheme w-4 h-4 rounded-full">
+					<div className="dark:text-textDarkTheme text-xs text-textLightTheme w-4 h-4 rounded-full bg-theme-primary">
 						{currentClan?.clan_name?.charAt(0).toUpperCase()}
 					</div>
 				)}

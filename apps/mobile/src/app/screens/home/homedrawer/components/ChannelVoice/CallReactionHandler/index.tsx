@@ -1,5 +1,4 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
 import { getSrcEmoji } from '@mezon/utils';
 import { VoiceReactionSend } from 'mezon-js';
@@ -38,13 +37,12 @@ interface EmojiItem {
 	translateX: Animated.Value;
 	scale: Animated.Value;
 	opacity: Animated.Value;
-	rotation: Animated.Value;
 	startX: number;
 	startY: number;
 }
 
 interface ReactProps {
-	channel: ChannelsEntity;
+	channelId: string;
 	isAnimatedCompleted: boolean;
 }
 
@@ -58,17 +56,7 @@ const AnimatedEmoji = memo(({ item }: { item: EmojiItem }) => {
 				left: '50%',
 				width: ANIMATION_CONFIG.EMOJI_SIZE,
 				height: ANIMATION_CONFIG.EMOJI_SIZE,
-				transform: [
-					{ translateY: item.translateY },
-					{ translateX: item.translateX },
-					{ scale: item.scale },
-					{
-						rotate: item.rotation.interpolate({
-							inputRange: [-ANIMATION_CONFIG.MAX_ROTATION, ANIMATION_CONFIG.MAX_ROTATION],
-							outputRange: ['-120deg', '120deg']
-						})
-					}
-				],
+				transform: [{ translateY: item.translateY }, { translateX: item.translateX }, { scale: item.scale }],
 				opacity: item.opacity,
 				alignItems: 'center',
 				justifyContent: 'center',
@@ -89,7 +77,7 @@ const AnimatedEmoji = memo(({ item }: { item: EmojiItem }) => {
 
 AnimatedEmoji.displayName = 'AnimatedEmoji';
 
-export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: ReactProps) => {
+export const CallReactionHandler = memo(({ channelId, isAnimatedCompleted }: ReactProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const [displayedEmojis, setDisplayedEmojis] = useState<EmojiItem[]>([]);
@@ -109,13 +97,10 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 
 	// Create optimized animation sequence
 	const createEmojiAnimation = useCallback((emojiItem: EmojiItem): Animated.CompositeAnimation => {
-		const { translateY, translateX, scale, opacity, rotation } = emojiItem;
-
-		// Calculate animation values
+		const { translateY, translateX, scale, opacity } = emojiItem;
 		const horizontalOffset = (Math.random() - 0.5) * ANIMATION_CONFIG.MAX_HORIZONTAL_OFFSET;
 		const finalY = -(height * ANIMATION_CONFIG.FLIGHT_HEIGHT_RATIO + Math.random() * height * ANIMATION_CONFIG.FLIGHT_HEIGHT_VARIANCE);
 		const bezierControlX = horizontalOffset * (1.5 + Math.random());
-		const rotationAmount = (Math.random() - 0.5) * ANIMATION_CONFIG.MAX_ROTATION;
 
 		return Animated.parallel([
 			// Bounce entrance with optimized scaling
@@ -142,7 +127,7 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 					easing: Easing.out(Easing.quad),
 					useNativeDriver: true
 				}),
-				Animated.delay(ANIMATION_CONFIG.DURATIONS.TOTAL - ANIMATION_CONFIG.DURATIONS.FADE_OUT),
+				Animated.delay(1000),
 				Animated.timing(opacity, {
 					toValue: 0,
 					duration: ANIMATION_CONFIG.DURATIONS.FADE_OUT,
@@ -179,15 +164,7 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 					easing: Easing.in(Easing.circle),
 					useNativeDriver: true
 				})
-			]),
-
-			// Smooth rotation
-			Animated.timing(rotation, {
-				toValue: rotationAmount,
-				duration: ANIMATION_CONFIG.DURATIONS.TOTAL,
-				easing: Easing.inOut(Easing.circle),
-				useNativeDriver: true
-			})
+			])
 		]);
 	}, []);
 
@@ -204,7 +181,6 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 				translateX: new Animated.Value(0),
 				scale: new Animated.Value(0),
 				opacity: new Animated.Value(0),
-				rotation: new Animated.Value(0),
 				startX: ANIMATION_CONFIG.START_X + horizontalOffset * 0.2,
 				startY: ANIMATION_CONFIG.START_Y - verticalOffset
 			};
@@ -231,7 +207,7 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 	// Optimized socket message handler
 	const handleVoiceReactionMessage = useCallback(
 		(message: VoiceReactionSend) => {
-			if (channel?.channel_id !== message?.channel_id) return;
+			if (channelId !== message?.channel_id) return;
 
 			try {
 				const emojis = message.emojis || [];
@@ -244,7 +220,7 @@ export const CallReactionHandler = memo(({ channel, isAnimatedCompleted }: React
 				console.error('Error handling voice reaction:', error);
 			}
 		},
-		[channel?.channel_id, createAndAnimateEmoji]
+		[channelId, createAndAnimateEmoji]
 	);
 
 	// Effect for socket handling with proper cleanup
