@@ -104,19 +104,19 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 
 			dispatch(
 				messagesActions.remove({
-					channelId: currentDmId ? currentDmId : currentChannelId,
+					channelId: currentDmId ? currentDmId : currentTopicId || currentChannelId,
 					messageId
 				})
 			);
 			await socket.removeChatMessage(
 				currentDmId ? '0' : currentClanId || '',
-				currentDmId ? currentDmId : currentChannelId,
+				currentDmId ? currentDmId : currentTopicId || currentChannelId,
 				mode,
 				isPublic,
 				messageId
 			);
 		},
-		[currentChannel, currentChannelId, currentDmId, dispatch, mode, socketRef]
+		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, mode, socketRef, store]
 	);
 
 	const onConfirmAction = useCallback(
@@ -486,6 +486,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const messageActionList = useMemo(() => {
 		const isMyMessage = userId === message?.user?.id;
 		const isMessageError = message?.isError;
+		const isHidePinMessage = !!currentTopicId;
 		const isUnPinMessage = listPinMessages.some((pinMessage) => pinMessage?.message_id === message?.id);
 		const isHideCreateThread = isDM || ((!isCanManageThread || !isCanManageChannel) && !isClanOwner) || currentChannel?.parent_id !== '0';
 		const isHideThread = currentChannel?.parent_id !== '0';
@@ -510,6 +511,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		};
 
 		const listOfActionShouldHide = [
+			isHidePinMessage && EMessageActionType.PinMessage,
 			isUnPinMessage ? EMessageActionType.PinMessage : EMessageActionType.UnPinMessage,
 			(!isShowForwardAll() || isHideThread) && EMessageActionType.ForwardAllMessages,
 			isHideCreateThread && EMessageActionType.CreateThread,
@@ -566,7 +568,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		isAnonymous,
 		messagePosition,
 		convertedAllMessagesEntities,
-		t
+		t,
+		currentTopicId
 	]);
 
 	const handleReact = useCallback(
