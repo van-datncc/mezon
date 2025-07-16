@@ -56,6 +56,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
+import { CONSTANT } from './constant';
 
 const ThreadBox = () => {
 	const dispatch = useAppDispatch();
@@ -103,7 +104,7 @@ const ThreadBox = () => {
 
 	const createThread = useCallback(
 		async (value: ThreadValue, messageContent?: IMessageSendPayload) => {
-			if (value.nameValueThread.length <= 3) {
+			if (value.nameValueThread.length <= CONSTANT.MINIMUM_CHAT_NAME_LENGTH) {
 				toast('Thread name must be longer than 3 characters');
 				return;
 			}
@@ -189,7 +190,7 @@ const ThreadBox = () => {
 			references?: Array<ApiMessageRef>,
 			value?: ThreadValue
 		): Promise<boolean> => {
-			if (content?.t && content.t.length > 4000) {
+			if (content?.t && content.t.length > CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH) {
 				toast.error('Message exceeds the 4000-character limit');
 				return false;
 			}
@@ -198,7 +199,6 @@ const ThreadBox = () => {
 		},
 		[handleSend]
 	);
-
 
 	const handleTyping = useCallback(() => {
 		sendMessageTyping();
@@ -304,8 +304,8 @@ const ThreadBox = () => {
 						mentionRaw: []
 					};
 					const checkedRequest = request ? request : emptyRequest;
-					if (checkedRequest.content.length > 4000) {
-						toast.error('Message exceeds the 4000-character limit');
+					if (checkedRequest.content.length > CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH) {
+						toast.error(`Message exceeds the ${CONSTANT.LIMIT_CHARACTER_REACTION_INPUT_LENGTH}-character limit`);
 						event.preventDefault();
 						return;
 					}
