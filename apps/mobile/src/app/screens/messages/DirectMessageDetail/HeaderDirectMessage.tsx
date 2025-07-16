@@ -234,6 +234,15 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 	};
 
+	const navigateToSearch = () => {
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM,
+			params: {
+				currentChannel: currentDmGroup
+			}
+		});
+	};
+
 	return (
 		<View style={styles.headerWrapper}>
 			<ChannelSeen channelId={directMessageId || ''} streamMode={streamMode} />
@@ -268,13 +277,19 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
-				{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
-					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
-						<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
+				<View style={styles.iconWrapper}>
+					{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
+						<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
+							<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
+						</TouchableOpacity>
+					)}
+					<TouchableOpacity style={styles.iconHeader} onPress={navigateToSearch}>
+						<MezonIconCDN icon={IconCDN.magnifyingIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
-				)}
-				<View style={styles.iconOption}>
-					<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+
+					<View style={styles.iconOption}>
+						<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+					</View>
 				</View>
 			</Pressable>
 		</View>
