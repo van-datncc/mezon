@@ -57,7 +57,7 @@ export default function MezonSearch({
 				<TextInput
 					ref={inputRef}
 					style={styles.input}
-					placeholderTextColor={themeValue.text}
+					placeholderTextColor={themeValue.textDisabled}
 					placeholder={t('search')}
 					value={value}
 					onChangeText={onChangeText}

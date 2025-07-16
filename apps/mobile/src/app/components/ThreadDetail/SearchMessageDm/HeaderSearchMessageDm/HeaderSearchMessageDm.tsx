@@ -44,7 +44,7 @@ export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: 
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
-					placeholderTextColor={themeValue.text}
+					placeholderTextColor={themeValue.textDisabled}
 					placeholder={t('search')}
 					autoFocus
 				/>

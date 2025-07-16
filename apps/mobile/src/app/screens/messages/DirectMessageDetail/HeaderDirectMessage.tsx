@@ -278,14 +278,14 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 					{dmLabel}
 				</Text>
 				<View style={styles.iconWrapper}>
+					<TouchableOpacity style={styles.iconHeader} onPress={navigateToSearch}>
+						<MezonIconCDN icon={IconCDN.magnifyingIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
+					</TouchableOpacity>
 					{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
 						<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
 							<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 						</TouchableOpacity>
 					)}
-					<TouchableOpacity style={styles.iconHeader} onPress={navigateToSearch}>
-						<MezonIconCDN icon={IconCDN.magnifyingIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
-					</TouchableOpacity>
 
 					<View style={styles.iconOption}>
 						<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />

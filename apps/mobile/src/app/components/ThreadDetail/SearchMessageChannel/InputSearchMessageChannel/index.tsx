@@ -132,7 +132,7 @@ const InputSearchMessageChannel = ({
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
-					placeholderTextColor={themeValue.text}
+					placeholderTextColor={themeValue.textDisabled}
 					placeholder={optionFilter?.title || userMention?.display ? '' : t('search')}
 					autoFocus
 				></TextInput>
