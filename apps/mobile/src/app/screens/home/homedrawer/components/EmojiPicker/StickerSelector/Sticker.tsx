@@ -152,23 +152,13 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 		<View style={styles.session} key={`${categoryName}_stickers-parent`}>
 			<TouchableOpacity onPress={toggleExpand} style={styles.sessionHeader}>
 				<Text style={styles.sessionTitle}>{categoryName}</Text>
-				{isExpanded ? (
-					<MezonIconCDN
-						icon={IconCDN.chevronDownSmallIcon}
-						color={themeValue.text}
-						width={size.s_18}
-						height={size.s_18}
-						customStyle={styles.chevronIcon}
-					/>
-				) : (
-					<MezonIconCDN
-						icon={IconCDN.chevronSmallRightIcon}
-						color={themeValue.text}
-						width={size.s_18}
-						height={size.s_18}
-						customStyle={styles.chevronIcon}
-					/>
-				)}
+				<MezonIconCDN
+					icon={isExpanded ? IconCDN.chevronDownSmallIcon : IconCDN.chevronSmallRightIcon}
+					color={themeValue.text}
+					width={size.s_18}
+					height={size.s_18}
+					customStyle={styles.chevronIcon}
+				/>
 			</TouchableOpacity>
 			{isExpanded && (
 				<FlatList

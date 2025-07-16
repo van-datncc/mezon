@@ -26,23 +26,13 @@ const EmojiCategory: FC<EmojiCategoryProps> = ({ emojisData, categoryName, onEmo
 		<View style={styles.displayByCategories}>
 			<TouchableOpacity onPress={toggleExpand} style={styles.categoryHeader}>
 				<Text style={styles.titleCategories}>{categoryName}</Text>
-				{isExpanded ? (
-					<MezonIconCDN
-						icon={IconCDN.chevronDownSmallIcon}
-						color={themeValue.text}
-						width={size.s_18}
-						height={size.s_18}
-						customStyle={styles.chevronIcon}
-					/>
-				) : (
-					<MezonIconCDN
-						icon={IconCDN.chevronSmallRightIcon}
-						color={themeValue.text}
-						width={size.s_18}
-						height={size.s_18}
-						customStyle={styles.chevronIcon}
-					/>
-				)}
+				<MezonIconCDN
+					icon={isExpanded ? IconCDN.chevronDownSmallIcon : IconCDN.chevronSmallRightIcon}
+					color={themeValue.text}
+					width={size.s_18}
+					height={size.s_18}
+					customStyle={styles.chevronIcon}
+				/>
 			</TouchableOpacity>
 			{isExpanded && <EmojisPanel emojisData={emojisData} onEmojiSelect={onEmojiSelect} />}
 		</View>
