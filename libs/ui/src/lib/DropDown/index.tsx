@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Content, Item } from './Dropdown.Context';
+import { Content, Item } from './Dropdown.Content';
 
 type Place = 'bottom' | 'right' | 'left' | 'top' | `${'left' | 'right'}-${'bottom' | 'top'}`;
 
