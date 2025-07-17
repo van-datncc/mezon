@@ -236,6 +236,9 @@ const MessageItem = React.memo(
 				)
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+				isShow: false
+			});
 		}, [dispatch, message, mode, preventAction, senderDisplayName]);
 
 		// Message welcome

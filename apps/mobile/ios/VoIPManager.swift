@@ -213,26 +213,6 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
                 RNCallKeep.endCall(withUUID: activeUUID, reason: 6)
                 RNCallKeep.endCall(withUUID: "0731961b-415b-44f3-a960-dd94ef3372fc", reason: 6)
                 clearStoredNotificationDataInternal()
-                RNCallKeep.reportNewIncomingCall(
-                  callUUID,
-                  handle: callerId.isEmpty ? callerName : callerId,
-                  handleType: "generic",
-                  hasVideo: true,
-                  localizedCallerName: "Call Cancelled",
-                  supportsHolding: false,
-                  supportsDTMF: false,
-                  supportsGrouping: false,
-                  supportsUngrouping: false,
-                  fromPushKit: true,
-                  payload: payloadDict,
-                  withCompletionHandler: {
-                      print("log => Cancel call reported to CallKit")
-                      // Immediately end the call
-                      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                          RNCallKeep.endCall(withUUID: callUUID, reason: 6)
-                      }
-                  }
-                )
             } else {
                 print("log  => No active call UUID found, cannot end call")
                 clearStoredNotificationDataInternal()
