@@ -16,7 +16,12 @@ export default function InputSearchAuditLog({ placeHolder, onChangeText }: { pla
 
 	return (
 		<View style={styles.searchMessage}>
-			<TextInput placeholder={placeHolder} placeholderTextColor={themeValue.text} style={styles.searchInput} onChangeText={handleChangeText} />
+			<TextInput
+				placeholder={placeHolder}
+				placeholderTextColor={themeValue.textDisabled}
+				style={styles.searchInput}
+				onChangeText={handleChangeText}
+			/>
 			<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
 		</View>
 	);

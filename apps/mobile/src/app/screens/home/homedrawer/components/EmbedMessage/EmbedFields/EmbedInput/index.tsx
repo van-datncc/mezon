@@ -42,7 +42,7 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 		<TextInput
 			style={styles.TextInput}
 			placeholder={input?.placeholder}
-			placeholderTextColor={themeValue.text}
+			placeholderTextColor={themeValue.textDisabled}
 			onChangeText={handleChange}
 			multiline={!!input?.textarea}
 			keyboardType={input.type === 'number' ? 'numeric' : 'default'}
