@@ -155,8 +155,8 @@ export default memo(function Sticker({ stickerList, categoryName, onClickSticker
 				<MezonIconCDN
 					icon={isExpanded ? IconCDN.chevronDownSmallIcon : IconCDN.chevronSmallRightIcon}
 					color={themeValue.text}
-					width={size.s_18}
-					height={size.s_18}
+					width={size.s_16}
+					height={size.s_16}
 					customStyle={styles.chevronIcon}
 				/>
 			</TouchableOpacity>

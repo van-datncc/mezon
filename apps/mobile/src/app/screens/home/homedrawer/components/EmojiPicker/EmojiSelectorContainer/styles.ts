@@ -32,9 +32,9 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 		titleCategories: {
 			color: colors.text,
 			fontSize: size.medium,
-			fontWeight: '600',
+			fontWeight: 'bold',
 			paddingBottom: size.s_4,
-			textTransform: 'capitalize'
+			textTransform: 'uppercase'
 		},
 		textInputWrapper: {
 			flexDirection: 'row',
@@ -83,9 +83,10 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 		},
 		categoryHeader: {
 			flexDirection: 'row',
-			alignItems: 'center'
+			alignItems: 'center',
+			gap: size.s_2
 		},
 		chevronIcon: {
-			marginBottom: size.s_2
+			marginBottom: size.s_4
 		}
 	});

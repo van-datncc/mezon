@@ -21,7 +21,8 @@
         "topicDiscussion": "Topic Discussion",
         "resend": "Resend",
         "buzz": "Buzz!!",
-        "markMessage": "Mark Message"
+        "markMessage": "Mark Message",
+        "allAlbums": "All Albums"
     },
     "chatBox": {
         "replyingTo": "Replying to",
