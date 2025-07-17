@@ -6,23 +6,19 @@ import {
 	ChannelsEntity,
 	emojiSuggestionActions,
 	getStore,
-	messagesActions,
 	referencesActions,
 	selectAllAccount,
 	selectAllRolesClan,
 	selectAttachmentByChannelId,
 	selectChannelById,
-	selectCurrentTopicInitMessage,
 	selectDmGroupCurrent,
 	selectIsShowCreateTopic,
 	selectMemberClanByUserId2,
 	sendEphemeralMessage,
 	threadsActions,
-	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { useMezon } from '@mezon/transport';
 import {
 	IEmojiOnMessage,
 	IHashtagOnMessage,
@@ -34,12 +30,10 @@ import {
 	ThreadStatus,
 	checkIsThread,
 	filterEmptyArrays,
-	getMobileUploadedAttachments,
-	sleep,
 	uniqueUsers
 } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api.gen';
+import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { MutableRefObject, memo, useCallback, useMemo } from 'react';
 import { DeviceEventEmitter, Keyboard, View } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
@@ -112,18 +106,17 @@ export const ChatMessageSending = memo(
 			channelId: channelId,
 			mode: ChannelStreamMode.STREAM_MODE_CHANNEL ?? 0
 		});
-		const { clientRef, sessionRef, socketRef } = useMezon();
 		const userId = useMemo(() => {
 			return load(STORAGE_MY_USER_ID);
 		}, []);
-		const valueTopic = useSelector(selectCurrentTopicInitMessage);
 		const isCreateTopic = useSelector(selectIsShowCreateTopic);
 		const channelOrDirect =
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD ? currentChannel : currentDmGroup;
 		const isPublic = !channelOrDirect?.channel_private;
 		const { editSendMessage, sendMessage } = useChatSending({
 			mode,
-			channelOrDirect: channelOrDirect
+			channelOrDirect: channelOrDirect,
+			fromTopic: isCreateTopic || !!currentTopicId
 		});
 
 		const attachmentDataRef = useMemo(() => {
@@ -303,24 +296,15 @@ export const ChatMessageSending = memo(
 						);
 					} else {
 						const isMentionEveryOne = mentionsOnMessage?.current?.some?.((mention) => mention.user_id === ID_MENTION_HERE);
-						if (isCreateTopic) {
-							await handleSendAndCreateTopic(
-								filterEmptyArrays(payloadSendMessage),
-								simplifiedMentionList || [],
-								attachmentDataRef || [],
-								reference
-							);
-						} else {
-							await sendMessage(
-								filterEmptyArrays(payloadSendMessage),
-								simplifiedMentionList || [],
-								attachmentDataRef || [],
-								reference,
-								anonymousMode && !currentDmGroup,
-								isMentionEveryOne,
-								true
-							);
-						}
+						await sendMessage(
+							filterEmptyArrays(payloadSendMessage),
+							simplifiedMentionList || [],
+							attachmentDataRef || [],
+							reference,
+							anonymousMode && !currentDmGroup && !currentTopicId,
+							isMentionEveryOne,
+							true
+						);
 					}
 					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT);
 				}
@@ -337,98 +321,11 @@ export const ChatMessageSending = memo(
 			// 	}, 0);
 			// });
 		};
-		const sendMessageTopic = useCallback(
-			async (
-				content: IMessageSendPayload,
-				mentions?: Array<ApiMessageMention>,
-				attachments?: Array<ApiMessageAttachment>,
-				references?: Array<ApiMessageRef>,
-				topicId?: string
-			) => {
-				const session = sessionRef?.current;
-				const client = clientRef?.current;
-				const socket = socketRef?.current;
-
-				if (!client || !session || !socket || !channelOrDirect?.channel_id) {
-					throw new Error('Client is not initialized');
-				}
-
-				const uploadedFiles = await getMobileUploadedAttachments({
-					attachments,
-					channelId,
-					clanId: channelOrDirect?.clan_id || '',
-					client,
-					session
-				});
-
-				await socket.writeChatMessage(
-					channelOrDirect?.clan_id || '',
-					channelOrDirect?.channel_id as string,
-					mode,
-					isPublic,
-					content,
-					mentions,
-					uploadedFiles,
-					references,
-					false,
-					false,
-					'',
-					0,
-					topicId?.toString()
-				);
-			},
-			[sessionRef, clientRef, socketRef, channelOrDirect?.channel_id, channelOrDirect?.clan_id, mode, isPublic]
-		);
-
-		const handleSendAndCreateTopic = useCallback(
-			async (
-				content: IMessageSendPayload,
-				mentions?: Array<ApiMessageMention>,
-				attachments?: Array<ApiMessageAttachment>,
-				references?: Array<ApiMessageRef>
-			) => {
-				if (currentTopicId !== '') {
-					await sendMessageTopic(content, mentions, attachments, references, currentTopicId || '');
-				} else {
-					const body: ApiSdTopicRequest = {
-						clan_id: currentChannel?.clan_id,
-						channel_id: currentChannel?.channel_id as string,
-						message_id: valueTopic?.id
-					};
-
-					const topic = (await dispatch(topicsActions.createTopic(body))).payload as ApiSdTopic;
-					dispatch(topicsActions.setCurrentTopicId(topic?.id || ''));
-
-					if (topic) {
-						await dispatch(
-							messagesActions.updateToBeTopicMessage({
-								channelId: currentChannel?.channel_id as string,
-								messageId: valueTopic?.id as string,
-								topicId: topic.id as string,
-								creatorId: userId as string
-							})
-						);
-
-						await sleep(10);
-						await sendMessageTopic(content, mentions, attachments, references, topic.id || '');
-						await dispatch(
-							messagesActions.fetchMessages({
-								channelId: currentChannel?.channel_id,
-								clanId: currentChannel?.clan_id,
-								topicId: topic.id || '',
-								noCache: true
-							})
-						);
-					}
-				}
-			},
-			[currentChannel?.channel_id, currentChannel?.clan_id, currentTopicId, dispatch, sendMessageTopic, valueTopic?.id, userId]
-		);
 
 		const startRecording = async () => {
 			const data = {
 				snapPoints: ['50%'],
-				children: <BaseRecordAudioMessage channelId={channelId} mode={mode} />
+				children: <BaseRecordAudioMessage channelId={channelId} mode={mode} topicId={currentTopicId} />
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 			Keyboard.dismiss();
