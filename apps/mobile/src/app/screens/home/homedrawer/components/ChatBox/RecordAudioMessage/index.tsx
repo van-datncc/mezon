@@ -24,11 +24,12 @@ import { style } from './styles';
 interface IRecordAudioMessageProps {
 	channelId: string;
 	mode: ChannelStreamMode;
+	topicId?: string;
 }
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
 
-export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMessageProps) => {
+export const BaseRecordAudioMessage = memo(({ channelId, mode, topicId = '' }: IRecordAudioMessageProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation(['recordChatMessage']);
@@ -134,12 +135,12 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 			const attachments = await getAudioFileInfo(recordingUrl);
 			const uploadedFiles = await getMobileUploadedAttachments({
 				attachments,
-				channelId,
+				channelId: topicId || channelId,
 				clanId,
 				client,
 				session
 			});
-			await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '');
+			await socket.writeChatMessage(clanId, channelId, mode, isPublic, { t: '' }, [], uploadedFiles, [], false, false, '', 0, topicId);
 			setIsDisplay(false);
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 		} catch (error) {
@@ -154,6 +155,7 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode }: IRecordAudioMes
 		currentChannelDM?.clan_id,
 		currentChannelDM?.channel_id,
 		currentChannelDM?.channel_private,
+		topicId,
 		mode,
 		setIsDisplay,
 		recordUrl,
