@@ -1,7 +1,5 @@
 import { ArrowLeftIcon, FilterSearchIcon, IOption, IUerMention } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity } from '@mezon/store-mobile';
-import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import debounce from 'lodash.debounce';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -28,10 +26,10 @@ type InputSearchMessageChannelProps = {
 	onChangeOptionFilter: (option: IOption) => void;
 	inputValue: string;
 	userMention: IUerMention;
-	currentChannel: IChannel | DirectEntity;
 	optionFilter: IOption;
 	onKeyPress: (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
 	nameChannel?: string;
+	isClearSearch?: boolean;
 };
 
 const InputSearchMessageChannel = ({
@@ -41,7 +39,8 @@ const InputSearchMessageChannel = ({
 	userMention,
 	optionFilter,
 	onKeyPress,
-	nameChannel
+	nameChannel,
+	isClearSearch = false
 }: InputSearchMessageChannelProps) => {
 	const [textInput, setTextInput] = useState<string>(inputValue);
 	const [isVisibleToolTip, setIsVisibleToolTip] = useState<boolean>(false);
@@ -89,6 +88,13 @@ const InputSearchMessageChannel = ({
 	};
 
 	useEffect(() => {
+		if (isClearSearch) {
+			setTextInput('');
+			onChangeText('');
+		}
+	}, [isClearSearch, nameChannel]);
+
+	useEffect(() => {
 		if (optionFilter || userMention) {
 			setTextInput(' ');
 			onChangeText(' ');
@@ -132,7 +138,7 @@ const InputSearchMessageChannel = ({
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
-					placeholderTextColor={themeValue.text}
+					placeholderTextColor={themeValue.textDisabled}
 					placeholder={optionFilter?.title || userMention?.display ? '' : t('search')}
 					autoFocus
 				></TextInput>

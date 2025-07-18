@@ -1,9 +1,10 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { embedActions, useAppDispatch } from '@mezon/store-mobile';
 import { IMessageInput } from '@mezon/utils';
 import debounce from 'lodash.debounce';
 import { memo, useEffect } from 'react';
-import { TextInput } from 'react-native';
+import { DeviceEventEmitter, TextInput } from 'react-native';
 import { style } from './styles';
 
 type EmbedInputProps = {
@@ -38,15 +39,22 @@ export const EmbedInput = memo(({ input, buttonId, messageId }: EmbedInputProps)
 		);
 	});
 
+	const onFocus = () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+			isShow: false
+		});
+	};
+
 	return (
 		<TextInput
 			style={styles.TextInput}
 			placeholder={input?.placeholder}
-			placeholderTextColor={themeValue.text}
+			placeholderTextColor={themeValue.textDisabled}
 			onChangeText={handleChange}
 			multiline={!!input?.textarea}
 			keyboardType={input.type === 'number' ? 'numeric' : 'default'}
 			defaultValue={input?.defaultValue?.toString()}
+			onFocus={onFocus}
 		/>
 	);
 });

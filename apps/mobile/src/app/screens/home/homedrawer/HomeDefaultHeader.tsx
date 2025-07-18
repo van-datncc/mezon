@@ -89,7 +89,8 @@ const HomeDefaultHeader = React.memo(
 				params: {
 					typeSearch: ETypeSearch.SearchChannel,
 					currentChannel,
-					nameChannel: currentChannel?.channel_label
+					nameChannel: currentChannel?.channel_label,
+					isClearSearch: true
 				}
 			});
 		};

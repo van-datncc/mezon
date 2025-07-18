@@ -78,8 +78,8 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
     uploaderData = [${uploaderData}];
 
 		switch (e.key) {
-			case 'ArrowUp':
-        case 'ArrowLeft':
+			case 'ArrowDown':
+        case 'ArrowRight':
           if(currentIndex > 0){
             document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
             currentIndex--;
@@ -98,8 +98,8 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
           }
           break;
 
-        case 'ArrowDown':
-        case 'ArrowRight':
+        case 'ArrowUp':
+        case 'ArrowLeft':
           if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
             document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
             currentIndex++;

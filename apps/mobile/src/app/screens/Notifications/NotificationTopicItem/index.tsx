@@ -1,14 +1,7 @@
 import { useAuth, useGetPriorityNameFromUserClan } from '@mezon/core';
 import { convertTimestampToTimeAgo } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
-import {
-	TopicDiscussionsEntity,
-	getStoreAsync,
-	selectAllUserClans,
-	selectMemberClanByUserId,
-	topicsActions,
-	useAppSelector
-} from '@mezon/store-mobile';
+import { TopicDiscussionsEntity, getStoreAsync, selectAllUserClans, selectMemberClanByUserId, topicsActions } from '@mezon/store-mobile';
 import { INotification } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { safeJSONParse } from 'mezon-js';
@@ -16,6 +9,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { parseObject } from '../NotificationMentionItem';
@@ -32,17 +26,14 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
 	const data = parseObject(notify?.message);
-	const memberClan = useAppSelector(selectAllUserClans);
+	const memberClan = useSelector(selectAllUserClans);
 	const { userId } = useAuth();
-	const { priorityAvatar: priorityAvatarSender } = useGetPriorityNameFromUserClan(notify?.last_sent_message?.sender_id);
-	const { priorityAvatar: priorityAvatarContentSender } = useGetPriorityNameFromUserClan(notify?.message?.sender_id);
-	const message = Object.assign({}, data, { create_time: notify?.create_time, avatar: priorityAvatarContentSender });
-	const unixTimestamp = Math.floor(new Date(message?.create_time).getTime() / 1000);
-	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
+	const { priorityAvatar } = useGetPriorityNameFromUserClan(notify?.last_sent_message?.sender_id);
+	const messageTimeDifference = convertTimestampToTimeAgo(notify?.last_sent_message?.timestamp_seconds);
 	const initMessage = safeJSONParse(notify?.last_sent_message?.content || '')?.t;
 	const userIds = notify?.last_sent_message?.repliers;
 	const [subjectTopic, setSubjectTopic] = useState('');
-	const lastSentUser = useAppSelector(selectMemberClanByUserId(notify?.last_sent_message?.sender_id ?? ''));
+	const lastSentUser = useSelector(selectMemberClanByUserId(notify?.last_sent_message?.sender_id ?? ''));
 
 	const usernames = useMemo(() => {
 		return memberClan
@@ -68,7 +59,7 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 		await onPressNotify(notifytoJump);
 		const store = await getStoreAsync();
 		const promises = [];
-		promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(message)));
+		promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(data)));
 		promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.id || '')));
 		promises.push(store.dispatch(topicsActions.setIsShowCreateTopic(true)));
 
@@ -88,7 +79,7 @@ const NotificationTopicItem = React.memo(({ notify, onPressNotify }: NotifyProps
 			<View style={styles.notifyContainer}>
 				<View style={styles.notifyHeader}>
 					<View style={styles.boxImage}>
-						<MezonAvatar avatarUrl={priorityAvatarSender} username={notify?.message?.username}></MezonAvatar>
+						<MezonAvatar avatarUrl={priorityAvatar} username={notify?.message?.username}></MezonAvatar>
 					</View>
 					<View style={styles.notifyContent}>
 						<Text numberOfLines={2} style={[styles.notifyHeaderTitle, styles.username]}>

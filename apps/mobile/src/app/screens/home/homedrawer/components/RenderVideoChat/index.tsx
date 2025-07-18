@@ -1,7 +1,8 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, Metrics, size } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, NativeModules, Platform, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, DeviceEventEmitter, NativeModules, Platform, TouchableOpacity, View } from 'react-native';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ImageNative from '../../../../../components/ImageNative';
@@ -14,6 +15,9 @@ export const RenderVideoChat = React.memo(
 		const [thumbPath, setThumbPath] = useState('');
 
 		const handlePlayVideo = () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+				isShow: false
+			});
 			navigation.navigate(APP_SCREEN.VIDEO_DETAIL, { videoURL });
 		};
 
@@ -56,7 +60,7 @@ export const RenderVideoChat = React.memo(
 						.catch((error) => {
 							console.error('Error creating thumbnail:', error);
 							setThumbPath('');
-						})
+						});
 				}
 			}
 		}, [videoURL]);

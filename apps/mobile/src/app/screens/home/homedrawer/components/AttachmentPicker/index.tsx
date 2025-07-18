@@ -5,16 +5,16 @@ import { MAX_FILE_SIZE, checkIsThread } from '@mezon/utils';
 import Geolocation from '@react-native-community/geolocation';
 import { errorCodes, pick, types } from '@react-native-documents/picker';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, DeviceEventEmitter, Linking, PermissionsAndroid, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IFile } from '../../../../../componentUI/MezonImagePicker';
 import ShareLocationConfirmModal from '../../../../../components/ShareLocationConfirmModal';
 import { IconCDN } from '../../../../../constants/icon_cdn';
-import { AlbumPanel } from '../../AlbumPannel';
 import Gallery from './Gallery';
 import { style } from './styles';
 export type AttachmentPickerProps = {
@@ -30,8 +30,6 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 	const { t } = useTranslation(['message']);
 	const timeRef = useRef<any>(null);
 	const dispatch = useDispatch();
-	const [isShowAlbum, setIsShowAlbum] = useState<boolean>(false);
-	const [currentAlbum, setCurrentAlbum] = useState<string>('All');
 
 	useEffect(() => {
 		return () => {
@@ -220,31 +218,46 @@ function AttachmentPicker({ mode, currentChannelId, currentClanId, onCancel }: A
 		}
 	};
 
-	const handleShow = () => {
-		setIsShowAlbum(!isShowAlbum);
-	};
+	const handleShowAllAlbums = useCallback(async () => {
+		try {
+			const result = await launchImageLibrary({
+				selectionLimit: 10,
+				mediaType: 'mixed'
+			});
 
-	const handleChangeAlbum = (value) => {
-		setIsShowAlbum(false);
-		setCurrentAlbum(value);
-	};
+			if (!result?.assets?.length) {
+				return;
+			}
+			const convertedFiles = result.assets.map((asset) => ({
+				...asset,
+				uri: Platform.OS === 'ios' && asset?.uri?.startsWith?.('file://') ? asset.uri.replace('file://', '') : asset.uri,
+				name: asset?.fileName || `image_${Date.now()}`,
+				size: asset?.fileSize || 0
+			}));
+
+			// Batch process all attachments instead of individual loops
+			(convertedFiles as IFile[]).forEach(handleSelectedAttachments);
+		} catch (error) {
+			console.error('Failed to select images from library:', error);
+			Toast.show({
+				type: 'error',
+				text1: 'Failed to access photo library',
+				text2: 'Please try again or check permissions'
+			});
+		}
+	}, [handleSelectedAttachments]);
 
 	return (
 		<View style={styles.container}>
-			{isShowAlbum && <AlbumPanel valueAlbum={currentAlbum} onAlbumChange={handleChangeAlbum} />}
 			<View style={styles.wrapperHeader}>
 				<TouchableOpacity activeOpacity={0.8} style={styles.buttonHeader} onPress={() => handleLinkGoogleMap()}>
 					<MezonIconCDN icon={IconCDN.locationIcon} height={20} width={20} color={themeValue.text} />
 					<Text style={styles.titleButtonHeader}>{t('message:actions.location')}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity activeOpacity={0.8} style={styles.buttonAlbum} onPress={handleShow}>
+				<TouchableOpacity activeOpacity={0.8} style={styles.buttonAlbum} onPress={() => handleShowAllAlbums()}>
 					<View style={styles.albumButtonGroup}>
-						<Text style={styles.albumTitle}>{currentAlbum}</Text>
-						{isShowAlbum ? (
-							<MezonIconCDN icon={IconCDN.chevronSmallUpIcon} color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
-						) : (
-							<MezonIconCDN icon={IconCDN.chevronDownSmallIcon} color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
-						)}
+						<Text style={styles.albumTitle}>{t('message:actions.allAlbums')}</Text>
+						<MezonIconCDN icon={IconCDN.chevronSmallRightIcon} color={themeValue.textStrong} height={size.s_16} width={size.s_16} />
 					</View>
 				</TouchableOpacity>
 				<TouchableOpacity activeOpacity={0.8} onPress={onPickFiles} style={styles.buttonHeader}>

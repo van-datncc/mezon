@@ -13,13 +13,14 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage } from '@mezon/utils';
+import { ChannelMembersEntity, IChannel, IChannelMember, convertTimeMessage, createImgproxyUrl } from '@mezon/utils';
+import { AvatarImage } from 'libs/components/src/lib/components';
 import { ChannelType } from 'mezon-js';
 import { MutableRefObject, useCallback, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import AvatarGroup, { AvatarCount, AvatarRound } from '../../../../Avatar/AvatarGroup';
+import AvatarGroup, { AvatarCount } from '../../../../Avatar/AvatarGroup';
 import { Coords } from '../../../../ChannelLink';
 import SettingChannel from '../../../../ChannelSetting';
 import { useMessageSender } from '../../../../MessageWithUser/useMessageSender';
@@ -158,7 +159,17 @@ const ThreadItem = ({ thread, setIsShowThread, isPublicThread = false, isHasCont
 				<div className="flex flex-col gap-1">
 					<p className="text-base font-semibold leading-5 one-line">{thread?.channel_label}</p>
 					<div className="flex flex-row items-center h-6">
-						<AvatarRound src={user?.clan_avatar || avatarImg} className="mr-2 h-4" />
+						<AvatarImage
+							alt={`${user?.user?.username}'s avatar`}
+							username={user?.user?.username}
+							className="size-4 rounded-md object-cover mr-2"
+							srcImgProxy={createImgproxyUrl(user?.clan_avatar || user?.user?.avatar_url || '', {
+								width: 300,
+								height: 300,
+								resizeType: 'fit'
+							})}
+							src={user?.clan_avatar || avatarImg}
+						/>
 						<span className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap text-[#17AC86] text-sm font-semibold leading-4">
 							{user?.clan_nick ?? user?.user?.display_name ?? username}:&nbsp;
 						</span>
