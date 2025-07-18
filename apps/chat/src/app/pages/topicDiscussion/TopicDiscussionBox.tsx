@@ -184,7 +184,7 @@ const TopicDiscussionBox = () => {
 					)}
 					{checkAttachment && (
 				<div
-					className={`${checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''} bg-theme-setting-primary max-h-full`}
+							className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}
 				>
 					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
