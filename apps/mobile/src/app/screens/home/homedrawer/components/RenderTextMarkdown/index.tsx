@@ -107,7 +107,7 @@ export const markdownStyles = (
 			color: colors.text,
 			borderColor: colors.secondary,
 			fontSize: size.h7,
-			lineHeight: size.s_22,
+			lineHeight: size.s_24,
 			paddingHorizontal: size.s_10
 		},
 		code_inline: {
