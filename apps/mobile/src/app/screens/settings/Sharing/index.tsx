@@ -26,12 +26,12 @@ import {
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
-import { FlashList } from '@shopify/flash-list';
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
 	ActivityIndicator,
+	FlatList,
 	Image as ImageRN,
 	KeyboardAvoidingView,
 	Platform,
@@ -95,10 +95,9 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
 	const allChannels = useMemo(() => {
-		return [...listChannelsText, ...listDMText];
+		return [...(listChannelsText || []), ...(listDMText || [])];
 	}, [listChannelsText, listDMText]);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const [isShareToInputFocused, setIsShareToInputFocused] = useState(false);
 
 	useEffect(() => {
 		if (data) {
@@ -439,13 +438,9 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		[clans]
 	);
 
-	const getItemType = useCallback((item: any) => {
-		return item.type === ChannelType.CHANNEL_TYPE_DM ? 'dm' : 'channel';
-	}, []);
-
 	return (
 		<View style={styles.wrapper}>
-			<KeyboardAvoidingView behavior="position" enabled={isShareToInputFocused}>
+			<KeyboardAvoidingView behavior="position">
 				<StatusBarHeight />
 				<View style={styles.header}>
 					<TouchableOpacity onPress={() => onClose()}>
@@ -564,8 +559,6 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 										setSearchText(value);
 										debouncedSearch(value);
 									}}
-									onFocus={() => setIsShareToInputFocused(true)}
-									onBlur={() => setIsShareToInputFocused(false)}
 									placeholder={'Select a channel or category...'}
 									placeholderTextColor={Colors.tertiary}
 								/>
@@ -602,14 +595,24 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 					{!!dataShareTo?.length && (
 						<View style={styles.rowItem}>
 							<Text style={styles.title}>Suggestions</Text>
-							<FlashList
+							<FlatList
 								data={dataShareTo}
-								renderItem={renderItemSuggest}
 								keyExtractor={(item, index) => `${item?.id}_${index}_suggestion`}
-								getItemType={getItemType}
-								estimatedItemSize={size.s_30}
-								removeClippedSubviews={true}
+								renderItem={renderItemSuggest}
 								keyboardShouldPersistTaps={'handled'}
+								onEndReachedThreshold={0.1}
+								initialNumToRender={1}
+								maxToRenderPerBatch={5}
+								windowSize={15}
+								updateCellsBatchingPeriod={10}
+								decelerationRate={'fast'}
+								disableVirtualization={true}
+								removeClippedSubviews={true}
+								getItemLayout={(_, index) => ({
+									length: size.s_44,
+									offset: size.s_44 * index,
+									index
+								})}
 							/>
 						</View>
 					)}
