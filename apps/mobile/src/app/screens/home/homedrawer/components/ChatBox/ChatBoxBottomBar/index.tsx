@@ -241,7 +241,7 @@ export const ChatBoxBottomBar = memo(
 
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
-							channelId,
+							channelId: topicChannelId || channelId,
 							files: [imageFile]
 						})
 					);
@@ -447,7 +447,7 @@ export const ChatBoxBottomBar = memo(
 
 						dispatch(
 							referencesActions.setAtachmentAfterUpload({
-								channelId,
+								channelId: topicChannelId || channelId,
 								files: [
 									{
 										filename: fileTxtSaved.name,

@@ -33,7 +33,6 @@ import {
 	selectNotifiSettingsEntitiesById,
 	selectSession,
 	selectStatusMenu,
-	selectTheme,
 	threadsActions,
 	toastActions,
 	topicsActions,
@@ -307,7 +306,6 @@ const ChannelTopbarTools = memo(
 		isApp: boolean;
 		isStream: boolean;
 	}) => {
-		const appearanceTheme = useSelector(selectTheme);
 		const dispatch = useAppDispatch();
 		const isShowChatStream = useSelector(selectIsShowChatStream);
 		const { setStatusMenu } = useMenu();
@@ -397,7 +395,6 @@ const DmTopbarTools = memo(() => {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectCurrentDM);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
-	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const userProfile = useSelector(selectSession);
 	const { setStatusMenu } = useMenu();

@@ -8,8 +8,7 @@ import {
 	selectCurrentChannel,
 	selectCurrentTopicId,
 	selectDmGroupCurrent,
-	topicsActions,
-	useAppDispatch
+	selectIsShowCreateTopic
 } from '@mezon/store-mobile';
 import { IMessageSendPayload, checkIsThread } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -75,7 +74,7 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 	const { t } = useTranslation('message');
 	const [stickerMode, setStickerMode] = useState<MediaType>(MediaType.STICKER);
 	const currentTopicId = useSelector(selectCurrentTopicId);
-	const dispatch = useAppDispatch();
+	const isCreateTopic = useSelector(selectIsShowCreateTopic);
 
 	const dmMode = currentDirectMessage
 		? Number(currentDirectMessage?.user_id?.length === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP)
@@ -83,34 +82,9 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 
 	const { sendMessage } = useChatSending({
 		mode: dmMode ? dmMode : checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
-		channelOrDirect: currentDirectMessage || currentChannel
+		channelOrDirect: currentDirectMessage || currentChannel,
+		fromTopic: isCreateTopic || !!currentTopicId
 	});
-
-	const sendTopicMessage = useCallback(
-		(attachments: Array<ApiMessageAttachment>, messageRef: any) => {
-			if (!currentTopicId) return false;
-
-			dispatch(
-				topicsActions.handleSendTopic({
-					clanId: currentChannel?.clan_id as string,
-					channelId: currentChannel?.id as string,
-					mode: checkIsThread(currentChannel) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
-					anonymous: false,
-					attachments,
-					code: 0,
-					content: { t: '' },
-					isMobile: true,
-					isPublic: !currentChannel?.channel_private,
-					mentionEveryone: false,
-					mentions: [],
-					references: isEmpty(messageRef) ? [] : [messageRef],
-					topicId: currentTopicId as string
-				})
-			);
-			return true;
-		},
-		[currentTopicId, currentChannel, dispatch]
-	);
 
 	const handleSend = useCallback(
 		(
@@ -148,19 +122,12 @@ function EmojiPicker({ onDone, bottomSheetRef, directMessageId = '', messageActi
 		}
 
 		if (type === 'gif') {
-			const sentToTopic = sendTopicMessage([{ url: data }], messageRef);
-
-			if (!sentToTopic) {
-				handleSend({ t: '' }, [], [{ url: data }], isEmpty(messageRef) ? [] : [messageRef]);
-			}
+			handleSend({ t: '' }, [], [{ url: data }], isEmpty(messageRef) ? [] : [messageRef]);
 		} else if (type === 'sticker') {
 			const imageUrl = data?.source ? data?.source : `${process.env.NX_BASE_IMG_URL}/stickers/${data?.id}.webp`;
 			const attachments = [{ url: imageUrl, filetype: stickerMode === MediaType.STICKER ? 'image/gif' : 'audio/mpeg', filename: data?.id }];
-			const sentToTopic = sendTopicMessage(attachments, messageRef);
 
-			if (!sentToTopic) {
-				handleSend({ t: '' }, [], attachments, isEmpty(messageRef) ? [] : [messageRef]);
-			}
+			handleSend({ t: '' }, [], attachments, isEmpty(messageRef) ? [] : [messageRef]);
 		} else {
 			/* empty */
 		}
