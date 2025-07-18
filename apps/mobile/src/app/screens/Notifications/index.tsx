@@ -7,6 +7,7 @@ import {
 	clansActions,
 	directActions,
 	fetchListNotification,
+	getFirstMessageOfTopic,
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
@@ -17,8 +18,7 @@ import {
 	selectNotificationMentions,
 	selectTopicsSort,
 	topicsActions,
-	useAppDispatch,
-	usersClanActions
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -179,6 +179,7 @@ const Notifications = () => {
 				} else {
 					if (Number(notify?.content?.topic_id) !== 0) {
 						promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(null)));
+						promises.push(store.dispatch(getFirstMessageOfTopic(notify?.content?.topic_id || '')));
 						promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.content?.topic_id || '')));
 						promises.push(store.dispatch(topicsActions.setIsShowCreateTopic(true)));
 					}
