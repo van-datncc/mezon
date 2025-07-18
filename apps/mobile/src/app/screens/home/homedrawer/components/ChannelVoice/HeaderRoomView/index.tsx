@@ -5,7 +5,6 @@ import { getStore, selectChannelById2 } from '@mezon/store-mobile';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
-import InCallManager from 'react-native-incall-manager';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { EMessageBSToShow } from '../../../enums';
@@ -63,16 +62,14 @@ const HeaderRoomView = memo(({ channelId, clanId, onPressMinimizeRoom, isGroupCa
 				await AudioSessionModule.setAudioDevice(outputType);
 				setCurrentAudioOutput(outputType);
 			} else if (Platform.OS === 'ios') {
-				// Use existing iOS logic
 				const newSpeakerState = outputType === 'speaker';
 				await AudioSession.configureAudio({
 					ios: {
 						defaultOutput: newSpeakerState ? 'speaker' : 'earpiece'
 					}
 				});
-				InCallManager.setSpeakerphoneOn(newSpeakerState);
-				InCallManager.setForceSpeakerphoneOn(newSpeakerState);
 				setCurrentAudioOutput(outputType);
+				await AudioSessionModule?.setAudioDevice?.(outputType);
 			}
 		} catch (error) {
 			console.error('Error switching audio output:', error);

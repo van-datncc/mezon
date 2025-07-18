@@ -2,7 +2,7 @@ import { useLocalParticipant } from '@livekit/react-native';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { Room, Track, createLocalVideoTrack } from 'livekit-client';
 import React, { memo } from 'react';
-import { Platform, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { style } from '../styles';
@@ -15,30 +15,20 @@ const SwitchCamera = memo(() => {
 	const handleSwitchCamera = async () => {
 		try {
 			if (cameraTrack && cameraTrack.track) {
-				if (Platform.OS === 'ios') {
-					const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
-					const videoTrack = videoPublication?.track;
-					const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
-					if (videoTrack) {
-						await localParticipant.unpublishTrack(videoTrack);
-					}
-					const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
-					const devices = await Room.getLocalDevices('videoinput');
-					const targetCamera = devices.find((d: any) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
-					const newTrack = await createLocalVideoTrack({
-						deviceId: targetCamera.deviceId,
-						facingMode: newFacingMode
-					});
-					await localParticipant.publishTrack(newTrack);
-				} else {
-					if (typeof cameraTrack?.track?.mediaStreamTrack?._switchCamera === 'function') {
-						try {
-							cameraTrack?.track?.mediaStreamTrack?._switchCamera();
-						} catch (error) {
-							console.error(error);
-						}
-					}
+				const videoPublication = localParticipant.getTrackPublication(Track.Source.Camera);
+				const videoTrack = videoPublication?.track;
+				const facingModeCurrent = videoPublication.track?.mediaStreamTrack?.getSettings?.()?.facingMode;
+				if (videoTrack) {
+					await localParticipant.unpublishTrack(videoTrack);
 				}
+				const newFacingMode = facingModeCurrent === 'user' ? 'environment' : 'user';
+				const devices = await Room.getLocalDevices('videoinput');
+				const targetCamera = devices.find((d: any) => d?.facing === (newFacingMode === 'user' ? 'front' : 'environment'));
+				const newTrack = await createLocalVideoTrack({
+					deviceId: targetCamera.deviceId,
+					facingMode: newFacingMode
+				});
+				await localParticipant.publishTrack(newTrack);
 			}
 		} catch (error) {
 			console.error(error);
