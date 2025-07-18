@@ -11,6 +11,7 @@ import {
 	selectCurrentTopicId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
+	selectIsTopicReady,
 	selectSession,
 	selectStatusMenu,
 	useAppDispatch,
@@ -21,7 +22,7 @@ import isElectron from 'is-electron';
 import FileSelectionButton from 'libs/components/src/lib/components/MessageBox/FileSelectionButton';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
@@ -60,24 +61,6 @@ const TopicDiscussionBox = () => {
 		fromTopic: true
 	});
 
-	useEffect(() => {
-		const fetchCurrentTopicMessages = async () => {
-			await new Promise((res) => setTimeout(res, 300));
-			await dispatch(
-				fetchMessages({
-					channelId: currentChannelId as string,
-					clanId: currentClanId as string,
-					topicId: currentTopicId || '',
-				})
-			);
-			setIsFetchMessageDone(true);
-		};
-
-		if (currentTopicId !== '') {
-			fetchCurrentTopicMessages();
-		}
-	}, [currentClanId, currentChannelId, currentTopicId, dispatch]);
-
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -89,19 +72,17 @@ const TopicDiscussionBox = () => {
 
 			const safeAttachments = attachments ?? [];
 			const isFileOnly = !content?.t && safeAttachments.length > 0;
-			if (!content?.t && safeAttachments.length === 0) {
-				return;
-			}
+			if (!content?.t && safeAttachments.length === 0) return;
 
 			await sendMessage(
 				content,
 				mentions,
 				safeAttachments,
 				references,
-				false, // anonymous
-				false, // mentionEveryone
 				false,
-				0 // threadType
+				false,
+				false,
+				0
 			);
 
 			dispatch(
@@ -110,9 +91,18 @@ const TopicDiscussionBox = () => {
 					files: []
 				})
 			);
+
 			setIsFetchMessageDone(true);
 		},
-		[sendMessage, sessionUser, dispatch, currentTopicId, currentInputChannelId]
+		[
+			sendMessage,
+			sessionUser,
+			dispatch,
+			currentTopicId,
+			currentInputChannelId,
+			currentChannelId,
+			currentClanId
+		]
 	);
 
 
@@ -121,7 +111,6 @@ const TopicDiscussionBox = () => {
 
 
 	const handleTyping = useCallback(() => {
-		// sendMessageTyping();
 	}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
@@ -155,6 +144,26 @@ const TopicDiscussionBox = () => {
 		},
 		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
+
+	const isTopicReady = useSelector(selectIsTopicReady(currentTopicId || ''));
+	const hasFetchedRef = useRef(false);
+
+	useEffect(() => {
+		if (isTopicReady && !hasFetchedRef.current) {
+			dispatch(
+				fetchMessages({
+					channelId: currentChannelId as string,
+					clanId: currentClanId as string,
+					topicId: currentTopicId || '',
+				})
+			);
+			setIsFetchMessageDone(true);
+			hasFetchedRef.current = true;
+		}
+		if (!isTopicReady) {
+			hasFetchedRef.current = false;
+		}
+	}, [isTopicReady, currentTopicId, currentChannelId, currentClanId, dispatch]);
 
 	return (
 		<>
