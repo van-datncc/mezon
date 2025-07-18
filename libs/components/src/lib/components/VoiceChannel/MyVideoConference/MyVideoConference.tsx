@@ -1,6 +1,6 @@
 import {
 	ConnectionStateToast,
-	LayoutContext,
+	LayoutContextProvider,
 	RoomAudioRenderer,
 	TrackReferenceOrPlaceholder,
 	isTrackReference,
@@ -145,7 +145,7 @@ export function MyVideoConference({
 	return (
 		<div className="lk-video-conference flex-1">
 			<ReactionCallHandler currentChannel={currentChannel} onSoundReaction={handleSoundReaction} />
-			<LayoutContext.Provider value={layoutContext}>
+			<LayoutContextProvider value={layoutContext}>
 				<div className="lk-video-conference-inner relative bg-gray-100 dark:bg-black group">
 					{!focusTrack ? (
 						<div className="lk-grid-layout-wrapper bg-gray-300 dark:bg-black !h-full !py-[68px]">
@@ -266,7 +266,7 @@ export function MyVideoConference({
 						/>
 					</div>
 				</div>
-			</LayoutContext.Provider>
+			</LayoutContextProvider>
 			<RoomAudioRenderer />
 			{!propTracks && <ConnectionStateToast />}
 		</div>
