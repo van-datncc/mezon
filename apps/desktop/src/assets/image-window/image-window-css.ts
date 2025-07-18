@@ -166,7 +166,7 @@ width : 0 !important;
     width: fit-content;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     padding: 20px 0;
     overflow-y: scroll;
     scrollbar-width: none;
