@@ -2,6 +2,7 @@ import { ArrowLeftIcon } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
@@ -11,6 +12,7 @@ export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: 
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const { t } = useTranslation('common');
 	const [textInput, setTextInput] = useState<string>('');
 
 	const handleTextChange = (text: string) => {
@@ -42,8 +44,8 @@ export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: 
 					value={textInput}
 					onChangeText={handleTextChange}
 					style={styles.input}
-					placeholderTextColor={themeValue.text}
-					placeholder={'search'}
+					placeholderTextColor={themeValue.textDisabled}
+					placeholder={t('search')}
 					autoFocus
 				/>
 				{textInput?.length ? (

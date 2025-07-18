@@ -37,7 +37,7 @@ const ChannelFileSearch = ({ onSearchTextChange }: fileSearchProps) => {
 			<TextInput
 				ref={searchInputRef}
 				placeholder={t('menu.thread.searchFiles')}
-				placeholderTextColor={themeValue.text}
+				placeholderTextColor={themeValue.textDisabled}
 				style={styles.searchInput}
 				onChangeText={(text) => typingSearchDebounce(text)}
 			/>

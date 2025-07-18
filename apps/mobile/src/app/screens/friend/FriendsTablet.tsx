@@ -99,7 +99,7 @@ export const FriendsTablet = React.memo(({ navigation }: { navigation: any }) =>
 				<Feather size={18} name="search" style={{ color: themeValue.text }} />
 				<TextInput
 					placeholder={t('common:searchPlaceHolder')}
-					placeholderTextColor={themeValue.text}
+					placeholderTextColor={themeValue.textDisabled}
 					style={styles.searchInput}
 					onChangeText={(text) => typingSearchDebounce(text)}
 				/>
