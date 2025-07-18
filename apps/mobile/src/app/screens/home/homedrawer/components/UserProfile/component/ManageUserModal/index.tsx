@@ -1,16 +1,19 @@
-import { usePermissionChecker, useRoles } from '@mezon/core';
+import { useMyRole, usePermissionChecker, useRoles } from '@mezon/core';
 import { CheckIcon } from '@mezon/mobile-components';
 import { Colors, Text, baseColor, size, useTheme, verticalScale } from '@mezon/mobile-ui';
 import {
 	ChannelMembersEntity,
+	rolesClanActions,
 	selectAllRolesClan,
 	selectCurrentClan,
 	selectUserMaxPermissionLevel,
+	setAddPermissions,
+	setRemovePermissions,
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store-mobile';
 import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -18,6 +21,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../../../../../componentUI/MezonIconCDN';
+import ImageNative from '../../../../../../../components/ImageNative';
 import { toastConfig } from '../../../../../../../configs/toastConfig';
 import { IconCDN } from '../../../../../../../constants/icon_cdn';
 import { EActionSettingUserProfile, IProfileSetting } from '../UserSettingProfile';
@@ -29,12 +33,12 @@ interface IManageUserModalProp {
 	profileSetting: IProfileSetting[];
 }
 
-export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }: IManageUserModalProp) => {
+export const ManageUserModal = memo<IManageUserModalProp>(({ user, visible, onclose, profileSetting }) => {
 	const { themeValue } = useTheme();
 	const [editMode, setEditMode] = useState(false);
 	const rolesClan = useSelector(selectAllRolesClan);
 	const currentClan = useSelector(selectCurrentClan);
-	const { updateRole } = useRoles();
+	const { maxPermissionId } = useMyRole();
 	const [selectedRole, setSelectedRole] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const { t } = useTranslation('message');
@@ -42,15 +46,121 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 	const dispatch = useAppDispatch();
 	const [isClanOwner] = usePermissionChecker([EPermission.clanOwner]);
 
+	const styles = useMemo(
+		() => ({
+			container: { flex: 1, backgroundColor: themeValue?.charcoal, paddingTop: size.s_40 },
+			headerContainer: {
+				flexDirection: 'row' as const,
+				alignItems: 'center' as const,
+				justifyContent: 'space-between' as const,
+				height: size.s_40,
+				paddingHorizontal: size.s_14
+			},
+			headerTitle: { flex: 1 },
+			userInfoContainer: {
+				flexDirection: 'row' as const,
+				alignItems: 'center' as const,
+				justifyContent: 'space-between' as const,
+				backgroundColor: themeValue.secondary,
+				padding: size.s_12,
+				gap: size.s_10,
+				marginTop: size.s_18,
+				marginHorizontal: size.s_14,
+				borderRadius: size.s_14
+			},
+			userInfo: { flex: 1, flexDirection: 'row' as const, gap: size.s_10, alignItems: 'center' as const },
+			rolesSection: { marginHorizontal: size.s_14, marginTop: size.s_20 },
+			roleListContainer: { borderRadius: size.s_10, overflow: 'hidden' as const, marginTop: size.s_8 },
+			roleItemContainer: {
+				backgroundColor: themeValue.secondary,
+				padding: size.s_14,
+				borderBottomWidth: 1,
+				borderBottomColor: themeValue.tertiary,
+				flexDirection: 'row' as const,
+				gap: size.s_10
+			},
+			roleDisplayContainer: {
+				backgroundColor: themeValue.secondary,
+				padding: size.s_14,
+				borderBottomWidth: 1,
+				borderBottomColor: themeValue.tertiary
+			},
+			checkboxContainer: { height: size.s_20, width: size.s_20 },
+			editButtonContainer: { backgroundColor: themeValue.secondary, padding: size.s_14 },
+			actionsSection: { marginHorizontal: size.s_14, marginTop: size.s_20 },
+			actionItemContainer: {
+				backgroundColor: themeValue.secondary,
+				padding: size.s_14,
+				flexDirection: 'row' as const,
+				alignItems: 'center' as const,
+				gap: size.s_12
+			},
+			actionText: { fontSize: verticalScale(14) },
+			roleCircle: {
+				height: size.s_12,
+				width: size.s_12,
+				borderRadius: size.s_12,
+				backgroundColor: Colors.bgToggleOnBtn
+			},
+			icon: {
+				width: size.s_30,
+				height: size.s_20,
+				flexBasis: size.s_20
+			},
+			content: {
+				flexBasis: size.s_10,
+				flexGrow: 1
+			},
+			roleIcon: {
+				height: size.s_20,
+				width: size.s_20
+			}
+		}),
+		[themeValue]
+	);
+
+	// Memoized checkbox styles
+	const checkboxStyles = useMemo(
+		() => ({
+			iconStyle: { borderRadius: 5 },
+			textStyle: { fontFamily: 'JosefinSans-Regular' }
+		}),
+		[]
+	);
+
 	const activeRoleOfUser = useMemo(() => {
-		return rolesClan?.filter((role) => user?.role_id?.includes(role?.id)) || [];
+		if (!rolesClan || !user?.role_id) return [];
+		return rolesClan.filter((role) => user.role_id.includes(role?.id));
 	}, [rolesClan, user?.role_id]);
 
 	const editableRoleList = useMemo(() => {
-		return rolesClan?.filter((role) => role?.id !== EVERYONE_ROLE_ID);
+		if (!rolesClan) return [];
+		return rolesClan.filter((role) => role?.id !== EVERYONE_ROLE_ID);
 	}, [rolesClan]);
 
-	const handleAfterUpdate = (isSuccess: boolean) => {
+	const roleList = useMemo(() => {
+		if (!editMode) {
+			return activeRoleOfUser?.map((role) => ({ ...role, disabled: false })) || [];
+		}
+		return (
+			editableRoleList?.map((role) => ({
+				...role,
+				disabled: isClanOwner ? false : maxPermissionLevel <= (role?.max_level_permission || 0)
+			})) || []
+		);
+	}, [editMode, activeRoleOfUser, editableRoleList, isClanOwner, maxPermissionLevel]);
+
+	// Memoized filtered profile settings
+	const actionableProfileSettings = useMemo(() => {
+		return profileSetting.filter((item) => item.value !== EActionSettingUserProfile.Manage && item.isShow);
+	}, [profileSetting]);
+
+	const hasActionableSettings = useMemo(() => {
+		return actionableProfileSettings.length > 0;
+	}, [actionableProfileSettings]);
+
+	// Memoized callback functions
+	const handleAfterUpdate = useCallback((isSuccess: boolean) => {
 		if (isSuccess) {
 			Toast.show({
 				type: 'success',
@@ -68,110 +178,151 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 				}
 			});
 		}
-	};
+	}, []);
 
-	const addRole = async (roleId: string, roleColor: string) => {
-		const activeRole = rolesClan?.find((role) => role.id === roleId);
-		const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', roleColor ?? '', [user?.user?.id], [], [], []);
-		handleAfterUpdate(Boolean(response));
-		setIsLoading(false);
-		if (response) {
-			dispatch(
-				usersClanActions.addRoleIdUser({
-					id: roleId,
-					clanId: currentClan?.clan_id,
-					userId: user?.user?.id
-				})
-			);
-		}
-	};
+	const addRole = useCallback(
+		async (roleId: string, roleColor: string) => {
+			try {
+				const activeRole = rolesClan?.find((role) => role.id === roleId);
+				const response = await dispatch(
+					rolesClanActions.updateRole({
+						roleId,
+						title: activeRole?.title ?? '',
+						color: roleColor ?? '',
+						addUserIds: [user?.user?.id],
+						activePermissionIds: [],
+						removeUserIds: [],
+						removePermissionIds: [],
+						clanId: currentClan?.clan_id || '',
+						maxPermissionId: maxPermissionId,
+						roleIcon: ''
+					})
+				);
+				handleAfterUpdate(Boolean(response?.payload));
 
-	const deleteRole = async (roleId: string, roleColor: string) => {
-		const activeRole = rolesClan?.find((role) => role.id === roleId);
-		const response = await updateRole(currentClan?.clan_id || '', roleId, activeRole?.title ?? '', roleColor ?? '', [], [], [user?.user?.id], []);
-		handleAfterUpdate(Boolean(response));
-		setIsLoading(false);
-		if (response) {
-			dispatch(
-				usersClanActions.removeRoleIdUser({
-					id: roleId,
-					clanId: currentClan?.clan_id,
-					userId: user?.user?.id
-				})
-			);
-		}
-	};
+				if (response?.payload) {
+					dispatch(
+						usersClanActions.addRoleIdUser({
+							id: roleId,
+							clanId: currentClan?.clan_id,
+							userId: user?.user?.id
+						})
+					);
+					dispatch(setAddPermissions([]));
+					dispatch(setRemovePermissions([]));
+				}
+			} catch (error) {
+				console.error('Error adding role:', error);
+				handleAfterUpdate(false);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[rolesClan, currentClan?.clan_id, user?.user?.id, handleAfterUpdate, dispatch]
+	);
 
-	const onSelectedRoleChange = async (value: boolean, roleId: string, roleColor: string) => {
-		setIsLoading(true);
-		const uniqueSelectedRole = new Set(selectedRole);
-		if (value) {
-			uniqueSelectedRole.add(roleId);
-			setSelectedRole([...uniqueSelectedRole]);
-			addRole(roleId, roleColor);
-		} else {
-			uniqueSelectedRole.delete(roleId);
-			setSelectedRole([...uniqueSelectedRole]);
-			deleteRole(roleId, roleColor);
-		}
-	};
+	const deleteRole = useCallback(
+		async (roleId: string, roleColor: string) => {
+			try {
+				const activeRole = rolesClan?.find((role) => role.id === roleId);
+				const response = await dispatch(
+					rolesClanActions.updateRole({
+						roleId,
+						title: activeRole?.title ?? '',
+						color: roleColor ?? '',
+						addUserIds: [],
+						activePermissionIds: [],
+						removeUserIds: [user?.user?.id],
+						removePermissionIds: [],
+						clanId: currentClan?.clan_id || '',
+						maxPermissionId: maxPermissionId,
+						roleIcon: ''
+					})
+				);
+
+				handleAfterUpdate(Boolean(response?.payload));
+
+				if (response?.payload) {
+					dispatch(
+						usersClanActions.removeRoleIdUser({
+							id: roleId,
+							clanId: currentClan?.clan_id,
+							userId: user?.user?.id
+						})
+					);
+				}
+			} catch (error) {
+				console.error('Error removing role:', error);
+				handleAfterUpdate(false);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[rolesClan, currentClan?.clan_id, user?.user?.id, handleAfterUpdate, dispatch]
+	);
+
+	const onSelectedRoleChange = useCallback(
+		async (value: boolean, roleId: string, roleColor: string) => {
+			if (isLoading) return; // Prevent multiple simultaneous operations
+
+			setIsLoading(true);
+			const uniqueSelectedRole = new Set(selectedRole);
+
+			if (value) {
+				uniqueSelectedRole.add(roleId);
+				setSelectedRole([...uniqueSelectedRole]);
+				await addRole(roleId, roleColor);
+			} else {
+				uniqueSelectedRole.delete(roleId);
+				setSelectedRole([...uniqueSelectedRole]);
+				await deleteRole(roleId, roleColor);
+			}
+		},
+		[selectedRole, isLoading, addRole, deleteRole]
+	);
+
+	const handleClose = useCallback(() => {
+		onclose();
+		setEditMode(false);
+	}, [onclose]);
+
+	const handleToggleEditMode = useCallback(() => {
+		setEditMode((prev) => !prev);
+	}, []);
+
+	const renderCheckboxInnerStyle = useCallback(
+		(isSelected: boolean) => ({
+			borderWidth: 1.5,
+			borderColor: isSelected ? Colors.bgButton : Colors.tertiary,
+			borderRadius: 5
+		}),
+		[]
+	);
+
+	// Early return if user is not available
+	if (!user?.user) {
+		return null;
+	}
 
 	useEffect(() => {
 		if (user?.role_id) {
 			setIsLoading(false);
-			setSelectedRole(user?.role_id);
+			setSelectedRole(user.role_id);
 		}
 	}, [user?.role_id]);
 
-	const roleList = useMemo(() => {
-		return !editMode
-			? activeRoleOfUser?.map((role) => ({ ...role, disabled: false }))
-			: editableRoleList?.map((role) => ({ ...role, disabled: isClanOwner ? false : maxPermissionLevel <= role?.max_level_permission }));
-	}, [editMode, activeRoleOfUser, editableRoleList, isClanOwner, maxPermissionLevel]);
-
-	// const menuActions = useMemo(
-	// 	() =>
-	// 		profileSetting
-	// 			.filter((item) => item.value !== EActionSettingUserProfile.Manage)
-	// 			.map((item) => ({
-	// 				items: [
-	// 					{
-	// 						title: `${item.label} '${user?.user?.username}'`,
-	// 						disabled: !item.isShow,
-	// 						textStyle: { color: baseColor.redStrong, fontSize: verticalScale(14) },
-	// 						onPress: () => handleOpenKickUserModal(item)
-	// 					}
-	// 				]
-	// 			})) satisfies IMezonMenuSectionProps[],
-	// 	[profileSetting, user]
-	// );
-
 	return (
 		<Modal visible={visible} animationType={'slide'} statusBarTranslucent={true} supportedOrientations={['portrait', 'landscape']}>
-			<View style={{ flex: 1, backgroundColor: themeValue?.charcoal, paddingTop: size.s_40 }}>
-				<View
-					style={{
-						flexDirection: 'row',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						height: size.s_40,
-						paddingHorizontal: size.s_14
-					}}
-				>
+			<View style={styles.container}>
+				<View style={styles.headerContainer}>
 					<View>
 						{!isLoading && (
-							<TouchableOpacity
-								onPress={() => {
-									onclose();
-									setEditMode(false);
-								}}
-								disabled={isLoading}
-							>
+							<TouchableOpacity onPress={handleClose} disabled={isLoading}>
 								<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_30} width={size.s_30} color={themeValue.white} />
 							</TouchableOpacity>
 						)}
 					</View>
-					<View style={{ flex: 1 }}>
+					<View style={styles.headerTitle}>
 						<Text center color={themeValue.white} h3>
 							{t('manage.edit')} {user?.user?.username}
 						</Text>
@@ -179,21 +330,9 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 				</View>
 
 				<ScrollView>
-					<View
-						style={{
-							flexDirection: 'row',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							backgroundColor: themeValue.secondary,
-							padding: size.s_12,
-							gap: size.s_10,
-							marginTop: size.s_18,
-							marginHorizontal: size.s_14,
-							borderRadius: size.s_14
-						}}
-					>
-						<View style={{ flex: 1, flexDirection: 'row', gap: size.s_10, alignItems: 'center' }}>
-							<MezonAvatar avatarUrl={user?.user?.avatar_url} username={user?.user?.username} />
+					<View style={styles.userInfoContainer}>
+						<View style={styles.userInfo}>
+							<MezonAvatar avatarUrl={user?.user?.avatar_url || ''} username={user?.user?.username || ''} />
 							<View>
 								{user?.user?.display_name ? <Text color={themeValue.white}>{user?.user?.display_name}</Text> : null}
 								<Text color={themeValue.text}>{user?.user?.username}</Text>
@@ -201,63 +340,54 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 						</View>
 					</View>
 
-					<View style={{ marginHorizontal: size.s_14, marginTop: size.s_20 }}>
+					<View style={styles.rolesSection}>
 						<Text color={themeValue.text} h5>
 							{t('manage.roles')}
 						</Text>
-						<View style={{ borderRadius: size.s_10, overflow: 'hidden', marginTop: size.s_8 }}>
+						<View style={styles.roleListContainer}>
 							{roleList.map((role) => {
 								const isDisable = isLoading || role?.disabled;
+								const isSelected = selectedRole?.includes(role?.id);
+
 								if (editMode) {
 									return (
 										<TouchableOpacity
 											key={role?.id}
-											onPress={() => onSelectedRoleChange(!selectedRole?.includes(role?.id), role?.id, role?.color)}
+											onPress={() => onSelectedRoleChange(!isSelected, role?.id, role?.color)}
 											disabled={isDisable}
 										>
-											<View
-												style={{
-													backgroundColor: themeValue.secondary,
-													padding: size.s_14,
-													borderBottomWidth: 1,
-													borderBottomColor: themeValue.tertiary,
-													flexDirection: 'row',
-													gap: size.s_10
-												}}
-											>
-												<View style={{ height: size.s_20, width: size.s_20 }}>
+											<View style={styles.roleItemContainer}>
+												<View style={styles.checkboxContainer}>
 													<BouncyCheckbox
 														disabled={isDisable}
 														size={20}
-														isChecked={selectedRole?.includes(role?.id)}
+														isChecked={isSelected}
 														onPress={(value) => onSelectedRoleChange(value, role?.id, role?.color)}
 														fillColor={isDisable ? Colors.bgGrayDark : Colors.bgButton}
-														iconStyle={{ borderRadius: 5 }}
-														innerIconStyle={{
-															borderWidth: 1.5,
-															borderColor: selectedRole?.includes(role?.id) ? Colors.bgButton : Colors.tertiary,
-															borderRadius: 5
-														}}
-														textStyle={{ fontFamily: 'JosefinSans-Regular' }}
+														iconStyle={checkboxStyles.iconStyle}
+														innerIconStyle={renderCheckboxInnerStyle(isSelected)}
+														textStyle={checkboxStyles.textStyle}
 													/>
 												</View>
-												<Text color={isDisable ? themeValue.textDisabled : themeValue.white} h4>
-													{role?.title}
-												</Text>
+												<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_6 }}>
+													<View style={[styles.roleCircle, role?.color && { backgroundColor: role?.color }]}></View>
+													<Text
+														numberOfLines={1}
+														color={isDisable ? themeValue.textDisabled : themeValue.white}
+														h4
+														style={{ maxWidth: '80%' }}
+													>
+														{role?.title}
+													</Text>
+													{role?.role_icon && <ImageNative url={role?.role_icon} style={styles.roleIcon} />}
+												</View>
 											</View>
 										</TouchableOpacity>
 									);
 								}
+
 								return (
-									<View
-										key={role?.id}
-										style={{
-											backgroundColor: themeValue.secondary,
-											padding: size.s_14,
-											borderBottomWidth: 1,
-											borderBottomColor: themeValue.tertiary
-										}}
-									>
+									<View key={role?.id} style={styles.roleDisplayContainer}>
 										<Text color={themeValue.white} h4>
 											{role?.title}
 										</Text>
@@ -265,71 +395,43 @@ export const ManageUserModal = memo(({ user, visible, onclose, profileSetting }:
 								);
 							})}
 
-							{!editMode ? (
-								<TouchableOpacity onPress={() => setEditMode(true)} disabled={isLoading}>
-									<View style={{ backgroundColor: themeValue.secondary, padding: size.s_14 }}>
-										<Text color={isLoading ? Colors.textGray : baseColor.blurple} h5>
-											{t('manage.editRoles')}
-										</Text>
-									</View>
-								</TouchableOpacity>
-							) : (
-								<TouchableOpacity onPress={() => setEditMode(false)} disabled={isLoading}>
-									<View style={{ backgroundColor: themeValue.secondary, padding: size.s_14 }}>
-										<Text color={isLoading ? Colors.textGray : baseColor.blurple} h4>
-											{t('manage.cancel')}
-										</Text>
-									</View>
-								</TouchableOpacity>
-							)}
+							<TouchableOpacity onPress={handleToggleEditMode} disabled={isLoading}>
+								<View style={styles.editButtonContainer}>
+									<Text color={isLoading ? Colors.textGray : baseColor.blurple} h5={!editMode} h4={editMode}>
+										{editMode ? t('manage.cancel') : t('manage.editRoles')}
+									</Text>
+								</View>
+							</TouchableOpacity>
 						</View>
 					</View>
 
-					<View style={{ marginHorizontal: size.s_14, marginTop: size.s_20 }}>
-						{profileSetting.find((item) => item.value !== EActionSettingUserProfile.Manage && item.isShow) && (
+					{hasActionableSettings && (
+						<View style={styles.actionsSection}>
 							<Text color={themeValue.text} h5>
 								Actions
 							</Text>
-						)}
 
-						<View style={{ borderRadius: size.s_10, overflow: 'hidden', marginTop: size.s_8 }}>
-							{profileSetting
-								.filter((item) => item.value !== EActionSettingUserProfile.Manage && item.isShow)
-								.map((item, index) => (
+							<View style={styles.roleListContainer}>
+								{actionableProfileSettings.map((item, index) => (
 									<Pressable
 										key={`${item.value}_${index}`}
-										onPress={() => item?.action(item?.value)}
-										style={{
-											backgroundColor: themeValue.secondary,
-											padding: size.s_14,
-											flexDirection: 'row',
-											alignItems: 'center',
-											gap: size.s_12
-										}}
+										onPress={() => item?.action?.(item?.value)}
+										style={styles.actionItemContainer}
 									>
 										{item.icon}
-										<Text color={baseColor.redStrong} style={{ fontSize: verticalScale(14) }}>
+										<Text color={baseColor.redStrong} style={styles.actionText}>
 											{item.label} {user?.user?.username}
 										</Text>
 									</Pressable>
 								))}
+							</View>
 						</View>
-					</View>
-
-					{/* <View style={{ padding: 15 }}>
-							<MezonMenu menu={menuActions} />
-						</View> */}
+					)}
 				</ScrollView>
 			</View>
 			<Toast config={toastConfig} />
-			{/* <MezonModal
-					visible={visibleKickUserModal}
-					visibleChange={(visible) => {
-						setVisibleKickUserModal(visible);
-					}}
-				>
-					<KickUserClanModal onRemoveUserClan={handleRemoveUserClans} user={user} />
-				</MezonModal> */}
 		</Modal>
 	);
 });
+
+ManageUserModal.displayName = 'ManageUserModal';
