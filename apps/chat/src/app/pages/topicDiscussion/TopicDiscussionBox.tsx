@@ -1,24 +1,28 @@
 import { AttachmentPreviewThumbnail, MentionReactInput, ReplyMessageBox, UserMentionList } from '@mezon/components';
-import { useChatSending, useDragAndDrop, useReference } from '@mezon/core';
+import { useChatSending, useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
 import {
 	fetchMessages,
 	referencesActions,
 	selectAllChannelMemberIds,
+	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentTopicId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
+	selectIsTopicReady,
 	selectSession,
+	selectStatusMenu,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { CREATING_TOPIC, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason, processFile } from '@mezon/utils';
+import { CREATING_TOPIC, EOverriddenPermission, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason } from '@mezon/utils';
 import isElectron from 'is-electron';
+import FileSelectionButton from 'libs/components/src/lib/components/MessageBox/FileSelectionButton';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
@@ -36,9 +40,14 @@ const TopicDiscussionBox = () => {
 	const currentInputChannelId = currentTopicId || CREATING_TOPIC;
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
-
+	const closeMenu = useSelector(selectCloseMenu);
+	const statusMenu = useSelector(selectStatusMenu);
+	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentTopicId ?? '');
 	const mode =
 		currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL;
+	const handleChildContextMenu = (event: React.MouseEvent) => {
+		event.stopPropagation();
+	};
 
 	const { sendMessage } = useChatSending({
 		mode,
@@ -52,16 +61,6 @@ const TopicDiscussionBox = () => {
 		fromTopic: true
 	});
 
-	useEffect(() => {
-		const fetchCurrentTopicMessages = async () => {
-			await dispatch(fetchMessages({ channelId: currentChannelId as string, clanId: currentClanId as string, topicId: currentTopicId || '' }));
-			setIsFetchMessageDone(true);
-		};
-		if (currentTopicId !== '') {
-			fetchCurrentTopicMessages();
-		}
-	}, [currentClanId, currentChannelId, currentTopicId, dispatch]);
-
 	const handleSend = useCallback(
 		async (
 			content: IMessageSendPayload,
@@ -70,46 +69,101 @@ const TopicDiscussionBox = () => {
 			references?: Array<ApiMessageRef>
 		) => {
 			if (!sessionUser) return;
-			await sendMessage(content, mentions, attachments, references, false, false, false, 0);
+
+			const safeAttachments = attachments ?? [];
+			const isFileOnly = !content?.t && safeAttachments.length > 0;
+			if (!content?.t && safeAttachments.length === 0) return;
+
+			await sendMessage(
+				content,
+				mentions,
+				safeAttachments,
+				references,
+				false,
+				false,
+				false,
+				0
+			);
+
+			dispatch(
+				referencesActions.setAtachmentAfterUpload({
+					channelId: currentInputChannelId,
+					files: []
+				})
+			);
+
+			setIsFetchMessageDone(true);
 		},
-		[sendMessage, sessionUser]
+		[
+			sendMessage,
+			sessionUser,
+			dispatch,
+			currentTopicId,
+			currentInputChannelId,
+			currentChannelId,
+			currentClanId
+		]
 	);
 
+
+
+
+
+
 	const handleTyping = useCallback(() => {
-		// sendMessageTyping();
 	}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
 	const firstMessageOfThisTopic = useSelector(selectFirstMessageOfCurrentTopic);
+	const onConvertToFiles = useCallback(
+		async (content: string, anonymousMessage?: boolean) => {
+			const fileContent = new Blob([content], { type: 'text/plain' });
+			const now = Date.now();
+			const filename = now + '.txt';
+			const file = new File([fileContent], filename, { type: 'text/plain' });
 
-	const onPastedFiles = useCallback(
-		async (event: React.ClipboardEvent<HTMLDivElement>) => {
-			const items = Array.from(event.clipboardData?.items || []);
-			const files = items
-				.filter((item) => item.type.startsWith('image'))
-				.map((item) => item.getAsFile())
-				.filter((file): file is File => Boolean(file));
-
-			if (!files.length) return;
-
-			const totalFiles = files.length + (attachmentFilteredByChannelId?.files?.length || 0);
-			if (totalFiles > MAX_FILE_ATTACHMENTS) {
+			if (attachmentFilteredByChannelId?.files?.length + 1 > MAX_FILE_ATTACHMENTS) {
 				setOverUploadingState(true, UploadLimitReason.COUNT);
 				return;
 			}
 
-			const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
-
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentInputChannelId,
-					files: updatedFiles
+					files: [
+						{
+							filename: file.name,
+							filetype: file.type,
+							size: file.size,
+							url: URL.createObjectURL(file)
+						}
+					]
 				})
 			);
 		},
-		[currentInputChannelId, attachmentFilteredByChannelId?.files?.length, dispatch, setOverUploadingState]
+		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
+
+	const isTopicReady = useSelector(selectIsTopicReady(currentTopicId || ''));
+	const hasFetchedRef = useRef(false);
+
+	useEffect(() => {
+		if (isTopicReady && !hasFetchedRef.current) {
+			dispatch(
+				fetchMessages({
+					channelId: currentChannelId as string,
+					clanId: currentClanId as string,
+					topicId: currentTopicId || '',
+				})
+			);
+			setIsFetchMessageDone(true);
+			hasFetchedRef.current = true;
+		}
+		if (!isTopicReady) {
+			hasFetchedRef.current = false;
+		}
+	}, [isTopicReady, currentTopicId, currentChannelId, currentClanId, dispatch]);
 
 	return (
 		<>
@@ -127,9 +181,18 @@ const TopicDiscussionBox = () => {
 					/>
 				</div>
 			)}
-			{checkAttachment && (
+
+
+			<div className="flex flex-col flex-1">
+				<div className="flex-shrink-0  flex flex-col pb-[26px] px-4 bg-theme-chat h-auto relative">
+					{dataReferences.message_ref_id && (
+						<div className="mb-1 px-[1px] w-full ">
+							<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
+						</div>
+					)}
+					{checkAttachment && (
 				<div
-					className={`${checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''} bg-theme-setting-primary max-h-full`}
+							className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}
 				>
 					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
@@ -144,29 +207,39 @@ const TopicDiscussionBox = () => {
 								</Fragment>
 							);
 						})}
+							</div>
+						</div>
+					)}
+					<div
+						className={`flex flex-inline items-start gap-2 box-content max-sm:mb-0
+						bg-theme-surface rounded-lg relative shadow-md border-theme-primary ${checkAttachment || (dataReferences && dataReferences.message_ref_id) ? 'rounded-t-none' : 'rounded-t-lg'}
+						${closeMenu && !statusMenu ? 'max-w-wrappBoxChatViewMobile' : 'w-wrappBoxChatView'}`}
+					>
+						<FileSelectionButton
+							currentClanId={currentClanId || ''}
+							currentChannelId={currentInputChannelId}
+							hasPermissionEdit={canSendMessage}
+						/>
+
+						<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
+							<div className={`w-full border-none rounded-r-lg gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
+								<MentionReactInput
+									onSend={handleSend}
+									onTyping={handleTypingDebounced}
+									listMentions={UserMentionList({
+										channelID: currentChannel?.channel_id as string,
+										channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
+									})}
+									isTopic
+									handleConvertToFile={onConvertToFiles}
+									currentChannelId={currentInputChannelId}
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
-			)}
-			{dataReferences.message_ref_id && (
-				<div className="relative z-1 pb-[4px] w-[450px] ml-3">
-					<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
-				</div>
-			)}
-			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0 flex flex-col pb-4 px-3 bg-theme-chat  h-auto relative">
-					<MentionReactInput
-						handlePaste={onPastedFiles}
-						onSend={handleSend}
-						onTyping={handleTypingDebounced}
-						listMentions={UserMentionList({
-							channelID: currentChannel?.channel_id as string,
-							channelMode: ChannelStreamMode.STREAM_MODE_CHANNEL
-						})}
-						isTopic
-						currentChannelId={currentInputChannelId}
-					/>
-				</div>
 			</div>
+
 		</>
 	);
 };
