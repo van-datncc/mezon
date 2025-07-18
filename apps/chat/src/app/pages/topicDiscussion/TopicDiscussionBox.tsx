@@ -62,7 +62,6 @@ const TopicDiscussionBox = () => {
 
 	useEffect(() => {
 		const fetchCurrentTopicMessages = async () => {
-			// Chờ 300ms để backend xử lý xong file message
 			await new Promise((res) => setTimeout(res, 300));
 			await dispatch(
 				fetchMessages({
