@@ -29,18 +29,7 @@ import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPubl
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import {
-	ActivityIndicator,
-	FlatList,
-	Image as ImageRN,
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View
-} from 'react-native';
+import { ActivityIndicator, FlatList, Image as ImageRN, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
@@ -440,184 +429,182 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 	return (
 		<View style={styles.wrapper}>
-			<KeyboardAvoidingView behavior="position">
-				<StatusBarHeight />
-				<View style={styles.header}>
-					<TouchableOpacity onPress={() => onClose()}>
-						<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_28} height={size.s_28} />
-					</TouchableOpacity>
-					<Text style={styles.titleHeader}>Share</Text>
-					{channelSelected && isAttachmentUploaded ? (
-						isLoading ? (
-							<Flow size={size.s_28} color={Colors.white} />
-						) : (
-							<TouchableOpacity onPress={onSend}>
-								<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
-							</TouchableOpacity>
-						)
+			<StatusBarHeight />
+			<View style={styles.header}>
+				<TouchableOpacity onPress={() => onClose()}>
+					<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_28} height={size.s_28} />
+				</TouchableOpacity>
+				<Text style={styles.titleHeader}>Share</Text>
+				{channelSelected && isAttachmentUploaded ? (
+					isLoading ? (
+						<Flow size={size.s_28} color={Colors.white} />
 					) : (
-						<View style={{ width: size.s_28 }} />
+						<TouchableOpacity onPress={onSend}>
+							<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
+						</TouchableOpacity>
+					)
+				) : (
+					<View style={{ width: size.s_28 }} />
+				)}
+			</View>
+			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
+				<View style={styles.rowItem}>
+					<Text style={styles.title}>Message preview</Text>
+					{!!getAttachmentUnique(attachmentUpload)?.length && (
+						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
+							<ScrollView horizontal style={styles.wrapperMedia}>
+								{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
+									const isFile =
+										Platform.OS === 'android'
+											? !isImage(media?.filename?.toLowerCase()) && !isVideo(media?.filename?.toLowerCase())
+											: !isImage(media?.url?.toLowerCase()) && !isVideo(media?.url?.toLowerCase());
+									const isUploaded = media?.url?.includes('http');
+
+									return (
+										<View
+											key={`${media?.url}_${index}_media_sharing`}
+											style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
+										>
+											{isVideo(media?.filename?.toLowerCase()) && isVideo(media?.url?.toLowerCase()) && (
+												<View style={styles.videoOverlay}>
+													<PlayIcon width={size.s_20} height={size.s_20} />
+												</View>
+											)}
+											{isFile ? (
+												<AttachmentFilePreview attachment={media} />
+											) : (
+												<FastImage
+													source={{
+														uri: createImgproxyUrl(media?.url ?? '', { width: 300, height: 300, resizeType: 'fit' })
+													}}
+													style={styles.itemMedia}
+												/>
+											)}
+											{isUploaded && (
+												<TouchableOpacity
+													style={styles.iconRemoveMedia}
+													onPress={() => removeAttachmentByUrl(media.url ?? '')}
+												>
+													<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} height={size.s_18} />
+												</TouchableOpacity>
+											)}
+
+											{!isUploaded && (
+												<View style={styles.videoOverlay}>
+													<ActivityIndicator size={'small'} color={'white'} />
+												</View>
+											)}
+										</View>
+									);
+								})}
+							</ScrollView>
+						</View>
 					)}
+
+					<View style={styles.inputWrapper}>
+						<View style={styles.iconLeftInput}>
+							<PenIcon width={size.s_18} />
+						</View>
+						<TextInput
+							style={styles.textInput}
+							value={dataText}
+							onChangeText={(text) => setDataText(text)}
+							placeholder={'Add a Comment (Optional)'}
+							placeholderTextColor={Colors.tertiary}
+						/>
+						{!!dataText?.length && (
+							<TouchableOpacity activeOpacity={0.8} onPress={() => setDataText('')} style={styles.iconRightInput}>
+								<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} />
+							</TouchableOpacity>
+						)}
+					</View>
 				</View>
-				<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
-					<View style={styles.rowItem}>
-						<Text style={styles.title}>Message preview</Text>
-						{!!getAttachmentUnique(attachmentUpload)?.length && (
-							<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
-								<ScrollView horizontal style={styles.wrapperMedia}>
-									{getAttachmentUnique(attachmentUpload)?.map((media: any, index) => {
-										const isFile =
-											Platform.OS === 'android'
-												? !isImage(media?.filename?.toLowerCase()) && !isVideo(media?.filename?.toLowerCase())
-												: !isImage(media?.url?.toLowerCase()) && !isVideo(media?.url?.toLowerCase());
-										const isUploaded = media?.url?.includes('http');
 
-										return (
-											<View
-												key={`${media?.url}_${index}_media_sharing`}
-												style={[styles.wrapperItemMedia, isFile && { height: size.s_60, width: size.s_50 * 3 }]}
-											>
-												{isVideo(media?.filename?.toLowerCase()) && isVideo(media?.url?.toLowerCase()) && (
-													<View style={styles.videoOverlay}>
-														<PlayIcon width={size.s_20} height={size.s_20} />
-													</View>
-												)}
-												{isFile ? (
-													<AttachmentFilePreview attachment={media} />
-												) : (
-													<FastImage
-														source={{
-															uri: createImgproxyUrl(media?.url ?? '', { width: 300, height: 300, resizeType: 'fit' })
-														}}
-														style={styles.itemMedia}
-													/>
-												)}
-												{isUploaded && (
-													<TouchableOpacity
-														style={styles.iconRemoveMedia}
-														onPress={() => removeAttachmentByUrl(media.url ?? '')}
-													>
-														<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} height={size.s_18} />
-													</TouchableOpacity>
-												)}
-
-												{!isUploaded && (
-													<View style={styles.videoOverlay}>
-														<ActivityIndicator size={'small'} color={'white'} />
-													</View>
-												)}
-											</View>
-										);
-									})}
-								</ScrollView>
+				<View style={styles.rowItem}>
+					<Text style={styles.title}>Share to</Text>
+					<View style={styles.inputWrapper}>
+						{channelSelected ? (
+							<View style={styles.iconLeftInput}>
+								<MezonAvatar
+									avatarUrl={channelSelected?.channel_avatar?.[0] || clans?.[channelSelected?.clan_id]?.logo}
+									username={clans?.[channelSelected?.clan_id]?.clan_name || channelSelected?.channel_label}
+									width={size.s_18}
+									height={size.s_18}
+								/>
+							</View>
+						) : (
+							<View style={styles.iconLeftInput}>
+								<SearchIcon width={size.s_18} height={size.s_18} />
 							</View>
 						)}
-
-						<View style={styles.inputWrapper}>
-							<View style={styles.iconLeftInput}>
-								<PenIcon width={size.s_18} />
-							</View>
+						{channelSelected ? (
+							<Text style={styles.textChannelSelected}>{channelSelected?.channel_label}</Text>
+						) : (
 							<TextInput
+								ref={inputSearchRef}
 								style={styles.textInput}
-								value={dataText}
-								onChangeText={(text) => setDataText(text)}
-								placeholder={'Add a Comment (Optional)'}
+								onChangeText={(value) => {
+									setSearchText(value);
+									debouncedSearch(value);
+								}}
+								placeholder={'Select a channel or category...'}
 								placeholderTextColor={Colors.tertiary}
 							/>
-							{!!dataText?.length && (
-								<TouchableOpacity activeOpacity={0.8} onPress={() => setDataText('')} style={styles.iconRightInput}>
-									<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} />
-								</TouchableOpacity>
-							)}
-						</View>
-					</View>
-
-					<View style={styles.rowItem}>
-						<Text style={styles.title}>Share to</Text>
-						<View style={styles.inputWrapper}>
-							{channelSelected ? (
-								<View style={styles.iconLeftInput}>
-									<MezonAvatar
-										avatarUrl={channelSelected?.channel_avatar?.[0] || clans?.[channelSelected?.clan_id]?.logo}
-										username={clans?.[channelSelected?.clan_id]?.clan_name || channelSelected?.channel_label}
-										width={size.s_18}
-										height={size.s_18}
-									/>
-								</View>
-							) : (
-								<View style={styles.iconLeftInput}>
-									<SearchIcon width={size.s_18} height={size.s_18} />
-								</View>
-							)}
-							{channelSelected ? (
-								<Text style={styles.textChannelSelected}>{channelSelected?.channel_label}</Text>
-							) : (
-								<TextInput
-									ref={inputSearchRef}
-									style={styles.textInput}
-									onChangeText={(value) => {
-										setSearchText(value);
-										debouncedSearch(value);
-									}}
-									placeholder={'Select a channel or category...'}
-									placeholderTextColor={Colors.tertiary}
-								/>
-							)}
-							{channelSelected ? (
+						)}
+						{channelSelected ? (
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => {
+									setChannelSelected(undefined);
+									inputSearchRef?.current?.focus?.();
+								}}
+								style={styles.iconRightInput}
+							>
+								<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} />
+							</TouchableOpacity>
+						) : (
+							!!searchText?.length && (
 								<TouchableOpacity
 									activeOpacity={0.8}
 									onPress={() => {
-										setChannelSelected(undefined);
-										inputSearchRef?.current?.focus?.();
+										setSearchText('');
+										inputSearchRef?.current?.clear?.();
+										debouncedSearch('');
 									}}
 									style={styles.iconRightInput}
 								>
 									<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} />
 								</TouchableOpacity>
-							) : (
-								!!searchText?.length && (
-									<TouchableOpacity
-										activeOpacity={0.8}
-										onPress={() => {
-											setSearchText('');
-											inputSearchRef?.current?.clear?.();
-											debouncedSearch('');
-										}}
-										style={styles.iconRightInput}
-									>
-										<MezonIconCDN icon={IconCDN.closeIcon} width={size.s_18} />
-									</TouchableOpacity>
-								)
-							)}
-						</View>
+							)
+						)}
 					</View>
+				</View>
 
-					{!!dataShareTo?.length && (
-						<View style={styles.rowItem}>
-							<Text style={styles.title}>Suggestions</Text>
-							<FlatList
-								data={dataShareTo}
-								keyExtractor={(item, index) => `${item?.id}_${index}_suggestion`}
-								renderItem={renderItemSuggest}
-								keyboardShouldPersistTaps={'handled'}
-								onEndReachedThreshold={0.1}
-								initialNumToRender={1}
-								maxToRenderPerBatch={5}
-								windowSize={15}
-								updateCellsBatchingPeriod={10}
-								decelerationRate={'fast'}
-								disableVirtualization={true}
-								removeClippedSubviews={true}
-								getItemLayout={(_, index) => ({
-									length: size.s_44,
-									offset: size.s_44 * index,
-									index
-								})}
-							/>
-						</View>
-					)}
-				</ScrollView>
-			</KeyboardAvoidingView>
+				{!!dataShareTo?.length && (
+					<View style={styles.rowItem}>
+						<Text style={styles.title}>Suggestions</Text>
+						<FlatList
+							data={dataShareTo}
+							keyExtractor={(item, index) => `${item?.id}_${index}_suggestion`}
+							renderItem={renderItemSuggest}
+							keyboardShouldPersistTaps={'handled'}
+							onEndReachedThreshold={0.1}
+							initialNumToRender={1}
+							maxToRenderPerBatch={5}
+							windowSize={15}
+							updateCellsBatchingPeriod={10}
+							decelerationRate={'fast'}
+							disableVirtualization={true}
+							removeClippedSubviews={true}
+							getItemLayout={(_, index) => ({
+								length: size.s_42,
+								offset: size.s_42 * index,
+								index
+							})}
+						/>
+					</View>
+				)}
+			</ScrollView>
 		</View>
 	);
 };
