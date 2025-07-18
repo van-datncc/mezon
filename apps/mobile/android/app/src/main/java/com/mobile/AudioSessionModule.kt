@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothClass
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -123,11 +124,46 @@ class AudioSessionModule(private val reactContext: ReactApplicationContext) : Re
     }
 
     private fun isBluetoothAudioDevice(device: BluetoothDevice): Boolean {
-        val bluetoothAdapter = this.bluetoothAdapter ?: return false
-        val pairedDevices = bluetoothAdapter.bondedDevices
+        return try {
+            val deviceClass = device.bluetoothClass
+            if (deviceClass == null) {
+                Log.w(TAG, "Device class is null for device: ${device.name}")
+                return false
+            }
 
-        return pairedDevices.any { pairedDevice ->
-            pairedDevice == device && device.bluetoothClass.majorDeviceClass == 1024 // AUDIO_VIDEO
+            val majorDeviceClass = deviceClass.majorDeviceClass
+            val deviceClassCode = deviceClass.deviceClass
+
+            // Check for audio/video devices (headphones, headsets, speakers)
+            val isAudioVideo = majorDeviceClass == BluetoothClass.Device.Major.AUDIO_VIDEO
+            
+            // Check specific audio device types
+            val isHeadphones = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_HEADPHONES
+            val isHandsfree = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE
+            val isHeadset = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_WEARABLE_HEADSET
+            val isSpeaker = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_LOUDSPEAKER
+            val isCarAudio = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_CAR_AUDIO
+            val isHiFiAudio = deviceClassCode == BluetoothClass.Device.AUDIO_VIDEO_HIFI_AUDIO
+            
+            val isAudioDevice = isAudioVideo && (isHeadphones || isHandsfree || isHeadset || isSpeaker || isCarAudio || isHiFiAudio)
+            
+            // Check if device supports A2DP or headset profiles
+            val uuids = device.uuids
+            val hasAudioProfile = uuids?.any { uuid ->
+                uuid.toString().contains("0000110b", ignoreCase = true) || // A2DP
+                uuid.toString().contains("0000111e", ignoreCase = true) || // Handsfree
+                uuid.toString().contains("00001108", ignoreCase = true)    // Headset
+            } ?: false
+
+            val result = isAudioDevice || hasAudioProfile
+            
+            Log.d(TAG, "Device: ${device.name} - Audio device: $result (MajorClass: $majorDeviceClass, DeviceClass: $deviceClassCode, HasAudioProfile: $hasAudioProfile)")
+            
+            return result
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking if device is audio device: ${device.name}", e)
+            false
         }
     }
 
@@ -302,35 +338,102 @@ class AudioSessionModule(private val reactContext: ReactApplicationContext) : Re
 
             // Check if Bluetooth is enabled
             if (!bluetoothAdapter.isEnabled) {
+                Log.d(TAG, "Bluetooth is not enabled")
                 return false
             }
 
-            // Check if any paired audio devices are connected
-            val pairedDevices = bluetoothAdapter.bondedDevices
-            pairedDevices.any { device ->
-                // Check if the device is an audio device and connected
-                isBluetoothAudioDevice(device) &&
-                device.isConnected() // This requires API level check
+            // Use BluetoothHeadset profile if available
+            bluetoothHeadset?.let { headset ->
+                val connectedDevices = headset.connectedDevices
+                if (connectedDevices.isNotEmpty()) {
+                    Log.d(TAG, "Found ${connectedDevices.size} connected Bluetooth headset devices via profile")
+                    connectedDevices.forEach { device ->
+                        Log.d(TAG, "Connected device: ${device.name} - ${device.address}")
+                    }
+                    return true
+                }
             }
+
+            // Fallback: Check audio manager SCO state
+            val isScoOn = audioManager.isBluetoothScoOn
+            val isScoAvailable = audioManager.isBluetoothScoAvailableOffCall
+            
+            Log.d(TAG, "Bluetooth SCO - On: $isScoOn, Available: $isScoAvailable")
+            
+            if (isScoOn) {
+                return true
+            }
+
+            // Additional check: Look for any connected audio devices through AudioManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val audioDevices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+                val bluetoothDevices = audioDevices.filter { device ->
+                    device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
+                    device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
+                }
+                
+                if (bluetoothDevices.isNotEmpty()) {
+                    Log.d(TAG, "Found ${bluetoothDevices.size} connected Bluetooth audio devices via AudioManager")
+                    bluetoothDevices.forEach { device ->
+                        Log.d(TAG, "Audio device: ${device.productName} - Type: ${getDeviceTypeString(device.type)}")
+                    }
+                    return true
+                }
+            }
+
+            // Final fallback: Check paired devices with improved device type detection
+            val pairedDevices = bluetoothAdapter.bondedDevices
+            val connectedAudioDevices = pairedDevices.filter { device ->
+                isBluetoothAudioDevice(device) && isDeviceConnected(device)
+            }
+            
+            if (connectedAudioDevices.isNotEmpty()) {
+                Log.d(TAG, "Found ${connectedAudioDevices.size} connected audio devices via paired devices check")
+                return true
+            }
+
+            Log.d(TAG, "No Bluetooth audio devices found connected")
+            return false
+            
         } catch (e: Exception) {
             Log.e(TAG, "Error checking Bluetooth headset connection", e)
             false
         }
     }
 
-    // Helper method to check if device is connected (with API level handling)
-    private fun BluetoothDevice.isConnected(): Boolean {
+    // Improved device connection check
+    private fun isDeviceConnected(device: BluetoothDevice): Boolean {
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                // Use reflection to access the hidden isConnected method
-                val method = this.javaClass.getMethod("isConnected")
-                method.invoke(this) as Boolean
-            } else {
-                // For older versions, assume connected if bonded
-                bondState == BluetoothDevice.BOND_BONDED
+            // First check bond state
+            if (device.bondState != BluetoothDevice.BOND_BONDED) {
+                return false
             }
+
+            // Use BluetoothHeadset profile if available for more accurate results
+            bluetoothHeadset?.let { headset ->
+                val connectionState = headset.getConnectionState(device)
+                val isConnected = connectionState == BluetoothHeadset.STATE_CONNECTED
+                Log.d(TAG, "Device ${device.name} headset profile connection state: $connectionState (connected: $isConnected)")
+                return isConnected
+            }
+
+            // Fallback to reflection method with better error handling
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                return try {
+                    val method = device.javaClass.getMethod("isConnected")
+                    method.invoke(device) as Boolean
+                } catch (reflectionException: Exception) {
+                    Log.w(TAG, "Reflection method failed for device: ${device.name}, assuming connected if bonded", reflectionException)
+                    // If reflection fails, assume connected if bonded and audio device
+                    true
+                }
+            }
+            
+            // For very old Android versions, assume connected if bonded
+            return true
+            
         } catch (e: Exception) {
-            Log.e(TAG, "Error checking device connection status", e)
+            Log.e(TAG, "Error checking device connection status for: ${device.name}", e)
             false
         }
     }
