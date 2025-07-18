@@ -159,7 +159,8 @@ export const BaseRecordAudioMessage = memo(({ channelId, mode, topicId = '' }: I
 		mode,
 		setIsDisplay,
 		recordUrl,
-		stopRecording
+		stopRecording,
+		topicId
 	]);
 
 	const normalizeFilePath = (path) => {

@@ -19,7 +19,6 @@ const MessageTopic = ({ message, avatar }: { message: MessagesEntity; avatar: st
 	const handleOpenTopic = () => {
 		dispatch(topicsActions.setCurrentTopicInitMessage(message));
 		dispatch(topicsActions.setCurrentTopicId(message?.content?.tp || ''));
-		dispatch(topicsActions.setIsShowCreateTopic(true));
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 			screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
 		});

@@ -99,10 +99,10 @@ const MessageModalImage = () => {
 			closeModal();
 			return;
 		}
-		if (event.key === 'ArrowUp') {
+		if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
 			handleSelectNextImage();
 		}
-		if (event.key === 'ArrowDown') {
+		if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
 			handleSelectPreviousImage();
 		}
 	};

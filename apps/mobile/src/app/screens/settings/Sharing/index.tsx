@@ -26,11 +26,10 @@ import {
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
-import { FlashList } from '@shopify/flash-list';
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Image as ImageRN, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image as ImageRN, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Flow } from 'react-native-animated-spinkit';
 import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
@@ -44,7 +43,6 @@ import { isImage, isVideo } from '../../../utils/helpers';
 import AttachmentFilePreview from '../../home/homedrawer/components/AttachmentFilePreview';
 import SharingSuggestItem from './SharingSuggestItem';
 import { styles } from './styles';
-
 interface ISharing {
 	data: any;
 	onClose?: (isSend?: boolean) => void;
@@ -55,18 +53,21 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 	const clans = useMemo(() => {
 		return selectClansEntities(store.getState() as any);
-	}, [store]);
+	}, []);
 
 	const listChannelsText = useMemo(() => {
 		const listChannels = selectAllChannelsByUser(store.getState() as any);
 		return listChannels.filter(
 			(channel) => channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
 		);
-	}, [store]);
-	const listDM = selectDirectsOpenlist(store.getState() as any);
+	}, []);
+
+	const listDM = useMemo(() => {
+		return selectDirectsOpenlist(store.getState() as any);
+	}, []);
 
 	const listDMText = useMemo(() => {
-		return listDM.filter((channel) => !!channel.channel_label);
+		return listDM?.filter((channel) => !!channel?.channel_label);
 	}, [listDM]);
 
 	const mezon = useMezon();
@@ -82,6 +83,9 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 	const dataMedia = useMemo(() => {
 		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
+	const allChannels = useMemo(() => {
+		return [...(listChannelsText || []), ...(listDMText || [])];
+	}, [listChannelsText, listDMText]);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
@@ -97,51 +101,49 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 	}, [handleReconnect]);
 
 	useEffect(() => {
-		if (searchText) {
-			handleSearchShareTo();
-		} else {
-			setDataShareTo([...listChannelsText, ...listDMText]);
-		}
-	}, [listChannelsText, listDMText, searchText]);
-
-	useEffect(() => {
 		if (dataMedia?.length) {
 			convertFileFormat();
 		}
 	}, [dataMedia]);
 
 	useEffect(() => {
-		if (listChannelsText || listDMText) setDataShareTo([...listChannelsText, ...listDMText]);
-	}, [listChannelsText, listDMText]);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const debouncedSetSearchText = useMemo(() => debounce((value) => setSearchText(value), 200), []);
+		if (listChannelsText || listDMText) setDataShareTo(allChannels);
+	}, [allChannels]);
+
 	const generateChannelMatch = (data: any, DMList: any, searchText: string) => {
-		const matchChannels = [...DMList, ...data].filter((channel: { channel_label?: string | number }) =>
+		const matchChannels = [...DMList, ...data]?.filter((channel: { channel_label?: string | number }) =>
 			channel.channel_label?.toString()?.trim()?.toLowerCase()?.includes(searchText?.trim()?.toLowerCase())
 		);
-		if (matchChannels.length > 0) {
-			const matchIdList = new Set(matchChannels.map((item) => item.channel_id));
-			const resultList = [...DMList, ...data].filter((item) => matchIdList.has(item.parent_id));
+		if (matchChannels?.length > 0) {
+			const matchIdList = new Set(matchChannels?.map((item) => item?.channel_id));
+			const resultList = [...DMList, ...data]?.filter((item) => matchIdList.has(item?.parent_id));
 
 			return [...matchChannels, ...resultList];
 		}
 		return [];
 	};
 
-	const handleSearchShareTo = async () => {
-		const matchedChannels = generateChannelMatch(listChannelsText, listDMText, searchText);
-		setDataShareTo(matchedChannels || []);
-	};
+	const debouncedSearch = useCallback(
+		debounce((keyword: string) => {
+			if (keyword?.trim()) {
+				const matchedChannels = generateChannelMatch(listChannelsText, listDMText, keyword);
+				setDataShareTo(matchedChannels || []);
+			} else {
+				setDataShareTo(allChannels);
+			}
+		}, 300),
+		[allChannels]
+	);
 
 	const onChooseSuggestion = useCallback(async (channel: any) => {
 		// Send to DM message
-		if (channel.type === ChannelStreamMode.STREAM_MODE_DM || channel.type === ChannelStreamMode.STREAM_MODE_GROUP) {
+		if (channel?.type === ChannelStreamMode.STREAM_MODE_DM || channel.type === ChannelStreamMode.STREAM_MODE_GROUP) {
 			const store = await getStoreAsync();
 			store.dispatch(
 				directActions.joinDirectMessage({
-					directMessageId: channel.id,
-					channelName: channel.channel_label,
-					type: channel.type
+					directMessageId: channel?.id,
+					channelName: channel?.channel_label,
+					type: channel?.type
 				})
 			);
 		}
@@ -162,7 +164,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 		await mezon.socketRef.current.writeChatMessage(
 			'0',
-			channelSelected.id,
+			channelSelected?.id,
 			Number(channelSelected?.user_id?.length) === 1 ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP,
 			false,
 			{
@@ -189,33 +191,33 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		const isDiffClan = clanIdStore !== channelSelected?.clan_id;
 		requestAnimationFrame(async () => {
 			if (isDiffClan) {
-				await store.dispatch(clansActions.joinClan({ clanId: channelSelected.clan_id }));
-				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected.clan_id }));
+				await store.dispatch(clansActions.joinClan({ clanId: channelSelected?.clan_id }));
+				await store.dispatch(clansActions.changeCurrentClan({ clanId: channelSelected?.clan_id }));
 			}
 			await store.dispatch(
 				channelsActions.joinChannel({
-					clanId: channelSelected.clan_id ?? '',
-					channelId: channelSelected.channel_id,
+					clanId: channelSelected?.clan_id ?? '',
+					channelId: channelSelected?.channel_id,
 					noFetchMembers: false,
 					noCache: true
 				})
 			);
 		});
-		const dataSave = getUpdateOrAddClanChannelCache(channelSelected.clan_id, channelSelected.channel_id);
+		const dataSave = getUpdateOrAddClanChannelCache(channelSelected?.clan_id, channelSelected?.channel_id);
 		save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 		save(STORAGE_CLAN_ID, channelSelected?.clan_id);
 		await store.dispatch(
 			channelsActions.joinChat({
-				clanId: channelSelected.clan_id,
-				channelId: channelSelected.channel_id,
-				channelType: channelSelected.type,
+				clanId: channelSelected?.clan_id,
+				channelId: channelSelected?.channel_id,
+				channelType: channelSelected?.type,
 				isPublic: isPublic
 			})
 		);
 
 		await mezon.socketRef.current.writeChatMessage(
-			channelSelected.clan_id,
-			channelSelected.channel_id,
+			channelSelected?.clan_id,
+			channelSelected?.channel_id,
 			checkIsThread(channelSelected) ? ChannelStreamMode.STREAM_MODE_THREAD : ChannelStreamMode.STREAM_MODE_CHANNEL,
 			isPublic,
 			{
@@ -310,7 +312,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 						: checkIsImage
 							? await compressImage(media?.filePath || media?.contentUri)
 							: null;
-					const fileData = await RNFS.readFile(pathCompressed || media.filePath || media?.contentUri, 'base64');
+					const fileData = await RNFS.readFile(pathCompressed || media?.filePath || media?.contentUri, 'base64');
 					let width = 600;
 					let height = 900;
 					if (checkIsImage) {
@@ -330,7 +332,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 						});
 					}
 					return {
-						uri: media.contentUri || media?.filePath,
+						uri: media?.contentUri || media?.filePath,
 						name: media?.fileName || media?.contentUri || media?.filePath,
 						type: media?.mimeType,
 						size: fileSize,
@@ -408,14 +410,22 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 	const isAttachmentUploaded = useMemo(() => {
 		if (!attachmentUpload) return true;
 
-		return attachmentUpload.every((attachment: any) => attachment.url.includes('http'));
+		return attachmentUpload.every((attachment: any) => attachment?.url?.includes('http'));
 	}, [attachmentUpload]);
 
-	const renderItemSuggest = ({ item, index }) => {
-		return (
-			<SharingSuggestItem key={`${item?.channel_id}_${index}_share_suggest_item`} item={item} clans={clans} onChooseItem={onChooseSuggestion} />
-		);
-	};
+	const renderItemSuggest = useCallback(
+		({ item, index }) => {
+			return (
+				<SharingSuggestItem
+					key={`${item?.channel_id}_${index}_share_suggest_item`}
+					item={item}
+					clans={clans}
+					onChooseItem={onChooseSuggestion}
+				/>
+			);
+		},
+		[clans]
+	);
 
 	return (
 		<View style={styles.wrapper}>
@@ -533,7 +543,10 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 							<TextInput
 								ref={inputSearchRef}
 								style={styles.textInput}
-								onChangeText={debouncedSetSearchText}
+								onChangeText={(value) => {
+									setSearchText(value);
+									debouncedSearch(value);
+								}}
 								placeholder={'Select a channel or category...'}
 								placeholderTextColor={Colors.tertiary}
 							/>
@@ -556,6 +569,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 									onPress={() => {
 										setSearchText('');
 										inputSearchRef?.current?.clear?.();
+										debouncedSearch('');
 									}}
 									style={styles.iconRightInput}
 								>
@@ -569,11 +583,24 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 				{!!dataShareTo?.length && (
 					<View style={styles.rowItem}>
 						<Text style={styles.title}>Suggestions</Text>
-						<FlashList
+						<FlatList
 							data={dataShareTo}
-							renderItem={renderItemSuggest}
 							keyExtractor={(item, index) => `${item?.id}_${index}_suggestion`}
-							estimatedItemSize={size.s_30}
+							renderItem={renderItemSuggest}
+							keyboardShouldPersistTaps={'handled'}
+							onEndReachedThreshold={0.1}
+							initialNumToRender={1}
+							maxToRenderPerBatch={5}
+							windowSize={15}
+							updateCellsBatchingPeriod={10}
+							decelerationRate={'fast'}
+							disableVirtualization={true}
+							removeClippedSubviews={true}
+							getItemLayout={(_, index) => ({
+								length: size.s_42,
+								offset: size.s_42 * index,
+								index
+							})}
 						/>
 					</View>
 				)}

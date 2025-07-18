@@ -8,7 +8,7 @@ import {
 	STORAGE_IS_DISABLE_LOAD_BACKGROUND,
 	STORAGE_MY_USER_ID
 } from '@mezon/mobile-components';
-import { appActions, channelsActions, clansActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
+import { appActions, channelsActions, clansActions, directActions, getFirstMessageOfTopic, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import notifee from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
@@ -485,6 +485,7 @@ const handleOpenTopicDiscustion = async (store: any, topicId: string, channelId:
 	promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(null)));
 	promises.push(store.dispatch(topicsActions.setCurrentTopicId(topicId || '')));
 	promises.push(store.dispatch(topicsActions.setIsShowCreateTopic(true)));
+	promises.push(store.dispatch(getFirstMessageOfTopic(topicId || '')));
 
 	await Promise.all(promises);
 

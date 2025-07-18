@@ -25,7 +25,8 @@ export const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		paddingBottom: size.s_30,
+		paddingTop: size.s_10,
+		paddingBottom: size.s_10,
 		paddingHorizontal: size.s_10
 	},
 	titleHeader: {
@@ -41,14 +42,13 @@ export const styles = StyleSheet.create({
 		textTransform: 'uppercase'
 	},
 	rowItem: {
-		marginBottom: size.s_30
+		marginBottom: size.s_24
 	},
 	inputWrapper: {
 		backgroundColor: Colors.primary,
 		flexDirection: 'row',
 		alignItems: 'center',
 		paddingHorizontal: size.s_10,
-		paddingVertical: size.s_4,
 		borderRadius: size.s_10
 	},
 	iconLeftInput: {

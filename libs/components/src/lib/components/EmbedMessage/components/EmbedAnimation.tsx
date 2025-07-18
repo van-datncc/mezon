@@ -17,7 +17,7 @@ const BREAK_POINT_RESPONSIVE = 1200;
 const DEFAULT_HEIGH = 133;
 const DEFAULT_WIDTH = 133;
 const WIDTH_BOX_ANIMATION_SMALL = 80;
-const HEIGH_BOX_ANIMATION_SMALL = (80 / DEFAULT_WIDTH) * DEFAULT_HEIGH;
+const HEIGH_BOX_ANIMATION_SMALL = 80;
 export const EmbedAnimation = ({
 	url_image,
 	url_position,
@@ -44,7 +44,11 @@ export const EmbedAnimation = ({
 				const style = document.createElement('style');
 				const widthItem = jsonPosition.frames[poolItem[0]].frame.w;
 				const heightItem = jsonPosition.frames[poolItem[0]].frame.h;
-				const ratioWidthBig = widthItem < heightItem ? DEFAULT_WIDTH / widthItem : DEFAULT_HEIGH / heightItem;
+				const defaultSizeBig = widthItem < heightItem ? DEFAULT_WIDTH : DEFAULT_HEIGH;
+				const defaultSizeSmall = widthItem < heightItem ? WIDTH_BOX_ANIMATION_SMALL : HEIGH_BOX_ANIMATION_SMALL;
+				const boxSize = (ref.current?.offsetWidth || 0) > defaultSizeBig * pool.length ? defaultSizeBig : defaultSizeSmall;
+				const ratioWidthBig = boxSize / (widthItem < heightItem ? widthItem : heightItem);
+
 				const ratioWidthSmall = widthItem < heightItem ? WIDTH_BOX_ANIMATION_SMALL / widthItem : HEIGH_BOX_ANIMATION_SMALL / heightItem;
 
 				if (!isResult) {
@@ -57,6 +61,8 @@ export const EmbedAnimation = ({
             animation: animation_embed_${index}_${messageId} ${duration}s steps(1) forwards;
             animation-iteration-count: ${repeat ? repeat : 'infinite'};
             background-repeat : no-repeat;
+            width : ${DEFAULT_HEIGH * ratioWidthBig}px !important;
+            height : ${DEFAULT_WIDTH * ratioWidthBig}px !important;
             background-size: ${jsonPosition.meta.size.w * ratioWidthBig}px ${jsonPosition.meta.size.h * ratioWidthBig}px;
             }
 
@@ -89,6 +95,8 @@ export const EmbedAnimation = ({
             background-repeat : no-repeat;
             background-position: -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.x * ratioWidthBig}px -${jsonPosition.frames[poolItem[poolItem.length - 1]].frame.y * ratioWidthBig}px;
             background-size: ${jsonPosition.meta.size.w * ratioWidthBig}px ${jsonPosition.meta.size.h * ratioWidthBig}px;
+            width : ${DEFAULT_HEIGH * ratioWidthBig}px !important;
+            height : ${DEFAULT_WIDTH * ratioWidthBig}px !important;
             }
               @media (max-width: ${BREAK_POINT_RESPONSIVE}px) {
               .box_resize_${index}_${messageId}{
