@@ -16,7 +16,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { CREATING_TOPIC, EOverriddenPermission, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason, processFile } from '@mezon/utils';
+import { CREATING_TOPIC, EOverriddenPermission, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason } from '@mezon/utils';
 import isElectron from 'is-electron';
 import FileSelectionButton from 'libs/components/src/lib/components/MessageBox/FileSelectionButton';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
@@ -62,9 +62,18 @@ const TopicDiscussionBox = () => {
 
 	useEffect(() => {
 		const fetchCurrentTopicMessages = async () => {
-			await dispatch(fetchMessages({ channelId: currentChannelId as string, clanId: currentClanId as string, topicId: currentTopicId || '' }));
+			// Chờ 300ms để backend xử lý xong file message
+			await new Promise((res) => setTimeout(res, 300));
+			await dispatch(
+				fetchMessages({
+					channelId: currentChannelId as string,
+					clanId: currentClanId as string,
+					topicId: currentTopicId || '',
+				})
+			);
 			setIsFetchMessageDone(true);
 		};
+
 		if (currentTopicId !== '') {
 			fetchCurrentTopicMessages();
 		}
@@ -81,7 +90,6 @@ const TopicDiscussionBox = () => {
 
 			const safeAttachments = attachments ?? [];
 			const isFileOnly = !content?.t && safeAttachments.length > 0;
-
 			if (!content?.t && safeAttachments.length === 0) {
 				return;
 			}
@@ -103,17 +111,15 @@ const TopicDiscussionBox = () => {
 					files: []
 				})
 			);
-			await dispatch(
-				fetchMessages({
-					channelId: currentChannelId as string,
-					clanId: currentClanId as string,
-					topicId: currentTopicId || ''
-				})
-			);
 			setIsFetchMessageDone(true);
 		},
 		[sendMessage, sessionUser, dispatch, currentTopicId, currentInputChannelId]
 	);
+
+
+
+
+
 
 	const handleTyping = useCallback(() => {
 		// sendMessageTyping();
@@ -150,33 +156,6 @@ const TopicDiscussionBox = () => {
 		},
 		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
-	const onPastedFiles = useCallback(
-		async (event: React.ClipboardEvent<HTMLDivElement>) => {
-			const items = Array.from(event.clipboardData?.items || []);
-			const files = items
-				.filter((item) => item.type.startsWith('image'))
-				.map((item) => item.getAsFile())
-				.filter((file): file is File => Boolean(file));
-
-			if (!files.length) return;
-
-			const totalFiles = files.length + (attachmentFilteredByChannelId?.files?.length || 0);
-			if (totalFiles > MAX_FILE_ATTACHMENTS) {
-				setOverUploadingState(true, UploadLimitReason.COUNT);
-				return;
-			}
-
-			const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
-
-			dispatch(
-				referencesActions.setAtachmentAfterUpload({
-					channelId: currentInputChannelId,
-					files: updatedFiles
-				})
-			);
-		},
-		[currentInputChannelId, attachmentFilteredByChannelId?.files?.length, dispatch, setOverUploadingState]
-	);
 
 	return (
 		<>
@@ -194,7 +173,16 @@ const TopicDiscussionBox = () => {
 					/>
 				</div>
 			)}
-			{checkAttachment && (
+
+
+			<div className="flex flex-col flex-1">
+				<div className="flex-shrink-0  flex flex-col pb-[26px] px-4 bg-theme-chat h-auto relative">
+					{dataReferences.message_ref_id && (
+						<div className="mb-1 px-[1px] w-full ">
+							<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
+						</div>
+					)}
+					{checkAttachment && (
 				<div
 					className={`${checkAttachment ? 'px-3 mx-4 pb-1 pt-5 rounded-t-lg border-b-[1px] border-color-primary' : ''} bg-theme-setting-primary max-h-full`}
 				>
@@ -211,15 +199,7 @@ const TopicDiscussionBox = () => {
 								</Fragment>
 							);
 						})}
-					</div>
-				</div>
-			)}
-
-			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0 flex flex-col pb-[26px] px-4 bg-theme-chat h-auto relative">
-					{dataReferences.message_ref_id && (
-						<div className="mb-1 px-[1px] w-full">
-							<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
+							</div>
 						</div>
 					)}
 					<div
@@ -234,12 +214,8 @@ const TopicDiscussionBox = () => {
 						/>
 
 						<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
-							<div
-								className={`w-full border-none rounded-r-lg gap-3 relative whitespace-pre-wrap`}
-								onContextMenu={handleChildContextMenu}
-							>
+							<div className={`w-full border-none rounded-r-lg gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
 								<MentionReactInput
-									handlePaste={onPastedFiles}
 									onSend={handleSend}
 									onTyping={handleTypingDebounced}
 									listMentions={UserMentionList({
@@ -255,6 +231,7 @@ const TopicDiscussionBox = () => {
 					</div>
 				</div>
 			</div>
+
 		</>
 	);
 };
