@@ -23,7 +23,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 
-import { ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
+import { IS_MOBILE, ParticipantMeetState, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -153,7 +153,7 @@ const ChannelVoice = memo(
 							id="livekitRoom11"
 							key={token}
 							className={`${!isShow || isOpenPopOut ? '!hidden' : ''} flex ${isVoiceFullScreen ? 'w-full h-full' : ''}`}
-							audio={false}
+							audio={IS_MOBILE}
 							video={false}
 							token={token}
 							serverUrl={serverUrl}

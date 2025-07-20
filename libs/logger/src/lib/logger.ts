@@ -17,7 +17,8 @@ export function logger(): string {
 
 export async function captureSentryError(error: unknown, actionName: string, context?: LogContext): Promise<void> {
 	const errorDetail = await getErrorMessage(error);
-	if (errorDetail === SKIP_LOG) return;
+	if (SKIP_LOG) return;
+	// skip all
 
 	const timestamp = new Date().toISOString();
 	const errorLabel = `${actionName} - ${timestamp}`;

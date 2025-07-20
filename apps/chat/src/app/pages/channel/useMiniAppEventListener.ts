@@ -49,7 +49,8 @@ const useMiniAppEventListener = (
 			}
 
 			if (!compareHost(event.origin, appChannel.app_url)) {
-				console.warn('MiniApp: Message from unauthorized origin:', event.origin);
+				// eslint-disable-next-line no-console
+				console.log('MiniApp: Message from unauthorized origin:', event.origin);
 				return;
 			}
 
