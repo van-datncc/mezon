@@ -13,7 +13,7 @@ import {
 	useAppDispatch,
 	voiceActions
 } from '@mezon/store';
-import { GUEST_NAME } from '@mezon/utils';
+import { GUEST_NAME, IS_MOBILE } from '@mezon/utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -215,7 +215,7 @@ export default function PreJoinCalling() {
 					ref={containerRef}
 					id="livekitRoom"
 					key={getExternalToken}
-					audio={showMicrophone as boolean}
+					audio={IS_MOBILE as boolean}
 					video={showCamera as boolean}
 					token={getExternalToken}
 					serverUrl={serverUrl}
