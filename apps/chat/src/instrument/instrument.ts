@@ -1,7 +1,17 @@
 import * as Sentry from '@sentry/react';
 
+const warningsToSkip = [
+	/does not exist in local storage/g,
+	/silence detected on local audio track/g,
+	/this browser does not support desktop notification/g,
+	/already attempting reconnect, returning early/g,
+	/server unreachable from heartbeat/g
+];
+
+const errorsToSkip = [/permission denied/g, /server unreachable from heartbeat/g];
+
 Sentry.init({
-	dsn: process.env.NX_CHAT_SENTRY_DNS,
+	// dsn: process.env.NX_CHAT_SENTRY_DNS,
 	environment: process.env.NODE_ENV || 'development',
 	release: process.env.NX_APP_VERSION || '1.0.0',
 	integrations: [
@@ -13,8 +23,13 @@ Sentry.init({
 			levels: ['error', 'warn']
 		}),
 		Sentry.contextLinesIntegration(),
-		Sentry.httpClientIntegration()
+		Sentry.httpClientIntegration(),
+		Sentry.replayIntegration()
 	],
+	normalizeDepth: 10,
+	maxValueLength: 5000,
+	maxBreadcrumbs: 2,
+
 	tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 	tracePropagationTargets: ['localhost'],
 	replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.05 : 0.1,
@@ -25,30 +40,21 @@ Sentry.init({
 			component: 'frontend'
 		}
 	},
-	beforeSend(event, hint) {
-		if (event.exception) {
-			const error = hint.originalException;
-			if (error instanceof Error) {
-				event.tags = {
-					...event.tags,
-					errorType: error.constructor.name
-				};
-
-				if (error.stack) {
-					event.extra = {
-						...event.extra,
-						errorStack: error.stack
-					};
+	beforeSend(event) {
+		if (event.level === 'warning' && event.message) {
+			for (const warningToSkip of warningsToSkip) {
+				if (event.message.match(warningToSkip)) {
+					return null;
 				}
 			}
 		}
 
-		if (typeof window !== 'undefined') {
-			event.extra = {
-				...event.extra,
-				url: window.location.href,
-				userAgent: navigator.userAgent
-			};
+		if (event.level === 'error' && event.message) {
+			for (const errorToSkip of errorsToSkip) {
+				if (event.message.match(errorToSkip)) {
+					return null;
+				}
+			}
 		}
 
 		return event;
