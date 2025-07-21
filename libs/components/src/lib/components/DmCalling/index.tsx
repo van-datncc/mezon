@@ -404,7 +404,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 								onClick={handleCloseCall}
 							>
-								<Icons.StopCall />
+								<Icons.StopCall className="size-6 text-white-600" />
 							</div>
 						</div>
 					)}
