@@ -125,7 +125,7 @@ const ModalCreateCategory = ({ onClose, onCreateCategory }: ModalCreateCategoryP
 						Cancel
 					</button>
 					<button
-						className={`px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 bg-primary  ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
+						className={`px-4 py-2  btn-primary btn-primary-hover rounded-lg  ${checkValidate ? 'opacity-50 cursor-not-allowed' : ''}`}
 						onClick={handleCreateCate}
 						disabled={checkCategoryName}
 					>
