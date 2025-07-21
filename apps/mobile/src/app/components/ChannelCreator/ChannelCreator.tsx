@@ -56,7 +56,7 @@ export function ChannelCreator({ navigation, route }: MenuClanScreenProps<Create
 				</Pressable>
 			)
 		});
-	}, [channelName, navigation, t, themeValue.text]);
+	}, [channelName, navigation, t, themeValue.text, isChannelPrivate, channelType]);
 
 	async function handleCreateChannel() {
 		if (!validInput(channelName)) return;
