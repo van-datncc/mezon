@@ -120,6 +120,14 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 		};
 	}, [channelId, dispatch, idMessageToJump?.id, isLoadingJumpMessage, messages]);
 
+	useEffect(() => {
+		return () => {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+				isShow: false
+			});
+		};
+	}, []);
+
 	const isCanLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
 			try {
