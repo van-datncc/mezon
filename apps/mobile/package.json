@@ -7,7 +7,6 @@
 	},
 	"dependencies": {
 		"@gorhom/bottom-sheet": "5.1.2",
-		"@invertase/react-native-apple-authentication": "2.3.0",
 		"@likashefqet/react-native-image-zoom": "4.0.0",
 		"@livekit/react-native": "2.7.6",
 		"@livekit/react-native-webrtc": "125.0.11",
@@ -67,7 +66,6 @@
 		"react-native-markdown-display": "7.0.2",
 		"react-native-mmkv": "3.2.0",
 		"react-native-permissions": "5.2.5",
-		"react-native-raw-bottom-sheet": "3.0.0",
 		"react-native-reanimated": "3.17.1",
 		"react-native-receive-sharing-intent": "2.0.0",
 		"react-native-safe-area-context": "5.4.0",

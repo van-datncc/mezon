@@ -60,7 +60,7 @@ export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string;
 		) {
 			markAsReadSeen(lastMessage, streamMode, 0);
 		}
-	}, [lastMessage, lastMessageState, markAsReadSeen, streamMode]);
+	}, [lastMessage?.id, lastMessageState, markAsReadSeen, streamMode]);
 
 	const updateChannelSeenState = useCallback(
 		(channelId: string) => {
@@ -74,13 +74,13 @@ export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string;
 			dispatch(directMetaActions.updateLastSeenTime(lastMessage));
 			markMessageAsRead();
 		}
-	}, [lastMessage, markMessageAsRead, dispatch, channelId]);
+	}, [lastMessage?.id, markMessageAsRead, dispatch, channelId]);
 
 	useEffect(() => {
 		if (isMounted.current || !lastMessage) return;
 		isMounted.current = true;
 		updateChannelSeenState(channelId);
-	}, [channelId, lastMessage, updateChannelSeenState]);
+	}, [channelId, lastMessage?.id, updateChannelSeenState]);
 
 	return null;
 });
