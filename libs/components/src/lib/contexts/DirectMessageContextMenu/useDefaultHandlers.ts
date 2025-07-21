@@ -1,4 +1,3 @@
-import { EMuteState } from '@mezon/utils';
 import { useCallback } from 'react';
 import { DirectMessageContextMenuHandlers } from './types';
 
@@ -65,7 +64,7 @@ export function useDefaultHandlers({
 				},
 				handleUnmute: () => {
 					const channelId = user?.channelId || user?.channel_id;
-					muteOrUnMuteChannel(channelId, EMuteState.UN_MUTE);
+					muteOrUnMuteChannel(channelId, 1);
 				},
 				handleEnableE2EE: () => {
 					const channelId = user?.channelId || user?.channel_id;

@@ -1,5 +1,4 @@
 import { SetMuteNotificationPayload, SetNotificationPayload, notificationSettingActions, useAppDispatch } from '@mezon/store';
-import { EMuteState } from '@mezon/utils';
 import { format } from 'date-fns';
 import { ChannelType } from 'mezon-js';
 import { useCallback, useEffect, useState } from 'react';
@@ -54,7 +53,7 @@ export function useNotificationSettings({ channelId, notificationSettings, getCh
 					channel_id: channelId,
 					notification_type: 0,
 					clan_id: '',
-					active: EMuteState.MUTED,
+					active: 0,
 					is_current_channel: true
 				};
 				dispatch(notificationSettingActions.setMuteNotificationSetting(body));
@@ -77,37 +76,34 @@ export function useNotificationSettings({ channelId, notificationSettings, getCh
 	);
 
 	useEffect(() => {
-		const checkUnMute = notificationSettings?.active === EMuteState.UN_MUTE || notificationSettings?.id === '0';
-		const checkMuteTime = notificationSettings?.time_mute ? new Date(notificationSettings?.time_mute) > new Date() : false;
-
-		if (checkUnMute && !checkMuteTime) {
+		if (notificationSettings?.active === 1 || notificationSettings?.id === '0') {
 			setNameChildren(`Mute`);
 			setMutedUntilText('');
 		} else {
 			setNameChildren(`UnMute`);
-		}
 
-		if (notificationSettings?.time_mute && checkMuteTime && checkUnMute) {
-			const timeMute = new Date(notificationSettings.time_mute);
-			const currentTime = new Date();
-			if (timeMute > currentTime) {
-				const timeDifference = timeMute.getTime() - currentTime.getTime();
-				const formattedDate = format(timeMute, 'dd/MM, HH:mm');
-				setMutedUntilText(`Muted until ${formattedDate}`);
+			if (notificationSettings?.time_mute) {
+				const timeMute = new Date(notificationSettings.time_mute);
+				const currentTime = new Date();
+				if (timeMute > currentTime) {
+					const timeDifference = timeMute.getTime() - currentTime.getTime();
+					const formattedDate = format(timeMute, 'dd/MM, HH:mm');
+					setMutedUntilText(`Muted until ${formattedDate}`);
 
-				setTimeout(() => {
-					const channelId = getChannelId;
-					if (channelId) {
-						const body = {
-							channel_id: channelId,
-							notification_type: notificationSettings?.notification_setting_type || 0,
-							clan_id: '',
-							active: 1,
-							is_current_channel: true
-						};
-						dispatch(notificationSettingActions.setMuteNotificationSetting(body));
-					}
-				}, timeDifference);
+					setTimeout(() => {
+						const channelId = getChannelId;
+						if (channelId) {
+							const body = {
+								channel_id: channelId,
+								notification_type: notificationSettings?.notification_setting_type || 0,
+								clan_id: '',
+								active: 1,
+								is_current_channel: true
+							};
+							dispatch(notificationSettingActions.setMuteNotificationSetting(body));
+						}
+					}, timeDifference);
+				}
 			}
 		}
 	}, [notificationSettings, dispatch, getChannelId]);

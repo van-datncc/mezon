@@ -188,7 +188,6 @@ export const setMuteNotificationSetting = createAsyncThunk(
 				thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			} else {
-				thunkAPI.dispatch(notificationSettingActions.updateNotiState({ channelId: channel_id as string, active }));
 				thunkAPI.dispatch(directActions.update({ id: channel_id as string, changes: { is_mute: active === 0 } }));
 				thunkAPI.dispatch(directMetaActions.updateMuteDM({ channelId: channel_id as string, isMute: active === 0 }));
 			}
@@ -271,11 +270,8 @@ export const notificationSettingSlice = createSlice({
 			}
 
 			const notificationSetting = state?.byChannels?.[channelId]?.notificationSetting;
-			if (notificationSetting && notificationSetting?.active !== active) {
+			if (notificationSetting) {
 				notificationSetting.active = active;
-			}
-			if (notificationSetting && notificationSetting?.active === active && active === 0) {
-				notificationSetting.time_mute = new Date(0).toDateString();
 			}
 		}
 	},

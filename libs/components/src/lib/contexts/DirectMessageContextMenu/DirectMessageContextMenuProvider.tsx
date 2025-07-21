@@ -9,7 +9,7 @@ import {
 	selectNotifiSettingsEntitiesById,
 	useAppSelector
 } from '@mezon/store';
-import { EMuteState, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
+import { FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { FC, createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { Menu, Submenu, useContextMenu } from 'react-contexify';
@@ -117,7 +117,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 	});
 
 	const isSelf = userProfile?.user?.id === currentUser?.id || currentUser?.user_id?.includes(userProfile?.user?.id);
-	const isMuted = notificationSettings?.active === EMuteState.MUTED;
+	const isMuted = notificationSettings?.active === 0;
 	const hasMuteTime = notificationSettings?.time_mute ? new Date(notificationSettings.time_mute) > new Date() : false;
 	const isOwnerClanOrGroup = userProfile?.user?.id && dataMemberCreate?.createId && userProfile?.user?.id === dataMemberCreate.createId;
 	const infoFriend = useAppSelector((state: RootState) => selectFriendById(state, currentUser?.user_id?.[0] || ''));
