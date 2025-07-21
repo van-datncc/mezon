@@ -49,7 +49,7 @@ const LIGHT_THEMES = ['light', 'sunrise'];
 let currentThemeLink: HTMLLinkElement | null = null;
 let loadingOverlay: HTMLDivElement | null = null;
 
-const DEFAULT_THEME = 'dark';
+const DEFAULT_THEME = 'sunrise';
 const THEME_LOAD_TIMEOUT = 10000;
 
 export class ThemeManager {
