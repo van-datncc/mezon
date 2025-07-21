@@ -145,9 +145,9 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					)}
 				</div>
 				{showThreadSearch && (
-					<ul className="pb-4 pr-4 pl-4">
+					<div className="h-[500px] pb-4 pr-4 pl-4 app-scroll overflow-y-auto">
 						<GroupThreads preventClosePannel={preventClosePannel} title="Results" threads={threadsSearched} />
-					</ul>
+					</div>
 				)}
 				{showThreadList && (
 					<div className="h-[500px] ">
