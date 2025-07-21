@@ -91,7 +91,10 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 			tabIndex={0}
 		>
-			<div className="w-[400px] h-[400px] rounded-lg flex-col justify-center items-start gap-3 inline-flex overflow-hidden p-3" ref={modalRef}>
+			<div
+				className="w-[400px] h-[400px] rounded-lg bg-theme-setting-primary text-theme-primary flex-col justify-center items-start gap-3 inline-flex overflow-hidden p-3"
+				ref={modalRef}
+			>
 				{isLoading && (
 					<div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-60 z-10 text-white">
 						<AttachmentLoader appearanceTheme={appearanceTheme} />
