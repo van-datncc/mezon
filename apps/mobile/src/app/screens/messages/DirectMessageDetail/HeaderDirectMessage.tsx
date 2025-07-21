@@ -268,7 +268,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 							</View>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
-								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
+								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)?.toUpperCase()}</Text>
 							</View>
 						)}
 						<UserStatus status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }} customStatus={status} />

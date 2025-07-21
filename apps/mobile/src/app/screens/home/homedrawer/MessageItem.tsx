@@ -161,7 +161,7 @@ const MessageItem = React.memo(
 			? message?.display_name || message?.username || ''
 			: message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 
-		const usernameMessage = isDM ? message?.display_name || message?.user?.username : checkAnonymous ? 'Anonymous' : message?.user?.username;
+		const usernameMessage = isDM ? message?.display_name || message?.user?.username : checkAnonymous ? 'Anonymous' : message?.user?.username || message?.username;
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
 

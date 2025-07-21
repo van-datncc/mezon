@@ -46,7 +46,7 @@ export default memo(function MezonClanAvatar({
 	if (alt && !image && alt !== 'Anonymous') {
 		return (
 			<View style={styles.avatarMessageBoxDefault}>
-				<Text style={styles.textAvatarMessageBoxDefault}>{alt?.charAt?.(0)}</Text>
+				<Text style={styles.textAvatarMessageBoxDefault}>{alt?.charAt?.(0)?.toUpperCase()}</Text>
 			</View>
 		);
 	}
