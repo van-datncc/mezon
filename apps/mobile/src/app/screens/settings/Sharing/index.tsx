@@ -57,7 +57,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 
 	useEffect(() => {
 		if (!listDM?.length) dispatch(directActions.fetchDirectMessage({ noCache: true }));
-	}, [listDM]);
+	}, [listDM?.length]);
 
 	const clans = useMemo(() => {
 		return selectClansEntities(store.getState() as any);
@@ -78,7 +78,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		} catch (e) {
 			return [];
 		}
-	}, [listDM]);
+	}, [listDM?.length]);
 
 	const mezon = useMezon();
 	const [dataText, setDataText] = useState<string>('');
