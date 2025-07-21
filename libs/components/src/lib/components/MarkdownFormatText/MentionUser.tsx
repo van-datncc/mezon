@@ -118,6 +118,7 @@ const MentionUser = ({
 			if (checkAnonymous) {
 				return;
 			}
+			const screenX = window.innerWidth;
 			const heightPanel =
 				mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
 					? HEIGHT_PANEL_PROFILE
@@ -128,7 +129,9 @@ const MentionUser = ({
 					left:
 						e.clientX < WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + WIDTH_PANEL_PROFILE
 							? WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-							: e.clientX
+							: screenX < e.clientX + WIDTH_PANEL_PROFILE
+								? screenX - WIDTH_PANEL_PROFILE
+								: e.clientX
 				});
 			} else {
 				setPositionShortUser({
@@ -136,7 +139,9 @@ const MentionUser = ({
 					left:
 						e.clientX < WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + WIDTH_PANEL_PROFILE
 							? WIDTH_CLAN_SIDE_BAR + WIDTH_CHANNEL_LIST_BOX + e.currentTarget.offsetWidth + 24
-							: e.clientX
+							: screenX < e.clientX + WIDTH_PANEL_PROFILE
+								? screenX - WIDTH_PANEL_PROFILE
+								: e.clientX
 				});
 			}
 			setIsShowPanelChannel(!showProfileUser);
