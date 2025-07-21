@@ -129,7 +129,6 @@ const BottomSheetRootListener = () => {
 	useEffect(() => {
 		const bottomSheetListener = DeviceEventEmitter.addListener(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, ({ isDismiss, data }) => {
 			clearDataBottomSheet();
-			console.log('log  => data', data);
 			if (isDismiss || !data) {
 				onCloseBottomSheet();
 			} else {
