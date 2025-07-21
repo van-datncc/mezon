@@ -17,6 +17,7 @@ export { default as ExpiryTimeModal } from './components/ExpiryTime';
 export { default as FooterProfile } from './components/FooterProfile';
 export { default as ModalForward } from './components/ForwardMessage';
 export { GifStickerEmojiPopup } from './components/GifsStickersEmojis';
+export { default as InviteAcceptModal } from './components/InviteAcceptModal';
 export { default as ListMemberInvite } from './components/ListMemberInvite';
 export { default as ModalInvite } from './components/ListMemberInvite/modalInvite';
 export { default as EmojiMarkup } from './components/MarkdownFormatText/EmojiMarkup';
