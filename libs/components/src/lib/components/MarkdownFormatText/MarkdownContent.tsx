@@ -145,7 +145,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 								openInviteModal();
 							} else {
 								setIsLoadingInvite(false);
-								setInviteError(result.error?.message || 'Failed to load invite. Please check the link and try again.');
+								setInviteError('Failed to load invite. Please check the link and try again.');
 							}
 						} catch (error) {
 							setIsLoadingInvite(false);
