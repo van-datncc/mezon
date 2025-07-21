@@ -206,7 +206,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 		},
 		textAvatar: {
 			textAlign: 'center',
-			fontSize: size.h6,
+			fontSize: size.h4,
 			color: Colors.white
 		},
 		lottie: { width: size.s_30, height: size.s_20 },

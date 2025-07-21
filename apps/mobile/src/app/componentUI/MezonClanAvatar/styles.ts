@@ -36,7 +36,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		textAvatarMessageBoxDefault: {
-			fontSize: size.s_14,
+			fontSize: size.h4,
 			color: Colors.white
 		}
 	});
