@@ -272,7 +272,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 	const renderItem = ({ item }: { item: Receiver }) => {
 		return (
 			<Pressable key={`token_receiver_${item.id}`} style={styles.userItem} onPress={() => handleSelectUser(item)}>
-				<MezonAvatar avatarUrl={item?.avatar_url} username={item?.username} height={size.s_34} width={size.s_34} />
+				<MezonAvatar avatarUrl={item?.avatar_url} username={item?.username?.[0]} height={size.s_34} width={size.s_34} />
 				<Text style={styles.title}>{item.username}</Text>
 			</Pressable>
 		);
@@ -280,7 +280,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 
 	const handleSearchText = debounce((text) => {
 		setSearchText(text);
-	}, 500);
+	}, 300);
 
 	const handleInputChange = (text: string) => {
 		const sanitizedText = text.replace(/[^0-9]/g, '');

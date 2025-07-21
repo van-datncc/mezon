@@ -58,7 +58,7 @@ export const style = (colors: Attributes) =>
 			height: size.s_20,
 			flexBasis: size.s_20
 		},
-		content: { 
+		content: {
 			flexBasis: size.s_10,
 			flexGrow: 1
 		},

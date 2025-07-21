@@ -88,7 +88,6 @@ jobs:
           envkey_NX_CHAT_APP_API_GW_HOST: ${{ secrets.NX_CHAT_APP_API_GW_HOST }}
           envkey_NX_CHAT_APP_API_GW_PORT: ${{ secrets.NX_CHAT_APP_API_GW_PORT }}
           envkey_NX_DOMAIN_URL: https://mezon.ai
-          envkey_ELECTRON_DISABLE_SANDBOX: true
 
       - name: Release Desktop
         run: |

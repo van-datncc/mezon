@@ -24,7 +24,7 @@ export const AvatarMessage = React.memo(({ isShow, onPress, onLongPress, id, use
 					<MezonAvatar avatarUrl={avatar} username={username} />
 				) : (
 					<View style={styles.avatarMessageBoxDefault}>
-						<Text style={styles.textAvatarMessageBoxDefault}>{username?.charAt?.(0)}</Text>
+						<Text style={styles.textAvatarMessageBoxDefault}>{username?.charAt?.(0)?.toUpperCase()}</Text>
 					</View>
 				)}
 			</Pressable>

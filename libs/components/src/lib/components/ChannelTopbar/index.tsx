@@ -228,7 +228,7 @@ const TopBarChannelText = memo(() => {
 				) : (
 					<DmTopbarTools />
 				)}
-				<SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />
+				{!isMemberPath && <SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />}
 			</div>
 		</>
 	);

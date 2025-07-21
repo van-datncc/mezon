@@ -116,8 +116,11 @@ const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) 
 			const resp = await dispatch(createNewChannel(data)).unwrap();
 			toggleSuccess();
 		} catch (error: any) {
-			console.error('Create channel failed:', error);
-			toast.error('Name already exists or you are not the owner of this clan, please choose another name or clan!');
+			console.error('Failed to Add App:', error);
+
+			if (error) {
+				toast.error(`Failed to Add App: ${error.message || error}`);
+			}
 		}
 	}, [applicationId, clanValue, categoryValue, labelValue, dispatch, appDetail]);
 

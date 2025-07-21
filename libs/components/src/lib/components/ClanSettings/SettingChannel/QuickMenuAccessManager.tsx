@@ -44,8 +44,6 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 				} else {
 					await dispatch(quickMenuActions.addQuickMenuAccess(formData)).unwrap();
 				}
-
-				await dispatch(quickMenuActions.listQuickMenuAccess({ channelId }));
 				setIsModalOpen(false);
 				setEditingItem(null);
 				setFormData({ menu_name: '', action_msg: '', channelId, clanId });
@@ -83,7 +81,6 @@ const QuickMenuAccessManager: React.FC<QuickMenuAccessManagerProps> = ({ channel
 		setLoading(true);
 		try {
 			await dispatch(quickMenuActions.deleteQuickMenuAccess({ id: itemToDelete.id as string, channelId })).unwrap();
-			await dispatch(quickMenuActions.listQuickMenuAccess({ channelId }));
 			setIsDeleteModalOpen(false);
 			setItemToDelete(null);
 		} catch (error) {

@@ -27,16 +27,19 @@ export const addQuickMenuAccess = createAsyncThunk(
 	async (body: ApiQuickMenuAccessRequest & { channelId: string; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-
-			const response = await mezon.client.addQuickMenuAccess(mezon.session, {
+			const data = {
 				id: Snowflake.generate(),
 				bot_id: '0',
 				channel_id: body.channelId,
 				clan_id: body.clanId,
 				menu_name: body.menu_name,
 				action_msg: body.action_msg || ''
-			});
-			return { ...response, channelId: body.channelId };
+			};
+			const response = await mezon.client.addQuickMenuAccess(mezon.session, data);
+			if (response) {
+				return { data, channelId: body.channelId };
+			}
+			return { data: null, channelId: body.channelId };
 		} catch (error) {
 			captureSentryError(error, 'quickMenu/addQuickMenuAccess');
 			return thunkAPI.rejectWithValue(error);
@@ -49,15 +52,19 @@ export const updateQuickMenuAccess = createAsyncThunk(
 	async (body: ApiQuickMenuAccessRequest & { channelId: string; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.updateQuickMenuAccess(mezon.session, {
+			const data = {
 				id: body.id,
 				bot_id: '0',
 				channel_id: body.channelId,
 				clan_id: body.clanId,
 				menu_name: body.menu_name,
 				action_msg: body.action_msg || ''
-			});
-			return { ...response, channelId: body.channelId };
+			};
+			const response = await mezon.client.updateQuickMenuAccess(mezon.session, data);
+			if (response) {
+				return { data, channelId: body.channelId };
+			}
+			return { data: null, channelId: body.channelId };
 		} catch (error) {
 			captureSentryError(error, 'quickMenu/updateQuickMenuAccess');
 			return thunkAPI.rejectWithValue(error);
@@ -140,8 +147,10 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(addQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
-				const { channelId } = action.payload;
-				delete state.timestamps[channelId];
+				const { channelId, data } = action.payload;
+				if (data) {
+					state.byChannels[channelId].push(data);
+				}
 			})
 			.addCase(addQuickMenuAccess.rejected, (state, action) => {
 				state.loadingStatus = 'error';
@@ -152,8 +161,11 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(updateQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
-				const { channelId } = action.payload;
-				delete state.timestamps[channelId];
+				const { channelId, data } = action.payload;
+				if (data) {
+					const indexUpdate = state.byChannels[channelId].findIndex((item) => item.id === data.id);
+					state.byChannels[channelId][indexUpdate] = data;
+				}
 			})
 			.addCase(updateQuickMenuAccess.rejected, (state, action) => {
 				state.loadingStatus = 'error';
