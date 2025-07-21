@@ -2,7 +2,7 @@ import { Attributes, Colors, Fonts, Metrics, baseColor, horizontalScale, size, v
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 const width = Dimensions.get('window').width;
 const inputWidth = width * 0.6;
-export const style = (colors: Attributes, isTabletLandscape: boolean) =>
+export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		mainList: {
 			height: '100%',
@@ -696,7 +696,7 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 		},
 		iconBell: {
 			paddingRight: size.s_14,
-			padding: isTabletLandscape ? size.s_10 : 0
+			padding: 0
 		},
 		friendActions: {
 			flexDirection: 'row',
@@ -863,17 +863,17 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			backgroundColor: baseColor.blurple + '1A',
 			borderLeftWidth: size.s_4,
 			borderColor: baseColor.blurple,
-			borderRadius: size.s_6,
+			borderRadius: size.s_6
 		},
 		ephemeralIndicator: {
 			flexDirection: 'row',
 			alignItems: 'center',
-			marginTop: size.s_4,
+			marginTop: size.s_4
 		},
 		ephemeralText: {
 			fontSize: size.s_12,
 			color: colors.textDisabled,
 			fontStyle: 'italic',
-			marginLeft: size.s_4,
-		},
+			marginLeft: size.s_4
+		}
 	});

@@ -11,6 +11,7 @@ import {
 	STORAGE_DATA_CLAN_CHANNEL_CACHE
 } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
+import { selectDirectsOpenlist } from '@mezon/store';
 import {
 	channelMetaActions,
 	channelsActions,
@@ -22,7 +23,7 @@ import {
 	selectClansEntities,
 	selectCurrentChannelId,
 	selectCurrentClanId,
-	selectDirectsOpenlist
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
@@ -34,7 +35,7 @@ import { Flow } from 'react-native-animated-spinkit';
 import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -50,6 +51,13 @@ interface ISharing {
 
 export const Sharing = ({ data, onClose }: ISharing) => {
 	const store = getStore();
+	const dispatch = useAppDispatch();
+
+	const listDM = useSelector(selectDirectsOpenlist);
+
+	useEffect(() => {
+		if (!listDM?.length) dispatch(directActions.fetchDirectMessage({ noCache: true }));
+	}, [listDM]);
 
 	const clans = useMemo(() => {
 		return selectClansEntities(store.getState() as any);
@@ -60,21 +68,23 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		return listChannels.filter(
 			(channel) => channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && channel.type !== ChannelType.CHANNEL_TYPE_MEZON_VOICE
 		);
-	}, []);
-
-	const listDM = useMemo(() => {
-		return selectDirectsOpenlist(store.getState() as any);
-	}, []);
+	}, [store]);
 
 	const listDMText = useMemo(() => {
-		return listDM?.filter((channel) => !!channel?.channel_label);
+		try {
+			const data = listDM?.filter?.((channel) => !!channel?.channel_label);
+			if (data?.length) return data;
+			return [];
+		} catch (e) {
+			return [];
+		}
 	}, [listDM]);
 
 	const mezon = useMezon();
-	const dispatch = useDispatch();
 	const [dataText, setDataText] = useState<string>('');
 	const [dataShareTo, setDataShareTo] = useState<any>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [inputFocus, setInputFocus] = useState<boolean>(false);
 	const [searchText, setSearchText] = useState<string>('');
 	const [channelSelected, setChannelSelected] = useState<any>();
 	const inputSearchRef = useRef<any>(null);
@@ -83,9 +93,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 	const dataMedia = useMemo(() => {
 		return data?.filter((data: { contentUri: string; filePath: string }) => !!data?.contentUri || !!data?.filePath);
 	}, [data]);
-	const allChannels = useMemo(() => {
-		return [...(listChannelsText || []), ...(listDMText || [])];
-	}, [listChannelsText, listDMText]);
+
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
@@ -106,36 +114,58 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		}
 	}, [dataMedia]);
 
+	// Memoize the combined channels list to avoid recreating it on every search
+	const combinedChannels = useMemo(() => {
+		return [...(listDMText || []), ...(listChannelsText || [])];
+	}, [listDMText, listChannelsText]);
+
 	useEffect(() => {
-		if (listChannelsText || listDMText) setDataShareTo(allChannels);
-	}, [allChannels]);
+		setDataShareTo(combinedChannels);
+	}, [combinedChannels]);
 
-	const generateChannelMatch = (data: any, DMList: any, searchText: string) => {
-		const matchChannels = [...DMList, ...data]?.filter((channel: { channel_label?: string | number }) =>
-			channel.channel_label?.toString()?.trim()?.toLowerCase()?.includes(searchText?.trim()?.toLowerCase())
-		);
-		if (matchChannels?.length > 0) {
-			const matchIdList = new Set(matchChannels?.map((item) => item?.channel_id));
-			const resultList = [...DMList, ...data]?.filter((item) => matchIdList.has(item?.parent_id));
+	// Optimized search function with better performance
+	const generateChannelMatch = useCallback(
+		(searchText: string) => {
+			if (!searchText.trim()) return combinedChannels;
 
-			return [...matchChannels, ...resultList];
-		}
-		return [];
-	};
+			const normalizedSearch = searchText.trim().toLowerCase();
+			const matchChannels: any[] = [];
+			const matchChannelIds = new Set<string>();
+
+			// Single pass to find matching channels and collect their IDs
+			for (const channel of combinedChannels) {
+				const channelLabel = channel?.channel_label?.toString()?.toLowerCase();
+				// Check if channel has user information for DM channels
+				const hasUserMatch = (channel as any)?.usernames?.some?.((username: string) => username?.toLowerCase()?.includes(normalizedSearch));
+
+				const isMatch = channelLabel?.includes(normalizedSearch) || hasUserMatch;
+
+				if (isMatch) {
+					matchChannels.push(channel);
+					if (channel?.channel_id) {
+						matchChannelIds.add(channel.channel_id);
+					}
+				}
+			}
+
+			// Find child channels in a single pass
+			const childChannels = combinedChannels.filter((item) => item?.parent_id && matchChannelIds.has(item.parent_id));
+
+			return [...matchChannels, ...childChannels];
+		},
+		[combinedChannels]
+	);
 
 	const debouncedSearch = useCallback(
 		debounce((keyword: string) => {
-			if (keyword?.trim()) {
-				const matchedChannels = generateChannelMatch(listChannelsText, listDMText, keyword);
-				setDataShareTo(matchedChannels || []);
-			} else {
-				setDataShareTo(allChannels);
-			}
+			const matchedChannels = generateChannelMatch(keyword);
+			setDataShareTo(matchedChannels);
 		}, 300),
-		[allChannels]
+		[generateChannelMatch]
 	);
 
 	const onChooseSuggestion = useCallback(async (channel: any) => {
+		setInputFocus(false);
 		// Send to DM message
 		if (channel?.type === ChannelStreamMode.STREAM_MODE_DM || channel.type === ChannelStreamMode.STREAM_MODE_GROUP) {
 			const store = await getStoreAsync();
@@ -447,8 +477,8 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 					<View style={{ width: size.s_28 }} />
 				)}
 			</View>
-			<ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
-				<View style={styles.rowItem}>
+			<View style={styles.container}>
+				<View style={[styles.rowItem, inputFocus && { display: 'none' }]}>
 					<Text style={styles.title}>Message preview</Text>
 					{!!getAttachmentUnique(attachmentUpload)?.length && (
 						<View style={[styles.inputWrapper, { marginBottom: size.s_16 }]}>
@@ -547,6 +577,8 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 									setSearchText(value);
 									debouncedSearch(value);
 								}}
+								onFocus={() => setInputFocus(true)}
+								onBlur={() => setInputFocus(false)}
 								placeholder={'Select a channel or category...'}
 								placeholderTextColor={Colors.tertiary}
 							/>
@@ -604,7 +636,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 						/>
 					</View>
 				)}
-			</ScrollView>
+			</View>
 		</View>
 	);
 };
