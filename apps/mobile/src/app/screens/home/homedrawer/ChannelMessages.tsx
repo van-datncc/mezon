@@ -19,9 +19,10 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { Direction_Mode, LIMIT_MESSAGE } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Keyboard, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -62,8 +63,18 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const flatListRef = useRef(null);
 	const timeOutRef = useRef(null);
 	const [isShowJumpToPresent, setIsShowJumpToPresent] = useState(false);
+	const navigation = useNavigation<any>();
 
 	const userId = useSelector(selectAllAccount)?.user?.id;
+
+	useEffect(() => {
+		const sub = navigation.addListener('transitionStart', (e) => {
+			if (e?.data?.closing) {
+				Keyboard.dismiss();
+			}
+		});
+		return sub;
+	}, [navigation]);
 
 	useEffect(() => {
 		const event = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT, () => {

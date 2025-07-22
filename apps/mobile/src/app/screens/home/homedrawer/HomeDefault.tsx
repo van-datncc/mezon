@@ -32,15 +32,6 @@ const HomeDefault = React.memo(
 
 		const isChannelApp = channelType === ChannelType.CHANNEL_TYPE_APP;
 
-		useEffect(() => {
-			const sub = navigation.addListener('transitionStart', (e) => {
-				if (e?.data?.closing) {
-					Keyboard.dismiss();
-				}
-			});
-			return sub;
-		}, [navigation]);
-
 		const onOpenDrawer = useCallback(() => {
 			requestAnimationFrame(async () => {
 				navigation.navigate(APP_SCREEN.BOTTOM_BAR);

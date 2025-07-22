@@ -4,27 +4,18 @@ import { useTheme } from '@mezon/mobile-ui';
 import { clansActions, directActions, getStore, selectDmGroupCurrentId, selectIdMessageToJump, useAppDispatch } from '@mezon/store-mobile';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { memo, useCallback, useContext, useEffect, useRef } from 'react';
-import { AppState, DeviceEventEmitter, Keyboard, Platform, StatusBar, View } from 'react-native';
+import { AppState, DeviceEventEmitter, Platform, StatusBar, View } from 'react-native';
 import { useSelector } from 'react-redux';
 
 export const DirectMessageDetailListener = memo(({ dmType, directMessageId }: { dmType: number; directMessageId: string }) => {
 	const { themeValue } = useTheme();
-	const navigation = useNavigation<any>();
+	const navigation = useNavigation();
 	const dispatch = useAppDispatch();
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 
 	const isFetchMemberChannelDmRef = useRef(false);
 	const { handleReconnect } = useContext(ChatContext);
 	const appStateRef = useRef(AppState.currentState);
-
-	useEffect(() => {
-		const sub = navigation.addListener('transitionStart', (e) => {
-			if (e?.data?.closing) {
-				Keyboard.dismiss();
-			}
-		});
-		return sub;
-	}, [navigation]);
 
 	const fetchMemberChannel = async () => {
 		DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
