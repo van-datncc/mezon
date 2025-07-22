@@ -85,7 +85,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 	};
 
 	const handleLeaveRoom = async (clanId: string, channelId: string) => {
-		if (clanId && channelId) {
+		if (channelId) {
 			await participantMeetState(ParticipantMeetState.LEAVE, clanId, channelId);
 			dispatch(voiceActions.resetVoiceSettings());
 		}
@@ -186,6 +186,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 
 				if (data?.isEndCall) {
 					await handleLeaveRoom(data?.clanId, data?.channelId);
+					setIsGroupCall(false);
 					setVoicePlay(false);
 					if (isFromNativeCall) {
 						BackHandler.exitApp();

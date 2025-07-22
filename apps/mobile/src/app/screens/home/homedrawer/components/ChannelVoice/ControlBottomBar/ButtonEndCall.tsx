@@ -90,6 +90,7 @@ const ButtonEndCall = ({ channelId, clanId, isGroupCall = false }: { channelId: 
 				})
 			);
 		}
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: '', channelId: currentDmGroup?.channel_id });
 	};
 
 	const handleEndCall = () => {
@@ -97,7 +98,9 @@ const ButtonEndCall = ({ channelId, clanId, isGroupCall = false }: { channelId: 
 			handleGroupCallEnd(isShowPreCallInterface ? 'cancel' : 'quit');
 		}
 		room.disconnect();
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: clanId, channelId: channelId });
+		if (!isGroupCall) {
+			DeviceEventEmitter.emit(ActionEmitEvent.ON_OPEN_MEZON_MEET, { isEndCall: true, clanId: clanId, channelId: channelId });
+		}
 	};
 
 	return (
