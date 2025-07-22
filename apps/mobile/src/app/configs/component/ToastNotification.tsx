@@ -49,10 +49,9 @@ export const ToastNotification = memo((props: ToastConfigParams<any>) => {
 						</Text>
 						<Text
 							style={{
-								fontSize: verticalScale(16),
+								fontSize: verticalScale(14),
 								marginLeft: 0,
 								marginRight: 0,
-								fontWeight: 'bold',
 								color: themeValue.textStrong
 							}}
 							numberOfLines={3}
