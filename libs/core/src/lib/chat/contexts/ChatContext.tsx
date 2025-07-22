@@ -91,6 +91,7 @@ import { useMezon } from '@mezon/transport';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
 	AMOUNT_TOKEN,
+	ChannelStatusEnum,
 	EEventAction,
 	EEventStatus,
 	EMuteState,
@@ -775,26 +776,27 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								clanId: channel_desc.clan_id as string
 							})
 						);
+						if (channel_desc.channel_private === ChannelStatusEnum.isPrivate) {
+							const thread: ThreadsEntity = {
+								id: channel.id,
+								channel_id: channel_desc.channel_id,
+								active: 1,
+								channel_label: channel_desc.channel_label,
+								clan_id: channel_desc.clan_id || (clanId as string),
+								parent_id: channel_desc.parent_id,
+								last_sent_message: {
+									timestamp_seconds: userAdds.create_time_second
+								},
+								type: channel_desc.type
+							};
 
-						const thread: ThreadsEntity = {
-							id: channel.id,
-							channel_id: channel_desc.channel_id,
-							active: 1,
-							channel_label: channel_desc.channel_label,
-							clan_id: channel_desc.clan_id || (clanId as string),
-							parent_id: channel_desc.parent_id,
-							last_sent_message: {
-								timestamp_seconds: userAdds.create_time_second
-							},
-							type: channel_desc.type
-						};
-
-						dispatch(
-							threadsActions.addThreadToCached({
-								channelId: channel.parent_id || '',
-								thread: thread
-							})
-						);
+							dispatch(
+								threadsActions.addThreadToCached({
+									channelId: channel.parent_id || '',
+									thread: thread
+								})
+							);
+						}
 					}
 
 					if (channel_desc.parent_id) {
