@@ -157,6 +157,6 @@ export const DEFAULT_POSITION = { x: 100, y: 100 };
 export const ASPECT_RATIO = 4 / 3;
 
 export enum EMuteState {
-	UN_MUTE = 0,
-	MUTED = 1
+	UN_MUTE = 1,
+	MUTED = 0
 }

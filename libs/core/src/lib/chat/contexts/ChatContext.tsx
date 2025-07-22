@@ -93,6 +93,7 @@ import {
 	AMOUNT_TOKEN,
 	EEventAction,
 	EEventStatus,
+	EMuteState,
 	EOverriddenPermission,
 	ERepeatType,
 	IMessageSendPayload,
@@ -1509,9 +1510,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[userId]
 	);
 	const onunmuteevent = useCallback(async (unmuteEvent: UnmuteEvent) => {
-		const store = await getStoreAsync();
-		const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-
 		if (unmuteEvent.category_id !== '0') {
 			dispatch(
 				defaultNotificationCategoryActions.setMuteCategory({
@@ -1522,11 +1520,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			);
 		} else {
 			dispatch(
-				notificationSettingActions.setMuteNotificationSetting({
-					channel_id: unmuteEvent.channel_id,
-					active: 1,
-					clan_id: unmuteEvent.clan_id,
-					is_current_channel: unmuteEvent.channel_id === currentChannelId
+				notificationSettingActions.updateNotiState({
+					active: EMuteState.UN_MUTE,
+					channelId: unmuteEvent.channel_id
 				})
 			);
 		}

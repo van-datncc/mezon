@@ -146,7 +146,6 @@ export const setNotificationSetting = createAsyncThunk(
 			}
 			if (!is_direct) {
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
-				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			}
 			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 			return response;
