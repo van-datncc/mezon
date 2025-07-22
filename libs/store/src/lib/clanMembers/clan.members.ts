@@ -122,7 +122,7 @@ export const UsersClanSlice = createSlice({
 			const { clanId, user } = action.payload;
 
 			if (!state.byClans[clanId]) {
-				return;
+				state.byClans[clanId] = getInitialClanState();
 			}
 
 			UsersClanAdapter.addOne(state.byClans[clanId].entities, user);
