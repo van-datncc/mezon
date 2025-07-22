@@ -308,7 +308,7 @@ const MessageItem = React.memo(
 						isEphemeralMessage && styles.ephemeralMessage
 					]}
 				>
-					{!isMessageSystem && (
+					{!isMessageSystem && !message?.content?.fwd && (
 						<RenderMessageItemRef
 							message={message}
 							preventAction={preventAction}
