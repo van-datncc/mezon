@@ -171,7 +171,7 @@ const BottomSheetRootListener = () => {
 			style={styles.container}
 			containerStyle={containerStyle}
 			animationConfigs={{
-				duration: 150
+				duration: 200
 			}}
 			onChange={handleSheetPositionChange}
 			handleComponent={

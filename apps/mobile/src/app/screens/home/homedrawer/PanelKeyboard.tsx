@@ -83,7 +83,7 @@ const PanelKeyboard = React.memo((props: IProps) => {
 				index={0}
 				animateOnMount
 				animationConfigs={{
-					duration: 150
+					duration: 200
 				}}
 				backgroundStyle={{
 					backgroundColor: themeBasic === 'light' ? themeValue.tertiary : themeValue.primary
