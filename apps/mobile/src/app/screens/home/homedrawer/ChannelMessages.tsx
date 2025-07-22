@@ -68,15 +68,6 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	const userId = useSelector(selectAllAccount)?.user?.id;
 
 	useEffect(() => {
-		const sub = navigation.addListener('transitionStart', (e) => {
-			if (e?.data?.closing) {
-				Keyboard.dismiss();
-			}
-		});
-		return sub;
-	}, [navigation]);
-
-	useEffect(() => {
 		const event = DeviceEventEmitter.addListener(ActionEmitEvent.SCROLL_TO_BOTTOM_CHAT, () => {
 			if (!isViewingOldMessage) {
 				flatListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
@@ -132,12 +123,18 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 	}, [channelId, dispatch, idMessageToJump?.id, isLoadingJumpMessage, messages]);
 
 	useEffect(() => {
+		const sub = navigation.addListener('transitionStart', (e) => {
+			if (e?.data?.closing) {
+				Keyboard.dismiss();
+			}
+		});
 		return () => {
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
 				isShow: false
 			});
+			sub();
 		};
-	}, []);
+	}, [navigation]);
 
 	const isCanLoadMore = useCallback(
 		async (direction: ELoadMoreDirection) => {
