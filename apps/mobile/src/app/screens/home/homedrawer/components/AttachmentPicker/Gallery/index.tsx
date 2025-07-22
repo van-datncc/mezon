@@ -58,7 +58,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					groupName: null
 				});
 
-				setPhotos(after ? [...photos, ...res.edges] : res.edges);
+				setPhotos((prev) => [...(prev || []), ...(res?.edges || [])]);
 				setPageInfo(res.page_info);
 			} catch (error) {
 				console.error('Error loading photos', error);
@@ -332,7 +332,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	}, [hasPermission, onPickGallery]);
 
 	const handleLoadMore = async () => {
-		if (pageInfo?.has_next_page) {
+		if (pageInfo?.has_next_page && pageInfo?.end_cursor) {
 			await loadPhotos(pageInfo.end_cursor);
 		}
 	};
