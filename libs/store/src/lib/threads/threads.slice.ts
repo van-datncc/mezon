@@ -91,7 +91,7 @@ export const fetchThreadsCached = async (
 	const threadsState = currentState[THREADS_FEATURE_KEY];
 	const channelData = threadsState.byChannels?.[channelId] || getInitialChannelState();
 
-	const apiKey = createApiKey('fetchThreads', channelId, clanId, mezon.session.username || '', threadId || '', page || 0);
+	const apiKey = createApiKey('fetchThreads', channelId, clanId, mezon.session.username || '', threadId || '', page || 1);
 
 	const shouldForceCall = shouldForceApiCall(apiKey, channelData.cache, noCache);
 
@@ -120,7 +120,7 @@ const updateCacheOnThreadCreation = createAsyncThunk(
 	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const threads = await fetchThreadsCached(thunkAPI.getState as () => RootState, mezon, channelId, clanId, undefined, undefined, true);
+			const threads = await fetchThreadsCached(thunkAPI.getState as () => RootState, mezon, channelId, clanId, undefined, undefined);
 
 			return mapToThreadEntity((threads.channeldesc as ApiChannelDescription[]) || []);
 		} catch (e) {
@@ -377,6 +377,13 @@ export const threadsSlice = createSlice({
 			if (channelData && channelData.threads) {
 				channelData.threads = channelData.threads.filter((thread) => thread.id !== threadId);
 			}
+		},
+		addThreadToCached: (state, action: PayloadAction<{ channelId: string; thread: ThreadsEntity }>) => {
+			const { channelId, thread } = action.payload;
+			if (!state.byChannels?.[channelId]) {
+				state.byChannels[channelId] = getInitialChannelState();
+			}
+			state.byChannels[channelId].threads?.push(thread);
 		}
 	},
 	extraReducers: (builder) => {
@@ -540,6 +547,6 @@ export const selectThreadInputSearchByChannelId = createSelector(
 );
 
 export const selectThreadsByParentChannelId = createSelector(
-	[selectAllThreads, (_: any, parentChannelId: string) => parentChannelId],
-	(allThreads, parentChannelId) => allThreads.filter((thread) => thread?.parent_id === parentChannelId)
+	[getThreadsState, (_, parentChannelId: string) => parentChannelId],
+	(state, parentChannelId) => state.byChannels?.[parentChannelId]?.threads || []
 );
