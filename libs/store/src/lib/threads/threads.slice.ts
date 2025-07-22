@@ -378,7 +378,7 @@ export const threadsSlice = createSlice({
 			const channelData = state.byChannels?.[channelId];
 
 			if (channelData && channelData.threads) {
-				channelData.threads = threadsAdapter.removeOne(channelData.threads, threadId);
+				threadsAdapter.removeOne(channelData.threads, threadId);
 			}
 		},
 		addThreadToCached: (state, action: PayloadAction<{ channelId: string; thread: ThreadsEntity }>) => {
@@ -387,7 +387,7 @@ export const threadsSlice = createSlice({
 				return;
 			}
 
-			state.byChannels[channelId].threads = threadsAdapter.upsertOne(state.byChannels[channelId].threads, thread);
+			threadsAdapter.upsertOne(state.byChannels[channelId].threads, thread);
 		}
 	},
 	extraReducers: (builder) => {
