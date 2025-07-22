@@ -26,12 +26,13 @@ const UpdateGateScreen = ({ route }) => {
 			<View
 				style={{
 					alignSelf: 'center',
+					maxHeight: '70%',
 					marginBottom: size.s_50
 				}}
 			>
 				<FastImage
 					source={require('../../../assets/images/bgRocket.png')}
-					style={{ width: size.s_300, height: size.s_300 }}
+					style={{ width: size.s_300, height: size.s_300, maxHeight: '80%' }}
 					resizeMode={'cover'}
 				/>
 				<View>

@@ -83,6 +83,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+
 	const fetchThreads = async (pageNumber: number) => {
 		setIsLoading(true);
 		try {
@@ -93,9 +94,8 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 				noCache: true
 			};
 
-			const res = await dispatch(threadsActions.fetchThreads(body));
-			const newThreads = Array.isArray(res?.payload) ? res.payload : [];
-			const isLastPage = newThreads.length < LIMIT;
+			const payload = await dispatch(threadsActions.fetchThreads(body)).unwrap();
+			const isLastPage = payload?.threads?.length < LIMIT;
 			setHasMore(!isLastPage);
 		} catch (error) {
 			console.error('Error fetching threads:', error);
@@ -145,12 +145,12 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					)}
 				</div>
 				{showThreadSearch && (
-					<div className="h-[500px] pb-4 pr-4 pl-4 app-scroll overflow-y-auto">
+					<ul className="pb-4 pr-4 pl-4 h-[500px] overflow-y-auto app-scroll">
 						<GroupThreads preventClosePannel={preventClosePannel} title="Results" threads={threadsSearched} />
-					</div>
+					</ul>
 				)}
 				{showThreadList && (
-					<div className="h-[500px] ">
+					<div className="h-[500px]">
 						<ThreadList preventClosePannel={preventClosePannel} isLoading={isLoading} loadMore={loadMore} threads={threadFetched} />
 					</div>
 				)}

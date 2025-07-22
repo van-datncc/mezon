@@ -415,9 +415,21 @@ export const createNewChannel = createAsyncThunk('channels/createNewChannel', as
 		} else {
 			return thunkAPI.rejectWithValue([]);
 		}
-	} catch (error) {
+	} catch (error: any) {
 		captureSentryError(error, 'channels/createNewChannel');
-		return thunkAPI.rejectWithValue(error);
+
+		if (error instanceof Response) {
+			try {
+				const errorBody = await error.json();
+				return thunkAPI.rejectWithValue(errorBody);
+			} catch (parseError) {
+				return thunkAPI.rejectWithValue({ message: 'Unknown error from server' });
+			}
+		}
+
+		return thunkAPI.rejectWithValue({
+			message: error?.message || 'Something went wrong'
+		});
 	}
 });
 

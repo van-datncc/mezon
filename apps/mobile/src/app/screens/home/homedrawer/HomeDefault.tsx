@@ -73,7 +73,7 @@ const HomeDefault = React.memo(
 				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
 			>
 				{Platform.OS === 'ios' && <LicenseAgreement />}
-				<DrawerListener />
+				<DrawerListener channelId={channelId} />
 				<HomeDefaultHeader openBottomSheet={openBottomSheet} navigation={props.navigation} onOpenDrawer={onOpenDrawer} />
 				<View style={{ flex: 1 }}>
 					<ChannelMessages

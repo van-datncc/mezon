@@ -145,7 +145,9 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 								{(
 									directMessage?.channel_label ||
 									(typeof directMessage?.usernames === 'string' ? directMessage?.usernames : directMessage?.usernames?.[0] || '')
-								)?.charAt?.(0)}
+								)
+									?.charAt?.(0)
+									?.toUpperCase()}
 							</Text>
 						</View>
 					)}

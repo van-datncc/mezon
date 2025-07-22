@@ -358,7 +358,7 @@ function MessageMenu({ messageInfo }: IServerMenuProps) {
 							/>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
-								<Text style={styles.textAvatar}>{userName?.charAt?.(0)}</Text>
+								<Text style={styles.textAvatar}>{userName?.charAt?.(0)?.toUpperCase()}</Text>
 							</View>
 						)}
 					</View>
