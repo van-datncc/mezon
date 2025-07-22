@@ -103,9 +103,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 	};
 
 	useEffect(() => {
-		if (showEmpty) {
-			fetchThreads(1);
-		}
+		fetchThreads(1);
 	}, []);
 
 	const loadMore = useCallback(() => {
@@ -146,7 +144,7 @@ const ThreadModal = ({ onClose, rootRef }: ThreadsProps) => {
 					)}
 				</div>
 				{showThreadSearch && (
-					<ul className="pb-4 pr-4 pl-4 h-full max-h-[calc(100vh_-_228px)] overflow-y-auto app-scroll">
+					<ul className="pb-4 pr-4 pl-4 h-[500px] overflow-y-auto app-scroll">
 						<GroupThreads preventClosePannel={preventClosePannel} title="Results" threads={threadsSearched} />
 					</ul>
 				)}
