@@ -337,5 +337,5 @@ export const selectNotifiSettingEntities = createSelector(getNotificationSetting
 
 export const selectNotifiSettingsEntitiesById = createSelector(
 	[getNotificationSettingState, (state: RootState, channelId: string) => channelId],
-	(state, channelId) => state?.byChannels[channelId]?.notificationSetting
+	(state, channelId) => state?.byChannels?.[channelId]?.notificationSetting
 );
