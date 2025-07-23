@@ -383,8 +383,7 @@ export const RenderTextMarkdownContent = ({
 		...hg.map((item) => ({ ...item, kindOf: ETokenMessage.HASHTAGS })),
 		...(mentions?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MENTIONS })) || []),
 		...ej.map((item) => ({ ...item, kindOf: ETokenMessage.EMOJIS })),
-		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || []),
-		...(lk.map((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS, type: EBacktickType.LINK })) || [])
+		...(mk?.map?.((item) => ({ ...item, kindOf: ETokenMessage.MARKDOWNS })) || [])
 	].sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 
 	const store = elements?.length > 0 ? getStore() : null;
