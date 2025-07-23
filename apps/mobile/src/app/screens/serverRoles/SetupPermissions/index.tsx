@@ -78,18 +78,22 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	const handleEditPermissions = useCallback(async () => {
 		try {
 			dispatch(appActions.setLoadingMainMobile(true));
-			const removePermissionList = permissionList?.filter((permission) => !selectedPermissions.includes(permission?.id)).map((it) => it?.id);
+			const listAddPermissions = selectedPermissions?.filter((permission) => !originSelectedPermissions?.includes(permission));
+			const removePermissionList = originSelectedPermissions?.filter((id) => !selectedPermissions?.includes(id));
 			const response = await updateRole(
 				clanRole?.clan_id,
 				clanRole?.id,
 				clanRole?.title,
 				clanRole?.color || '',
 				[],
-				selectedPermissions,
+				listAddPermissions,
 				[],
-				removePermissionList
+				removePermissionList,
+				''
 			);
-			if (response) {
+			if (response?.ok !== undefined && response?.ok === false) {
+				throw new Error('failed');
+			} else {
 				Toast.show({
 					type: 'success',
 					props: {
@@ -98,8 +102,6 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 					}
 				});
 				navigation.goBack();
-			} else {
-				throw new Error('failed');
 			}
 		} catch (error) {
 			console.error(error);
@@ -113,7 +115,18 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 		} finally {
 			dispatch(appActions.setLoadingMainMobile(false));
 		}
-	}, [clanRole, navigation, permissionList, selectedPermissions, t, updateRole]);
+	}, [
+		clanRole?.clan_id,
+		clanRole?.color,
+		clanRole?.id,
+		clanRole?.title,
+		dispatch,
+		navigation,
+		originSelectedPermissions,
+		selectedPermissions,
+		t,
+		updateRole
+	]);
 
 	useEffect(() => {
 		navigation.setOptions({
