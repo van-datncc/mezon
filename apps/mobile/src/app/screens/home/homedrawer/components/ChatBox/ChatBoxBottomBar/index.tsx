@@ -161,7 +161,7 @@ export const ChatBoxBottomBar = memo(
 
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
-			onChange: async (newValue) => {
+			onChange: (newValue) => {
 				handleTextInputChange(newValue);
 				if (isEphemeralMode && !ephemeralTargetUserInfo?.id) {
 					handleMentionSelectForEphemeral(newValue);
