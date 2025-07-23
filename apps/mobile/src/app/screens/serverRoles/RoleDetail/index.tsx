@@ -242,8 +242,8 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 				</View>
 
 				<View style={{ marginVertical: size.s_10, flex: 1 }}>
-					<RoleCoLourComponent roleId={roleId} />
-					<RoleImagePicker roleId={roleId} />
+					<RoleCoLourComponent roleId={roleId} disable={!isCanEditRole} />
+					<RoleImagePicker roleId={roleId} disable={!isCanEditRole} />
 					<View style={{ borderRadius: size.s_10, overflow: 'hidden' }}>
 						<FlatList
 							data={actionList}
@@ -256,7 +256,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 							windowSize={2}
 							renderItem={({ item }) => {
 								return (
-									<TouchableOpacity onPress={() => handleAction(item.type)}>
+									<TouchableOpacity onPress={() => handleAction(item.type)} disabled={!isCanEditRole}>
 										<View
 											style={{
 												flexDirection: 'row',
@@ -285,7 +285,7 @@ export const RoleDetail = ({ navigation, route }: MenuClanScreenProps<RoleDetail
 												)}
 											</View>
 											<View>
-												<MezonIconCDN icon={IconCDN.chevronSmallRightIcon} color={themeValue.text} />
+												{!item?.isView && <MezonIconCDN icon={IconCDN.chevronSmallRightIcon} color={themeValue.text} />}
 											</View>
 										</View>
 									</TouchableOpacity>
