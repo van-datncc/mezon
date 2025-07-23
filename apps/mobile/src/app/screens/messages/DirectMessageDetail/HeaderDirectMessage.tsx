@@ -278,7 +278,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 					{dmLabel}
 				</Text>
 				<View style={styles.iconWrapper}>
-					<TouchableOpacity style={styles.iconHeader} onPress={navigateToSearch}>
+					<TouchableOpacity style={[styles.iconHeader, { marginRight: size.s_6 }]} onPress={navigateToSearch}>
 						<MezonIconCDN icon={IconCDN.magnifyingIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
 					{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (

@@ -195,8 +195,8 @@ const CreateAppPopup = ({ togglePopup }: ICreateAppPopup) => {
 						</div>
 					</div>
 				</div>
-				<div className="bg-theme-setting-nav  flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22] rounded-b-md">
-					<div className="hover:underline cursor-pointer" onClick={togglePopup}>
+				<div className="bg-white dark:bg-[#313338]   flex justify-end items-center gap-4 p-[16px] text-[14px] font-medium border-t dark:border-[#1e1f22]  rounded-b-md">
+					<div className="hover:underline cursor-pointer text-zinc-800 dark:text-zinc-200" onClick={togglePopup}>
 						Cancel
 					</div>
 					<button

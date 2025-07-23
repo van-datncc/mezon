@@ -31,8 +31,8 @@ function MessageWithSystem({ message, onContextMenu, popup, isSearchMessage, sho
 			{message && (
 				<HoverStateWrapper
 					isSearchMessage={isSearchMessage}
-					popup={popup}
-					onContextMenu={onContextMenu}
+					popup={undefined}
+					onContextMenu={undefined}
 					messageId={message?.id}
 					className={'fullBoxText relative group'}
 				>

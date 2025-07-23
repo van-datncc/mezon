@@ -59,6 +59,7 @@ import {
 	selectChannelByIdAndClanId,
 	selectChannelThreads,
 	selectChannelsByClanId,
+	selectClanMemberByClanId,
 	selectClanView,
 	selectClansLoadingStatus,
 	selectClickedOnTopicStatus,
@@ -72,7 +73,6 @@ import {
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLoadingStatus,
-	selectModeResponsive,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -91,14 +91,14 @@ import { useMezon } from '@mezon/transport';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
 	AMOUNT_TOKEN,
+	ChannelStatusEnum,
 	EEventAction,
 	EEventStatus,
+	EMuteState,
 	EOverriddenPermission,
 	ERepeatType,
 	IMessageSendPayload,
 	IMessageTypeCallLog,
-	LIMIT,
-	ModeResponsive,
 	NotificationCategory,
 	NotificationCode,
 	TOKEN_TO_AMOUNT,
@@ -733,7 +733,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			const store = await getStoreAsync();
 			const clanId = selectCurrentClanId(store.getState());
-			const channelId = selectCurrentChannelId(store.getState() as unknown as RootState);
 			const currentClanId = selectCurrentClanId(store.getState());
 
 			const userIds = users.map((u) => u.user_id);
@@ -776,8 +775,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								clanId: channel_desc.clan_id as string
 							})
 						);
-
-						if (channel.parent_id === channelId) {
+						if (channel_desc.channel_private === ChannelStatusEnum.isPrivate) {
 							const thread: ThreadsEntity = {
 								id: channel.id,
 								channel_id: channel_desc.channel_id,
@@ -791,17 +789,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 								type: channel_desc.type
 							};
 
-							const store = await getStoreAsync();
-							const allThreads = selectAllThreads(store.getState());
-							const defaultThreadList: ApiChannelDescription[] = [
-								thread as ApiChannelDescription,
-								...((allThreads || []) as ApiChannelDescription[])
-							];
 							dispatch(
-								threadsActions.updateCacheOnThreadCreation({
-									clanId: channel.clan_id || '',
+								threadsActions.addThreadToCached({
 									channelId: channel.parent_id || '',
-									defaultThreadList: defaultThreadList.length > LIMIT ? defaultThreadList.slice(0, -1) : defaultThreadList
+									thread: thread
 								})
 							);
 						}
@@ -859,7 +850,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(
 					channelMembersActions.addNewMember({
 						channel_id: channel_desc.channel_id as string,
-						user_ids: userIds
+						user_ids: userIds,
+						addedByUserId: caller?.user_id
 					})
 				);
 			}
@@ -872,14 +864,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onuserclanadded = useCallback(async (userJoinClan: AddClanUserEvent) => {
 		const store = await getStoreAsync();
-		const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
-		const modeResponsive = selectModeResponsive(store.getState() as unknown as RootState);
 
-		if (modeResponsive === ModeResponsive.MODE_DM || currentChannel?.channel_private) {
-			return;
-		}
-
-		if (userJoinClan?.user) {
+		const clanMemberStore = selectClanMemberByClanId(store.getState() as unknown as RootState, userJoinClan.clan_id);
+		if (userJoinClan?.user && clanMemberStore) {
 			const createTime = new Date(userJoinClan.user.create_time_second * 1000).toISOString();
 			dispatch(
 				usersClanActions.add({
@@ -1084,26 +1071,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 	const onchannelcreated = useCallback(async (channelCreated: ChannelCreatedEvent) => {
 		if (channelCreated.parent_id) {
-			const store = await getStoreAsync();
-			const allThreads = selectAllThreads(store.getState());
-
-			const now = Date.now() / 1000;
-			const newThread = {
+			const newThread: ThreadsEntity = {
 				...channelCreated,
+				id: channelCreated.channel_id,
 				type: channelCreated.channel_type,
 				last_sent_message: {
 					sender_id: channelCreated.creator_id,
-					timestamp_seconds: now
+					timestamp_seconds: Date.now() / 1000
 				},
 				active: channelCreated.creator_id === userId ? ThreadStatus.joined : ThreadStatus.activePublic
 			};
-			const defaultThreadList: ApiChannelDescription[] = [newThread, ...((allThreads || []) as ApiChannelDescription[])];
-
 			dispatch(
-				threadsActions.updateCacheOnThreadCreation({
-					clanId: channelCreated.clan_id,
+				threadsActions.addThreadToCached({
 					channelId: channelCreated.parent_id,
-					defaultThreadList: defaultThreadList.length > LIMIT ? defaultThreadList.slice(0, -1) : defaultThreadList
+					thread: newThread
 				})
 			);
 		}
@@ -1509,9 +1490,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		[userId]
 	);
 	const onunmuteevent = useCallback(async (unmuteEvent: UnmuteEvent) => {
-		const store = await getStoreAsync();
-		const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-
 		if (unmuteEvent.category_id !== '0') {
 			dispatch(
 				defaultNotificationCategoryActions.setMuteCategory({
@@ -1522,11 +1500,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			);
 		} else {
 			dispatch(
-				notificationSettingActions.setMuteNotificationSetting({
-					channel_id: unmuteEvent.channel_id,
-					active: 1,
-					clan_id: unmuteEvent.clan_id,
-					is_current_channel: unmuteEvent.channel_id === currentChannelId
+				notificationSettingActions.updateNotiState({
+					active: EMuteState.UN_MUTE,
+					channelId: unmuteEvent.channel_id
 				})
 			);
 		}
@@ -2068,11 +2044,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onclanupdated = onclanupdated;
 
-			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
+			socket.onjoinchannelappevent = onJoinChannelAppEvent;
 
 			socket.onsdtopicevent = onsdtopicevent;
 
-			socket.onUnpinMessageEvent = onUnpinMessageEvent;
+			socket.onunpinmessageevent = onUnpinMessageEvent;
 
 			socket.onblockfriend = onblockfriend;
 
@@ -2246,11 +2222,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onJoinChannelAppEvent = () => {};
+			socket.onjoinchannelappevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onsdtopicevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onUnpinMessageEvent = () => {};
+			socket.onunpinmessageevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onblockfriend = () => {};
 		};
