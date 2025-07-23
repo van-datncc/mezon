@@ -859,7 +859,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(
 					channelMembersActions.addNewMember({
 						channel_id: channel_desc.channel_id as string,
-						user_ids: userIds
+						user_ids: userIds,
+						addedByUserId: caller?.user_id
 					})
 				);
 			}
@@ -2058,11 +2059,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 			socket.onclanupdated = onclanupdated;
 
-			socket.onJoinChannelAppEvent = onJoinChannelAppEvent;
+			socket.onjoinchannelappevent = onJoinChannelAppEvent;
 
 			socket.onsdtopicevent = onsdtopicevent;
 
-			socket.onUnpinMessageEvent = onUnpinMessageEvent;
+			socket.onunpinmessageevent = onUnpinMessageEvent;
 
 			socket.onblockfriend = onblockfriend;
 
@@ -2236,11 +2237,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ontokensent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onJoinChannelAppEvent = () => {};
+			socket.onjoinchannelappevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onsdtopicevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onUnpinMessageEvent = () => {};
+			socket.onunpinmessageevent = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onblockfriend = () => {};
 		};
