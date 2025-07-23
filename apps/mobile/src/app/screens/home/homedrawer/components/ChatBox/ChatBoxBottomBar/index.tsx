@@ -161,7 +161,16 @@ export const ChatBoxBottomBar = memo(
 
 		const { textInputProps, triggers } = useMentions({
 			value: mentionTextValue,
-			onChange: (newValue) => {
+			onChange: async (newValue) => {
+				const image = await Clipboard.getImage();
+				if (image?.length > MIN_THRESHOLD_CHARS) {
+					if (convertRef.current) {
+						return;
+					}
+					convertRef.current = true;
+					await onConvertToFiles(newValue);
+					clearClipboard();
+				}
 				handleTextInputChange(newValue);
 				if (isEphemeralMode && !ephemeralTargetUserInfo?.id) {
 					handleMentionSelectForEphemeral(newValue);
@@ -290,8 +299,25 @@ export const ChatBoxBottomBar = memo(
 				});
 			}
 		}, []);
+		const clearClipboard = () => {
+			if (Platform.OS === 'ios') {
+				Clipboard.setImage('');
+			} else if (Platform.OS === 'android') {
+				Clipboard.setString('');
+			}
+		};
 		const handleTextInputChange = async (text: string) => {
 			const store = getStore();
+			if (text?.length > MIN_THRESHOLD_CHARS) {
+				if (convertRef.current) {
+					return;
+				}
+				convertRef.current = true;
+				await onConvertToFiles(text);
+				textValueInputRef.current = '';
+				setTextChange('');
+				return;
+			}
 			setTextChange(text);
 			textValueInputRef.current = text;
 			if (!text || text === '') {
@@ -303,17 +329,6 @@ export const ChatBoxBottomBar = memo(
 			}
 
 			if (!text) return;
-
-			if (text?.length > MIN_THRESHOLD_CHARS) {
-				if (convertRef.current) {
-					return;
-				}
-				convertRef.current = true;
-				await onConvertToFiles(text);
-				textValueInputRef.current = '';
-				setTextChange('');
-				return;
-			}
 
 			const convertedHashtag = convertMentionsToText(text);
 			const words = convertedHashtag?.split?.(mentionRegexSplit);
@@ -531,11 +546,7 @@ export const ChatBoxBottomBar = memo(
 			}
 		};
 		const cancelPasteImage = useCallback(() => {
-			if (Platform.OS === 'ios') {
-				Clipboard.setImage('');
-			} else if (Platform.OS === 'android') {
-				Clipboard.setString('');
-			}
+			clearClipboard();
 			setImageBase64(null);
 		}, []);
 
