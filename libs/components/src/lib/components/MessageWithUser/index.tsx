@@ -253,7 +253,7 @@ function MessageWithUser({
 						{!!message?.content?.fwd && (
 							<div
 								style={{ height: `${!isCombine ? 'calc(100% - 50px)' : '100%'}` }}
-								className="border-l-4  rounded absolute left-[45px] bottom-0"
+								className="border-l-4  rounded absolute left-[58px] bottom-0"
 							></div>
 						)}
 						{!!message?.content?.fwd && (
