@@ -124,7 +124,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 			},
 			{
 				title: t('displayName'),
-				description: userProfile?.user?.display_name,
+				description: userProfile?.user?.display_name || '',
 				type: EAccountSettingType.DisplayName
 			}
 		];
