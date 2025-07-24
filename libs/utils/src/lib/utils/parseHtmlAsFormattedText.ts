@@ -175,27 +175,66 @@ function parseMarkdown(html: string) {
 	return parsedHtml;
 }
 
-const LINK_TEMPLATE =
-	/(ftp|http|https):\/\/(((www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z][-a-zA-Z0-9]{1,62})|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?([-a-zA-Z0-9()@:%_+.,~#?&\/=!*';$\[\]{}^\\|`<>]*)/gi;
+const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
+const localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
+const nonLocalhostDomainRE = /^[^\s\.]+\.\S{2,}$/;
+
+function isUrl(string: string): boolean {
+	if (typeof string !== 'string') {
+		return false;
+	}
+
+	const match = string.match(protocolAndDomainRE);
+	if (!match) {
+		return false;
+	}
+
+	const everythingAfterProtocol = match[1];
+	if (!everythingAfterProtocol) {
+		return false;
+	}
+
+	if (localhostDomainRE.test(everythingAfterProtocol) || nonLocalhostDomainRE.test(everythingAfterProtocol)) {
+		return true;
+	}
+
+	return false;
+}
+
+const LINK_TEMPLATE = /(?:\w+:)?\/\/\S+/gi;
 
 function parseMarkdownLinks(html: string) {
-	const parts = html.split(/(`{1,3})/);
-	let isInCode = false;
-	let result = '';
+	if (!html || html.length === 0) return html;
 
-	for (let i = 0; i < parts.length; i++) {
-		const part = parts[i];
-		if (part.match(/^`{1,3}$/)) {
-			isInCode = !isInCode;
-			result += part;
-			continue;
-		}
+	const codeSections: string[] = [];
+	let result = html;
 
-		if (isInCode) {
-			result += part;
-		} else {
-			result += part.replace(LINK_TEMPLATE, '<a href="$&" target="_blank">$&</a>');
+	result = result.replace(/```[\s\S]*?```/g, (match) => {
+		const index = codeSections.length;
+		codeSections.push(match);
+		return `__CODE_BLOCK_${index}__`;
+	});
+
+	result = result.replace(/`[^`\n]*?`/g, (match) => {
+		const index = codeSections.length;
+		codeSections.push(match);
+		return `__INLINE_CODE_${index}__`;
+	});
+
+	result = result.replace(LINK_TEMPLATE, (match) => {
+		const cleanMatch = match.replace(/[)\]}>.,;:!?'"]+$/, '');
+		const trailingPunctuation = match.slice(cleanMatch.length);
+
+		if (isUrl(cleanMatch)) {
+			return `<a href="${cleanMatch}" target="_blank">${cleanMatch}</a>${trailingPunctuation}`;
 		}
+		return match;
+	});
+
+	if (codeSections.length > 0) {
+		result = result.replace(/__(?:CODE_BLOCK|INLINE_CODE)_(\d+)__/g, (match, index) => {
+			return codeSections[parseInt(index, 10)] || match;
+		});
 	}
 
 	return result;
