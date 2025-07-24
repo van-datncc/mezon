@@ -25,6 +25,7 @@ class MainActivity : ReactActivity() {
 
   fun isTablet(context: Context): Boolean {
     val metrics = context.resources.displayMetrics
+    val configuration = context.resources.configuration
     val widthInches = metrics.widthPixels / metrics.xdpi
     val heightInches = metrics.heightPixels / metrics.ydpi
     val screenSize =
@@ -32,7 +33,10 @@ class MainActivity : ReactActivity() {
             (widthInches.toDouble() * widthInches.toDouble()) +
                 (heightInches.toDouble() * heightInches.toDouble())
         )
-    return screenSize >= 7.0
+    val isLargeDiagonal = screenSize >= 7.0
+    val smallestWidthDp = configuration.smallestScreenWidthDp
+    val isTabletWidth = smallestWidthDp >= 600
+    return isLargeDiagonal || isTabletWidth
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
