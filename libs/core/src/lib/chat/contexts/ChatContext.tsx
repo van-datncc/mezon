@@ -1021,6 +1021,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 					return Number(currentValue) + Number(updateAmount);
 				})
 			);
+			if (isReceiverGiveCoffee) {
+				let playCount = 0;
+				const joinSoundElement = document.createElement('audio');
+				joinSoundElement.src = 'assets/audio/bankSound.mp3';
+				joinSoundElement.preload = 'auto';
+				joinSoundElement.style.display = 'none';
+				document.body.appendChild(joinSoundElement);
+				joinSoundElement.addEventListener('ended', () => {
+					if (!playCount) {
+						joinSoundElement.currentTime = 0;
+						joinSoundElement.play();
+						playCount++;
+					} else {
+						document.body.removeChild(joinSoundElement);
+					}
+				});
+				joinSoundElement.play();
+			}
 		},
 		[dispatch, userId]
 	);
