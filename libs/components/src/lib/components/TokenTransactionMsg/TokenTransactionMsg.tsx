@@ -25,7 +25,13 @@ const TokenTransactionMessage = ({ message }: ITokenTransactionMessageProps) => 
 						<div className="font-semibold ">{title}</div>
 						<div className="text-xs font-medium ">
 							<span className="dark:text-blue-500 text-blue-600">Detail: </span>
-							{description}
+
+							<p
+								title={description}
+								className="font-semibold truncate w-full text-center text-theme-primary-active text-ellipsis whitespace-nowrap max-w-[200px]"
+							>
+								{description}
+							</p>
 						</div>
 					</div>
 				</div>
