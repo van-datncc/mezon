@@ -1,10 +1,11 @@
 import { PinMessageEntity, selectMemberClanByUserId } from '@mezon/store';
-import { safeJSONParse } from 'mezon-js';
+import { IMessageWithUser, TOPBARS_MAX_WIDTH } from '@mezon/utils';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
 import { SimpleMemberProfile } from '../../../MemberProfile';
+import MessageAttachment from '../../../MessageWithUser/MessageAttachment';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
-import { ListPinAttachment } from './ItemPinMessage';
 
 type ModalDeletePinMessProps = {
 	pinMessage: PinMessageEntity;
@@ -23,39 +24,49 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 		>
 			<div className="w-fit h-fit bg-theme-setting-primary text-theme-primary rounded-lg flex-col justify-start  items-start gap-3 inline-flex overflow-hidden max-w-[440px]">
-				<div className=" w-full">
-					<div className="p-4 pb-0">
-						<h3 className="font-semibold pb-4 text-xl">Unpin Message</h3>
+				<div className="w-full">
+					<div className="px-4 py-4">
+						<h3 className="font-semibold pb-1 text-xl">Unpin Message</h3>
 						<p>You sure you want to remove this pinned message?</p>
 					</div>
-					<div className="p-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
-						<div className="flex items-start p-4 pr-6 shadow-md  rounded">
-							<SimpleMemberProfile
-								isHideUserName={true}
-								avatar={pinMessage.avatar || ''}
-								name={pinMessage.username ?? ''}
-								isHideStatus={true}
-								isHideIconStatus={true}
-								textColor="#fff"
-							/>
-							<div className="flex flex-col gap-1 text-left w-[90%]">
+					<div className="px-4 pb-2 max-h-[60vh] overflow-y-auto hide-scrollbar">
+						<div className="flex items-start gap-2 p-2 shadow-md rounded bg-theme-setting-secondary">
+							<div className="flex-shrink-0">
+								<SimpleMemberProfile
+									isHideUserName={true}
+									avatar={pinMessage.avatar || ''}
+									name={pinMessage.username ?? ''}
+									isHideStatus={true}
+									isHideIconStatus={true}
+									textColor="#fff"
+								/>
+							</div>
+							<div className="flex flex-col gap-1 text-left flex-1 min-w-0 pointer-events-none [&_.attachment-actions]:!hidden [&_button]:!hidden">
 								<div>
-									<span className="font-medium ">
+									<span className="font-medium text-sm">
 										{userSender?.clan_nick ?? userSender?.user?.display_name ?? userSender?.user?.username}
 									</span>
 								</div>
-								<span>
-									<MessageLine
-										isEditted={false}
-										isJumMessageEnabled={false}
-										isTokenClickAble={false}
-										content={safeJSONParse(pinMessage.content || '{}')}
-										isInPinMsg={true}
-										messageId={pinMessage.message_id}
-										isSearchMessage={true} // resize youtube link emmbed
+								<div className="text-sm">
+									{contentString && (
+										<MessageLine
+											isEditted={false}
+											isJumMessageEnabled={false}
+											isTokenClickAble={false}
+											content={safeJSONParse(pinMessage.content || '{}')}
+											isInPinMsg={true}
+											messageId={pinMessage.message_id}
+											isSearchMessage={true}
+										/>
+									)}
+								</div>
+								{attachments && (
+									<MessageAttachment
+										mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+										message={{ ...pinMessage, attachments: attachments } as IMessageWithUser}
+										defaultMaxWidth={TOPBARS_MAX_WIDTH}
 									/>
-								</span>
-								{attachments?.length ? <ListPinAttachment attachments={attachments} /> : <></>}
+								)}
 							</div>
 						</div>
 					</div>
@@ -70,7 +81,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 							}}
 							className="px-4 py-2 hover:bg-opacity-85 rounded bg-[#DA363C] text-white font-medium"
 						>
-							Remove it please!
+							Unpin it
 						</button>
 					</div>
 				</div>
