@@ -14,8 +14,6 @@ import com.zoontek.rnbootsplash.RNBootSplash;
 import android.app.NotificationManager
 import android.content.Context;
 import android.util.DisplayMetrics;
-import android.view.View;
-import android.content.res.Resources
 
 class MainActivity : ReactActivity() {
 
@@ -27,6 +25,7 @@ class MainActivity : ReactActivity() {
 
   fun isTablet(context: Context): Boolean {
     val metrics = context.resources.displayMetrics
+    val configuration = context.resources.configuration
     val widthInches = metrics.widthPixels / metrics.xdpi
     val heightInches = metrics.heightPixels / metrics.ydpi
     val screenSize =
@@ -34,7 +33,10 @@ class MainActivity : ReactActivity() {
             (widthInches.toDouble() * widthInches.toDouble()) +
                 (heightInches.toDouble() * heightInches.toDouble())
         )
-    return screenSize >= 7.0
+    val isLargeDiagonal = screenSize >= 7.0
+    val smallestWidthDp = configuration.smallestScreenWidthDp
+    val isTabletWidth = smallestWidthDp >= 600
+    return isLargeDiagonal || isTabletWidth
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,34 +65,4 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
-
-  private fun getStatusBarHeight(): Int {
-    val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-    return if (resourceId > 0) {
-        resources.getDimensionPixelSize(resourceId)
-    } else {
-        0
-    }
-  }
-
-  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
-    super.onPictureInPictureModeChanged(isInPictureInPictureMode)
-
-    val rootView = findViewById<View>(android.R.id.content)
-
-    if (isInPictureInPictureMode) {
-        rootView.setPadding(0, 0, 0, 0)
-
-        window.decorView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        )
-    } else {
-        val statusBarHeight = getStatusBarHeight()
-        rootView.setPadding(0, statusBarHeight, 0, 0)
-
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
-    }
-  }
 }
