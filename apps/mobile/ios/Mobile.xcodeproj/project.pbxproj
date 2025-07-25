@@ -26,6 +26,7 @@
 		E9443C732DDF8CA7002A97D3 /* VoIPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9443C722DDF8CA7002A97D3 /* VoIPManager.swift */; };
 		E9443C752DDF8CCB002A97D3 /* VoIPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E9443C742DDF8CCB002A97D3 /* VoIPManager.m */; };
 		E94D0A432DA66F2700D84EF2 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E94CBA5D2DA65548005C0A98 /* ReplayKit.framework */; };
+		E9514FF82E3331DD00CA354E /* bank.wav in Resources */ = {isa = PBXBuildFile; fileRef = E9514FF72E3331DD00CA354E /* bank.wav */; };
 		E967E05F2C6B20060050124F /* MezonSharing in Resources */ = {isa = PBXBuildFile; fileRef = E967E05E2C6B20060050124F /* MezonSharing */; };
 		E967E0672C6B20290050124F /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E967E0662C6B20290050124F /* ShareViewController.swift */; };
 		E967E06A2C6B20290050124F /* Base in Resources */ = {isa = PBXBuildFile; fileRef = E967E0692C6B20290050124F /* Base */; };
@@ -94,7 +95,7 @@
 		BBF63FBD8F416D85DC93F4BD /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mobile/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		C1190298260C5138DB9A8602 /* libPods-Mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC2EF50EB870283F95A556F6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Mobile/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		E905035C2CF564A5005D584F /* ringing.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = ringing.mp3; path = ringing.mp3; sourceTree = "<group>"; };
+		E905035C2CF564A5005D584F /* ringing.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ringing.mp3; sourceTree = "<group>"; };
 		E908EBB12D76A95200571976 /* Mobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Mobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		E908EBB22D76A95200571976 /* CustomImageViewIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomImageViewIOS.swift; sourceTree = "<group>"; };
 		E908EBB42D76A97400571976 /* CustomImageViewIOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomImageViewIOS.m; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 		E9443C742DDF8CCB002A97D3 /* VoIPManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VoIPManager.m; sourceTree = "<group>"; };
 		E94CBA5D2DA65548005C0A98 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		E94D0A422DA66F2700D84EF2 /* ScreenBroadcast.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenBroadcast.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9514FF72E3331DD00CA354E /* bank.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bank.wav; sourceTree = "<group>"; };
 		E967E05E2C6B20060050124F /* MezonSharing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MezonSharing; sourceTree = "<group>"; };
 		E967E0642C6B20290050124F /* MezonSharing.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MezonSharing.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E967E0662C6B20290050124F /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -125,7 +127,7 @@
 		E9BFF0C22C37AC0F003C310E /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
 		E9C22F3A2BF59D4200BCBA90 /* MobileRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = MobileRelease.entitlements; path = Mobile/MobileRelease.entitlements; sourceTree = "<group>"; };
 		E9CB94B52CFE07C800F484EA /* buzz.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = buzz.mp3; sourceTree = "<group>"; };
-		E9DCD8C42CF5738500193E85 /* endcall.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = endcall.mp3; path = endcall.mp3; sourceTree = "<group>"; };
+		E9DCD8C42CF5738500193E85 /* endcall.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = endcall.mp3; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F430D579619E0B5CFD2D20E7 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Mobile-MobileTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -186,6 +188,7 @@
 		13B07FAE1A68108700A75B9A /* Mobile */ = {
 			isa = PBXGroup;
 			children = (
+				E9514FF72E3331DD00CA354E /* bank.wav */,
 				E943F9EC2DB9D70000B81261 /* DeviceUtilsIOS.swift */,
 				E925D79E2DB8D69E00C10D69 /* AppDelegate.swift */,
 				E99B89642D0ECA2100D60E91 /* GoogleService-Info.plist */,
@@ -474,6 +477,7 @@
 				E9ABAB192CF42C7F003537E1 /* default.mp3 in Resources */,
 				E91B62B12CEF3E2F0042CB57 /* dialtone.mp3 in Resources */,
 				72F27102A63F9EE6833F91E0 /* PrivacyInfo.xcprivacy in Resources */,
+				E9514FF82E3331DD00CA354E /* bank.wav in Resources */,
 				E967E05F2C6B20060050124F /* MezonSharing in Resources */,
 				C8CFB53919EB44CE8B1A3053 /* icomoon.ttf in Resources */,
 			);
@@ -885,7 +889,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.54;
+				MARKETING_VERSION = 1.2.55;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1065,7 +1069,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.54;
+				MARKETING_VERSION = 1.2.55;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
