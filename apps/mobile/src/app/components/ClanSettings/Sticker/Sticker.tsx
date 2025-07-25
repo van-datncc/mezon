@@ -95,13 +95,13 @@ export function StickerSetting({ navigation }) {
 
 	const handleWebViewMessage = useCallback(
 		(event: any) => {
-			const result = event.nativeEvent.data;
+			const result = event?.nativeEvent?.data;
 
 			if (result?.startsWith('ERROR')) {
-				watermarkState.reject?.(new Error('Cannot process image'));
-			} else if (result.startsWith('data:image')) {
-				const base64Data = result.split(',')[1];
-				watermarkState.resolve?.(base64Data);
+				watermarkState?.reject?.(new Error('Cannot process image'));
+			} else if (result?.startsWith('data:image')) {
+				const base64Data = result?.split(',')?.[1];
+				watermarkState?.resolve?.(base64Data);
 			}
 
 			setWatermarkState({
@@ -113,7 +113,7 @@ export function StickerSetting({ navigation }) {
 	);
 
 	const handleUploadImage = useCallback(async (file: IFile) => {
-		if (Number(file.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 2)) {
+		if (Number(file?.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 2)) {
 			Toast.show({
 				type: 'error',
 				text1: t('toast.errorSizeLimit')
@@ -135,7 +135,7 @@ export function StickerSetting({ navigation }) {
 
 		return {
 			id,
-			url: attachment.url
+			url: attachment?.url
 		};
 	}, []);
 
@@ -150,7 +150,7 @@ export function StickerSetting({ navigation }) {
 				height: 320
 			});
 
-			if (Number(croppedFile.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 2)) {
+			if (Number(croppedFile?.size) > Number(LIMIT_SIZE_UPLOAD_IMG / 2)) {
 				Toast.show({
 					type: 'error',
 					text1: t('toast.errorSizeLimit')
@@ -175,10 +175,10 @@ export function StickerSetting({ navigation }) {
 	const handleUploadConfirm = async (croppedFile, name, isForSale) => {
 		const { id, url } = await handleUploadImage({
 			fileData: croppedFile?.data,
-			name: croppedFile.filename,
-			uri: croppedFile.path,
-			size: croppedFile.size,
-			type: croppedFile.mime
+			name: croppedFile?.filename,
+			uri: croppedFile?.path,
+			size: croppedFile?.size,
+			type: croppedFile?.mime
 		});
 
 		const category = 'Among Us';
@@ -197,10 +197,10 @@ export function StickerSetting({ navigation }) {
 
 			const { id } = await handleUploadImage({
 				fileData: fileData,
-				name: croppedFile.modificationDate,
-				uri: croppedFile.path,
-				size: croppedFile.size,
-				type: croppedFile.mime
+				name: croppedFile?.modificationDate,
+				uri: croppedFile?.path,
+				size: croppedFile?.size,
+				type: croppedFile?.mime
 			});
 			request.id = id;
 		}
