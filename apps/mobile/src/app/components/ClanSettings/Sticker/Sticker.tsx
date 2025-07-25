@@ -1,5 +1,5 @@
 import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { createSticker, selectCurrentClanId, selectStickersByClanId, useAppDispatch } from '@mezon/store-mobile';
 import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { LIMIT_SIZE_UPLOAD_IMG } from '@mezon/utils';
@@ -209,14 +209,14 @@ export function StickerSetting({ navigation }) {
 
 	const ListHeaderComponent = () => {
 		return (
-			<View style={{ paddingBottom: size.s_20 }}>
+			<View style={styles.header}>
 				<Pressable style={styles.addButton} onPress={handleUploadSticker}>
 					<Text style={styles.buttonText}>{t('btn.upload')}</Text>
 				</Pressable>
 				<Text style={[styles.text, styles.textTitle]}>{t('content.requirements')}</Text>
-				<Text style={styles.text}>{t('content.reqType')}</Text>
-				<Text style={styles.text}>{t('content.reqDim')}</Text>
-				<Text style={styles.text}>{t('content.reqSize')}</Text>
+				<Text style={[styles.text, styles.textDescription]}>{t('content.reqType')}</Text>
+				<Text style={[styles.text, styles.textDescription]}>{t('content.reqDim')}</Text>
+				<Text style={[styles.text, styles.textDescription]}>{t('content.reqSize')}</Text>
 			</View>
 		);
 	};

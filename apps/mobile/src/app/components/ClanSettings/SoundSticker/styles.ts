@@ -32,9 +32,9 @@ export const style = (colors: Attributes) =>
 		title: {
 			marginHorizontal: size.s_20,
 			color: colors.borderRadio,
-			fontSize: size.s_14,
-			lineHeight: size.s_18,
-			marginBottom: size.s_20
+			fontSize: size.s_12,
+			lineHeight: size.s_16,
+			marginBottom: size.s_10
 		},
 		requireTitle: {
 			marginHorizontal: size.s_20,
@@ -44,9 +44,9 @@ export const style = (colors: Attributes) =>
 			marginLeft: size.s_28
 		},
 		lightTitle: {
+			marginTop: size.s_6,
 			fontWeight: 'bold',
 			marginHorizontal: size.s_20,
-			marginVertical: size.s_10,
 			color: colors.borderRadio,
 			fontSize: size.s_14
 		},
