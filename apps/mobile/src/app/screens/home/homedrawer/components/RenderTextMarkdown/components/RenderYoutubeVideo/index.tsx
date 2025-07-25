@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, TextStyle, View, useWindowDimensio
 import YoutubePlayer from 'react-native-youtube-iframe';
 
 type RenderYoutubeVideoProps = {
-	key: string;
+	videoKey: string;
 	videoId: string;
 	contentInElement: string;
 	onPress?: () => void;
@@ -12,13 +12,13 @@ type RenderYoutubeVideoProps = {
 	linkStyle?: TextStyle;
 };
 
-const RenderYoutubeVideo = ({ key, videoId, contentInElement, onPress, onLongPress, linkStyle }: RenderYoutubeVideoProps) => {
+const RenderYoutubeVideo = ({ videoKey, videoId, contentInElement, onPress, onLongPress, linkStyle }: RenderYoutubeVideoProps) => {
 	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
 	const { width, height } = useWindowDimensions();
 	const isLandscape = width > height;
 
 	return (
-		<View key={key}>
+		<View key={videoKey}>
 			<Text style={linkStyle} onPress={onPress} onLongPress={onLongPress}>
 				{contentInElement}
 			</Text>
