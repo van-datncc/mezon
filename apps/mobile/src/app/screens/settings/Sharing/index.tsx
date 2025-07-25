@@ -25,7 +25,6 @@ import {
 } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
 import { checkIsThread, createImgproxyUrl, EBacktickType, ILinkOnMessage, isPublicChannel, isYouTubeLink } from '@mezon/utils';
-import Images from 'apps/mobile/src/assets/Images';
 import debounce from 'lodash.debounce';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -41,11 +40,13 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
+import { Flow } from 'react-native-animated-spinkit';
 import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSelector } from 'react-redux';
+import Images from '../../../../assets/Images';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -654,7 +655,11 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 							disabled={!channelSelected || !isAttachmentUploaded}
 							style={[styles.sendButton, { opacity: channelSelected && isAttachmentUploaded ? 1 : 0.5 }]}
 						>
-							<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
+							{isLoading ? (
+								<Flow size={size.s_28} color={Colors.white} />
+							) : (
+								<SendIcon width={size.s_28} height={size.s_20} color={Colors.white} />
+							)}
 						</TouchableOpacity>
 					</View>
 				</View>
