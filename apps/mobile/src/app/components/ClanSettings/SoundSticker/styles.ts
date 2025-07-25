@@ -30,11 +30,12 @@ export const style = (colors: Attributes) =>
 			fontWeight: '500'
 		},
 		title: {
-			marginHorizontal: size.s_20,
+			marginLeft: size.s_30,
+			marginRight: size.s_14,
 			color: colors.borderRadio,
 			fontSize: size.s_12,
 			lineHeight: size.s_16,
-			marginBottom: size.s_10
+			marginBottom: size.s_10,
 		},
 		requireTitle: {
 			marginHorizontal: size.s_20,
@@ -48,7 +49,8 @@ export const style = (colors: Attributes) =>
 			fontWeight: 'bold',
 			marginHorizontal: size.s_20,
 			color: colors.borderRadio,
-			fontSize: size.s_14
+			fontSize: size.s_14,
+			marginBottom: size.s_4
 		},
 		emojiSlotsTitle: {
 			fontWeight: 'bold',
