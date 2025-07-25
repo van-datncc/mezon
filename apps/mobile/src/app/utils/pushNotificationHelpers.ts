@@ -137,7 +137,7 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 		channelId: (data?.sound as string) || 'default',
 		smallIcon: 'ic_notification',
 		color: '#7029c1',
-		sound: (data?.sound as string) || 'bank.mp3',
+		sound: (data?.sound as string) || 'default',
 		smallIconLevel: 10,
 		importance: AndroidImportance.HIGH,
 		showTimestamp: true,
