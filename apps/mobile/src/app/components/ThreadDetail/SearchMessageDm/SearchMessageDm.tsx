@@ -64,7 +64,7 @@ export default function SearchMessageDm({ navigation, route }: any) {
 	useEffect(() => {
 		return () => {
 			if (currentChannel?.channel_id) {
-				dispatch(searchMessagesActions.setTotalResults({ channelId: currentChannel?.channel_id, total: 0 }));
+				dispatch(searchMessagesActions.setTotalResults({ channelId: currentChannel.channel_id, total: 0 }));
 			}
 			setFiltersSearch([]);
 		};
