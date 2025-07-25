@@ -648,7 +648,7 @@ export const RenderTextMarkdownContent = ({
 
 							markdownBlackParts.push(
 								<RenderYoutubeVideo
-									key={`youtube-${index}`}
+									videoKey={`youtube-${index}`}
 									videoId={videoId}
 									contentInElement={contentInElement}
 									onPress={() => openUrl(contentInElement, null)}
