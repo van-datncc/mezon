@@ -61,7 +61,13 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 				<ReplyIcon width={size.s_34} height={size.s_30} />
 			</View>
 			<View style={styles.repliedMessageWrapper}>
-				<MezonAvatar avatarUrl={avatarSender} username={messageReferences?.message_sender_username} height={size.s_20} width={size.s_20} />
+				<MezonAvatar
+					avatarUrl={avatarSender}
+					username={messageReferences?.message_sender_username}
+					height={size.s_20}
+					width={size.s_20}
+					isMsgReply={true}
+				/>
 				<View style={styles.replyContentWrapper}>
 					<Text style={styles.replyDisplayName}>
 						{messageReferences?.message_sender_clan_nick ||
