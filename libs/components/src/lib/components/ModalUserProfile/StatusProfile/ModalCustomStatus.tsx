@@ -19,7 +19,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 	}, []);
 
 	const handleChangeCustomStatus = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const updatedStatus = e.target.value.slice(0, 128).replace(/\\/g, '\\\\');
+		const updatedStatus = e.target.value.slice(0, 128).replace(/[\\'`]/g, '');
 		setCustomStatus(updatedStatus);
 	};
 
