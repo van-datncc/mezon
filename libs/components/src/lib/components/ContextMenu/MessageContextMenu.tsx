@@ -36,6 +36,7 @@ import {
 	selectMessageIdsByChannelId,
 	selectModeResponsive,
 	selectPinMessageByChannelId,
+	selectQuickMenuByChannelId,
 	selectTheme,
 	selectThreadCurrentChannel,
 	setIsForwardAll,
@@ -576,7 +577,9 @@ function MessageContextMenu({
 		},
 		[createDirectMessageWithUser, sendInviteMessage]
 	);
-	/* eslint-disable no-console */
+
+	const quickMenuItems = useAppSelector((state) => selectQuickMenuByChannelId(state, currentChannel?.id || ''));
+
 	const items = useMemo<ContextMenuItem[]>(() => {
 		const builder = new MenuBuilder();
 
@@ -708,7 +711,7 @@ function MessageContextMenu({
 			);
 		});
 
-		builder.when(checkPos, (builder) => {
+		builder.when(checkPos && quickMenuItems?.length > 0, (builder) => {
 			builder.addMenuItem(
 				'slashCommands',
 				'Slash Commands',

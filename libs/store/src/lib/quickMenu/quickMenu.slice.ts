@@ -9,8 +9,8 @@ import { RootState } from '../store';
 export const QUICK_MENU_FEATURE_KEY = 'quickMenu';
 
 export interface QuickMenuState {
-	byChannels: Record<string, ApiQuickMenuAccess[]>;
-	timestamps: Record<string, number>;
+	byChannels: Record<string, Record<number, ApiQuickMenuAccess[]>>;
+	timestamps: Record<string, Record<number, number>>;
 	loadingStatus: LoadingStatus;
 	error?: string | null;
 }
@@ -114,7 +114,7 @@ export const addQuickMenuAccess = createAsyncThunk(
 				clan_id: body.clanId,
 				menu_name: body.menu_name,
 				action_msg: body.action_msg || '',
-				menu_type: body.menu_type || QUICK_MENU_TYPE.QUICK_MESSAGE
+				menu_type: body.menu_type || QUICK_MENU_TYPE.FLASH_MESSAGE
 			};
 			const response = await mezon.client.addQuickMenuAccess(mezon.session, data);
 			if (response) {
@@ -140,7 +140,7 @@ export const updateQuickMenuAccess = createAsyncThunk(
 				clan_id: body.clanId,
 				menu_name: body.menu_name,
 				action_msg: body.action_msg || '',
-				menu_type: body.menu_type || QUICK_MENU_TYPE.QUICK_MESSAGE
+				menu_type: body.menu_type || QUICK_MENU_TYPE.FLASH_MESSAGE
 			};
 			const response = await mezon.client.updateQuickMenuAccess(mezon.session, data);
 			if (response) {
@@ -168,29 +168,32 @@ export const deleteQuickMenuAccess = createAsyncThunk(
 	}
 );
 
-export const listQuickMenuAccess = createAsyncThunk('quickMenu/listQuickMenuAccess', async ({ channelId }: { channelId: string }, thunkAPI) => {
-	try {
-		const state = thunkAPI.getState() as RootState;
-		const quickMenuState = getQuickMenuState(state);
+export const listQuickMenuAccess = createAsyncThunk(
+	'quickMenu/listQuickMenuAccess',
+	async ({ channelId, menuType }: { channelId: string; menuType: number }, thunkAPI) => {
+		try {
+			const state = thunkAPI.getState() as RootState;
+			const quickMenuState = getQuickMenuState(state);
 
-		const cachedData = quickMenuState.byChannels[channelId];
-		const lastFetchTime = quickMenuState.timestamps[channelId];
-		const now = Date.now();
-		const CACHE_DURATION = 5 * 60 * 1000;
+			const cachedData = quickMenuState.byChannels[channelId]?.[menuType];
+			const lastFetchTime = quickMenuState.timestamps[channelId]?.[menuType];
+			const now = Date.now();
+			const CACHE_DURATION = 5 * 60 * 1000;
 
-		if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_DURATION) {
-			return { channelId, quickMenuItems: cachedData, fromCache: true };
+			if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_DURATION) {
+				return { channelId, menuType, quickMenuItems: cachedData, fromCache: true };
+			}
+
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			const response = await mezon.client.listQuickMenuAccess(mezon.session, '0', channelId, menuType);
+
+			return { channelId, menuType, quickMenuItems: response.list_menus || [], fromCache: false };
+		} catch (error) {
+			captureSentryError(error, 'quickMenu/listQuickMenuAccess');
+			return thunkAPI.rejectWithValue(error);
 		}
-
-		const mezon = await ensureSession(getMezonCtx(thunkAPI));
-		const response = await mezon.client.listQuickMenuAccess(mezon.session, '0', channelId);
-
-		return { channelId, quickMenuItems: response.list_menus || [], fromCache: false };
-	} catch (error) {
-		captureSentryError(error, 'quickMenu/listQuickMenuAccess');
-		return thunkAPI.rejectWithValue(error);
 	}
-});
+);
 
 export const quickMenuSlice = createSlice({
 	name: QUICK_MENU_FEATURE_KEY,
@@ -213,11 +216,19 @@ export const quickMenuSlice = createSlice({
 			})
 			.addCase(listQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
-				const { channelId, quickMenuItems, fromCache } = action.payload;
-				state.byChannels[channelId] = quickMenuItems;
+				const { channelId, menuType, quickMenuItems, fromCache } = action.payload;
+
+				if (!state.byChannels[channelId]) {
+					state.byChannels[channelId] = {};
+				}
+				if (!state.timestamps[channelId]) {
+					state.timestamps[channelId] = {};
+				}
+
+				state.byChannels[channelId][menuType] = quickMenuItems;
 
 				if (!fromCache) {
-					state.timestamps[channelId] = Date.now();
+					state.timestamps[channelId][menuType] = Date.now();
 				}
 			})
 			.addCase(listQuickMenuAccess.rejected, (state, action) => {
@@ -230,8 +241,14 @@ export const quickMenuSlice = createSlice({
 			.addCase(addQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
 				const { channelId, data } = action.payload;
-				if (data) {
-					state.byChannels[channelId].push(data);
+				if (data && data.menu_type !== undefined) {
+					if (!state.byChannels[channelId]) {
+						state.byChannels[channelId] = {};
+					}
+					if (!state.byChannels[channelId][data.menu_type]) {
+						state.byChannels[channelId][data.menu_type] = [];
+					}
+					state.byChannels[channelId][data.menu_type].push(data);
 				}
 			})
 			.addCase(addQuickMenuAccess.rejected, (state, action) => {
@@ -244,9 +261,13 @@ export const quickMenuSlice = createSlice({
 			.addCase(updateQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
 				const { channelId, data } = action.payload;
-				if (data) {
-					const indexUpdate = state.byChannels[channelId].findIndex((item) => item.id === data.id);
-					state.byChannels[channelId][indexUpdate] = data;
+				if (data && data.menu_type !== undefined) {
+					if (state.byChannels[channelId]?.[data.menu_type]) {
+						const indexUpdate = state.byChannels[channelId][data.menu_type].findIndex((item) => item.id === data.id);
+						if (indexUpdate !== -1) {
+							state.byChannels[channelId][data.menu_type][indexUpdate] = data;
+						}
+					}
 				}
 			})
 			.addCase(updateQuickMenuAccess.rejected, (state, action) => {
@@ -259,8 +280,12 @@ export const quickMenuSlice = createSlice({
 			.addCase(deleteQuickMenuAccess.fulfilled, (state, action) => {
 				state.loadingStatus = 'loaded';
 				const { channelId, id } = action.payload;
+				// Find and remove from all menu types in this channel
 				if (state.byChannels[channelId]) {
-					state.byChannels[channelId] = state.byChannels[channelId].filter((item) => item.id !== id);
+					Object.keys(state.byChannels[channelId]).forEach((menuTypeKey) => {
+						const menuType = parseInt(menuTypeKey);
+						state.byChannels[channelId][menuType] = state.byChannels[channelId][menuType].filter((item) => item.id !== id);
+					});
 				}
 			})
 			.addCase(deleteQuickMenuAccess.rejected, (state, action) => {
@@ -285,7 +310,26 @@ export const getQuickMenuState = (rootState: { [QUICK_MENU_FEATURE_KEY]: QuickMe
 
 export const selectQuickMenuByChannelId = createSelector(
 	[getQuickMenuState, (_state: RootState, channelId: string) => channelId],
-	(quickMenuState, channelId) => quickMenuState?.byChannels?.[channelId] || []
+	(quickMenuState, channelId) => {
+		const channelData = quickMenuState?.byChannels?.[channelId];
+		if (!channelData) return [];
+		return Object.values(channelData).flat();
+	}
+);
+
+export const selectQuickMenuByChannelIdAndType = createSelector(
+	[getQuickMenuState, (_state: RootState, channelId: string) => channelId, (_state: RootState, _channelId: string, menuType: number) => menuType],
+	(quickMenuState, channelId, menuType) => quickMenuState?.byChannels?.[channelId]?.[menuType] || []
+);
+
+export const selectFlashMessagesByChannelId = createSelector(
+	[getQuickMenuState, (_state: RootState, channelId: string) => channelId],
+	(quickMenuState, channelId) => quickMenuState?.byChannels?.[channelId]?.[QUICK_MENU_TYPE.FLASH_MESSAGE] || []
+);
+
+export const selectQuickMenusByChannelId = createSelector(
+	[getQuickMenuState, (_state: RootState, channelId: string) => channelId],
+	(quickMenuState, channelId) => quickMenuState?.byChannels?.[channelId]?.[QUICK_MENU_TYPE.QUICK_MENU] || []
 );
 
 export const selectQuickMenuLoadingStatus = createSelector(getQuickMenuState, (state) => state?.loadingStatus || 'not loaded');
