@@ -32,6 +32,7 @@ class MainActivity : ReactActivity() {
         Math.sqrt(
             (widthInches.toDouble() * widthInches.toDouble()) +
                 (heightInches.toDouble() * heightInches.toDouble())
+        )
     return screenSize >= 7.5
   }
 

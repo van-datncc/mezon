@@ -134,10 +134,10 @@ const openAppSettings = () => {
 const getConfigDisplayNotificationAndroid = async (data: Record<string, string | object>): Promise<NotificationAndroid> => {
 	const defaultConfig: NotificationAndroid = {
 		visibility: AndroidVisibility.PUBLIC,
-		channelId: 'default',
+		channelId: (data?.sound as string) || 'default',
 		smallIcon: 'ic_notification',
 		color: '#7029c1',
-		sound: 'default',
+		sound: (data?.sound as string) || 'bank.mp3',
 		smallIconLevel: 10,
 		importance: AndroidImportance.HIGH,
 		showTimestamp: true,
@@ -159,7 +159,7 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 
 	try {
 		const groupId = await getOrCreateChannelGroup(channel);
-		const channelId = await createNotificationChannel(channel, groupId || '');
+		const channelId = await createNotificationChannel(channel, groupId || '', (data?.sound as string) || 'default');
 
 		return {
 			...defaultConfig,
@@ -200,7 +200,7 @@ const getOrCreateChannelGroup = async (channelId: string): Promise<string> => {
 	}
 };
 
-const createNotificationChannel = async (channelId: string, groupId: string): Promise<string> => {
+const createNotificationChannel = async (channelId: string, groupId: string, sound: string): Promise<string> => {
 	try {
 		if (!isValidString(channelId) || !isValidString(groupId)) {
 			throw new Error('Invalid channel or group ID');
@@ -211,7 +211,7 @@ const createNotificationChannel = async (channelId: string, groupId: string): Pr
 			name: channelId,
 			groupId,
 			importance: AndroidImportance.HIGH,
-			sound: 'default',
+			sound: sound ? sound : 'default',
 			visibility: AndroidVisibility.PUBLIC
 		});
 	} catch (error) {
@@ -224,7 +224,7 @@ const getConfigDisplayNotificationIOS = async (data: Record<string, string | obj
 	const defaultConfig: NotificationIOS = {
 		critical: true,
 		criticalVolume: 1.0,
-		sound: 'default',
+		sound: (data?.sound as string) || 'default',
 		foregroundPresentationOptions: {
 			badge: true,
 			banner: true,
