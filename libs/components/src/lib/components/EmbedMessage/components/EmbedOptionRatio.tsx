@@ -1,7 +1,7 @@
-import { embedActions } from '@mezon/store';
+import { embedActions, selectDataFormEmbedByMessageId } from '@mezon/store';
 import { IMessageRatioOption } from '@mezon/utils';
 import { useCallback, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { MessageRatioButton } from '../../MessageActionsPanel/components/MessageRatio';
 import { EmbedDescription } from './EmbedDescription';
 import { EmbedTitle } from './EmbedTitle';
@@ -15,7 +15,8 @@ interface EmbedOptionRatioProps {
 }
 
 export function EmbedOptionRatio({ options, message_id, idRadio, max_options }: EmbedOptionRatioProps) {
-	const [checked, setChecked] = useState<string[]>([]);
+	const embedData = useSelector((state) => selectDataFormEmbedByMessageId(state, message_id))?.[idRadio];
+	const [checked, setChecked] = useState<string[]>(embedData ? (Array.isArray(embedData) ? embedData : [embedData]) : []);
 	const handleCheckedOption = (value: string) => {
 		if (!max_options || checked.length < max_options || !checkMultiple || checked.includes(value)) {
 			handleAddEmbedRadioValue(value);

@@ -1,3 +1,4 @@
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Attributes, Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
@@ -11,11 +12,13 @@ import {
 import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, isYouTubeLink } from '@mezon/utils';
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
-import { Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
+import { useCallback } from 'react';
+import { DeviceEventEmitter, Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import ImageNative from '../../../../../components/ImageNative';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
+import LinkOptionModal from '../LinkOptions/LinkOptionModal';
 import { ChannelHashtag } from '../MarkdownFormatText/ChannelHashtag';
 import { MentionUser } from '../MarkdownFormatText/MentionUser';
 import RenderCanvasItem from '../RenderCanvasItem';
@@ -388,6 +391,14 @@ export const RenderTextMarkdownContent = ({
 
 	const store = elements?.length > 0 ? getStore() : null;
 
+	const handleLongPressLink = useCallback((link: string) => {
+		const data = {
+			heightFitContent: true,
+			children: <LinkOptionModal visible={true} link={link} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	}, []);
+
 	elements.forEach((element, index) => {
 		const s = element.s ?? 0;
 		const e = element.e ?? 0;
@@ -633,7 +644,7 @@ export const RenderTextMarkdownContent = ({
 									key={`link-${index}`}
 									style={themeValue ? markdownStyles(themeValue).link : {}}
 									onPress={() => openUrl(contentInElement, null)}
-									onLongPress={onLongPress}
+									onLongPress={() => handleLongPressLink?.(contentInElement)}
 								>
 									{contentInElement}
 								</Text>
@@ -648,11 +659,11 @@ export const RenderTextMarkdownContent = ({
 
 							markdownBlackParts.push(
 								<RenderYoutubeVideo
-									key={`youtube-${index}`}
+									videoKey={`youtube-${index}`}
 									videoId={videoId}
 									contentInElement={contentInElement}
 									onPress={() => openUrl(contentInElement, null)}
-									onLongPress={onLongPress}
+									onLongPress={() => handleLongPressLink?.(contentInElement)}
 									linkStyle={themeValue ? markdownStyles(themeValue).link : {}}
 								/>
 							);
@@ -662,7 +673,7 @@ export const RenderTextMarkdownContent = ({
 									key={`link-${index}`}
 									style={themeValue ? markdownStyles(themeValue).link : {}}
 									onPress={() => openUrl(contentInElement, null)}
-									onLongPress={onLongPress}
+									onLongPress={() => handleLongPressLink?.(contentInElement)}
 								>
 									{contentInElement}
 								</Text>

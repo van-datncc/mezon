@@ -44,6 +44,7 @@ import {
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	MentionReactInputProps,
+	QUICK_MENU_TYPE,
 	RequestInput,
 	SubPanelName,
 	TITLE_MENTION_HERE,
@@ -170,13 +171,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const dataReferences = useAppSelector((state) => selectDataReferences(state, props.currentChannelId ?? ''));
 	const dataReferencesTopic = useAppSelector((state) => selectDataReferences(state, currTopicId ?? ''));
 
-	const scopeId = props.isTopic
-		? (currTopicId || CREATING_TOPIC)
-		: props.currentChannelId!;
+	const scopeId = props.isTopic ? currTopicId || CREATING_TOPIC : props.currentChannelId!;
 
-	const attachmentFiltered = useAppSelector((state) =>
-		selectAttachmentByChannelId(state, scopeId || '')
-	);
+	const attachmentFiltered = useAppSelector((state) => selectAttachmentByChannelId(state, scopeId || ''));
 
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
 
@@ -494,7 +491,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		}
 	}, [attachmentFiltered?.files]);
 
-
 	const isReplyOnChannel = dataReferences.message_ref_id && !props.isTopic ? true : false;
 	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
 	const isSendMessageOnThreadBox = openThreadMessageState && !props.isTopic ? true : false;
@@ -720,7 +716,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				callback(generateCommandsList(search));
 				if (props.currentChannelId) {
 					try {
-						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						await dispatch(
+							quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId, menuType: QUICK_MENU_TYPE.FLASH_MESSAGE })
+						);
 						callback(generateCommandsList(search));
 					} catch (error) {
 						console.error('Error fetching fresh commands:', error);
@@ -730,7 +728,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				callback([{ id: 'loading', display: 'loading', description: 'Loading commands...', isLoading: true }]);
 				try {
 					if (props.currentChannelId) {
-						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						await dispatch(
+							quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId, menuType: QUICK_MENU_TYPE.FLASH_MESSAGE })
+						);
 					}
 					callback(generateCommandsList(search));
 				} catch (error) {
@@ -803,10 +803,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	};
 
 	return (
-		<div
-			className={`contain-layout relative bg-theme-surface rounded-lg `}
-			ref={containerRef}
-		>
+		<div className={`contain-layout relative bg-theme-surface rounded-lg `} ref={containerRef}>
 			<div className="relative">
 				<span
 					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary   pointer-events-none z-10 truncate transition-opacity duration-300 ${

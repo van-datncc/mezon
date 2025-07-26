@@ -10,7 +10,7 @@ import {
 	selectCurrentTopicId,
 	selectMemberClanByUserId2,
 	selectMessageByMessageId,
-	selectQuickMenuByChannelId,
+	selectQuickMenusByChannelId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -120,21 +120,12 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 			const userProfile = selectAllAccount(store.getState());
 			const profileInClan = selectMemberClanByUserId2(store.getState(), userProfile?.user?.id ?? '');
 
-			if (command.menu_type === QUICK_MENU_TYPE.BOT_EVENT) {
+			if (command.menu_type === QUICK_MENU_TYPE.QUICK_MENU) {
 				try {
 					const channelId = currentChannelId || currentChannel?.channel_id || '';
 					const clanId = currentChannel?.clan_id || '';
 					const mode = getActiveMode(channelId);
 					const isPublic = isPublicChannel(currentChannel);
-
-					const content = {
-						t: command.action_msg || command.description || '',
-						bot_menu: {
-							menu_name: command.display || command.menu_name || '',
-							menu_id: command.menu_id || command.id?.replace('quick_menu_', ''),
-							triggered_by_message: messageId
-						}
-					};
 
 					await dispatch(
 						quickMenuActions.writeQuickMenuEvent({
@@ -143,7 +134,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 							menuName: command.display || command.menu_name || '',
 							mode,
 							isPublic,
-							content,
+							content: message.content,
 							mentions: message?.mentions || [],
 							attachments: message?.attachments || [],
 							references: message?.references || [],
@@ -164,20 +155,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		[onSlashCommandExecute, dispatch, currentChannelId, currentChannel, messageId, message, isFocusTopicBox, currenTopicId]
 	);
 
-	const handleSlashCommandHover = useCallback(async () => {
-		if (currentChannelId && !isLoadingCommands) {
-			setIsLoadingCommands(true);
-			try {
-				await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: currentChannelId }));
-			} catch (error) {
-				console.error('Error fetching quick menu commands:', error);
-			} finally {
-				setIsLoadingCommands(false);
-			}
-		}
-	}, [dispatch, currentChannelId, isLoadingCommands]);
-
-	const quickMenuItems = useAppSelector((state) => selectQuickMenuByChannelId(state, currentChannelId || ''));
+	const quickMenuItems = useAppSelector((state) => selectQuickMenusByChannelId(state, currentChannelId || ''));
 
 	const slashCommandOptions = useMemo(() => {
 		if (isLoadingCommands) {
@@ -207,6 +185,10 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		[handleSlashCommandClick]
 	);
 
+	const shouldShowQuickMenu = useMemo(() => {
+		return quickMenuItems.length > 0 || isLoadingCommands;
+	}, [quickMenuItems, isLoadingCommands]);
+
 	const children = useMemo(() => {
 		const elements: React.ReactNode[] = [];
 		for (let index = 0; index < items.length; index++) {
@@ -221,15 +203,11 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 			const lableAddReaction = item.label === 'Add Reaction';
 			const lableSlashCommands = item.label === 'Slash Commands';
 
-			if (lableSlashCommands) {
+			if (lableSlashCommands && shouldShowQuickMenu) {
 				elements.push(
 					<Submenu
 						key={item.label}
-						label={
-							<span onMouseEnter={handleSlashCommandHover} className="text-sm font-medium pl-[4px]">
-								Quick Menu
-							</span>
-						}
+						label={<span className="text-sm font-medium pl-[4px]">Quick Menu</span>}
 						className="border-none bg-theme-contexify p-0"
 					>
 						{isLoadingCommands ? (
@@ -324,7 +302,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 						</Item>
 					</Dropdown>
 				);
-			} else {
+			} else if (!lableSlashCommands) {
 				elements.push(
 					<Item
 						key={item.label}
@@ -370,11 +348,11 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		messageId,
 		handleClickEmoji,
 		slashCommandOptions,
-		handleSlashCommandHover,
 		isLoadingCommands,
 		handleCommandSelect,
 		isTopic,
-		message
+		message,
+		shouldShowQuickMenu
 	]);
 
 	return (

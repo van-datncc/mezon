@@ -201,6 +201,41 @@ function isUrl(string: string): boolean {
 	return false;
 }
 
+function getCleanUrlAndTrailing(match: string, fullText: string, matchIndex: number): { cleanMatch: string; trailingPunctuation: string } {
+	const beforeMatch = fullText.substring(0, matchIndex);
+
+	const wrappingPairs = [
+		{ open: '(', close: ')' },
+		{ open: '[', close: ']' },
+		{ open: '{', close: '}' },
+		{ open: '<', close: '>' }
+	];
+
+	let cleanMatch = match;
+	let trailingPunctuation = '';
+
+	let isWrapped = false;
+	for (const pair of wrappingPairs) {
+		if (beforeMatch.endsWith(pair.open) && match.endsWith(pair.close)) {
+			cleanMatch = match.slice(0, -1);
+			trailingPunctuation = pair.close;
+			isWrapped = true;
+			break;
+		}
+	}
+
+	if (!isWrapped) {
+		const commonTrailingPunctuation = /[.,;:!?'"]+$/;
+		const trailingMatch = match.match(commonTrailingPunctuation);
+		if (trailingMatch) {
+			cleanMatch = match.slice(0, -trailingMatch[0].length);
+			trailingPunctuation = trailingMatch[0];
+		}
+	}
+
+	return { cleanMatch, trailingPunctuation };
+}
+
 const LINK_TEMPLATE = /(?:\w+:)?\/\/\S+/gi;
 
 function parseMarkdownLinks(html: string) {
@@ -215,21 +250,40 @@ function parseMarkdownLinks(html: string) {
 		return `__CODE_BLOCK_${index}__`;
 	});
 
-	result = result.replace(/`[^`\n]*?`/g, (match) => {
+	result = result.replace(/`[^`\n]+`/g, (match) => {
+		if (match.includes('__CODE_BLOCK_')) {
+			return match;
+		}
+
 		const index = codeSections.length;
 		codeSections.push(match);
 		return `__INLINE_CODE_${index}__`;
 	});
 
-	result = result.replace(LINK_TEMPLATE, (match) => {
-		const cleanMatch = match.replace(/[)\]}>.,;:!?'"]+$/, '');
-		const trailingPunctuation = match.slice(cleanMatch.length);
+	const placeholderRegex = /__(?:CODE_BLOCK|INLINE_CODE)_\d+__/g;
+	const parts = result.split(placeholderRegex);
+	const placeholders = result.match(placeholderRegex) || [];
 
-		if (isUrl(cleanMatch)) {
-			return `<a href="${cleanMatch}" target="_blank">${cleanMatch}</a>${trailingPunctuation}`;
+	for (let i = 0; i < parts.length; i++) {
+		if (parts[i]) {
+			const partText = parts[i];
+			parts[i] = partText.replace(LINK_TEMPLATE, (match, offset) => {
+				const { cleanMatch, trailingPunctuation } = getCleanUrlAndTrailing(match, partText, offset);
+				if (isUrl(cleanMatch)) {
+					return `<a href="${cleanMatch}" target="_blank">${cleanMatch}</a>${trailingPunctuation}`;
+				}
+				return match;
+			});
 		}
-		return match;
-	});
+	}
+
+	result = '';
+	for (let i = 0; i < parts.length; i++) {
+		result += parts[i];
+		if (i < placeholders.length) {
+			result += placeholders[i];
+		}
+	}
 
 	if (codeSections.length > 0) {
 		result = result.replace(/__(?:CODE_BLOCK|INLINE_CODE)_(\d+)__/g, (match, index) => {

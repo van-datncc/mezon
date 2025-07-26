@@ -70,18 +70,12 @@ export const SearchableCommandList: React.FC<SearchableCommandListProps> = ({
 	const defaultFormatOptionLabel = useCallback(
 		(option: CommandOption) => (
 			<div className="flex items-start gap-2 w-full">
-				<div className="flex items-center justify-center w-5 h-5 bg-blue-500 rounded flex-shrink-0 mt-0.5">
-					<span className="text-white font-mono text-xs font-semibold">/</span>
-				</div>
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2 mb-1">
-						<span className="font-medium text-sm text-theme-primary">/{option.command?.display}</span>
-						{option.command?.isBuiltIn && (
-							<span className="px-1.5 py-0.5 text-xs bg-blue-500 text-white rounded font-medium">BUILT-IN</span>
-						)}
 						{option.command?.menu_type === 2 && (
 							<span className="px-1.5 py-0.5 text-xs bg-green-500 text-white rounded font-medium">BOT</span>
 						)}
+						<span className="font-medium text-sm text-theme-primary">{option.command?.display}</span>
 					</div>
 				</div>
 			</div>

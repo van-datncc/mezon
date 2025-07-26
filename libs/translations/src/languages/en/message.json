@@ -22,7 +22,12 @@
         "resend": "Resend",
         "buzz": "Buzz!!",
         "markMessage": "Mark Message",
-        "allAlbums": "All Albums"
+        "allAlbums": "All Albums",
+        "linkOptions": "Link Options",
+        "openLink": "Open Link",
+        "copyLink": "Copy Link",
+        "shareLink": "Share Link",
+        "copyLinkSuccess": "Copied link to clipboard"
     },
     "chatBox": {
         "replyingTo": "Replying to",
