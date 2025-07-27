@@ -100,7 +100,7 @@ export const refreshSession = createAsyncThunk('auth/refreshSession', async (_, 
 			is_remember: sessionState.is_remember ?? false
 		});
 	} catch (error: any) {
-		return thunkAPI.rejectWithValue('Redirect Login');
+		return thunkAPI.rejectWithValue(error);
 	}
 
 	if (!session) {
