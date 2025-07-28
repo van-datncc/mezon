@@ -13,7 +13,7 @@ import { EBacktickType, ETokenMessage, IExtendedMessage, getSrcEmoji, isYouTubeL
 import { TFunction } from 'i18next';
 import { ChannelType } from 'mezon-js';
 import { useCallback } from 'react';
-import { DeviceEventEmitter, Dimensions, Linking, StyleSheet, Text, View } from 'react-native';
+import { DeviceEventEmitter, Linking, StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import CustomIcon from '../../../../../../../src/assets/CustomIcon';
 import ImageNative from '../../../../../components/ImageNative';
@@ -52,8 +52,6 @@ export const TYPE_MENTION = {
  * custom style for markdown
  * react-native-markdown-display/src/lib/styles.js to see more
  */
-const screenWidth = Dimensions.get('window').width;
-const codeBlockMaxWidth = screenWidth - size.s_70;
 
 export const markdownStyles = (
 	colors: Attributes,
@@ -120,7 +118,7 @@ export const markdownStyles = (
 		},
 		fence: {
 			color: colors.text,
-			width: isTabletLandscape ? codeBlockMaxWidth * 0.6 : codeBlockMaxWidth,
+			width: isTabletLandscape ? '70%' : '100%',
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
@@ -199,7 +197,8 @@ export const markdownStyles = (
 			color: colors.text
 		},
 		blockSpacing: {
-			paddingVertical: size.s_4
+			paddingVertical: size.s_4,
+			width: '100%'
 		}
 	});
 };
@@ -552,7 +551,6 @@ export const RenderTextMarkdownContent = ({
 										</Text>
 									</View>
 								</View>
-								{s !== 0 && e !== t?.length && '\n'}
 							</Text>
 						);
 						break;
@@ -695,7 +693,7 @@ export const RenderTextMarkdownContent = ({
 		textParts.push(
 			renderTextPalainContain(
 				themeValue,
-				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
+				t?.slice(lastIndex).replace(/^[\s\n]+/, ''),
 				lastIndex,
 				isUnReadChannel,
 				isLastMessage,

@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { FriendsEntity } from '@mezon/store-mobile';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 
 	const allFriendGroupByAlphabet = useMemo(() => {
 		const groupedByCharacter = friendList.reduce((acc, friend) => {
-			const name = showAction ? friend?.user?.username : friend?.user?.display_name;
+			const name = friend?.user?.display_name ? friend?.user?.display_name : friend?.user?.username;
 			const firstNameCharacter = name?.charAt(0)?.toUpperCase();
 			if (!acc[firstNameCharacter]) {
 				acc[firstNameCharacter] = [];
@@ -62,7 +62,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 				friendList: groupedByCharacter[character]
 			}))
 			.sort(sortByAlphabet);
-	}, [friendList, showAction]);
+	}, [friendList]);
 
 	const renderListFriendGroupByAlphabet = ({ item }: { item: IFriendGroupByCharacter }) => {
 		return (
@@ -99,7 +99,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 	return (
 		<View style={styles.listUserByAlphabetContainer}>
 			{isSearching ? (
-				<View>
+				<View style={{ flex: 1 }}>
 					{friendList?.length ? <Text style={styles.friendText}>{t('friends:friends')}</Text> : null}
 					<View style={styles.groupWrapper}>
 						<FlatList
@@ -112,6 +112,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 							windowSize={10}
 							keyboardShouldPersistTaps="handled"
 							onScrollBeginDrag={() => Keyboard.dismiss()}
+							contentContainerStyle={{ paddingBottom: size.s_50 }}
 							renderItem={({ item }) => (
 								<FriendItem
 									friend={item}
