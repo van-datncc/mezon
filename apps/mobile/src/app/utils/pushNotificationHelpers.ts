@@ -430,9 +430,12 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
 			setTimeout(() => {
+				if (channelId) {
+					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, channelId);
+				}
 				store.dispatch(appActions.setIsFromFCMMobile(false));
 				save(STORAGE_IS_DISABLE_LOAD_BACKGROUND, false);
-			}, 4000);
+			}, 2000);
 		} else {
 			const linkDirectMessageMatch = link.match(clanDirectMessageLinkRegex);
 
