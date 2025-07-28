@@ -132,7 +132,7 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						<button className="py-2 h-10 px-4 rounded-lg  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
-						<button className="py-2 h-10 px-4 rounded-lg btn-primary-hover btn-primary " type="button" onClick={handleSaveCustomStatus}>
+						<button className="py-2 h-10 px-4 rounded-lg text-white !bg-[#5265ec] hover:!bg-[#4654c0]" type="button" onClick={handleSaveCustomStatus}>
 							Save
 						</button>
 					</div>
