@@ -1081,6 +1081,25 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelcreated = useCallback(async (channelCreated: ChannelCreatedEvent) => {
+		if (channelCreated.parent_id && channelCreated.parent_id !== '0' && channelCreated.channel_private !== ChannelStatusEnum.isPrivate) {
+			const newThread: ThreadsEntity = {
+				...channelCreated,
+				id: channelCreated.channel_id,
+				type: channelCreated.channel_type,
+				last_sent_message: {
+					sender_id: channelCreated.creator_id,
+					timestamp_seconds: Date.now() / 1000
+				},
+				active: channelCreated.creator_id === userId ? ThreadStatus.joined : ThreadStatus.activePublic
+			};
+			dispatch(
+				threadsActions.addThreadToCached({
+					channelId: channelCreated.parent_id,
+					thread: newThread
+				})
+			);
+		}
+
 		if (channelCreated.creator_id === userId) {
 			if (channelCreated.parent_id) {
 				const thread: ChannelsEntity = {
