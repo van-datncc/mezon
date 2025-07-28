@@ -13,14 +13,14 @@ import { RootAuthStack } from './RootAuthStack';
 const messaging = getMessaging(getApp());
 export const Authentication = memo(() => {
 	const isTabletLandscape = useTabletLandscape();
-	const [initRouteName, setInitRouteName] = useState<string>(APP_SCREEN.HOME_DEFAULT);
+	const [initRouteName, setInitRouteName] = useState<string>('');
 	const notiInitRef = useRef<any>(null);
 
 	const getInitRouterName = async () => {
 		let routeName: string = APP_SCREEN.BOTTOM_BAR;
 		try {
 			const remoteMessage: any = Platform.OS === 'ios' ? await getInitialNotification(messaging) : await notifee.getInitialNotification();
-			const notification = { ...remoteMessage?.notification, data: remoteMessage?.data || remoteMessage?.notification?.data };
+			const notification = { ...(remoteMessage?.notification || {}), data: remoteMessage?.data || remoteMessage?.notification?.data };
 
 			if (notification?.data?.link) {
 				notiInitRef.current = notification;
