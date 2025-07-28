@@ -92,7 +92,7 @@
     "unpinSuccess": "Unpin Message Successfully",
     "Yes": "Yes",
     "No": "No",
-    "unableSendMessage": "Unable to send message. Please try again.",
+    "unableSendMessage": "Failed to send message. Hold for options.",
     "manage": {
         "edit": "Edit",
         "roles": "Roles",
