@@ -33,7 +33,6 @@ import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } f
 import { useSelector } from 'react-redux';
 import { SimpleMemberProfile } from '../MemberProfile';
 import DeviceSelector from './DeviceSelector';
-import LabelDm from './labelDm';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -209,9 +208,8 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 						isHideStatus={true}
 						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
 						key={currentDmGroup?.channel_id}
-						isHiddenAvatarPanel={true}
+						isHiddenAvatarPanel={false}
 					/>
-					<LabelDm dmGroupId={dmGroupId || ''} currentDmGroup={currentDmGroup} />
 				</div>
 			</div>
 
