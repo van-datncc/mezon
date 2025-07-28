@@ -11,12 +11,11 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 
 const ChannelSeen = memo(
 	({ channelId }: { channelId: string }) => {
 		const dispatch = useAppDispatch();
-		const currentChannel = useSelector((state) => selectChannelById(state, channelId as string));
+		const currentChannel = useAppSelector((state) => selectChannelById(state, channelId as string));
 		const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 		const { markAsReadSeen } = useSeenMessagePool();
 		const handleReadMessage = useCallback(() => {
