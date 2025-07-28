@@ -691,7 +691,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
 
 			const quickMenuCommands = channelQuickMenuItems
-				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()))
+				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()) && item.menu_type === QUICK_MENU_TYPE.FLASH_MESSAGE)
 				.map((item) => ({
 					id: `quick_menu_${item.id}`,
 					display: item.menu_name || '',
