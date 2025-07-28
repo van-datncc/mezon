@@ -47,7 +47,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 
 	const allFriendGroupByAlphabet = useMemo(() => {
 		const groupedByCharacter = friendList.reduce((acc, friend) => {
-			const name = showAction ? friend?.user?.username : friend?.user?.display_name;
+			const name = friend?.user?.display_name ? friend?.user?.display_name : friend?.user?.username;
 			const firstNameCharacter = name?.charAt(0)?.toUpperCase();
 			if (!acc[firstNameCharacter]) {
 				acc[firstNameCharacter] = [];
@@ -62,7 +62,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 				friendList: groupedByCharacter[character]
 			}))
 			.sort(sortByAlphabet);
-	}, [friendList, showAction]);
+	}, [friendList]);
 
 	const renderListFriendGroupByAlphabet = ({ item }: { item: IFriendGroupByCharacter }) => {
 		return (
