@@ -15,6 +15,7 @@ interface IWaveButtonProps {
 }
 
 const STICKER_WELCOME_URL = 'https://cdn.mezon.ai/stickers/7355562928528545988.webp';
+const STICKER_WELCOME_NAME = '24318127-fb1d-4ac4-a036-c3d59ffb033c.gif';
 const MEZON_AVATAR_URL = 'https://cdn.mezon.ai/0/1840653409082937344/1782991817428439000/1748500199026_0logo_new.png';
 
 const WaveButton = ({ message }: IWaveButtonProps) => {
@@ -50,7 +51,7 @@ const WaveButton = ({ message }: IWaveButtonProps) => {
 				{
 					url: STICKER_WELCOME_URL,
 					filetype: 'image/gif',
-					filename: '24318127-fb1d-4ac4-a036-c3d59ffb033c.gif',
+					filename: STICKER_WELCOME_NAME,
 					size: 286037,
 					width: 240,
 					height: 240
