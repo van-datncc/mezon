@@ -15,6 +15,7 @@ import android.app.NotificationManager
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import com.swmansion.rnscreens.RNScreensPackage;
 
 class MainActivity : ReactActivity() {
 
