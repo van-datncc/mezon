@@ -13,8 +13,8 @@ import {
 	useUserMetaById
 } from '@mezon/core';
 import { EStateFriend, selectAccountCustomStatus, selectAllAccount, selectCurrentUserId, selectFriendStatus } from '@mezon/store';
-import { ChannelMembersEntity, IMessageWithUser } from '@mezon/utils';
-import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
+import { ChannelMembersEntity, IMessageWithUser, saveParseUserStatus } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import { RefObject, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getColorAverageFromURL } from '../SettingProfile/AverageColor';
@@ -90,7 +90,7 @@ const ModalUserProfile = ({
 	const onLoading = useRef<boolean>(false);
 	const statusOnline = useMemo(() => {
 		if (userProfile?.user?.metadata && userId === userID) {
-			const metadata = safeJSONParse(userProfile?.user?.metadata);
+			const metadata = saveParseUserStatus(userProfile?.user?.metadata);
 			return metadata?.user_status;
 		}
 		if (userMetaById) {
