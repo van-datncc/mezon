@@ -118,7 +118,7 @@ export const markdownStyles = (
 		},
 		fence: {
 			color: colors.text,
-			width: isTabletLandscape ? '60%' : '100%',
+			width: isTabletLandscape ? '70%' : '100%',
 			backgroundColor: colors.secondaryLight,
 			borderColor: colors.black,
 			borderRadius: size.s_4,
