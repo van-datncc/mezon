@@ -209,7 +209,7 @@ const ModalUserProfile = ({
 				onLoading.current = true;
 			}
 		},
-		[userById]
+		[userById, content]
 	);
 	return (
 		<div tabIndex={-1} ref={profileRef} className={'outline-none ' + classWrapper} onClick={() => setOpenModal(initOpenModal)}>
