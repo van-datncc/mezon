@@ -44,7 +44,9 @@
       "copyText": "Đã sao chép văn bản tin nhắn",
       "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi một chút",
       "pinMessage": "Tin nhắn đã được ghim",
-      "markMessage": "Đã đánh dấu tin nhắn"
+      "markMessage": "Đã đánh dấu tin nhắn",
+      "markMessageUnread": "Đã đánh dấu chưa đọc",
+      "markMessageUnreadFailed": "Không thể bỏ đọc"
   },
   "directMessage": {
       "you": "Bạn"

@@ -7,7 +7,7 @@
         "deleteMessage": "Delete Message",
         "pinMessage": "Pin Message",
         "unPinMessage": "Unpin Message",
-        "markUnRead": "Mark UnRead",
+        "markUnRead": "Mark Unread",
         "mention": "Mention",
         "copyMessageLink": "Copy Message Link",
         "report": "Report",
@@ -44,7 +44,9 @@
         "copyText": "Copied Message Text",
         "attachmentIsLoading": "Attachment is loading, please wait a moment",
         "pinMessage": "Message has been pinned",
-        "markMessage": "Message has been marked"
+        "markMessage": "Message has been marked",
+        "markMessageUnread": "Message has been unread",
+        "markMessageUnreadFailed": "Failed to unread message"
     },
     "directMessage": {
         "you": "You"
