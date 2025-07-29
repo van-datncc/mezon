@@ -198,29 +198,10 @@ export const markdownStyles = (
 		},
 		blockSpacing: {
 			paddingVertical: size.s_4,
-			width: '100%'
+			width: '99.9%'
 		}
 	});
 };
-
-const styleMessageReply = (colors: Attributes) =>
-	StyleSheet.create({
-		body: {
-			color: colors.text,
-			fontSize: size.small
-		},
-		textVoiceChannel: {
-			fontSize: size.small,
-			color: colors.textDisabled,
-			lineHeight: size.s_20
-		},
-		mention: {
-			fontSize: size.small,
-			color: colors.textLink,
-			backgroundColor: colors.midnightBlue,
-			lineHeight: size.s_20
-		}
-	});
 
 export type IMarkdownProps = {
 	content: IExtendedMessage;
