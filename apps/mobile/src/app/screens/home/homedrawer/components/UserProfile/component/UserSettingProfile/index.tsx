@@ -94,7 +94,13 @@ const UserSettingProfile = ({
 				label: `${EActionSettingUserProfile.Manage}`,
 				value: EActionSettingUserProfile.Manage,
 				icon: (
-					<MezonIconCDN icon={IconCDN.settingIcon} color={themeValue.text} width={20} height={20} customStyle={{ marginTop: size.s_2 }} />
+					<MezonIconCDN
+						icon={IconCDN.settingIcon}
+						color={themeValue.text}
+						width={size.s_22}
+						height={size.s_22}
+						customStyle={{ marginTop: size.s_2 }}
+					/>
 				),
 				action: handleSettingUserProfile,
 				isShow: hasAdminPermission
@@ -109,9 +115,7 @@ const UserSettingProfile = ({
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
-				icon: (
-					<MezonIconCDN icon={IconCDN.leaveGroupIcon} width={20} height={20} color={baseColor.red} customStyle={{ marginTop: size.s_2 }} />
-				),
+				icon: <MezonIconCDN icon={IconCDN.leaveGroupIcon} width={size.s_22} height={size.s_22} color={baseColor.red} />,
 				action: handleSettingUserProfile,
 				isShow: !isItMe && (hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
