@@ -59,6 +59,7 @@ import { IConfirmActionPayload, IMessageAction, IMessageActionNeedToResolve, IRe
 import { ConfirmPinMessageModal } from '../ConfirmPinMessageModal';
 import EmojiSelector from '../EmojiPicker/EmojiSelector';
 import { IReactionMessageProps } from '../MessageReaction';
+import { QuickMenuModal } from '../QuickMenuModal';
 import { ReportMessageModal } from '../ReportMessageModal';
 import { RecentEmojiMessageAction } from './RecentEmojiMessageAction';
 import { style } from './styles';
@@ -74,6 +75,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const { t } = useTranslation(['message']);
 	const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 	const [currentMessageActionType, setCurrentMessageActionType] = useState<EMessageActionType | null>(null);
+	const [isShowQuickMenuModal, setIsShowQuickMenuModal] = useState(false);
 
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
@@ -95,6 +97,10 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 
 	const onCloseModalConfirm = useCallback(() => {
 		setCurrentMessageActionType(null);
+	}, []);
+
+	const onCloseQuickMenuModal = useCallback(() => {
+		setIsShowQuickMenuModal(false);
 	}, []);
 
 	const onDeleteMessage = useCallback(
@@ -367,6 +373,10 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		onClose();
 	};
 
+	const handleActionQuickMenu = () => {
+		setIsShowQuickMenuModal(true);
+	};
+
 	const handleActionMarkMessage = async () => {
 		try {
 			await dispatch(notificationActions.markMessageNotify(message));
@@ -478,6 +488,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.TopicDiscussion:
 				handleActionTopicDiscussion();
 				break;
+			case EMessageActionType.QuickMenu:
+				handleActionQuickMenu();
+				break;
 			default:
 				break;
 		}
@@ -523,6 +536,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.discussionIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			case EMessageActionType.MarkMessage:
 				return <MezonIconCDN icon={IconCDN.starIcon} width={size.s_20} height={size.s_18} color={themeValue.text} />;
+			case EMessageActionType.QuickMenu:
+				return <MezonIconCDN icon={IconCDN.quickAction} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			default:
 				return <View />;
 		}
@@ -563,7 +578,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			isHideDeleteMessage && EMessageActionType.DeleteMessage,
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
 			(isMyMessage || isMessageSystem || isAnonymous) && EMessageActionType.GiveACoffee,
-			isHideTopicDiscussion && EMessageActionType.TopicDiscussion
+			isHideTopicDiscussion && EMessageActionType.TopicDiscussion,
+			isDM && EMessageActionType.QuickMenu
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
@@ -579,7 +595,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		const mediaList =
 			(message?.attachments?.length > 0 &&
 				message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))) ||
-			message?.content?.embed?.some((embed) => embed?.image)
+				message?.content?.embed?.some((embed) => embed?.image)
 				? []
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
@@ -714,6 +730,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					type={currentMessageActionType}
 				/>
 			)}
+
+			{isShowQuickMenuModal && <QuickMenuModal channelId={currentChannelId} isVisible={isShowQuickMenuModal} onClose={onCloseQuickMenuModal} />}
 		</BottomSheetView>
 	);
 });
