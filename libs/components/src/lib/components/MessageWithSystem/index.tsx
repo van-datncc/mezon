@@ -5,6 +5,7 @@ import { TypeMessage, addMention, convertDateString } from '@mezon/utils';
 import React, { ReactNode, useRef, useState } from 'react';
 import { MessageReaction } from '../../components';
 import { MessageLineSystem } from '../MessageWithUser/MessageLineSystem';
+import WaveButton from './WaveButton';
 
 export type ReactedOutsideOptional = {
 	id: string;
@@ -49,7 +50,9 @@ function MessageWithSystem({ message, onContextMenu, popup, isSearchMessage, sho
 							content={contentUpdatedMention}
 						/>
 					</div>
+
 					<MessageReaction message={message} isTopic={isTopic} />
+					{message?.code === TypeMessage.Welcome && <WaveButton message={message} />}
 				</HoverStateWrapper>
 			)}
 		</>
