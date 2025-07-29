@@ -1,5 +1,5 @@
 import { useAuth, useChannelMembersActions, usePermissionChecker } from '@mezon/core';
-import { Colors, baseColor, useTheme } from '@mezon/mobile-ui';
+import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -93,7 +93,9 @@ const UserSettingProfile = ({
 			{
 				label: `${EActionSettingUserProfile.Manage}`,
 				value: EActionSettingUserProfile.Manage,
-				icon: <MezonIconCDN icon={IconCDN.settingIcon} color={themeValue.text} width={20} height={20} />,
+				icon: (
+					<MezonIconCDN icon={IconCDN.settingIcon} color={themeValue.text} width={20} height={20} customStyle={{ marginTop: size.s_2 }} />
+				),
 				action: handleSettingUserProfile,
 				isShow: hasAdminPermission
 			},
@@ -107,7 +109,9 @@ const UserSettingProfile = ({
 			{
 				label: `${EActionSettingUserProfile.Kick}`,
 				value: EActionSettingUserProfile.Kick,
-				icon: <MezonIconCDN icon={IconCDN.userMinusIcon} width={20} height={20} color={baseColor.red} />,
+				icon: (
+					<MezonIconCDN icon={IconCDN.leaveGroupIcon} width={20} height={20} color={baseColor.red} customStyle={{ marginTop: size.s_2 }} />
+				),
 				action: handleSettingUserProfile,
 				isShow: !isItMe && (hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
