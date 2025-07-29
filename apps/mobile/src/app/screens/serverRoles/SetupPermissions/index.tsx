@@ -88,8 +88,7 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 				[],
 				listAddPermissions,
 				[],
-				removePermissionList,
-				''
+				removePermissionList
 			);
 			if (response?.ok !== undefined && response?.ok === false) {
 				throw new Error('failed');
