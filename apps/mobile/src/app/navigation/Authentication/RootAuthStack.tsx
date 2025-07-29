@@ -61,6 +61,20 @@ export const RootAuthStack = memo(
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
 							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+							transitionSpec: {
+								open: {
+									animation: 'timing',
+									config: {
+										duration: 100
+									}
+								},
+								close: {
+									animation: 'timing',
+									config: {
+										duration: 50
+									}
+								}
+							},
 							keyboardHandlingEnabled: false
 						}}
 					/>
@@ -75,7 +89,21 @@ export const RootAuthStack = memo(
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
 							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-							keyboardHandlingEnabled: false
+							keyboardHandlingEnabled: false,
+							transitionSpec: {
+								open: {
+									animation: 'timing',
+									config: {
+										duration: 100
+									}
+								},
+								close: {
+									animation: 'timing',
+									config: {
+										duration: 50
+									}
+								}
+							}
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />

@@ -2,7 +2,7 @@
   "userAction": {
     "transferFunds": "Transfer Funds",
     "sendMessage": "Message",
-    "voiceCall": "VoiceCall",
+    "voiceCall": "Call",
     "videoCall": "VideoCall",
     "addFriend": "Add Friend",
     "pending": "Pending",

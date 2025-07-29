@@ -693,7 +693,7 @@ export const RenderTextMarkdownContent = ({
 		textParts.push(
 			renderTextPalainContain(
 				themeValue,
-				t?.slice(lastIndex).replace(/^[\s\n]+/, ''),
+				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
 				lastIndex,
 				isUnReadChannel,
 				isLastMessage,
