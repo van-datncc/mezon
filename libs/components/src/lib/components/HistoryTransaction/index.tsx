@@ -204,13 +204,13 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 							<div className="flex items-center gap-2">
 								<button
 									onClick={refreshData}
-									className="text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
+									className=" none-draggable-area text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
 								>
 									<Icons.ReloadIcon className="w-5 h-5 " />
 								</button>
 								<button
 									onClick={onClose}
-									className="text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
+									className=" none-draggable-area text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
 								>
 									<Icons.Close className="w-5 h-5 " />
 								</button>
@@ -302,13 +302,13 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 						<div className="flex items-center gap-2">
 							<button
 								onClick={refreshData}
-								className="text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
+								className=" none-draggable-area text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
 							>
 								<Icons.ReloadIcon className="w-5 h-5 " />
 							</button>
 							<button
 								onClick={onClose}
-								className="text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
+								className=" none-draggable-area text-theme-primary text-theme-primary-hover transition-colors p-2 rounded-lg hover:bg-gray-500/10 "
 							>
 								<Icons.Close className="w-5 h-5 " />
 							</button>
