@@ -377,7 +377,7 @@ export const threadsSlice = createSlice({
 		},
 		addThreadToCached: (state, action: PayloadAction<{ channelId: string; thread: ThreadsEntity }>) => {
 			const { channelId, thread } = action.payload;
-			if (!state.byChannels[channelId]) {
+			if (!state.byChannels?.[channelId]) {
 				return;
 			}
 

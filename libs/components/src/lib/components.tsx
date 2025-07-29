@@ -93,7 +93,7 @@ export { default as ModalDeleteMess } from './components/DeleteMessageModal/Moda
 export { default as FailLoginModal } from './components/FailLoginModal';
 export { default as ModalRemoveMemberClan } from './components/MemberProfile/ModalRemoveMemberClan';
 export { default as processMention } from './components/MessageBox/ReactionMentionInput/processMention';
-export { default as PanelMember } from './components/PanelMember';
+export { default as PanelMemberTable } from './components/PanelMember/PanelMemberTable';
 export { default as UserProfileModalInner } from './components/UserProfileModalInner';
 
 export * from './components/ThumbnailAttachmentRender';

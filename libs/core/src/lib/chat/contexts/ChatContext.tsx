@@ -1081,7 +1081,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	);
 
 	const onchannelcreated = useCallback(async (channelCreated: ChannelCreatedEvent) => {
-		if (channelCreated.parent_id) {
+		if (channelCreated.parent_id && channelCreated.parent_id !== '0' && channelCreated.channel_private !== ChannelStatusEnum.isPrivate) {
 			const newThread: ThreadsEntity = {
 				...channelCreated,
 				id: channelCreated.channel_id,
