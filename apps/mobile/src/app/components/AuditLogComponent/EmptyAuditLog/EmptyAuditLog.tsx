@@ -23,9 +23,8 @@ export default function EmptyAuditLog() {
 			<Text
 				style={{
 					fontSize: verticalScale(16),
-					marginLeft: 0,
-					marginRight: 0,
-					color: themeValue.white
+					color: themeValue.white,
+					textAlign: 'center'
 				}}
 			>
 				{t('emptyAuditLog.description')}

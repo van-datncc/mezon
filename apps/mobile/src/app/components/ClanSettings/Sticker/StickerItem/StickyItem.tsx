@@ -128,7 +128,7 @@ export const StickerSettingItem = forwardRef(({ data, clanID, onSwipeOpen }: ISt
 					</View>
 				</View>
 
-				<View style={styles.flexRow}>
+				<View style={[styles.flexRow, { justifyContent: 'flex-end' }]}>
 					<Text style={styles.text} numberOfLines={1}>
 						{user?.user?.username}
 					</Text>

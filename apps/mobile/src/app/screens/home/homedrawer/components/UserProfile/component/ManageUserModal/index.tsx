@@ -465,7 +465,7 @@ export const ManageUserModal = memo<IManageUserModalProp>(({ user, visible, oncl
 										<Text
 											style={{
 												fontSize: verticalScale(14),
-												color: baseColor.redStrong
+												color: baseColor.red
 											}}
 										>
 											{item.label} {user?.user?.username}
