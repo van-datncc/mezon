@@ -12,11 +12,13 @@ type MessageRatioButtonProps = {
 };
 
 export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, messageId, buttonId }) => {
-	const { placeholder, required, textarea, type = 'text' } = input;
+	const { placeholder, required, textarea, type = 'text', readonly = false } = input;
 	const dispatch = useDispatch();
 
 	const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		debouncedChangeInput(e.target.value);
+		if (!readonly) {
+			debouncedChangeInput(e.target.value);
+		}
 	};
 
 	useEffect(() => {
@@ -52,7 +54,7 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 					min={type === 'number' ? 0 : undefined}
 					placeholder={(placeholder || '') + (required ? '*' : '')}
 					type={type}
-						className={`outline-none p-4 py-2  bg-markdown-code text-theme-message rounded w-full hide-scrollbar`}
+					className={`outline-none p-4 py-2  bg-markdown-code text-theme-message rounded w-full hide-scrollbar`}
 					required={required}
 					defaultValue={input.defaultValue}
 					step={type === 'number' ? 0.5 : undefined}

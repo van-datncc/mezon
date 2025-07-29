@@ -309,6 +309,7 @@ export interface IMessageRatioOption {
 	value: string;
 	style?: EButtonMessageStyle;
 	disabled?: boolean;
+	readonly?: boolean;
 }
 
 export interface IMessageInput {
@@ -318,6 +319,7 @@ export interface IMessageInput {
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
 	defaultValue?: string;
+	readonly?: boolean;
 }
 
 export interface IMessageDatePicker {
@@ -379,6 +381,7 @@ export interface IMessageSelect {
 	max_options?: number;
 	disabled?: boolean;
 	valueSelected?: IMessageSelectOption;
+	readonly?: boolean;
 }
 
 export interface IMessageComponent<T> {
