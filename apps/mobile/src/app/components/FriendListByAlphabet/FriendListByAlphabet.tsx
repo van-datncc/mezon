@@ -74,6 +74,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 						style={styles.groupByAlphabetWrapper}
 						ItemSeparatorComponent={SeparatorWithLine}
 						keyExtractor={(friend) => friend.id.toString()}
+						showsVerticalScrollIndicator={false}
 						scrollEventThrottle={100}
 						keyboardShouldPersistTaps="handled"
 						onScrollBeginDrag={() => Keyboard.dismiss()}
@@ -113,6 +114,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 							keyboardShouldPersistTaps="handled"
 							onScrollBeginDrag={() => Keyboard.dismiss()}
 							contentContainerStyle={{ paddingBottom: size.s_50 }}
+							showsVerticalScrollIndicator={false}
 							renderItem={({ item }) => (
 								<FriendItem
 									friend={item}
@@ -131,6 +133,7 @@ export const FriendListByAlphabet = React.memo((props: IListUserByAlphabetProps)
 				<FlatList
 					data={allFriendGroupByAlphabet}
 					keyExtractor={(item) => item.character}
+					showsVerticalScrollIndicator={false}
 					ItemSeparatorComponent={SeparatorWithSpace}
 					renderItem={renderListFriendGroupByAlphabet}
 					initialNumToRender={1}

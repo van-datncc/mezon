@@ -102,7 +102,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
-			<View style={{ flex: 1, backgroundColor: themeValue.secondary }}>
+			<View style={{ flex: 1, backgroundColor: themeValue.primary }}>
 				<StatusBarHeight />
 				<InputSearchMessageChannel
 					onKeyPress={handleKeyPress}
