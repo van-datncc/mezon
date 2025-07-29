@@ -86,7 +86,7 @@ const EmbedOptionRatioItem = ({
 	disabled?: boolean;
 }) => {
 	const handleCheckedOptionItem = () => {
-		if (disabled) return;
+		if (!disabled) return;
 		handleCheckedOption();
 		if (!checkMultiple) {
 			setChecked([option.value]);
