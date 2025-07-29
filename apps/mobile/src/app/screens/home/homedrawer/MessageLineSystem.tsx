@@ -7,6 +7,7 @@ import { ChannelType } from 'mezon-js';
 import React, { memo, useCallback, useMemo } from 'react';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
+import WaveButton from '../../../components/WaveWelcome';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -198,11 +199,15 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 				)}
 				{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon width={size.s_24} height={size.s_24} />}
 			</View>
-			<View style={styles.messageSystemBox}>
-				<Text style={styles.messageText}>
-					{content}
-					<Text style={styles.messageTime}>{`   ${messageTime}`}</Text>
-				</Text>
+			<View style={{ flexDirection: 'column' }}>
+				<View style={styles.messageSystemBox}>
+					<Text style={styles.messageText}>
+						{content}
+						<Text style={styles.messageTime}>{`   ${messageTime}`}</Text>
+					</Text>
+				</View>
+
+				{message?.code === TypeMessage.Welcome && <WaveButton message={message} />}
 			</View>
 		</View>
 	);
