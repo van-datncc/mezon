@@ -91,7 +91,10 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 			className="w-[100vw] h-[100vh] overflow-hidden fixed top-0 left-0 z-50 bg-black bg-opacity-80 flex flex-row justify-center items-center"
 			tabIndex={0}
 		>
-			<div className="w-[400px] h-[400px] rounded-lg flex-col justify-center items-start gap-3 inline-flex overflow-hidden p-3" ref={modalRef}>
+			<div
+				className="w-[400px] h-[400px] rounded-lg bg-theme-setting-primary  flex-col justify-center items-start gap-3 inline-flex overflow-hidden p-3"
+				ref={modalRef}
+			>
 				{isLoading && (
 					<div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-60 z-10 text-white">
 						<AttachmentLoader appearanceTheme={appearanceTheme} />
@@ -100,9 +103,9 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 
 				<div className={'flex items-center justify-start gap-3 h-fit w-full'}>
 					<div
-						className={`text-white ${
+						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.IMAGE && 'bg-item-theme'
-						} rounded px-5 py-1 font-semibold cursor-pointer hover:bg-bgAvatarDark`}
+							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.IMAGE)}
 					>
 						Upload image
@@ -110,9 +113,9 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 
 					{/*WIP*/}
 					<div
-						className={`text-white ${
+						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.EMOJI && 'bg-item-theme'
-						} rounded px-5 py-1 font-semibold cursor-pointer  hover:bg-bgAvatarDark`}
+							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover  `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.EMOJI)}
 					>
 						Emoji
@@ -120,9 +123,9 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 				</div>
 				<div className={'flex-1 w-full flex flex-col justify-center items-center gap-2 px-2'}>
 					<div className={'rounded flex justify-center items-center w-20 h-20 cursor-pointer group'} onClick={handleIconClick}>
-						<Icons.ImageUploadIcon className="w-6 h-6 group-hover:scale-110 ease-in-out duration-75" />
+						<Icons.ImageUploadIcon className="w-6 h-6 text-theme-primary group-hover:scale-110 ease-in-out duration-75" />
 					</div>
-					<p className={''}>Choose an image to upload</p>
+					<p className={'text-theme-primary'}>Choose an image to upload</p>
 					<input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleChooseImage} />
 				</div>
 			</div>

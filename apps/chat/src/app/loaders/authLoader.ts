@@ -56,6 +56,34 @@ const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
 	});
 };
 
+const handleLogoutWithRedirect = (dispatch: AppDispatch, initialPath: string): IAuthLoaderData => {
+	const redirectTo = getRedirectTo(initialPath);
+	dispatch(authActions.setLogout());
+	const redirect = redirectTo ? `/desktop/login?redirect=${redirectTo}` : '/desktop/login';
+	return { isLogin: false, redirect } as IAuthLoaderData;
+};
+
+const isServerError500 = (errorPayload: any): boolean => {
+	if (errorPayload && typeof errorPayload === 'object' && 'status' in errorPayload && errorPayload.status === 500) {
+		return true;
+	}
+	if (errorPayload instanceof Response && errorPayload.status === 500) {
+		return true;
+	}
+	return false;
+};
+
+const isNetworkRelatedError = (error: unknown): boolean => {
+	return (
+		!navigator.onLine ||
+		(error instanceof Error &&
+			(error.message.includes('fetch') ||
+				error.message.includes('network') ||
+				error.message.includes('Failed to fetch') ||
+				error.name === 'NetworkError'))
+	);
+};
+
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
 	let retries = 6;
 	let attempt = 0;
@@ -70,10 +98,20 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 	while (retries > 0) {
 		try {
 			const response = await dispatch(authActions.refreshSession());
+
 			if (response?.payload === 'Redirect Login') {
 				isRedirectLogin = true;
 			}
-			if (!(response as unknown as IWithError).error) {
+
+			if ((response as unknown as IWithError).error) {
+				const errorPayload = response.payload;
+				if (isServerError500(errorPayload)) {
+					console.error('Server error (500), logging out immediately');
+					return handleLogoutWithRedirect(dispatch, initialPath);
+				}
+
+				throw new Error('Session refresh failed');
+			} else {
 				const profileResponse = await dispatch(accountActions.getUserProfile());
 				if (!(profileResponse as unknown as IWithError).error) {
 					return { isLogin: true } as IAuthLoaderData;
@@ -81,7 +119,12 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 				throw new Error('Session expired');
 			}
 		} catch (error) {
-			console.error(`Error in refreshSession, retrying... (${5 - retries + 1}/5)`, error);
+			if (!isNetworkRelatedError(error) && error instanceof Error && !error.message.includes('Session expired')) {
+				console.error('Non-retryable error, logging out:', error);
+				return handleLogoutWithRedirect(dispatch, initialPath);
+			}
+
+			console.error(`Error in refreshSession, retrying... (${6 - retries + 1}/6)`, error);
 		}
 
 		retries -= 1;

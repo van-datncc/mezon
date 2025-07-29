@@ -146,7 +146,6 @@ export const setNotificationSetting = createAsyncThunk(
 			}
 			if (!is_direct) {
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
-				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			}
 			thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 			return response;
@@ -188,6 +187,7 @@ export const setMuteNotificationSetting = createAsyncThunk(
 				thunkAPI.dispatch(getNotificationSetting({ channelId: channel_id || '', noCache: true }));
 				thunkAPI.dispatch(defaultNotificationCategoryActions.fetchChannelCategorySetting({ clanId: clan_id || '', noCache: true }));
 			} else {
+				thunkAPI.dispatch(notificationSettingActions.updateNotiState({ channelId: channel_id as string, active }));
 				thunkAPI.dispatch(directActions.update({ id: channel_id as string, changes: { is_mute: active === 0 } }));
 				thunkAPI.dispatch(directMetaActions.updateMuteDM({ channelId: channel_id as string, isMute: active === 0 }));
 			}
@@ -270,8 +270,11 @@ export const notificationSettingSlice = createSlice({
 			}
 
 			const notificationSetting = state?.byChannels?.[channelId]?.notificationSetting;
-			if (notificationSetting) {
+			if (notificationSetting && notificationSetting?.active !== active) {
 				notificationSetting.active = active;
+			}
+			if (notificationSetting && notificationSetting?.active === active && active === 0) {
+				notificationSetting.time_mute = new Date(0).toDateString();
 			}
 		}
 	},
@@ -334,5 +337,5 @@ export const selectNotifiSettingEntities = createSelector(getNotificationSetting
 
 export const selectNotifiSettingsEntitiesById = createSelector(
 	[getNotificationSettingState, (state: RootState, channelId: string) => channelId],
-	(state, channelId) => state?.byChannels[channelId]?.notificationSetting
+	(state, channelId) => state?.byChannels?.[channelId]?.notificationSetting
 );

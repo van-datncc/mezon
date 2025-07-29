@@ -33,7 +33,6 @@ import {
 	selectNotifiSettingsEntitiesById,
 	selectSession,
 	selectStatusMenu,
-	selectTheme,
 	threadsActions,
 	toastActions,
 	topicsActions,
@@ -229,7 +228,7 @@ const TopBarChannelText = memo(() => {
 				) : (
 					<DmTopbarTools />
 				)}
-				<SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />
+				{!isMemberPath && <SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />}
 			</div>
 		</>
 	);
@@ -307,7 +306,6 @@ const ChannelTopbarTools = memo(
 		isApp: boolean;
 		isStream: boolean;
 	}) => {
-		const appearanceTheme = useSelector(selectTheme);
 		const dispatch = useAppDispatch();
 		const isShowChatStream = useSelector(selectIsShowChatStream);
 		const { setStatusMenu } = useMenu();
@@ -397,7 +395,6 @@ const DmTopbarTools = memo(() => {
 	const dispatch = useAppDispatch();
 	const currentDmGroup = useSelector(selectCurrentDM);
 	const isShowMemberListDM = useSelector(selectIsShowMemberListDM);
-	const appearanceTheme = useSelector(selectTheme);
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const userProfile = useSelector(selectSession);
 	const { setStatusMenu } = useMenu();
@@ -804,7 +801,13 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 				onContextMenu={(e) => e.preventDefault()}
 			>
 				<Icons.PinRight defaultSize="size-5" />
-				{isShowPinBadge && <div className="bg-red-500 size-2 absolute rounded-full bottom-0 right-0 border-[3px]  box-content" />}
+				{isShowPinBadge && (
+					<div
+						className="absolute border-theme-primary
+		 w-[8px] h-[8px] rounded-full bg-colorDanger outline outline-1 outline-transparent
+		  font-bold text-[11px] flex items-center justify-center -bottom-[0.05rem] -right-[0.075rem]"
+					></div>
+				)}
 			</button>
 			{isShowPinMessage && <PinnedMessages mode={mode} rootRef={pinRef} onClose={handleTogglePinMessage} />}
 		</div>

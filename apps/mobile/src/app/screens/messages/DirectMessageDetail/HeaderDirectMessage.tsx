@@ -43,24 +43,27 @@ interface HeaderProps {
 export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string; streamMode: number }) => {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
+	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
 	const lastMessageState = useSelector((state) => selectLastSeenMessageStateByChannelId(state, channelId as string));
+
 	const { markAsReadSeen } = useSeenMessagePool();
+
 	const isMounted = useRef(false);
 
 	const markMessageAsRead = useCallback(() => {
 		if (!lastMessage) return;
-		if (!lastMessageState) {
-			markAsReadSeen(lastMessage, streamMode, 0);
-			return;
-		}
+
 		if (
 			lastMessage?.create_time_seconds &&
 			lastMessageState?.timestamp_seconds &&
 			lastMessage?.create_time_seconds >= lastMessageState?.timestamp_seconds
 		) {
-			markAsReadSeen(lastMessage, streamMode, 0);
+			const mode =
+				currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
+
+			markAsReadSeen(lastMessage, mode, 0);
 		}
-	}, [lastMessage, lastMessageState, markAsReadSeen, streamMode]);
+	}, [lastMessage, markAsReadSeen, currentDmGroup, lastMessageState]);
 
 	const updateChannelSeenState = useCallback(
 		(channelId: string) => {
@@ -81,7 +84,6 @@ export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string;
 		isMounted.current = true;
 		updateChannelSeenState(channelId);
 	}, [channelId, lastMessage, updateChannelSeenState]);
-
 	return null;
 });
 
@@ -234,6 +236,15 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 		sendMessage({ t: text || 'Buzz!!' }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 	};
 
+	const navigateToSearch = () => {
+		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_DM,
+			params: {
+				currentChannel: currentDmGroup
+			}
+		});
+	};
+
 	return (
 		<View style={styles.headerWrapper}>
 			<ChannelSeen channelId={directMessageId || ''} streamMode={streamMode} />
@@ -259,7 +270,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 							</View>
 						) : (
 							<View style={styles.wrapperTextAvatar}>
-								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)}</Text>
+								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)?.toUpperCase()}</Text>
 							</View>
 						)}
 						<UserStatus status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }} customStatus={status} />
@@ -268,13 +279,19 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 				<Text style={styles.titleText} numberOfLines={1}>
 					{dmLabel}
 				</Text>
-				{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
-					<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
-						<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
+				<View style={styles.iconWrapper}>
+					<TouchableOpacity style={[styles.iconHeader, { marginRight: size.s_6 }]} onPress={navigateToSearch}>
+						<MezonIconCDN icon={IconCDN.magnifyingIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
 					</TouchableOpacity>
-				)}
-				<View style={styles.iconOption}>
-					<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+					{((!isTypeDMGroup && !!currentDmGroup?.user_id?.[0]) || (isTypeDMGroup && !!currentDmGroup?.meeting_code)) && (
+						<TouchableOpacity style={styles.iconHeader} onPress={goToCall}>
+							<MezonIconCDN icon={IconCDN.phoneCallIcon} width={size.s_18} height={size.s_18} color={themeValue.text} />
+						</TouchableOpacity>
+					)}
+
+					<View style={styles.iconOption}>
+						<HeaderTooltip onPressOption={onPressOption} options={headerOptions} />
+					</View>
 				</View>
 			</Pressable>
 		</View>

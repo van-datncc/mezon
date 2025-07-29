@@ -31,7 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
       // Initialize React Native
       FirebaseApp.configure()
-      try? AVAudioSession.sharedInstance().setCategory(.playback)
+      
+      // Configure audio session with proper error handling
+      do {
+        try AVAudioSession.sharedInstance().setCategory(.playback)
+      } catch {
+        print("Failed to set audio session category: \(error)")
+      }
+      
       setDefaultOrientationForDevice()
 
       let delegate = ReactNativeDelegate()

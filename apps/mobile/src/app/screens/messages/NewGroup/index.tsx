@@ -160,20 +160,22 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 							<Feather size={18} name="search" style={{ color: themeValue.text }} />
 							<TextInput
 								placeholder={t('common:searchPlaceHolder')}
-								placeholderTextColor={themeValue.text}
+								placeholderTextColor={themeValue.textDisabled}
 								style={styles.searchInput}
 								onChangeText={(text) => typingSearchDebounce(text)}
 							/>
 						</View>
 
-						<FriendListByAlphabet
-							isSearching={Boolean(searchText?.trim()?.length)}
-							friendList={filteredFriendList}
-							handleFriendAction={handleFriendAction}
-							selectMode={true}
-							onSelectedChange={onSelectedChange}
-							selectedFriendDefault={selectedFriendDefault}
-						/>
+						<View style={styles.friendListWrapper}>
+							<FriendListByAlphabet
+								isSearching={Boolean(searchText?.trim()?.length)}
+								friendList={filteredFriendList}
+								handleFriendAction={handleFriendAction}
+								selectMode={true}
+								onSelectedChange={onSelectedChange}
+								selectedFriendDefault={selectedFriendDefault}
+							/>
+						</View>
 					</View>
 
 					<UserInformationBottomSheet user={selectedUser} onClose={onClose} showAction={false} showRole={false} />

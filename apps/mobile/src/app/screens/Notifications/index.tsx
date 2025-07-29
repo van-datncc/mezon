@@ -7,6 +7,7 @@ import {
 	clansActions,
 	directActions,
 	fetchListNotification,
+	getFirstMessageOfTopic,
 	getStoreAsync,
 	messagesActions,
 	notificationActions,
@@ -17,8 +18,7 @@ import {
 	selectNotificationMentions,
 	selectTopicsSort,
 	topicsActions,
-	useAppDispatch,
-	usersClanActions
+	useAppDispatch
 } from '@mezon/store-mobile';
 import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -177,9 +177,18 @@ const Notifications = () => {
 					promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
 				} else {
-					if (Number(notify?.content?.topic_id) !== 0) {
+					if (Number(notify?.id) !== 0) {
+						promises.push(
+							store.dispatch(
+								channelsActions.addThreadToChannels({
+									clanId: notify?.content?.clan_id ?? '',
+									channelId: notify?.content?.channel_id || ''
+								})
+							)
+						);
 						promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(null)));
-						promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.content?.topic_id || '')));
+						promises.push(store.dispatch(getFirstMessageOfTopic(notify?.id || '')));
+						promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.id || '')));
 						promises.push(store.dispatch(topicsActions.setIsShowCreateTopic(true)));
 					}
 					if (notify?.content?.clan_id !== currentClanId) {

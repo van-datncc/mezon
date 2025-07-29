@@ -37,7 +37,7 @@ export const AVAILABLE_THEMES: ThemeConfig[] = [
 		cssFile: 'assets/themes/redDark.css'
 	},
 	{
-		name: 'Abyss Dark',
+		name: 'abyss_dark',
 		displayName: 'Abyss Dark',
 		color: 'linear-gradient(135deg, #0f172a, #1e3a8a, #6d28d9)',
 		cssFile: 'assets/themes/abyss_dark_.css'
@@ -49,7 +49,7 @@ const LIGHT_THEMES = ['light', 'sunrise'];
 let currentThemeLink: HTMLLinkElement | null = null;
 let loadingOverlay: HTMLDivElement | null = null;
 
-const DEFAULT_THEME = 'dark';
+const DEFAULT_THEME = 'sunrise';
 const THEME_LOAD_TIMEOUT = 10000;
 
 export class ThemeManager {
@@ -178,15 +178,15 @@ export class ThemeManager {
 		}
 	}
 
-	static getCurrentTheme(): string {
+	static getCurrentTheme(): 'light' | 'dark' | 'sunrise' | 'purple_haze' | 'redDark' | 'abyss_dark' {
 		const stored = localStorage.getItem('current-theme');
 		if (stored && AVAILABLE_THEMES.find((t) => t.name === stored)) {
-			return stored;
+			return stored as 'light' | 'dark' | 'sunrise' | 'purple_haze' | 'redDark' | 'abyss_dark';
 		}
 		return DEFAULT_THEME;
 	}
 
-	static async initializeTheme(): Promise<'light' | 'dark'> {
+	static async initializeTheme(): Promise<'sunrise' | 'dark' | 'light' | 'purple_haze' | 'redDark' | 'abyss_dark'> {
 		const currentTheme = this.getCurrentTheme();
 		try {
 			return await this.loadTheme(currentTheme, false);

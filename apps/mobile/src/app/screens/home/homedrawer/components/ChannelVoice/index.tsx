@@ -3,7 +3,6 @@ import { size, useTheme } from '@mezon/mobile-ui';
 import { selectIsPiPMode, selectVoiceInfo, useAppDispatch, useAppSelector, voiceActions } from '@mezon/store-mobile';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, NativeModules, Platform, View } from 'react-native';
-import InCallManager from 'react-native-incall-manager';
 import { PERMISSIONS, request } from 'react-native-permissions';
 import { useSelector } from 'react-redux';
 import StatusBarHeight from '../../../../../components/StatusBarHeight/StatusBarHeight';
@@ -11,7 +10,7 @@ import { CallReactionHandler } from './CallReactionHandler';
 import HeaderRoomView from './HeaderRoomView';
 import RoomView from './RoomView';
 
-const { CustomAudioModule, KeepAwake, KeepAwakeIOS } = NativeModules;
+const { CustomAudioModule, KeepAwake, KeepAwakeIOS, AudioSessionModule } = NativeModules;
 
 // Audio output types
 export type AudioOutput = {
@@ -40,7 +39,9 @@ const ConnectionMonitor = memo(() => {
 			await AudioSession.configureAudio({
 				android: {
 					audioTypeOptions: {
-						forceHandleAudioRouting: true
+						forceHandleAudioRouting: true,
+						manageAudioFocus: true,
+						audioFocusMode: 'gainTransientMayDuck' // Allow ducking other audio
 					}
 				}
 			});
@@ -58,30 +59,32 @@ const ConnectionMonitor = memo(() => {
 		} else {
 			await AudioSession.startAudioSession();
 			await AudioSession.setAppleAudioConfiguration({
+				audioCategory: 'playAndRecord',
 				audioCategoryOptions: [
 					'allowBluetooth',
 					'allowBluetoothA2DP',
 					'allowAirPlay',
 					'mixWithOthers',
+					'duckOthers',
 					'interruptSpokenAudioAndMixWithOthers'
-				]
+				],
+				audioMode: 'voiceChat'
 			});
-			InCallManager.start({ media: 'audio' });
 			await AudioSession.configureAudio({
 				ios: {
 					defaultOutput: 'earpiece'
 				}
 			});
-			InCallManager.setSpeakerphoneOn(false);
-			InCallManager.setForceSpeakerphoneOn(false);
+			await AudioSessionModule?.setAudioDevice?.('earpiece');
 		}
 	};
 
 	const stopAudioCall = async () => {
 		if (Platform.OS === 'android') {
 			CustomAudioModule.setSpeaker(false, null);
+		} else {
+			await AudioSessionModule.stopAudioSession();
 		}
-		InCallManager.stop();
 		await AudioSession.stopAudioSession();
 	};
 

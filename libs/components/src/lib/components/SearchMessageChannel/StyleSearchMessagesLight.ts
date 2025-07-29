@@ -11,7 +11,8 @@ export default {
 
 		highlighter: {
 			padding: 1,
-			border: '1px inset transparent'
+			border: '1px inset transparent',
+			height: '26px'
 		},
 		input: {
 			padding: 1,

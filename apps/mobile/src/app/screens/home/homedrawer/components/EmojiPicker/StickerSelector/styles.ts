@@ -42,8 +42,8 @@ export const style = (colors: Attributes) =>
 		sessionTitle: {
 			fontSize: size.medium,
 			color: colors.text,
-			fontWeight: '600',
-			textTransform: 'capitalize',
+			fontWeight: 'bold',
+			textTransform: 'uppercase',
 			marginTop: size.s_20,
 			marginBottom: size.s_10
 		},
@@ -80,7 +80,8 @@ export const style = (colors: Attributes) =>
 		},
 		sessionHeader: {
 			flexDirection: 'row',
-			alignItems: 'center'
+			alignItems: 'center',
+			gap: size.s_2
 		},
 		chevronIcon: {
 			marginTop: size.s_10

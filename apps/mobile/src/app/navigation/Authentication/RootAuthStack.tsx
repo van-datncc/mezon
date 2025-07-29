@@ -31,9 +31,10 @@ const RootStack = createStackNavigator();
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
 		useEffect(() => {
-			requestAnimationFrame(async () => {
+			const splashTask = requestAnimationFrame(async () => {
 				await BootSplash.hide({ fade: false });
 			});
+			return () => cancelAnimationFrame(splashTask);
 		}, []);
 
 		return (
@@ -59,7 +60,8 @@ export const RootAuthStack = memo(
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
-							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+							keyboardHandlingEnabled: false
 						}}
 					/>
 					<RootStack.Screen
@@ -72,7 +74,8 @@ export const RootAuthStack = memo(
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
-							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+							keyboardHandlingEnabled: false
 						}}
 					/>
 					<RootStack.Screen name={APP_SCREEN.SERVERS.STACK} children={(props) => <ServersStacks {...props} />} />

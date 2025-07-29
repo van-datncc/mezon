@@ -38,7 +38,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		textAvatarMessageBoxDefault: {
-			fontSize: size.s_22,
+			fontSize: size.h4,
 			color: Colors.white
 		},
 		logoUser: {

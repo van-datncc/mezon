@@ -45,6 +45,7 @@ export const style = (colors: Attributes) =>
 		},
 		albumTitle: {
 			color: colors.textStrong,
-			fontWeight: 'bold'
+			fontSize: size.s_14,
+			fontWeight: '600'
 		}
 	});

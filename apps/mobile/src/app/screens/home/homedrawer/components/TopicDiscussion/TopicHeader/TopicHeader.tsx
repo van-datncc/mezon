@@ -1,11 +1,12 @@
+import { useGetPriorityNameFromUserClan } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { Text, size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
-import { ChannelsEntity, selectCurrentTopicInitMessage } from '@mezon/store-mobile';
+import { size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { ChannelsEntity, selectCurrentTopicInitMessage, selectFirstMessageOfCurrentTopic } from '@mezon/store-mobile';
 import { DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR, convertTimeString } from '@mezon/utils';
-import { ChannelStreamMode } from 'mezon-js';
+import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Pressable, ScrollView, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../../../../componentUI/MezonAvatar';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
@@ -14,40 +15,19 @@ import { MessageAttachment } from '../../MessageAttachment';
 import { RenderTextMarkdownContent } from '../../RenderTextMarkdown';
 import { style } from './styles';
 
-const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
-
 type TopicHeaderProps = {
 	mode: ChannelStreamMode;
 	handleBack: () => void;
 };
 
 const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
-	const valueTopic = useSelector(selectCurrentTopicInitMessage);
+	const currentTopic = useSelector(selectCurrentTopicInitMessage);
+	const firstMessage = useSelector(selectFirstMessageOfCurrentTopic);
+	const valueTopic = currentTopic || firstMessage?.message;
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation('message');
-
-	const isDM = useMemo(() => {
-		return [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
-	}, [mode]);
-
-	const checkAnonymous = useMemo(() => valueTopic?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID, [valueTopic?.sender_id]);
-
-	const senderDisplayName = useMemo(() => {
-		if (isDM) {
-			return valueTopic?.display_name || valueTopic?.username || '';
-		}
-		return (
-			valueTopic?.clan_nick || valueTopic?.display_name || valueTopic?.user?.username || (checkAnonymous ? 'Anonymous' : valueTopic?.username)
-		);
-	}, [checkAnonymous, valueTopic?.clan_nick, valueTopic?.user?.username, valueTopic?.username, valueTopic?.display_name, isDM]);
-
-	const messageAvatar = useMemo(() => {
-		if (mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD) {
-			return valueTopic?.clan_avatar || valueTopic?.avatar;
-		}
-		return valueTopic?.avatar;
-	}, [valueTopic?.clan_avatar, valueTopic?.avatar, mode]);
+	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(valueTopic?.sender_id || '');
 
 	const userRolesClan = useColorsRoleById(valueTopic?.sender_id || '');
 
@@ -80,21 +60,21 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 				</View>
 				<View style={{ width: size.s_50 }} />
 			</View>
-			<View style={styles.userInfo}>
-				<MezonAvatar avatarUrl={messageAvatar} username={senderDisplayName} />
-				<View>
-					<Text style={styles.name} color={colorSenderName}>
-						{senderDisplayName}
-					</Text>
-					<Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>
+			{valueTopic && (
+				<View style={styles.userInfo}>
+					<MezonAvatar avatarUrl={priorityAvatar} username={namePriority} />
+					<View>
+						<Text style={[styles.name, { color: colorSenderName }]}>{namePriority}</Text>
+						{valueTopic?.create_time && <Text style={styles.dateText}>{convertTimeString(valueTopic?.create_time)}</Text>}
+					</View>
 				</View>
-			</View>
+			)}
 			{!valueTopic ? null : (
 				<ScrollView>
 					<RenderTextMarkdownContent
 						content={{
-							...(typeof valueTopic.content === 'object' ? valueTopic.content : {}),
-							mentions: valueTopic.mentions
+							...((typeof valueTopic?.content === 'object' ? valueTopic?.content : safeJSONParse(valueTopic?.content)) || {}),
+							mentions: valueTopic?.mentions
 						}}
 						translate={t}
 						isMessageReply={false}
@@ -103,7 +83,9 @@ const TopicHeader = React.memo(({ mode, handleBack }: TopicHeaderProps) => {
 					/>
 					{valueTopic?.attachments?.length > 0 && (
 						<MessageAttachment
-							attachments={valueTopic?.attachments || []}
+							attachments={
+								typeof valueTopic?.attachments === 'object' ? valueTopic?.attachments : safeJSONParse(valueTopic?.attachments) || []
+							}
 							clanId={valueTopic?.clan_id}
 							channelId={valueTopic?.channel_id}
 						/>

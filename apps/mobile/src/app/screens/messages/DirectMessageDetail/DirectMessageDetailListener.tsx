@@ -30,7 +30,7 @@ export const DirectMessageDetailListener = memo(({ dmType, directMessageId }: { 
 		dispatch(directActions.fetchDirectMessage({ noCache: true }));
 	};
 
-	const directMessageLoader = async () => {
+	const directMessageLoader = useCallback(async () => {
 		save(STORAGE_IS_LAST_ACTIVE_TAB_DM, 'true');
 		await dispatch(
 			directActions.joinDirectMessage({
@@ -42,7 +42,7 @@ export const DirectMessageDetailListener = memo(({ dmType, directMessageId }: { 
 			})
 		);
 		handleReconnect('DM detail reconnect attempt loader');
-	};
+	}, [directMessageId, dispatch, dmType, handleReconnect]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -55,7 +55,7 @@ export const DirectMessageDetailListener = memo(({ dmType, directMessageId }: { 
 				if (idMessageToJump?.id) return;
 				await directMessageLoader();
 			});
-		}, [])
+		}, [directMessageLoader, themeValue.primary])
 	);
 
 	useEffect(() => {

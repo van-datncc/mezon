@@ -102,7 +102,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 		if (isPrivateEvent) {
 			return `${process.env.NX_CHAT_APP_REDIRECT_URI}${externalLink}`;
 		}
-		return `${origin}/chat/clans/${event?.clan_id}/channels/${event?.channel_id}`;
+		return `${process.env.NX_CHAT_APP_REDIRECT_URI}/chat/clans/${event?.clan_id}/channels/${event?.channel_id}`;
 	}, []);
 
 	const handleCopyLink = useCallback(() => {

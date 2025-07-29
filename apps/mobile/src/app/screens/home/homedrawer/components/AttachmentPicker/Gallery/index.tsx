@@ -1,5 +1,4 @@
 import { useReference } from '@mezon/core';
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { MAX_FILE_SIZE } from '@mezon/utils';
@@ -13,18 +12,7 @@ import {
 import { iosReadGalleryPermission } from '@react-native-camera-roll/camera-roll/src/CameraRollIOSPermission';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	ActivityIndicator,
-	Alert,
-	AppState,
-	DeviceEventEmitter,
-	Dimensions,
-	EmitterSubscription,
-	Linking,
-	PermissionsAndroid,
-	Platform,
-	View
-} from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, EmitterSubscription, Linking, PermissionsAndroid, Platform, View } from 'react-native';
 import RNFS from 'react-native-fs';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ImagePicker from 'react-native-image-picker';
@@ -44,12 +32,11 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	const { t } = useTranslation(['qrScanner']);
 	const [hasPermission, setHasPermission] = useState(false);
 	const [photos, setPhotos] = useState<PhotoIdentifier[]>([]);
-	const [currentAlbums, setCurrentAlbums] = useState<string>('All');
 	const [pageInfo, setPageInfo] = useState(null);
-	const [isLoadingMore, setIsLoadingMore] = useState(false);
+	const [isPermissionLimitIOS, setIsPermissionLimitIOS] = useState(false);
 	const dispatch = useAppDispatch();
 	const timerRef = useRef<any>(null);
-	const haveLoadMorePhoto = useRef<any>(false);
+	const isLoadingMoreRef = useRef<boolean>(false);
 	const { removeAttachmentByIndex, attachmentFilteredByChannelId } = useReference(currentChannelId);
 
 	const isDisableSelectAttachment = useMemo(() => {
@@ -58,45 +45,47 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		return files?.length >= 10;
 	}, [attachmentFilteredByChannelId]);
 
+	const loadPhotos = useCallback(async (after = null) => {
+		if (isLoadingMoreRef?.current) return;
+		isLoadingMoreRef.current = true;
+		try {
+			const res = await CameraRoll.getPhotos({
+				first: 32,
+				assetType: 'All',
+				...(!!after && { after: after }),
+				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
+				groupTypes: 'All'
+			});
+
+			setPhotos((prev) => [...(prev || []), ...(res?.edges || [])]);
+			setPageInfo(res.page_info);
+		} catch (error) {
+			console.error('Error loading photos', error);
+		} finally {
+			isLoadingMoreRef.current = false;
+		}
+	}, []);
+
 	useEffect(() => {
+		const subscription: EmitterSubscription = cameraRollEventEmitter.addListener('onLibrarySelectionChange', (_event) => {
+			if (isPermissionLimitIOS) {
+				loadPhotos();
+			}
+		});
 		checkAndRequestPermissions();
 
 		return () => {
 			timerRef?.current && clearTimeout(timerRef.current);
-		};
-	}, []);
-
-	useEffect(() => {
-		const subscription = AppState.addEventListener('change', async (nextAppState) => {
-			if (nextAppState === 'active') {
-				loadPhotos(currentAlbums);
-			}
-		});
-
-		return () => {
-			subscription.remove();
-		};
-	}, [currentAlbums]);
-
-	useEffect(() => {
-		const subscription: EmitterSubscription = cameraRollEventEmitter.addListener('onLibrarySelectionChange', (_event) => {
-			if (!haveLoadMorePhoto?.current) {
-				loadPhotos(currentAlbums);
-				haveLoadMorePhoto.current = true;
-			}
-		});
-
-		return () => {
 			if (subscription) {
 				subscription.remove();
 			}
 		};
-	}, [currentAlbums]);
+	}, [isPermissionLimitIOS]);
 
 	const checkAndRequestPermissions = async () => {
 		const hasPermission = await requestPermission();
 		if (hasPermission) {
-			loadPhotos(currentAlbums);
+			loadPhotos();
 		} else {
 			await requestPermission();
 		}
@@ -198,6 +187,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
 				return requestResult === 'granted' || requestResult === 'limited';
 			} else if (result === 'limited') {
+				setIsPermissionLimitIOS(true);
 				await iosRefreshGallerySelection();
 			}
 
@@ -214,39 +204,6 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 			Linking.openSettings();
 		}
 	};
-
-	const loadPhotos = async (album, after = null) => {
-		if (isLoadingMore) return;
-
-		setIsLoadingMore(true);
-		try {
-			const res = await CameraRoll.getPhotos({
-				first: 32,
-				assetType: album === 'All Videos' ? 'Videos' : 'All',
-				...(!!pageInfo && !!after && { after: after }),
-				include: ['filename', 'fileSize', 'fileExtension', 'imageSize', 'orientation'],
-				groupTypes: album === 'All' ? 'All' : 'Album',
-				groupName: album === 'All' || album === 'All Videos' ? null : album
-			});
-
-			setPhotos(after ? [...photos, ...res.edges] : res.edges);
-			setPageInfo(res.page_info);
-		} catch (error) {
-			console.error('Error loading photos', error);
-		} finally {
-			setIsLoadingMore(false);
-		}
-	};
-
-	useEffect(() => {
-		const showKeyboard = DeviceEventEmitter.addListener(ActionEmitEvent.ON_SELECT_ALBUM, (value) => {
-			loadPhotos(value);
-			setCurrentAlbums(value);
-		});
-		return () => {
-			showKeyboard.remove();
-		};
-	}, []);
 
 	const renderItem = ({ item }) => {
 		return (
@@ -375,8 +332,8 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	}, [hasPermission, onPickGallery]);
 
 	const handleLoadMore = async () => {
-		if (pageInfo?.has_next_page) {
-			await loadPhotos(currentAlbums, pageInfo.end_cursor);
+		if (pageInfo?.has_next_page && pageInfo?.end_cursor) {
+			await loadPhotos(pageInfo.end_cursor);
 		}
 	};
 
@@ -412,7 +369,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 				}}
 				onEndReached={handleLoadMore}
 				onEndReachedThreshold={0.5}
-				ListFooterComponent={() => isLoadingMore && <ActivityIndicator size="small" color={themeValue.text} />}
+				ListFooterComponent={() => isLoadingMoreRef?.current && <ActivityIndicator size="small" color={themeValue.text} />}
 			/>
 		</View>
 	);

@@ -34,7 +34,7 @@ export const style = (colors: Attributes) =>
 		},
 		textAvatar: {
 			textAlign: 'center',
-			fontSize: size.h6,
+			fontSize: size.h4,
 			color: Colors.white
 		},
 		serverName: {

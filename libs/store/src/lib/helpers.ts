@@ -105,7 +105,7 @@ export async function fetchDataWithSocketFallback<T>(
 	const socket = mezon.socketRef?.current;
 	let response: T | undefined;
 
-	if (socket) {
+	if (socket?.isOpen()) {
 		try {
 			const data = await socket.listDataSocket(socketRequest);
 

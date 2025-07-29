@@ -83,8 +83,11 @@ export const style = (colors: Attributes) =>
 			fontSize: size.h6,
 			color: Colors.white
 		},
+		iconWrapper: {
+			flexDirection: 'row',
+			gap: size.s_2
+		},
 		iconHeader: {
-			marginRight: size.s_4,
 			width: size.s_34,
 			height: size.s_34,
 			borderRadius: size.s_30,
@@ -93,6 +96,8 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center'
 		},
 		iconOption: {
-			marginRight: size.s_12
+			marginLeft: -size.s_2,
+			alignItems: 'center',
+			justifyContent: 'center'
 		}
 	});

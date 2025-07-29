@@ -1,9 +1,9 @@
 import {
 	ConnectionStateToast,
-	isTrackReference,
 	LayoutContextProvider,
 	RoomAudioRenderer,
 	TrackReferenceOrPlaceholder,
+	isTrackReference,
 	useCreateLayoutContext,
 	usePinnedTracks,
 	useRoomContext,
@@ -11,7 +11,7 @@ import {
 } from '@livekit/components-react';
 import { useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { LocalParticipant, LocalTrackPublication, RoomEvent, Track } from 'livekit-client';
+import { LocalParticipant, LocalTrackPublication, RemoteParticipant, RoomEvent, Track } from 'livekit-client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { NotificationTooltip } from '../../NotificationList/NotificationTooltip';
 import ControlBar from '../ControlBar/ControlBar';
@@ -66,7 +66,6 @@ export function MyVideoConference({
 	}, [tracks]);
 
 	const focusTrack = usePinnedTracks(layoutContext)?.[0];
-
 	const [isShowMember, setIsShowMember] = useState<boolean>(true);
 
 	const handleShowMember = useCallback(() => {
@@ -100,12 +99,15 @@ export function MyVideoConference({
 		const handleDisconnected = () => {
 			onLeaveRoom();
 		};
-		const handleTrackPublished = (publication: LocalTrackPublication, participant: LocalParticipant) => {
+		const handleLocalTrackUnpublished = (publication: LocalTrackPublication, participant: LocalParticipant) => {
 			if (publication.source === Track.Source.ScreenShare) {
 				dispatch(voiceActions.setShowScreen(false));
 			}
 			if (publication.source === Track.Source.Camera) {
 				dispatch(voiceActions.setShowCamera(false));
+			}
+			if (focusTrack && focusTrack?.participant.sid === participant.sid) {
+				layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
 			}
 		};
 		const handleReconnectedRoom = async () => {
@@ -116,13 +118,24 @@ export function MyVideoConference({
 				onLeaveRoom();
 			}
 		};
+
+		const handleTrackUnpublish = (participant: RemoteParticipant) => {
+			if (focusTrack && focusTrack?.participant.sid === participant.sid) {
+				layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
+			}
+		};
 		room?.on('disconnected', handleDisconnected);
-		room?.on('localTrackUnpublished', handleTrackPublished);
+		room?.on('localTrackUnpublished', handleLocalTrackUnpublished);
 		room?.on('reconnected', handleReconnectedRoom);
+		room?.on('participantDisconnected', handleTrackUnpublish);
+
 		return () => {
 			room?.off('disconnected', handleDisconnected);
+			room?.off('localTrackUnpublished', handleLocalTrackUnpublished);
+			room?.off('reconnected', handleReconnectedRoom);
+			room?.off('participantDisconnected', handleTrackUnpublish);
 		};
-	}, [room]);
+	}, [room, focusTrack?.participant.sid]);
 
 	const onToggleChatBox = () => {
 		if (isExternalCalling) {

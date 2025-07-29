@@ -29,7 +29,7 @@ import { useMezon } from '@mezon/transport';
 import { getApp } from '@react-native-firebase/app';
 import { getMessaging, onMessage } from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Linking, Platform, StatusBar } from 'react-native';
@@ -220,48 +220,52 @@ export const AuthenticationLoader = () => {
 
 	useEffect(() => {
 		const unsubscribe = onMessage(messaging, (remoteMessage) => {
-			if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
-				// Case: FCM start call
-				const title = remoteMessage?.notification?.title || remoteMessage?.data?.title;
-				const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
-				if (
-					title === 'Incoming call' ||
-					(body && ['video call', 'audio call', 'Untitled message'].some((text) => body?.includes?.(text))) ||
-					!body ||
-					!title ||
-					body?.includes?.('"Untitled message"')
-				) {
-					return;
-				}
-				Toast.show({
-					type: 'notification',
-					topOffset: Platform.OS === 'ios' ? undefined : StatusBar.currentHeight + 10,
-					props: {
-						title,
-						body
-					},
-					swipeable: true,
-					visibilityTime: 5000,
-					onPress: async () => {
-						Toast.hide();
-						const store = await getStoreAsync();
-						store.dispatch(directActions.setDmGroupCurrentId(''));
-						store.dispatch(appActions.setIsFromFCMMobile(true));
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
-							isShow: false
-						});
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
-						DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
-						requestAnimationFrame(async () => {
-							await navigateToNotification(store, remoteMessage, navigation);
-						});
+			try {
+				if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
+					// Case: FCM start call
+					const title = remoteMessage?.notification?.title || remoteMessage?.data?.title;
+					const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
+					if (
+						title === 'Incoming call' ||
+						(body && ['video call', 'audio call', 'Untitled message'].some((text) => body?.includes?.(text))) ||
+						!body ||
+						!title ||
+						body?.includes?.('"Untitled message"')
+					) {
+						return;
 					}
-				});
-			}
-			//Payload from FCM need messageType and sound
-			if (remoteMessage?.notification?.body === 'Buzz!!') {
-				playBuzzSound();
-				handleBuzz(remoteMessage);
+					Toast.show({
+						type: 'notification',
+						topOffset: Platform.OS === 'ios' ? undefined : StatusBar.currentHeight + 10,
+						props: {
+							title,
+							body
+						},
+						swipeable: true,
+						visibilityTime: 5000,
+						onPress: async () => {
+							Toast.hide();
+							const store = await getStoreAsync();
+							store.dispatch(directActions.setDmGroupCurrentId(''));
+							store.dispatch(appActions.setIsFromFCMMobile(true));
+							DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+								isShow: false
+							});
+							DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+							DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+							requestAnimationFrame(async () => {
+								await navigateToNotification(store, remoteMessage, navigation);
+							});
+						}
+					});
+				}
+				//Payload from FCM need messageType and sound
+				if (remoteMessage?.notification?.body === 'Buzz!!') {
+					playBuzzSound();
+					handleBuzz(remoteMessage);
+				}
+			} catch (e) {
+				console.error('log  => e', e);
 			}
 		});
 		// To get All Received Urls

@@ -31,6 +31,7 @@ import {
 } from '@mezon/store';
 import {
 	CHANNEL_INPUT_ID,
+	CREATING_TOPIC,
 	ChannelMembersEntity,
 	GENERAL_INPUT_ID,
 	IEmojiOnMessage,
@@ -43,6 +44,7 @@ import {
 	MIN_THRESHOLD_CHARS,
 	MentionDataProps,
 	MentionReactInputProps,
+	QUICK_MENU_TYPE,
 	RequestInput,
 	SubPanelName,
 	TITLE_MENTION_HERE,
@@ -169,17 +171,16 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const dataReferences = useAppSelector((state) => selectDataReferences(state, props.currentChannelId ?? ''));
 	const dataReferencesTopic = useAppSelector((state) => selectDataReferences(state, currTopicId ?? ''));
 
-	const attachmentFilteredByChannelId = useAppSelector((state) =>
-		selectAttachmentByChannelId(state, !props.isTopic ? props.currentChannelId! : currTopicId!)
-	);
+	const scopeId = props.isTopic ? currTopicId || CREATING_TOPIC : props.currentChannelId!;
+
+	const attachmentFiltered = useAppSelector((state) => selectAttachmentByChannelId(state, scopeId || ''));
 
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
 
 	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
-	const { setOpenThreadMessageState, checkAttachment } = useReference(props.currentChannelId || '');
-
+	const { setOpenThreadMessageState, checkAttachment } = useReference(scopeId || '');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
 	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [titleModalMention, setTitleModalMention] = useState('');
@@ -213,7 +214,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		editMessageId: idMessageRefEdit,
 		currentChannelId: props.currentChannelId,
 		currentDmGroupId: props.currentDmGroupId,
-		hasAttachments: attachmentFilteredByChannelId?.files.length > 0
+		hasAttachments: attachmentFiltered?.files?.length > 0
 	});
 
 	useEmojiPicker({
@@ -296,7 +297,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			if ((!text && !checkAttachment) || ((draftRequest?.valueTextInput || '').trim() === '' && !checkAttachment)) {
 				return;
 			}
-
+			if (props.isTopic && !text && checkAttachment) {
+				payload.t = '';
+			}
 			if (
 				draftRequest?.valueTextInput &&
 				typeof draftRequest?.valueTextInput === 'string' &&
@@ -481,12 +484,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const closeMenu = useSelector(selectCloseMenu);
 
 	const attachmentData = useMemo(() => {
-		if (attachmentFilteredByChannelId === null) {
+		if (!attachmentFiltered) {
 			return [];
 		} else {
-			return attachmentFilteredByChannelId.files;
+			return attachmentFiltered.files;
 		}
-	}, [attachmentFilteredByChannelId?.files]);
+	}, [attachmentFiltered?.files]);
 
 	const isReplyOnChannel = dataReferences.message_ref_id && !props.isTopic ? true : false;
 	const isReplyOnTopic = dataReferencesTopic.message_ref_id && props.isTopic ? true : false;
@@ -688,7 +691,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const builtInCommands = slashCommands.filter((cmd) => cmd.display.toLowerCase().includes(search.toLowerCase()));
 
 			const quickMenuCommands = channelQuickMenuItems
-				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()))
+				.filter((item) => item.menu_name?.toLowerCase().includes(search.toLowerCase()) && item.menu_type === QUICK_MENU_TYPE.FLASH_MESSAGE)
 				.map((item) => ({
 					id: `quick_menu_${item.id}`,
 					display: item.menu_name || '',
@@ -713,7 +716,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				callback(generateCommandsList(search));
 				if (props.currentChannelId) {
 					try {
-						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						await dispatch(
+							quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId, menuType: QUICK_MENU_TYPE.FLASH_MESSAGE })
+						);
 						callback(generateCommandsList(search));
 					} catch (error) {
 						console.error('Error fetching fresh commands:', error);
@@ -723,7 +728,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				callback([{ id: 'loading', display: 'loading', description: 'Loading commands...', isLoading: true }]);
 				try {
 					if (props.currentChannelId) {
-						await dispatch(quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId }));
+						await dispatch(
+							quickMenuActions.listQuickMenuAccess({ channelId: props.currentChannelId, menuType: QUICK_MENU_TYPE.FLASH_MESSAGE })
+						);
 					}
 					callback(generateCommandsList(search));
 				} catch (error) {
@@ -796,10 +803,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	};
 
 	return (
-		<div
-			className={`contain-layout relative bg-theme-surface rounded-lg ${props.isTopic ? 'border-theme-primary shadow-md' : ''}`}
-			ref={containerRef}
-		>
+		<div className={`contain-layout relative bg-theme-surface rounded-lg `} ref={containerRef}>
 			<div className="relative">
 				<span
 					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary   pointer-events-none z-10 truncate transition-opacity duration-300 ${

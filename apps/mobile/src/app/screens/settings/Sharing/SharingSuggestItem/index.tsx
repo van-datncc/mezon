@@ -1,9 +1,12 @@
-import { size } from '@mezon/mobile-ui';
-import { ClansEntity, selectChannelById, useAppSelector } from '@mezon/store-mobile';
+import { size, useTheme } from '@mezon/mobile-ui';
+import { ClansEntity, getStore, selectChannelById } from '@mezon/store-mobile';
+import { ChannelType } from 'mezon-js';
 import { memo, useMemo } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import Images from '../../../../../assets/Images';
 import MezonAvatar from '../../../../componentUI/MezonAvatar';
-import { styles } from './styles';
+import { style } from './styles';
 
 type SharingSuggestItemProps = {
 	item: any;
@@ -11,21 +14,49 @@ type SharingSuggestItemProps = {
 	onChooseItem: (item: any) => void;
 };
 const SharingSuggestItem = memo(({ item, clans, onChooseItem }: SharingSuggestItemProps) => {
-	const parentChannel = useAppSelector((state) => selectChannelById(state, item?.parent_id || ''));
-	const parentLabel = useMemo(() => (parentChannel?.channel_label ? `(${parentChannel.channel_label})` : ''), [parentChannel]);
+	const { themeValue } = useTheme();
+	const styles = style(themeValue);
+	const parentLabel = useMemo(() => {
+		const store = getStore();
+		const state = store.getState();
+		const parentChannel = selectChannelById(state, item?.parent_id || '');
+		return parentChannel?.channel_label ? `(${parentChannel.channel_label})` : '';
+	}, [item?.parent_id]);
+
+	const isGroupDM = useMemo(() => item?.type === ChannelType.CHANNEL_TYPE_GROUP, [item?.type]);
 
 	const handleChooseItem = () => {
 		onChooseItem(item);
 	};
 
+	const data = useMemo(() => {
+		if (item?.type === ChannelType.CHANNEL_TYPE_DM) {
+			return {
+				name: item?.channel_label,
+				avatarUrl: item?.channel_avatar?.[0]
+			};
+		}
+		const clan = clans?.[item?.clan_id];
+		return {
+			name: clan?.clan_name,
+			avatarUrl: clan?.logo
+		};
+	}, [item, clans]);
+
 	return (
 		<TouchableOpacity style={styles.itemSuggestion} onPress={handleChooseItem}>
-			<MezonAvatar
-				avatarUrl={item?.channel_avatar?.[0] || clans?.[item?.clan_id]?.logo}
-				username={clans?.[item?.clan_id]?.clan_name || item?.channel_label}
-				width={size.s_24}
-				height={size.s_24}
-			/>
+			{isGroupDM ? (
+				<FastImage
+					source={Images.AVATAR_GROUP}
+					style={{
+						width: size.s_24,
+						height: size.s_24,
+						borderRadius: 50
+					}}
+				/>
+			) : (
+				<MezonAvatar avatarUrl={data?.avatarUrl} username={data?.name} width={size.s_24} height={size.s_24} />
+			)}
 			<Text style={styles.titleSuggestion} numberOfLines={1}>{`${item?.channel_label} ${parentLabel}`}</Text>
 		</TouchableOpacity>
 	);

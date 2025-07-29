@@ -112,6 +112,9 @@
           }
         ]
       },
+      "deb": {
+        "afterInstall": "scripts/installer.sh"
+      },
       "options": {
         "outputPath": "dist/apps/desktop",
         "main": "apps/desktop/src/main.ts",
@@ -263,6 +266,9 @@
               "url": "https://cdn.mezon.ai/release/"
             }
           ]
+        },
+        "deb": {
+          "afterInstall": "scripts/installer.sh"
         }
       }
     },
@@ -363,6 +369,9 @@
               "url": "https://cdn.mezon.ai/release/"
             }
           ]
+        },
+        "deb": {
+          "afterInstall": "scripts/installer.sh"
         }
       }
     },
