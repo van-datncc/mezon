@@ -1,30 +1,24 @@
 import { useChatSending } from '@mezon/core';
-import { useTheme } from '@mezon/mobile-ui';
-import { selectCurrentChannel } from '@mezon/store-mobile';
+import { selectCurrentChannel } from '@mezon/store';
 import { IMessage, IMessageSendPayload, MEZON_AVATAR_URL, STICKER_WAVE, WAVE_SENDER_NAME } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
+import { ApiChannelDescription } from 'mezon-js/dist/api.gen';
 import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import ImageNative from '../ImageNative';
-import { style } from './styles';
+
 interface IWaveButtonProps {
 	message: IMessage;
 }
 
 const WaveButton = ({ message }: IWaveButtonProps) => {
-	const { themeValue } = useTheme();
-	const styles = style(themeValue);
-	const { t } = useTranslation('dmMessage');
 	const currenChannel = useSelector(selectCurrentChannel);
 
 	const { sendMessage } = useChatSending({
 		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
-		channelOrDirect: currenChannel
+		channelOrDirect: currenChannel as ApiChannelDescription
 	});
 
-	const handleSendWaveSticker = async () => {
+	const handleSendWaveSticker = () => {
 		try {
 			const content: IMessageSendPayload = { t: '' };
 			const ref = {
@@ -53,17 +47,20 @@ const WaveButton = ({ message }: IWaveButtonProps) => {
 				}
 			];
 
-			sendMessage(content, [], attachments, [ref], false, false, true);
+			sendMessage(content, [], attachments, [ref], false, false, false);
 		} catch (error) {
 			console.error('Error sending wave sticker:', error);
 		}
 	};
 
 	return (
-		<TouchableOpacity style={styles.waveButton} onPress={handleSendWaveSticker}>
-			<ImageNative url={STICKER_WAVE.URL} style={styles.waveIcon} resizeMode="contain" />
-			<Text style={styles.waveButtonText}>{t('waveWelcome')}</Text>
-		</TouchableOpacity>
+		<button
+			className="bg-theme-primary py-1 px-3 rounded mt-2 flex flex-row items-center ml-[72px] gap-2 hover:scale-102 transition-all duration-200 ease-in-out hover:shadow-md"
+			onClick={handleSendWaveSticker}
+		>
+			<img src={STICKER_WAVE.URL} alt="Wave Icon" className="object-contain mb-1" width={32} height={32} />
+			<p className="text-theme-secondary text-sm font-medium text-center">Wave to say hi!</p>
+		</button>
 	);
 };
 
