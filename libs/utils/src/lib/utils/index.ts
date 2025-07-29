@@ -74,6 +74,9 @@ export * from './windowEnvironment';
 export * from './windowSize';
 
 export const convertTimeString = (dateString: string) => {
+	if (!dateString) {
+		return '';
+	}
 	const codeTime = new Date(dateString);
 	const today = startOfDay(new Date());
 	const yesterday = startOfDay(subDays(new Date(), 1));

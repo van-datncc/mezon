@@ -185,6 +185,63 @@ const UserProfile = React.memo(
 			directMessageWithUser(userId || user?.id);
 		};
 
+		const handleCallUser = useCallback(
+			async (userId: string) => {
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+					isShow: false
+				});
+				const directMessage = listDM?.find?.((dm) => {
+					const userIds = dm?.user_id;
+					return Array.isArray(userIds) && userIds.length === 1 && userIds[0] === userId;
+				});
+				if (directMessage?.id) {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userId,
+							receiverAvatar: message?.avatar || user?.avatar_url || user?.user?.avatar_url || userById?.user?.avatar_url,
+							directMessageId: directMessage?.id
+						}
+					});
+					return;
+				}
+				const response = await createDirectMessageWithUser(
+					userId,
+					message?.display_name || user?.user?.display_name || user?.display_name || userById?.user?.display_name,
+					message?.user?.username || user?.user?.username || user?.username || userById?.user?.username,
+					message?.avatar || user?.avatar_url || user?.user?.avatar_url || userById?.user?.avatar_url
+				);
+				if (response?.channel_id) {
+					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
+						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
+						params: {
+							receiverId: userId,
+							receiverAvatar: message?.avatar || user?.avatar_url || user?.user?.avatar_url || userById?.user?.avatar_url,
+							directMessageId: response?.channel_id
+						}
+					});
+				}
+			},
+			[
+				createDirectMessageWithUser,
+				listDM,
+				message?.avatar,
+				message?.display_name,
+				message?.user?.username,
+				navigation,
+				user?.avatar_url,
+				user?.display_name,
+				user?.user?.avatar_url,
+				user?.user?.display_name,
+				user?.user?.username,
+				user?.username,
+				userById?.user?.avatar_url,
+				userById?.user?.display_name,
+				userById?.user?.username
+			]
+		);
+
 		const actionList = [
 			{
 				id: 1,
@@ -193,21 +250,13 @@ const UserProfile = React.memo(
 				action: navigateToMessageDetail,
 				isShow: true
 			},
-			// {
-			// 	id: 2,
-			// 	text: t('userAction.voiceCall'),
-			// 	icon: <MezonIconCDN icon={IconCDN.phoneCallIcon} color={themeValue.text} />,
-			// 	action: () => {
-			// 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
-			// 			screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
-			// 			params: {
-			// 				receiverId: userById?.user?.id,
-			// 				receiverAvatar: userById?.user?.avatar_url
-			// 			}
-			// 		});
-			// 	},
-			// 	isShow: !!targetUser && ![EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state)
-			// },
+			{
+				id: 2,
+				text: t('userAction.voiceCall'),
+				icon: <MezonIconCDN icon={IconCDN.phoneCallIcon} color={themeValue.text} />,
+				action: () => handleCallUser(userId || user?.id),
+				isShow: true
+			},
 			// {
 			// 	id: 3,
 			// 	text: t('userAction.videoCall'),
@@ -386,7 +435,7 @@ const UserProfile = React.memo(
 									const { action, icon, id, isShow, text, textStyles } = actionItem;
 									if (!isShow) return null;
 									return (
-										<TouchableOpacity key={id} onPress={() => action()} style={[styles.actionItem]}>
+										<TouchableOpacity key={id} onPress={() => action?.()} style={[styles.actionItem]}>
 											{icon}
 											<Text style={[styles.actionText, textStyles && textStyles]}>{text}</Text>
 										</TouchableOpacity>

@@ -401,7 +401,7 @@ const HoverStateWrapper: React.FC<HoverStateWrapperProps> = ({
 	return (
 		<div
 			className={classNames(
-				'message-list-item relative message-container hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150',
+				'message-list-item relative message-container bg-item-hover transition-colors duration-150',
 				{
 					'w-full': isSearchMessage
 				},

@@ -25,26 +25,6 @@ export const PendingContent = memo((props: IPendingContentProps) => {
 
 	const actionList = [
 		{
-			id: 1,
-			text: t('pendingContent.block'),
-			action: () => {
-				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' });
-			},
-			isWarning: true,
-			isShow: true
-		},
-		{
-			id: 2,
-			text: t('pendingContent.reportUserProfile'),
-			action: () => {
-				//TODO
-				Toast.show({ type: 'info', text1: 'Updating...' });
-			},
-			isWarning: true,
-			isShow: true
-		},
-		{
 			id: 3,
 			text: t('pendingContent.acceptFriend'),
 			action: () => {
