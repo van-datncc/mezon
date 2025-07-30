@@ -17,7 +17,7 @@ import {
 import { DEFAULT_ROLE_COLOR, IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -101,13 +101,50 @@ const UserProfile = React.memo(
 
 		const status = getUserStatusByMetadata(user?.user?.metadata);
 
+		useEffect(() => {
+			if (isShowPendingContent) {
+				setIsShowPendingContent(false);
+			}
+		}, [infoFriend?.state]);
+
 		const isKicked = useMemo(() => {
 			return !userById;
 		}, [userById]);
 
-		const targetUser = useMemo(() => {
-			return allUser?.find?.((targetUser) => [user?.id, userId].includes(targetUser?.user?.id));
-		}, [user?.id, userId, allUser]);
+		const handleAddFriend = () => {
+			const userIdToAddFriend = userId || user?.id;
+			if (userIdToAddFriend) {
+				addFriend({
+					usernames: [],
+					ids: [userIdToAddFriend]
+				});
+			}
+		};
+
+		const iconFriend = useMemo(() => {
+			switch (infoFriend?.state) {
+				case EFriendState.Friend:
+					return {
+						icon: IconCDN.userFriendIcon,
+						action: () => setIsShowPendingContent(true)
+					};
+				case EFriendState.ReceivedRequestFriend:
+					return {
+						icon: IconCDN.userPendingIcon,
+						action: () => setIsShowPendingContent(true)
+					};
+				case EFriendState.SentRequestFriend:
+					return {
+						icon: IconCDN.userPendingIcon,
+						action: () => setIsShowPendingContent(true)
+					};
+				default:
+					return {
+						icon: IconCDN.userPlusIcon,
+						action: handleAddFriend
+					};
+			}
+		}, [infoFriend?.state]);
 
 		const userRolesClan = useMemo(() => {
 			return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
@@ -277,16 +314,8 @@ const UserProfile = React.memo(
 				id: 4,
 				text: t('userAction.addFriend'),
 				icon: <MezonIconCDN icon={IconCDN.userPlusIcon} color={Colors.green} />,
-				action: () => {
-					const userIdToAddFriend = userId || user?.id;
-					if (userIdToAddFriend) {
-						addFriend({
-							usernames: [],
-							ids: [userIdToAddFriend]
-						});
-					}
-				},
-				isShow: !targetUser && !isBlocked,
+				action: handleAddFriend,
+				isShow: !infoFriend && !isBlocked,
 				textStyles: {
 					color: Colors.green
 				}
@@ -299,9 +328,9 @@ const UserProfile = React.memo(
 					setIsShowPendingContent(true);
 				},
 				isShow:
-					!!targetUser &&
-					targetUser.state !== undefined &&
-					[EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser.state),
+					!!infoFriend &&
+					infoFriend?.state !== undefined &&
+					[EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(infoFriend?.state),
 				textStyles: {
 					color: Colors.goldenrodYellow
 				}
@@ -309,11 +338,11 @@ const UserProfile = React.memo(
 		];
 
 		const handleAcceptFriend = () => {
-			acceptFriend(targetUser?.user?.username || '', targetUser?.user?.id || '');
+			acceptFriend(infoFriend?.user?.username || '', infoFriend?.user?.id || '');
 		};
 
 		const handleIgnoreFriend = () => {
-			deleteFriend(targetUser?.user?.username || '', targetUser?.user?.id || '');
+			deleteFriend(infoFriend?.user?.username || '', infoFriend?.user?.id || '');
 		};
 		const isChannelOwner = useMemo(() => {
 			if (dmChannel?.creator_id) {
@@ -350,7 +379,7 @@ const UserProfile = React.memo(
 		if (isShowPendingContent) {
 			return (
 				<View style={[styles.wrapper]}>
-					<PendingContent targetUser={targetUser!} onClose={() => setIsShowPendingContent(false)} />
+					<PendingContent targetUser={infoFriend} onClose={() => setIsShowPendingContent(false)} />
 				</View>
 			);
 		}
@@ -359,19 +388,34 @@ const UserProfile = React.memo(
 			<View style={[styles.wrapper]}>
 				<View style={[styles.backdrop, { backgroundColor: userById || user?.avatar_url ? color : Colors.titleReset }]}>
 					{!isCheckOwner && (
-						<TouchableOpacity
-							onPress={() => handleTransferFunds()}
-							style={{
-								position: 'absolute',
-								right: size.s_10,
-								top: size.s_10,
-								padding: size.s_6,
-								borderRadius: size.s_20,
-								backgroundColor: themeValue.primary
-							}}
-						>
-							<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} width={size.s_20} height={size.s_20} />
-						</TouchableOpacity>
+						<View style={{ flexDirection: 'row' }}>
+							<TouchableOpacity
+								onPress={iconFriend?.action}
+								style={{
+									position: 'absolute',
+									right: size.s_10,
+									top: size.s_10,
+									padding: size.s_6,
+									borderRadius: size.s_20,
+									backgroundColor: themeValue.primary
+								}}
+							>
+								<MezonIconCDN icon={iconFriend?.icon} color={themeValue.text} width={size.s_20} height={size.s_20} />
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={() => handleTransferFunds()}
+								style={{
+									position: 'absolute',
+									right: size.s_50,
+									top: size.s_10,
+									padding: size.s_6,
+									borderRadius: size.s_20,
+									backgroundColor: themeValue.primary
+								}}
+							>
+								<MezonIconCDN icon={IconCDN.transactionIcon} color={themeValue.text} width={size.s_20} height={size.s_20} />
+							</TouchableOpacity>
+						</View>
 					)}
 					<View style={[styles.userAvatar]}>
 						<MezonAvatar
@@ -386,7 +430,7 @@ const UserProfile = React.memo(
 										user?.avatar_url)
 									: (userById?.user?.avatar_url ?? user?.user?.avatar_url ?? user?.avatar_url ?? messageAvatar)
 							}
-							username={user?.user?.username}
+							username={user?.user?.username || user?.username}
 							userStatus={userStatus}
 							customStatus={status}
 							isBorderBoxImage={true}
@@ -443,7 +487,7 @@ const UserProfile = React.memo(
 								})}
 							</View>
 						)}
-						{EFriendState.ReceivedRequestFriend === targetUser?.state && (
+						{EFriendState.ReceivedRequestFriend === infoFriend?.state && (
 							<View style={{ marginTop: size.s_16 }}>
 								<Text style={styles.receivedFriendRequestTitle}>{t('incomingFriendRequest')}</Text>
 								<View style={{ flexDirection: 'row', gap: size.s_10, marginTop: size.s_10 }}>
