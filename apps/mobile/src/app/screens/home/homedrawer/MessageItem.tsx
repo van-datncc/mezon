@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { ActionEmitEvent, validLinkGoogleMapRegex, validLinkInviteRegex } from '@mezon/mobile-components';
-import { Colors, useTheme } from '@mezon/mobile-ui';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import {
 	ChannelsEntity,
 	MessagesEntity,
@@ -12,12 +12,13 @@ import {
 	setSelectedMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData } from '@mezon/utils';
+import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData, sleep } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Animated, DeviceEventEmitter, PanResponder, Platform, Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
@@ -78,6 +79,7 @@ const MessageItem = React.memo(
 		const previousMessage: MessagesEntity = props?.previousMessage;
 		const { t: contentMessage, lk = [] } = message?.content || {};
 		const userId = props?.userId;
+		const swipeRef = useRef(null);
 
 		const isEphemeralMessage = useMemo(() => message?.code === TypeMessage.Ephemeral, [message?.code]);
 		const isInviteLink = Array.isArray(lk) && validLinkInviteRegex.test(contentMessage);
@@ -90,8 +92,11 @@ const MessageItem = React.memo(
 			message?.code === TypeMessage.CreateThread ||
 			message?.code === TypeMessage.CreatePin ||
 			message?.code === TypeMessage.AuditLog;
+		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
+		const senderDisplayName = isDM
+			? message?.display_name || message?.username || ''
+			: message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 
-		const translateX = useRef(new Animated.Value(0)).current;
 		const onReplyMessage = useCallback(() => {
 			const payload: IMessageActionNeedToResolve = {
 				type: EMessageActionType.Reply,
@@ -100,8 +105,7 @@ const MessageItem = React.memo(
 				replyTo: senderDisplayName
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, payload);
-		}, [message]);
-		//check
+		}, [message, senderDisplayName]);
 
 		const hasIncludeMention = (() => {
 			const store = getStore();
@@ -126,8 +130,6 @@ const MessageItem = React.memo(
 			return includesUser || includesRole || checkReplied;
 		})();
 
-		const isSameUser = message?.user?.id === previousMessage?.user?.id;
-
 		const isTimeGreaterThan5Minutes =
 			message?.create_time && previousMessage?.create_time
 				? Date.parse(message.create_time) - Date.parse(previousMessage.create_time) < 2 * 60 * 1000
@@ -135,10 +137,8 @@ const MessageItem = React.memo(
 
 		const isBuzzMessage = message?.code === TypeMessage.MessageBuzz;
 
-		const isCombine = isSameUser && isTimeGreaterThan5Minutes;
-		const backgroundColor = React.useRef(new Animated.Value(0)).current;
+		const isCombine = message?.user?.id === previousMessage?.user?.id && isTimeGreaterThan5Minutes;
 
-		const isDM = [ChannelStreamMode.STREAM_MODE_DM, ChannelStreamMode.STREAM_MODE_GROUP].includes(mode);
 		const messageAvatar =
 			mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD
 				? message?.clan_avatar || message?.avatar
@@ -156,10 +156,6 @@ const MessageItem = React.memo(
 			message?.update_time && !message.isError && !message.isErrorRetry
 				? new Date(message?.update_time) > new Date(message?.create_time)
 				: message.hide_editted === false && !!message?.content?.t;
-
-		const senderDisplayName = isDM
-			? message?.display_name || message?.username || ''
-			: message?.clan_nick || message?.display_name || message?.user?.username || (checkAnonymous ? 'Anonymous' : message?.username);
 
 		const usernameMessage = isDM
 			? message?.display_name || message?.user?.username
@@ -250,66 +246,46 @@ const MessageItem = React.memo(
 			return <WelcomeMessage channelId={props.channelId} />;
 		}
 
-		const handlePressIn = () => {
-			Animated.timing(backgroundColor, {
-				toValue: 1,
-				duration: 200,
-				useNativeDriver: true
-			}).start();
+		const renderRightActions = () => {
+			return (
+				<View style={styles.replyMessage}>
+					<MezonIconCDN icon={IconCDN.replyMsg} width={size.s_20} height={size.s_20} />
+				</View>
+			);
 		};
 
-		const handlePressOut = () => {
-			Animated.timing(backgroundColor, {
-				toValue: 0,
-				duration: 200,
-				useNativeDriver: true
-			}).start();
+		const handleSwipeOpen = async () => {
+			onReplyMessage();
+			await sleep(200);
+			swipeRef?.current?.close();
 		};
-
-		const bgColor = backgroundColor.interpolate({
-			inputRange: [0, 1],
-			outputRange: ['transparent', themeValue.secondaryWeight]
-		});
-
-		const panResponder = PanResponder.create({
-			onMoveShouldSetPanResponder: (_, gestureState) => {
-				if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 && gestureState.dx < -10) {
-					Animated.sequence([
-						Animated.timing(translateX, {
-							toValue: -100,
-							duration: 200,
-							useNativeDriver: true
-						}),
-						Animated.spring(translateX, {
-							toValue: 0,
-							useNativeDriver: true
-						})
-					]).start();
-					onReplyMessage && onReplyMessage();
-					return true;
-				}
-
-				return false;
-			}
-		});
 
 		return (
-			<Animated.View {...panResponder?.panHandlers} style={[{ backgroundColor: bgColor }, { transform: [{ translateX }] }]}>
+			<Swipeable
+				ref={swipeRef}
+				enabled={!preventAction}
+				dragOffsetFromLeftEdge={1000}
+				renderRightActions={renderRightActions}
+				onSwipeableWillOpen={handleSwipeOpen}
+			>
 				<Pressable
 					android_ripple={{
 						color: themeValue.secondaryLight
 					}}
 					disabled={isMessageCallLog || isGoogleMapsLink}
 					delayLongPress={300}
-					onPressIn={Platform.OS === 'ios' ? handlePressIn : undefined}
-					onPressOut={Platform.OS === 'ios' ? handlePressOut : undefined}
 					onLongPress={handleLongPressMessage}
-					style={[
+					style={({ pressed }) => [
 						styles.messageWrapper,
 						(isCombine || preventAction) && { marginTop: 0 },
 						hasIncludeMention && styles.highlightMessageReply,
 						isHighlight && styles.highlightMessageMention,
-						isEphemeralMessage && styles.ephemeralMessage
+						isEphemeralMessage && styles.ephemeralMessage,
+						Platform.OS === 'ios' &&
+							pressed && {
+								backgroundColor: themeValue.secondaryWeight,
+								opacity: 0.8
+							}
 					]}
 				>
 					{!isMessageSystem && !message?.content?.fwd && (
@@ -458,7 +434,7 @@ const MessageItem = React.memo(
 						</View>
 					</View>
 				</Pressable>
-			</Animated.View>
+			</Swipeable>
 		);
 	},
 	(prevProps, nextProps) => {
