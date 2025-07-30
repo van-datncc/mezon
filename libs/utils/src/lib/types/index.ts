@@ -318,6 +318,7 @@ export interface IMessageInput {
 	textarea?: boolean;
 	style?: EButtonMessageStyle;
 	defaultValue?: string;
+	disabled?: boolean;
 }
 
 export interface IMessageDatePicker {

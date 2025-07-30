@@ -14,10 +14,11 @@ interface EmbedOptionRatioProps {
 	disabled?: boolean;
 }
 
-export function EmbedOptionRatio({ options, message_id, idRadio, max_options }: EmbedOptionRatioProps) {
+export function EmbedOptionRatio({ options, message_id, idRadio, max_options, disabled = false }: EmbedOptionRatioProps) {
 	const embedData = useSelector((state) => selectDataFormEmbedByMessageId(state, message_id))?.[idRadio];
 	const [checked, setChecked] = useState<string[]>(embedData ? (Array.isArray(embedData) ? embedData : [embedData]) : []);
 	const handleCheckedOption = (value: string) => {
+		if (!disabled) return;
 		if (!max_options || checked.length < max_options || !checkMultiple || checked.includes(value)) {
 			handleAddEmbedRadioValue(value);
 		}
@@ -60,6 +61,7 @@ export function EmbedOptionRatio({ options, message_id, idRadio, max_options }: 
 					checkMultiple={checkMultiple}
 					checked={checked.includes(option.value)}
 					handleCheckedOption={() => handleCheckedOption(option.value)}
+					disabled={disabled}
 				/>
 			))}
 		</>
@@ -72,7 +74,8 @@ const EmbedOptionRatioItem = ({
 	setChecked,
 	checkMultiple,
 	handleCheckedOption,
-	checked
+	checked,
+	disabled
 }: {
 	setChecked: React.Dispatch<React.SetStateAction<string[]>>;
 	option: IMessageRatioOption;
@@ -80,8 +83,10 @@ const EmbedOptionRatioItem = ({
 	handleCheckedOption: () => void;
 	checkMultiple: boolean;
 	checked: boolean;
+	disabled?: boolean;
 }) => {
 	const handleCheckedOptionItem = () => {
+		if (!disabled) return;
 		handleCheckedOption();
 		if (!checkMultiple) {
 			setChecked([option.value]);
