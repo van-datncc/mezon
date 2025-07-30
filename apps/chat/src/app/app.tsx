@@ -168,18 +168,28 @@ export function App() {
 }
 
 function AppWrapper() {
-	useEffect(() => {
-		const splashScreen = document.getElementById('splash-screen');
-		if (splashScreen) {
-			splashScreen.style.display = 'none';
-		}
-	}, []);
+    useEffect(() => {
+        const splashScreen = document.getElementById('splash-screen');
+        if (splashScreen) {
+            splashScreen.style.display = 'none';
+        }
+    }, []);
 
+<<<<<<< Updated upstream
 	return (
 		<MezonContextProvider mezon={mezon} connect={true}>
 			<App />
 		</MezonContextProvider>
 	);
+=======
+    return (
+        <>
+            <MezonContextProvider mezon={mezon} connect={true}>
+                <App />
+            </MezonContextProvider>
+        </>
+    );
+>>>>>>> Stashed changes
 }
 
 export default AppWrapper;
