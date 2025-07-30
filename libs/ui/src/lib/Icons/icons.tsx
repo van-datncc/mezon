@@ -6409,7 +6409,7 @@ export const UpcomingEventIcon: React.FC<IconProps> = ({ defaultSize = 'w-12 h-1
 	return (
 		<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={defaultSize}>
 			<g id="Live area">
-				<line x1="2" y1="9" x2="10" y2="9" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+				<line x1="2" y1="9" x2="10" y2="9" stroke="rgba(163, 22, 22, 1)" strokeWidth="2" strokeLinecap="round" />
 				<path
 					id="Vector"
 					fillRule="evenodd"
