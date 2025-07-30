@@ -175,7 +175,6 @@ function AppWrapper() {
         }
     }, []);
 
-<<<<<<< Updated upstream
 	return (
 		<>
 			<MezonContextProvider mezon={mezon} connect={true}>
@@ -184,15 +183,7 @@ function AppWrapper() {
 			<CustomCookieConsent />
 		</>
 	);
-=======
-    return (
-        <>
-            <MezonContextProvider mezon={mezon} connect={true}>
-                <App />
-            </MezonContextProvider>
-        </>
-    );
->>>>>>> Stashed changes
+
 }
 
 export default AppWrapper;
