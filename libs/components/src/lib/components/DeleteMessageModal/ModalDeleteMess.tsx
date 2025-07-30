@@ -103,6 +103,7 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 
 	const isMessageSystem =
 		mess?.code === TypeMessage.Welcome ||
+		message?.code === TypeMessage.UpcomingEvent ||
 		mess?.code === TypeMessage.CreateThread ||
 		mess?.code === TypeMessage.CreatePin ||
 		mess?.code === TypeMessage.AuditLog;

@@ -85,6 +85,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const { sendInviteMessage } = useSendInviteMessage();
 	const isMessageSystem =
 		message?.code === TypeMessage.Welcome ||
+		message?.code === TypeMessage.UpcomingEvent ||
 		message?.code === TypeMessage.CreateThread ||
 		message?.code === TypeMessage.CreatePin ||
 		message?.code === TypeMessage.AuditLog;
