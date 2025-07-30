@@ -182,7 +182,6 @@ function AppWrapper() {
 			</MezonContextProvider>
 		</>
 	);
-
 }
 
 export default AppWrapper;
