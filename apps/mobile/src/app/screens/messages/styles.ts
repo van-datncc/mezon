@@ -272,12 +272,12 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			alignItems: 'center',
 			gap: size.s_6,
 			padding: size.s_6,
-			borderRadius: size.s_6,
+			borderRadius: size.s_12,
 			backgroundColor: colors.secondary,
-			borderColor: colors.border,
+			borderColor: colors.secondaryLight,
 			borderWidth: 1,
 			maxWidth: size.s_220,
-			marginRight: size.s_8
+			marginRight: size.s_10
 		},
 		avatarActivity: {
 			width: size.s_48,
@@ -286,7 +286,7 @@ export const style = (colors: Attributes, isTablet?: boolean) =>
 			overflow: 'hidden'
 		},
 		userNameActivity: {
-			fontSize: size.s_14,
+			fontSize: size.s_12,
 			paddingBottom: size.s_4,
 			fontWeight: '600',
 			color: colors.text

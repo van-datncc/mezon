@@ -58,7 +58,6 @@ function DrawerListener({ channelId }: { channelId: string }) {
 	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId));
 	const prevChannelIdRef = useRef<string>('');
 	const dispatch = useAppDispatch();
-	console.log('log  => DrawerListener');
 
 	const fetchMemberChannel = useCallback(async () => {
 		if (!currentChannel) {
