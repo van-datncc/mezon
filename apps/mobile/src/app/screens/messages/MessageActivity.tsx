@@ -81,6 +81,7 @@ function MessageActivity() {
 					<ImageNative
 						url={createImgproxyUrl(item?.avatar ?? '', { width: 100, height: 100, resizeType: 'fit' })}
 						style={styles.avatarActivity}
+						resizeMode={'cover'}
 					/>
 				</View>
 				<View style={{ flexShrink: 1 }}>

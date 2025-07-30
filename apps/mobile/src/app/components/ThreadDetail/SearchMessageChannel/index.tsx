@@ -88,7 +88,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		setFiltersSearch(filter);
 
 		if ((searchText?.trim() || (optionFilter && userMention)) && !!currentChannel?.id) {
-			dispatch(searchMessagesActions.setCurrentPage(1));
+			dispatch(searchMessagesActions.setCurrentPage({ channelId: currentChannel?.id, page: 1 }));
 			dispatch(searchMessagesActions.fetchListSearchMessage(payload));
 		}
 	};
@@ -118,6 +118,7 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 					<SearchMessagePage
 						userMention={userMention}
 						currentChannel={currentChannel}
+						nameChannel={nameChannel}
 						searchText={searchText}
 						typeSearch={typeSearch}
 						isSearchMessage={Boolean(searchText?.trim())}
