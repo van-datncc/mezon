@@ -88,7 +88,7 @@ export function useNotificationSettings({ channelId, notificationSettings, getCh
 		}
 
 		if (notificationSettings?.time_mute && checkUnMute) {
-			const timeMute = new Date(Date.now() + 5000);
+			const timeMute = new Date(notificationSettings.time_mute);
 			const currentTime = new Date();
 			if (timeMute > currentTime) {
 				const formattedDate = format(timeMute, 'dd/MM, HH:mm');

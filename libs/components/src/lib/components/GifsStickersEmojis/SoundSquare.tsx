@@ -246,7 +246,7 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 			<div className="mb-3">
 				<button
 					onClick={handleToggleButton}
-					className=" w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem]  bg-theme-setting-nav max-h-full"
+					className=" w-full flex flex-row justify-between items-center px-4 py-2 gap-[2px] sticky top-[-0.5rem]  bg-theme-setting-nav max-h-full z-10"
 				>
 					<p className="uppercase font-semibold text-xs tracking-wider text-theme-primary-active">
 						{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}
