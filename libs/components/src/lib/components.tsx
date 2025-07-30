@@ -78,7 +78,6 @@ export { default as SettingAppearance } from './components/SettingAppearance';
 export { default as SettingNotifications } from './components/SettingNotifications';
 export * from './components/SettingProfile';
 export { getColorAverageFromURL } from './components/SettingProfile/AverageColor';
-export { default as ShortUserProfile } from './components/ShortUserProfile/ShortUserProfile';
 export { default as UserListVoiceChannel } from './components/UserListVoiceChannel';
 
 export { UserMentionList } from './components/UserMentionList';
@@ -140,3 +139,4 @@ export * from './components/DmCall';
 export { DmCallManager } from './components/DmCall/DmCallManager';
 export { default as InternetStatusPopover } from './components/InternetStatusPopover';
 export { default as ModalLayout } from './components/Modal';
+export { default as CustomCookieConsent } from './components/CustomCookieConsent';

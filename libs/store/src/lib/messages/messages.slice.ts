@@ -1116,6 +1116,7 @@ export const messagesSlice = createSlice({
 
 			switch (code) {
 				case TypeMessage.Welcome:
+				case TypeMessage.UpcomingEvent:
 				case TypeMessage.CreateThread:
 				case TypeMessage.CreatePin:
 				case TypeMessage.MessageBuzz:
@@ -1125,24 +1126,7 @@ export const messagesSlice = createSlice({
 				case TypeMessage.Chat: {
 					if (topic_id !== '0' && topic_id) {
 						handleAddOneMessage({ state, channelId: topic_id, adapterPayload: action.payload });
-
 						state.lastMessageByChannel[channelId] = action.payload;
-						if (!isSending && (isMe || isAnonymous)) {
-							const newContent = content;
-
-							const sendingMessages = state.channelMessages[topic_id]?.ids.filter(
-								(id) => state.channelMessages[topic_id].entities[id].isSending
-							);
-							// if (sendingMessages && sendingMessages.length) {
-							// 	for (const mid of sendingMessages) {
-							// 		const message = state.channelMessages[topic_id].entities[mid];
-							// 		if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
-							// 			state.channelMessages[topic_id] = handleRemoveOneMessage({ state, channelId: topic_id, messageId: mid });
-							// 			break;
-							// 		}
-							// 	}
-							// }
-						}
 					} else {
 						handleAddOneMessage({ state, channelId, adapterPayload: action.payload });
 						// update last message

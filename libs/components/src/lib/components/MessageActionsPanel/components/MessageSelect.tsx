@@ -32,7 +32,7 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 	const [availableOptions, setAvailableOptions] = useState(select?.options || []);
 	const dispatch = useAppDispatch();
 	const handleOptionSelect = (option: { value: string; label: string }) => {
-		if (!select.disabled) {
+		if (select.disabled) {
 			return;
 		}
 		if (selectedOptions.length >= (select?.max_options || select.options.length)) {

@@ -1168,7 +1168,8 @@ export enum TypeMessage {
 	Topic = 9,
 	AuditLog = 10,
 	SendToken = 11,
-	Ephemeral = 12
+	Ephemeral = 12,
+	UpcomingEvent = 13
 }
 
 export enum ServerSettingsMenuValue {

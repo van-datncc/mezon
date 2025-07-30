@@ -16,6 +16,8 @@ const RenderYoutubeVideo = ({ videoKey, videoId, contentInElement, onPress, onLo
 	const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
 	const { width, height } = useWindowDimensions();
 	const isLandscape = width > height;
+	const playerWidth = isLandscape ? width * 0.4 : width * 0.8;
+	const playerHeight = (playerWidth * 9) / 16;
 
 	return (
 		<View key={videoKey}>
@@ -30,8 +32,8 @@ const RenderYoutubeVideo = ({ videoKey, videoId, contentInElement, onPress, onLo
 					</View>
 				)}
 				<YoutubePlayer
-					height={size.s_165}
-					width={isLandscape ? width * 0.4 : width * 0.8}
+					height={playerHeight}
+					width={playerWidth}
 					videoId={videoId}
 					play={false}
 					onReady={() => setIsVideoReady(true)}
