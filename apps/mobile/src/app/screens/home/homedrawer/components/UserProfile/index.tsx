@@ -30,7 +30,6 @@ import { IconCDN } from '../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { getUserStatusByMetadata } from '../../../../../utils/helpers';
 import { style } from './UserProfile.styles';
-import ActivityAppComponent from './component/ActivityAppComponent';
 import EditUserProfileBtn from './component/EditUserProfileBtn';
 import { PendingContent } from './component/PendingContent';
 import UserInfoDm from './component/UserInfoDm';
@@ -477,7 +476,6 @@ const UserProfile = React.memo(
 									<Text style={[styles.aboutMeText]}>{userById?.user?.about_me}</Text>
 								</View>
 							)}
-							<ActivityAppComponent userId={userId || user?.id || ''} />
 							{userRolesClan?.length && showRole && !isDM ? (
 								<View>
 									<Text style={[styles.title]}>{t('aboutMe.roles.headerTitle')}</Text>
