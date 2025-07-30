@@ -16,9 +16,10 @@ export const MessageInput: React.FC<MessageRatioButtonProps> = ({ input, message
 	const dispatch = useDispatch();
 
 	const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		if (!disabled) {
-			debouncedChangeInput(e.target.value);
+		if (disabled) {
+			return;
 		}
+		debouncedChangeInput(e.target.value);
 	};
 
 	useEffect(() => {
