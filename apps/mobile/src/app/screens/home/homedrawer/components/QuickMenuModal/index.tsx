@@ -54,10 +54,13 @@ export const QuickMenuModal = React.memo(({ channelId, isVisible, onClose }: Qui
     const [searchText, setSearchText] = useState('');
     const [debouncedSearchText, setDebouncedSearchText] = useState('');
 
-    const debouncedSetSearchText = useMemo(() => debounce((value: string) => setDebouncedSearchText(value), 300), []);
+    const debouncedSetSearchText = useMemo(() => debounce((value: string) => {
+        setSearchText(value);
+        setDebouncedSearchText(value);
+    }, 300), []);
+
     const quickMenus = useAppSelector((state) => selectQuickMenusByChannelId(state as any, channelId || ''));
     const isLoading = useAppSelector((state) => selectQuickMenuLoadingStatus(state as any));
-    console.log(quickMenus);
 
     const filteredQuickMenus = useMemo(() => {
         if (!debouncedSearchText.trim()) {
@@ -81,13 +84,13 @@ export const QuickMenuModal = React.memo(({ channelId, isVisible, onClose }: Qui
     );
 
     const handleClose = useCallback(() => {
-        setSearchText('');
+        debouncedSetSearchText('');
         onClose();
-    }, [onClose]);
+    }, [onClose, debouncedSetSearchText]);
 
     const handleClearSearch = useCallback(() => {
-        setSearchText('');
-    }, []);
+        debouncedSetSearchText('');
+    }, [debouncedSetSearchText]);
 
     const renderQuickMenuItem = useCallback(
         ({ item }: { item: any }) => (
@@ -103,7 +106,7 @@ export const QuickMenuModal = React.memo(({ channelId, isVisible, onClose }: Qui
 
     const keyExtractor = useCallback((item: any) => item.id?.toString() || Math.random().toString(), []);
 
-    const getItemLayout = useCallback((data: any, index: number) => ({
+    const getItemLayout = useCallback((_: any, index: number) => ({
         length: size.s_60,
         offset: size.s_60 * index,
         index,
@@ -134,10 +137,7 @@ export const QuickMenuModal = React.memo(({ channelId, isVisible, onClose }: Qui
                                 placeholder="Search quick menu..."
                                 placeholderTextColor={themeValue.text}
                                 value={searchText}
-                                onChangeText={(value) => {
-                                    setSearchText(value);
-                                    debouncedSetSearchText(value);
-                                }}
+                                onChangeText={debouncedSetSearchText}
                                 autoCapitalize="none"
                                 autoCorrect={false}
                             />

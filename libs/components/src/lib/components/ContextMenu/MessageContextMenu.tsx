@@ -197,7 +197,8 @@ function MessageContextMenu({
 		message?.code !== TypeMessage.CreatePin &&
 		message?.code !== TypeMessage.MessageBuzz &&
 		message?.code !== TypeMessage.AuditLog &&
-		message?.code !== TypeMessage.Welcome;
+		message?.code !== TypeMessage.Welcome &&
+		message?.code !== TypeMessage.UpcomingEvent;
 
 	const handleAddToNote = useCallback(() => {
 		if (!message || !currentChannel || !currentClanId) return;

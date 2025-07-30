@@ -89,6 +89,7 @@ const MessageItem = React.memo(
 		const checkSystem = message?.sender_id === '0' && message?.username?.toLowerCase() === 'system';
 		const isMessageSystem =
 			message?.code === TypeMessage.Welcome ||
+			message?.code === TypeMessage.UpcomingEvent ||
 			message?.code === TypeMessage.CreateThread ||
 			message?.code === TypeMessage.CreatePin ||
 			message?.code === TypeMessage.AuditLog;
