@@ -263,10 +263,7 @@ const GroupCallComponent = memo(
 		};
 
 		const handleCancelPreCall = () => {
-			if (isJoined && token) {
-				handleLeaveRoom();
-				return;
-			}
+			handleLeaveRoom();
 
 			const cancelData = createCancelData({
 				isVideo: groupCall.state.isVideoCall,
