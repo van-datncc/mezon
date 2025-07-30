@@ -199,7 +199,7 @@ function SoundSquare({ channel, mode, onClose, isTopic = false, onSoundSelect }:
 					))}
 				</div>
 			</div>
-			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar bg-item-theme rounded-r-lg" ref={containerRef}>
+			<div className="flex flex-col h-[400px] overflow-y-auto flex-1 hide-scrollbar bg-theme-setting-primary rounded-r-lg" ref={containerRef}>
 				{valueInputToCheckHandleSearch ? (
 					<SoundPanel soundList={searchedSounds} onClickSendSound={onClickSendSound} />
 				) : (
@@ -251,8 +251,8 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 					<p className="uppercase font-semibold text-xs tracking-wider text-theme-primary-active">
 						{categoryName !== 'custom' ? categoryName : currentClan?.clan_name}
 					</p>
-					<span className={`transition-transform duration-200 ${isShowSoundList ? 'rotate-90' : ''}`}>
-						<Icons.ArrowRight defaultFill="currentColor" className="w-3.5 h-3.5 opacity-70" />
+					<span className={`transition-transform duration-200 text-theme-primary ${isShowSoundList ? 'rotate-90' : ''}`}>
+						<Icons.ArrowRight defaultFill="currentColor" className="w-3.5 h-3.5 opacity-70 " />
 					</span>
 				</button>
 				{isShowSoundList && <SoundPanel soundList={soundListByCategoryName} onClickSendSound={onClickSendSound} />}
