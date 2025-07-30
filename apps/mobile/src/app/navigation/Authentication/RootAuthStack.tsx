@@ -32,7 +32,7 @@ export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
 		useEffect(() => {
 			const splashTask = requestAnimationFrame(async () => {
-				await BootSplash.hide({ fade: false });
+				await BootSplash.hide({ fade: true });
 			});
 			return () => cancelAnimationFrame(splashTask);
 		}, []);
@@ -65,13 +65,13 @@ export const RootAuthStack = memo(
 								open: {
 									animation: 'timing',
 									config: {
-										duration: 100
+										duration: 200
 									}
 								},
 								close: {
 									animation: 'timing',
 									config: {
-										duration: 50
+										duration: 200
 									}
 								}
 							},
@@ -94,13 +94,13 @@ export const RootAuthStack = memo(
 								open: {
 									animation: 'timing',
 									config: {
-										duration: 100
+										duration: 200
 									}
 								},
 								close: {
 									animation: 'timing',
 									config: {
-										duration: 50
+										duration: 200
 									}
 								}
 							}
