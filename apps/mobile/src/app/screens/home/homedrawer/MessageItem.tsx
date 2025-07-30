@@ -273,7 +273,7 @@ const MessageItem = React.memo(
 					android_ripple={{
 						color: themeValue.secondaryLight
 					}}
-					disabled={isMessageCallLog || isGoogleMapsLink}
+					disabled={isMessageCallLog || isGoogleMapsLink || isSearchTab}
 					delayLongPress={300}
 					onLongPress={handleLongPressMessage}
 					style={({ pressed }) => [
