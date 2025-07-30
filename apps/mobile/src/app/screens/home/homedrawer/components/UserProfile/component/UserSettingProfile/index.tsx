@@ -1,10 +1,19 @@
 import { useAuth, useChannelMembersActions, usePermissionChecker } from '@mezon/core';
+import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { ChannelMembersEntity, selectCurrentClan, selectCurrentClanId } from '@mezon/store-mobile';
+import {
+	ChannelMembersEntity,
+	channelUsersActions,
+	selectCurrentChannel,
+	selectCurrentClan,
+	selectCurrentClanId,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
+import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../componentUI/MezonIconCDN';
@@ -18,7 +27,8 @@ export enum EActionSettingUserProfile {
 	Manage = 'Manage',
 	TimeOut = 'Timeout',
 	Kick = 'Kick',
-	Ban = 'Ban'
+	Ban = 'Ban',
+	ThreadRemove = 'ThreadRemove'
 }
 
 interface IUserSettingProfileProps {
@@ -44,6 +54,7 @@ const UserSettingProfile = ({
 	showKickUserModal = false,
 	showActionOutside = true
 }: IUserSettingProfileProps) => {
+	const dispatch = useAppDispatch();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation('clanOverviewSetting');
@@ -52,6 +63,8 @@ const UserSettingProfile = ({
 	const { userProfile } = useAuth();
 	const { removeMemberClan } = useChannelMembersActions();
 	const currentClan = useSelector(selectCurrentClan);
+	const currentChannel = useSelector(selectCurrentChannel);
+	const currentChannelId = currentChannel?.channel_id;
 	const isItMe = useMemo(() => userProfile?.user?.id === user?.user?.id, [user?.user?.id, userProfile?.user?.id]);
 	const isThatClanOwner = useMemo(() => currentClan?.creator_id === user?.user?.id, [user?.user?.id, currentClan?.creator_id]);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -60,6 +73,8 @@ const UserSettingProfile = ({
 		EPermission.administrator,
 		EPermission.manageClan
 	]);
+	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
+	const dangerActions = [EActionSettingUserProfile.Kick, EActionSettingUserProfile.ThreadRemove];
 
 	useEffect(() => {
 		setVisibleKickUserModal(showKickUserModal);
@@ -83,6 +98,9 @@ const UserSettingProfile = ({
 				break;
 			case EActionSettingUserProfile.Ban:
 				break;
+			case EActionSettingUserProfile.ThreadRemove:
+				handleRemoveMemberFromThread(user?.user?.id);
+				break;
 			default:
 				break;
 		}
@@ -91,7 +109,7 @@ const UserSettingProfile = ({
 	const profileSetting: IProfileSetting[] = useMemo(() => {
 		const settingList = [
 			{
-				label: `${EActionSettingUserProfile.Manage}`,
+				label: t('action.manage'),
 				value: EActionSettingUserProfile.Manage,
 				icon: (
 					<MezonIconCDN
@@ -113,11 +131,18 @@ const UserSettingProfile = ({
 			// 	isShow: hasAdminPermission && !isItMe
 			// },
 			{
-				label: `${EActionSettingUserProfile.Kick}`,
+				label: t('action.kick'),
 				value: EActionSettingUserProfile.Kick,
 				icon: <MezonIconCDN icon={IconCDN.leaveGroupIcon} width={size.s_22} height={size.s_22} color={baseColor.red} />,
 				action: handleSettingUserProfile,
 				isShow: !isItMe && (hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
+			},
+			{
+				label: t('action.removeFromThread'),
+				value: EActionSettingUserProfile.ThreadRemove,
+				icon: <MezonIconCDN icon={IconCDN.removeFriend} width={20} height={20} color={baseColor.red} />,
+				action: handleSettingUserProfile,
+				isShow: !isItMe && isThread && (isThatClanOwner || hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
 			// {
 			// 	label: `${EActionSettingUserProfile.Ban}`,
@@ -128,7 +153,7 @@ const UserSettingProfile = ({
 			// }
 		];
 		return settingList;
-	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner]);
+	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner, hasClanOwnerPermission, isThread, t]);
 
 	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {
@@ -157,6 +182,40 @@ const UserSettingProfile = ({
 		}
 	}, [currentClanId, removeMemberClan, user]);
 
+	const handleRemoveMemberFromThread = useCallback(
+		async (userId?: string) => {
+			if (!userId || !currentChannelId) return;
+
+			try {
+				await dispatch(
+					channelUsersActions.removeChannelUsers({
+						channelId: currentChannelId,
+						userId,
+						channelType: ChannelType.CHANNEL_TYPE_THREAD,
+						clanId: currentClan?.clan_id
+					})
+				);
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('permissions.toast.removeMemberThreadSuccess'),
+						leadingIcon: <MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
+					}
+				});
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+			} catch (error) {
+				Toast.show({
+					type: 'error',
+					props: {
+						text2: t('permissions.toast.removeMemberThreadFailed'),
+						leadingIcon: <MezonIconCDN icon={IconCDN.closeIcon} color={Colors.red} />
+					}
+				});
+			}
+		},
+		[dispatch, currentClan?.clan_id, currentChannelId, isThread]
+	);
+
 	function handleUserModalClose() {
 		setVisibleManageUserModal(false);
 		onShowManagementUserModalChange?.(false);
@@ -173,7 +232,12 @@ const UserSettingProfile = ({
 							<TouchableOpacity onPress={() => item.action(item.value)} key={`${item?.value}_${index}`}>
 								<View style={styles.option}>
 									{item?.icon}
-									<Text style={styles.textOption}>{item?.label}</Text>
+									<Text style={[
+										styles.textOption,
+										dangerActions.includes(item.value) && {
+											color: baseColor.red
+										}
+									]}>{item?.label}</Text>
 								</View>
 							</TouchableOpacity>
 						);

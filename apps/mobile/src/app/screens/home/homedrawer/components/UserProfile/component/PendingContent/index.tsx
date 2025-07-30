@@ -23,9 +23,14 @@ export const PendingContent = memo((props: IPendingContentProps) => {
 	const { t } = useTranslation(['userProfile']);
 	const { acceptFriend, deleteFriend } = useFriends();
 
+	const handleRemoveFriend = () => {
+		deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
+		onClose();
+	};
+
 	const actionList = [
 		{
-			id: 3,
+			id: 1,
 			text: t('pendingContent.acceptFriend'),
 			action: () => {
 				acceptFriend(targetUser?.user?.username, targetUser?.user?.id);
@@ -35,17 +40,22 @@ export const PendingContent = memo((props: IPendingContentProps) => {
 			isShow: [EFriendState.ReceivedRequestFriend].includes(targetUser?.state)
 		},
 		{
-			id: 4,
-			text: t('pendingContent.cancelFriendRequest'),
-			action: () => {
-				deleteFriend(targetUser?.user?.username, targetUser?.user?.id);
-				onClose();
-			},
+			id: 2,
+			text:
+				targetUser?.state === EFriendState.ReceivedRequestFriend ? t('pendingContent.rejectFriend') : t('pendingContent.cancelFriendRequest'),
+			action: handleRemoveFriend,
 			isWarning: false,
 			isShow: [EFriendState.ReceivedRequestFriend, EFriendState.SentRequestFriend].includes(targetUser?.state)
 		},
 		{
-			id: 5,
+			id: 3,
+			text: t('pendingContent.removeFriend'),
+			action: handleRemoveFriend,
+			isWarning: false,
+			isShow: [EFriendState.Friend].includes(targetUser?.state)
+		},
+		{
+			id: 4,
 			text: t('pendingContent.copyUsername'),
 			action: () => {
 				Clipboard.setString(targetUser?.user?.username || '');
@@ -91,7 +101,7 @@ export const PendingContent = memo((props: IPendingContentProps) => {
 				</View>
 
 				<TouchableOpacity onPress={() => onClose()}>
-					<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_32} width={size.s_32} />
+					<MezonIconCDN icon={IconCDN.closeIcon} height={size.s_32} width={size.s_32} color={themeValue.text} />
 				</TouchableOpacity>
 			</View>
 			<View style={{ marginHorizontal: size.s_10, backgroundColor: themeValue.secondary, borderRadius: size.s_10 }}>
@@ -103,7 +113,7 @@ export const PendingContent = memo((props: IPendingContentProps) => {
 						const { text, isWarning, action, isShow } = item;
 						if (!isShow) return null;
 						return (
-							<TouchableOpacity onPress={() => action()}>
+							<TouchableOpacity onPress={action}>
 								<View style={{ padding: size.s_14 }}>
 									<Text
 										style={{

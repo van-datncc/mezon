@@ -25,9 +25,11 @@
     "unblock": "Unblock",
     "reportUserProfile": "Report User Profile",
     "acceptFriend": "Accept Friend",
+    "rejectFriend": "Ignore Friend Request",
     "cancelFriendRequest": "Cancel Friend Request",
     "copyUsername": "Copy Username",
-    "copiedUserName": "Copied {{username}}"
+    "copiedUserName": "Copied {{username}}",
+    "removeFriend": "Remove Friend"
   },
   "userInfoDM": {
     "menu": {

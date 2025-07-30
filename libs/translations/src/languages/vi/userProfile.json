@@ -25,9 +25,11 @@
     "unblock": "Bỏ chặn",
     "reportUserProfile": "Báo cáo hồ sơ người dùng",
     "acceptFriend": "Chấp nhận kết bạn",
+    "rejectFriend": "Từ chối yêu cầu kết bạn",
     "cancelFriendRequest": "Hủy yêu cầu kết bạn",
     "copyUsername": "Sao chép tên người dùng",
-    "copiedUserName": "Đã sao chép {{username}}"
+    "copiedUserName": "Đã sao chép {{username}}",
+    "removeFriend": "Hủy kết bạn"
   },
   "userInfoDM": {
     "menu": {
