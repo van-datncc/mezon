@@ -396,15 +396,6 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
-			if (clanId && channelId) {
-				const joinAndChangeClan = async (store: any, clanId: string) => {
-					await Promise.allSettled([
-						store.dispatch(clansActions.joinClan({ clanId: clanId })),
-						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
-					]);
-				};
-				await joinAndChangeClan(store, clanId);
-			}
 			if (channelId) {
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
@@ -422,9 +413,19 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
 				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
 			}
+			if (clanId && channelId) {
+				const joinAndChangeClan = async (store: any, clanId: string) => {
+					await Promise.allSettled([
+						store.dispatch(clansActions.joinClan({ clanId: clanId })),
+						store.dispatch(clansActions.changeCurrentClan({ clanId: clanId, noCache: true }))
+					]);
+				};
+				await joinAndChangeClan(store, clanId);
+			}
 			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
 			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
 			save(STORAGE_CLAN_ID, clanId);
+			store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 			if (topicId && topicId !== '0' && !!topicId) {
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
