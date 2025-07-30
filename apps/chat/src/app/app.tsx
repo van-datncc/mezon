@@ -180,7 +180,6 @@ function AppWrapper() {
 			<MezonContextProvider mezon={mezon} connect={true}>
 				<App />
 			</MezonContextProvider>
-			<CustomCookieConsent />
 		</>
 	);
 
