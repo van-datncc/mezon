@@ -7,7 +7,7 @@ import { APP_SCREEN } from '../ScreenTypes';
 import BottomNavigator from './BottomNavigator';
 
 const BottomNavigatorWrapper = memo(({ initRouteName = '' }: { initRouteName: string }) => {
-	const [isReadyToRender, setIsReadyToRender] = useState<boolean>(false);
+	const [isReadyToRender, setIsReadyToRender] = useState<boolean>(initRouteName === APP_SCREEN.BOTTOM_BAR);
 	const navigation = useNavigation();
 
 	const initLoader = useCallback(async () => {

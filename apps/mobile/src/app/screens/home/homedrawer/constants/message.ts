@@ -89,5 +89,10 @@ export const getMessageActions = (t: TFunction): IMessageAction[] => {
 			title: t('message:actions.markMessage'),
 			type: EMessageActionType.MarkMessage
 		},
+		{
+			id: 20,
+			title: t('message:actions.quickMenu'),
+			type: EMessageActionType.QuickMenu
+		}
 	];
 };
