@@ -29,7 +29,7 @@ import { useMezon } from '@mezon/transport';
 import { getApp } from '@react-native-firebase/app';
 import { getMessaging, onMessage } from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
+import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Linking, Platform, StatusBar } from 'react-native';
