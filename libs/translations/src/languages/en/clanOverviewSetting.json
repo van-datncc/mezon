@@ -57,5 +57,11 @@
         "kick": "Kick",
         "removeFromThread": "Remove from Thread",
         "manage": "Manage"
+    },
+    "threadRemoveModal": {
+        "title": "Remove from Thread?",
+        "description": "Are you sure you want to remove {{username}} from this Thread?",
+        "remove": "Remove",
+        "cancel": "Never mind"
     }
 }

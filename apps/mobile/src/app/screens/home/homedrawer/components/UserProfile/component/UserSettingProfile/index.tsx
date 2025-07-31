@@ -7,9 +7,11 @@ import {
 	selectCurrentChannel,
 	selectCurrentClan,
 	selectCurrentClanId,
+	selectMemberIdsByChannelId,
 	useAppDispatch
 } from '@mezon/store-mobile';
 import { EPermission } from '@mezon/utils';
+import MezonConfirm from 'apps/mobile/src/app/componentUI/MezonConfirm';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -74,6 +76,17 @@ const UserSettingProfile = ({
 		EPermission.manageClan
 	]);
 	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
+
+	const memberIds = useSelector((state) =>
+		currentChannelId ? selectMemberIdsByChannelId(state, currentChannelId) : []
+	);
+
+	const isUserInThread = useMemo(() => {
+		if (!isThread || !memberIds?.length || !user?.user?.id) return false;
+
+		return memberIds.includes(user.user.id);
+	}, [isThread, memberIds, user?.user?.id]);
+
 	const dangerActions = [EActionSettingUserProfile.Kick, EActionSettingUserProfile.ThreadRemove];
 
 	useEffect(() => {
@@ -86,7 +99,6 @@ const UserSettingProfile = ({
 
 	const handleSettingUserProfile = useCallback((action?: EActionSettingUserProfile) => {
 		switch (action) {
-			// short profile
 			case EActionSettingUserProfile.Manage:
 				setVisibleManageUserModal(true);
 				onShowManagementUserModalChange?.(true);
@@ -99,7 +111,7 @@ const UserSettingProfile = ({
 			case EActionSettingUserProfile.Ban:
 				break;
 			case EActionSettingUserProfile.ThreadRemove:
-				handleRemoveMemberFromThread(user?.user?.id);
+				confirmRemoveFromThread();
 				break;
 			default:
 				break;
@@ -142,7 +154,7 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.ThreadRemove,
 				icon: <MezonIconCDN icon={IconCDN.removeFriend} width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: !isItMe && isThread && (isThatClanOwner || hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
+				isShow: !isItMe && isThread && isUserInThread && (isThatClanOwner || hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
 			// {
 			// 	label: `${EActionSettingUserProfile.Ban}`,
@@ -153,7 +165,7 @@ const UserSettingProfile = ({
 			// }
 		];
 		return settingList;
-	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner, hasClanOwnerPermission, isThread, t]);
+	}, [themeValue.text, handleSettingUserProfile, hasAdminPermission, isItMe, isThatClanOwner, hasClanOwnerPermission, isThread, isUserInThread, t]);
 
 	const handleRemoveUserClans = useCallback(async () => {
 		if (user) {
@@ -202,7 +214,7 @@ const UserSettingProfile = ({
 						leadingIcon: <MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
 					}
 				});
-				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 			} catch (error) {
 				Toast.show({
 					type: 'error',
@@ -215,6 +227,26 @@ const UserSettingProfile = ({
 		},
 		[dispatch, currentClan?.clan_id, currentChannelId, isThread]
 	);
+
+	const handleCloseRemoveFromThread = () => DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
+
+	const confirmRemoveFromThread = () => {
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
+		const data = {
+			children: (
+				<MezonConfirm
+					title={t('threadRemoveModal.title')}
+					content={t('threadRemoveModal.description', { username: user?.user?.username || user?.['username'] })}
+					confirmText={t('threadRemoveModal.remove')}
+					isDanger
+					onConfirm={() => handleRemoveMemberFromThread(user?.user?.id)}
+					onCancel={handleCloseRemoveFromThread}
+				/>
+			)
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
+	};
+
 
 	function handleUserModalClose() {
 		setVisibleManageUserModal(false);
