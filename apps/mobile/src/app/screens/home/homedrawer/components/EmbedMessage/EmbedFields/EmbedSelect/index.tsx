@@ -22,10 +22,10 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 
 	const checkMultipleSelect = useMemo(() => {
 		return (!!select?.min_options && select?.min_options > 1) || (!!select?.max_options && select?.max_options >= 2);
-	}, [select?.min_options, select.max_options]);
+	}, [select?.min_options, select?.max_options]);
 	useEffect(() => {
-		if (select.valueSelected) {
-			handleChangeDataInput(select.valueSelected.value, buttonId);
+		if (select?.valueSelected) {
+			handleSelectChanged({ value: select?.valueSelected.value, label: select?.valueSelected.label });
 		}
 	}, []);
 
@@ -37,7 +37,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 					id: id,
 					value: value
 				},
-				multiple: true,
+				multiple: checkMultipleSelect,
 				onlyChooseOne: !checkMultipleSelect
 			})
 		);
@@ -66,12 +66,6 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 		handleChangeDataInput(option?.value, buttonId);
 	};
 
-	useEffect(() => {
-		if (select?.valueSelected) {
-			handleChangeDataInput(select?.valueSelected?.value, buttonId);
-		}
-	}, []);
-
 	const handleRemoveOption = (option) => {
 		setSelectedOptions((prev) => prev.filter((opt) => opt?.value !== option?.value));
 		dispatch(
@@ -90,7 +84,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 		return (
 			<View style={styles.selectItem}>
 				<Text ellipsizeMode="tail" style={styles.itemTitle} numberOfLines={1}>
-					{option?.title}
+					{option?.label}
 				</Text>
 				<Pressable onPress={() => handleRemoveOption(option)}>
 					<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_20} width={size.s_20} />
@@ -123,7 +117,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 				})}
 				onChange={handleSelectChanged}
 				placeholder={getSelectNote()}
-				defaultValue={{ title: select?.valueSelected?.label, value: select?.valueSelected?.value }}
+				defaultValue={{ title: selectedOptions?.[0]?.label, value: selectedOptions?.[0]?.value }}
 			/>
 			{!!selectedOptions?.length && (
 				<View style={styles.selectGroup}>
