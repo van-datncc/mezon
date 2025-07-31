@@ -57,5 +57,11 @@
     "kick": "Khai trừ",
     "removeFromThread": "Xóa khỏi chủ đề",
     "manage": "Quản lý"
+  },
+  "threadRemoveModal": {
+    "title": "Xóa khỏi chủ đề?",
+    "description": "Bạn có chắc chắn muốn xóa {{username}} khỏi chủ đề này?",
+    "remove": "Xóa",
+    "cancel": "Không sao"
   }
 }
