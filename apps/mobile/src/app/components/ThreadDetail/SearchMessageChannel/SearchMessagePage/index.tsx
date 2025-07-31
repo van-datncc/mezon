@@ -40,10 +40,10 @@ function SearchMessagePage({ searchText, currentChannel, userMention, typeSearch
 	useEffect(() => {
 		const timeout = setTimeout(() => {
 			setIsContentReady(true);
-		}, 200);
+		}, 300);
 
 		return () => clearTimeout(timeout);
-	}, [activeTab, searchText]);
+	}, []);
 
 	useEffect(() => {
 		dispatch(listChannelsByUserActions.fetchListChannelsByUser({ noCache: true, isClearChannel: true }));
@@ -134,9 +134,9 @@ function SearchMessagePage({ searchText, currentChannel, userMention, typeSearch
 		return data?.filter((tab) => tab?.display);
 	}, [t, searchText, membersSearch?.length, userMention, channelsSearch?.length, totalResult, isSearchMessage, nameChannel]);
 
-	function handelHeaderTabChange(index: number) {
+	const handelHeaderTabChange = useCallback((index: number) => {
 		setActiveTab(index);
-	}
+	}, []);
 
 	useEffect(() => {
 		setActiveTab(TabList[0]?.index);

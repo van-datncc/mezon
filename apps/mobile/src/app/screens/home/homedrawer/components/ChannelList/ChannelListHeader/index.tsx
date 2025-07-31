@@ -1,6 +1,6 @@
 import { ActionEmitEvent, ETypeSearch, VerifyIcon } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { getStoreAsync, selectCurrentChannel, selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
+import { selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,13 +30,10 @@ const ChannelListHeader = () => {
 	const clanName = !currentClan?.id || currentClan?.id === '0' ? previousClanName.current : currentClan?.clan_name;
 
 	const navigateToSearchPage = async () => {
-		const store = await getStoreAsync();
-		const currentChannel = selectCurrentChannel(store.getState() as any);
 		navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 			screen: APP_SCREEN.MENU_CHANNEL.SEARCH_MESSAGE_CHANNEL,
 			params: {
-				typeSearch: ETypeSearch.SearchAll,
-				currentChannel
+				typeSearch: ETypeSearch.SearchAll
 			}
 		});
 	};
@@ -84,7 +81,7 @@ const ChannelListHeader = () => {
 					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
 				</View>
 				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
+					<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
 						{`${members} ${t('info.members')}`}
 					</Text>
 					<View
@@ -96,7 +93,7 @@ const ChannelListHeader = () => {
 							marginHorizontal: size.s_8
 						}}
 					/>
-					<Text numberOfLines={1} style={[styles.subTitle, {color: themeValue.textStrong}]}>
+					<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
 						{t('common.community')}
 					</Text>
 				</View>

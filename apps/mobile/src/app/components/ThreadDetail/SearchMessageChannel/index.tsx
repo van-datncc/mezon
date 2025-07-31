@@ -60,8 +60,8 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 	}, []);
 
 	useEffect(() => {
-		handleSearchMessage();
-	}, [searchText, userMention]);
+		if (nameChannel) handleSearchMessage();
+	}, [searchText, userMention, nameChannel]);
 
 	const handleSearchMessage = () => {
 		const filter: SearchFilter[] = [];
@@ -93,12 +93,15 @@ const SearchMessageChannel = ({ route }: SearchMessageChannelProps) => {
 		}
 	};
 
-	const handleKeyPress = (e) => {
-		if (e.nativeEvent.key === Backspace && !searchText?.length) {
-			setUserMention(null);
-			setOptionFilter(null);
-		}
-	};
+	const handleKeyPress = useCallback(
+		(e) => {
+			if (e.nativeEvent.key === Backspace && !searchText?.length) {
+				setUserMention(null);
+				setOptionFilter(null);
+			}
+		},
+		[searchText?.length]
+	);
 
 	return (
 		<SearchMessageChannelContext.Provider value={filtersSearch}>
