@@ -160,7 +160,7 @@ export interface SearchThreadsArgs {
 }
 export const searchedThreads = createAsyncThunk('threads/searchThreads', async ({ label, channelId }: SearchThreadsArgs, thunkAPI) => {
 	try {
-		if (!label?.trim() || label.trim().length < 3) {
+		if (!label?.trim() || label.trim().length < 1) {
 			return null;
 		}
 
