@@ -131,6 +131,7 @@ const NavigationMain = memo(
 						style={{ flex: 1, backgroundColor: themeValue.primary }}
 					>
 						<RootStack {...props} />
+						<NetInfoComp />
 					</SafeAreaView>
 				</SafeAreaProvider>
 				<RootListener />
@@ -163,7 +164,6 @@ const RootNavigation = (props) => {
 								<EmojiSuggestionProvider isMobile={true}>
 									<KeyboardProvider statusBarTranslucent>
 										<NavigationMain {...props} />
-										<NetInfoComp />
 									</KeyboardProvider>
 								</EmojiSuggestionProvider>
 							</PermissionProvider>

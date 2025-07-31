@@ -636,7 +636,7 @@ export const updateLastSeenMessage = createAsyncThunk(
 			const state = thunkAPI.getState() as RootState;
 			const channelsLoadingStatus = selectLoadingStatus(state);
 			const clansLoadingStatus = selectClansLoadingStatus(state);
-			if (channelsLoadingStatus !== 'loaded' || clansLoadingStatus !== 'loaded') {
+			if (channelsLoadingStatus === 'loading' || clansLoadingStatus === 'loading') {
 				return;
 			}
 

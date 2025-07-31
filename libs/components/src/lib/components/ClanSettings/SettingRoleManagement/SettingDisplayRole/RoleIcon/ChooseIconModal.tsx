@@ -2,9 +2,9 @@ import { useEscapeKeyClose, useOnClickOutside, useRoles } from '@mezon/core';
 import {
 	RootState,
 	getNewAddMembers,
+	getNewAddPermissions,
 	getNewColorRole,
 	getNewNameRole,
-	getNewSelectedPermissions,
 	getRemoveMemberRoles,
 	getRemovePermissions,
 	getSelectedRoleId,
@@ -61,7 +61,7 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 		const currentRoleId = getSelectedRoleId(state);
 		const nameRoleNew = getNewNameRole(state);
 		const colorRoleNew = getNewColorRole(state);
-		const newSelectedPermissions = getNewSelectedPermissions(state);
+		const newSelectedPermissions = getNewAddPermissions(state);
 		const removeMemberRoles = getRemoveMemberRoles(state);
 		const removePermissions = getRemovePermissions(state);
 		const newAddMembers = getNewAddMembers(state);
@@ -105,7 +105,7 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 					<div
 						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.IMAGE && 'bg-item-theme'
-							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover `}
+						} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.IMAGE)}
 					>
 						Upload image
@@ -115,7 +115,7 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 					<div
 						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.EMOJI && 'bg-item-theme'
-							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover  `}
+						} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover  `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.EMOJI)}
 					>
 						Emoji

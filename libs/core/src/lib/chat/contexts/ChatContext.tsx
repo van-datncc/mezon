@@ -104,7 +104,8 @@ import {
 	TOKEN_TO_AMOUNT,
 	ThreadStatus,
 	TypeMessage,
-	isBackgroundModeActive
+	isBackgroundModeActive,
+	isLinuxDesktop
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import {
@@ -577,6 +578,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				dispatch(toastActions.addToast({ message: notification.subject, type: 'info', id: 'ACTION_FRIEND' }));
 				// Fecth 2 API
 				dispatch(friendsActions.fetchListFriends({ noCache: true }));
+			}
+
+			if (isLinuxDesktop) {
+				const notiSoundElement = document.createElement('audio');
+				notiSoundElement.src = 'assets/audio/noti-linux.mp3';
+				notiSoundElement.preload = 'auto';
+				notiSoundElement.style.display = 'none';
+				document.body.appendChild(notiSoundElement);
+				notiSoundElement.addEventListener('ended', () => {
+					document.body.removeChild(notiSoundElement);
+				});
+				notiSoundElement.play().catch((err) => {
+					console.warn('cant play sound noti:', err.message || err);
+				});
+
 			}
 		},
 		[userId]
@@ -2312,3 +2328,4 @@ const ChatContextConsumer = ChatContext.Consumer;
 ChatContextProvider.displayName = 'ChatContextProvider';
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+
