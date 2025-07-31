@@ -1,4 +1,4 @@
-import { urlRegex } from '@mezon/mobile-components';
+import { urlRegex, validLinkInviteRegex } from '@mezon/mobile-components';
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import LinkInvite from './LinkInvite';
@@ -13,7 +13,7 @@ function RenderMessageInvite({ content }: IRenderMessageInviteProps) {
 	return (
 		<View>
 			{parts?.map((part, index) => {
-				if (urlRegex?.test(part)) {
+				if (validLinkInviteRegex?.test(part)) {
 					return <LinkInvite content={content} key={index + part} />;
 				}
 				return null;
