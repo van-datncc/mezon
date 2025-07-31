@@ -17,7 +17,7 @@
   "kickUserClanModal": {
     "kickFromServer": "Kick {{username}} from Clan",
     "description": "Are you sure you want to kick {{username}} from the clan? They will be able to rejoin again with a new invite.",
-    "reasonKick": "REASON FOR KICK",
+    "reasonKick": "Reason for kick",
     "buttonName": "Kick"
   },
   "pendingContent": {
@@ -40,14 +40,14 @@
     "mezonMemberSince": "MEZON MEMBER SINCE"
   },
   "notification": {
-        "blockUser": {
-            "success": "User blocked successfully",
-            "error": "Failed to block user"
-        },
-        "unblockUser": {
-            "success": "User unblocked successfully",
-            "error": "Failed to unblock user"
-        }
+    "blockUser": {
+      "success": "User blocked successfully",
+      "error": "Failed to block user"
+    },
+    "unblockUser": {
+      "success": "User unblocked successfully",
+      "error": "Failed to unblock user"
+    }
   },
   "incomingFriendRequest": "INCOMING FRIEND REQUEST",
   "sendAddFriendSuccess": "Friend Request Sent",

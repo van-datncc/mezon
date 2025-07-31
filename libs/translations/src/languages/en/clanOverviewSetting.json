@@ -63,5 +63,10 @@
         "description": "Are you sure you want to remove {{username}} from this Thread?",
         "remove": "Remove",
         "cancel": "Never mind"
+    },
+    "modal": {
+        "kickUserClan": {
+            "title": "Are you sure?"
+        }
     }
 }

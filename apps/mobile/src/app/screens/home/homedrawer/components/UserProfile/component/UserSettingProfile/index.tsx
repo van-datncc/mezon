@@ -259,7 +259,7 @@ const UserSettingProfile = ({
 			{showActionOutside && profileSetting.some((action) => action.isShow) && (
 				<View style={styles.wrapper}>
 					{profileSetting?.map((item, index) => {
-						if (!item?.isShow) return <View />;
+						if (!item?.isShow) return <View key={`empty-${index}`} />;
 						return (
 							<TouchableOpacity onPress={() => item.action(item.value)} key={`${item?.value}_${index}`}>
 								<View style={styles.option}>
@@ -278,6 +278,7 @@ const UserSettingProfile = ({
 			)}
 
 			<MezonModal
+				title={t('modal.kickUserClan.title')}
 				visible={visibleKickUserModal}
 				visibleChange={(visible) => {
 					setVisibleKickUserModal(visible);

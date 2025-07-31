@@ -133,5 +133,6 @@ export enum IconCDN {
 	bluetoothIcon = require('./iconPNG/bluetoothIcon.png'),
 	userFriendIcon = require('./iconPNG/userFriendIcon.png'),
 	userPendingIcon = require('./iconPNG/userPendingIcon.png'),
-	replyMsg = require('./iconPNG/replyMsg.png')
+	replyMsg = require('./iconPNG/replyMsg.png'),
+	userKickIcon = require('./iconPNG/kickIcon.png')
 }
