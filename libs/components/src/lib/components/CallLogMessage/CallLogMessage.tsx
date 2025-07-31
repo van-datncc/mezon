@@ -104,7 +104,7 @@ export default function CallLogMessage({ userId, username, messageId, channelId,
 	const callLogMessage =
 		callLog.callLogType === IMessageTypeCallLog.FINISHCALL
 			? contentMsg
-			: callLog.callLogType === IMessageTypeCallLog.TIMEOUTCALL && senderId === userId
+			: callLog.callLogType === IMessageTypeCallLog.TIMEOUTCALL && isMe
 				? CallLog.TIME_DEFAULT
 				: `${callLog.isVideo ? CallLog.VIDEO_CALL : CallLog.VOICE_CALL}`;
 
