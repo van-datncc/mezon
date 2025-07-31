@@ -12,7 +12,7 @@ import {
 } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Platform, RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
@@ -33,6 +33,11 @@ const ChannelList = () => {
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 	const [refreshing, setRefreshing] = useState(false);
 	const dispatch = useAppDispatch();
+	useEffect(() => {
+		if (currentClan?.clan_id) {
+			flashListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
+		}
+	}, [currentClan?.clan_id]);
 	const handleRefresh = async () => {
 		setRefreshing(true);
 
