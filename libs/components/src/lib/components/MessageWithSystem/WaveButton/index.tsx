@@ -14,10 +14,10 @@ const WaveButton = ({ message }: IWaveButtonProps) => {
 	const currenChannel = useSelector(selectCurrentChannel);
 	const currentDm = useSelector(selectCurrentDM);
 	const mode = useMemo(() => {
-		return currenChannel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_GROUP;
-	}, [currenChannel]);
+		return message?.clan_id === '0' ? ChannelStreamMode.STREAM_MODE_GROUP : ChannelStreamMode.STREAM_MODE_CHANNEL;
+	}, [message?.clan_id]);
 	const channelOrDirect = useMemo(() => {
-		return mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currenChannel : currentDm;
+		return mode === ChannelStreamMode.STREAM_MODE_GROUP ? currentDm : currenChannel;
 	}, [currenChannel, currentDm, mode]);
 
 	const { sendMessage } = useChatSending({
