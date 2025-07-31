@@ -25,7 +25,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 	}, [select?.min_options, select?.max_options]);
 	useEffect(() => {
 		if (select?.valueSelected) {
-			handleSelectChanged({ value: select?.valueSelected.value, label: select?.valueSelected.label });
+			handleSelectChanged({ value: select?.valueSelected.value, title: select?.valueSelected.label });
 		}
 	}, []);
 
@@ -84,7 +84,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 		return (
 			<View style={styles.selectItem}>
 				<Text ellipsizeMode="tail" style={styles.itemTitle} numberOfLines={1}>
-					{option?.label}
+					{option?.title}
 				</Text>
 				<Pressable onPress={() => handleRemoveOption(option)}>
 					<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_20} width={size.s_20} />
@@ -117,7 +117,7 @@ export const EmbedSelect = memo(({ select, messageId, buttonId }: EmbedSelectPro
 				})}
 				onChange={handleSelectChanged}
 				placeholder={getSelectNote()}
-				defaultValue={{ title: selectedOptions?.[0]?.label, value: selectedOptions?.[0]?.value }}
+				defaultValue={{ title: selectedOptions?.[0]?.title, value: selectedOptions?.[0]?.value }}
 			/>
 			{!!selectedOptions?.length && (
 				<View style={styles.selectGroup}>
