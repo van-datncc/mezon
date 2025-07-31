@@ -418,6 +418,9 @@ export const ChatBoxBottomBar = memo(
 					handleTextInputChange(dataEditMessageFormatted?.formatContentDraft);
 					break;
 				case EMessageActionType.CreateThread:
+					DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
+						isShow: false
+					});
 					dispatch(threadsActions.setOpenThreadMessageState(true));
 					dispatch(threadsActions.setValueThread(targetMessage));
 					timeoutRef.current = setTimeout(() => {

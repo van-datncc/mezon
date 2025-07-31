@@ -91,6 +91,7 @@ const HomeDefault = React.memo(
 						threadIcon: channelType === ChannelType.CHANNEL_TYPE_THREAD
 					}}
 					isPublic={isPublicChannel}
+					topicChannelId={''}
 				/>
 				<PanelKeyboard currentChannelId={channelId} currentClanId={clanId} />
 

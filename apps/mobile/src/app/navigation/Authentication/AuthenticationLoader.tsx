@@ -65,6 +65,27 @@ export const AuthenticationLoader = () => {
 	useCheckUpdatedVersion();
 
 	useEffect(() => {
+		const eventDeeplink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
+		const initializeApp = async () => {
+			try {
+				setTimeout(() => {
+					loadFileSharing();
+					initFirebaseMessaging();
+				}, 2000);
+				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
+				await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
+			} catch (error) {
+				console.error('Error in initialization:', error);
+			}
+		};
+
+		initializeApp();
+		return () => {
+			eventDeeplink.remove();
+		};
+	}, []);
+
+	useEffect(() => {
 		const getUrl = async () => {
 			try {
 				const url = await Linking.getInitialURL();
@@ -77,24 +98,6 @@ export const AuthenticationLoader = () => {
 		};
 		getUrl();
 	}, []);
-
-	useEffect(() => {
-		const eventDeeplink = DeviceEventEmitter.addListener(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, (path) => onNavigationDeeplink(path));
-		initLoader();
-
-		return () => {
-			eventDeeplink.remove();
-		};
-	}, []);
-
-	const initLoader = async () => {
-		try {
-			await remove(STORAGE_CHANNEL_CURRENT_CACHE);
-			await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
-		} catch (error) {
-			console.error('Error in tasks:', error);
-		}
-	};
 
 	const extractChannelParams = (url: string) => {
 		const regex = /channel-app\/(\d+)\/(\d+)(?:\?[^#]*)?/;
@@ -218,13 +221,13 @@ export const AuthenticationLoader = () => {
 		};
 	}, [dispatch, navigation, userProfile?.user?.id]);
 
-	useEffect(() => {
+	const initFirebaseMessaging = () => {
 		const unsubscribe = onMessage(messaging, (remoteMessage) => {
 			try {
 				if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 					// Case: FCM start call
 					const title = remoteMessage?.notification?.title || remoteMessage?.data?.title;
-					const body = remoteMessage?.notification?.body || remoteMessage?.data?.body;
+					const body: any = remoteMessage?.notification?.body || remoteMessage?.data?.body;
 					if (
 						title === 'Incoming call' ||
 						(body && ['video call', 'audio call', 'Untitled message'].some((text) => body?.includes?.(text))) ||
@@ -268,14 +271,10 @@ export const AuthenticationLoader = () => {
 				console.error('log  => e', e);
 			}
 		});
-		// To get All Received Urls
-		loadFileSharing();
 
 		// To clear Intents
-		return () => {
-			unsubscribe();
-		};
-	}, []);
+		return unsubscribe;
+	};
 
 	const playBuzzSound = () => {
 		Sound.setCategory('Playback');

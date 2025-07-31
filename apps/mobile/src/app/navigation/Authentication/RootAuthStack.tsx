@@ -13,9 +13,7 @@ import { RenderVideoDetail } from '../../screens/home/homedrawer/components/Rend
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
-import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
-import { FCMNotificationLoader } from './FCMNotificationLoader';
 import { ListenerLoader } from './ListenerLoader';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
@@ -143,8 +141,8 @@ export const RootAuthStack = memo(
 					<RootStack.Screen name={APP_SCREEN.WALLET} component={WalletScreen} />
 					<RootStack.Screen name={APP_SCREEN.SHOP.STACK} children={(props) => <ShopStack {...props} />} />
 				</RootStack.Navigator>
-				<FCMNotificationLoader notifyInit={notifyInit} />
-				<AuthenticationLoader />
+				<LazyFCMNotificationLoader notifyInit={notifyInit} />
+				<LazyAuthenticationLoader />
 				<CallingModalWrapper />
 				<CallingModalGroupWrapper />
 				<ChannelRouterListener />
@@ -153,3 +151,6 @@ export const RootAuthStack = memo(
 		);
 	}
 );
+
+const LazyFCMNotificationLoader = React.lazy(() => import('./FCMNotificationLoader').then((module) => ({ default: module.FCMNotificationLoader })));
+const LazyAuthenticationLoader = React.lazy(() => import('./AuthenticationLoader').then((module) => ({ default: module.AuthenticationLoader })));

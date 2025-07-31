@@ -39,6 +39,7 @@ export const ChatMessageWrapper = memo(({ directMessageId, isModeDM, currentClan
 					threadIcon: true
 				}}
 				isPublic={false}
+				topicChannelId={''}
 			/>
 			<PanelKeyboard directMessageId={directMessageId || ''} currentChannelId={directMessageId} currentClanId={currentClanId} />
 		</KeyboardAvoidingView>
