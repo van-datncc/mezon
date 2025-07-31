@@ -41,7 +41,7 @@ import {
 	voiceActions
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, createImgproxyUrl } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, ValidateSpecialCharacters, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -125,17 +125,16 @@ const TopBarChannelText = memo(() => {
 		if (isEditing) setEditValue(channelDmGroupLabel || '');
 	}, [isEditing, channelDmGroupLabel]);
 
-	const validateChannelName = (name: string) => {
-		return /^[\w\-]{1,64}$/.test(name.trim());
-	};
+
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const value = e.target.value;
 		setEditValue(value);
-		if (!validateChannelName(value)) {
-			setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
+		const regex = ValidateSpecialCharacters();
+		if (regex.test(value)) {
+			setEditError(null); 
 		} else {
-			setEditError(null);
+			setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
 		}
 	};
 
@@ -144,7 +143,9 @@ const TopBarChannelText = memo(() => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				const value = editValue.trim();
-				if (!validateChannelName(value)) {
+				const regex = ValidateSpecialCharacters();
+				if (regex.test(value)) {
+				} else {
 					setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
 					return;
 				}
