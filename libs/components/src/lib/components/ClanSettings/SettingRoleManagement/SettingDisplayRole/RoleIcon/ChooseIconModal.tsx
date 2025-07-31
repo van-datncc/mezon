@@ -1,12 +1,8 @@
 import { useEscapeKeyClose, useOnClickOutside, useRoles } from '@mezon/core';
 import {
 	RootState,
-	getNewAddMembers,
 	getNewColorRole,
 	getNewNameRole,
-	getNewSelectedPermissions,
-	getRemoveMemberRoles,
-	getRemovePermissions,
 	getSelectedRoleId,
 	getStoreAsync,
 	roleSlice,
@@ -61,26 +57,12 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 		const currentRoleId = getSelectedRoleId(state);
 		const nameRoleNew = getNewNameRole(state);
 		const colorRoleNew = getNewColorRole(state);
-		const newSelectedPermissions = getNewSelectedPermissions(state);
-		const removeMemberRoles = getRemoveMemberRoles(state);
-		const removePermissions = getRemovePermissions(state);
-		const newAddMembers = getNewAddMembers(state);
 
 		setIsLoading(true);
 		const resizeFile = (await resizeFileImage(file, 64, 64, 'file')) as File;
 		const roleIcon = await handleUploadFile(clientRef.current, sessionRef.current, currentClanId || '', 'roleIcon', file.name, resizeFile);
 
-		await updateRole(
-			currentClanId || '',
-			currentRoleId || '',
-			nameRoleNew,
-			colorRoleNew,
-			newAddMembers,
-			newSelectedPermissions,
-			removeMemberRoles,
-			removePermissions,
-			roleIcon.url
-		);
+		await updateRole(currentClanId || '', currentRoleId || '', nameRoleNew, colorRoleNew, [], [], [], [], roleIcon.url);
 		dispatch(roleSlice.actions.setCurrentRoleIcon(roleIcon?.url || ''));
 		onClose();
 		setIsLoading(false);
@@ -105,7 +87,7 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 					<div
 						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.IMAGE && 'bg-item-theme'
-							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover `}
+						} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.IMAGE)}
 					>
 						Upload image
@@ -115,7 +97,7 @@ const ChooseIconModal: React.FC<ChooseIconModalProps> = ({ onClose }) => {
 					<div
 						className={`text-theme-primary  ${
 							selectMethod === ESelectRoleIconMethod.EMOJI && 'bg-item-theme'
-							} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover  `}
+						} rounded px-5 py-1 font-semibold cursor-pointer bg-item-theme-hover  `}
 						onClick={() => handleChangeSelectMethod(ESelectRoleIconMethod.EMOJI)}
 					>
 						Emoji
