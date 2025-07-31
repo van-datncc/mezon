@@ -1,9 +1,9 @@
 import { useChatSending } from '@mezon/core';
-import { selectCurrentChannel } from '@mezon/store';
+import { selectCurrentChannel, selectCurrentDM } from '@mezon/store';
 import { IMessage, IMessageSendPayload, MEZON_AVATAR_URL, STICKER_WAVE, WAVE_SENDER_NAME } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import { ApiChannelDescription } from 'mezon-js/dist/api.gen';
-import { memo } from 'react';
+import { ApiChannelDescription } from 'mezon-js/api.gen';
+import { memo, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 interface IWaveButtonProps {
@@ -12,10 +12,17 @@ interface IWaveButtonProps {
 
 const WaveButton = ({ message }: IWaveButtonProps) => {
 	const currenChannel = useSelector(selectCurrentChannel);
+	const currentDm = useSelector(selectCurrentDM);
+	const mode = useMemo(() => {
+		return currenChannel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_GROUP;
+	}, [currenChannel]);
+	const channelOrDirect = useMemo(() => {
+		return mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? currenChannel : currentDm;
+	}, [currenChannel, currentDm, mode]);
 
 	const { sendMessage } = useChatSending({
-		mode: ChannelStreamMode.STREAM_MODE_CHANNEL,
-		channelOrDirect: currenChannel as ApiChannelDescription
+		mode: mode,
+		channelOrDirect: channelOrDirect as ApiChannelDescription
 	});
 
 	const handleSendWaveSticker = () => {
