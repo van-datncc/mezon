@@ -71,7 +71,7 @@ export const TransactionItem = ({ item, isExpand, onPress }: { item: ApiWalletLe
 			setDetailHeight(h);
 			if (isExpand) animation.setValue(h);
 		}
-	}
+	};
 
 	const copyTransactionId = () => {
 		if (detailLedger?.trans_id) {
@@ -80,17 +80,15 @@ export const TransactionItem = ({ item, isExpand, onPress }: { item: ApiWalletLe
 				type: 'success',
 				props: {
 					text2: t('historyTransaction.copied'),
-					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} />
+					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} />,
+					customStyle: { backgroundColor: themeValue.secondary }
 				}
 			});
 		}
-	}
+	};
 
-	const detailView = (
-		!loadingDetail ? <View
-			style={styles.detail}
-			onLayout={onContainerLayout}
-		>
+	const detailView = !loadingDetail ? (
+		<View style={styles.detail} onLayout={onContainerLayout}>
 			{[
 				{
 					label: t('historyTransaction.detail.transactionId'),
@@ -124,12 +122,7 @@ export const TransactionItem = ({ item, isExpand, onPress }: { item: ApiWalletLe
 							{field.label === t('historyTransaction.detail.transactionId') && detailLedger?.trans_id && (
 								<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
 									<Pressable onPress={copyTransactionId} style={{ padding: 4 }}>
-										<MezonIconCDN
-											icon={IconCDN.copyIcon}
-											color={themeValue.text}
-											width={size.s_16}
-											height={size.s_16}
-										/>
+										<MezonIconCDN icon={IconCDN.copyIcon} color={themeValue.text} width={size.s_16} height={size.s_16} />
 									</Pressable>
 								</View>
 							)}
@@ -139,9 +132,10 @@ export const TransactionItem = ({ item, isExpand, onPress }: { item: ApiWalletLe
 				</View>
 			))}
 		</View>
-			: <View style={styles.loading}>
-				<ActivityIndicator size="small" color={themeValue.text} />
-			</View>
+	) : (
+		<View style={styles.loading}>
+			<ActivityIndicator size="small" color={themeValue.text} />
+		</View>
 	);
 
 	return (
