@@ -251,6 +251,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 
 	const handleOpenBottomSheet = () => {
 		Keyboard.dismiss();
+		setSearchText('');
 		BottomSheetRef?.current?.present();
 	};
 

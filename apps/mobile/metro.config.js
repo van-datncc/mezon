@@ -17,21 +17,13 @@ const customConfig = {
 		getTransformOptions: async () => ({
 			transform: {
 				experimentalImportSupport: false,
-				inlineRequires: true,
-				unstable_transformProfile: 'hermes-canary',
+				inlineRequires: true
 			},
 		}),
-		minifierConfig: {
-			keep_fnames: true,
-			mangle: {
-				keep_fnames: true,
-			},
-		},
 	},
 	resolver: {
 		assetExts: assetExts.filter((ext) => ext !== 'svg'),
-		sourceExts: [...sourceExts, 'cjs', 'mjs', 'svg'],
-		platforms: ['ios', 'native'],
+		sourceExts: [...sourceExts, 'cjs', 'mjs', 'svg']
 	},
 };
 

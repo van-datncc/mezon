@@ -20,6 +20,7 @@ import {
 	calculateAlbumLayout,
 	createImgproxyUrl,
 	getAttachmentDataForWindow,
+	isMacDesktop,
 	isMediaTypeNotSupported,
 	useAppLayout
 } from '@mezon/utils';
@@ -69,7 +70,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 				attachment.filetype?.includes(EMimeTypes.jpeg) ||
 				attachment.filetype?.startsWith(ETypeLinkMedia.IMAGE_PREFIX)) &&
 				!attachment.filetype?.includes('svg+xml') &&
-				!attachment.filetype?.includes(EMimeTypes.heic)) ||
+				(!attachment.filetype?.includes(EMimeTypes.heic) || isMacDesktop)) ||
 			attachment.url?.endsWith('.gif')
 		) {
 			const resultAttach: ApiMessageAttachment & { create_time?: string } = {

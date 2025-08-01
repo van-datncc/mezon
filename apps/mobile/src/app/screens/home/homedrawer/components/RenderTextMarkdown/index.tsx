@@ -357,7 +357,8 @@ export const RenderTextMarkdownContent = ({
 	const { themeValue } = useTheme();
 	const isTabletLandscape = useTabletLandscape();
 
-	const { t, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
+	const { t, embed, mentions = [], hg = [], ej = [], mk = [], lk = [] } = content || {};
+	const embedNotificationMessage = embed?.[0]?.title;
 	let lastIndex = 0;
 	const textParts: React.ReactNode[] = [];
 	const markdownBlackParts: React.ReactNode[] = [];
@@ -512,7 +513,7 @@ export const RenderTextMarkdownContent = ({
 									style={
 										themeValue
 											? markdownStyles(themeValue, isUnReadChannel, isLastMessage, isBuzzMessage, isTabletLandscape)
-													.blockSpacing
+												.blockSpacing
 											: {}
 									}
 								>
@@ -675,6 +676,18 @@ export const RenderTextMarkdownContent = ({
 			renderTextPalainContain(
 				themeValue,
 				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
+				lastIndex,
+				isUnReadChannel,
+				isLastMessage,
+				isBuzzMessage,
+				true
+			)
+		);
+	} else {
+		textParts.push(
+			renderTextPalainContain(
+				themeValue,
+				embedNotificationMessage,
 				lastIndex,
 				isUnReadChannel,
 				isLastMessage,

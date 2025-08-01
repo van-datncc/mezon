@@ -20,25 +20,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
 
-      // Configure RNCallKeep
-      let callKeepConfig: [String: Any] = [
-        "appName": "Mezon",
-        "maximumCallGroups": 3,
-        "maximumCallsPerCallGroup": 1,
-        "supportsVideo": false
-      ]
-      RNCallKeep.setup(callKeepConfig)
+      DispatchQueue.global(qos: .background).async {
+        let callKeepConfig: [String: Any] = [
+            "appName": "Mezon",
+            "maximumCallGroups": 3,
+            "maximumCallsPerCallGroup": 1,
+            "supportsVideo": false
+        ]
+        RNCallKeep.setup(callKeepConfig)
+      }
 
       // Initialize React Native
       FirebaseApp.configure()
-      
+
       // Configure audio session with proper error handling
-      do {
-        try AVAudioSession.sharedInstance().setCategory(.playback)
-      } catch {
-        print("Failed to set audio session category: \(error)")
+      DispatchQueue.global(qos: .background).async {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+        } catch {
+            print("Failed to set audio session category: \(error)")
+        }
       }
-      
+
       setDefaultOrientationForDevice()
 
       let delegate = ReactNativeDelegate()
