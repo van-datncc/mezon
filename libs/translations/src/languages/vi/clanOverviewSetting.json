@@ -63,5 +63,10 @@
     "description": "Bạn có chắc chắn muốn xóa {{username}} khỏi chủ đề này?",
     "remove": "Xóa",
     "cancel": "Không sao"
+  },
+  "modal": {
+    "kickUserClan": {
+      "title": "Bạn có chắc chắn?"
+    }
   }
 }
