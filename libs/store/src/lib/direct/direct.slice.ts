@@ -649,8 +649,9 @@ export const directSlice = createSlice({
 				directAdapter.updateOne(state, {
 					id: data.channel_id || '',
 					changes: {
-						...data,
-						...currentData
+						...currentData,
+						last_sent_message: data.last_sent_message,
+						update_time_seconds: data.update_time_seconds
 					}
 				});
 			}
