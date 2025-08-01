@@ -41,18 +41,16 @@ export const ActionMessageSelected = memo(({ messageActionNeedToResolve, onClose
 					style={{
 						flexDirection: 'row',
 						alignItems: 'center',
-						padding: size.tiny,
-						gap: 10,
 						borderBottomWidth: 1,
 						borderBottomColor: themeValue.border
 					}}
 				>
-					<Pressable onPress={() => handleCloseMessageAction(EMessageActionType.Reply)}>
-						<MezonIconCDN icon={IconCDN.circleXIcon} height={20} width={20} color={themeValue.text} />
+					<Pressable onPress={() => handleCloseMessageAction(EMessageActionType.Reply)} style={{ padding: size.tiny }}>
+						<MezonIconCDN icon={IconCDN.circleXIcon} height={size.s_20} width={size.s_20} color={themeValue.text} />
 					</Pressable>
 					<Text
 						style={{
-							fontSize: verticalScale(10),
+							fontSize: size.s_10,
 							color: themeValue.text
 						}}
 					>

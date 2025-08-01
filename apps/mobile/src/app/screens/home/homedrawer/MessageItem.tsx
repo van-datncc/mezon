@@ -12,7 +12,7 @@ import {
 	setSelectedMessage,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData, sleep } from '@mezon/utils';
+import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useRef } from 'react';
@@ -170,7 +170,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				heightFitContent: true,
+				snapPoints: ['55%', '80%'],
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -226,7 +226,7 @@ const MessageItem = React.memo(
 			if (preventAction) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
-				heightFitContent: true,
+				snapPoints: ['55%', '80%'],
 				children: (
 					<ContainerMessageActionModal
 						message={message}
@@ -257,15 +257,17 @@ const MessageItem = React.memo(
 
 		const handleSwipeOpen = async () => {
 			onReplyMessage();
-			await sleep(200);
-			swipeRef?.current?.close();
+			requestAnimationFrame(() => {
+				swipeRef?.current?.close();
+			});
 		};
 
 		return (
 			<Swipeable
 				ref={swipeRef}
 				enabled={!preventAction}
-				dragOffsetFromLeftEdge={1000}
+				dragOffsetFromLeftEdge={500}
+				dragOffsetFromRightEdge={12}
 				renderRightActions={renderRightActions}
 				onSwipeableWillOpen={handleSwipeOpen}
 			>
