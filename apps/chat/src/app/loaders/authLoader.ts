@@ -38,15 +38,31 @@ function getRedirectTo(initialPath?: string): string {
 	return '';
 }
 
-const sleepWithNetworkCheck = async (delayMs: number): Promise<void> => {
-	if (!navigator.onLine) {
-		return new Promise((resolve) => {
-			const handleOnline = () => {
-				window.removeEventListener('online', handleOnline);
-				resolve();
-			};
-			window.addEventListener('online', handleOnline);
-		});
+let connectionCheckPromise: Promise<void> | null = null;
+let isCheckingConnection = false;
+
+const waitForInternetConnection = async (delayMs: number): Promise<void> => {
+	const hasConnection = await checkInternetConnection();
+
+	if (!hasConnection) {
+		if (isCheckingConnection && connectionCheckPromise) {
+			await connectionCheckPromise;
+		} else {
+			isCheckingConnection = true;
+			connectionCheckPromise = new Promise<void>((resolve) => {
+				const intervalId = setInterval(async () => {
+					const isConnected = await checkInternetConnection();
+					if (isConnected) {
+						clearInterval(intervalId);
+						isCheckingConnection = false;
+						connectionCheckPromise = null;
+						resolve();
+					}
+				}, 2000);
+			});
+			await connectionCheckPromise;
+		}
+		return;
 	}
 
 	return new Promise((resolve) => {
@@ -63,6 +79,18 @@ const handleLogoutWithRedirect = (dispatch: AppDispatch, initialPath: string): I
 	return { isLogin: false, redirect } as IAuthLoaderData;
 };
 
+async function checkInternetConnection() {
+	try {
+		const response = await fetch('https://www.google.com/favicon.ico', {
+			method: 'HEAD',
+			cache: 'no-cache'
+		});
+		return response.ok;
+	} catch (error) {
+		return false;
+	}
+}
+
 const isServerError500 = (errorPayload: any): boolean => {
 	if (errorPayload && typeof errorPayload === 'object' && 'status' in errorPayload && errorPayload.status === 500) {
 		return true;
@@ -71,17 +99,6 @@ const isServerError500 = (errorPayload: any): boolean => {
 		return true;
 	}
 	return false;
-};
-
-const isNetworkRelatedError = (error: unknown): boolean => {
-	return (
-		!navigator.onLine ||
-		(error instanceof Error &&
-			(error.message.includes('fetch') ||
-				error.message.includes('network') ||
-				error.message.includes('Failed to fetch') ||
-				error.name === 'NetworkError'))
-	);
 };
 
 const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch; initialPath: string }) => {
@@ -119,7 +136,7 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 				throw new Error('Session expired');
 			}
 		} catch (error) {
-			if (!isNetworkRelatedError(error) && error instanceof Error && !error.message.includes('Session expired')) {
+			if ((await checkInternetConnection()) && error instanceof Error && !error.message.includes('Session expired')) {
 				console.error('Non-retryable error, logging out:', error);
 				return handleLogoutWithRedirect(dispatch, initialPath);
 			}
@@ -134,7 +151,7 @@ const refreshSession = async ({ dispatch, initialPath }: { dispatch: AppDispatch
 			const delayMs = Math.min(1000 * Math.pow(2, attempt - 1), 16000);
 
 			console.error(`Session expired, retrying in ${delayMs}ms... (${6 - retries + 1}/6)`);
-			await sleepWithNetworkCheck(delayMs);
+			await waitForInternetConnection(delayMs);
 		} else {
 			console.error('Session expired after 6 retries');
 			const redirectTo = getRedirectTo(initialPath);
