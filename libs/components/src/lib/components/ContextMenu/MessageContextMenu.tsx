@@ -364,7 +364,13 @@ function MessageContextMenu({
 	}, [dispatch, dmGroupChatList?.length, message]);
 
 	const handleUnPinMessage = useCallback(() => {
-		dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: message?.channel_id, message_id: message?.id }));
+		dispatch(
+			pinMessageActions.deleteChannelPinMessage({
+				channel_id: message?.channel_id,
+				message_id: message?.id,
+				clan_id: message?.clan_id as string
+			})
+		);
 	}, [dispatch, message?.channel_id, message?.id]);
 
 	const setIsShowCreateThread = useCallback(
