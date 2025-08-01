@@ -125,14 +125,12 @@ const TopBarChannelText = memo(() => {
 		if (isEditing) setEditValue(channelDmGroupLabel || '');
 	}, [isEditing, channelDmGroupLabel]);
 
-
-
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		const value = e.target.value;
 		setEditValue(value);
 		const regex = ValidateSpecialCharacters();
 		if (regex.test(value)) {
-			setEditError(null); 
+			setEditError(null);
 		} else {
 			setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
 		}
@@ -144,8 +142,7 @@ const TopBarChannelText = memo(() => {
 				e.preventDefault();
 				const value = editValue.trim();
 				const regex = ValidateSpecialCharacters();
-				if (regex.test(value)) {
-				} else {
+				if (!regex.test(value)) {
 					setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
 					return;
 				}
@@ -190,9 +187,7 @@ const TopBarChannelText = memo(() => {
 	return (
 		<>
 			<div className="flex relative flex-1 min-w-0 items-center gap-2  text-theme-primary">
-				{editError && (
-					<span className="absolute  text-xs top-[52px] text-colorDanger mb-1 break-words w-full">{editError}</span>
-				)}
+				{editError && <span className="absolute  text-xs top-[52px] text-colorDanger mb-1 break-words w-full">{editError}</span>}
 				<div className="flex sbm:hidden pl-3 px-2 text-theme-primary" onClick={openMenu} role="button">
 					<Icons.OpenMenu />
 				</div>
@@ -228,20 +223,19 @@ const TopBarChannelText = memo(() => {
 						/>
 
 						{isEditing ? (
-								<div className=" relative flex flex-col flex-1 min-w-0">
-
-									<textarea
-										key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}`}
-										rows={1}
-										className={`none-draggable-area cursor-text font-medium bg-transparent flex-1 outline-none resize-none w-full leading-10 truncate one-line text-theme-primary `}
-										value={editValue}
-										onChange={handleInputChange}
-										onKeyDown={handleChangeGroupName}
-										onBlur={handleRestoreName}
-										maxLength={64}
-										style={{ minHeight: 40, maxWidth: 250, minWidth: 0, overflow: 'hidden' }}
-									></textarea>
-								</div>
+							<div className=" relative flex flex-col flex-1 min-w-0">
+								<textarea
+									key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}`}
+									rows={1}
+									className={`none-draggable-area cursor-text font-medium bg-transparent flex-1 outline-none resize-none w-full leading-10 truncate one-line text-theme-primary `}
+									value={editValue}
+									onChange={handleInputChange}
+									onKeyDown={handleChangeGroupName}
+									onBlur={handleRestoreName}
+									maxLength={64}
+									style={{ minHeight: 40, maxWidth: 250, minWidth: 0, overflow: 'hidden' }}
+								></textarea>
+							</div>
 						) : (
 							<div
 								key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}_display`}
@@ -824,7 +818,7 @@ function PinButton({ styleCss, mode }: { styleCss: string; mode?: number }) {
 		if (!currentDmGroup?.id && !currentChannelId) {
 			return;
 		}
-		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId || currentDmGroup.id }));
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId || currentDmGroup.id, clanId: currentClanId }));
 		dispatch(pinMessageActions.togglePinModal());
 		if (isShowPinBadge) {
 			dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: currentClanId, channelId: currentChannelId, isShow: false }));
