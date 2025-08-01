@@ -28,9 +28,9 @@ const BottomNavigator = memo(({ isLastActiveTabDm = false }: { isLastActiveTabDm
 				tabBarStyle: {
 					position: 'absolute',
 					zIndex: isTabletLandscape ? -1 : 100,
-					height: isTabletLandscape ? 0 : size.s_80 - (isHiddenTab && Platform.OS === 'android' ? size.s_20 : 0),
+					height: isTabletLandscape ? 0 : size.s_80 - (isHiddenTab && Platform.OS === 'android' ? size.s_20 : size.s_2),
 					paddingHorizontal: 0,
-					paddingBottom: isHiddenTab && Platform.OS === 'android' ? 0 : size.s_20,
+					paddingBottom: isHiddenTab && Platform.OS === 'android' ? size.s_2 : size.s_20,
 					borderTopWidth: 1,
 					elevation: 0,
 					backgroundColor: themeValue.secondary,
