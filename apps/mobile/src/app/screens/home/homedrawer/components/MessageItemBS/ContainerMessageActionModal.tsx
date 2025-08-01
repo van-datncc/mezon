@@ -1,6 +1,5 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 /* eslint-disable no-console */
-import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useChannelMembers, useChatSending, useDirect, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import { ActionEmitEvent, CheckIcon, CloseIcon, STORAGE_MY_USER_ID, formatContentEditMessage, load } from '@mezon/mobile-components';
 import { Colors, baseColor, size, useTheme } from '@mezon/mobile-ui';
@@ -42,11 +41,12 @@ import {
 	sleep
 } from '@mezon/utils';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode } from 'mezon-js';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, DeviceEventEmitter, Pressable, Text, View } from 'react-native';
+import { Alert, DeviceEventEmitter, Text, View } from 'react-native';
+import { Pressable } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../src/app/componentUI/MezonIconCDN';
@@ -596,7 +596,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		const mediaList =
 			(message?.attachments?.length > 0 &&
 				message.attachments?.every((att) => att?.filetype?.includes('image') || att?.filetype?.includes('video'))) ||
-				message?.content?.embed?.some((embed) => embed?.image)
+			message?.content?.embed?.some((embed) => embed?.image)
 				? []
 				: [EMessageActionType.SaveImage, EMessageActionType.CopyMediaLink];
 
@@ -712,7 +712,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	);
 
 	return (
-		<BottomSheetView focusHook={useFocusEffect} style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
+		<View style={[styles.bottomSheetWrapper, { backgroundColor: themeValue.primary }]}>
 			{isShowEmojiPicker || isOnlyEmojiPicker ? (
 				<View style={{ padding: size.s_10, minHeight: '100%' }}>
 					<EmojiSelector onSelected={onSelectEmoji} isReactMessage />
@@ -733,6 +733,6 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			)}
 
 			{isShowQuickMenuModal && <QuickMenuModal channelId={currentChannelId} isVisible={isShowQuickMenuModal} onClose={onCloseQuickMenuModal} />}
-		</BottomSheetView>
+		</View>
 	);
 });

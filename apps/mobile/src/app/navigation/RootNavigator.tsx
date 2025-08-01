@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import { MezonStoreProvider, initStore } from '@mezon/store-mobile';
+import { MezonStoreProvider, appActions, initStore, selectHiddenBottomTabMobile, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { extractAndSaveConfig, useMezon } from '@mezon/transport';
 import { LinkingOptions, NavigationContainer, getStateFromPath } from '@react-navigation/native';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { ChatContextProvider, EmojiSuggestionProvider, PermissionProvider } from '@mezon/core';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -39,15 +39,16 @@ const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean) =
 const NavigationMain = memo(
 	(props) => {
 		const { themeValue, themeBasic } = useTheme();
-		const [isThreeButtonNav, setIsThreeButtonNav] = useState<boolean>(false);
+		const dispatch = useAppDispatch();
+		const isHiddenTab = useAppSelector(selectHiddenBottomTabMobile);
 
 		useEffect(() => {
 			const getNavigationInfo = async () => {
 				if (Platform.OS === 'android') {
 					try {
 						const hasThreeButtons = await NavigationBarModule.getNavigationBarStyle();
-						setIsThreeButtonNav(hasThreeButtons);
-						await NavigationBarModule.setNavigationBarTransparent();
+						dispatch(appActions.setHiddenBottomTabMobile(hasThreeButtons));
+						await NavigationBarModule.setNavigationBarColor(themeValue.secondary);
 					} catch (error) {
 						console.error('Error getting navigation bar info:', error);
 					}
@@ -57,7 +58,7 @@ const NavigationMain = memo(
 			};
 
 			getNavigationInfo();
-		}, []);
+		}, [themeBasic]);
 
 		// comment logic check new version on code-push
 		// useEffect(() => {
@@ -127,14 +128,14 @@ const NavigationMain = memo(
 				/>
 				<SafeAreaProvider>
 					<SafeAreaView
-						edges={Platform.OS === 'android' ? (isThreeButtonNav ? ['top', 'bottom'] : ['top']) : []}
+						edges={Platform.OS === 'android' ? (isHiddenTab ? ['top', 'bottom'] : ['top']) : []}
 						style={{ flex: 1, backgroundColor: themeValue.primary }}
 					>
 						<RootStack {...props} />
-						<NetInfoComp />
 					</SafeAreaView>
 				</SafeAreaProvider>
 				<RootListener />
+				<NetInfoComp />
 			</NavigationContainer>
 		);
 	},

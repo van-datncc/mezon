@@ -1,8 +1,7 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo } from 'react';
 
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { Dimensions, Platform, View } from 'react-native';
-import BootSplash from 'react-native-bootsplash';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
@@ -13,7 +12,9 @@ import { RenderVideoDetail } from '../../screens/home/homedrawer/components/Rend
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
+import { AuthenticationLoader } from './AuthenticationLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
+import { FCMNotificationLoader } from './FCMNotificationLoader';
 import { ListenerLoader } from './ListenerLoader';
 import { FriendStacks } from './stacks/FriendStacks';
 import { MenuChannelStacks } from './stacks/MenuChannelStack';
@@ -28,13 +29,6 @@ const RootStack = createStackNavigator();
 
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
-		useEffect(() => {
-			const splashTask = requestAnimationFrame(async () => {
-				await BootSplash.hide({ fade: true });
-			});
-			return () => cancelAnimationFrame(splashTask);
-		}, []);
-
 		return (
 			<View style={{ flex: 1 }}>
 				<RootStack.Navigator
@@ -141,8 +135,8 @@ export const RootAuthStack = memo(
 					<RootStack.Screen name={APP_SCREEN.WALLET} component={WalletScreen} />
 					<RootStack.Screen name={APP_SCREEN.SHOP.STACK} children={(props) => <ShopStack {...props} />} />
 				</RootStack.Navigator>
-				<LazyFCMNotificationLoader notifyInit={notifyInit} />
-				<LazyAuthenticationLoader />
+				<FCMNotificationLoader notifyInit={notifyInit} />
+				<AuthenticationLoader />
 				<CallingModalWrapper />
 				<CallingModalGroupWrapper />
 				<ChannelRouterListener />
@@ -151,6 +145,3 @@ export const RootAuthStack = memo(
 		);
 	}
 );
-
-const LazyFCMNotificationLoader = React.lazy(() => import('./FCMNotificationLoader').then((module) => ({ default: module.FCMNotificationLoader })));
-const LazyAuthenticationLoader = React.lazy(() => import('./AuthenticationLoader').then((module) => ({ default: module.AuthenticationLoader })));
