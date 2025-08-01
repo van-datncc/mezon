@@ -134,10 +134,6 @@ const NavigationMain = memo(
 						<RootStack {...props} />
 					</SafeAreaView>
 				</SafeAreaProvider>
-				<View style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
-					<RootListener />
-					<NetInfoComp />
-				</View>
 			</NavigationContainer>
 		);
 	},
@@ -167,6 +163,10 @@ const RootNavigation = (props) => {
 								<EmojiSuggestionProvider isMobile={true}>
 									<KeyboardProvider statusBarTranslucent>
 										<NavigationMain {...props} />
+										<View style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
+											<RootListener />
+											<NetInfoComp />
+										</View>
 									</KeyboardProvider>
 								</EmojiSuggestionProvider>
 							</PermissionProvider>
