@@ -49,11 +49,11 @@ const ButtonEndCall = ({ channelId, clanId, isGroupCall = false }: { channelId: 
 				dispatch(
 					messagesActions.sendMessage({
 						channelId: currentDmGroup?.channel_id,
-						clanId: '',
+						clanId: '0',
 						mode: ChannelStreamMode.STREAM_MODE_GROUP,
 						isPublic: true,
 						content: {
-							t: 'Voice call ended',
+							t: 'Group call ended',
 							callLog: {
 								isVideo: false,
 								callLogType: IMessageTypeCallLog.FINISHCALL,
