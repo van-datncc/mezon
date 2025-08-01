@@ -646,13 +646,23 @@ export const directSlice = createSlice({
 			const data = action.payload;
 			const currentData = state.entities[data.channel_id || ''];
 			if (currentData) {
+				let changes;
+				if (data?.update_time_seconds && data?.last_sent_message) {
+					changes = {
+						...currentData,
+						last_sent_message: data?.last_sent_message,
+						update_time_seconds: data?.update_time_seconds
+					};
+				} else {
+					changes = {
+						...data,
+						...currentData
+					};
+				}
+
 				directAdapter.updateOne(state, {
 					id: data.channel_id || '',
-					changes: {
-						...currentData,
-						last_sent_message: data.last_sent_message,
-						update_time_seconds: data.update_time_seconds
-					}
+					changes
 				});
 			}
 		}
