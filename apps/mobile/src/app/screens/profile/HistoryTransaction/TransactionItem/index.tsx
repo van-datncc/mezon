@@ -80,8 +80,7 @@ export const TransactionItem = ({ item, isExpand, onPress }: { item: ApiWalletLe
 				type: 'success',
 				props: {
 					text2: t('historyTransaction.copied'),
-					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} color={themeValue.text} />,
-					customStyle: { backgroundColor: themeValue.secondary }
+					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} color={themeValue.text} />
 				}
 			});
 		}
