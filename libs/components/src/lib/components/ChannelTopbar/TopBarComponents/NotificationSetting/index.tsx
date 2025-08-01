@@ -164,15 +164,6 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 						<ItemPanel children={nameChildren} subText={mutedUntil} onClick={() => muteOrUnMuteChannel(1)} />
 					)}
 				</div>
-				{/* <div className="flex flex-col pb-2 mb-1 border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0">
-					<ItemPanel
-						children="Reaction Message"
-						type="checkbox"
-						name="NotifiReactionSetting"
-						checked={isNotifyReactMessage}
-						onClick={setNotiReactMess}
-					/>
-				</div> */}
 				<ItemPanel
 					children="Use Category Default"
 					type="radio"
