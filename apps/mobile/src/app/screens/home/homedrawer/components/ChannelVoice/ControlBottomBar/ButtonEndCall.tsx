@@ -45,6 +45,29 @@ const ButtonEndCall = ({ channelId, clanId, isGroupCall = false }: { channelId: 
 		};
 
 		if (type === 'quit') {
+			if (room?.numParticipants === 1) {
+				dispatch(
+					messagesActions.sendMessage({
+						channelId: currentDmGroup?.channel_id,
+						clanId: '',
+						mode: ChannelStreamMode.STREAM_MODE_GROUP,
+						isPublic: true,
+						content: {
+							t: 'Voice call ended',
+							callLog: {
+								isVideo: false,
+								callLogType: IMessageTypeCallLog.FINISHCALL,
+								showCallBack: false
+							}
+						},
+						anonymous: false,
+						senderId: userProfile?.user?.id || '',
+						avatar: userProfile?.user?.avatar_url || '',
+						isMobile: true,
+						username: currentDmGroup?.channel_label || ''
+					})
+				);
+			}
 			sendSignalingToParticipants(
 				currentDmGroup?.user_id || [],
 				WEBRTC_SIGNALING_TYPES.GROUP_CALL_QUIT,
