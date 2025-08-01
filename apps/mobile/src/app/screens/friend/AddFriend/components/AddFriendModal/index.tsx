@@ -46,6 +46,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 						leadingIcon: <CheckIcon color={Colors.green} width={20} height={20} />
 					}
 				});
+				resetField();
 			} else {
 				Toast.show({
 					type: 'success',
@@ -116,7 +117,6 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 			inputRef.current.blur();
 		}
 		await addFriend(requestAddFriend);
-		resetField();
 	};
 
 	useEffect(() => {
