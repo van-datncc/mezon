@@ -133,7 +133,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 			Animated.timing(pan, {
 				toValue: { x: 0, y: 0 },
 				duration: 300,
-				useNativeDriver: false
+				useNativeDriver: true
 			}).start(() => {
 				setIsAnimationComplete(true);
 			});
@@ -142,7 +142,7 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 			Animated.timing(pan, {
 				toValue: { x: 0, y: 0 },
 				duration: 300,
-				useNativeDriver: false
+				useNativeDriver: true
 			}).start(() => {
 				setIsAnimationComplete(false);
 			});
@@ -213,7 +213,9 @@ const ChannelVoicePopup = ({ isFromNativeCall = false }) => {
 		<Animated.View
 			{...(!isAnimationComplete && !isPiPMode ? panResponder.panHandlers : {})}
 			style={[
-				pan?.getLayout(),
+				{
+					transform: [{ translateX: pan?.x }, { translateY: pan?.y }]
+				},
 				{
 					zIndex: 99,
 					position: 'absolute',
