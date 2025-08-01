@@ -592,7 +592,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				notiSoundElement.play().catch((err) => {
 					console.warn('cant play sound noti:', err.message || err);
 				});
-
 			}
 		},
 		[userId]
@@ -631,8 +630,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 		if (!unpin_message_event?.channel_id) return;
 		dispatch(
 			pinMessageActions.deleteChannelPinMessage({
+				pin_id: unpin_message_event.id,
 				channel_id: unpin_message_event.channel_id || '',
-				message_id: unpin_message_event.message_id
+				message_id: unpin_message_event.message_id,
+				clan_id: unpin_message_event.clan_id
 			})
 		);
 		dispatch(
@@ -2328,4 +2329,3 @@ const ChatContextConsumer = ChatContext.Consumer;
 ChatContextProvider.displayName = 'ChatContextProvider';
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
-

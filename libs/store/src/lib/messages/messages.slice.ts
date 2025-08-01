@@ -41,6 +41,7 @@ import { selectClansLoadingStatus } from '../clans/clans.slice';
 import { selectCurrentDM } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { pinMessageActions, selectPinMessageByChannelId } from '../pinMessages/pinMessage.slice';
 import { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import { RootState } from '../store';
 import { referencesActions, selectDataReferences } from './references.slice';
@@ -921,8 +922,21 @@ export const addNewMessage = createAsyncThunk('messages/addNewMessage', async (m
 
 	if (message.code === TypeMessage.ChatRemove) {
 		const replyData = selectDataReferences(state, channelId);
+		const pinList = selectPinMessageByChannelId(state, channelId);
 		if (replyData && replyData.message_ref_id === message.id) {
 			thunkAPI.dispatch(referencesActions.resetAfterReply(message.channel_id));
+		}
+
+		if (pinList) {
+			const pinData = pinList.find((item) => item.message_id === message.id);
+			if (pinData) {
+				thunkAPI.dispatch(
+					pinMessageActions.removePinMessage({
+						channelId: message.channel_id,
+						pinId: pinData.id
+					})
+				);
+			}
 		}
 	}
 
