@@ -101,7 +101,7 @@ const ChannelList = () => {
 		[currentChannelId, themeValue.secondary]
 	);
 
-	const keyExtractor = useCallback((item, index) => item.id + item.isFavor?.toString() + index, []);
+	const keyExtractor = useCallback((item, index) => item?.id + item?.isFavor?.toString() + index, []);
 	return (
 		<View style={styles.mainList}>
 			<ChannelListScroll data={data} flashListRef={flashListRef} />
