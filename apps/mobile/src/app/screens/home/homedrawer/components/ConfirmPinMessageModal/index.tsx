@@ -80,7 +80,8 @@ export const ConfirmPinMessageModal = memo((props: IConfirmPinMessageModalProps)
 				dispatch(
 					pinMessageActions.deleteChannelPinMessage({
 						channel_id: params?.['directMessageId'] ? params?.['directMessageId'] : message?.channel_id || '',
-						message_id: message.id
+						message_id: message.id,
+						clan_id: message?.clan_id
 					})
 				);
 				break;

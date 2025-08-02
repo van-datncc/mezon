@@ -9,7 +9,7 @@ import { ChatContextProvider, EmojiSuggestionProvider, PermissionProvider } from
 import { ActionEmitEvent, STORAGE_SESSION_KEY, save } from '@mezon/mobile-components';
 import { ThemeModeBase, ThemeProvider, useTheme } from '@mezon/mobile-ui';
 import { Session } from 'mezon-js';
-import { DeviceEventEmitter, NativeModules, Platform, StatusBar } from 'react-native';
+import { DeviceEventEmitter, NativeModules, Platform, StatusBar, View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -134,8 +134,6 @@ const NavigationMain = memo(
 						<RootStack {...props} />
 					</SafeAreaView>
 				</SafeAreaProvider>
-				<RootListener />
-				<NetInfoComp />
 			</NavigationContainer>
 		);
 	},
@@ -165,6 +163,10 @@ const RootNavigation = (props) => {
 								<EmojiSuggestionProvider isMobile={true}>
 									<KeyboardProvider statusBarTranslucent>
 										<NavigationMain {...props} />
+										<View style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
+											<RootListener />
+											<NetInfoComp />
+										</View>
 									</KeyboardProvider>
 								</EmojiSuggestionProvider>
 							</PermissionProvider>

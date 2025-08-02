@@ -556,18 +556,6 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 						}}
 						contentContainerStyle={{ paddingBottom: size.s_20, minHeight: '100%' }}
 						renderItem={renderItem}
-						removeClippedSubviews={true}
-						maxToRenderPerBatch={5}
-						windowSize={15}
-						initialNumToRender={1}
-						updateCellsBatchingPeriod={10}
-						disableVirtualization={true}
-						getItemLayout={(_, index) => ({
-							length: size.s_60,
-							offset: size.s_60 * index,
-							index
-						})}
-						onEndReachedThreshold={0.1}
 					/>
 				</BottomSheetModal>
 			</View>
