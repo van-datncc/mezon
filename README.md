@@ -354,6 +354,9 @@ See: https://github.com/electron/electron/issues/3331
 -   4, Click on `Configure...` and add `localhost:8315` to the list
 -   5, Click on `inspect` to open the DevTools
 
+## Mezon mainnet
+
+
 ## Screenshot
 
 ![image](https://github.com/user-attachments/assets/7060df63-0ca8-4dd5-a220-2f127c2f1031)
