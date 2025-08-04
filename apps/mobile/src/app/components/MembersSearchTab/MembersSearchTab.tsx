@@ -72,15 +72,19 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 		},
 		[onDetailMember, store]
 	);
+
+	const keyExtractor = useCallback((item, index) => `${item?.['id']}_member_search_${index}}`, []);
+
 	return (
 		<View style={[styles.container, { backgroundColor: listMemberSearch?.length > 0 ? themeValue.primary : themeValue.secondary }]}>
 			<FlatList
 				data={listMemberSearch?.length > 0 ? listMemberSearch : []}
 				renderItem={renderItem}
 				onScrollBeginDrag={() => Keyboard.dismiss()}
-				initialNumToRender={15}
-				maxToRenderPerBatch={5}
-				windowSize={5}
+				keyExtractor={keyExtractor}
+				initialNumToRender={1}
+				maxToRenderPerBatch={1}
+				windowSize={1}
 				removeClippedSubviews={true}
 				keyboardShouldPersistTaps={'handled'}
 				disableVirtualization={false}

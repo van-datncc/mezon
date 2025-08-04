@@ -55,7 +55,7 @@ export const MemberList = memo((props: IMemberListProps) => {
 				onEndReachedThreshold={0.1}
 				initialNumToRender={5}
 				maxToRenderPerBatch={5}
-				windowSize={15}
+				windowSize={5}
 				updateCellsBatchingPeriod={10}
 				decelerationRate={'fast'}
 				disableVirtualization={true}
