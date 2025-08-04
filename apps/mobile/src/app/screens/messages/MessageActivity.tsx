@@ -58,7 +58,7 @@ function MessageActivity() {
 			return mergeListFriendAndListUserDM.reduce((acc, user) => {
 				const info = activityMap.get(user.id);
 				if (info) {
-					const activityName = info?.activity_name + ' - ' + info?.activity_description;
+					const activityName = info?.activity_description ? `${info?.activity_name} - ${info.activity_description}` : info?.activity_name;
 
 					acc.push({
 						activityName,
