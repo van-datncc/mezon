@@ -1,4 +1,4 @@
-import { size, useTheme } from '@mezon/mobile-ui';
+import { useTheme } from '@mezon/mobile-ui';
 import { ETokenMessage, IExtendedMessage, getSrcEmoji } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
@@ -70,7 +70,7 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 			const headingMatch = formatEmojiInText?.match(/^#{1,6}\s*([^\s]+)/);
 			const headingContent = headingMatch ? headingMatch[1] : '';
 			parts.push(
-				<Text key="heading" style={[styles.message, props?.styleText && props?.styleText, { fontWeight: 'bold', fontSize: size.medium }]}>
+				<Text key="heading" style={[styles.message, props?.styleText && props?.styleText, { fontWeight: 'bold' }]}>
 					{headingContent}
 				</Text>
 			);
