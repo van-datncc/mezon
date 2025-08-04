@@ -278,14 +278,6 @@ const persistedHashTagDmReducer = persistReducer(
 	hashtagDmReducer
 );
 
-const persistedNotiReactMsgReducer = persistReducer(
-	{
-		key: 'notifireactmessage',
-		storage
-	},
-	notifiReactMessageReducer
-);
-
 const persistedGifsStickerEmojiReducer = persistReducer(
 	{
 		key: 'gifsstickersemojis',
@@ -445,7 +437,6 @@ const reducer = {
 	defaultnotificationcategory: persistedDefaultNotiCatReducer,
 	notichannelcategorysetting: persistedChannelCatSettingReducer,
 	hashtagdm: persistedHashTagDmReducer,
-	notifireactmessage: persistedNotiReactMsgReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
