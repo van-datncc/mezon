@@ -44,10 +44,16 @@ export const Authentication = memo(() => {
 	}, []);
 
 	useEffect(() => {
-		const splashTask = requestAnimationFrame(async () => {
-			if (initRouteName) await BootSplash.hide({ fade: false });
-		});
-		return () => cancelAnimationFrame(splashTask);
+		let splashTask;
+		if (initRouteName) {
+			splashTask = setTimeout(() => {
+				BootSplash.hide({ fade: false });
+			}, 1);
+		}
+
+		return () => {
+			if (splashTask) clearTimeout(splashTask);
+		};
 	}, [initRouteName]);
 
 	if (!initRouteName) return null;

@@ -22,13 +22,14 @@ export const UserStatus = React.memo(({ status, customStyles, iconSize = size.s_
 				return <MezonIconCDN icon={IconCDN.offlineStatusIcon} color="#AEAEAE" width={iconSize} height={iconSize} />;
 
 			default:
-				if (!status?.status) return <MezonIconCDN icon={IconCDN.onlineStatusIcon} color="#AEAEAE" width={iconSize} height={iconSize} />;
+				if (!status?.status && customStatus !== EUserStatus.ONLINE)
+					return <MezonIconCDN icon={IconCDN.onlineStatusIcon} color="#AEAEAE" width={iconSize} height={iconSize} />;
 				if (status?.isMobile) {
 					return <MezonIconCDN icon={IconCDN.mobileDeviceIcon} color="#16A34A" width={mobileIconSize} height={mobileIconSize} />;
 				}
 				return <MezonIconCDN icon={IconCDN.onlineStatusIcon} color="#16A34A" width={iconSize} height={iconSize} />;
 		}
-	}, []);
+	}, [customStatus, iconSize, mobileIconSize, status?.isMobile, status?.status]);
 
 	return (
 		<View

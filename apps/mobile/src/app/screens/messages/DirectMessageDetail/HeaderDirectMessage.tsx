@@ -40,7 +40,7 @@ interface HeaderProps {
 	themeValue: any;
 	directMessageId: string;
 }
-export const ChannelSeen = memo(({ channelId, streamMode }: { channelId: string; streamMode: number }) => {
+export const ChannelSeen = memo(({ channelId }: { channelId: string }) => {
 	const dispatch = useAppDispatch();
 	const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId ?? ''));
@@ -110,10 +110,6 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const dmAvatar = useMemo(() => {
 		return currentDmGroup?.channel_avatar?.[0];
 	}, [currentDmGroup?.channel_avatar?.[0]]);
-
-	const streamMode = useMemo(() => {
-		return currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
-	}, [currentDmGroup?.type]);
 
 	const navigateToThreadDetail = useCallback(() => {
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
@@ -247,7 +243,7 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 
 	return (
 		<View style={styles.headerWrapper}>
-			<ChannelSeen channelId={directMessageId || ''} streamMode={streamMode} />
+			<ChannelSeen channelId={directMessageId || ''} />
 			{!isTabletLandscape && (
 				<Pressable onPress={handleBack} style={styles.backButton}>
 					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} color={themeValue.text} height={size.s_20} width={size.s_20} />
@@ -273,7 +269,11 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)?.toUpperCase()}</Text>
 							</View>
 						)}
-						<UserStatus status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }} customStatus={status} />
+						<UserStatus
+							status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
+							customStatus={status}
+							iconSize={size.s_10}
+						/>
 					</View>
 				)}
 				<Text style={styles.titleText} numberOfLines={1}>
