@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import ChannelList from './ChannelList';
 import ProfileBar from './ProfileBar';
@@ -9,6 +9,15 @@ import { style } from './styles';
 
 const ChannelListWrapper = React.memo(
 	() => {
+		const [showChannelList, setShowChannelList] = useState(false);
+
+		useEffect(() => {
+			const splashTask = requestAnimationFrame(() => {
+				setShowChannelList(true);
+			});
+			return () => cancelAnimationFrame(splashTask);
+		}, []);
+		if (!showChannelList) return null;
 		return (
 			<>
 				<UserEmptyClan />

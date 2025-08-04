@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { MessagesEntity } from '@mezon/store';
+import { MessagesEntity, topicsActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
 	HEIGHT_PANEL_PROFILE,
@@ -83,6 +83,7 @@ function MessageWithUser({
 	observeIntersectionForLoading,
 	isSelected
 }: Readonly<MessageWithUserProps>) {
+	const dispatch = useAppDispatch();
 	const userId = user?.user?.id as string;
 	const positionShortUser = useRef<{ top: number; left: number } | null>(null);
 	const shortUserId = useRef('');
@@ -138,6 +139,13 @@ function MessageWithUser({
 		[mode]
 	);
 
+	const handleLeaveComment = useCallback(() => {
+		dispatch(topicsActions.setIsShowCreateTopic(true));
+		dispatch(topicsActions.setCurrentTopicInitMessage(message));
+		dispatch(topicsActions.setCurrentTopicId(''));
+		dispatch(topicsActions.setFirstMessageOfCurrentTopic(message));
+	}, [dispatch, message]);
+
 	const isDM = mode === ChannelStreamMode.STREAM_MODE_GROUP || mode === ChannelStreamMode.STREAM_MODE_DM;
 
 	const [isAnonymousOnModal, setIsAnonymousOnModal] = useState<boolean>(false);
@@ -168,6 +176,8 @@ function MessageWithUser({
 		);
 	}, [message]);
 
+	// (message?.content as any)?.isCard
+
 	return (
 		<>
 			{message && showDivider && <MessageDateDivider message={message} />}
@@ -197,7 +207,10 @@ function MessageWithUser({
 						},
 						{ 'bg-item-msg-selected': isSelected },
 						{ 'pointer-events-none': message.isSending },
-						{ 'is-error pointer-events-none': message.isError }
+						{ 'is-error pointer-events-none': message.isError },
+						{
+							'max-w-[37rem] bg-[#2f3136] border border-[#40444b] rounded-lg mx-2 my-1 p-3': message.content?.isCard
+						}
 					)}
 					create_time={message.create_time}
 					showMessageHead={showMessageHead}
@@ -263,6 +276,17 @@ function MessageWithUser({
 							</div>
 						)}
 
+						{(message?.attachments?.length as number) > 0 && (
+							<MessageAttachment
+								observeIntersectionForLoading={observeIntersectionForLoading}
+								mode={mode}
+								message={message}
+								onContextMenu={onContextMenu}
+								isInSearchMessage={isSearchMessage}
+								defaultMaxWidth={isTopic ? TOPIC_MAX_WIDTH : undefined}
+							/>
+						)}
+
 						{isEditing && (
 							<MessageInput
 								messageId={message?.id}
@@ -291,17 +315,6 @@ function MessageWithUser({
 									</div>
 								)}
 							</>
-						)}
-
-						{(message?.attachments?.length as number) > 0 && (
-							<MessageAttachment
-								observeIntersectionForLoading={observeIntersectionForLoading}
-								mode={mode}
-								message={message}
-								onContextMenu={onContextMenu}
-								isInSearchMessage={isSearchMessage}
-								defaultMaxWidth={isTopic ? TOPIC_MAX_WIDTH : undefined}
-							/>
 						)}
 
 						{Array.isArray(message?.content?.embed) && (
@@ -342,6 +355,19 @@ function MessageWithUser({
 							))}
 					</div>
 					{!isEphemeralMessage && <MessageReaction message={message} isTopic={!!isTopic} />}
+
+					{!isTopic && message?.content?.isCard && !isEphemeralMessage && message?.code !== TypeMessage.Topic && (
+						<div
+							className="border-t border-[#40444b] mt-3 pt-3 flex items-center justify-between cursor-pointer hover:bg-[#36393f] transition-colors duration-150 rounded-b-lg -mx-3 -mb-3 px-3 py-2"
+							onClick={handleLeaveComment}
+						>
+							<div className="flex items-center gap-2 text-sm text-[#b9bbbe]">
+								<Icons.MessageSquareIcon className="w-5 h-5" />
+								<span>Go to Topic</span>
+							</div>
+							<Icons.ArrowRight className="w-4 h-4 text-[#72767d]" />
+						</div>
+					)}
 				</HoverStateWrapper>
 			)}
 		</>

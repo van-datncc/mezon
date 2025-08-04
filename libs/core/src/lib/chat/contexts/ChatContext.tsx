@@ -629,14 +629,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const onUnpinMessageEvent = useCallback((unpin_message_event: UnpinMessageEvent) => {
 		if (!unpin_message_event?.channel_id) return;
 		dispatch(
-			pinMessageActions.deleteChannelPinMessage({
-				pin_id: unpin_message_event.id,
-				channel_id: unpin_message_event.channel_id || '',
-				message_id: unpin_message_event.message_id,
-				clan_id: unpin_message_event.clan_id
-			})
-		);
-		dispatch(
 			pinMessageActions.removePinMessage({
 				channelId: unpin_message_event.channel_id,
 				pinId: unpin_message_event.message_id
