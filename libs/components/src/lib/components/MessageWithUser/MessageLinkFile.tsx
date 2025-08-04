@@ -1,6 +1,6 @@
 import { selectCurrentUserId, selectTheme } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { DOWNLOAD_FILE, EFailAttachment, IMessageWithUser, electronBridge } from '@mezon/utils';
+import { DOWNLOAD_FILE, EFailAttachment, EMimeTypes, IMessageWithUser, electronBridge } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { ChannelStreamMode } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
@@ -27,7 +27,11 @@ function formatFileSize(bytes: number) {
 	}
 }
 
-export const AttachmentLoader = ({ appearanceTheme }: { appearanceTheme: 'light' | 'dark' | 'sunrise' | 'purple_haze' | 'redDark' | 'abyss_dark' }) => {
+export const AttachmentLoader = ({
+	appearanceTheme
+}: {
+	appearanceTheme: 'light' | 'dark' | 'sunrise' | 'purple_haze' | 'redDark' | 'abyss_dark';
+}) => {
 	return (
 		<div className="w-[30px] h-[30px] flex justify-center items-center">
 			<div className={appearanceTheme === 'light' ? 'light-attachment-loader' : 'dark-attachment-loader'} />
@@ -82,10 +86,10 @@ function MessageLinkFile({ attachmentData, mode, message }: MessageImage) {
 	const thumbnailAttachment = RenderAttachmentThumbnail({ attachment: attachmentData, size: 'w-8 h-10' });
 
 	const hideTheInformationFile =
-		attachmentData.filetype !== 'image/gif' &&
-		attachmentData.filetype !== 'image/png' &&
-		attachmentData.filetype !== 'image/jpeg' &&
-		attachmentData.filetype !== 'video/mp4';
+		attachmentData.filetype !== EMimeTypes.gif &&
+		attachmentData.filetype !== EMimeTypes.png &&
+		attachmentData.filetype !== EMimeTypes.jpeg &&
+		attachmentData.filetype !== EMimeTypes.mp4;
 
 	const isPDF = attachmentData.filetype === 'application/pdf' || attachmentData.filename?.toLowerCase().endsWith('.pdf');
 

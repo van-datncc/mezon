@@ -1,7 +1,7 @@
 import { useChatSending, useCurrentInbox, useEscapeKeyClose, useGifs, useGifsStickersEmoji } from '@mezon/core';
 import { referencesActions, selectDataReferences, useAppSelector } from '@mezon/store';
 import { Loading } from '@mezon/ui';
-import { IGifCategory, SubPanelName, blankReferenceObj } from '@mezon/utils';
+import { EMimeTypes, IGifCategory, SubPanelName, blankReferenceObj } from '@mezon/utils';
 import { ApiChannelDescription, ApiMessageRef } from 'mezon-js/api.gen';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -71,7 +71,7 @@ function TenorGifCategories({ channelOrDirect, mode, onClose, isTopic = false }:
 				})
 			);
 		} else {
-			sendMessage({ t: '' }, [], [{ url: giftUrl, filetype: 'gif' }], [], undefined);
+			sendMessage({ t: '' }, [], [{ url: giftUrl, filetype: EMimeTypes.gif }], [], undefined);
 		}
 		setSubPanelActive(SubPanelName.NONE);
 	};
