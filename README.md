@@ -355,6 +355,7 @@ See: https://github.com/electron/electron/issues/3331
 -   5, Click on `inspect` to open the DevTools
 
 ## Mezon mainnet
+<img width="1061" height="695" alt="1754016094020_image" src="https://github.com/user-attachments/assets/9e4137ea-5b73-40c0-98dc-0bdc403b6f91" />
 
 
 ## Screenshot
