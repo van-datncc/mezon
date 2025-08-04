@@ -36,6 +36,10 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 		const messageSender = selectMemberClanByUserId2(state, messageReferences?.message_sender_id ?? '') as unknown as ChannelMembersEntity;
 		return messageSender?.clan_avatar || messageSender?.user?.avatar_url || '';
 	}, [messageReferences]);
+	const isEmbedMessage = useMemo(() => {
+		const content = safeJSONParse(messageReferences?.content ?? '{}');
+		return !content?.t && content?.embed;
+	}, [messageReferences]);
 
 	const handleJumpToMessage = (messageId: string) => {
 		requestAnimationFrame(async () => {
@@ -76,7 +80,7 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 							'Anonymous'}
 						<FastImage />
 					</Text>
-					{messageReferences?.has_attachment ? (
+					{messageReferences?.has_attachment || isEmbedMessage ? (
 						<Text>
 							<Text style={styles.tapToSeeAttachmentText}>{t('tapToSeeAttachment')} </Text>
 							<MezonIconCDN icon={IconCDN.imageIcon} width={size.s_12} height={size.s_12} color={Colors.textGray} />
