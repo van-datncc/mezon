@@ -87,8 +87,10 @@ const GroupPopupNotiCall = ({ dataCall, userId }: ModalCallProps) => {
 	return (
 		<div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
 			<div className="bg-black p-6 rounded-lg shadow-xl flex flex-col gap-6 items-center justify-center w-[300px]">
-				<div className="text-center">
-					<p className="font-semibold text-xl text-white">{groupName}</p>
+				<div className="text-center w-full">
+					<p className="font-semibold text-xl text-white truncate w-full max-w-[250px] mx-auto" title={groupName}>
+						{groupName}
+					</p>
 					<p className="text-gray-400">{isVideoCall ? 'Incoming Video Call' : 'Incoming Voice Call'}</p>
 				</div>
 

@@ -31,7 +31,7 @@ export const CallStatus = memo<CallStatusProps>(({ isConnecting, isConnected, pa
 					</div>
 				)}
 				<div>
-					<h3 className="text-lg font-semibold dark:text-white text-black">{groupName}</h3>
+					<h3 className="text-lg font-semibold text-white">{groupName}</h3>
 				</div>
 			</div>
 
