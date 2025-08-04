@@ -39,7 +39,7 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 	const isEmbedMessage = useMemo(() => {
 		const content = safeJSONParse(messageReferences?.content ?? '{}');
 		return !content?.t && content?.embed;
-	}, [messageReferences]);
+	}, [messageReferences?.content]);
 
 	const handleJumpToMessage = (messageId: string) => {
 		requestAnimationFrame(async () => {
