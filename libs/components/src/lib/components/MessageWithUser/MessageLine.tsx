@@ -483,7 +483,7 @@ export const MessageLine = ({
 
       `}
 		>
-			{code === TypeMessage.MessageBuzz ? <span className="!text-red-500">{content2}</span> : content2}
+			{code === TypeMessage.MessageBuzz ? <span className="text-red-500">{content2}</span> : content2}
 		</div>
 	);
 };
