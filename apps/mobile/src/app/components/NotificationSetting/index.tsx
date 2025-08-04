@@ -2,7 +2,6 @@ import { IOptionsNotification, notifyLabels } from '@mezon/mobile-components';
 import { useTheme } from '@mezon/mobile-ui';
 import {
 	appActions,
-	notifiReactMessageActions,
 	notificationSettingActions,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -115,25 +114,6 @@ export default function NotificationSetting({ channel }: { channel?: ChannelThre
 			} finally {
 				dispatch(appActions.setLoadingMainMobile(false));
 			}
-		}
-	};
-
-	const handleCheckboxPress = async (check: boolean) => {
-		if (!channel?.channel_id && !currentChannelId) {
-			return;
-		}
-		try {
-			if (check) {
-				await dispatch(
-					notifiReactMessageActions.setNotifiReactMessage({ channel_id: channel?.channel_id || currentChannelId || '' })
-				).unwrap();
-			} else {
-				await dispatch(
-					notifiReactMessageActions.deleteNotifiReactMessage({ channel_id: channel?.channel_id || currentChannelId || '' })
-				).unwrap();
-			}
-		} catch (error) {
-			console.error('Toggle failed:', error);
 		}
 	};
 
