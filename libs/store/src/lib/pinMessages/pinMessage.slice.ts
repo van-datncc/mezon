@@ -252,7 +252,7 @@ export const pinMessageSlice = createSlice({
 				return;
 			}
 
-			state.byChannels[channelId].pinMessages?.push(pinMessage);
+			state.byChannels[channelId].pinMessages?.unshift(pinMessage);
 		},
 		removePinMessage: (state: PinMessageState, action: PayloadAction<{ channelId: string; pinId: string }>) => {
 			const { channelId, pinId } = action.payload;
