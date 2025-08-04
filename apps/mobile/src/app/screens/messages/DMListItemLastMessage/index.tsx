@@ -1,4 +1,4 @@
-import { useTheme } from '@mezon/mobile-ui';
+import { size, useTheme } from '@mezon/mobile-ui';
 import { ETokenMessage, IExtendedMessage, getSrcEmoji } from '@mezon/utils';
 import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
@@ -24,6 +24,12 @@ const EmojiMarkup = ({ shortname, emojiid }: IEmojiMarkup) => {
 		return shortname;
 	}
 	return `${EMOJI_KEY}${srcEmoji}${EMOJI_KEY}`;
+};
+
+const isHeadingText = (text?: string) => {
+	if (!text) return false;
+	const headingMatchRegex = /^(#{1,6})\s+(.+)$/;
+	return headingMatchRegex?.test(text?.trim());
 };
 
 const EMOJI_KEY = '[ICON_EMOJI]';
@@ -59,6 +65,17 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 		const parts = [];
 		let startIndex = 0;
 		let endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
+
+		if (isHeadingText(formatEmojiInText)) {
+			const headingMatch = formatEmojiInText?.match(/^#{1,6}\s*([^\s]+)/);
+			const headingContent = headingMatch ? headingMatch[1] : '';
+			parts.push(
+				<Text key="heading" style={[styles.message, props?.styleText && props?.styleText, { fontWeight: 'bold', fontSize: size.medium }]}>
+					{headingContent}
+				</Text>
+			);
+			return parts;
+		}
 
 		while (endIndex !== -1) {
 			const textPart = formatEmojiInText.slice(startIndex, endIndex);
