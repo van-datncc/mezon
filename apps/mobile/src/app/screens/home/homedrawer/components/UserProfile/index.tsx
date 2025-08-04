@@ -98,7 +98,7 @@ const UserProfile = React.memo(
 			return infoFriend?.state === EStateFriend.BLOCK;
 		}, [infoFriend?.state]);
 
-		const status = getUserStatusByMetadata(user?.user?.metadata);
+		const status = getUserStatusByMetadata(user?.user?.metadata) || user?.metadata?.user_status;
 
 		useEffect(() => {
 			if (isShowPendingContent) {
@@ -455,16 +455,16 @@ const UserProfile = React.memo(
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
-										userById?.user?.display_name ||
-										userById?.user?.username ||
-										user?.clan_nick ||
-										user?.user?.display_name ||
-										user?.user?.username
+									userById?.user?.display_name ||
+									userById?.user?.username ||
+									user?.clan_nick ||
+									user?.user?.display_name ||
+									user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
 								: user?.display_name ||
-									user?.username ||
-									user?.user?.display_name ||
-									(checkAnonymous ? 'Anonymous' : message?.username)}
+								user?.username ||
+								user?.user?.display_name ||
+								(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
