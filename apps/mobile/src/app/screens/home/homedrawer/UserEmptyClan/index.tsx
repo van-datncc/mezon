@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { RootState, selectAllClans } from '@mezon/store-mobile';
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -51,4 +51,4 @@ const UserEmptyClan = () => {
 	return null;
 };
 
-export default UserEmptyClan;
+export default memo(UserEmptyClan);

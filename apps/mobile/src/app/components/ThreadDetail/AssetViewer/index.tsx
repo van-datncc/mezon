@@ -70,9 +70,11 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 				) : tabActive === 4 ? (
 					<Canvas
 						channelId={
-							[ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
-								? currentChannel?.channel_id
-								: channelId
+							currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel?.parent_id
+								? currentChannel?.parent_id
+								: [ChannelType.CHANNEL_TYPE_DM, ChannelType.CHANNEL_TYPE_GROUP].includes(currentChannel?.type)
+									? currentChannel?.channel_id
+									: channelId
 						}
 						clanId={currentClanId}
 					/>

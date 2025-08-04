@@ -74,12 +74,28 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		[visibleToolbarConfig]
 	);
 
-	const onIndexChange = useCallback((newIndex: number) => {
-		if (formattedImageList[newIndex]?.id !== currentImage?.id) {
-			setCurrentImage(formattedImageList[newIndex]);
-			ref.current?.reset();
+	useEffect(() => {
+		if (currentImage?.url && formattedImageList?.length > 0) {
+			try {
+				const newIndex = formattedImageList?.findIndex((item) => item?.url === currentImage.url);
+				if (newIndex !== -1) {
+					ref.current?.setIndex(newIndex);
+				}
+			} catch (error) {
+				console.error('Error finding image index:', error);
+			}
 		}
-	}, []);
+	}, [formattedImageList]);
+
+	const onIndexChange = useCallback(
+		(newIndex: number) => {
+			if (formattedImageList?.[newIndex]?.id !== currentImage?.id) {
+				setCurrentImage(formattedImageList[newIndex]);
+				ref.current?.reset();
+			}
+		},
+		[currentImage?.id, formattedImageList]
+	);
 
 	const setTimeoutHideFooter = useCallback(() => {
 		footerTimeoutRef.current = setTimeout(() => {

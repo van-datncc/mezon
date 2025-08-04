@@ -20,7 +20,7 @@ import {
 	topicsActions,
 	useAppDispatch
 } from '@mezon/store-mobile';
-import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate } from '@mezon/utils';
+import { INotification, NotificationCategory, NotificationEntity, sleep, sortNotificationsByDate, TypeMessage } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { FlashList } from '@shopify/flash-list';
 import { ChannelStreamMode } from 'mezon-js';
@@ -172,12 +172,17 @@ const Notifications = () => {
 	const handleNotification = (notify: INotification, currentClanId: string, store: any, navigation: any) => {
 		return new Promise<void>((resolve) => {
 			requestAnimationFrame(async () => {
+				const isTopic =
+					Number(notify?.content?.topic_id) !== 0 ||
+					notify?.content?.code === TypeMessage.Topic ||
+					notify?.message?.code === TypeMessage.Topic;
+
 				const promises = [];
 				if (notify?.content?.mode === ChannelStreamMode.STREAM_MODE_DM || notify?.content?.mode === ChannelStreamMode.STREAM_MODE_GROUP) {
 					promises.push(store.dispatch(directActions.fetchDirectMessage({})));
 					promises.push(store.dispatch(directActions.setDmGroupCurrentId(notify?.content?.channel_id)));
 				} else {
-					if (Number(notify?.id) !== 0) {
+					if (isTopic) {
 						promises.push(
 							store.dispatch(
 								channelsActions.addThreadToChannels({
@@ -187,8 +192,8 @@ const Notifications = () => {
 							)
 						);
 						promises.push(store.dispatch(topicsActions.setCurrentTopicInitMessage(null)));
-						promises.push(store.dispatch(getFirstMessageOfTopic(notify?.id || '')));
-						promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.id || '')));
+						promises.push(store.dispatch(getFirstMessageOfTopic(notify?.content?.topic_id || notify?.id || '')));
+						promises.push(store.dispatch(topicsActions.setCurrentTopicId(notify?.content?.topic_id || notify?.id || '')));
 						promises.push(store.dispatch(topicsActions.setIsShowCreateTopic(true)));
 					}
 					if (notify?.content?.clan_id !== currentClanId) {
@@ -215,7 +220,7 @@ const Notifications = () => {
 					} else {
 						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: notify?.content?.channel_id });
 					}
-				} else if (Number(notify?.content?.topic_id) !== 0) {
+				} else if (isTopic) {
 					navigation.navigate(APP_SCREEN.MESSAGES.STACK, {
 						screen: APP_SCREEN.MESSAGES.TOPIC_DISCUSSION
 					});

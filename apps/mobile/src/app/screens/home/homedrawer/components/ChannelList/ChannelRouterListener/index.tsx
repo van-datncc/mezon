@@ -1,5 +1,5 @@
 import { ActionEmitEvent, STORAGE_DATA_CLAN_CHANNEL_CACHE, getUpdateOrAddClanChannelCache, save } from '@mezon/mobile-components';
-import { channelsActions, directActions, getStoreAsync } from '@mezon/store-mobile';
+import { channelsActions, directActions, getStoreAsync, topicsActions } from '@mezon/store-mobile';
 import { IChannel } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -58,6 +58,7 @@ const ChannelRouterListener = () => {
 				const channelId = channel?.channel_id || '';
 				const clanId = channel?.clan_id || '';
 				const store = await getStoreAsync();
+				store.dispatch(topicsActions.setCurrentTopicId(''));
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				store.dispatch(
