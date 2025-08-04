@@ -12,7 +12,7 @@ import {
 } from '@mezon/store-mobile';
 import { ICategoryChannel } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Platform, RefreshControl, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import useTabletLandscape from '../../../../hooks/useTabletLandscape';
@@ -33,6 +33,8 @@ const ChannelList = () => {
 	const listChannelRender = useAppSelector((state) => selectListChannelRenderByClanId(state, currentClan?.clan_id));
 	const [refreshing, setRefreshing] = useState(false);
 	const dispatch = useAppDispatch();
+	const flashListRef = useRef(null);
+
 	useEffect(() => {
 		if (currentClan?.clan_id) {
 			flashListRef?.current?.scrollToOffset?.({ animated: true, offset: 0 });
@@ -73,9 +75,20 @@ const ChannelList = () => {
 		[listChannelRender, isShowEmptyCategory]
 	) as ICategoryChannel[];
 
-	const styles = style(themeValue, isTabletLandscape);
-
-	const flashListRef = useRef(null);
+	const styles = useMemo(() => style(themeValue, isTabletLandscape), [themeValue, isTabletLandscape]);
+	const contentContainerStyle = useMemo(
+		() => ({
+			backgroundColor: themeValue.secondary,
+			paddingBottom: size.s_6
+		}),
+		[themeValue?.secondary]
+	);
+	const listStyle = useMemo(
+		() => ({
+			backgroundColor: themeValue.secondary
+		}),
+		[themeValue?.secondary]
+	);
 
 	const renderItem = useCallback(
 		({ item, index }) => {
@@ -101,7 +114,34 @@ const ChannelList = () => {
 		[currentChannelId, themeValue.secondary]
 	);
 
-	const keyExtractor = useCallback((item, index) => item?.id + item?.isFavor?.toString() + index, []);
+	const keyExtractor = useCallback((item, index) => {
+		if (index === 0) return 'backgroundHeader';
+		if (index === 1) return 'listHeader';
+		return `${item?.id || 'item'}_${item?.isFavor ? 'fav' : 'unfav'}_${index}`;
+	}, []);
+
+	const refreshControl = useMemo(() => <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />, [refreshing, handleRefresh]);
+
+	const viewabilityConfig = useMemo(
+		() => ({
+			itemVisiblePercentThreshold: 50,
+			minimumViewTime: 300
+		}),
+		[]
+	);
+
+	const onScrollToIndexFailed = useCallback((info) => {
+		if (info?.highestMeasuredFrameIndex) {
+			const wait = new Promise((resolve) => setTimeout(resolve, 200));
+			if (info.highestMeasuredFrameIndex < info.index) {
+				flashListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: true });
+				wait.then(() => {
+					flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
+				});
+			}
+		}
+	}, []);
+
 	return (
 		<View style={styles.mainList}>
 			<ChannelListScroll data={data} flashListRef={flashListRef} />
@@ -110,7 +150,7 @@ const ChannelList = () => {
 				data={data}
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}
-				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+				refreshControl={refreshControl}
 				stickyHeaderIndices={[1]}
 				showsVerticalScrollIndicator={true}
 				initialNumToRender={15}
@@ -120,30 +160,12 @@ const ChannelList = () => {
 				scrollEventThrottle={16}
 				removeClippedSubviews={Platform.OS === 'android'}
 				keyboardShouldPersistTaps={'handled'}
-				viewabilityConfig={{
-					itemVisiblePercentThreshold: 50,
-					minimumViewTime: 300
-				}}
+				viewabilityConfig={viewabilityConfig}
 				contentOffset={{ x: 0, y: 0 }}
-				onScrollToIndexFailed={(info) => {
-					if (info?.highestMeasuredFrameIndex) {
-						const wait = new Promise((resolve) => setTimeout(resolve, 200));
-						if (info.highestMeasuredFrameIndex < info.index) {
-							flashListRef.current?.scrollToIndex({ index: info.highestMeasuredFrameIndex, animated: true });
-							wait.then(() => {
-								flashListRef.current?.scrollToIndex({ index: info.index, animated: true });
-							});
-						}
-					}
-				}}
+				onScrollToIndexFailed={onScrollToIndexFailed}
 				disableVirtualization={false}
-				contentContainerStyle={{
-					backgroundColor: themeValue.secondary,
-					paddingBottom: size.s_6
-				}}
-				style={{
-					backgroundColor: themeValue.secondary
-				}}
+				contentContainerStyle={contentContainerStyle}
+				style={listStyle}
 			/>
 			{!isTabletLandscape && <View style={{ height: 80 }} />}
 			<ButtonNewUnread />
@@ -151,4 +173,4 @@ const ChannelList = () => {
 	);
 };
 
-export default ChannelList;
+export default memo(ChannelList);

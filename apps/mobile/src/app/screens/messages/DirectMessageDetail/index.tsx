@@ -1,5 +1,5 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { directActions, selectDmGroupCurrent, useAppDispatch } from '@mezon/store-mobile';
+import { directActions, selectDmGroupCurrent, topicsActions, useAppDispatch } from '@mezon/store-mobile';
 import { ChannelType } from 'mezon-js';
 import React, { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
@@ -20,6 +20,7 @@ export const DirectMessageDetailScreen = ({ route }: { route: any }) => {
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
 
 	useEffect(() => {
+		dispatch(topicsActions.setCurrentTopicId(''));
 		// When the screen is focused, socket disconnect or some case, we want to fetch the DM group if it is not already available
 		if (!currentDmGroup?.channel_id) {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
