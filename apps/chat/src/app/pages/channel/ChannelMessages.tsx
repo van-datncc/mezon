@@ -548,8 +548,8 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 		onNotchToggle
 	}) => {
 		const dispatch = useAppDispatch();
-		const userId = useSelector(selectAllAccount)?.user?.id;
-		const currentClanUser = useAppSelector((state) => selectMemberClanByUserId2(state, userId as string));
+		const user = useSelector(selectAllAccount);
+		const currentClanUser = useAppSelector((state) => selectMemberClanByUserId2(state, user?.user?.id as string));
 		const lastMessage = useAppSelector((state) => selectLastMessageByChannelId(state, channelId));
 		const idMessageToJump = useSelector(selectIdMessageToJump);
 		const entities = useAppSelector((state) => selectMessageEntitiesByChannelId(state, channelId));
@@ -684,7 +684,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 			const container = chatRef.current;
 			if (!container) return;
 			if (
-				userId === lastMessage?.sender_id &&
+				user?.user?.id === lastMessage?.sender_id &&
 				lastMessage?.create_time &&
 				new Date().getTime() - new Date(lastMessage.create_time).getTime() < 500
 			) {
@@ -902,7 +902,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = memo(
 						isTopic={isTopic}
 						canSendMessage={canSendMessage}
 						observeIntersectionForLoading={observeIntersectionForLoading}
-						user={currentClanUser}
+						user={currentClanUser || user}
 						showMessageContextMenu={showMessageContextMenu}
 						isSelected={isSelected}
 						isEditing={isEditing}
