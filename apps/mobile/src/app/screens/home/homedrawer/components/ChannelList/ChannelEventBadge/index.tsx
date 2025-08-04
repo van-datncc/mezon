@@ -25,7 +25,6 @@ export const EventBadge = memo(({ clanId, channelId }: EventBadgeProps) => {
 			const urlVoice = `${linkGoogleMeet}${channelVoice?.meeting_code}`;
 			await Linking.openURL(urlVoice);
 		} else if (channelVoice?.meeting_code && channelVoice?.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE) {
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			const data = {
 				snapPoints: ['45%'],
 				children: <JoinChannelVoiceBS channel={channelVoice} />
