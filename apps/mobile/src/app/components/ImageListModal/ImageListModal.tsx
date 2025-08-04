@@ -76,9 +76,13 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 
 	useEffect(() => {
 		if (currentImage?.url && formattedImageList?.length > 0) {
-			const newIndex = formattedImageList?.findIndex((item) => item?.url === currentImage.url);
-			if (newIndex !== -1) {
-				ref.current?.setIndex(newIndex);
+			try {
+				const newIndex = formattedImageList?.findIndex((item) => item?.url === currentImage.url);
+				if (newIndex !== -1) {
+					ref.current?.setIndex(newIndex);
+				}
+			} catch (error) {
+				console.error('Error finding image index:', error);
 			}
 		}
 	}, [formattedImageList]);
