@@ -184,35 +184,6 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				</MemberProvider>
 			)}
 
-			{/* Description Section */}
-			<div className="bg-theme-setting-nav p-4 rounded-lg mt-6 ">
-				<h4 className="text-lg font-semibold text-theme-primary-active mb-2">Description</h4>
-				<div className="relative">
-					<textarea
-						className="w-full h-32 bg-theme-setting-primary text-theme-primary rounded-md p-2 resize-none border border-theme-primary bg-theme-setting-primary focus-input"
-						placeholder="Enter your clan description..."
-						value={description}
-						onChange={handleChangeDescription}
-						maxLength={300}
-					/>
-					<div className="absolute bottom-2 right-2 text-sm text-theme-primary">{description.length}/300</div>
-				</div>
-			</div>
-
-			{/* About Section */}
-			<div className="bg-theme-setting-nav p-4 rounded-lg mt-6 ">
-				<h4 className="text-lg font-semibold text-theme-primary-active mb-2">About</h4>
-				<div className="relative">
-					<textarea
-						className="w-full h-32 bg-theme-setting-primary text-theme-primary rounded-md p-2 resize-none border border-theme-primary bg-theme-setting-primary focus-input"
-						placeholder="Tell us about your clan..."
-						value={about}
-						onChange={handleChangeAbout}
-						maxLength={300}
-					/>
-					<div className="absolute bottom-2 right-2 text-sm text-theme-primary">{about.length}/300</div>
-				</div>
-			</div>
 		</div>
 	);
 
@@ -224,7 +195,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 						<div className="bg-theme-setting-primary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
 							<div className="flex justify-between items-center mb-6">
-								<h3 className="text-xl font-semibold text-theme-primary-active">Community Settings</h3>
+								<h3 className="text-xl font-semibold text-theme-primary-active">Onboarding Settings</h3>
 								<button onClick={() => setIsModalOpen(false)} className=" text-theme-primary text-theme-primary-hover ">
 									<Icons.CloseIcon className="w-6 h-6" />
 								</button>
