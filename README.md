@@ -268,6 +268,7 @@ We welcome contributions from the community! Here's how you can help:
 
 -   [**Web App**](https://mezon.ai/chat/direct/friends) - Try Mezon instantly
 -   [**Community Directory**](https://mezon.ai/clans/) - Discover communities
+-   [**Bot/App store**](https://top.mezon.ai/) - Mezon Top Board
 -   [**User Guide**](docs/user-guides/GETTING_STARTED.md) - Getting started guide
 
 ### 🛠️ For Developers
