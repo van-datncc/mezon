@@ -74,7 +74,7 @@ yarn dev:chat
 
 The application will be available at http://localhost:4200/
 
-> 📖 **Need help?** Check out our [Developer Guide](DEVELOPER_GUIDE.md) for detailed setup instructions.
+> 📖 **Need help?** Check out our [Developer Guide](docs/developer/SETUP.md) for detailed setup instructions.
 
 ---
 
@@ -211,7 +211,7 @@ mezon/
 
 ### 📚 Getting Started
 
-1. **Setup**: Follow the [Developer Guide](DEVELOPER_GUIDE.md) for detailed setup instructions
+1. **Setup**: Follow the [Developer Guide](docs/developer/SETUP.md) for detailed setup instructions
 2. **Architecture**: Review [Architecture docs](docs/developer/ARCHITECTURE.md) to understand the system
 3. **Contribute**: Browse [open issues](https://github.com/mezonai/mezon/issues) for contribution opportunities
 4. **Community**: Join our [developer community](https://mezon.ai/invite/1840696977034055680) for support and discussions
@@ -272,7 +272,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ### 🛠️ For Developers
 
--   [**Developer Guide**](DEVELOPER_GUIDE.md) - Complete setup and development guide
+-   [**Developer Guide**](docs/developer/SETUP.md) - Complete setup and development guide
 -   [**API Documentation**](https://mezon.ai/docs/mezon-sdk-docs/) - REST API and WebSocket reference
 -   [**Architecture Guide**](docs/developer/ARCHITECTURE.md) - System design and architecture
 -   [**Bot Development**](https://github.com/mezonai/mezon-bot-example) - Bot creation tutorial
