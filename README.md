@@ -3,6 +3,9 @@ Mezon is great for playing games and chilling with friends,
 or even building a worldwide community.
 Customize your own space to talk, play, and hang out.
 
+# Try mezon
+https://mezon.ai
+
 # Bug report community
 https://mezon.ai/invite/1840696977034055680
 
@@ -356,14 +359,5 @@ See: https://github.com/electron/electron/issues/3331
 
 ## Mezon mainnet
 <img width="1061" height="695" alt="1754016094020_image" src="https://github.com/user-attachments/assets/9e4137ea-5b73-40c0-98dc-0bdc403b6f91" />
-
-
-## Screenshot
-
-![image](https://github.com/user-attachments/assets/7060df63-0ca8-4dd5-a220-2f127c2f1031)
-
-![image](https://github.com/user-attachments/assets/a205ee39-1054-4207-9963-49229ae9d00d)
-
-![image](https://github.com/user-attachments/assets/6b5e2b79-3f4d-4de0-b885-24d5d7e6fa96)
 
 
