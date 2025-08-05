@@ -37,8 +37,13 @@ export const MessageReferences = ({ messageReferences, preventAction, channelId,
 		return messageSender?.clan_avatar || messageSender?.user?.avatar_url || '';
 	}, [messageReferences]);
 	const isEmbedMessage = useMemo(() => {
-		const content = safeJSONParse(messageReferences?.content ?? '{}');
-		return !content?.t && content?.embed;
+		try {
+			const content = safeJSONParse(messageReferences?.content ?? '{}');
+			return !content?.t && content?.embed;
+		} catch (error) {
+			console.error('Failed to parse message references content: ', error);
+			return false;
+		}
 	}, [messageReferences?.content]);
 
 	const handleJumpToMessage = (messageId: string) => {
