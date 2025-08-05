@@ -32,6 +32,11 @@ const AddNodeMenuPopup = () => {
 			title: 'Webhook',
 			nodeType: 'webhook',
 			description: 'Receives updates via HTTP requests for real-time integrations.'
+		},
+		{
+			title: 'Quick Menu Event',
+			nodeType: 'quickMenu',
+			description: 'Receives event to quick menu in app for quick actions.'
 		}
 	];
 	return (
