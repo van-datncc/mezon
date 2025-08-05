@@ -9,7 +9,7 @@ export type ClanLoaderData = {
 };
 
 export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => {
-	const { clanId } = params;
+	const { clanId, canvasId } = params;
 	if (!clanId) {
 		throw new Error('Clan ID null');
 	}
@@ -20,7 +20,9 @@ export const clanLoader: CustomLoaderFunction = async ({ params, dispatch }) => 
 	dispatch(clansActions.joinClan({ clanId }));
 	dispatch(clansActions.changeCurrentClan({ clanId }));
 	dispatch(channelsActions.setModeResponsive({ clanId, mode: ModeResponsive.MODE_CLAN }));
-	dispatch(appActions.setIsShowCanvas(false));
+	if (!canvasId) {
+		dispatch(appActions.setIsShowCanvas(false));
+	}
 	dispatch(topicsActions.setIsShowCreateTopic(false));
 	dispatch(topicsActions.setCurrentTopicId(''));
 	return {

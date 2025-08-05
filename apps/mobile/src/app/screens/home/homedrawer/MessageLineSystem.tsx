@@ -1,5 +1,5 @@
 import { ActionEmitEvent, Icons } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { MessagesEntity, channelsActions, messagesActions, selectAllChannelMemberIds, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
 import { ETokenMessage, TypeMessage, convertTimeString, parseThreadInfo } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -197,7 +197,12 @@ export const MessageLineSystem = memo(({ message }: { message: MessagesEntity })
 				{message?.code === TypeMessage.CreatePin && (
 					<MezonIconCDN icon={IconCDN.pinIcon} color={themeValue.text} width={size.s_20} height={size.s_20} />
 				)}
-				{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon width={size.s_24} height={size.s_24} />}
+				{message?.code === TypeMessage.AuditLog && (
+					<MezonIconCDN icon={IconCDN.auditLog} width={size.s_24} height={size.s_24} color={baseColor.blurple} />
+				)}
+				{message?.code === TypeMessage.UpcomingEvent && (
+					<MezonIconCDN icon={IconCDN.auditLog} width={size.s_24} height={size.s_24} color={baseColor.redStrong} />
+				)}
 			</View>
 			<View style={{ flexDirection: 'column' }}>
 				<View style={styles.messageSystemBox}>

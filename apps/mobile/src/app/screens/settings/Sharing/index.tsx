@@ -355,7 +355,7 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 						: checkIsImage
 							? await compressImage(media?.filePath || media?.contentUri)
 							: null;
-					const fileData = await RNFS.readFile(pathCompressed || media?.filePath || media?.contentUri, 'base64');
+					const fileData = await RNFS.readFile(pathCompressed || media?.contentUri || media?.filePath, 'base64');
 					let width = 600;
 					let height = 900;
 					if (checkIsImage) {
@@ -395,11 +395,11 @@ export const Sharing = ({ data, onClose }: ISharing) => {
 		try {
 			return await Image.compress(image, {
 				compressionMethod: 'auto',
-				quality: 0.9
+				quality: 1
 			});
 		} catch (error) {
 			console.error('log  => error compressImage', error);
-			return image;
+			return '';
 		}
 	};
 

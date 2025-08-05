@@ -2,7 +2,6 @@ import { useAuth } from '@mezon/core';
 import { appActions, canvasActions, canvasAPIActions, selectIdCanvas, useAppDispatch } from '@mezon/store';
 import { ICanvas } from '@mezon/utils';
 import { ButtonCopy } from 'libs/components/src/lib/components';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 type GroupCanvasProps = {
@@ -17,7 +16,6 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel }: G
 	const canvasId = canvas.id;
 	const currentIdCanvas = useSelector(selectIdCanvas);
 	const { userProfile } = useAuth();
-	const [isCopied, setIsCopied] = useState(false);
 	const dispatch = useAppDispatch();
 	const isDisableDelCanvas = Boolean(
 		canvas.creator_id && canvas.creator_id !== userProfile?.user?.id && creatorIdChannel !== userProfile?.user?.id
