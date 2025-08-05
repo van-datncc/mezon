@@ -35,6 +35,7 @@ export type MemberProfileProps = {
 	isMute?: boolean;
 	metaDataDM?: any;
 	statusOnline?: any;
+	onClick?: (event: React.MouseEvent) => void;
 };
 
 type BaseMemberProfileProps = MemberProfileProps & {
@@ -201,7 +202,7 @@ const MemberProfileCore = ({
 };
 
 export const MemberProfile = (props: MemberProfileProps) => {
-	return <BaseMemberProfile {...props} isDM={true} currentClan={undefined} />;
+	return <BaseMemberProfile {...props} isDM={true} currentClan={undefined} onClick={props.onClick} />;
 };
 
 export const SimpleMemberProfile = (props: BaseMemberProfileProps) => {
