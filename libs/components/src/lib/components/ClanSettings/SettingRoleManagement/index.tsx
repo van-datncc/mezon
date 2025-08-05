@@ -27,7 +27,6 @@ type EditNewRole = {
 export type ModalSettingSave = {
 	flagOption: boolean;
 	handleClose: () => void;
-	handleSaveClose: () => void;
 	handleUpdateUser: () => Promise<void>;
 };
 const ServerSettingRoleManagement = (props: EditNewRole) => {
@@ -58,7 +57,6 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 			dispatch(setSelectedPermissions(permissionIds));
 		}
 	};
-	const handleSaveClose = () => null;
 
 	const handleUpdateUser = async (hasChangeRole?: boolean) => {
 		if (isCreateNewRole) {
@@ -72,7 +70,6 @@ const ServerSettingRoleManagement = (props: EditNewRole) => {
 	const saveProfile: ModalSettingSave = {
 		flagOption: isChange,
 		handleClose,
-		handleSaveClose,
 		handleUpdateUser
 	};
 	return flagOption ? (
