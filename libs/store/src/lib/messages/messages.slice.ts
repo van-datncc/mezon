@@ -572,8 +572,9 @@ export const jumpToMessage = createAsyncThunk(
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: 'temp', navigate: false }));
 			const channelMessages = selectViewportIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
+			let found = true;
 			if (indexMessage < 10) {
-				await thunkAPI
+				const response = await thunkAPI
 					.dispatch(
 						fetchMessages({
 							clanId: clanId,
@@ -587,6 +588,11 @@ export const jumpToMessage = createAsyncThunk(
 						})
 					)
 					.unwrap();
+
+				found = response?.messages?.some((item) => item.id === messageId);
+				if (!found) {
+					thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
+				}
 			}
 
 			const state = thunkAPI.getState() as RootState;
@@ -602,10 +608,10 @@ export const jumpToMessage = createAsyncThunk(
 				if (clanId === '0') {
 					channelPath = `/chat/direct/message/${channelId}/${mode}`;
 				}
-				thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: true }));
+				found && thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: true }));
 				navigate && navigate(channelPath);
 			} else {
-				thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: false }));
+				found && thunkAPI.dispatch(messagesActions.setIdMessageToJump({ id: messageId, navigate: false }));
 			}
 		} catch (e) {
 			captureSentryError(e, 'messages/jumpToMessage');
@@ -1853,7 +1859,7 @@ const updateReferenceMessage = ({ state, channelId, listMessageIds }: { state: M
 };
 
 const handleAddOneMessage = ({ state, channelId, adapterPayload }: { state: MessagesState; channelId: string; adapterPayload: MessagesEntity }) => {
-	if (state.channelMessages[channelId]?.ids?.length) {
+	if (state.channelMessages[channelId]) {
 		state.channelMessages[channelId] = channelMessagesAdapter.addOne(state.channelMessages[channelId], adapterPayload);
 	}
 };
