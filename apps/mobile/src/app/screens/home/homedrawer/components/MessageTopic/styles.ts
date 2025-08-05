@@ -10,14 +10,19 @@ export const style = (colors: Attributes) =>
 			borderRadius: size.s_10
 		},
 		container: {
-			paddingTop: size.s_6,
-			marginVertical: size.s_2,
-			marginBottom: size.s_4,
+			paddingVertical: size.s_6,
+			paddingHorizontal: size.s_10,
+			marginVertical: size.s_4,
 			flexDirection: 'row',
 			alignItems: 'center',
-			gap: size.s_4
+			gap: size.s_4,
+			backgroundColor: colors.secondaryLight,
+			borderRadius: size.s_6,
+			borderWidth: 0.5,
+			borderColor: Colors.gray72
 		},
 		dateMessageBox: {
+			paddingLeft: size.small,
 			fontSize: size.small,
 			color: Colors.gray72
 		},

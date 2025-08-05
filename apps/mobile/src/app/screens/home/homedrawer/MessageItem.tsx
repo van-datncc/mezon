@@ -26,6 +26,7 @@ import { MessageLineSystem } from './MessageLineSystem';
 import RenderMessageBlock from './RenderMessageBlock';
 import WelcomeMessage from './WelcomeMessage';
 import { AvatarMessage } from './components/AvatarMessage';
+import ButtonGotoTopic from './components/ButtonGotoTopic/ButtonGotoTopic';
 import { EmbedComponentsPanel } from './components/EmbedComponents';
 import { EmbedMessage } from './components/EmbedMessage';
 import { InfoUserMessage } from './components/InfoUserMessage';
@@ -325,7 +326,7 @@ const MessageItem = React.memo(
 								/>
 							)}
 
-							<View style={message?.content?.fwd ? { display: 'flex' } : undefined}>
+							<View style={[message?.content?.fwd ? { display: 'flex' } : undefined, message?.content?.isCard && styles.cardMsg]}>
 								<View style={message?.content?.fwd ? { borderLeftWidth: 2, borderColor: 'gray', paddingLeft: 10 } : undefined}>
 									{!!message?.content?.fwd && (
 										<Text style={styles.forward}>
@@ -408,6 +409,9 @@ const MessageItem = React.memo(
 										</View>
 									)}
 								</View>
+
+								{message?.content?.isCard && message?.code !== TypeMessage.Topic && <ButtonGotoTopic message={message} />}
+								{message?.code === TypeMessage.Topic && message?.content?.isCard && <MessageTopic message={message} />}
 							</View>
 							{message.isError && <Text style={{ color: Colors.textRed }}>{t('unableSendMessage')}</Text>}
 							{!preventAction && !!message?.reactions?.length ? (
@@ -433,7 +437,7 @@ const MessageItem = React.memo(
 									}}
 								/>
 							) : null}
-							{message?.code === TypeMessage.Topic && <MessageTopic message={message} avatar={messageAvatar} />}
+							{message?.code === TypeMessage.Topic && !message?.content?.isCard && <MessageTopic message={message} />}
 						</View>
 					</View>
 				</Pressable>
