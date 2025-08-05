@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';

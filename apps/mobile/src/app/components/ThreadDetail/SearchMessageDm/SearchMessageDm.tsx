@@ -28,28 +28,32 @@ export default function SearchMessageDm({ navigation, route }: any) {
 	}, []);
 	const [filtersSearch, setFiltersSearch] = useState<SearchFilter[]>();
 	const { currentChannel } = route?.params || {};
-	const totalResult = useAppSelector((state) => selectTotalResultSearchMessage(state, currentChannel?.channel_id));
+	const totalResult = useAppSelector((state) => selectTotalResultSearchMessage(state, currentChannel?.channel_id || ''));
 	const dispatch = useAppDispatch();
-	const valueInputSearch = useAppSelector((state) => selectValueInputSearchMessage(state, currentChannel?.channel_id));
+	const valueInputSearch = useAppSelector((state) => selectValueInputSearchMessage(state, currentChannel?.channel_id || ''));
 	const keywordSearch = useRef<string>(valueInputSearch || '');
 
 	const handleSearchMessageDm = async (searchText: string) => {
-		const filter = [
-			{
-				field_name: 'content',
-				field_value: searchText
-			},
-			{ field_name: 'channel_id', field_value: currentChannel?.channel_id },
-			{ field_name: 'clan_id', field_value: currentChannel?.clan_id }
-		];
-		setFiltersSearch(filter || []);
-		const payload = {
-			filters: filter,
-			from: 1,
-			size: SIZE_PAGE_SEARCH
-		};
-		await dispatch(searchMessagesActions.fetchListSearchMessage(payload));
-		dispatch(searchMessagesActions.setCurrentPage({ channelId: currentChannel?.channel_id, page: 1 }));
+		try {
+			const filter = [
+				{
+					field_name: 'content',
+					field_value: searchText
+				},
+				{ field_name: 'channel_id', field_value: currentChannel?.channel_id || '' },
+				{ field_name: 'clan_id', field_value: currentChannel?.clan_id || '' }
+			];
+			setFiltersSearch(filter || []);
+			const payload = {
+				filters: filter,
+				from: 1,
+				size: SIZE_PAGE_SEARCH
+			};
+			await dispatch(searchMessagesActions.fetchListSearchMessage(payload));
+			dispatch(searchMessagesActions.setCurrentPage({ channelId: currentChannel?.channel_id || '', page: 1 }));
+		} catch (error) {
+			console.error('Fetch list search message error', error);
+		}
 	};
 
 	const TabList = useMemo(
@@ -78,7 +82,7 @@ export default function SearchMessageDm({ navigation, route }: any) {
 	);
 
 	const handleSetValueInputSearch = useCallback((value: string) => {
-		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.channel_id, value: value }));
+		dispatch(searchMessagesActions.setValueInputSearch({ channelId: currentChannel?.channel_id || '', value: value }));
 	}, []);
 
 	useEffect(() => {
