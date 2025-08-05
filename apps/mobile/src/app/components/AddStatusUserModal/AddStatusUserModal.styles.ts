@@ -2,7 +2,10 @@ import { Colors, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-	headerModal: { backgroundColor: Colors.transparent, paddingHorizontal: 0 },
+	headerModal: {
+		backgroundColor: Colors.transparent,
+		paddingHorizontal: size.s_20
+	},
 	titleHeader: {
 		width: '76%',
 		textAlign: 'center'
