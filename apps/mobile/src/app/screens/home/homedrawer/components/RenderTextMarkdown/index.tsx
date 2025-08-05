@@ -66,32 +66,32 @@ export const markdownStyles = (
 	};
 	return StyleSheet.create({
 		heading1: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h1,
 			fontWeight: '600'
 		},
 		heading2: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h2,
 			fontWeight: '600'
 		},
 		heading3: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h3,
 			fontWeight: '600'
 		},
 		heading4: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h4,
 			fontWeight: '600'
 		},
 		heading5: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h5,
 			fontWeight: '600'
 		},
 		heading6: {
-			color: colors.text,
+			color: commonHeadingStyle.color,
 			fontSize: size.h6,
 			fontWeight: '600'
 		},
@@ -299,7 +299,17 @@ const renderTextPalainContain = (
 
 			if (headingLevel) {
 				headingFormattedLines.push(
-					<Text key={`line-${idx}_${headingText}`} style={[themeValue ? markdownStyles(themeValue)?.[`heading${headingLevel}`] : {}]}>
+					<Text
+						key={`line-${idx}_${headingText}`}
+						style={[
+							themeValue ? markdownStyles(
+								themeValue,
+								isUnReadChannel,
+								isLastMessage,
+								isBuzzMessage
+							)?.[`heading${headingLevel}`] : {}
+						]}
+					>
 						{headingText}
 						{idx !== lines.length - 1 || !isLastText ? '\n' : ''}
 					</Text>
@@ -332,7 +342,7 @@ const renderTextPalainContain = (
 			</Text>
 		);
 	} else {
-		return <Text>{headingFormattedLines}</Text>;
+		return <Text key={`heading-text-${lastIndex}`}>{headingFormattedLines}</Text>;
 	}
 };
 
@@ -725,12 +735,20 @@ export const RenderTextMarkdownContent = ({
 
 			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap', alignItems: 'flex-end' }}>
 				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-					{textParts?.length > 0 && <Text key={`textParts${t}_${lastIndex}`}>{textParts}</Text>}
-					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
+					{textParts?.length > 0 && textParts.map((part, index) => (
+						<View key={`text-part-${index}`}>
+							{part}
+						</View>
+					))}
+					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item, index) => (
+						<View key={`markdown-part-${index}`}>
+							{item}
+						</View>
+					))}
 				</View>
 				{isEdited && (
 					<View>
-						<Text key={`edited-${textParts}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
+						<Text key={`edited-${lastIndex}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
 							{translate('edited')}
 						</Text>
 					</View>
