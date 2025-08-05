@@ -1,365 +1,352 @@
-# The Live, Work, and Play Platform – the best Discord alternative.
-Mezon is great for playing games and chilling with friends,
-or even building a worldwide community.
-Customize your own space to talk, play, and hang out.
+<div align="center">
+  <h1>Mezon</h1>
+  
+  <p align="center">
+    <strong>The Live, Work, and Play Platform – the best Discord alternative.</strong>
+  </p>
 
-# Bug report community
-https://mezon.ai/invite/1840696977034055680
+  <p align="center">
+    <a href="https://github.com/mezonai/mezon/releases"><img src="https://img.shields.io/github/v/release/mezonai/mezon?style=flat-square" alt="Latest Release"></a>
+    <a href="https://github.com/mezonai/mezon/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mezonai/mezon?style=flat-square" alt="License"></a>
+    <a href="https://github.com/mezonai/mezon/stargazers"><img src="https://img.shields.io/github/stars/mezonai/mezon?style=flat-square" alt="GitHub Stars"></a>
+    <a href="https://github.com/mezonai/mezon/issues"><img src="https://img.shields.io/github/issues/mezonai/mezon?style=flat-square" alt="Issues"></a>
+    <a href="https://github.com/mezonai/mezon/network/members"><img src="https://img.shields.io/github/forks/mezonai/mezon?style=flat-square" alt="Forks"></a>
+  </p>
 
-# Funny game community
-https://mezon.ai/invite/1840680133686464512
+  <p align="center">
+    <a href="https://mezon.ai"><img src="https://img.shields.io/badge/Try%20Live-mezon.ai-blue?style=flat-square" alt="Try Live"></a>
+    <a href="https://mezon.ai/invite/1840696977034055680"><img src="https://img.shields.io/badge/Join-Community-purple?style=flat-square" alt="Join Community"></a>
+    <a href="#contributing"><img src="https://img.shields.io/badge/Contributions-Welcome-green?style=flat-square" alt="Contributions Welcome"></a>
+  </p>
+</div>
 
-# Mezon Monthly Bot Challenge
-https://mezon.ai/invite/1840677412925345792
+---
 
-## Installing Nx Globally
+## About Mezon
 
-`npm install --global nx@latest`
+Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your own space to talk, play, and hang out., Mezon delivers enterprise-grade performance with sub-millisecond response times and support for millions of concurrent connections.
 
-## Notes
+<div align="center">
+  <img src="docs/mezon_header_bot_battle.png" alt="Mezon Platform Overview" width="100%">
+</div>
 
--   using `Git Bash` to run the commands
--   using `VSCode` as the code editor
+### ✨ Key Features
 
-## Prerequisites
+-   **🔒 Security First** - End-to-end encryption, XSS protection, zero-knowledge architecture
+-   **⚡ High Performance** - Sub-millisecond response times, millions of concurrent connections
+-   **🌐 Cross-Platform** - Web, Desktop (Windows/macOS/Linux), Mobile (iOS/Android)
+-   **🤖 AI-Powered** - Built-in content moderation, real-time translation, meeting summaries
+-   **🔧 Extensible** - Custom bots, 100+ integrations, API-first design
+-   **💰 Creator Economy** - Built-in monetization, premium memberships, token rewards
 
--   Node.js 18.17.0
--   yarn 1.22.17
--   git bash
+### 🎯 Use Cases
 
-## Setup
+| Use Case               | Features                                             |
+| ---------------------- | ---------------------------------------------------- |
+| **Gaming Communities** | Voice chat, tournaments, streaming integration       |
+| **Professional Teams** | Channels, file sharing, integrations, meeting tools  |
+| **Content Creators**   | Monetization tools, community building, analytics    |
+| **Personal Groups**    | Private spaces, family connections, secure messaging |
 
--   Clone the repository
+---
 
-## Install the dependencies
+## 🚀 Quick Start
 
--   Run `yarn` to install the dependencies
+### For Users
 
-## Prepare the environment variables
+1. **Web App**: Visit [mezon.ai](https://mezon.ai) - no installation required
+2. **Desktop**: Download from [releases](https://github.com/mezonai/mezon/releases) for Windows, macOS, or Linux
+3. **Mobile**: Get the app from [App Store](https://mezon.ai) or [Google Play](https://mezon.ai)
 
--   Create a `.env` file in the `apps/chat` directory
-
-## Start the chat app
-
-To start the development server run `yarn dev:chat`. Open your browser and navigate to http://localhost:4200/. Happy coding!
-
-## Linting
-
--   Run `yarn lint` to lint the codebase
--   Run `yarn lint:fix` to fix the linting issues
-
-## Format
-
--   Run `yarn format` to format the codebase
--   Run `yarn format:fix` to fix the formatting issues
-
-## Architecture Overview
-
-[![Architecture Overview](./docs/mezon-overview.png)](https://drive.google.com/file/d/1SssyfwQGJFLR80ONQ4KvV3W8qi27yt_G/preview)
-
-## Workspace Structure
-
-![Workspace Structure](./docs/workspace-structure.svg)
-
-We are using monorepo architecture to manage the codebase. The workspace is divided into multiple applications and libraries. Each application is a standalone application and each library is a reusable codebase.
-
-Workspace will be managed by [`Nx`](https://nx.dev/) which is a smart, fast and extensible build system.
-
-### Applications
-
-All applications are located in the `apps` directory. Each application is a standalone React application and has its own codebase.
-
--   `chat`: Chat application
--   `admin`: Admin application
-
-Currently, we only focus on the `chat` application.
-
-### Libraries
-
-All libraries are located in the `libs` directory. Each library is a reusable codebase and can be used by multiple applications.
-
--   `ui`: UI elements library, the components are `stateless` and `dumb`
--   `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
--   `core`: Core library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
--   `transports`: Transport layer library, contains the logic to communicate with the server through `mezon-js` library
--   `store`: State management library, contains the logic to manage the state of the application using `redux` and `redux-toolkit`
--   `assets`: Assets library, contains the assets used by the applications and libraries
--   `logger`: Logger library, contains the logic to log the messages
--   `utils`: Utility functions library
-
-### Dependencies
-
-Codebase is divided into multiple dependencies which are managed by `Nx`. There are 2 types of modules:
-
--   apps: standalone applications
--   libs: reusable codebase
-
-the libraries are shared by multiple applications and could be reused by multiple applications.
-
-There are several types of libraries:
-
--   `ui`: UI elements library, the components are `stateless` and `dumb`
--   `components`: Shared components library, the components are `stateful` and `smart` perform some logic through `context` and `hooks`
--   `logic`: Logic library, contains the core logic of the application, could be reused by multiple applications e.g. web, mobile, desktop
--   `utils`: Utility functions library
-
-The dependencies are depend on each other based on the following rules `(<- = depend on)`:
-
--   `apps` <- `libs` ✅
--   `libs` <- `libs` ✅
--   `components` <- `ui` ✅
--   `components` <- `store` ✅
--   `store` <- `transports` ✅
--   `store` <- `utils` ✅
-
-Bad dependencies:
-
--   `apps` <- `apps` ❌
--   `libs` <- `apps` ❌
--   `components` <- `apps` ❌
--   `ui` <- `components` ❌
--   `store` <- `components` ❌
--   `transports` <- `store` ❌
--   `utils` <- `store` ❌
--   `utils` <- `transports` ❌
--   `mobile libs` <- `web libs` ❌
--   `web libs` <- `desktop libs` ❌
-
-### Dependency Graph
-
-The dependency graph is managed by `Nx` and could be visualized by running the following command:
+### For Developers
 
 ```bash
- npx nx graph
+# Clone the repository
+git clone https://github.com/mezonai/mezon.git
+cd mezon
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev:chat
 ```
 
-the output will be the dependency graph of the workspace.
+The application will be available at http://localhost:4200/
 
-![Dependency Graph](./docs/dependency-graph.png)
+> 📖 **Need help?** Check out our [Developer Guide](DEVELOPER_GUIDE.md) for detailed setup instructions.
 
-how to read the dependency graph:
+---
 
--   dependencies are represented by the arrows
--   the `apps` are the standalone applications
--   the `libs` are the reusable codebase
--   the bad dependencies are the dependencies that are not allowed, for example, `apps` <- `apps`, `libs` <- `apps`, `ui` <- `components`, etc.
--   in summary, all dependencies should be in top -> bottom direction, if a dependency is in the bottom -> top direction, it is a bad dependency
--   Cycle dependencies are not allowed, a cycle dependency is a dependency that forms a cycle, to remove the cycle dependency, we need to move the shared code to the shared library or create a new library to manage the shared code
+## 🌟 Core Features
 
-for example, we have bad dependencies between `components` and `apps` which are not allowed.
+### 💬 Communication
 
-![alt text](./docs/bad-dependencies.png)
+-   **Rich Text Messaging** - Markdown support, threads, reactions, file sharing up to 500MB
+-   **Voice & Video** - Crystal-clear HD calls supporting up to 1000 users
+-   **Screen Sharing** - Built-in recording and streaming capabilities
 
-## Data Flow
+### 🛡️ Security & Privacy
 
-We are using `one-way` data flow architecture to manage the data flow of the application. The data flow is unidirectional follow the `Redux` pattern.
+-   **End-to-End Encryption** - All messages, voice, and video communications
+-   **Zero-Knowledge Architecture** - Client-side encryption, secure binary sockets
+-   **XSS Protection** - Safe message rendering and content validation
 
-![Data Flow](./docs/redux-data-flow.gif)
+### 🎯 Organization & Management
 
-See more about the `Redux` pattern [here](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow).
+-   **Advanced Permissions** - Custom roles with granular permission controls
+-   **Smart Notifications** - AI-powered filtering and priority management
+-   **Event Scheduling** - Built-in calendar with RSVP system
 
-The core concepts are `one-way` data flow and `single source of truth`.
+### 🤖 AI-Powered Features
 
-## Application data
+-   **Content Moderation** - Automated safety and community management
+-   **Real-time Translation** - Support for 100+ languages
+-   **Meeting Intelligence** - Auto-generated summaries and transcription
 
-![Data Flow](./docs/data-flow.svg)
+### 🔧 Integration & Extensibility
 
-The application data flow is managed by some packages:
+-   **API-First Design** - Comprehensive REST and WebSocket APIs
+-   **Bot Framework** - Extensible platform with SDK support
+-   **Third-party Integrations** - 100+ tools and custom webhooks
 
--   `mezon-js`: The core package to communicate with the server through `WebSocket` and `REST` API
-    -   `WebSocket`: send and listen to the messages from the server
-    -   `REST`: send and receive the messages from the server
--   `store`: The state management package to manage the state of the application. store is divided into multiple slices, each slice is a standalone slice and has its own reducer, action, and selector.
+---
 
-    -   `slice`: A standalone slice of the store, contains the reducer, action, and selector
-    -   `reducer`: A function to manage the state of the application
-    -   `action`: A function to dispatch the action to the reducer
-    -   `selector`: A function to select the state from the store
+## 📦 Installation
 
--   `routing`: The routing package to manage the routing of the application. The routing is managed by `react-router-dom` package.
-    -   loader: The loader to load the component dynamically
-    -   route: The route to navigate to the component
-    -   page: The page to render the component
+### System Requirements
 
-### Data concept
+| Platform        | Requirements                                                   |
+| --------------- | -------------------------------------------------------------- |
+| **Web**         | Modern browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+) |
+| **Desktop**     | Windows 10+, macOS 10.15+, Ubuntu 18.04+                       |
+| **Mobile**      | iOS 13.0+, Android 8.0+ (API level 26+)                        |
+| **Development** | Node.js 18+, Yarn 1.22.4+, 4GB RAM minimum                     |
 
--   When the application starts, based on the initial route, the application will load the components and pages
--   Before render components and pages, the application will trigger `loader` to load the initial data
--   The `loader` will trigger the `action` to fetch the data from the server
--   The component will render the data based on the state of the store
--   The dispatched action will trigger an `asyncThunk` to fetch the data from the server using `mezon-js` package
--   The `asyncThunk` returns the data from the server and updates the state of the store by an `extraReducers` function
--   The component or hook will select the data from the store using `useSelector`
--   the selectors will select the data from the store based on the state of the store
--   When user interacts with the component, the component will dispatch the action to update the state of the store
--   We could group the data and logic into a custom hook to manage the data and logic of the component
--   The component could use the custom hook to manage the data and logic of the component
+### Download Options
 
-![Data Flow for voice](./docs/voice.svg)
+| Platform    | Download Link                   | Status    |
+| ----------- | ------------------------------- | --------- |
+| **Windows** | [Download](https://mezon.ai)    | ✅ Stable |
+| **macOS**   | [Download](https://mezon.ai)    | ✅ Stable |
+| **Linux**   | [Download](https://mezon.ai)    | ✅ Stable |
+| **iOS**     | [App Store](https://mezon.ai)   | ✅ Stable |
+| **Android** | [Google Play](https://mezon.ai) | ✅ Stable |
+| **Web**     | [mezon.ai](https://mezon.ai)    | ✅ Stable |
 
--   in voice context, we add room voice creat function createVoiceConnection.
--   when someone join to voice room, voicecontext will send to chat server and trigger onVoiceJoined (notify all) in mezon-js.
--   we create a slice in FE to manage state when onVoiceJoined trigger and update number of joined participate in channel.
+---
 
-## Layouting
+## 👨‍💻 Development
 
-how to layout the components and pages
+### 🛠️ Development Setup
 
-![Layouting](./docs/layouting.svg)
+```bash
+# Clone the repository
+git clone https://github.com/mezonai/mezon.git
+cd mezon
 
-We have sevaral layout components to handle layout based on the route:
+# Install dependencies
+yarn install
 
--   `/` - `AppLayout`: The layout for the application
--   `/chat` -[logged in]- `MainLayout`: The layout for the main page
--   `Main`: The main page to render the global components
--   `/chat/server/:id` - `ClanLayout`: The layout for the server page
--   `/chat/server/:id/channel/:id` - `ChannelLayout`: The layout for the channel page
--   routes are defined in the [./apps/chat/src/app/routes/index.tsx](./apps/chat/src/app/routes/index.tsx) file
--   We are using `react-router` v6 to manage the routing of the application, see more about the `react-router` v6 [here](https://reactrouter.com/en/6.22.1/start/overview)
+# Available development commands
+yarn dev:chat          # Start chat app (port 4200)
+yarn dev:admin         # Start admin dashboard (port 4200)
+yarn dev:mobile        # Start mobile development
+yarn dev:desktop       # Start desktop app
 
-### Access Control
+# Build for production
+yarn build:chat        # Build web chat app
+yarn build:desktop     # Build desktop app
+yarn build:mobile      # Build mobile apps
 
-Access control is managed by the `policies` slice. each user has it own permissions to access the resources. The permission is managed by the `policies` slice.
-
-There are several ways to manage the access control:
-
--   using `policies` slice and `selectAllPermissionsUser` to get the permissions of the user
--   using `useSelector(selectAllPermissionsUser)` to get the permissions of the user
--   using `UserRestrictionZone` to control displaying the components based on the user permissions
--   using `useUserRestriction` to get the user restrictions based on the user permissions
-
-### Toast Notification
-
-Toast notification is managed by the `toasts` slice. each toast has it own message and type. The toast is managed by the `toasts` slice.
-
-Actions
-
--   `addToast`: add a toast to the list
--   `removeToast`: remove a toast from the list
-
-Toast are displayed in the `<ToastContainer />` component.
-
-There are several ways to manage the toast notification:
-
--   dispatch the `addToast` action to add the toast to the list
--   dispatch any action with `withToast` meta
-
-```tsx
-    // add toast notification to any action
-	return thunkAPI.fulfillWithValue(
-		value,
-		withToast({
-			message: 'Clan changed',
-			type: 'success',
-		})
-	);
-
-    // dispatch the addToast action directly
-    thunkAPI.dispatch(
-        addToast({
-            message: 'Clan changed',
-            type: 'success',
-        });
-    );
+# Code quality
+yarn lint              # Run linting
+yarn format           # Format code
 ```
 
-### Error Handling
+### 📁 Project Structure
 
-Error handling is managed by the `errors` slice. each error has it own message and code. The error is managed by the `errors` slice.
-
-By default, the error is displayed as toast notification. in case you want to disable the toast notification, you could set the `toast` meta to `false`.
-
-```tsx
-// No toast notification
-return thunkAPI.rejectWithValue(
-	error,
-	withError({
-		toast: false
-	})
-);
-
-// toast with custom message
-return thunkAPI.rejectWithValue(error, withError('Custom error message'));
-
-// fully custom error
-return thunkAPI.rejectWithValue(
-	error,
-	withError({
-		toast: {
-			message: 'Custom error message',
-			type: 'error',
-			theme: 'dark'
-		}
-	})
-);
+```
+mezon/
+├── apps/              # Applications
+│   ├── chat/          # Main web chat application
+│   ├── admin/         # Admin dashboard
+│   ├── desktop/       # Electron desktop app
+│   ├── mobile/        # React Native mobile app
+│   └── discover/      # Community discovery app
+├── libs/              # Shared libraries
+│   ├── components/    # Reusable UI components
+│   ├── store/         # State management (Redux)
+│   ├── transport/     # API & WebSocket clients
+│   ├── core/          # Business logic
+│   └── ui/            # Design system
+└── docs/              # Documentation
 ```
 
-## Building the application
+### 🔧 Technology Stack
 
-For the `desktop` application, we are using `electron` to build the application. The application's dependencies are managed by the `apps/desktop/package.json` file. When building the application, the dependencies are installed in the `apps/desktop/node_modules` directory.
+#### Frontend
 
-## Performance Optimization
+-   **Framework**: React 18 with TypeScript
+-   **State Management**: Redux Toolkit + RTK Query
+-   **Styling**: Tailwind CSS
+-   **Build Tool**: Nx Monorepo with Webpack
+-   **Mobile**: React Native
+-   **Desktop**: Electron
 
-### Performance Factors
+#### Backend & Infrastructure
 
-The application performance is mostly affected by these factors:
+-   **Core**: We built a custom server using Redis, ScyllaDB, and sockets to enable real-time communication.
+-   **Mezon Mainnet**: [mmn](https://github.com/mezonai/mmn) - High-performance and zero free blockchain layer 1
+-   **Real-time**: WebSocket with binary protocol
+-   **Security**: E2E encryption, TLS 1.3
+-   **Performance**: Sub-millisecond latency, horizontal scaling
 
--   The routing structure: we keep the routing straitforward and simple, make sure that one route is only re-render when the route changes
--   Unnecessary re-render: we use `memo` and `useMemo` to prevent unnecessary re-render
--   Memory leak: we use `useEffect` and `clear function` to prevent memory leak
--   Function changes reference: we use `useCallback` to prevent function changes reference
--   Api calls: we use `store` and `memoizee` to cache the api calls
--   Wrong level of abstraction: we use `custom hook` to manage the data and logic of the component, make sure that the custom hook group data of same level of abstraction, and not re-render the component when the unrelated data changes
+#### Development Tools
 
-### Performance Tools
+-   **Testing**: Jest + Cypress
+-   **Linting**: ESLint + Prettier
+-   **CI/CD**: GitHub Actions
+-   **Package Manager**: Yarn
 
-We use several tools to measure the performance of the application:
+### 📚 Getting Started
 
--   `React DevTools`: to measure the performance of the application
--   `Chrome DevTools`: to measure the performance of the application
+1. **Setup**: Follow the [Developer Guide](DEVELOPER_GUIDE.md) for detailed setup instructions
+2. **Architecture**: Review [Architecture docs](docs/developer/ARCHITECTURE.md) to understand the system
+3. **Contribute**: Browse [open issues](https://github.com/mezonai/mezon/issues) for contribution opportunities
+4. **Community**: Join our [developer community](https://mezon.ai/invite/1840696977034055680) for support and discussions
 
-## Conventions and Guidelines
+### 🔌 Extensibility
 
-## Code Formatting
+**Bot Development**
 
-Using `Prettier` and `ESLint` to format the codebase. The codebase should be formatted before committing the code.
+-   Build powerful bots using our official SDKs
+-   Automate workflows and community management
+-   Access comprehensive APIs for custom integrations
 
-## Naming Convention
+**Custom Themes**
 
--   `PascalCase` for the components and pages
--   `camelCase` for the functions and variables
+-   Create custom themes and UI modifications
+-   Brand customization for communities
+-   Personalized user interfaces
 
-See more about the naming convention [here](https://github.com/airbnb/javascript/tree/master/react#naming)
+**API Integration**
 
-## 🔔 Coding Rules
+-   REST API and WebSocket support
+-   Custom webhooks and third-party integrations
+-   Extensive documentation and examples
 
--   Stick with the architecture
--   Do not cause blocks to other team members
+> 🔗 **Resources**: [Bot Example](https://github.com/mezonai/mezon-bot-example) | [SDK Documentation](https://mezon.ai/docs/mezon-sdk-docs/)
 
-## ⚠ Notice
+## 🤝 Contributing
 
--   Identify and clarify to the team what and where you are going to add to the repo
--   Do self-test for your own codes
--   Contact **2 team members** to review your changes
+We welcome contributions from the community! Here's how you can help:
 
-## Troubleshooting
+### Ways to Contribute
 
-### Debug desktop app
+-   🐛 **Report Bugs**: Use our [issue tracker](https://github.com/mezonai/mezon/issues)
+-   💡 **Feature Requests**: Suggest new features and improvements
+-   💻 **Code Contributions**: Submit pull requests for bug fixes and features
+-   📚 **Documentation**: Help improve our docs and guides
+-   🌍 **Translation**: Help translate Mezon to more languages
 
-See: https://github.com/electron/electron/issues/3331
+### Development Process
 
--   1, First build and package the app as usual
--   2, Run the app with `./dist/executables/win-unpacked/mezon.exe --remote-debugging-port=8315`
--   3, Open Chrome and navigate to `chrome://inspect`
--   4, Click on `Configure...` and add `localhost:8315` to the list
--   5, Click on `inspect` to open the DevTools
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and add tests
+4. Ensure all tests pass (`yarn test`)
+5. Submit a pull request
 
-## Screenshot
+> 📋 **Guidelines**: Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information about our development process, coding standards, and pull request guidelines.
 
-![image](https://github.com/user-attachments/assets/7060df63-0ca8-4dd5-a220-2f127c2f1031)
+---
 
-![image](https://github.com/user-attachments/assets/a205ee39-1054-4207-9963-49229ae9d00d)
+## 📚 Resources & Documentation
 
-![image](https://github.com/user-attachments/assets/6b5e2b79-3f4d-4de0-b885-24d5d7e6fa96)
+### 🚀 For Users
 
+-   [**Web App**](https://mezon.ai/chat/direct/friends) - Try Mezon instantly
+-   [**Community Directory**](https://mezon.ai/clans/) - Discover communities
+-   [**User Guide**](docs/user-guides/GETTING_STARTED.md) - Getting started guide
 
+### 🛠️ For Developers
+
+-   [**Developer Guide**](DEVELOPER_GUIDE.md) - Complete setup and development guide
+-   [**API Documentation**](https://mezon.ai/docs/mezon-sdk-docs/) - REST API and WebSocket reference
+-   [**Architecture Guide**](docs/developer/ARCHITECTURE.md) - System design and architecture
+-   [**Bot Development**](https://github.com/mezonai/mezon-bot-example) - Bot creation tutorial
+
+### 📦 SDKs & Libraries
+
+-   [**JavaScript SDK**](https://github.com/mezonai/mezon-js) - Official JS/TS SDK
+-   [**Go SDK**](https://github.com/mezonai/mezon-go-sdk) - Official Go SDK
+-   [**Java SDK**](https://github.com/mezonai/mezon-java-sdk) - Official Java SDK
+-   [**Mezon WebJs SDK**](https://github.com/mezonai/mezon-web-js) - SDK for channel apps integration
+-   [**MCP Integration**](https://github.com/mezonai/mezon-mcp) - AI-ready integration
+
+### 🌐 Community & Support
+
+-   [**Community Hub**](https://mezon.ai/invite/1840696977034055680) - Join our official community
+-   [**GitHub Discussions**](https://github.com/mezonai/mezon/discussions) - Ask questions and share ideas
+-   [**Issue Tracker**](https://github.com/mezonai/mezon/issues) - Report bugs and request features
+-   [**Developer Portal**](https://mezon.ai/developers/applications) - Build applications on Mezon
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Installation Problems**
+
+-   Ensure Node.js 18+ and Yarn 1.22.4+ are installed
+-   Clear node_modules and reinstall: `rm -rf node_modules && yarn install`
+-   Check [system requirements](#-installation) for your platform
+
+**Development Issues**
+
+-   Port conflicts: Change port in project configuration
+-   Build failures: Run `yarn lint` and `yarn format` to fix code issues
+-   WebSocket connection issues: Check firewall and proxy settings
+
+**Performance Issues**
+
+-   Enable hardware acceleration in browser settings
+-   Close unnecessary applications to free up system resources
+-   Update to the latest version for performance improvements
+
+> 🆘 **Need Help?** Visit our [troubleshooting guide](docs/TROUBLESHOOTING.md) or ask in our [community chat](https://mezon.ai/invite/1840696977034055680).
+
+---
+
+## 📄 License & Legal
+
+-   **License**: [MIT License](LICENSE) - Free for personal and commercial use
+-   **Privacy Policy**: [mezon.ai/privacy](https://mezon.ai/privacy)
+-   **Terms of Service**: [mezon.ai/terms](https://mezon.ai/terms)
+-   **Security Policy**: [SECURITY.md](SECURITY.md)
+
+---
+
+## 🙏 Acknowledgments
+
+Mezon is built on top of amazing open-source technologies:
+
+-   [webrtc](https://github.com/pion/webrtc) - Pion WebRTC A pure Go implementation of the WebRTC API
+-   [React](https://reactjs.org/) - UI framework
+-   [Nx](https://nx.dev/) - Monorepo tooling
+-   And many other fantastic open-source projects
+
+<div align="center">
+  <p>
+    <strong>Made with ❤️ by the Mezon Team</strong><br>
+    <em>Connecting communities worldwide</em>
+  </p>
+  
+  <p>
+    <a href="https://github.com/mezonai/mezon">⭐ Star us on GitHub</a> •
+    <a href="https://mezon.ai/invite/1840696977034055680">💬 Join our community</a> •
+    <a href="https://github.com/mezonai/mezon/issues/new/choose">🐛 Report an issue</a>
+  </p>
+</div>
