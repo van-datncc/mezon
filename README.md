@@ -263,6 +263,8 @@ We welcome contributions from the community! Here's how you can help:
 ### 📦 SDKs & Libraries
 - [**JavaScript SDK**](https://github.com/mezonai/mezon-js) - Official JS/TS SDK
 - [**Go SDK**](https://github.com/mezonai/mezon-go-sdk) - Official Go SDK
+- [**Java SDK**](https://github.com/mezonai/mezon-java-sdk) - Official Java SDK
+- [**Mezon WebJs SDK**](https://github.com/mezonai/mezon-web-js) - SDK for channel apps integration
 - [**MCP Integration**](https://github.com/mezonai/mezon-mcp) - AI-ready integration
 
 ### 🌐 Community & Support
