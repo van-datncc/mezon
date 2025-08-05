@@ -59,8 +59,8 @@ export function useRoles() {
 					roleIcon
 				})
 			);
-			dispatch(setAddPermissions([]));
-			dispatch(setRemovePermissions([]));
+			if (activePermissionIds.length) dispatch(setAddPermissions([]));
+			if (activePermissionIds.length) dispatch(setRemovePermissions([]));
 			return response?.payload;
 		},
 		[dispatch]
