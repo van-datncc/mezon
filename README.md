@@ -2,7 +2,7 @@
   <h1>Mezon</h1>
   
   <p align="center">
-    <strong>Open-source communication platform for communities, teams, and personal connections</strong>
+    <strong>The Live, Work, and Play Platform – the best Discord alternative.</strong>
   </p>
 
   <p align="center">
@@ -24,7 +24,7 @@
 
 ## About Mezon
 
-Mezon is an open-source communication platform built for modern communities, professional teams, and personal connections. Built on top of [Nakama](https://heroiclabs.com/nakama/) game server technology, Mezon delivers enterprise-grade performance with sub-millisecond response times and support for millions of concurrent connections.
+Mezon is great for playing games and chilling with friends, or even building a worldwide community. Customize your own space to talk, play, and hang out., Mezon delivers enterprise-grade performance with sub-millisecond response times and support for millions of concurrent connections.
 
 <div align="center">
   <img src="docs/mezon_header_bot_battle.png" alt="Mezon Platform Overview" width="100%">
