@@ -134,5 +134,8 @@
         "sticker": "Stickers"
     },
     "turnOffAnonymous": "Turn off Anonymous",
-    "turnOnAnonymous": "Turn on Anonymous"
+    "turnOnAnonymous": "Turn on Anonymous",
+    "goToTopic": "Go to Topic",
+    "creator": "Creator",
+    "viewTopic": "View topic"
 }

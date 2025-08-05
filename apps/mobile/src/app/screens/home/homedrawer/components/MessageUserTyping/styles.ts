@@ -11,6 +11,7 @@ export const style = (colors: Attributes) =>
 		threeDot: { width: 30, height: 20 },
 		typingContainer: {
 			flexDirection: 'row',
+			alignItems: 'center',
 			width: '100%',
 			paddingBottom: size.s_4,
 			paddingHorizontal: size.s_10,

@@ -885,5 +885,12 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'center',
 			alignItems: 'center',
 			backgroundColor: Colors.textViolet
+		},
+		cardMsg: {
+			padding: size.s_10,
+			paddingTop: 0,
+			borderWidth: 1,
+			borderColor: colors.border,
+			borderRadius: size.s_8
 		}
 	});
