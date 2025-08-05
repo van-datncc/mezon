@@ -12,9 +12,10 @@ type SettingSidebarProps = {
 	handleMenu: (value: boolean) => void;
 	currentSetting: string;
 	setIsShowDeletePopup: () => void;
+	isCommunityEnabled?: boolean;
 };
 
-const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDeletePopup }: SettingSidebarProps) => {
+const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDeletePopup, isCommunityEnabled }: SettingSidebarProps) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [isClanOwner, hasClanPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
@@ -22,7 +23,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 	const userProfile = useSelector(selectAllAccount);
 
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
-		const filteredListItem = sidebarItem.listItem.filter((item) => {
+		let filteredListItem = sidebarItem.listItem.filter((item) => {
 			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS, ItemSetting.AUDIT_LOG].includes(item.id)) {
 				return hasClanPermission;
 			}
@@ -31,6 +32,12 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			}
 			return true;
 		});
+
+		if (sidebarItem.title === 'Community' && isCommunityEnabled) {
+			filteredListItem = filteredListItem.map((item) =>
+				item.id === ItemSetting.ON_COMUNITY ? { ...item, name: 'Community Overview' } : item
+			);
+		}
 
 		return {
 			...sidebarItem,

@@ -1,3 +1,28 @@
+export async function handleUploadCommunityBanner(client: Client, session: Session, filename: string, file: File): Promise<ApiMessageAttachment> {
+	return new Promise<ApiMessageAttachment>(async function (resolve, reject) {
+		try {
+			let fileType = file.type;
+			if (!fileType) {
+				const fileNameParts = file.name.split('.');
+				const fileExtension = fileNameParts[fileNameParts.length - 1].toLowerCase();
+				fileType = `image/${fileExtension}`;
+			}
+			const buf = await file.arrayBuffer();
+			resolve(
+				uploadFile(
+					client,
+					session,
+					filename,
+					fileType,
+					file.size,
+					Buffer.from(buf)
+				)
+			);
+		} catch (error) {
+			reject(new Error(`${error}`));
+		}
+	});
+}
 import { Buffer as BufferMobile } from 'buffer';
 import { Client, Session } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
