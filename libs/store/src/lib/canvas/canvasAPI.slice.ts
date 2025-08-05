@@ -461,9 +461,15 @@ export const selectCanvasIdsByChannelId = createSelector(
 );
 
 export const selectCanvasEntityById = createSelector(
-	[getCanvasApiState, getChannelIdCanvasAsSecondParam, (_, __, canvasId) => canvasId],
-	(canvasState, channelId, canvasId) => {
-		return canvasState.channelCanvas[channelId]?.entities?.[canvasId];
+	[getCanvasApiState, getChannelIdCanvasAsSecondParam, getChannelIdCanvasAsParrent, (_, __, ___, canvasId) => canvasId],
+	(canvasState, channelId, parentId, canvasId) => {
+		if (!parentId) {
+			return canvasState.channelCanvas[channelId]?.entities?.[canvasId];
+		}
+		const canvastCurrent = canvasState?.channelCanvas[channelId]?.entities || {};
+		const canvasParrent = canvasState.channelCanvas[parentId]?.entities || {};
+		const wrapCanvast = { ...canvastCurrent, ...canvasParrent };
+		return wrapCanvast[canvasId];
 	}
 );
 
