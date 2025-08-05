@@ -187,7 +187,8 @@ mezon/
 - **Desktop**: Electron
 
 #### Backend & Infrastructure
-- **Core**: [Nakama](https://heroiclabs.com/nakama/) game server (Go)
+- **Core**: We built a custom server using Redis, ScyllaDB, and sockets to enable real-time communication.
+- **Mezon Mainnet**:  [mmn](https://github.com/mezonai/mmn) - High-performance and zero free blockchain layer 1
 - **Real-time**: WebSocket with binary protocol
 - **Security**: E2E encryption, TLS 1.3
 - **Performance**: Sub-millisecond latency, horizontal scaling
@@ -307,7 +308,7 @@ We welcome contributions from the community! Here's how you can help:
 ## 🙏 Acknowledgments
 
 Mezon is built on top of amazing open-source technologies:
-- [Nakama](https://heroiclabs.com/nakama/) - High-performance game server
+- [webrtc](https://github.com/pion/webrtc) - Pion WebRTC A pure Go implementation of the WebRTC API
 - [React](https://reactjs.org/) - UI framework
 - [Nx](https://nx.dev/) - Monorepo tooling
 - And many other fantastic open-source projects
