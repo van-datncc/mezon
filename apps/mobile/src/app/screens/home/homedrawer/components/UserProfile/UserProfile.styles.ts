@@ -33,10 +33,17 @@ export const style = (colors: Attributes, isTabletLandscape: boolean) =>
 			borderRadius: 8,
 			padding: size.s_20
 		},
+		actionGroupDM: {
+			backgroundColor: colors.secondary,
+			marginBottom: size.s_20,
+			borderRadius: 8,
+			paddingHorizontal: size.s_16
+		},
 		username: {
 			color: colors.textStrong,
 			fontSize: size.h6,
-			fontWeight: '600'
+			fontWeight: '600',
+			marginBottom: size.s_2
 		},
 		subUserName: {
 			color: colors.text,
