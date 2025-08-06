@@ -193,9 +193,6 @@ export default class App {
 			if (forceQuit.isEnabled) {
 				app.exit(0);
 				forceQuit.disable();
-			} else {
-				// event.preventDefault();
-				App.mainWindow.hide();
 			}
 		});
 
