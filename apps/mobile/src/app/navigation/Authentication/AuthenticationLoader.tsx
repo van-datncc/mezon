@@ -26,10 +26,11 @@ import {
 	useAppSelector
 } from '@mezon/store-mobile';
 import { useMezon } from '@mezon/transport';
+import { TypeMessage } from '@mezon/utils';
 import { getApp } from '@react-native-firebase/app';
 import { getMessaging, onMessage } from '@react-native-firebase/messaging';
 import { useNavigation } from '@react-navigation/native';
-import { WebrtcSignalingFwd, WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingFwd, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Linking, Platform, StatusBar } from 'react-native';
@@ -224,6 +225,18 @@ export const AuthenticationLoader = () => {
 	const initFirebaseMessaging = () => {
 		const unsubscribe = onMessage(messaging, (remoteMessage) => {
 			try {
+				const message = remoteMessage?.data?.message;
+				const messageData = safeJSONParse(message as string);
+
+				let messageCode = 0;
+				if (messageData?.code) {
+					if (typeof messageData.code === 'number') {
+						messageCode = messageData.code;
+					} else if (typeof messageData.code === 'object' && messageData.code?.value !== undefined) {
+						messageCode = messageData.code.value;
+					}
+				}
+
 				if (isShowNotification(currentChannelRef.current?.id, currentDmGroupIdRef.current, remoteMessage)) {
 					// Case: FCM start call
 					const title = remoteMessage?.notification?.title || remoteMessage?.data?.title;
@@ -263,7 +276,7 @@ export const AuthenticationLoader = () => {
 					});
 				}
 				//Payload from FCM need messageType and sound
-				if (remoteMessage?.notification?.body === 'Buzz!!') {
+				if (messageCode === TypeMessage.MessageBuzz) {
 					playBuzzSound();
 					handleBuzz(remoteMessage);
 				}
