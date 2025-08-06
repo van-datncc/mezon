@@ -73,6 +73,7 @@ import {
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLoadingStatus,
+	selectMemberClanByUserId2,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -1361,10 +1362,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				const store = await getStoreAsync();
 				const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
+				const meInClan = selectMemberClanByUserId2(store.getState(), userId as string).role_id;
+				const listRole = new Set(channelUpdated.role_ids || []);
+				const idAccessPrivate = (meInClan || []).some((role_id) => listRole.has(role_id));
+				const memberAccessPrivate = (channelUpdated || []).user_ids?.some((user_id) => user_id === userId);
+
 				const result = await dispatch(
 					channelsActions.updateChannelPrivateSocket({
 						action: channelUpdated,
-						isUserUpdate: channelUpdated.creator_id === userId
+						isUserUpdate: channelUpdated.creator_id === userId || !!memberAccessPrivate || idAccessPrivate
 					})
 				).unwrap();
 				if (result && currentChannelId === channelUpdated.channel_id) {
@@ -1379,14 +1385,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				);
 				if (channelUpdated.channel_private !== undefined && channelUpdated.channel_private !== 0) {
 					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string, clan_name: '' };
-					const cleanData: Record<string, string | number | boolean> = {};
+					const cleanData: Record<string, string | number | boolean | string[]> = {};
 
 					Object.keys(channelUpdated).forEach((key) => {
-						if (
-							channelUpdated[key as keyof ChannelUpdatedEvent] !== undefined &&
-							channelUpdated[key as keyof ChannelUpdatedEvent] !== ''
-						) {
-							cleanData[key] = channelUpdated[key as keyof ChannelUpdatedEvent];
+						const value = channelUpdated[key as keyof ChannelUpdatedEvent];
+						if (value !== undefined && value !== '') {
+							cleanData[key as keyof typeof cleanData] = value;
 						}
 					});
 
