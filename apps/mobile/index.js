@@ -6,7 +6,6 @@ import App from './src/app/navigation';
 import CustomIncomingCall from './src/app/screens/customIncomingCall';
 import { createLocalNotification, setupIncomingCall } from './src/app/utils/pushNotificationHelpers';
 
-registerGlobals();
 enableScreens(true);
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	const offer = remoteMessage?.data?.offer;
