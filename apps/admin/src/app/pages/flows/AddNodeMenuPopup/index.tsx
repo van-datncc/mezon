@@ -36,7 +36,7 @@ const AddNodeMenuPopup = () => {
 		{
 			title: 'Quick Menu Event',
 			nodeType: 'quickMenu',
-			description: 'Receives event to quick menu in app for quick actions.'
+			description: 'Receives in-app quick menu events.'
 		}
 	];
 	return (
