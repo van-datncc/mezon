@@ -156,7 +156,7 @@ export const MemberListStatus = React.memo(() => {
 
 	return (
 		<View style={styles.container}>
-			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM ? (
+			{currentChannel?.type === ChannelType.CHANNEL_TYPE_DM && currentChannel?.usernames?.[0] ? (
 				<TouchableOpacity onPress={() => navigateToNewGroupScreen()} style={styles.actionItem}>
 					<View style={[styles.actionIconWrapper]}>
 						<MezonIconCDN icon={IconCDN.groupIcon} height={20} width={20} color={baseColor.white} />

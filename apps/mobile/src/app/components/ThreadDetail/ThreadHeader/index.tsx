@@ -49,7 +49,7 @@ export const ThreadHeader = memo(() => {
 	const channelLabel = useMemo(() => {
 		return (currentDmGroup?.channel_label ||
 			currentChannel?.channel_label ||
-			(typeof currentChannel?.usernames === 'string' ? currentChannel?.usernames : currentChannel?.usernames?.[0] || 'defaultLabel')) as string;
+			(typeof currentChannel?.usernames === 'string' ? currentChannel?.usernames : currentChannel?.usernames?.[0] || '')) as string;
 	}, [currentDmGroup?.channel_label, currentChannel?.channel_label, currentChannel?.usernames]);
 
 	const isChannel = useMemo(() => {
@@ -104,7 +104,11 @@ export const ThreadHeader = memo(() => {
 							</View>
 						) : (
 							<MezonAvatar
-								avatarUrl={Array.isArray(currentChannel?.channel_avatar) && currentChannel.channel_avatar.length > 0 ? currentChannel.channel_avatar[0] : undefined}
+								avatarUrl={
+									Array.isArray(currentChannel?.channel_avatar) && currentChannel.channel_avatar.length > 0
+										? currentChannel.channel_avatar[0]
+										: undefined
+								}
 								username={channelLabel}
 								userStatus={userStatus}
 								customStatus={status}
