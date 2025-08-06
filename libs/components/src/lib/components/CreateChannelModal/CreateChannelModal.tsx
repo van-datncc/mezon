@@ -1,10 +1,9 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import {
-	categoriesActions,
 	channelsActions,
 	createNewChannel,
 	fetchApplications,
-	fetchChannels,
+	listChannelRenderAction,
 	selectAllApps,
 	selectChannelById,
 	selectCurrentCategory,
@@ -95,6 +94,13 @@ export const CreateNewChannelModal = () => {
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
+		if (currentCategory?.category_id) {
+			dispatch(listChannelRenderAction.updateCategoryChannels({
+				clanId: currentClan?.clan_id as string,
+				categoryId: currentCategory?.category_id,
+				channelId: channelID ?? ''
+			}));
+		}
 
 		if (
 			newChannelCreatedId &&
@@ -106,10 +112,6 @@ export const CreateNewChannelModal = () => {
 			navigate(channelPath);
 		}
 		clearDataAfterCreateNew();
-		if (currentClan?.clan_id) {
-			await dispatch(fetchChannels({ clanId: currentClan.clan_id, noCache: true }));
-			await dispatch(categoriesActions.fetchCategories({ clanId: currentClan.clan_id, noCache: true }));
-		}
 	};
 
 	const handleCloseModal = () => {
