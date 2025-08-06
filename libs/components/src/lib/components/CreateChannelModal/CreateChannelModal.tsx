@@ -1,8 +1,10 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import {
+	categoriesActions,
 	channelsActions,
 	createNewChannel,
 	fetchApplications,
+	fetchChannels,
 	selectAllApps,
 	selectChannelById,
 	selectCurrentCategory,
@@ -104,6 +106,10 @@ export const CreateNewChannelModal = () => {
 			navigate(channelPath);
 		}
 		clearDataAfterCreateNew();
+		if (currentClan?.clan_id) {
+			await dispatch(fetchChannels({ clanId: currentClan.clan_id, noCache: true }));
+			await dispatch(categoriesActions.fetchCategories({ clanId: currentClan.clan_id, noCache: true }));
+		}
 	};
 
 	const handleCloseModal = () => {
