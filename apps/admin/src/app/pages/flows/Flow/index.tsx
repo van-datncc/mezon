@@ -285,7 +285,7 @@ const Flow = () => {
 				};
 			});
 			flowDispatch(setNodesContext(listNode));
-			const listEdge: Edge[] = flowDetail.connections?.map((edge: IEdge) => {
+			const listEdge: Edge[] = (flowDetail.connections ?? []).map((edge: IEdge) => {
 				return {
 					id: uuidv4(),
 					source: nodeId[edge.sourceNodeId],

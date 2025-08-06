@@ -13,7 +13,7 @@ export interface IFlowDetail {
 	flowName: string;
 	description: string;
 	nodes: INode[];
-	connections: IEdge[];
+	connections?: IEdge[];
 }
 
 export type INodeType = 'commandInput' | 'uploadedImage' | 'formatFunction' | 'apiLoader' | 'default' | 'webhook' | 'quickMenu';
