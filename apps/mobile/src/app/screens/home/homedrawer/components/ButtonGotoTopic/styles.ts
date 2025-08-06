@@ -10,9 +10,7 @@ export const style = (colors: Attributes) =>
 			paddingVertical: size.s_6,
 			paddingHorizontal: size.s_10,
 			backgroundColor: colors.secondaryLight,
-			borderRadius: size.s_6,
-			borderWidth: 0.5,
-			borderColor: Colors.gray72
+			borderRadius: size.s_6
 		},
 		title: {
 			fontSize: size.small,
