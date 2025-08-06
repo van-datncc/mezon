@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 
+import { registerGlobals } from '@livekit/react-native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { Dimensions, Platform, View } from 'react-native';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
@@ -26,6 +27,7 @@ import { ServersStacks } from './stacks/ServersStacks';
 import { SettingStacks } from './stacks/SettingStacks';
 import { ShopStack } from './stacks/ShopStack';
 const RootStack = createStackNavigator();
+registerGlobals();
 
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {

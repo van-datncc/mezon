@@ -735,20 +735,12 @@ export const RenderTextMarkdownContent = ({
 
 			<View style={{ flexDirection: 'row', gap: size.s_6, flexWrap: 'wrap', alignItems: 'flex-end' }}>
 				<View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-					{textParts?.length > 0 && textParts.map((part, index) => (
-						<View key={`text-part-${index}`}>
-							{part}
-						</View>
-					))}
-					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item, index) => (
-						<View key={`markdown-part-${index}`}>
-							{item}
-						</View>
-					))}
+					{textParts?.length > 0 && <Text key={`textParts${t}_${lastIndex}`}>{textParts}</Text>}
+					{markdownBlackParts?.length > 0 && markdownBlackParts.map((item) => item)}
 				</View>
 				{isEdited && (
 					<View>
-						<Text key={`edited-${lastIndex}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
+						<Text key={`edited-${textParts}`} style={themeValue ? markdownStyles(themeValue).editedText : {}}>
 							{translate('edited')}
 						</Text>
 					</View>

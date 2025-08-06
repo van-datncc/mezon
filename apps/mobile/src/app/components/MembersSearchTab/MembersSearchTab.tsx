@@ -84,7 +84,8 @@ const MembersSearchTab = ({ listMemberSearch }: MembersSearchTabProps) => {
 				keyExtractor={keyExtractor}
 				initialNumToRender={1}
 				maxToRenderPerBatch={1}
-				windowSize={1}
+				windowSize={4}
+				showsVerticalScrollIndicator={false}
 				removeClippedSubviews={true}
 				keyboardShouldPersistTaps={'handled'}
 				disableVirtualization={false}

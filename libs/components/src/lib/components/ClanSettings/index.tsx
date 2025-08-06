@@ -5,6 +5,7 @@ import { EPermission } from '@mezon/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DeleteClanModal from '../DeleteClanModal';
+import SettingComunity from '../SettingComunity';
 import { ExitSetting } from '../SettingProfile';
 import AuditLog from './AuditLog';
 import ClanSettingOverview from './ClanSettingOverview';
@@ -46,6 +47,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 	const [isShowDeletePopup, setIsShowDeletePopup] = useState<boolean>(false);
 	const currentChannel = useSelector(selectCurrentChannel) || undefined;
 	const currentClanId = useSelector(selectCurrentClanId) as string;
+	const [isCommunityEnabled, setIsCommunityEnabled] = useState(false);
 
 	const currentSettingPage = () => {
 		switch (currentSettingId) {
@@ -69,6 +71,8 @@ const ClanSetting = (props: ModalSettingProps) => {
 				return <AuditLog currentClanId={currentClanId} />;
 			case ItemSetting.ON_BOARDING:
 				return <SettingOnBoarding onClose={onClose} />;
+			case ItemSetting.ON_COMUNITY:
+				return <SettingComunity clanId={currentClanId} onClose={onClose} onCommunityEnabledChange={setIsCommunityEnabled} />;
 		}
 	};
 
@@ -103,6 +107,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 						handleMenu={(value: boolean) => setMenu(value)}
 						currentSetting={currentSetting?.id || ''}
 						setIsShowDeletePopup={() => setIsShowDeletePopup(true)}
+						isCommunityEnabled={isCommunityEnabled}
 					/>
 				</div>
 
