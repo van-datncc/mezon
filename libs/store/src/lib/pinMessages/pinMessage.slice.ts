@@ -1,7 +1,7 @@
 import { captureSentryError } from '@mezon/logger';
 import { IMessageWithUser, IPinMessage, LoadingStatus } from '@mezon/utils';
 import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { ApiPinMessageRequest } from 'mezon-js/api.gen';
+import { ApiPinMessage, ApiPinMessageRequest } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
@@ -74,8 +74,8 @@ export const fetchChannelPinMessagesCached = async (
 	};
 };
 
-export const mapChannelPinMessagesToEntity = (pinMessageRes: ApiPinMessageRequest) => {
-	return { ...pinMessageRes, id: pinMessageRes.message_id || '' };
+export const mapChannelPinMessagesToEntity = (pinMessageRes: ApiPinMessage) => {
+	return { ...pinMessageRes, id: pinMessageRes.id || '' };
 };
 
 export const fetchChannelPinMessages = createAsyncThunk(
@@ -259,7 +259,7 @@ export const pinMessageSlice = createSlice({
 			if (!state.byChannels[channelId]) {
 				return;
 			}
-			const pinList = state.byChannels[channelId].pinMessages?.filter((pin) => pin.id !== pinId);
+			const pinList = state.byChannels[channelId].pinMessages?.filter((pin) => pin.message_id !== pinId);
 			state.byChannels[channelId].pinMessages = pinList;
 			state.byChannels[channelId].cache = createCacheMetadata(CHANNEL_PIN_MESSAGES_CACHED_TIME);
 		}
