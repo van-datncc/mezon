@@ -42,6 +42,7 @@ import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { clanMembersMetaReducer } from './clanMembers/clan.members.meta';
 import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
+import { COMUNITY_FEATURE_KEY, comunityReducer } from './comunity/comunity.slice';
 import { directMembersMetaReducer } from './direct/direct.members.meta';
 import { directMetaReducer } from './direct/directmeta.slice';
 import { audioCallReducer } from './dmcall/audioCall.slice';
@@ -299,6 +300,13 @@ const persistedOnboardingReducer = persistReducer(
 	},
 	onboardingReducer
 );
+const persistedComunityReducer = persistReducer(
+	{
+		key: COMUNITY_FEATURE_KEY,
+		storage,
+	},
+	comunityReducer
+);
 
 const persistedChannelAppReducer = persistReducer(
 	{
@@ -394,7 +402,8 @@ const reducer = {
 	[CHANNEL_LIST_RENDER]: listChannelRenderReducer,
 	[COMPOSE_FEATURE_KEY]: persistedCompose,
 	groupCall: groupCallReducer,
-	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer
+	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer,
+	[COMUNITY_FEATURE_KEY]: persistedComunityReducer
 };
 
 let storeInstance = configureStore({
