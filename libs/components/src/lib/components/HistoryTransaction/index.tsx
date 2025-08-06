@@ -165,17 +165,7 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 
 	const getTransactionType = (amount: number) => (amount < 0 ? TRANSACTION_TYPES.SENT : TRANSACTION_TYPES.RECEIVED);
 
-	const getStatusBadge = (amount: number) => (
-		<span
-			className={`px-2 py-1 text-xs font-medium rounded-full ${
-				amount < 0
-					? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-					: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-			}`}
-		>
-			{getTransactionType(amount)}
-		</span>
-	);
+
 
 	const handleFilterChange = (filter: FilterType) => {
 		if (activeFilter !== filter) {
@@ -372,7 +362,6 @@ const HistoryTransaction = ({ onClose }: IProps) => {
 																	{TRANSACTION_ITEM.ID_PREFIX}
 																	{item.transaction_id?.slice(-TRANSACTION_ITEM.ID_LENGTH)}
 																</p>
-																{getStatusBadge(item.value ?? 0)}
 															</div>
 															<p className="dark:text-gray-400 text-gray-500 text-xs mt-1">
 																{formatDate(item.create_time ?? '')}
