@@ -2,7 +2,7 @@ import { selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { fileTypeImage } from '@mezon/utils';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalValidateFile from '../../../ModalValidateFile';
 
@@ -19,6 +19,12 @@ const ClanBannerBackground = ({ onUpload, urlImage }: ClanBannerBackgroundProps)
 
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (fileInputRef.current) {
+			fileInputRef.current.value = '';
+		}
+	}, [urlImage]);
 
 	const handleFile = (e: any) => {
 		const file = e?.target?.files[0];
@@ -66,10 +72,7 @@ const ClanBannerBackground = ({ onUpload, urlImage }: ClanBannerBackgroundProps)
 				<h3 className="text-xs font-bold uppercase mb-2">Clan Banner Background</h3>
 				<p className="text-sm font-normal mb-2">This image will display at the top of your channels list.</p>
 				<p className="text-sm font-normal">The recommended minimum size is 960x540 and recommended aspect ratio is 16:9.</p>
-				<button
-					className="h-10 text-theme-primary-active w-fit px-4 mt-4 rounded-lg btn-primary btn-primary-hover"
-					onClick={handleOpenFile}
-				>
+				<button className="h-10 text-theme-primary-active w-fit px-4 mt-4 rounded-lg btn-primary btn-primary-hover" onClick={handleOpenFile}>
 					Upload Background
 				</button>
 			</div>
