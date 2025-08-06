@@ -194,7 +194,7 @@ export default class App {
 				app.exit(0);
 				forceQuit.disable();
 			} else {
-				// event.preventDefault();
+				event.preventDefault();
 				App.mainWindow.hide();
 			}
 		});
