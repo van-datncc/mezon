@@ -455,21 +455,26 @@ const UserProfile = React.memo(
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
-									userById?.user?.display_name ||
-									userById?.user?.username ||
-									user?.clan_nick ||
-									user?.user?.display_name ||
-									user?.user?.username
+										userById?.user?.display_name ||
+										userById?.user?.username ||
+										user?.clan_nick ||
+										user?.user?.display_name ||
+										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
 								: user?.display_name ||
-								user?.username ||
-								user?.user?.display_name ||
-								(checkAnonymous ? 'Anonymous' : message?.username)}
+									user?.user?.display_name ||
+									user?.username ||
+									user?.user?.username ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
-								? userById?.user?.username
-								: user?.username || user?.user?.display_name || (checkAnonymous ? 'Anonymous' : message?.username)}
+								? userById?.user?.username || userById?.user?.display_name
+								: user?.username ||
+									user?.user?.username ||
+									user?.display_name ||
+									user?.user?.display_name ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
@@ -505,7 +510,7 @@ const UserProfile = React.memo(
 					</View>
 
 					{isShowUserContent && (
-						<View style={[styles.roleGroup]}>
+						<View style={[!isDMGroup && styles.roleGroup]}>
 							{!isDMGroup && (userById?.user?.create_time || user?.create_time || user?.user?.create_time) && (
 								<View style={styles.memberSince}>
 									<Text style={styles.title}>{t('userInfoDM.mezonMemberSince')}</Text>
@@ -552,7 +557,9 @@ const UserProfile = React.memo(
 								</View>
 							) : null}
 							{isDMGroup && !isCheckOwner && isChannelOwner && (
-								<UserInfoDm currentChannel={dmChannel || (currentChannel as ChannelsEntity)} user={userById || (user as any)} />
+								<View style={styles.actionGroupDM}>
+									<UserInfoDm currentChannel={dmChannel || (currentChannel as ChannelsEntity)} user={userById || (user as any)} />
+								</View>
 							)}
 							{showAction && !isKicked && <UserSettingProfile user={userById || (user as any)} />}
 						</View>
