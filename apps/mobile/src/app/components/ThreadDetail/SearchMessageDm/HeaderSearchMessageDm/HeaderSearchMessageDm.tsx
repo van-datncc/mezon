@@ -1,19 +1,25 @@
 import { ArrowLeftIcon } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../constants/icon_cdn';
 import { style } from './styles';
 
-export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: (value: string) => void }) {
+interface HeaderSearchMessageDmProps {
+	initialSearchText?: string;
+	onClearStoreInput?: (value: string) => void;
+	onChangeText: (value: string) => void;
+}
+
+export default function HeaderSearchMessageDm({ initialSearchText, onClearStoreInput, onChangeText }: HeaderSearchMessageDmProps) {
 	const navigation = useNavigation<any>();
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const { t } = useTranslation('common');
-	const [textInput, setTextInput] = useState<string>('');
+	const [textInput, setTextInput] = useState<string>(initialSearchText || '');
 
 	const handleTextChange = (text: string) => {
 		setTextInput(text);
@@ -24,6 +30,7 @@ export default function HeaderSearchMessageDm({ onChangeText }: { onChangeText: 
 		if (textInput?.length) {
 			setTextInput('');
 			onChangeText('');
+			onClearStoreInput && onClearStoreInput('');
 		}
 	};
 

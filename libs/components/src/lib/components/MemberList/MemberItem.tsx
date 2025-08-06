@@ -4,6 +4,7 @@ import { MemberProfileType } from '@mezon/utils';
 import { safeJSONParse } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useMemberContextMenu } from '../../contexts';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
 import { MemberProfile } from '../MemberProfile';
 import AddedByUser from './AddedByUser';
@@ -38,6 +39,12 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 
 	const isMe = user?.user?.id === userProfile?.user?.id;
 
+	const { openProfileItem, setCurrentUser } = useMemberContextMenu();
+
+	const handleOnClick = (event: React.MouseEvent) => {
+		setCurrentUser(user);
+		openProfileItem(event, user);
+	};
 	return (
 		<div>
 			<MemberProfile
@@ -58,6 +65,7 @@ function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCrea
 				hideLongName={true}
 				isDM={isDM}
 				statusOnline={statusOnline}
+				onClick={handleOnClick}
 			/>
 			<AddedByUser groupId={directMessageId || ''} userId={user?.id} />
 		</div>

@@ -134,5 +134,6 @@ export enum IconCDN {
 	userFriendIcon = require('./iconPNG/userFriendIcon.png'),
 	userPendingIcon = require('./iconPNG/userPendingIcon.png'),
 	replyMsg = require('./iconPNG/replyMsg.png'),
-	userKickIcon = require('./iconPNG/kickIcon.png')
+	userKickIcon = require('./iconPNG/kickIcon.png'),
+	auditLog = require('./iconPNG/auditLog.png')
 }

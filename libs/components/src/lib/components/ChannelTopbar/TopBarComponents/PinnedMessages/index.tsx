@@ -32,7 +32,7 @@ const PinnedMessages = ({ onClose, rootRef, mode }: PinnedMessagesProps) => {
 			pinMessageActions.deleteChannelPinMessage({
 				channel_id: channelId || '',
 				message_id: messageId,
-				clan_id: currentChannel?.clan_id || '',
+				clan_id: currentChannel?.clan_id || '0',
 				pin_id: unpinMess?.pinMessage.id
 			})
 		);

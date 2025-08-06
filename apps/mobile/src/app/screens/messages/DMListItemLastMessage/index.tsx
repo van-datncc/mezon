@@ -67,13 +67,23 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 		let endIndex = formatEmojiInText.indexOf(EMOJI_KEY, startIndex);
 
 		if (isHeadingText(formatEmojiInText)) {
-			const headingMatch = formatEmojiInText?.match(/^#{1,6}\s*([^\s]+)/);
-			const headingContent = headingMatch ? headingMatch[1] : '';
-			parts.push(
-				<Text key="heading" style={[styles.message, props?.styleText && props?.styleText, { fontWeight: 'bold' }]}>
-					{headingContent}
-				</Text>
-			);
+			const headingMatch = formatEmojiInText?.match(/^#{1,6}\s*([^\n[\]@#:\u{1F600}-\u{1F64F}]+)/u);
+			if (headingMatch) {
+				let headingContent = headingMatch[1];
+				const forbiddenRegex = /```[^`]+?```|(?<!`)`[^`\n]+?`(?!`)/g;
+				const firstForbiddenMatch = forbiddenRegex.exec(headingContent);
+				if (firstForbiddenMatch) {
+					headingContent = headingContent?.slice(0, firstForbiddenMatch?.index);
+				}
+
+				if (headingContent.length > 0) {
+					parts.push(
+						<Text key="heading" style={[styles.message, props?.styleText && props?.styleText, { fontWeight: 'bold' }]}>
+							{headingContent}
+						</Text>
+					);
+				}
+			}
 			return parts;
 		}
 

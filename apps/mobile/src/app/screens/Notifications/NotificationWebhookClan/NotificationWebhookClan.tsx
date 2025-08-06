@@ -13,7 +13,7 @@ function NotificationWebhookClan({ notify }: { notify: INotification }) {
 	const clan = useAppSelector(selectClanById(notify?.content?.clan_id as string));
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const unixTimestamp = Math.floor(new Date(notify?.content?.create_time).getTime() / 1000);
+	const unixTimestamp = Math.floor(new Date(notify?.content?.create_time || notify?.create_time).getTime() / 1000);
 	const messageTimeDifference = convertTimestampToTimeAgo(unixTimestamp);
 	const data = parseObject(notify?.content);
 

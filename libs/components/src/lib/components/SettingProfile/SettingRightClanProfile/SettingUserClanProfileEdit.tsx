@@ -191,18 +191,15 @@ const SettingUserClanProfileEdit: React.FC<SettingUserClanProfileEditProps> = ({
 		}
 		setFlagOption(false);
 	};
-	const handleSaveClose = () => {
-		setFlagOption(false);
-	};
 	const handleUpdateUser = async () => {
 		if (!checkValidate && (urlImage || displayName)) {
 			await updateUserClanProfile(userClansProfile?.clan_id ?? '', displayName.trim() || '', urlImage || '');
 		}
+		setFlagOption(false);
 	};
 	const saveProfile: ModalSettingSave = {
 		flagOption: flagOption,
 		handleClose,
-		handleSaveClose,
 		handleUpdateUser
 	};
 

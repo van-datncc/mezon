@@ -405,11 +405,6 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 	};
 
 	useEffect(() => {
-		quillRef?.current?.setContents(quillRef.current.getContents());
-		quillRef?.current?.formatText(0, quillRef.current.getLength(), { color: isLightMode ? 'rgb(51, 51, 51)' : 'white' });
-	}, [isLightMode, idCanvas]);
-
-	useEffect(() => {
 		const handleClickOutside = (event: { target: any }) => {
 			if (selectRef.current && !selectRef?.current?.contains(event.target)) {
 				setIsOpen(false);
