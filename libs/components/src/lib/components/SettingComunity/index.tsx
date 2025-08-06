@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { comunityActions, selectCommunityBanner, selectComunityError, selectComunityLoading, selectIsCommunityEnabled, useAppDispatch, useAppSelector } from "@mezon/store"
+import { comunityActions, selectCommunityBanner, selectComunityAbout, selectComunityError, selectComunityLoading, selectIsCommunityEnabled, useAppDispatch, useAppSelector } from "@mezon/store"
 import { handleUploadEmoticon, useMezon } from "@mezon/transport"
 import { Icons } from "@mezon/ui"
 import { useEffect, useRef, useState } from "react"
@@ -16,36 +16,35 @@ const SettingComunity = ({
   onCommunityEnabledChange,
 }: { clanId: string; onClose?: () => void; onCommunityEnabledChange?: (enabled: boolean) => void }) => {
   const dispatch = useAppDispatch()
-  const isLoading = useAppSelector(selectComunityLoading)
-  const error = useAppSelector(selectComunityError)
+  const isEnabled = useAppSelector(state => selectIsCommunityEnabled(state, clanId));
+  const banner = useAppSelector(state => selectCommunityBanner(state, clanId));
+  const about = useAppSelector(state => selectComunityAbout(state, clanId));
+  const isLoading = useAppSelector(state => selectComunityLoading(state));
+  const error = useAppSelector(state => selectComunityError(state));
 
-  const isEnabledFromStore = useAppSelector(selectIsCommunityEnabled(clanId));
-  const bannerFromStore = useAppSelector(selectCommunityBanner(clanId));
-
-  const [isEnabled, setIsEnabled] = useState(false)
   const [isInitialEditing, setIsInitialEditing] = useState(false)
-  const [banner, setBanner] = useState<File | null>(null)
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
-  const [about, setAbout] = useState("")
+  const [aboutText, setAboutText] = useState("")
   const [initialBanner, setInitialBanner] = useState<string | null>(null)
   const [initialAbout, setInitialAbout] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [openSaveChange, setOpenSaveChange] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { sessionRef, clientRef } = useMezon();
-  const isDirty = about !== initialAbout || bannerPreview !== initialBanner
+  const isDirty = aboutText !== initialAbout || bannerPreview !== initialBanner
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setBanner(file);
+    setBannerFile(file);
     setBannerPreview(URL.createObjectURL(file));
     if (isEnabled) setOpenSaveChange(true);
     e.target.value = "";
   };
 
   const handleChangeAbout = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setAbout(e.target.value)
+    setAboutText(e.target.value)
     if (isEnabled) setOpenSaveChange(true)
   }
 
@@ -56,20 +55,19 @@ const SettingComunity = ({
     try {
       await dispatch(comunityActions.updateCommunityStatus({ clan_id: clanId, enabled: true })).unwrap();
       let bannerUrl = bannerPreview;
-      if (banner) {
+      if (bannerFile) {
         const client = clientRef.current;
         const session = sessionRef.current;
         if (!client || !session) throw new Error('Client/session not ready');
-        const path = 'community-banner/' + clanId + '.' + (banner.name.split('.').pop() || 'jpg');
-        const attachment = await handleUploadEmoticon(client, session, path, banner);
+        const path = 'community-banner/' + clanId + '.' + (bannerFile.name.split('.').pop() || 'jpg');
+        const attachment = await handleUploadEmoticon(client, session, path, bannerFile);
         if (attachment && attachment.url) {
           bannerUrl = attachment.url;
           await dispatch(comunityActions.updateCommunityBanner({ clan_id: clanId, bannerUrl })).unwrap();
         }
       }
-      setInitialAbout(about);
+      setInitialAbout(aboutText);
       setInitialBanner(bannerUrl);
-      setIsEnabled(true);
       setIsInitialEditing(false);
       onCommunityEnabledChange?.(true);
       toast.success("Community enabled and saved!");
@@ -81,9 +79,9 @@ const SettingComunity = ({
   }
 
   const handleReset = () => {
-    setAbout(initialAbout)
+    setAboutText(initialAbout)
     setBannerPreview(initialBanner)
-    setBanner(null)
+    setBannerFile(null)
     setOpenSaveChange(false)
   }
 
@@ -91,21 +89,21 @@ const SettingComunity = ({
     setIsSaving(true);
     try {
       let bannerUrl = bannerPreview;
-      if (banner) {
+      if (bannerFile) {
         const client = clientRef.current;
         const session = sessionRef.current;
         if (!client || !session) throw new Error('Client/session not ready');
-        const path = 'community-banner/' + clanId + '.' + (banner.name.split('.').pop() || 'jpg');
-        const attachment = await handleUploadEmoticon(client, session, path, banner);
+        const path = 'community-banner/' + clanId + '.' + (bannerFile.name.split('.').pop() || 'jpg');
+        const attachment = await handleUploadEmoticon(client, session, path, bannerFile);
         if (attachment && attachment.url) {
           bannerUrl = attachment.url;
           await dispatch(comunityActions.updateCommunityBanner({ clan_id: clanId, bannerUrl })).unwrap();
         }
       }
-      setInitialAbout(about);
+      setInitialAbout(aboutText);
       setInitialBanner(bannerUrl);
       setOpenSaveChange(false);
-      setBanner(null);
+      setBannerFile(null);
       toast.success("Changes saved!");
     } catch {
       toast.error("Save failed!");
@@ -118,9 +116,8 @@ const SettingComunity = ({
     setIsSaving(true)
     try {
       await dispatch(comunityActions.updateCommunityStatus({ clan_id: clanId, enabled: false })).unwrap()
-      setIsEnabled(false)
-      setAbout("")
-      setBanner(null)
+      setAboutText("")
+      setBannerFile(null)
       setBannerPreview(null)
       setInitialAbout("")
       setInitialBanner(null)
@@ -135,7 +132,7 @@ const SettingComunity = ({
   }
 
   const handleRemoveBanner = async () => {
-    setBanner(null);
+    setBannerFile(null);
     setBannerPreview(null);
     setOpenSaveChange(true);
     if (isEnabled) {
@@ -146,13 +143,9 @@ const SettingComunity = ({
   };
 
   useEffect(() => {
-    setIsEnabled(isEnabledFromStore);
-  }, [isEnabledFromStore]);
-
-  useEffect(() => {
-    setBannerPreview(bannerFromStore);
-    setInitialBanner(bannerFromStore);
-  }, [bannerFromStore]);
+    setBannerPreview(banner);
+    setInitialBanner(banner);
+  }, [banner]);
 
   if (!isEnabled && !isInitialEditing) {
     return <EnableComunity onEnable={handleEnable} />
@@ -252,7 +245,7 @@ const SettingComunity = ({
                 <textarea
                   className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary  focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none"
                   rows={5}
-                  value={about}
+                  value={aboutText}
                   onChange={handleChangeAbout}
                   placeholder="Tell us about your community... What makes it special?"
                   maxLength={300}
@@ -260,10 +253,10 @@ const SettingComunity = ({
                 <div className="absolute bottom-3 right-3 text-sm  bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
                   <span
                     className={
-                      about.length > 250 ? "text-orange-500" : about.length > 280 ? "text-red-500" : "text-gray-500"
+                      aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-gray-500"
                     }
                   >
-                    {about.length}
+                    {aboutText.length}
                   </span>
                   <span className="text-gray-400">/300</span>
                 </div>
@@ -407,7 +400,7 @@ const SettingComunity = ({
               <textarea
                 className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary  focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none"
                 rows={6}
-                value={about}
+                value={aboutText}
                 onChange={handleChangeAbout}
                 placeholder="Tell us about your community... What makes it special?"
                 maxLength={300}
@@ -415,10 +408,10 @@ const SettingComunity = ({
               <div className="absolute bottom-3 right-3 text-sm  bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
                 <span
                   className={
-                    about.length > 250 ? "text-orange-500" : about.length > 280 ? "text-red-500" : "text-gray-500"
+                    aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-gray-500"
                   }
                 >
-                  {about.length}
+                  {aboutText.length}
                 </span>
                 <span className="text-gray-400">/300</span>
               </div>

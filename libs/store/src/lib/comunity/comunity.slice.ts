@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
@@ -123,11 +123,28 @@ export const comunityActions = {
 };
 
 export const selectComunityState = (state: RootState) => state[COMUNITY_FEATURE_KEY] as ComunityState;
-export const selectIsCommunityEnabled = (clanId: string) => (state: RootState) =>
-    selectComunityState(state).byClanId?.[clanId]?.isCommunityEnabled ?? false;
-export const selectCommunityBanner = (clanId: string) => (state: RootState) =>
-    selectComunityState(state).byClanId?.[clanId]?.communityBanner ?? null;
-export const selectComunityAbout = (clanId: string) => (state: RootState) =>
-    selectComunityState(state).byClanId?.[clanId]?.about ?? "";
-export const selectComunityLoading = (state: RootState) => selectComunityState(state).isLoading;
-export const selectComunityError = (state: RootState) => selectComunityState(state).error;
+
+export const selectIsCommunityEnabled = createSelector(
+    [(state: RootState, clanId: string) => selectComunityState(state).byClanId?.[clanId]?.isCommunityEnabled],
+    (isCommunityEnabled) => isCommunityEnabled ?? false
+);
+
+export const selectCommunityBanner = createSelector(
+    [(state: RootState, clanId: string) => selectComunityState(state).byClanId?.[clanId]?.communityBanner],
+    (communityBanner) => communityBanner ?? null
+);
+
+export const selectComunityAbout = createSelector(
+    [(state: RootState, clanId: string) => selectComunityState(state).byClanId?.[clanId]?.about],
+    (about) => about ?? ""
+);
+
+export const selectComunityLoading = createSelector(
+    [selectComunityState],
+    (state) => state.isLoading
+);
+
+export const selectComunityError = createSelector(
+    [selectComunityState],
+    (state) => state.error
+);
