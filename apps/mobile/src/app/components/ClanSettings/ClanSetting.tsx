@@ -77,7 +77,9 @@ export function ClanSetting({ navigation }: MenuClanScreenProps<ClanSettingsScre
 		{
 			title: t('menu.settings.integrations'),
 			onPress: () => {
-				navigation.navigate(APP_SCREEN.MENU_CLAN.INTEGRATIONS);
+				navigation.navigate(APP_SCREEN.MENU_CLAN.INTEGRATIONS, {
+					isClanSetting: true
+				});
 			},
 			expandable: true,
 			icon: <MezonIconCDN icon={IconCDN.gameControllerIcon} color={themeValue.text} />,

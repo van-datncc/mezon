@@ -193,7 +193,8 @@ export function ChannelSetting({ navigation, route }: MenuChannelScreenProps<Scr
 						navigation.navigate(APP_SCREEN.MENU_CLAN.STACK, {
 							screen: APP_SCREEN.MENU_CLAN.INTEGRATIONS,
 							params: {
-								channelId: channel?.channel_id
+								channelId: channel?.channel_id,
+								isClanSetting: false,
 							}
 						});
 					}
