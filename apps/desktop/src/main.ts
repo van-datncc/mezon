@@ -21,9 +21,11 @@ import {
 } from './app/events/constants';
 import ElectronEvents from './app/events/electron.events';
 import SquirrelEvents from './app/events/squirrel.events';
+import { forceQuit } from './app/utils';
 import updateImagePopup from './assets/image-window/update_window_image';
 import openImagePopup from './assets/image-window/window_image';
 import { environment } from './environments/environment';
+// import { forceQuit } from '';
 
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
@@ -159,7 +161,11 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 			}
 			break;
 		case CLOSE_APP:
-			window.close();
+			if (forceQuit.isEnabled) {
+				window.close();
+				return;
+			}
+			window.hide();
 			break;
 		case CLOSE_IMAGE_WINDOW:
 			window.close();

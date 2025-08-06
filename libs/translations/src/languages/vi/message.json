@@ -120,7 +120,10 @@
     "videoCall": "Cuộc gọi video",
     "callBack": "Gọi lại",
     "incomingCall": "Cuộc gọi đến",
-    "outGoingCall": "Cuộc gọi đi"
+    "outGoingCall": "Cuộc gọi đi",
+    "startGroupCall" : "{{username}} đã bắt đầu 1 cuộc gọi nhóm",
+    "startAudioCall" : "{{username}} đã bắt đầu 1 cuộc gọi thoại",
+    "startVideoCall" : "{{username}} đã bắt đầu 1 cuộc gọi video"
   },
   "buzz": {
     "confirmText": "Gửi",

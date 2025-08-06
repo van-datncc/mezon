@@ -342,6 +342,7 @@ const MessageItem = React.memo(
 												channelId={message?.channel_id}
 												senderId={message?.sender_id}
 												callLog={message?.content?.callLog}
+												username={message?.display_name || message?.username || ''}
 											/>
 										) : isSendTokenLog ? (
 											<MessageSendTokenLog messageContent={message?.content?.t} />

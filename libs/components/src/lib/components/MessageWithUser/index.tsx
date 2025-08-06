@@ -331,7 +331,7 @@ function MessageWithUser({
 						{!!message?.content?.callLog?.callLogType && (
 							<CallLogMessage
 								userId={userId || ''}
-								username={user?.user?.display_name || ''}
+								username={message?.display_name || message?.username || ''}
 								channelId={message?.channel_id}
 								messageId={message?.id}
 								senderId={message?.sender_id}

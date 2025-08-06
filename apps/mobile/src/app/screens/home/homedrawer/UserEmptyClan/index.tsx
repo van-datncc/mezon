@@ -1,7 +1,7 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size } from '@mezon/mobile-ui';
 import { RootState, selectAllClans } from '@mezon/store-mobile';
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -15,12 +15,23 @@ const UserEmptyClan = () => {
 	const clansLoadingStatus = useSelector((state: RootState) => state?.clans?.loadingStatus);
 	const [isVisibleJoinClanModal, setIsVisibleJoinClanModal] = useState<boolean>(false);
 	const { t } = useTranslation('userEmptyClan');
+	const [showClanEmpty, setShowClanEmpty] = useState(false);
+
+	useEffect(() => {
+		const splashTask = setTimeout(() => {
+			setShowClanEmpty(true);
+		}, 1000);
+		return () => clearTimeout(splashTask);
+	}, []);
+
 	const onCreateClanModal = useCallback(() => {
 		const data = {
 			children: <CreateClanModal />
 		};
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	}, []);
+
+	if (!showClanEmpty) return null;
 
 	if (clansLoadingStatus === 'loaded' && !clans?.length) {
 		return (
