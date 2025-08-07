@@ -85,20 +85,19 @@ export const style = (colors: Attributes) =>
 		button: {
 			width: '100%',
 			marginTop: size.s_10,
-			height: size.s_50,
+			paddingVertical: size.s_12,
 			backgroundColor: Colors.bgButton,
-			borderRadius: 50,
 			display: 'flex',
 			alignItems: 'center',
 			justifyContent: 'center'
 		},
 		buttonText: {
-			fontSize: size.regular,
+			fontSize: size.s_14,
 			fontWeight: '600',
 			color: Colors.white
 		},
 		uploadText: {
-			fontSize: size.regular,
+			fontSize: size.s_14,
 			fontWeight: '500',
 			color: colors.textDisabled
 		},

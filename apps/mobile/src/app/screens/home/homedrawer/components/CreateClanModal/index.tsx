@@ -19,7 +19,7 @@ import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { MezonButton } from '../../../../../componentUI/MezonButton';
+import MezonButton from '../../../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IFile } from '../../../../../componentUI/MezonImagePicker';
 import MezonInput from '../../../../../componentUI/MezonInput';
@@ -153,9 +153,13 @@ const CreateClanModal = memo(() => {
 			<Text style={styles.community}>
 				{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
 			</Text>
-			<MezonButton disabled={!isCheckValid || isSubmitting} viewContainerStyle={styles.button} onPress={handleCreateClan}>
-				<Text style={styles.buttonText}>{t('createServer')}</Text>
-			</MezonButton>
+			<MezonButton
+				disabled={!isCheckValid || isSubmitting}
+				containerStyle={styles.button}
+				onPress={handleCreateClan}
+				title={t('createServer')}
+				titleStyle={styles.buttonText}
+			/>
 		</View>
 	);
 });

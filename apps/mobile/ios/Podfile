@@ -1,4 +1,5 @@
 ENV['RCT_NEW_ARCH_ENABLED'] = '1'
+ENV['USE_FRAMEWORKS'] = 'static'
 # Resolve react_native_pods.rb with node to allow for hoisting
 # require Pod::Executable.execute_command('node', ['-p',
 #   'require.resolve(
@@ -55,6 +56,7 @@ target 'Mobile' do
 
   pod 'FirebaseCore', :modular_headers => true
   pod 'Firebase/Analytics', :modular_headers => true
+  pod 'Firebase/Messaging', :modular_headers => true
   pod 'GoogleUtilities', :modular_headers => true
   pod 'SDWebImage', :modular_headers => true
   pod 'RNFS', :path => '../node_modules/react-native-fs'
@@ -74,6 +76,19 @@ target 'Mobile' do
 
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Enable optimizations
+        config.build_settings['GCC_OPTIMIZATION_LEVEL'] = 's'
+        config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+        
+        # Enable bitcode for better performance
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        
+        # Optimize for size
+        config.build_settings['SWIFT_COMPILATION_MODE'] = 'wholemodule'
+      end
+    end
     react_native_post_install(
       installer,
       config[:reactNativePath],
