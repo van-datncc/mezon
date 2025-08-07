@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import MezonButton from '../../../componentUI/MezonButton2';
+import MezonButton from '../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import ImageNative from '../../ImageNative';

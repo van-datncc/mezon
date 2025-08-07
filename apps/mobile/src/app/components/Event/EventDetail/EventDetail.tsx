@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
-import MezonButton from '../../../componentUI/MezonButton2';
+import MezonButton from '../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import ImageNative from '../../ImageNative';
