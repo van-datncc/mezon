@@ -42,9 +42,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 		showContextMenu(event, userTemplate);
 	};
 
-	const isOffline = !userMeta?.online;
-
-	
+	const isOffline = userMeta?.status === 'Invisible' ? true : !userMeta?.online;
 
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
