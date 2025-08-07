@@ -37,5 +37,11 @@
             "notEqual": "Confirmation password doesn't match"
         },
         "notification": "Password set successfully"
+    },
+    "toast": {
+        "deleteAccount": {
+            "success": "Account deleted successfully",
+            "error": "Failed to delete account"
+        }
     }
 }

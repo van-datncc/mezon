@@ -37,5 +37,11 @@
             "notEqual": "Mật khẩu xác nhận không khớp"
         },
         "notification": "Đặt mật khẩu thành công"
+    },
+    "toast": {
+        "deleteAccount": {
+            "success": "Xóa tài khoản thành công",
+            "error": "Xóa tài khoản thất bại"
+        }
     }
 }
