@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { createAsyncThunk, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 
@@ -9,6 +9,7 @@ export interface ComunityClanState {
     isCommunityEnabled: boolean;
     communityBanner: string | null;
     about: string;
+    description: string;
 }
 
 export interface ComunityState {
@@ -72,13 +73,14 @@ export const comunitySlice = createSlice({
         },
         setCommunityBanner: (state, action: PayloadAction<{ clanId: string; banner: string | null }>) => {
             const { clanId, banner } = action.payload;
-            if (!state.byClanId[clanId]) state.byClanId[clanId] = { isCommunityEnabled: false, communityBanner: null, about: "" };
+            if (!state.byClanId[clanId]) state.byClanId[clanId] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
             state.byClanId[clanId].communityBanner = banner;
         },
-        setCommunityAbout: (state, action: PayloadAction<{ clanId: string; about: string }>) => {
-            const { clanId, about } = action.payload;
-            if (!state.byClanId[clanId]) state.byClanId[clanId] = { isCommunityEnabled: false, communityBanner: null, about: "" };
+        setCommunityAbout: (state, action: PayloadAction<{ clanId: string; about: string; description?: string }>) => {
+            const { clanId, about, description = "" } = action.payload;
+            if (!state.byClanId[clanId]) state.byClanId[clanId] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
             state.byClanId[clanId].about = about;
+            state.byClanId[clanId].description = description;
         },
     },
     extraReducers: (builder) => {
@@ -89,7 +91,7 @@ export const comunitySlice = createSlice({
             })
             .addCase(updateCommunityStatus.fulfilled, (state, action) => {
                 const { clan_id, enabled } = action.payload;
-                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "" };
+                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
                 state.byClanId[clan_id].isCommunityEnabled = enabled;
                 state.isLoading = false;
             })
@@ -103,16 +105,83 @@ export const comunitySlice = createSlice({
             })
             .addCase(updateCommunityBanner.fulfilled, (state, action) => {
                 const { clan_id, bannerUrl } = action.payload;
-                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "" };
+                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
                 state.byClanId[clan_id].communityBanner = bannerUrl;
                 state.isLoading = false;
             })
             .addCase(updateCommunityBanner.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(updateCommunityAbout.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateCommunityAbout.fulfilled, (state, action) => {
+                const { clan_id, about } = action.payload;
+                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
+                state.byClanId[clan_id].about = about;
+                state.isLoading = false;
+            })
+            .addCase(updateCommunityAbout.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(updateCommunityDescription.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateCommunityDescription.fulfilled, (state, action) => {
+                const { clan_id, description } = action.payload;
+                if (!state.byClanId[clan_id]) state.byClanId[clan_id] = { isCommunityEnabled: false, communityBanner: null, about: "", description: "" };
+                state.byClanId[clan_id].description = description;
+                state.isLoading = false;
+            })
+            .addCase(updateCommunityDescription.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
             });
     },
 });
+
+
+export const updateCommunityAbout = createAsyncThunk(
+    'comunity/updateCommunityAbout',
+    async (
+        { clan_id, about }: { clan_id: string; about: string },
+        thunkAPI
+    ) => {
+        try {
+            const mezon = await ensureSession(getMezonCtx(thunkAPI));
+            await mezon.client.updateClanDesc(mezon.session, clan_id, {
+                about,
+            });
+            return { clan_id, about };
+        } catch (error) {
+            captureSentryError(error, 'comunity/updateCommunityAbout');
+            return thunkAPI.rejectWithValue('Failed to update community about');
+        }
+    }
+);
+
+export const updateCommunityDescription = createAsyncThunk(
+    'comunity/updateCommunityDescription',
+    async (
+        { clan_id, description }: { clan_id: string; description: string },
+        thunkAPI
+    ) => {
+        try {
+            const mezon = await ensureSession(getMezonCtx(thunkAPI));
+            await mezon.client.updateClanDesc(mezon.session, clan_id, {
+                description,
+            });
+            return { clan_id, description };
+        } catch (error) {
+            captureSentryError(error, 'comunity/updateCommunityDescription');
+            return thunkAPI.rejectWithValue('Failed to update community description');
+        }
+    }
+);
 
 export const comunityReducer = comunitySlice.reducer;
 
@@ -120,7 +189,13 @@ export const comunityActions = {
     ...comunitySlice.actions,
     updateCommunityStatus,
     updateCommunityBanner,
+    updateCommunityAbout,
+    updateCommunityDescription,
 };
+export const selectComunityDescription = createSelector(
+    [(state: RootState, clanId: string) => selectComunityState(state).byClanId?.[clanId]?.description],
+    (description) => description ?? ""
+);
 
 export const selectComunityState = (state: RootState) => state[COMUNITY_FEATURE_KEY] as ComunityState;
 

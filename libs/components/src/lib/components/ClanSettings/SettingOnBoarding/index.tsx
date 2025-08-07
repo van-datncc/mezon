@@ -311,7 +311,7 @@ const MainIndex = ({ isEnableOnBoarding, toggleEnableStatus, handleGoToPage, onC
 	return (
 		<div className="flex flex-col gap-6 flex-1">
 			<div className="flex flex-col gap-2">
-				<div className="text-[20px] text-theme-primary-active font-semibold">On Boarding</div>
+				<div className="text-[20px] text-theme-primary-active font-semibold">Onboarding</div>
 				<div className="font-medium text-theme-primary">
 					Give your members a simple starting experience with custom channels, roles and first steps.
 				</div>

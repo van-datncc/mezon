@@ -1,5 +1,6 @@
 import { usePermissionChecker } from '@mezon/core';
-import { authActions, selectAllAccount, selectCurrentClan, useAppDispatch } from '@mezon/store';
+import type { RootState } from '@mezon/store';
+import { authActions, selectAllAccount, selectCurrentClan, selectIsCommunityEnabled, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
 import { EPermission } from '@mezon/utils';
 import { useState } from 'react';
@@ -12,32 +13,32 @@ type SettingSidebarProps = {
 	handleMenu: (value: boolean) => void;
 	currentSetting: string;
 	setIsShowDeletePopup: () => void;
-	isCommunityEnabled?: boolean;
 };
 
-const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDeletePopup, isCommunityEnabled }: SettingSidebarProps) => {
+const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDeletePopup }: SettingSidebarProps) => {
 	const [selectedButton, setSelectedButton] = useState<string | null>(currentSetting);
 	const currentClan = useSelector(selectCurrentClan);
 	const [isClanOwner, hasClanPermission] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan]);
-
 	const userProfile = useSelector(selectAllAccount);
+	const clanId = currentClan?.clan_id;
+	const isCommunityEnabled = useSelector((state: RootState) => clanId ? selectIsCommunityEnabled(state, clanId) : false);
 
 	const sideBarListItemWithPermissions = sideBarListItem.map((sidebarItem) => {
 		let filteredListItem = sidebarItem.listItem.filter((item) => {
 			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.INTEGRATIONS, ItemSetting.AUDIT_LOG].includes(item.id)) {
 				return hasClanPermission;
 			}
-			if (item.id === ItemSetting.ON_BOARDING) {
+			if (item.id === ItemSetting.ON_BOARDING || item.id === ItemSetting.ON_COMUNITY) {
 				return isClanOwner;
 			}
 			return true;
 		});
 
-		if (sidebarItem.title === 'Community' && isCommunityEnabled) {
-			filteredListItem = filteredListItem.map((item) =>
-				item.id === ItemSetting.ON_COMUNITY ? { ...item, name: 'Community Overview' } : item
-			);
-		}
+		filteredListItem = filteredListItem.map((item) =>
+			item.id === ItemSetting.ON_COMUNITY && isCommunityEnabled
+				? { ...item, name: 'Community Overview' }
+				: item
+		);
 
 		return {
 			...sidebarItem,
