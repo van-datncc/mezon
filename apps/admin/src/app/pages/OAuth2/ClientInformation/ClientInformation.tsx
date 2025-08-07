@@ -68,11 +68,11 @@ const ClientInformation = ({ currentApp }: IClientInformationProps) => {
 						<div className="w-8">
 							<input
 								className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
-                            bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
-                            after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
-                            hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-                            focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
-                            disabled:bg-slate-200 disabled:after:bg-slate-300"
+							bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
+							after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
+							hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
+							focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
+							disabled:bg-slate-200 disabled:after:bg-slate-300"
 								type="checkbox"
 								id="id-c01"
 							/>
@@ -114,8 +114,8 @@ interface IResetSecretPopupProps {
 
 const ResetSecretPopup = ({ handleClosePopup, currentApp, handleCopyKey }: IResetSecretPopupProps) => {
 	const dispatch = useAppDispatch();
-	const newSecretKey = generateRandomPassword();
-
+	const [newSecretKey] = useState(() => generateRandomPassword());
+	const [tokenCopied, setTokenCopied] = useState(false);
 	const handleSaveSecretKey = async () => {
 		const request: ApiMezonOauthClient = {
 			...currentApp?.oAuthClient,
@@ -124,7 +124,11 @@ const ResetSecretPopup = ({ handleClosePopup, currentApp, handleCopyKey }: IRese
 		await dispatch(editMezonOauthClient({ body: request }));
 		handleClosePopup();
 	};
-
+	const handleCoppyKey = (url: string) => {
+		navigator.clipboard.writeText(url);
+		setTokenCopied(true);
+		setTimeout(() => setTokenCopied(false), 1000);
+	}
 	return (
 		<div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
 			<div onClick={handleClosePopup} className="fixed inset-0 bg-black opacity-80" />
@@ -136,12 +140,14 @@ const ResetSecretPopup = ({ handleClosePopup, currentApp, handleCopyKey }: IRese
 							Your app will stop working until you update the secret key in your app code.
 						</div>
 						<div className="relative">
-							<div className="bg-bgLightModeThird dark:bg-[#1e1f22] border border-bgSelectItemHover p-[10px] mb-2 rounded-lg">{newSecretKey}</div>
+							<div className="bg-bgLightModeThird dark:bg-[#1e1f22] border border-bgSelectItemHover p-[10px] mb-2 rounded-lg">
+								{newSecretKey}
+							</div>
 							<button
-								onClick={() => handleCopyKey(newSecretKey)}
-								className="absolute right-2 top-2 text-sm py-[5px] px-[6px] cursor-pointer bg-indigo-600  hover:bg-indigo-700  transition-colors rounded-lg w-fit select-none font-medium text-white"
+								onClick={() => handleCoppyKey(newSecretKey)}
+								className={`absolute right-2 top-2 text-sm py-[5px] px-[6px] cursor-pointer ${tokenCopied ? 'bg-gray-600 hover:bg-gray-700' : 'bg-indigo-600  hover:bg-indigo-700 '}  transition-colors rounded-lg w-fit select-none font-medium text-white`}
 							>
-								Copy
+								{tokenCopied ? 'Copied!' : 'Copy'}
 							</button>
 						</div>
 					</div>
