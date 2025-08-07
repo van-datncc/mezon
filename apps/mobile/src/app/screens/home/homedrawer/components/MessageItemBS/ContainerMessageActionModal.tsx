@@ -116,25 +116,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					messageId
 				})
 			);
-			if (currentTopicId) {
-				await socket.removeChatMessage(
-					currentClanId || '',
-					currentChannelId,
-					mode,
-					isPublic,
-					messageId,
-					!!message?.attachments,
-					currentTopicId
-				);
-			} else {
-				socket.removeChatMessage(
-					currentDmId ? '0' : currentClanId || '',
-					currentDmId ? currentDmId : currentTopicId || currentChannelId,
-					mode,
-					isPublic,
-					messageId
-				);
-			}
+			socket.removeChatMessage(
+				currentDmId ? '0' : currentClanId || '',
+				currentDmId ? currentDmId : currentChannelId,
+				mode,
+				isPublic,
+				messageId,
+				!!message?.attachments,
+				currentTopicId
+			);
 		},
 		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, message?.attachments, mode, socketRef, store]
 	);
