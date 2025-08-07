@@ -387,9 +387,13 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				);
 			}
 			if (navigation) {
-				navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
-				if (channelId !== '0' && !!channelId) {
-					navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
+				if (isTabletLandscape) {
+					navigation.navigate(APP_SCREEN.HOME as never);
+				} else {
+					navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
+					if (channelId !== '0' && !!channelId) {
+						navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
+					}
 				}
 			}
 			if (clanId) {
