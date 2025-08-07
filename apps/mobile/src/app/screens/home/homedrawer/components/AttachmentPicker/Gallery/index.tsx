@@ -83,7 +83,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 	}, [isPermissionLimitIOS]);
 
 	const checkAndRequestPermissions = async () => {
-		const hasPermission = await requestPermission();
+		const hasPermission = await requestPermission(true);
 		if (hasPermission) {
 			loadPhotos();
 		} else {
@@ -125,7 +125,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 		}
 	};
 
-	const requestPermission = async () => {
+	const requestPermission = async (isCheck = false) => {
 		if (Platform.OS === 'android') {
 			dispatch(appActions.setIsFromFCMMobile(true));
 			const hasPermission = await getCheckPermissionPromise();
@@ -144,8 +144,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 					timerRef.current = setTimeout(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 
 					if (
-						granted['android.permission.READ_MEDIA_IMAGES'] !== PermissionsAndroid.RESULTS.GRANTED ||
-						granted['android.permission.READ_MEDIA_VIDEO'] !== PermissionsAndroid.RESULTS.GRANTED
+						(granted['android.permission.READ_MEDIA_IMAGES'] !== PermissionsAndroid.RESULTS.GRANTED ||
+							granted['android.permission.READ_MEDIA_VIDEO'] !== PermissionsAndroid.RESULTS.GRANTED) &&
+						!isCheck
 					) {
 						alertOpenSettings();
 					}
@@ -167,7 +168,7 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 					timerRef.current = setTimeout(() => dispatch(appActions.setIsFromFCMMobile(false)), 2000);
 
-					if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+					if (granted !== PermissionsAndroid.RESULTS.GRANTED && !isCheck) {
 						alertOpenSettings();
 					}
 
@@ -185,6 +186,9 @@ const Gallery = ({ onPickGallery, currentChannelId }: IProps) => {
 
 			if (result === 'not-determined' || result === 'denied') {
 				const requestResult = await iosRequestReadWriteGalleryPermission();
+				if ((requestResult === 'not-determined' || requestResult === 'denied' || requestResult === 'blocked') && !isCheck) {
+					alertOpenSettings();
+				}
 				return requestResult === 'granted' || requestResult === 'limited';
 			} else if (result === 'limited') {
 				setIsPermissionLimitIOS(true);
