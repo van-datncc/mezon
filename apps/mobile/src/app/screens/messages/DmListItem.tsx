@@ -163,7 +163,8 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 							{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
 						]}
 					>
-						{(directMessage?.channel_label || directMessage?.usernames) ?? ''}
+						{(directMessage?.channel_label || directMessage?.usernames) ??
+							(directMessage?.creator_name ? directMessage.creator_name : '')}
 					</Text>
 					<BuzzBadge
 						channelId={directMessage?.channel_id}
