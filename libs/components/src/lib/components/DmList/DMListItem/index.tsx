@@ -8,13 +8,14 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, MemberProfileType } from '@mezon/utils';
+import { EUserStatus, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import BuzzBadge from '../../BuzzBadge';
 import LeaveGroupModal from '../../LeaveGroupModal';
-import { MemberProfile } from '../../MemberProfile';
+import { UserStatusIconClan } from '../../MemberProfile';
 export type DirectMessProp = {
 	id: string;
 	currentDmGroupId: string;
@@ -89,22 +90,13 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				joinToChatAndNavigate(id, directMessage?.type as number);
 			}}
 		>
-			<MemberProfile
+			<DmItemProfile
 				avatar={isTypeDMGroup ? 'assets/images/avatar-group.png' : (directMessage?.channel_avatar?.at(0) ?? '')}
-				name={directMessage?.channel_label ?? ''}
-				usernameAva={directMessage?.channel_label ?? 'Deleted Account'}
-				status={{ status: directMessage.is_online?.some(Boolean), isMobile: false }}
-				isHideStatus={true}
-				isHideIconStatus={false}
-				key={directMessage.channel_id}
-				isUnReadDirect={isUnReadChannel}
-				isHideAnimation={true}
-				positionType={MemberProfileType.DM_LIST}
-				countMember={(directMessage?.user_id?.length || 0) + 1}
-				user={directMessage as ChannelMembersEntity}
-				isMute={directMessage?.is_mute}
-				isDM
-				metaDataDM={metadata}
+				name={directMessage?.channel_label || ''}
+				number={(directMessage?.user_id?.length || 0) + 1}
+				isTypeDMGroup={isTypeDMGroup}
+				highlight={isUnReadChannel}
+				userMeta={metadata}
 			/>
 			{buzzStateDM?.isReset ? (
 				<BuzzBadge
@@ -128,3 +120,44 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 export default memo(DMListItem, (prev, cur) => {
 	return prev.id === cur.id && prev.isActive === cur.isActive;
 });
+
+const DmItemProfile = ({
+	avatar,
+	name,
+	number,
+	isTypeDMGroup,
+	highlight,
+	userMeta
+}: {
+	highlight: boolean;
+	avatar: string;
+	name: string;
+	number: number;
+	isTypeDMGroup: boolean;
+	userMeta?: any;
+}) => {
+	return (
+		<div
+			className={`relative flex gap-3 items-center text-theme-primary-hover  ${highlight ? 'text-theme-primary-active' : 'text-theme-primary'}`}
+		>
+			<AvatarImage
+				alt={name}
+				username={name}
+				className="min-w-8 min-h-8 max-w-8 max-h-8"
+				classNameText="font-semibold"
+				srcImgProxy={createImgproxyUrl(avatar ?? '')}
+				src={avatar}
+			/>
+			{!isTypeDMGroup && (
+				<div className="rounded-full left-7 absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-theme-primary">
+					<UserStatusIconClan status={userMeta?.user_status} online={userMeta?.user_status !== EUserStatus.INVISIBLE} />
+				</div>
+			)}
+
+			<div className="flex flex-col justify-center ">
+				<span className="one-line text-start">{name}</span>
+				{isTypeDMGroup && <p className="opacity-60 text-xs text-start">{number} Members</p>}
+			</div>
+		</div>
+	);
+};

@@ -1,7 +1,6 @@
 import { useAppDispatch, userClanProfileActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { Dropdown } from 'flowbite-react';
-import { SimpleMemberProfile } from '../../MemberProfile';
 import ItemStatus from './ItemStatus';
 
 export const StatusProfile = () => {
@@ -48,14 +47,6 @@ export const StatusProfile = () => {
 				placement="right-start"
 				className="bg-theme-contexify text-theme-primary border-none ml-2 py-[6px] px-[8px] w-[200px]"
 			>
-				<SimpleMemberProfile
-					name={''}
-					status={{ status: true, isMobile: false }}
-					avatar={''}
-					isHideStatus={false}
-					numberCharacterCollapse={15}
-					classParent="memberProfile"
-				/>
 				<ItemStatus children="Manage Accounts" />
 			</Dropdown>
 		</>

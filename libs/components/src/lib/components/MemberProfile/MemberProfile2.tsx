@@ -1,13 +1,16 @@
 import { useColorsRoleById } from '@mezon/core';
 import {
+	ChannelMembersEntity,
 	selectClanMemberMetaUserId,
 	selectMemberClanByUserId2,
+	selectMemberCustomStatusById,
 	selectMemberCustomStatusById2,
 	selectStatusInVoice,
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
+import { useMemo } from 'react';
 import { AvatarImage } from '../../components';
 import { useMemberContextMenu } from '../../contexts/MemberContextMenu';
 import { UserStatusIconClan } from './MemberProfile';
@@ -15,13 +18,29 @@ import { UserStatusIconClan } from './MemberProfile';
 type BaseMemberProfileProps = {
 	id: string;
 	creator_id?: string;
+	isDM?: boolean;
+	userDM?: ChannelMembersEntity;
 };
 
-export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) => {
-	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
-	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
-	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
-	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, user.user?.id || ''));
+export const BaseMemberProfile = ({ id, creator_id, isDM = false, userDM }: BaseMemberProfileProps) => {
+	const userClan = useAppSelector((state) => selectMemberClanByUserId2(state, id));
+	const userMetaClan = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
+	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, userClan?.user?.id || ''));
+	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, userClan?.user?.id || ''));
+	const userCustomDM = useAppSelector((state) => selectMemberCustomStatusById(state, userDM?.user?.id || '', isDM));
+
+	const user = useMemo(() => {
+		return isDM ? userDM || userClan : userClan;
+	}, [userClan, userVoiceStatus, userCustomStatus, isDM, userDM]);
+
+	const userMeta = useMemo(() => {
+		return isDM ? userCustomDM || userMetaClan : userMetaClan;
+	}, [userMetaClan, isDM, userDM]);
+
+	const userStatus = useMemo(() => {
+		return isDM ? userCustomDM || userCustomStatus : userCustomStatus;
+	}, [userCustomStatus, isDM, userDM]);
+
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
 	const isOwnerClan = creator_id === user?.user?.id;
@@ -69,7 +88,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 				</div>
 
 				<div className="flex flex-col font-medium">
-					<ClanUserName userId={user?.id} name={username} isOwnerClan={isOwnerClan} />
+					<ClanUserName userId={user?.id} name={username} isOwnerClan={isDM ? false : isOwnerClan} />
 					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] flex gap-1 items-center">
 						{!!userVoiceStatus ? (
 							<>
@@ -77,7 +96,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 								In voice
 							</>
 						) : (
-							userCustomStatus
+							userStatus
 						)}
 					</p>
 				</div>

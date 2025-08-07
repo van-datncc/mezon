@@ -1,12 +1,10 @@
 import { useUserMetaById } from '@mezon/core';
 import { ChannelMembersEntity, selectAccountCustomStatus, selectAllAccount, selectMemberCustomStatusById, useAppSelector } from '@mezon/store';
 import { MemberProfileType } from '@mezon/utils';
-import { safeJSONParse } from 'mezon-js';
-import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useMemberContextMenu } from '../../contexts';
 import { DataMemberCreate } from '../DmList/MemberListGroupChat';
-import { MemberProfile } from '../MemberProfile';
+import { BaseMemberProfile } from '../MemberProfile/MemberProfile2';
 import AddedByUser from './AddedByUser';
 export type MemberItemProps = {
 	user: ChannelMembersEntity;
@@ -20,53 +18,17 @@ export type MemberItemProps = {
 	isDM: boolean;
 };
 
-function MemberItem({ user, listProfile, isOffline, positionType, dataMemberCreate, directMessageId, name, isDM, isMobile }: MemberItemProps) {
+function MemberItem({ user, directMessageId, isDM }: MemberItemProps) {
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById(state, user.user?.id || '', isDM));
 	const userProfile = useSelector(selectAllAccount);
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
-	const displayCustomStatus = user.user?.id === userProfile?.user?.id ? currentUserCustomStatus : userCustomStatus;
 	const userMetaById = useUserMetaById(user.user?.id);
-
-	const statusOnline = useMemo(() => {
-		if (userProfile?.user?.metadata && user.user?.id === userProfile.user.id) {
-			const metadata = safeJSONParse(userProfile?.user?.metadata);
-			return metadata?.user_status;
-		}
-		if (userMetaById) {
-			return userMetaById as any;
-		}
-	}, [user.user?.id, userMetaById, userProfile?.user?.id, userProfile?.user?.metadata]);
-
-	const isMe = user?.user?.id === userProfile?.user?.id;
 
 	const { openProfileItem, setCurrentUser } = useMemberContextMenu();
 
-	const handleOnClick = (event: React.MouseEvent) => {
-		setCurrentUser(user);
-		openProfileItem(event, user);
-	};
 	return (
 		<div>
-			<MemberProfile
-				numberCharacterCollapse={30}
-				avatar={user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '')}
-				name={name || ''}
-				usernameAva={user?.user?.username}
-				status={{ status: isMe ? true : !isOffline, isMobile }}
-				customStatus={displayCustomStatus}
-				isHideStatus={true}
-				isHideIconStatus={false}
-				textColor="[#AEAEAE]"
-				user={user}
-				listProfile={listProfile}
-				isOffline={isMe ? false : isOffline}
-				positionType={positionType}
-				dataMemberCreate={dataMemberCreate}
-				hideLongName={true}
-				isDM={isDM}
-				statusOnline={statusOnline}
-				onClick={handleOnClick}
-			/>
+			<BaseMemberProfile id={user?.user?.id || ''} userDM={user} isDM={true} />
 			<AddedByUser groupId={directMessageId || ''} userId={user?.id} />
 		</div>
 	);
