@@ -73,7 +73,7 @@ import {
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLoadingStatus,
-	selectMemberClanByUserId2,
+	selectRolesByClanId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -1362,19 +1362,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				const store = await getStoreAsync();
 				const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-				const meInClan = selectMemberClanByUserId2(store.getState(), userId as string).role_id;
-				const listRole = new Set(channelUpdated.role_ids || []);
-				const idAccessPrivate = (meInClan || []).some((role_id) => listRole.has(role_id));
-				const memberAccessPrivate = (channelUpdated || []).user_ids?.some((user_id) => user_id === userId);
+				if (channelUpdated.channel_private) {
+					const roleInClan = selectRolesByClanId(store.getState(), channelUpdated.clan_id);
+					const hasRoleAccessPrivate = (channelUpdated.role_ids || []).some((key) => key in roleInClan);
+					const memberAccessPrivate = (channelUpdated.user_ids || []).some((user_id) => user_id === userId);
 
-				const result = await dispatch(
-					channelsActions.updateChannelPrivateSocket({
-						action: channelUpdated,
-						isUserUpdate: channelUpdated.creator_id === userId || !!memberAccessPrivate || idAccessPrivate
-					})
-				).unwrap();
-				if (result && currentChannelId === channelUpdated.channel_id) {
-					navigate(`/chat/clans/${channelUpdated.clan_id}`);
+					const result = await dispatch(
+						channelsActions.updateChannelPrivateSocket({
+							action: channelUpdated,
+							isUserUpdate: channelUpdated.creator_id === userId || memberAccessPrivate || hasRoleAccessPrivate
+						})
+					).unwrap();
+					if (result && currentChannelId === channelUpdated.channel_id) {
+						navigate(`/chat/clans/${channelUpdated.clan_id}`);
+					}
 				}
 				dispatch(
 					listChannelRenderAction.updateChannelInListRender({
