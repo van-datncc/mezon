@@ -11,7 +11,7 @@ import { IconCDN } from '../../../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { style } from './styles';
 
-export function WebhooksItem({ webhook }: { webhook: ApiWebhook }) {
+export function WebhooksItem({ webhook, isClanIntegration, isClanSetting }: { webhook: ApiWebhook, isClanIntegration: boolean, isClanSetting: boolean }) {
 	const { themeValue } = useTheme();
 	const navigation = useNavigation<any>();
 	const { t } = useTranslation(['clanIntegrationsSetting']);
@@ -29,7 +29,9 @@ export function WebhooksItem({ webhook }: { webhook: ApiWebhook }) {
 	const webhookOwner = useAppSelector((state) => selectMemberClanByUserId2(state, webhook.creator_id as string));
 	const handleEditWebhooks = () => {
 		navigation.navigate(APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT, {
-			webhook
+			webhook,
+			isClanIntegration,
+			isClanSetting
 		});
 	};
 	return (
