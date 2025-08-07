@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import { createAsyncThunk, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { RootState } from '../store';
 

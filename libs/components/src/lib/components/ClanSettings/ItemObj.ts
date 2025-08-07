@@ -37,7 +37,7 @@ export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATION
 
 export const listItemSettingModeration: ItemObjProps[] = [{ id: ItemSetting.AUDIT_LOG, name: 'Audit Log' }];
 export const communitySettingsList: ItemObjProps[] = [{ id: ItemSetting.ON_BOARDING, name: 'On Boarding' },
-{ id: ItemSetting.ON_COMUNITY, name: 'On Comunity' }
+	{ id: ItemSetting.ON_COMUNITY, name: 'Enable Comunity' }
 ];
 
 export const sideBarListItem: ListSideBarProps[] = [
