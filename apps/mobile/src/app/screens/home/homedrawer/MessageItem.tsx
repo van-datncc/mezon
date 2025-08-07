@@ -39,7 +39,7 @@ import MessageTopic from './components/MessageTopic/MessageTopic';
 import { RenderMessageItemRef } from './components/RenderMessageItemRef';
 import { RenderTextMarkdownContent } from './components/RenderTextMarkdown';
 import UserProfile from './components/UserProfile';
-import { EMessageActionType, EMessageBSToShow } from './enums';
+import { EMessageActionType } from './enums';
 import { style } from './styles';
 import { IMessageActionNeedToResolve } from './types';
 
@@ -172,14 +172,7 @@ const MessageItem = React.memo(
 			dispatch(setSelectedMessage(message));
 			const data = {
 				snapPoints: ['55%', '85%'],
-				children: (
-					<ContainerMessageActionModal
-						message={message}
-						mode={mode}
-						type={EMessageBSToShow.MessageAction}
-						senderDisplayName={senderDisplayName}
-					/>
-				)
+				children: <ContainerMessageActionModal message={message} mode={mode} senderDisplayName={senderDisplayName} />
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 		}, [dispatch, message, mode, preventAction, senderDisplayName]);
@@ -228,14 +221,7 @@ const MessageItem = React.memo(
 			dispatch(setSelectedMessage(message));
 			const data = {
 				snapPoints: ['55%', '85%'],
-				children: (
-					<ContainerMessageActionModal
-						message={message}
-						mode={mode}
-						type={EMessageBSToShow.MessageAction}
-						senderDisplayName={senderDisplayName}
-					/>
-				)
+				children: <ContainerMessageActionModal message={message} mode={mode} senderDisplayName={senderDisplayName} />
 			};
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
 			DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
@@ -428,7 +414,6 @@ const MessageItem = React.memo(
 												<ContainerMessageActionModal
 													message={message}
 													mode={mode}
-													type={EMessageBSToShow.MessageAction}
 													senderDisplayName={senderDisplayName}
 													isOnlyEmojiPicker={true}
 												/>

@@ -1,7 +1,7 @@
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { useCallback } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
 import { PERMISSIONS, RESULTS, check, request } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -66,7 +66,6 @@ export function useImage() {
 					return requestResult === RESULTS.GRANTED;
 				}
 				case RESULTS.BLOCKED:
-					Alert.alert('Permission Required', 'Please enable storage permission in your device settings to save images.', [{ text: 'OK' }]);
 					return false;
 				default:
 					return false;
@@ -76,14 +75,36 @@ export function useImage() {
 		}
 	};
 
+	const openAppSettings = () => {
+		if (Platform.OS === 'ios') {
+			Linking.openURL('app-settings:');
+		} else {
+			Linking.openSettings();
+		}
+	};
+
+	const alertOpenSettings = (title?: string, desc?: string) => {
+		Alert.alert(title || 'Photo Permission', desc || 'App needs access to your photo library', [
+			{
+				text: 'Cancel',
+				style: 'cancel'
+			},
+			{
+				text: 'OK',
+				onPress: () => {
+					openAppSettings();
+				}
+			}
+		]);
+	};
+
 	const saveImageToCameraRoll = useCallback(
 		async (filePath: string, type: string, isShowSuccessToast = true) => {
 			try {
 				const hasPermission = await checkAndRequestPermission();
 				if (!hasPermission) {
-					throw {
-						message: 'Permission Required'
-					};
+					alertOpenSettings();
+					return;
 				}
 				await CameraRoll.save(filePath, { type: type === 'video' ? 'video' : 'photo' });
 

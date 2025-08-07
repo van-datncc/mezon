@@ -9,10 +9,8 @@ import { EMessageActionType, EMessageBSToShow } from '../enums';
 export interface IReplyBottomSheet {
 	message: MessagesEntity;
 	onClose?: () => void;
-	type: EMessageBSToShow | null;
 	onConfirmAction?: (payload: IConfirmActionPayload) => void;
 	mode?: ChannelStreamMode;
-	clanId?: string;
 	isOnlyEmojiPicker?: boolean;
 	user?: ApiUser | null;
 	senderDisplayName?: string;
