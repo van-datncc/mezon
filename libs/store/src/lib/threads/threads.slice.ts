@@ -1,11 +1,11 @@
 import { captureSentryError } from '@mezon/logger';
-import { IMessageWithUser, IThread, LIMIT, LoadingStatus, TypeCheck } from '@mezon/utils';
-import { EntityState, PayloadAction, createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { getParentChannelIdIfHas, IMessageWithUser, IThread, LIMIT, LoadingStatus, TypeCheck } from '@mezon/utils';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { ApiChannelDescription } from 'mezon-js/api.gen';
 import { CacheMetadata, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions, selectCurrentChannel } from '../channels/channels.slice';
 import { listChannelRenderAction } from '../channels/listChannelRender.slice';
-import { MezonValueContext, ensureSession, ensureSocket, getMezonCtx } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, MezonValueContext } from '../helpers';
 import { RootState } from '../store';
 
 export const THREADS_FEATURE_KEY = 'threads';
@@ -168,9 +168,9 @@ export const searchedThreads = createAsyncThunk('threads/searchThreads', async (
 		const state = thunkAPI.getState() as RootState;
 		const clanId = state?.clans?.currentClanId;
 		const currentChannel = selectCurrentChannel(state);
-		const channelId = currentChannel?.parent_id && currentChannel?.parent_id !== '0' ? currentChannel?.parent_id : currentChannel?.channel_id;
+		const channelSearch = currentChannel ? getParentChannelIdIfHas(currentChannel) : channelId;
 		if (clanId && clanId !== '0' && channelId) {
-			const response = await mezon.client.searchThread(mezon.session, clanId, channelId, label?.trim());
+			const response = await mezon.client.searchThread(mezon.session, clanId, channelSearch, label?.trim());
 			if (!response.channeldesc) {
 				return [];
 			}
