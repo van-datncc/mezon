@@ -1,3 +1,4 @@
+import { registerGlobals } from '@livekit/react-native';
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { DMCallActions, appActions, selectCurrentUserId, selectSignalingDataByUserId, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
@@ -34,7 +35,7 @@ import { style } from './styles';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 import BG_CALLING from './bgCalling.png';
-
+registerGlobals();
 const AVATAR_DEFAULT = `${process.env.NX_BASE_IMG_URL}/1775731152322039808/1820659489792069632/mezon_logo.png`;
 const IncomingHomeScreen = memo((props: any) => {
 	const { themeValue } = useTheme();

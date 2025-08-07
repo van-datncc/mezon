@@ -17,9 +17,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			gap: size.s_4,
 			backgroundColor: colors.secondaryLight,
-			borderRadius: size.s_6,
-			borderWidth: 0.5,
-			borderColor: Colors.gray72
+			borderRadius: size.s_6
 		},
 		dateMessageBox: {
 			paddingLeft: size.small,

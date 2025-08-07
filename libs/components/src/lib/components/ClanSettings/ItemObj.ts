@@ -19,7 +19,8 @@ export const ItemSetting = {
 	// NOTIFICATION_SOUND: 'notification-sound',
 	CATEGORY_ORDER: 'category-order',
 	AUDIT_LOG: 'audit-log',
-	ON_BOARDING: 'on-boarding'
+	ON_BOARDING: 'on-boarding',
+	ON_COMUNITY: 'on-comunity'
 };
 
 export const listItemSetting: ItemObjProps[] = [
@@ -28,14 +29,16 @@ export const listItemSetting: ItemObjProps[] = [
 	{ id: ItemSetting.EMOJI, name: 'Emoji' },
 	{ id: ItemSetting.IMAGE_STICKERS, name: 'Image Stickers' },
 	{ id: ItemSetting.VOIDE_STICKERS, name: 'Voice Stickers' },
-	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' }
+	{ id: ItemSetting.CATEGORY_ORDER, name: 'Category Order' },
 	// { id: ItemSetting.NOTIFICATION_SOUND, name: 'Notification Sound' }
 ];
 
 export const listItemSettingApp: ItemObjProps[] = [{ id: ItemSetting.INTEGRATIONS, name: 'Integrations' }];
 
 export const listItemSettingModeration: ItemObjProps[] = [{ id: ItemSetting.AUDIT_LOG, name: 'Audit Log' }];
-export const communitySettingsList: ItemObjProps[] = [{ id: ItemSetting.ON_BOARDING, name: 'On Boarding' }];
+export const communitySettingsList: ItemObjProps[] = [{ id: ItemSetting.ON_BOARDING, name: 'On Boarding' },
+{ id: ItemSetting.ON_COMUNITY, name: 'On Comunity' }
+];
 
 export const sideBarListItem: ListSideBarProps[] = [
 	{
@@ -51,7 +54,7 @@ export const sideBarListItem: ListSideBarProps[] = [
 		listItem: listItemSettingModeration
 	},
 	{
-		title: 'Community',
+		title: '',
 		listItem: communitySettingsList
 	}
 ];

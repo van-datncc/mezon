@@ -103,31 +103,6 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 							<ItemSelect children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
 						</Dropdown>
 					</div>
-					<div className="px-4">
-						<div className="mb-2 block">
-							<label htmlFor="status" className="text-theme-primary text-xs uppercase font-semibold">
-								Status
-							</label>
-						</div>
-						<Dropdown
-							trigger="click"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-lg h-9 text-theme-primary-hover bg-input-secondary px-3 text-theme-primary">
-									<li className="text-[14px] text-theme-primary w-full py-[6px] cursor-pointer list-none select-none">Online</li>
-									<Icons.ArrowDown />
-								</div>
-							)}
-							label=""
-							placement="bottom-start"
-							className="bg-input-secondary border-none py-0 w-[200px] [&>ul]:py-0"
-						>
-							<ItemSelect children="Online" startIcon={<Icons.OnlineStatus />} />
-							<ItemSelect children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} />
-							<ItemSelect children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} />
-							<ItemSelect children="Invisible" startIcon={<Icons.OfflineStatus />} />
-						</Dropdown>
-					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b-theme-primary ">
 						<button className="py-2 h-10 px-4 rounded-lg  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel

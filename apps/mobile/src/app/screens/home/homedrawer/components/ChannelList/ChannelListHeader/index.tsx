@@ -4,7 +4,7 @@ import { selectCurrentClan, selectMembersClanCount } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { memo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, View, TouchableOpacity } from 'react-native';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../../../../../app/componentUI/MezonIconCDN';
 import { EventViewer } from '../../../../../../components/Event';
@@ -72,31 +72,33 @@ const ChannelListHeader = () => {
 
 	return (
 		<View style={[styles.container]}>
-			<TouchableOpacity onPressIn={handlePress} style={styles.listHeader}>
-				<View style={styles.titleNameWrapper}>
-					<Text numberOfLines={1} style={styles.titleServer}>
-						{clanName}
-					</Text>
-					<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
-				</View>
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-					<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
-						{`${members} ${t('info.members')}`}
-					</Text>
-					<View
-						style={{
-							width: size.s_4,
-							height: size.s_4,
-							borderRadius: size.s_4,
-							backgroundColor: themeValue.textDisabled,
-							marginHorizontal: size.s_8
-						}}
-					/>
-					<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
-						{t('common.community')}
-					</Text>
-				</View>
-			</TouchableOpacity>
+			{!!clanName && (
+				<TouchableOpacity onPressIn={handlePress} style={styles.listHeader}>
+					<View style={styles.titleNameWrapper}>
+						<Text numberOfLines={1} style={styles.titleServer}>
+							{clanName}
+						</Text>
+						<VerifyIcon width={size.s_18} height={size.s_18} color={baseColor.blurple} />
+					</View>
+					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+						<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
+							{`${members} ${t('info.members')}`}
+						</Text>
+						<View
+							style={{
+								width: size.s_4,
+								height: size.s_4,
+								borderRadius: size.s_4,
+								backgroundColor: themeValue.textDisabled,
+								marginHorizontal: size.s_8
+							}}
+						/>
+						<Text numberOfLines={1} style={[styles.subTitle, { color: themeValue.textStrong }]}>
+							{t('common.community')}
+						</Text>
+					</View>
+				</TouchableOpacity>
+			)}
 			<View style={{ marginTop: size.s_10, flexDirection: 'row', gap: size.s_8 }}>
 				<TouchableOpacity onPressIn={navigateToSearchPage} style={styles.wrapperSearch}>
 					<MezonIconCDN icon={IconCDN.magnifyingIcon} height={size.s_18} width={size.s_18} color={themeValue.text} />

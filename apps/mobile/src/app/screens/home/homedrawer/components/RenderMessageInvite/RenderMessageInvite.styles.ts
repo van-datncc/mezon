@@ -6,7 +6,8 @@ export const style = (colors: Attributes) =>
 		clanName: {
 			color: colors.text,
 			fontSize: size.s_14,
-			fontWeight: '700'
+			fontWeight: '700',
+			maxWidth: '91%'
 		},
 
 		inviteContainer: {

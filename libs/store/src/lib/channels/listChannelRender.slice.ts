@@ -427,6 +427,15 @@ export const listChannelRenderSlice = createSlice({
 					state.listChannelRender[clanId].join();
 				}
 			}
+		},
+		updateCategoryChannels: (state, action: PayloadAction<{ clanId: string; categoryId: string; channelId: string }>) => {
+			const { clanId, categoryId, channelId } = action.payload;
+			const index = state.listChannelRender[clanId]?.findIndex((item) => item.id === categoryId);
+			if (index !== undefined && index !== -1) {
+				const category = state.listChannelRender[clanId][index] as ICategoryChannel;
+				category.channels = ([...(category.channels as string[] || []), channelId]) as string[];
+				state.listChannelRender[clanId][index] = category;
+			}
 		}
 	}
 });

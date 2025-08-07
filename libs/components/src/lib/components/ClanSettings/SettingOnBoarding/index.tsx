@@ -7,7 +7,7 @@ import { ApiOnboardingContent } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import EnableCommunity from '../../EnableComnunity';
+import EnableOnboarding from '../../EnableOnboarding';
 import ModalSaveChanges from '../ClanSettingOverview/ModalSaveChanges';
 import GuideItemLayout from './GuideItemLayout';
 import ClanGuideSetting from './Mission/ClanGuideSetting';
@@ -190,7 +190,7 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 	if (!isCommunityEnabled) {
 		return (
 			<>
-				<EnableCommunity onEnable={handleEnableCommunity} />
+				<EnableOnboarding onEnable={handleEnableCommunity} />
 				{isModalOpen && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 						<div className="bg-theme-setting-primary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin  [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-[#5865F2] [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-track]:bg-gray-200">
@@ -229,12 +229,11 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 
 	return (
 		<>
-			{/* Onboarding Modal */}
 			{isModalOpen && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 					<div className="bg-theme-setting-primary p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
 						<div className="flex justify-between items-center mb-6">
-							<h3 className="text-xl font-semibold text-theme-primary">Community Settings</h3>
+							<h3 className="text-xl font-semibold text-theme-primary">Onboarding Settings</h3>
 							<button onClick={() => setIsModalOpen(false)} className=" bg-item-theme hover:text-white">
 								<Icons.CloseIcon className="w-6 h-6" />
 							</button>
@@ -263,19 +262,18 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 				</div>
 			)}
 
-			{/* Main Onboarding UI */}
 			{isCommunityEnabled && (
 				<div className="text-theme-primary text-sm pb-10">
 					<div className="flex items-center justify-between p-4 bg-theme-setting-primary rounded-lg mb-6">
 						<div className="flex flex-col">
-							<h3 className="text-lg font-semibold text-theme-primary">Community Onboarding</h3>
-							<p className="text-sm text-theme-primary">Community features are enabled</p>
+							<h3 className="text-lg font-semibold text-theme-primary"> Onboarding</h3>
+							<p className="text-sm text-theme-primary">Onboarding features are enabled</p>
 						</div>
 						<button
 							onClick={() => toggleEnableStatus(false)}
 							className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
 						>
-							Disable Community
+							Disable Onboarding
 						</button>
 					</div>
 					{renderOnboardingContent()}
