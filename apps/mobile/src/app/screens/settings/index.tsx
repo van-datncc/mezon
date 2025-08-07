@@ -8,7 +8,7 @@ import {
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
 } from '@mezon/mobile-components';
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { appActions, authActions, channelsActions, clansActions, getAuthState, getStoreAsync, messagesActions } from '@mezon/store-mobile';
+import { appActions, authActions, channelsActions, clansActions, getAuthState, getStoreAsync, listChannelsByUserActions, messagesActions } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +38,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		const store = await getStoreAsync();
 		store.dispatch(channelsActions.removeAll());
 		store.dispatch(messagesActions.removeAll());
+		store.dispatch(listChannelsByUserActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
 		store.dispatch(clansActions.refreshStatus());

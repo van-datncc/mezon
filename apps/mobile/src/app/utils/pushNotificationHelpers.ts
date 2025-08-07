@@ -19,7 +19,6 @@ import {
 	AndroidVisibility,
 	NotificationAndroid
 } from '@notifee/react-native/src/types/NotificationAndroid';
-import { NotificationIOS } from '@notifee/react-native/src/types/NotificationIOS';
 import { getApp } from '@react-native-firebase/app';
 import {
 	AuthorizationStatus,
@@ -32,7 +31,6 @@ import {
 import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, NativeModules, PermissionsAndroid, Platform } from 'react-native';
 import RNCallKeep from 'react-native-callkeep';
-import { PERMISSIONS, requestMultiple, RESULTS } from 'react-native-permissions';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const messaging = getMessaging(getApp());
@@ -220,26 +218,6 @@ const createNotificationChannel = async (channelId: string, groupId: string, sou
 	}
 };
 
-const getConfigDisplayNotificationIOS = async (data: Record<string, string | object>): Promise<NotificationIOS> => {
-	const defaultConfig: NotificationIOS = {
-		critical: true,
-		criticalVolume: 1.0,
-		sound: (data?.sound as string) || 'default',
-		foregroundPresentationOptions: {
-			badge: true,
-			banner: true,
-			list: true,
-			sound: true
-		}
-	};
-
-	const channel = safeGetChannelFromData(data);
-	return {
-		...defaultConfig,
-		threadId: channel || undefined
-	};
-};
-
 export const createLocalNotification = async (title: string, body: string, data: Record<string, string | object>) => {
 	try {
 		// Input validation
@@ -263,7 +241,6 @@ export const createLocalNotification = async (title: string, body: string, data:
 
 		const configDisplayNotificationAndroid: NotificationAndroid =
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
-		const configDisplayNotificationIOS: NotificationIOS = Platform.OS === 'ios' ? await getConfigDisplayNotificationIOS(data) : {};
 
 		const notificationId = `${data?.sender || 'unknown'}_${data?.body}_${new Date().getMilliseconds()}`;
 		const isAlreadyDisplayed = await isNotificationAlreadyDisplayed(data);
@@ -279,7 +256,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',
 			data: data,
 			android: configDisplayNotificationAndroid,
-			ios: configDisplayNotificationIOS
+			ios: {}
 		});
 
 		// Create or update summary notification for Android
@@ -396,7 +373,7 @@ export const navigateToNotification = async (store: any, notification: any, navi
 		if (linkMatch) {
 			const clanId = linkMatch?.[1];
 			const channelId = linkMatch?.[2];
-			if (channelId) {
+			if (channelId !== '0' && !!channelId) {
 				store.dispatch(directActions.setDmGroupCurrentId(''));
 				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 				store.dispatch(
@@ -411,9 +388,11 @@ export const navigateToNotification = async (store: any, notification: any, navi
 			}
 			if (navigation) {
 				navigation.navigate(APP_SCREEN.BOTTOM_BAR as never);
-				navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
+				if (channelId !== '0' && !!channelId) {
+					navigation.navigate(APP_SCREEN.HOME_DEFAULT as never);
+				}
 			}
-			if (clanId && channelId) {
+			if (clanId) {
 				const joinAndChangeClan = async (store: any, clanId: string) => {
 					await Promise.allSettled([
 						store.dispatch(clansActions.joinClan({ clanId: clanId })),
@@ -422,15 +401,17 @@ export const navigateToNotification = async (store: any, notification: any, navi
 				};
 				await joinAndChangeClan(store, clanId);
 			}
-			const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
-			save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+			if (clanId && channelId !== '0' && !!channelId) {
+				const dataSave = getUpdateOrAddClanChannelCache(clanId, channelId);
+				save(STORAGE_DATA_CLAN_CHANNEL_CACHE, dataSave);
+				store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
+			}
 			save(STORAGE_CLAN_ID, clanId);
-			store.dispatch(channelsActions.setCurrentChannelId({ clanId, channelId }));
 			if (topicId && topicId !== '0' && !!topicId) {
 				await handleOpenTopicDiscustion(store, topicId, channelId, navigation);
 			}
 			setTimeout(() => {
-				if (channelId) {
+				if (channelId !== '0' && !!channelId) {
 					DeviceEventEmitter.emit(ActionEmitEvent.SCROLL_TO_ACTIVE_CHANNEL, channelId);
 				}
 				store.dispatch(appActions.setIsFromFCMMobile(false));
@@ -512,41 +493,6 @@ export const processNotification = async ({ notification, navigation, time = 0, 
 	}
 };
 
-export const setupCallKeep = async () => {
-	const granted = await requestMultiple([PERMISSIONS.ANDROID.READ_PHONE_NUMBERS]);
-	if (granted[PERMISSIONS.ANDROID.READ_PHONE_NUMBERS] !== RESULTS.GRANTED && Platform.OS === 'android') return false;
-	try {
-		const options = {
-			ios: {
-				appName: 'Mezon',
-				supportsVideo: false,
-				maximumCallGroups: '1',
-				maximumCallsPerCallGroup: '1',
-				includesCallsInRecents: false,
-				ringtoneSound: 'ringing'
-			},
-			android: {
-				alertTitle: 'Permissions required',
-				alertDescription: 'Mezon needs to access your phone accounts to receive calls from mezon',
-				cancelButton: 'Cancel',
-				okButton: 'ok',
-				selfManaged: true,
-				additionalPermissions: [PERMISSIONS.ANDROID.WRITE_CALL_LOG],
-				foregroundService: {
-					channelId: 'com.mezon.mobile',
-					channelName: 'Incoming Call',
-					notificationTitle: 'Incoming Call',
-					notificationIcon: 'ic_notification'
-				}
-			}
-		};
-		await RNCallKeep.setup(options);
-		return true;
-	} catch (error) {
-		console.error('initializeCallKeep error:', (error as Error)?.message);
-	}
-};
-
 export const getVoIPToken = async () => {
 	try {
 		const VoIPManager = NativeModules?.VoIPManager as VoIPManagerType;
@@ -557,24 +503,6 @@ export const getVoIPToken = async () => {
 	}
 };
 
-const listRNCallKeep = async (bodyData: any) => {
-	try {
-		RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-			for (let i = 0; i < 10; i++) {
-				RNCallKeep.backToForeground();
-			}
-			setTimeout(() => {
-				RNCallKeep.endCall(callUUID);
-				DeviceEventEmitter.emit(ActionEmitEvent.GO_TO_CALL_SCREEN, { payload: bodyData });
-			}, 2000);
-		});
-		RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-			RNCallKeep.endCall(callUUID);
-		});
-	} catch (error) {
-		/* empty */
-	}
-};
 export const setupIncomingCall = async (body: string) => {
 	try {
 		const bodyData = safeJSONParse(body || '{}');
@@ -583,18 +511,6 @@ export const setupIncomingCall = async (body: string) => {
 			RNCallKeep.endCall(callID);
 			return;
 		}
-		// if (Platform.OS === 'ios') {
-		// 	const options = {
-		// 		playSound: true,
-		// 		vibration: true,
-		// 		sound: 'ringing',
-		// 		vibrationPattern: [0, 500, 1000],
-		// 		timeout: 30000
-		// 	};
-		// 	const callID = '6cb67209-4ef9-48c0-a8dc-2cec6cd6261d';
-		// 	RNCallKeep.displayIncomingCall(callID, callID, `${bodyData?.callerName} is calling you`, 'number', true, options);
-		// 	await listRNCallKeep(bodyData);
-		// }
 	} catch (error) {
 		console.error('log  => setupIncomingCall', error);
 		/* empty */

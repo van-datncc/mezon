@@ -121,7 +121,10 @@
         "videoCall": "Video call",
         "callBack": "Call back",
         "incomingCall": "Incoming call",
-        "outGoingCall": "Outgoing call"
+        "outGoingCall": "Outgoing call",
+        "startGroupCall": "{{username}} started a group call",
+        "startAudioCall": "{{username}} started an audio call",
+        "startVideoCall": "{{username}} started a video call"
     },
     "buzz": {
         "confirmText": "Send",

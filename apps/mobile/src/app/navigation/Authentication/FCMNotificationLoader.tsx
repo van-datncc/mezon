@@ -7,11 +7,11 @@ import { getMessaging, onNotificationOpenedApp } from '@react-native-firebase/me
 import { useNavigation } from '@react-navigation/native';
 import { ChannelMessage, safeJSONParse } from 'mezon-js';
 import moment from 'moment/moment';
-import React, { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { AppState, Platform } from 'react-native';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import NotificationPreferences from '../../utils/NotificationPreferences';
-import { checkNotificationPermission, processNotification, setupCallKeep } from '../../utils/pushNotificationHelpers';
+import { checkNotificationPermission, processNotification } from '../../utils/pushNotificationHelpers';
 
 const messaging = getMessaging(getApp());
 
@@ -144,9 +144,6 @@ export const FCMNotificationLoader = ({ notifyInit }: { notifyInit: any }) => {
 
 	const startupFCMRunning = async (navigation: any, isTabletLandscape: boolean) => {
 		await setupNotificationListeners(navigation, isTabletLandscape);
-		if (Platform.OS === 'ios') {
-			await setupCallKeep();
-		}
 	};
 	const deleteAllChannelGroupsNotifee = async () => {
 		try {
@@ -207,5 +204,5 @@ export const FCMNotificationLoader = ({ notifyInit }: { notifyInit: any }) => {
 		};
 	}, []);
 
-	return <></>;
+	return null;
 };

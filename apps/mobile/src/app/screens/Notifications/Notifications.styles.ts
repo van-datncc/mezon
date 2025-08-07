@@ -5,7 +5,7 @@ export const style = (colors: Attributes) =>
 	StyleSheet.create({
 		notifications: {
 			flex: 1,
-			backgroundColor: colors.secondary,
+			backgroundColor: colors.primary,
 			paddingVertical: size.s_10
 		},
 

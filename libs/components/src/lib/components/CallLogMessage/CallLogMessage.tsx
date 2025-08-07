@@ -97,7 +97,7 @@ export default function CallLogMessage({ userId, username, messageId, channelId,
 
 	const { icon, text, colorClass, bgClass } = iconMap[key] || {
 		icon: <Icons.OutGoingCall defaultSize="w-6 h-6" />,
-		text: `${username} started ${callLog.isVideo ? 'a video' : 'an audio'} call`,
+		text: `${username} started ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'a group' : callLog.isVideo ? 'a video' : 'an audio'} call`,
 		colorClass: '',
 		bgClass: ''
 	};

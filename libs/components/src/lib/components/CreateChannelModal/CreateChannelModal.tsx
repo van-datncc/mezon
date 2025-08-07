@@ -3,6 +3,7 @@ import {
 	channelsActions,
 	createNewChannel,
 	fetchApplications,
+	listChannelRenderAction,
 	selectAllApps,
 	selectChannelById,
 	selectCurrentCategory,
@@ -93,6 +94,13 @@ export const CreateNewChannelModal = () => {
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
+		if (currentCategory?.category_id) {
+			dispatch(listChannelRenderAction.updateCategoryChannels({
+				clanId: currentClan?.clan_id as string,
+				categoryId: currentCategory?.category_id,
+				channelId: channelID ?? ''
+			}));
+		}
 
 		if (
 			newChannelCreatedId &&

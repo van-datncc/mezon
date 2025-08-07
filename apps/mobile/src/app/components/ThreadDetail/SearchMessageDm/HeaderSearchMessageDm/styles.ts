@@ -6,7 +6,7 @@ export const style = (colors: Attributes) =>
 		searchBox: {
 			flexDirection: 'row',
 			alignItems: 'center',
-			backgroundColor: colors.bgInputPrimary,
+			backgroundColor: colors.secondary,
 			borderRadius: verticalScale(50),
 			flex: 1,
 			height: size.s_40,

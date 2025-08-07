@@ -3,6 +3,7 @@ import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { selectAllAccount, selectDmGroupCurrent } from '@mezon/store-mobile';
 import { IMessageCallLog, IMessageTypeCallLog } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { ChannelType } from 'mezon-js';
 import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -15,9 +16,10 @@ interface MessageCallLogProps {
 	channelId: string;
 	senderId: string;
 	callLog: IMessageCallLog;
+	username: string;
 }
 
-export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }: MessageCallLogProps) => {
+export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog, username }: MessageCallLogProps) => {
 	const { callLogType, isVideo = false } = callLog || {};
 	const { themeValue } = useTheme();
 	const navigation = useNavigation<any>();
@@ -52,8 +54,13 @@ export const MessageCallLog = memo(({ contentMsg, senderId, channelId, callLog }
 			case IMessageTypeCallLog.CANCELCALL:
 				return isMe ? t('callLog.cancel') : t('callLog.missed');
 			case IMessageTypeCallLog.FINISHCALL:
-			case IMessageTypeCallLog.STARTCALL:
 				return isMe ? t('callLog.outGoingCall') : t('callLog.incomingCall');
+			case IMessageTypeCallLog.STARTCALL:
+				return currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP
+					? t('callLog.startGroupCall', { username: username })
+					: isVideo
+						? t('callLog.startVideoCall', { username: username })
+						: t('callLog.startAudioCall', { username: username });
 			default:
 				return '';
 		}
