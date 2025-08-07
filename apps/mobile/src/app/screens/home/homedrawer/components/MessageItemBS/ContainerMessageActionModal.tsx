@@ -116,7 +116,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 					messageId
 				})
 			);
-			socket.removeChatMessage(
+			await socket.removeChatMessage(
 				currentDmId ? '0' : currentClanId || '',
 				currentDmId ? currentDmId : currentChannelId,
 				mode,
