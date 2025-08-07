@@ -77,9 +77,7 @@ const UserSettingProfile = ({
 	]);
 	const isThread = currentChannel?.type === ChannelType.CHANNEL_TYPE_THREAD;
 
-	const memberIds = useSelector((state) =>
-		currentChannelId ? selectMemberIdsByChannelId(state, currentChannelId) : []
-	);
+	const memberIds = useSelector((state) => (currentChannelId ? selectMemberIdsByChannelId(state, currentChannelId) : []));
 
 	const isUserInThread = useMemo(() => {
 		if (!isThread || !memberIds?.length || !user?.user?.id) return false;
@@ -154,7 +152,8 @@ const UserSettingProfile = ({
 				value: EActionSettingUserProfile.ThreadRemove,
 				icon: <MezonIconCDN icon={IconCDN.removeFriend} width={20} height={20} color={baseColor.red} />,
 				action: handleSettingUserProfile,
-				isShow: !isItMe && isThread && isUserInThread && (isThatClanOwner || hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
+				isShow:
+					!isItMe && isThread && isUserInThread && (isThatClanOwner || hasClanOwnerPermission || (hasAdminPermission && !isThatClanOwner))
 			}
 			// {
 			// 	label: `${EActionSettingUserProfile.Ban}`,
@@ -172,7 +171,7 @@ const UserSettingProfile = ({
 			try {
 				setVisibleKickUserModal(false);
 				const userIds = [user.user?.id ?? ''];
-				const response = await removeMemberClan({ clanId: currentClanId as string, channelId: user.channelId as string, userIds });
+				const response = await removeMemberClan({ clanId: currentClanId as string, channelId: currentChannelId as string, userIds });
 				if (response) {
 					Toast.show({
 						type: 'success',
@@ -181,7 +180,10 @@ const UserSettingProfile = ({
 							leadingIcon: <MezonIconCDN icon={IconCDN.checkmarkLargeIcon} color={Colors.green} />
 						}
 					});
+				} else {
+					throw new Error();
 				}
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 			} catch (error) {
 				Toast.show({
 					type: 'error',
@@ -192,7 +194,7 @@ const UserSettingProfile = ({
 				});
 			}
 		}
-	}, [currentClanId, removeMemberClan, user]);
+	}, [currentClanId, removeMemberClan, user, currentChannelId]);
 
 	const handleRemoveMemberFromThread = useCallback(
 		async (userId?: string) => {
@@ -247,7 +249,7 @@ const UserSettingProfile = ({
 		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: false, data });
 	};
 
-
+	
 	function handleUserModalClose() {
 		setVisibleManageUserModal(false);
 		onShowManagementUserModalChange?.(false);
@@ -264,12 +266,16 @@ const UserSettingProfile = ({
 							<TouchableOpacity onPress={() => item.action(item.value)} key={`${item?.value}_${index}`}>
 								<View style={styles.option}>
 									{item?.icon}
-									<Text style={[
-										styles.textOption,
-										dangerActions.includes(item.value) && {
-											color: baseColor.red
-										}
-									]}>{item?.label}</Text>
+									<Text
+										style={[
+											styles.textOption,
+											dangerActions.includes(item.value) && {
+												color: baseColor.red
+											}
+										]}
+									>
+										{item?.label}
+									</Text>
 								</View>
 							</TouchableOpacity>
 						);

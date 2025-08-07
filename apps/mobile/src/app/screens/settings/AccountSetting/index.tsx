@@ -1,14 +1,25 @@
 import { useAuth } from '@mezon/core';
 import {
+	CheckIcon,
 	ChevronIcon,
+	CloseIcon,
 	remove,
 	STORAGE_CHANNEL_CURRENT_CACHE,
 	STORAGE_DATA_CLAN_CHANNEL_CACHE,
 	STORAGE_KEY_TEMPORARY_ATTACHMENT,
 	STORAGE_KEY_TEMPORARY_INPUT_MESSAGES
 } from '@mezon/mobile-components';
-import { useTheme } from '@mezon/mobile-ui';
-import { authActions, channelsActions, clansActions, getStoreAsync, messagesActions, selectBlockedUsers } from '@mezon/store-mobile';
+import { Colors, size, useTheme } from '@mezon/mobile-ui';
+import {
+	accountActions,
+	authActions,
+	channelsActions,
+	clansActions,
+	getStoreAsync,
+	messagesActions,
+	selectBlockedUsers,
+	useAppDispatch
+} from '@mezon/store-mobile';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, Platform, Text, TouchableOpacity, View } from 'react-native';
@@ -39,6 +50,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 	const { themeValue } = useTheme();
 	const { userProfile } = useAuth();
 	const styles = style(themeValue);
+	const dispatch = useAppDispatch();
 	const { t } = useTranslation('accountSetting');
 	const blockedUsers = useSelector(selectBlockedUsers);
 	const blockedUsersCount = blockedUsers?.length.toString();
@@ -54,6 +66,32 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);
 		await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 		store.dispatch(authActions.logOut({ device_id: userProfile.user.username, platform: Platform.OS }));
+	};
+
+	const handleDeleteAccount = async () => {
+		try {
+			const response = await dispatch(accountActions.deleteAccount());
+
+			if (response?.meta?.requestStatus === 'fulfilled') {
+				await logout();
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('toast.deleteAccount.success'),
+						leadingIcon: <CheckIcon color={Colors.green} width={size.s_20} height={size.s_20} />
+					}
+				});
+			}
+		} catch (error) {
+			console.error('Delete account failed:', error);
+			Toast.show({
+				type: 'error',
+				props: {
+					text2: t('toast.deleteAccount.error'),
+					leadingIcon: <CloseIcon color={Colors.red} width={size.s_20} height={size.s_20} />
+				}
+			});
+		}
 	};
 
 	//TODO: delete
@@ -84,7 +122,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 						},
 						{
 							text: t('deleteAccountAlert.yesConfirm'),
-							onPress: () => logout()
+							onPress: () => handleDeleteAccount()
 						}
 					],
 					{ cancelable: false }

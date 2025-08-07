@@ -19,7 +19,6 @@ import { useSelector } from 'react-redux';
 import { TYPING_DARK_MODE, TYPING_LIGHT_MODE } from '../../../../../../../assets/lottie';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
-import { EMessageBSToShow } from '../../../enums';
 import { ContainerMessageActionModal } from '../../MessageItemBS/ContainerMessageActionModal';
 import ControlBottomBar from '../ControlBottomBar';
 import FocusedScreenPopup from '../FocusedScreenPopup';
@@ -102,11 +101,9 @@ const RoomView = ({
 				<ContainerMessageActionModal
 					message={undefined}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					type={EMessageBSToShow.MessageAction}
 					senderDisplayName={''}
 					isOnlyEmojiPicker={true}
 					channelId={voiceInfo?.channelId}
-					clanId={voiceInfo?.clanId}
 				/>
 			),
 			containerStyle: { zIndex: 1001 },

@@ -694,7 +694,10 @@ export const selectRolesClanEntities = createSelector(
 		return clanData ? clanData.roles : {};
 	}
 );
-
+export const selectRolesByClanId = createSelector([getRolesClanState, (state: RootState, clanId: string) => clanId], (state, clanId) => {
+	const clanData = state.byClans[clanId];
+	return clanData ? clanData.roles : {};
+});
 const handleMapUpdateRole = (
 	role: RolesClanEntity,
 	body: ApiUpdateRoleRequest,
