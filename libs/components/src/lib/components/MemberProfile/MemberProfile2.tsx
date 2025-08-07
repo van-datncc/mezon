@@ -7,7 +7,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
+import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { AvatarImage } from '../../components';
 import { useMemberContextMenu } from '../../contexts/MemberContextMenu';
 import { UserStatusIconClan } from './MemberProfile';
@@ -49,7 +49,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 		showContextMenu(event, userTemplate);
 	};
 
-	const isOffline = !userMeta?.online;
+	const isOffline = userMeta?.status === EUserStatus.INVISIBLE || !userMeta?.online;
 
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
