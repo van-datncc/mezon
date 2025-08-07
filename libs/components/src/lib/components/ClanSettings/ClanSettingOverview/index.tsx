@@ -69,7 +69,7 @@ const ClanSettingOverview = () => {
 		if (currentClan && clanRequest) {
 			const hasChanges = Object.keys(clanRequest).some((key) => {
 				const typedKey = key as keyof typeof clanRequest;
-				if (clanRequest[typedKey] || currentClan[typedKey]) {
+				if (typedKey !== 'description' && typedKey !== 'about' && (clanRequest[typedKey] || currentClan[typedKey])) {
 					return clanRequest[typedKey] !== currentClan[typedKey];
 				}
 			});

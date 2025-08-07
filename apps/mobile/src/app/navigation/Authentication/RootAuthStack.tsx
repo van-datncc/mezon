@@ -1,15 +1,21 @@
 import React, { memo } from 'react';
 
 import { registerGlobals } from '@livekit/react-native';
-import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
+import {
+	CardStyleInterpolators,
+	createStackNavigator,
+	StackCardInterpolatedStyle,
+	StackCardInterpolationProps,
+	StackCardStyleInterpolator
+} from '@react-navigation/stack';
 import { Dimensions, Platform, View } from 'react-native';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
-import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
 import ChannelAppScreen from '../../screens/home/homedrawer/ChannelApp';
-import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import ChannelRouterListener from '../../screens/home/homedrawer/components/ChannelList/ChannelRouterListener';
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
+import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
+import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
@@ -31,12 +37,36 @@ registerGlobals();
 
 export const RootAuthStack = memo(
 	({ isTabletLandscape, notifyInit, initRouteName }: { isTabletLandscape: boolean; notifyInit: any; initRouteName: string }) => {
+		const customCardStyleInterpolator: StackCardStyleInterpolator = (props: StackCardInterpolationProps): StackCardInterpolatedStyle => {
+			const { current, layouts } = props;
+			return {
+				cardStyle: {
+					transform: [
+						{
+							translateX: current.progress.interpolate({
+								inputRange: [0, 1],
+								outputRange: [layouts.screen.width, 0],
+								extrapolate: 'clamp'
+							})
+						}
+					]
+				},
+				overlayStyle: {
+					opacity: current.progress.interpolate({
+						inputRange: [0, 1],
+						outputRange: [0, 0.5]
+					})
+				}
+			};
+		};
+
 		return (
 			<View style={{ flex: 1 }}>
 				<RootStack.Navigator
 					initialRouteName={APP_SCREEN.BOTTOM_BAR}
 					screenOptions={{
 						headerShown: false,
+						animationEnabled: false,
 						gestureEnabled: Platform.OS === 'ios',
 						gestureDirection: 'horizontal'
 					}}
@@ -54,7 +84,7 @@ export const RootAuthStack = memo(
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
-							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+							cardStyleInterpolator: customCardStyleInterpolator,
 							transitionSpec: {
 								open: {
 									animation: 'timing',
@@ -69,7 +99,8 @@ export const RootAuthStack = memo(
 									}
 								}
 							},
-							keyboardHandlingEnabled: false
+							keyboardHandlingEnabled: false,
+							detachPreviousScreen: false
 						}}
 					/>
 					<RootStack.Screen
@@ -82,8 +113,9 @@ export const RootAuthStack = memo(
 							gestureEnabled: true,
 							gestureDirection: 'horizontal',
 							gestureResponseDistance: Dimensions.get('window').width,
-							cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+							cardStyleInterpolator: customCardStyleInterpolator,
 							keyboardHandlingEnabled: false,
+							detachPreviousScreen: false,
 							transitionSpec: {
 								open: {
 									animation: 'timing',

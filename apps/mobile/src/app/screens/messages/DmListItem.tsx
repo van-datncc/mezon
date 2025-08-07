@@ -26,10 +26,11 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 	const { t } = useTranslation('message');
 	const isTabletLandscape = useTabletLandscape();
 	const dispatch = useAppDispatch();
+	const senderId = directMessage?.last_sent_message?.sender_id;
 	const isYourAccount = useMemo(() => {
 		const userId = load(STORAGE_MY_USER_ID);
-		return userId?.toString() === directMessage?.last_sent_message?.sender_id?.toString();
-	}, [directMessage?.last_sent_message?.sender_id]);
+		return userId?.toString() === senderId?.toString();
+	}, [senderId]);
 
 	const redirectToMessageDetail = async () => {
 		if (!isTabletLandscape) {
@@ -54,10 +55,26 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 		}));
 	}, [directMessage]);
 
+	const renderLastMessageContent = useMemo(() => {
+		if (!senderId) {
+			return '';
+		}
+
+		if (isYourAccount) {
+			return `${t('directMessage.you')}: `;
+		}
+
+		const lastMessageSender = otherMemberList?.find?.((it) => it?.userId === senderId);
+		if (lastMessageSender?.username) {
+			return `${lastMessageSender.username}: `;
+		}
+
+		return '';
+	}, [isYourAccount, otherMemberList, senderId, t]);
+
 	const getLastMessageContent = (content: string | IExtendedMessage) => {
 		if (!content || (typeof content === 'object' && Object.keys(content).length === 0) || content === '{}') return null;
 		const text = typeof content === 'string' ? safeJSONParse(content)?.t : safeJSONParse(JSON.stringify(content) || '{}')?.t;
-		const lastMessageSender = otherMemberList?.find?.((it) => it?.userId === directMessage?.last_sent_message?.sender_id);
 
 		if (!text) {
 			return (
@@ -70,8 +87,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 						]}
 						numberOfLines={1}
 					>
-						{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
-						{': '}
+						{renderLastMessageContent}
 						{'attachment '}
 						<PaperclipIcon width={13} height={13} color={Colors.textGray} />
 					</Text>
@@ -81,16 +97,17 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 
 		return (
 			<View style={styles.contentMessage}>
-				<Text
-					style={[
-						styles.defaultText,
-						styles.lastMessage,
-						{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
-					]}
-				>
-					{lastMessageSender ? lastMessageSender?.username : t('directMessage.you')}
-					{': '}
-				</Text>
+				{renderLastMessageContent && (
+					<Text
+						style={[
+							styles.defaultText,
+							styles.lastMessage,
+							{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
+						]}
+					>
+						{renderLastMessageContent}
+					</Text>
+				)}
 				{!!content && (
 					<DmListItemLastMessage
 						content={typeof content === 'object' ? content : safeJSONParse(content || '{}')}
@@ -163,7 +180,8 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 							{ color: isUnReadChannel && !isYourAccount ? themeValue.white : themeValue.textDisabled }
 						]}
 					>
-						{(directMessage?.channel_label || directMessage?.usernames) ?? `${directMessage.creator_name}'s Group` ?? ''}
+						{(directMessage?.channel_label || directMessage?.usernames) ??
+							(directMessage?.creator_name ? `${directMessage.creator_name}'s Group` : '')}
 					</Text>
 					<BuzzBadge
 						channelId={directMessage?.channel_id}

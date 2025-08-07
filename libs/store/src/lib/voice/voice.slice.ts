@@ -42,7 +42,7 @@ export interface VoiceState extends EntityState<VoiceEntity, string> {
 }
 
 export const voiceAdapter = createEntityAdapter({
-	selectId: (voice: VoiceEntity) => voice.id
+	selectId: (voice: VoiceEntity) => voice.user_id
 });
 
 type fetchVoiceChannelMembersPayload = {
@@ -306,12 +306,12 @@ export const voiceActions = {
  *
  * See: https://react-redux.js.org/next/api/hooks#useselector
  */
-const { selectAll } = voiceAdapter.getSelectors();
+const { selectAll, selectById } = voiceAdapter.getSelectors();
 
 export const getVoiceState = (rootState: { [VOICE_FEATURE_KEY]: VoiceState }): VoiceState => rootState[VOICE_FEATURE_KEY];
 
 export const selectAllVoice = createSelector(getVoiceState, selectAll);
-
+export const selectStatusInVoice = createSelector([getVoiceState, (state, userId: string) => userId], (state, userId) => selectById(state, userId));
 export const selectVoiceJoined = createSelector(getVoiceState, (state) => state.isJoined);
 export const selectGroupCallJoined = createSelector(getVoiceState, (state) => state.isGroupCallJoined);
 

@@ -7,7 +7,6 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { DeviceEventEmitter, NativeModules, Platform, Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../../constants/icon_cdn';
-import { EMessageBSToShow } from '../../../enums';
 import AudioOutputTooltip from '../../AudioOutputTooltip';
 import { ContainerMessageActionModal } from '../../MessageItemBS/ContainerMessageActionModal';
 import { style } from '../styles';
@@ -136,11 +135,9 @@ const HeaderRoomView = memo(({ channelId, clanId, onPressMinimizeRoom, isGroupCa
 				<ContainerMessageActionModal
 					message={undefined}
 					mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-					type={EMessageBSToShow.MessageAction}
 					senderDisplayName={''}
 					isOnlyEmojiPicker={true}
 					channelId={channelId}
-					clanId={clanId}
 				/>
 			),
 			containerStyle: { zIndex: 1001 },

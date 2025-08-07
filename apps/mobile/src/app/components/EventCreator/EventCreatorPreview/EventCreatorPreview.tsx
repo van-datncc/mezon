@@ -5,7 +5,7 @@ import { OptionEvent } from '@mezon/utils';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
-import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';

@@ -68,7 +68,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const dispatch = useAppDispatch();
-	const { type, message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', channelId, clanId } = props;
+	const { message, mode, isOnlyEmojiPicker = false, senderDisplayName = '', channelId } = props;
 	const { socketRef } = useMezon();
 	const store = getStore();
 
@@ -118,13 +118,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			);
 			await socket.removeChatMessage(
 				currentDmId ? '0' : currentClanId || '',
-				currentDmId ? currentDmId : currentTopicId || currentChannelId,
+				currentDmId ? currentDmId : currentChannelId,
 				mode,
 				isPublic,
-				messageId
+				messageId,
+				!!message?.attachments,
+				currentTopicId
 			);
 		},
-		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, mode, socketRef, store]
+		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, message?.attachments, mode, socketRef, store]
 	);
 
 	const onConfirmAction = useCallback(

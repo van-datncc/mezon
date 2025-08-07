@@ -1,4 +1,3 @@
-"use client"
 
 import type React from "react"
 
@@ -26,13 +25,18 @@ const SettingComunity = ({
   const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [aboutText, setAboutText] = useState("")
+  const [descriptionText, setDescriptionText] = useState("");
   const [initialBanner, setInitialBanner] = useState<string | null>(null)
   const [initialAbout, setInitialAbout] = useState("")
+  const [initialDescription, setInitialDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false)
   const [openSaveChange, setOpenSaveChange] = useState(false)
+  const [aboutError, setAboutError] = useState(false);
+  const [descError, setDescError] = useState(false);
+  const [bannerError, setBannerError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { sessionRef, clientRef } = useMezon();
-  const isDirty = aboutText !== initialAbout || bannerPreview !== initialBanner
+  const isDirty = aboutText !== initialAbout || bannerPreview !== initialBanner || descriptionText !== initialDescription;
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,14 +47,68 @@ const SettingComunity = ({
     e.target.value = "";
   };
 
+
   const handleChangeAbout = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setAboutText(e.target.value)
     if (isEnabled) setOpenSaveChange(true)
+  }
+  const handleBlurAbout = async () => {
+    if (isEnabled && aboutText !== initialAbout) {
+      setIsSaving(true);
+      try {
+        await dispatch(comunityActions.updateCommunityAbout({ clan_id: clanId, about: aboutText })).unwrap();
+        setInitialAbout(aboutText);
+        toast.success("About updated!");
+      } catch {
+        toast.error("Update about failed!");
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  }
+
+  const handleChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescriptionText(e.target.value);
+    if (isEnabled) setOpenSaveChange(true);
+  }
+  const handleBlurDescription = async () => {
+    if (isEnabled && descriptionText !== initialDescription) {
+      setIsSaving(true);
+      try {
+        await dispatch(comunityActions.updateCommunityDescription({ clan_id: clanId, description: descriptionText })).unwrap();
+        setInitialDescription(descriptionText);
+        toast.success("Description updated!");
+      } catch {
+        toast.error("Update description failed!");
+      } finally {
+        setIsSaving(false);
+      }
+    }
   }
 
   const handleEnable = () => setIsInitialEditing(true)
 
   const handleConfirmEnable = async () => {
+    let hasError = false;
+    setAboutError(false);
+    setDescError(false);
+    setBannerError(false);
+    if (!aboutText.trim()) {
+      setAboutError(true);
+      hasError = true;
+    }
+    if (!descriptionText.trim()) {
+      setDescError(true);
+      hasError = true;
+    }
+    if (!bannerFile && !bannerPreview) {
+      setBannerError(true);
+      hasError = true;
+    }
+    if (hasError) {
+      toast.error("please fill all required fields: Banner, About, Description!");
+      return;
+    }
     setIsSaving(true);
     try {
       await dispatch(comunityActions.updateCommunityStatus({ clan_id: clanId, enabled: true })).unwrap();
@@ -66,7 +124,14 @@ const SettingComunity = ({
           await dispatch(comunityActions.updateCommunityBanner({ clan_id: clanId, bannerUrl })).unwrap();
         }
       }
+      if (aboutText) {
+        await dispatch(comunityActions.updateCommunityAbout({ clan_id: clanId, about: aboutText })).unwrap();
+      }
+      if (descriptionText) {
+        await dispatch(comunityActions.updateCommunityDescription({ clan_id: clanId, description: descriptionText })).unwrap();
+      }
       setInitialAbout(aboutText);
+      setInitialDescription(descriptionText);
       setInitialBanner(bannerUrl);
       setIsInitialEditing(false);
       onCommunityEnabledChange?.(true);
@@ -80,6 +145,7 @@ const SettingComunity = ({
 
   const handleReset = () => {
     setAboutText(initialAbout)
+    setDescriptionText(initialDescription)
     setBannerPreview(initialBanner)
     setBannerFile(null)
     setOpenSaveChange(false)
@@ -100,7 +166,14 @@ const SettingComunity = ({
           await dispatch(comunityActions.updateCommunityBanner({ clan_id: clanId, bannerUrl })).unwrap();
         }
       }
-      setInitialAbout(aboutText);
+      if (aboutText !== initialAbout) {
+        await dispatch(comunityActions.updateCommunityAbout({ clan_id: clanId, about: aboutText })).unwrap();
+        setInitialAbout(aboutText);
+      }
+      if (descriptionText !== initialDescription) {
+        await dispatch(comunityActions.updateCommunityDescription({ clan_id: clanId, description: descriptionText })).unwrap();
+        setInitialDescription(descriptionText);
+      }
       setInitialBanner(bannerUrl);
       setOpenSaveChange(false);
       setBannerFile(null);
@@ -117,9 +190,11 @@ const SettingComunity = ({
     try {
       await dispatch(comunityActions.updateCommunityStatus({ clan_id: clanId, enabled: false })).unwrap()
       setAboutText("")
+      setDescriptionText("")
       setBannerFile(null)
       setBannerPreview(null)
       setInitialAbout("")
+      setInitialDescription("")
       setInitialBanner(null)
       setOpenSaveChange(false)
       onCommunityEnabledChange?.(false)
@@ -147,6 +222,17 @@ const SettingComunity = ({
     setInitialBanner(banner);
   }, [banner]);
 
+  useEffect(() => {
+    setAboutText(about || "");
+    setInitialAbout(about || "");
+  }, [about, clanId, isEnabled]);
+
+  const description = useAppSelector(state => (state.COMUNITY_FEATURE_KEY?.byClanId?.[clanId]?.description ?? ""));
+  useEffect(() => {
+    setDescriptionText(description);
+    setInitialDescription(description);
+  }, [description, clanId, isEnabled]);
+
   if (!isEnabled && !isInitialEditing) {
     return <EnableComunity onEnable={handleEnable} />
   }
@@ -154,8 +240,7 @@ const SettingComunity = ({
   if (!isEnabled && isInitialEditing) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="relative max-w-2xl w-full bg-gradient-to-br from-white to-gray-50 dark:from-theme-setting-primary dark:to-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          {/* Header with gradient */}
+        <div className="relative w-full max-w-lg bg-gradient-to-br from-white to-gray-50 dark:from-theme-setting-primary dark:to-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden max-h-[90vh] flex flex-col">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
             <button
               className="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all duration-200"
@@ -169,10 +254,9 @@ const SettingComunity = ({
             <p className="text-blue-100">Create a great space for your members to connect</p>
           </div>
 
-          <div className="p-8 space-y-8 bg-theme-setting-primary">
-            {/* Banner Section */}
+          <div className="p-6 space-y-6 bg-theme-setting-primary overflow-y-auto thread-scroll" style={{ maxHeight: '75vh' }}>
             <div className="space-y-4">
-              <label className="flex items-center gap-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+              <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary">
                 <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -184,14 +268,13 @@ const SettingComunity = ({
                 Community Banner
               </label>
 
-              <div className="relative group">
+              <div className={`relative group ${bannerError ? 'border-2 border-red-500 rounded-xl' : ''}`}>
                 {bannerPreview ? (
-                  <div className="relative w-full h-52 rounded-xl overflow-hidden shadow-lg">
+                  <div className="relative w-full h-40 rounded-xl overflow-hidden shadow-lg">
                     <img
                       src={bannerPreview || "/placeholder.svg"}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                    {/* Nút xóa banner */}
                     <button
                       type="button"
                       onClick={handleRemoveBanner}
@@ -202,7 +285,6 @@ const SettingComunity = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    {/* Overlay Change Banner */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto z-10">
                       <button
                         onClick={() => fileInputRef.current?.click()}
@@ -215,7 +297,7 @@ const SettingComunity = ({
                 ) : (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="cursor-pointer w-full h-48 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 transition-colors duration-300 flex flex-col items-center justify-center text-theme-primary hover:text-blue-500 dark:hover:text-blue-400 bg-theme-setting-primary hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      className={`cursor-pointer w-full h-48 rounded-xl border-2 border-dashed ${bannerError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} hover:border-blue-400 dark:hover:border-blue-500 transition-colors duration-300 flex flex-col items-center justify-center text-theme-primary hover:text-blue-500 dark:hover:text-blue-400 bg-theme-setting-primary hover:bg-blue-50 dark:hover:bg-blue-900/20`}
                   >
                     <Icons.ImageUploadIcon className="w-12 h-12 mb-3 transition-transform duration-300 hover:scale-110" />
                     <p className="text-lg font-medium">Upload Banner</p>
@@ -227,9 +309,43 @@ const SettingComunity = ({
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerChange} />
             </div>
 
-            {/* About Section */}
             <div className="space-y-4">
-              <label className="flex items-center gap-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+              <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Community Description
+              </label>
+              <div className="relative">
+                <textarea
+                  className={`w-full border-2 rounded-xl p-4 bg-theme-input text-theme-primary focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none text-base ${descError ? 'border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
+                  rows={5}
+                  value={descriptionText}
+                  onChange={handleChangeDescription}
+                  onBlur={handleBlurDescription}
+                  placeholder="Enter a short description for your community..."
+                  maxLength={300}
+                />
+                <div className="absolute bottom-3 right-3 text-sm bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
+                  <span
+                    className={
+                      descriptionText.length > 250 ? "text-orange-500" : descriptionText.length > 280 ? "text-red-500" : "text-theme-primary-active"
+                    }
+                  >
+                    {descriptionText.length}
+                  </span>
+                  <span className="text-theme-primary">/300</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary">
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -243,27 +359,27 @@ const SettingComunity = ({
 
               <div className="relative">
                 <textarea
-                  className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary  focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none"
+                  className={`w-full border-2 rounded-xl p-4 bg-theme-input text-theme-primary focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none text-base ${aboutError ? 'border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
                   rows={5}
                   value={aboutText}
                   onChange={handleChangeAbout}
+                  onBlur={handleBlurAbout}
                   placeholder="Tell us about your community... What makes it special?"
                   maxLength={300}
                 />
                 <div className="absolute bottom-3 right-3 text-sm  bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
                   <span
                     className={
-                      aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-gray-500"
+                      aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-theme-primary-active"
                     }
                   >
                     {aboutText.length}
                   </span>
-                  <span className="text-gray-400">/300</span>
+                  <span className="text-theme-primary">/300</span>
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={handleConfirmEnable}
@@ -303,9 +419,8 @@ const SettingComunity = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white dark:bg-theme-setting-primary rounded-2xl shadow-xl border border-theme-primary overflow-hidden">
-        {/* Header */}
+    <div className="max-w-2xl mx-auto p-6">
+      <div className="bg-white dark:bg-theme-setting-primary rounded-2xl shadow-xl border border-theme-primary overflow-hidden max-h-[90vh] flex flex-col">
         <div className="bg-gradient-to-r from-green-500 to-blue-600 p-6 text-white">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -325,8 +440,7 @@ const SettingComunity = ({
           </div>
         </div>
 
-        <div className="p-8 space-y-8 bg-theme-setting-nav">
-          {/* Banner Section */}
+        <div className="p-6 space-y-6 bg-theme-setting-nav overflow-y-auto thread-scroll" style={{ maxHeight: '75vh' }}>
           <div className="space-y-4">
             <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary-active">
               <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,21 +455,11 @@ const SettingComunity = ({
             </label>
             <div className="relative group">
               {bannerPreview ? (
-                <div className="relative w-full h-52 rounded-xl overflow-hidden shadow-lg">
+                <div className="relative w-full h-40 rounded-xl overflow-hidden shadow-lg">
                   <img
                     src={bannerPreview || "/placeholder.svg"}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  {/* <button
-                    type="button"
-                    onClick={handleRemoveBanner}
-                    className="z-20 absolute top-2 right-2 bg-white/80 hover:bg-white text-red-600 rounded-full p-2 shadow transition"
-                    title="Remove Banner"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button> */}
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto z-10">
                     <button
                       onClick={() => fileInputRef.current?.click()}
@@ -368,11 +472,11 @@ const SettingComunity = ({
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="cursor-pointer group relative w-full h-52 rounded-xl border-2 border-dashed hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 flex items-center justify-center text-theme-primary bg-theme-setting-primary  "
+                    className="cursor-pointer group relative w-full h-48 rounded-lg border-2 border-dashed hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-300 flex items-center justify-center text-theme-primary bg-theme-setting-primary  "
                 >
                   <div className="text-center">
-                    <Icons.ImageUploadIcon className="w-16 h-16 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 text-theme-primary group-hover:text-blue-500" />
-                    <p className="text-xl font-medium mb-2">Upload Banner</p>
+                      <Icons.ImageUploadIcon className="w-12 h-12 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 text-theme-primary group-hover:text-blue-500" />
+                      <p className="text-lg font-medium mb-2">Upload Banner</p>
                     <p className="text-sm opacity-75">Drag & drop or click to select an image</p>
                   </div>
                 </div>
@@ -382,9 +486,43 @@ const SettingComunity = ({
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerChange} />
           </div>
 
-          {/* About Section */}
+
           <div className="space-y-4">
-            <label className="flex items-center gap-2 text-lg font-semibold text-gray-700 dark:text-gray-300">
+            <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary">
+              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Community Description
+            </label>
+            <div className="relative">
+              <textarea
+                className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none text-base"
+                rows={5}
+                value={descriptionText}
+                onChange={handleChangeDescription}
+                placeholder="Enter a short description for your community..."
+                maxLength={300}
+              />
+              <div className="absolute bottom-3 right-3 text-sm bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
+                <span
+                  className={
+                    descriptionText.length > 250 ? "text-orange-500" : descriptionText.length > 280 ? "text-red-500" : "text-theme-primary-active"
+                  }
+                >
+                  {descriptionText.length}
+                </span>
+                <span className="text-theme-primary">/300</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <label className="flex items-center gap-2 text-lg font-semibold text-theme-primary">
               <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -398,8 +536,8 @@ const SettingComunity = ({
 
             <div className="relative">
               <textarea
-                className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary  focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none"
-                rows={6}
+                className="w-full border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-theme-input text-theme-primary  focus:border-blue-400 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all duration-200 resize-none text-base"
+                rows={5}
                 value={aboutText}
                 onChange={handleChangeAbout}
                 placeholder="Tell us about your community... What makes it special?"
@@ -408,22 +546,20 @@ const SettingComunity = ({
               <div className="absolute bottom-3 right-3 text-sm  bg-theme-setting-primary text-theme-primary border border-theme-primary px-2 py-1 rounded-md">
                 <span
                   className={
-                    aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-gray-500"
+                    aboutText.length > 250 ? "text-orange-500" : aboutText.length > 280 ? "text-red-500" : "text-theme-primary-active"
                   }
                 >
                   {aboutText.length}
                 </span>
-                <span className="text-gray-400">/300</span>
+                <span className="text-theme-primary">/300</span>
               </div>
             </div>
           </div>
 
-          {/* Save Changes Modal */}
           {openSaveChange && isDirty && (
             <ModalSaveChanges onSave={handleSaveChanges} onReset={handleReset} isLoading={isSaving} />
           )}
 
-          {/* Action Buttons */}
           <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={handleDisable}

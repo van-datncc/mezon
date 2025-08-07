@@ -4,7 +4,7 @@ import { ERepeatType, OptionEvent } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton';
 import MezonDateTimePicker from '../../../componentUI/MezonDateTimePicker';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonImagePicker from '../../../componentUI/MezonImagePicker';

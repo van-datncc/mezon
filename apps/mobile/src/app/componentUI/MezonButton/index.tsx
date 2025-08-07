@@ -1,27 +1,93 @@
 import { useTheme } from '@mezon/mobile-ui';
-import React from 'react';
-import { Text, TextStyle, TouchableOpacity, TouchableOpacityProps, View, ViewStyle } from 'react-native';
-import { style } from './style';
+import { memo, useMemo } from 'react';
+import { Pressable, StyleProp, Text, TextStyle, ViewStyle } from 'react-native';
+import { style } from './styles';
 
-interface IMezonButtonProps extends TouchableOpacityProps {
-	children: React.ReactNode | string;
-	disabled?: boolean;
-	onPress?: () => void;
-	viewContainerStyle?: ViewStyle | ViewStyle[];
-	textStyle?: TextStyle | TextStyle[];
+export enum EMezonButtonTheme {
+	SUCCESS = 'success',
+	WARNING = 'warning',
+	DANGER = 'danger',
+	THEME = 'theme'
 }
 
-export const MezonButton = (props: IMezonButtonProps) => {
+export enum EMezonButtonSize {
+	MD = 'md',
+	LG = 'lg'
+}
+interface IMezonButton {
+	icon?: any;
+	title?: string;
+	titleStyle?: StyleProp<TextStyle>;
+	containerStyle?: StyleProp<ViewStyle>;
+	fluid?: boolean;
+	border?: boolean;
+	type?: EMezonButtonTheme;
+	size?: EMezonButtonSize;
+	onPress?: () => void;
+	rounded?: boolean;
+	disabled?: boolean;
+}
+
+const MezonButton = ({
+	icon,
+	title,
+	titleStyle,
+	fluid,
+	border,
+	type,
+	onPress,
+	size = EMezonButtonSize.MD,
+	rounded = false,
+	disabled = false,
+	containerStyle
+}: IMezonButton) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { children, textStyle, disabled, viewContainerStyle, onPress } = props;
-	const isString = typeof children === 'string';
+
+	const renderContainerStyle = useMemo(() => {
+		switch (type) {
+			case EMezonButtonTheme.SUCCESS:
+				return styles.containerSuccess;
+			case EMezonButtonTheme.WARNING:
+				return styles.containerWarning;
+			case EMezonButtonTheme.DANGER:
+				return styles.containerDanger;
+			case EMezonButtonTheme.THEME:
+				return styles.containerTheme;
+			default:
+				break;
+		}
+	}, [type]);
+
+	const renderContainerSize = useMemo(() => {
+		switch (size) {
+			case EMezonButtonSize.MD:
+				return styles.containerMd;
+			case EMezonButtonSize.LG:
+				return styles.containerLg;
+			default:
+				break;
+		}
+	}, [size]);
 
 	return (
-		<TouchableOpacity disabled={disabled} style={styles.fill} onPress={onPress} {...props}>
-			<View style={[styles.buttonWrapper, disabled && styles.disable, viewContainerStyle]}>
-				{isString ? <Text style={[styles.text, textStyle]}>{children}</Text> : children}
-			</View>
-		</TouchableOpacity>
+		<Pressable
+			style={[
+				styles.container,
+				fluid && styles.fluid,
+				border && styles.border,
+				rounded && styles.rounded,
+				renderContainerStyle,
+				renderContainerSize,
+				containerStyle
+			]}
+			disabled={disabled}
+			onPress={onPress}
+		>
+			{icon}
+			{title && <Text style={[styles.title, titleStyle]}>{title}</Text>}
+		</Pressable>
 	);
 };
+
+export default memo(MezonButton);

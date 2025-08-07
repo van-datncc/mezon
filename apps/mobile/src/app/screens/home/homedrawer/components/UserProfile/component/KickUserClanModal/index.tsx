@@ -4,10 +4,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../componentUI/MezonButton2';
-import MezonIconCDN from '../../../../../../../componentUI/MezonIconCDN';
+import MezonButton, { EMezonButtonSize, EMezonButtonTheme } from '../../../../../../../componentUI/MezonButton';
 import MezonInput from '../../../../../../../componentUI/MezonInput';
-import { IconCDN } from '../../../../../../../constants/icon_cdn';
 import { style } from './KickUserClanModal.style';
 
 const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEntity; onRemoveUserClan: () => void }) => {
@@ -22,7 +20,6 @@ const KickUserClanModal = ({ user, onRemoveUserClan }: { user: ChannelMembersEnt
 			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'position'} style={{ flex: 1 }}>
 				<View style={styles.container}>
 					<View style={styles.headerContent}>
-						<MezonIconCDN icon={IconCDN.userKickIcon} width={100} height={100} useOriginalColor />
 						<Text style={styles.textError}>
 							{t('kickUserClanModal.kickFromServer', { username: user?.user?.username || user?.['username'] })}
 						</Text>

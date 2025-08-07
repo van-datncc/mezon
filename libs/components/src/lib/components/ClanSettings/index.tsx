@@ -107,7 +107,6 @@ const ClanSetting = (props: ModalSettingProps) => {
 						handleMenu={(value: boolean) => setMenu(value)}
 						currentSetting={currentSetting?.id || ''}
 						setIsShowDeletePopup={() => setIsShowDeletePopup(true)}
-						isCommunityEnabled={isCommunityEnabled}
 					/>
 				</div>
 

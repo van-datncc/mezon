@@ -1,7 +1,13 @@
 import { useColorsRoleById } from '@mezon/core';
-import { selectClanMemberMetaUserId, selectMemberClanByUserId2, selectMemberCustomStatusById2, useAppSelector } from '@mezon/store';
+import {
+	selectClanMemberMetaUserId,
+	selectMemberClanByUserId2,
+	selectMemberCustomStatusById2,
+	selectStatusInVoice,
+	useAppSelector
+} from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
+import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { AvatarImage } from '../../components';
 import { useMemberContextMenu } from '../../contexts/MemberContextMenu';
 import { UserStatusIconClan } from './MemberProfile';
@@ -15,6 +21,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
 	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
+	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
 	const isOwnerClan = creator_id === user?.user?.id;
@@ -42,9 +49,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 		showContextMenu(event, userTemplate);
 	};
 
-	const isOffline = !userMeta?.online;
-
-	
+	const isOffline = userMeta?.status === EUserStatus.INVISIBLE || !userMeta?.online;
 
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
@@ -65,7 +70,16 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 
 				<div className="flex flex-col font-medium">
 					<ClanUserName userId={user?.id} name={username} isOwnerClan={isOwnerClan} />
-					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] ">{userCustomStatus}</p>
+					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] flex gap-1 items-center">
+						{!!userVoiceStatus ? (
+							<>
+								<Icons.Speaker className="text-green-500 !w-3 !h-3" />
+								In voice
+							</>
+						) : (
+							userCustomStatus
+						)}
+					</p>
 				</div>
 			</div>
 		</div>

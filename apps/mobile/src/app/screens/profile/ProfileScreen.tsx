@@ -21,7 +21,7 @@ import { DeviceEventEmitter, Image, ScrollView, Text, TouchableOpacity, View } f
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonAvatar from '../../componentUI/MezonAvatar';
-import { MezonButton } from '../../componentUI/MezonButton';
+import MezonButton from '../../componentUI/MezonButton';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { AddStatusUserModal } from '../../components/AddStatusUserModal';
 import { CustomStatusUser, EUserStatus } from '../../components/CustomStatusUser';
@@ -287,21 +287,23 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 			{isTabletLandscape && (
 				<View style={styles.buttonListLandscape}>
 					<MezonButton
-						viewContainerStyle={styles.button}
+						containerStyle={styles.button}
 						onPress={() => {
 							navigation.push(APP_SCREEN.WALLET, {
 								activeScreen: 'manage'
 							});
 						}}
-					>
-						<MezonIconCDN icon={IconCDN.wallet} height={size.s_20} width={size.s_20} color={'white'} />
-						<Text style={styles.whiteText}>{t('manageWallet')}</Text>
-					</MezonButton>
-
-					<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
-						<MezonIconCDN icon={IconCDN.pencilIcon} height={size.s_18} width={size.s_18} color={'white'} />
-						<Text style={styles.whiteText}>{t('editStatus')}</Text>
-					</MezonButton>
+						icon={<MezonIconCDN icon={IconCDN.wallet} height={size.s_20} width={size.s_20} color={'white'} />}
+						title={t('manageWallet')}
+						titleStyle={styles.whiteText}
+					/>
+					<MezonButton
+						containerStyle={styles.button}
+						onPress={() => navigateToProfileSetting()}
+						icon={<MezonIconCDN icon={IconCDN.pencilIcon} height={size.s_18} width={size.s_18} color={'white'} />}
+						title={t('editStatus')}
+						titleStyle={styles.whiteText}
+					/>
 				</View>
 			)}
 
@@ -351,21 +353,23 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
 					{!isTabletLandscape && (
 						<View style={styles.buttonList}>
 							<MezonButton
-								viewContainerStyle={styles.button}
+								containerStyle={styles.button}
 								onPress={() => {
 									navigation.push(APP_SCREEN.WALLET, {
 										activeScreen: 'manage'
 									});
 								}}
-							>
-								<MezonIconCDN icon={IconCDN.wallet} height={size.s_18} width={size.s_18} color={'white'} />
-								<Text style={styles.whiteText}>{t('manageWallet')}</Text>
-							</MezonButton>
-
-							<MezonButton viewContainerStyle={styles.button} onPress={() => navigateToProfileSetting()}>
-								<MezonIconCDN icon={IconCDN.pencilIcon} height={size.s_18} width={size.s_18} color={'white'} />
-								<Text style={styles.whiteText}>{t('editStatus')}</Text>
-							</MezonButton>
+								icon={<MezonIconCDN icon={IconCDN.wallet} height={size.s_20} width={size.s_20} color={'white'} />}
+								title={t('manageWallet')}
+								titleStyle={styles.whiteText}
+							/>
+							<MezonButton
+								containerStyle={styles.button}
+								onPress={() => navigateToProfileSetting()}
+								icon={<MezonIconCDN icon={IconCDN.pencilIcon} height={size.s_18} width={size.s_18} color={'white'} />}
+								title={t('editStatus')}
+								titleStyle={styles.whiteText}
+							/>
 						</View>
 					)}
 				</View>

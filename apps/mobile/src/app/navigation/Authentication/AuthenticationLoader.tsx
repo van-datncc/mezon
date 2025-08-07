@@ -41,6 +41,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import MezonConfirm from '../../componentUI/MezonConfirm';
 import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { Sharing } from '../../screens/settings/Sharing';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
 import { isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
@@ -52,6 +53,7 @@ export const AuthenticationLoader = () => {
 	const { userProfile } = useAuth();
 	const currentClan = useSelector(selectCurrentClan);
 	const mezon = useMezon();
+	const isTabletLandscape = useTabletLandscape();
 	const currentChannel = useSelector(selectCurrentChannel);
 	const currentDmGroupId = useSelector(selectDmGroupCurrentId);
 	const isLoadingMain = useSelector(selectLoadingMainMobile);
@@ -270,7 +272,7 @@ export const AuthenticationLoader = () => {
 							DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: true });
 							DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 							requestAnimationFrame(async () => {
-								await navigateToNotification(store, remoteMessage, navigation);
+								await navigateToNotification(store, remoteMessage, navigation, isTabletLandscape);
 							});
 						}
 					});
