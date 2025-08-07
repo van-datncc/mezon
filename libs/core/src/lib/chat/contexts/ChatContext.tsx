@@ -73,6 +73,7 @@ import {
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLoadingStatus,
+	selectRolesByClanId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -1361,14 +1362,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				//TODO: improve update once item
 				const store = await getStoreAsync();
 				const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-				const result = await dispatch(
-					channelsActions.updateChannelPrivateSocket({
-						action: channelUpdated,
-						isUserUpdate: channelUpdated.creator_id === userId
-					})
-				).unwrap();
-				if (result && currentChannelId === channelUpdated.channel_id) {
-					navigate(`/chat/clans/${channelUpdated.clan_id}`);
+				if (channelUpdated.channel_private) {
+					const roleInClan = selectRolesByClanId(store.getState(), channelUpdated.clan_id);
+					const hasRoleAccessPrivate = (channelUpdated.role_ids || []).some((key) => key in roleInClan);
+					const memberAccessPrivate = (channelUpdated.user_ids || []).some((user_id) => user_id === userId);
+
+					const result = await dispatch(
+						channelsActions.updateChannelPrivateSocket({
+							action: channelUpdated,
+							isUserUpdate: channelUpdated.creator_id === userId || memberAccessPrivate || hasRoleAccessPrivate
+						})
+					).unwrap();
+					if (result && currentChannelId === channelUpdated.channel_id) {
+						navigate(`/chat/clans/${channelUpdated.clan_id}`);
+					}
 				}
 				dispatch(
 					listChannelRenderAction.updateChannelInListRender({
@@ -1379,14 +1386,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				);
 				if (channelUpdated.channel_private !== undefined && channelUpdated.channel_private !== 0) {
 					const channel = { ...channelUpdated, type: channelUpdated.channel_type, id: channelUpdated.channel_id as string, clan_name: '' };
-					const cleanData: Record<string, string | number | boolean> = {};
+					const cleanData: Record<string, string | number | boolean | string[]> = {};
 
 					Object.keys(channelUpdated).forEach((key) => {
-						if (
-							channelUpdated[key as keyof ChannelUpdatedEvent] !== undefined &&
-							channelUpdated[key as keyof ChannelUpdatedEvent] !== ''
-						) {
-							cleanData[key] = channelUpdated[key as keyof ChannelUpdatedEvent];
+						const value = channelUpdated[key as keyof ChannelUpdatedEvent];
+						if (value !== undefined && value !== '') {
+							cleanData[key as keyof typeof cleanData] = value;
 						}
 					});
 
