@@ -6,6 +6,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { useSelector } from 'react-redux';
+import { useDirectMessageContextMenu } from '../../contexts';
 import { BaseMemberProfile } from '../MemberProfile/MemberProfile';
 import AddedByUser from './AddedByUser';
 export type MemberItemProps = {
@@ -21,7 +22,11 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById(state, user?.user?.id || '', isDM));
 	const userMetaById = useAppSelector((state) => selectDirectMemberMetaUserId(state, user?.user?.id || ''));
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
-
+	const { showContextMenu, setCurrentUser, openProfileItem } = useDirectMessageContextMenu();
+	const handleClick = (event: React.MouseEvent) => {
+		setCurrentUser(user);
+		openProfileItem(event, user);
+	};
 	return (
 		<div>
 			<BaseMemberProfile
@@ -34,6 +39,8 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 					status: userMetaById?.user?.metadata?.status
 				}}
 				userStatus={isMe ? currentUserCustomStatus : userCustomStatus}
+				onContextMenu={showContextMenu}
+				onClick={handleClick}
 			/>
 			<AddedByUser groupId={directMessageId || ''} userId={user?.id} />
 		</div>

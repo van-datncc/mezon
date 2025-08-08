@@ -32,7 +32,7 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 					MEMBER - {memberGroups.length}
 				</p>
 				{
-					<div className={`flex flex-col  ${isElectron() ? 'pb-8' : ''}`}>
+					<div className={`flex flex-col ${isElectron() ? 'pb-8' : ''}`}>
 						<MemberContextMenuProvider>
 							{memberGroups.map((user: ChannelMembersEntity, index) => (
 								<div key={user.id} className="p-2 rounded bg-item-hover">

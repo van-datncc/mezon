@@ -16,6 +16,7 @@ import isElectron from 'is-electron';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage, useVirtualizer } from '../../components';
+import { useMemberContextMenu } from '../../contexts';
 import { UserStatusIconClan } from '../MemberProfile';
 import { BaseMemberProfile, ClanUserName } from '../MemberProfile/MemberProfile';
 
@@ -71,7 +72,11 @@ const MemoizedMemberItem = memo((props: MemberClanProps) => {
 	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
-
+	const { showContextMenu, openProfileItem, setCurrentUser } = useMemberContextMenu();
+	const handleClick = (event: React.MouseEvent) => {
+		setCurrentUser(user);
+		openProfileItem(event, user);
+	};
 	return temp ? (
 		<TempMemberItem id={id} isOwner={isOwner} />
 	) : (
@@ -94,6 +99,8 @@ const MemoizedMemberItem = memo((props: MemberClanProps) => {
 			username={username}
 			id={id}
 			isOwner={isOwner}
+			onContextMenu={showContextMenu}
+			onClick={handleClick}
 		/>
 	);
 });

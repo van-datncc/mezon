@@ -4,7 +4,6 @@ import { Icons } from '@mezon/ui';
 import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { ReactNode } from 'react';
 import { AvatarImage } from '../../components';
-import { useMemberContextMenu } from '../../contexts';
 import { UserStatusIconClan } from './IconStatus';
 
 type BaseMemberProfileProps = {
@@ -15,16 +14,11 @@ type BaseMemberProfileProps = {
 	avatar: string;
 	isOwner?: boolean;
 	userStatus?: ReactNode;
+	onContextMenu: (event: React.MouseEvent<Element, MouseEvent>, user: UsersClanEntity) => void;
+	onClick: (event: React.MouseEvent) => void;
 };
 
-export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwner, userStatus }: BaseMemberProfileProps) => {
-	const { showContextMenu, openProfileItem, setCurrentUser } = useMemberContextMenu();
-
-	const handleClick = (event: React.MouseEvent) => {
-		setCurrentUser(user);
-		openProfileItem(event, user);
-	};
-
+export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwner, userStatus, onContextMenu, onClick }: BaseMemberProfileProps) => {
 	const handleContextMenu = (event: React.MouseEvent) => {
 		const userTemplate: UsersClanEntity = {
 			...user,
@@ -38,14 +32,14 @@ export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwne
 				avatar_url: user?.user?.avatar_url
 			}
 		};
-		showContextMenu(event, userTemplate);
+		onContextMenu(event, userTemplate);
 	};
 
 	const isOffline = userMeta?.status === EUserStatus.INVISIBLE || !userMeta?.online;
 
 	return (
 		<div className={`relative group w-full ${isOffline ? 'opacity-50' : ''}`}>
-			<div onContextMenu={handleContextMenu} onClick={handleClick} className="cursor-pointer flex items-center gap-[9px] relative">
+			<div onContextMenu={handleContextMenu} onClick={onClick} className="cursor-pointer flex items-center gap-[9px] relative">
 				<div className="relative">
 					<AvatarImage
 						alt={username}
@@ -62,17 +56,7 @@ export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwne
 
 				<div className="flex flex-col font-medium">
 					<ClanUserName userId={user?.id} name={username} isOwner={!!isOwner} />
-					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] flex gap-1 items-center">
-						{/* {userVoiceStatus ? (
-							<>
-								<Icons.Speaker className="text-green-500 !w-3 !h-3" />
-								In voice
-							</>
-						) : (
-							userStatus
-						)} */}
-						{userStatus}
-					</p>
+					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] flex gap-1 items-center">{userStatus}</p>
 				</div>
 			</div>
 		</div>
