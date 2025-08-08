@@ -180,7 +180,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
 						displayName={
 							<>
-								{friend?.user?.display_name}{' '}
+								{friend?.user?.display_name || friend?.user?.username}{' '}
 								<span className="group-hover:inline-block hidden text-theme-primary-hover">{friend?.user?.username}</span>
 							</>
 						}
