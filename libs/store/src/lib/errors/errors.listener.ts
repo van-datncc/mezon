@@ -1,6 +1,7 @@
 import { trackError } from '@mezon/utils';
 import { createListenerMiddleware } from '@reduxjs/toolkit';
 import * as Sentry from '@sentry/browser';
+import { authActions } from '../auth/auth.slice';
 import { Toast, ToastPayload, toastActions } from '../toasts';
 
 // Create the middleware instance and methods
@@ -9,6 +10,9 @@ export const errorListenerMiddleware = createListenerMiddleware({
 		console.error('errorListenerMiddleware', error);
 	}
 });
+
+let hasDispatchedRefreshOnce = false;
+let isRefreshing = false;
 
 function isErrorPredicate(action: any) {
 	return !!action.error;
@@ -75,12 +79,32 @@ function createErrorToast(error: any): ToastPayload {
 	return toast;
 }
 
-// Add one or more listener entries that look for specific actions.
-// They may contain any sync or async logic, similar to thunks.
 errorListenerMiddleware.startListening({
-	//   actionCreator: anyActionCreator,
 	predicate: isErrorPredicate,
 	effect: async (action: any, listenerApi) => {
+		try {
+			const isRefreshAction = typeof action.type === 'string' && action.type.startsWith('auth/refreshSession');
+
+			if (!isRefreshAction && !hasDispatchedRefreshOnce && !isRefreshing) {
+				let status: number | undefined = action?.payload?.status ?? action?.payload?.error?.status;
+				if (status == null && action?.payload && typeof action.payload === 'object') {
+					status = action?.payload?.status;
+				}
+
+				if (status === 401) {
+					isRefreshing = true;
+					hasDispatchedRefreshOnce = true;
+					try {
+						await listenerApi.dispatch(authActions.refreshSession());
+					} finally {
+						isRefreshing = false;
+					}
+				}
+			}
+		} catch (e) {
+			console.error(e);
+		}
+
 		const error = normalizeError(action);
 
 		if (!error) {
