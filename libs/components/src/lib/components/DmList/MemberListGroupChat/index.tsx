@@ -1,4 +1,4 @@
-import { useAppParams } from '@mezon/core';
+import { useAppParams, useAuth } from '@mezon/core';
 import { ChannelMembersEntity, selectGrouplMembers, useAppSelector } from '@mezon/store';
 import isElectron from 'is-electron';
 import { memo } from 'react';
@@ -18,7 +18,7 @@ export type DataMemberCreate = {
 function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 	const { directId } = useAppParams();
 	const rawMembers = useAppSelector((state) => selectGrouplMembers(state, directId as string));
-
+	const { userId } = useAuth();
 	const memberGroups = rawMembers.sort((a, b) => {
 		const nameA = a.user?.display_name?.toLowerCase() || a.user?.username?.toLowerCase() || '';
 		const nameB = b.user?.display_name?.toLowerCase() || b.user?.username?.toLowerCase() || '';
@@ -36,7 +36,12 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 						<MemberContextMenuProvider>
 							{memberGroups.map((user: ChannelMembersEntity, index) => (
 								<div key={user.id} className="p-2 rounded bg-item-hover">
-									<MemberItem user={user} directMessageId={directMessageId} isMobile={user.user?.is_mobile} index={index} />
+									<MemberItem
+										user={user}
+										directMessageId={directMessageId}
+										isMobile={user.user?.is_mobile}
+										isMe={userId === user.id}
+									/>
 								</div>
 							))}
 						</MemberContextMenuProvider>
