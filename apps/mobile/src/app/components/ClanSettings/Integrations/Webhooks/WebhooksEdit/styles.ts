@@ -28,19 +28,28 @@ export const style = (colors: Attributes) =>
 			color: colors.text,
 			fontWeight: '500',
 			flexBasis: '85%',
-			textAlign: 'left'
+			textAlign: 'left',
+			height: size.s_100
+		},
+		btnResetToken: {
+			backgroundColor: baseColor.bgSuccess,
+			paddingVertical: size.s_10,
+			paddingHorizontal: size.s_10,
+			borderRadius: size.s_14,
+			marginTop: size.s_20
 		},
 		btnDelete: {
-			backgroundColor: colors.secondary,
-			paddingVertical: size.s_14,
+			backgroundColor: baseColor.bgDanger,
+			paddingVertical: size.s_10,
 			paddingHorizontal: size.s_10,
-			borderRadius: size.s_10,
+			borderRadius: size.s_14,
 			marginTop: size.s_20
 		},
 		textBtnDelete: {
-			fontSize: size.s_16,
-			color: baseColor.redStrong,
-			fontWeight: '500'
+			fontSize: size.s_14,
+			color: colors.white,
+			fontWeight: '500',
+			textAlign: 'center'
 		},
 		textLink: {
 			fontSize: size.s_14,

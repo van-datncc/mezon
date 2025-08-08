@@ -118,13 +118,15 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			);
 			await socket.removeChatMessage(
 				currentDmId ? '0' : currentClanId || '',
-				currentDmId ? currentDmId : currentTopicId || currentChannelId,
+				currentDmId ? currentDmId : currentChannelId,
 				mode,
 				isPublic,
-				messageId
+				messageId,
+				!!message?.attachments,
+				currentTopicId
 			);
 		},
-		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, mode, socketRef, store]
+		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, message?.attachments, mode, socketRef, store]
 	);
 
 	const onConfirmAction = useCallback(

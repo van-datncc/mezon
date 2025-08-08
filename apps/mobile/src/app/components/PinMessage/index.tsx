@@ -32,7 +32,13 @@ const PinMessage = memo(({ currentChannelId, currentClanId }: { currentChannelId
 
 	const handleUnpinMessage = useCallback(
 		(message: PinMessageEntity) => {
-			dispatch(pinMessageActions.deleteChannelPinMessage({ channel_id: currentChannelId, message_id: message?.id, clan_id: currentClanId }));
+			dispatch(
+				pinMessageActions.deleteChannelPinMessage({
+					channel_id: currentChannelId,
+					message_id: message?.message_id || message?.id,
+					clan_id: currentClanId
+				})
+			);
 		},
 		[currentChannelId, currentClanId, dispatch]
 	);

@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, FlatList, Platform, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton2';
+import MezonButton, { EMezonButtonTheme } from '../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonOption, { IMezonOptionData } from '../../../componentUI/MezonOption';

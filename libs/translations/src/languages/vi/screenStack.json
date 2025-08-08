@@ -14,6 +14,7 @@
     "notificationSetting": "Cài đặt thông báo",
     "newOverride": "Ghi đè mới",
     "webhooks": "Webhook",
+    "clanWebhooks": "Webhook Clan",
     "integrations": "Tích hợp",
     "webhooksEdit": "Chỉnh sửa webhook",
     "auditLog": "Nhật ký kiểm tra",

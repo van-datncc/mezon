@@ -118,6 +118,15 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
         .bg-bgLightModeSecond {
         	padding-left: 0;
 				}
+				#clan-footer {
+					display: none !important;
+				}
+				.h-dvh {
+					padding-left: 0 !important;
+				}
+				#menu {
+					display: none !important
+				}
       \`;
       document.head.appendChild(style);
     })();
