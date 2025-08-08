@@ -54,15 +54,11 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
 	const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
-	const [dropdownOpen, setDropdownOpen] = useState(false);
 
 	const handleSendToken = () => {
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
 
-	const handleOpenWithdrawModal = () => {
-		setIsShowModalWithdraw(true);
-	};
 	const handleCloseWithdrawModal = () => {
 		setIsShowModalWithdraw(false);
 	};
@@ -73,9 +69,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		setIsShowModalHistory(false);
 	};
 
-	const handleWalletManagement = () => {
-		setShowWalletModal(true);
-	};
 	const statusIcon = (status: string): ReactNode => {
 		switch (status) {
 			case EUserStatus.ONLINE:
@@ -168,27 +161,11 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					disabled={true}
 				/>
 				<ItemStatus onClick={handleSendToken} children="Transfer Funds" startIcon={<Icons.SendMoney className="text-theme-primary" />} />
-				{/* <ItemStatus
-					onClick={handleOpenWithdrawModal}
-					children="Withdraw"
-					startIcon={<Icons.SendMoney className="transform scale-x-[-1] scale-y-[-1]" />}
-				/> */}
 				<ItemStatus
 					onClick={handleOpenHistoryModal}
 					children="History Transaction"
 					startIcon={<Icons.History className="text-theme-primary" />}
 				/>
-				{/* <ItemStatus
-					onClick={handleWalletManagement}
-					children="Manage Wallet"
-					startIcon={
-						<span className="w-5 h-5 flex items-center justify-center text-theme-primary">
-							{' '}
-							<WalletIcon />{' '}
-						</span>
-					}
-				/> */}
-
 				<ItemStatus
 					onClick={handleCustomStatus}
 					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
@@ -254,7 +231,13 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	);
 };
 
-const AddAccountModal = ({ handleSetAccount, handleCloseModalAddAccount }: { handleCloseModalAddAccount: () => void, handleSetAccount: (email: string, password: string) => void }) => {
+const AddAccountModal = ({
+	handleSetAccount,
+	handleCloseModalAddAccount
+}: {
+	handleCloseModalAddAccount: () => void;
+	handleSetAccount: (email: string, password: string) => void;
+}) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
@@ -333,7 +316,10 @@ const AddAccountModal = ({ handleSetAccount, handleCloseModalAddAccount }: { han
 				</div>
 				<div className="min-h-[20px]"></div>
 				<div className="flex gap-2">
-					<button className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] hover:underline text-theme-primary   whitespace-nowrap" onClick={handleCloseModalAddAccount}>
+					<button
+						className="w-full px-4 py-2 font-medium focus:outline-none  cursor-pointer  rounded-lg  text-[16px] leading-[24px] hover:underline text-theme-primary   whitespace-nowrap"
+						onClick={handleCloseModalAddAccount}
+					>
 						Cancel
 					</button>
 					<button
@@ -342,18 +328,13 @@ const AddAccountModal = ({ handleSetAccount, handleCloseModalAddAccount }: { han
 						disabled={!isFormValid}
 						className={`
               w-full rounded-lg px-4 py-2 font-medium leading-[24px] focus:outline-none
-              ${isFormValid
-								? 'bg-[#5265ec] text-white hover:bg-[#4654c0]'
-								: 'bg-gray-500 text-white'}
+              ${isFormValid ? 'bg-[#5265ec] text-white hover:bg-[#4654c0]' : 'bg-gray-500 text-white'}
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
 					>
 						Log In
 					</button>
-
-
 				</div>
-
 			</form>
 		</div>
 	);

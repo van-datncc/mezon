@@ -184,7 +184,7 @@ const TopicDiscussionBox = () => {
 
 
 			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0  flex flex-col pb-[26px] px-4 bg-theme-chat h-auto relative">
+				<div className="flex-shrink-0  flex flex-col pb-4 px-4 bg-theme-chat h-auto relative">
 					{dataReferences.message_ref_id && (
 						<div className="mb-1 px-[1px] w-full ">
 							<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
@@ -194,19 +194,19 @@ const TopicDiscussionBox = () => {
 				<div
 							className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}
 				>
-					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
-						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
-							return (
-								<Fragment key={index}>
-									<AttachmentPreviewThumbnail
-										attachment={item}
-										channelId={currentInputChannelId}
-										onRemove={removeAttachmentByIndex}
-										indexOfItem={index}
-									/>
-								</Fragment>
-							);
-						})}
+							<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
+								{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
+									return (
+										<Fragment key={index}>
+											<AttachmentPreviewThumbnail
+												attachment={item}
+												channelId={currentInputChannelId}
+												onRemove={removeAttachmentByIndex}
+												indexOfItem={index}
+											/>
+										</Fragment>
+									);
+								})}
 							</div>
 						</div>
 					)}

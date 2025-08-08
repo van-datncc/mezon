@@ -5,7 +5,7 @@ import { ApiUserActivity } from 'mezon-js/api.gen';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
-import { UserStatusIcon } from '../MemberProfile/MemberProfile';
+import { UserStatusIcon } from '../MemberProfile/IconStatus';
 type AvatarProfileProps = {
 	avatar?: string;
 	username?: string;
