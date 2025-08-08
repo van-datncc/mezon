@@ -101,7 +101,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				name={directMessage?.channel_label || ''}
 				number={(directMessage?.user_id?.length || 0) + 1}
 				isTypeDMGroup={isTypeDMGroup}
-				highlight={isUnReadChannel}
+				highlight={isUnReadChannel || currentDmGroupId === id}
 				userMeta={metadata}
 			/>
 			{buzzStateDM?.isReset ? (
