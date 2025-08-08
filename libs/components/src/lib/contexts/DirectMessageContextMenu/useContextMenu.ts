@@ -42,6 +42,7 @@ export function useContextMenuHandlers({
 	const openProfileItem = useCallback(
 		(event: React.MouseEvent, user: ChannelMembersEntity) => {
 			if (user) {
+				console.log('Here');
 				setCurrentUser(user);
 				openUserProfile();
 			}
