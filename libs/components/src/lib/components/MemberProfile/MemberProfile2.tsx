@@ -21,7 +21,7 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
 	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
-	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, user.user?.id || ''));
+	const userVoiceStatus = !!useAppSelector((state) => selectStatusInVoice(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
 	const isOwnerClan = creator_id === user?.user?.id;
@@ -70,8 +70,10 @@ export const BaseMemberProfile = ({ id, creator_id }: BaseMemberProfileProps) =>
 
 				<div className="flex flex-col font-medium">
 					<ClanUserName userId={user?.id} name={username} isOwnerClan={isOwnerClan} />
-					<p className="text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] flex gap-1 items-center">
-						{!!userVoiceStatus ? (
+					<p
+						className={`text-theme-primary w-full text-[12px] line-clamp-1 break-all max-w-[176px] ${userVoiceStatus ? 'flex gap-1 items-center' : ''}`}
+					>
+						{userVoiceStatus ? (
 							<>
 								<Icons.Speaker className="text-green-500 !w-3 !h-3" />
 								In voice
