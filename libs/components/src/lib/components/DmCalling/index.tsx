@@ -28,10 +28,9 @@ import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { IMessageTypeCallLog, createImgproxyUrl, sleep } from '@mezon/utils';
 import { Dropdown } from 'flowbite-react';
-import { ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { SimpleMemberProfile } from '../MemberProfile';
 import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
@@ -196,20 +195,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
-					<SimpleMemberProfile
-						numberCharacterCollapse={22}
-						avatar={
-							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
-								? 'assets/images/avatar-group.png'
-								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
-						}
-						name={currentDmGroup?.channel_label ?? ''}
-						status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
-						isHideStatus={true}
-						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
-						key={currentDmGroup?.channel_id}
-						isHiddenAvatarPanel={false}
-					/>
 				</div>
 			</div>
 

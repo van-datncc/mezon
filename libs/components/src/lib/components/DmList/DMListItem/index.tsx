@@ -138,7 +138,7 @@ const DmItemProfile = ({
 }) => {
 	return (
 		<div
-			className={`relative flex gap-3 items-center text-theme-primary-hover  ${highlight ? 'text-theme-primary-active' : 'text-theme-primary'}`}
+			className={`relative flex gap-2 items-center text-theme-primary-hover  ${highlight ? 'text-theme-primary-active' : 'text-theme-primary'}`}
 		>
 			<AvatarImage
 				alt={name}

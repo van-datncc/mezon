@@ -1,6 +1,5 @@
 import { useAppParams } from '@mezon/core';
 import { ChannelMembersEntity, selectGrouplMembers, useAppSelector } from '@mezon/store';
-import { MemberProfileType } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { memo } from 'react';
 import { MemberContextMenuProvider } from '../../../contexts';
@@ -26,8 +25,6 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 		return nameA.localeCompare(nameB);
 	});
 
-	const dataMemberCreate: DataMemberCreate = { createId: createId || '' };
-
 	return (
 		<div className="self-stretch w-full h-[268px] flex-col justify-start items-start flex pt-[16px] pb-[16px] ml-2 mr-1 gap-[24px]">
 			<div className="w-full">
@@ -37,19 +34,9 @@ function MemberListGroupChat({ directMessageId, createId }: MemberListProps) {
 				{
 					<div className={`flex flex-col  ${isElectron() ? 'pb-8' : ''}`}>
 						<MemberContextMenuProvider>
-							{memberGroups.map((user: ChannelMembersEntity) => (
+							{memberGroups.map((user: ChannelMembersEntity, index) => (
 								<div key={user.id} className="p-2 rounded bg-item-hover">
-									<MemberItem
-										user={user}
-										name={user.user?.display_name || user.user?.username}
-										positionType={MemberProfileType.DM_MEMBER_GROUP}
-										listProfile={true}
-										dataMemberCreate={dataMemberCreate}
-										directMessageId={directMessageId}
-										isOffline={!user.user?.online}
-										isMobile={user.user?.is_mobile}
-										isDM={true}
-									/>
+									<MemberItem user={user} directMessageId={directMessageId} isMobile={user.user?.is_mobile} index={index} />
 								</div>
 							))}
 						</MemberContextMenuProvider>
