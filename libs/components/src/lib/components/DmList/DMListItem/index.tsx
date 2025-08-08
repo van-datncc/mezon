@@ -47,7 +47,10 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				console.error('Error parsing JSON:', user?.user?.metadata, error);
 			}
 		} else if (typeof user?.user?.metadata === 'object') {
-			return user?.user?.metadata;
+			return {
+				status: user.user.metadata.status,
+				user_status: user.user.online ? user.user.metadata.user_status || EUserStatus.ONLINE : EUserStatus.INVISIBLE
+			};
 		}
 	}, [user?.user?.metadata?.user_status]);
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
