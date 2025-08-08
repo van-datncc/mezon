@@ -8,10 +8,11 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { EUserStatus, createImgproxyUrl } from '@mezon/utils';
+import { ChannelMembersEntity, EUserStatus, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useDirectMessageContextMenu } from '../../../contexts';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
 import BuzzBadge from '../../BuzzBadge';
 import LeaveGroupModal from '../../LeaveGroupModal';
@@ -81,8 +82,13 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	};
 
 	const ref = useRef<HTMLDivElement>(null);
+	const { showContextMenu } = useDirectMessageContextMenu();
+	const handleContextMenu = (event: React.MouseEvent) => {
+		showContextMenu(event, directMessage as ChannelMembersEntity);
+	};
 	return (
 		<div
+			onContextMenu={handleContextMenu}
 			ref={ref}
 			style={{ height: 42 }}
 			className={`flex items-center group/itemListDm relative cursor-pointer bg-item-hover h-fit px-2 rounded-[6px] w-full ${isActive ? 'bg-item-theme text-theme-primary-active' : 'text-theme-primary'}`}
