@@ -84,10 +84,10 @@ const MemoizedMemberItem = memo((props: MemberClanProps) => {
 			userStatus={
 				<>
 					{userVoiceStatus ? (
-						<>
+						<span className="flex items-center gap-1">
 							<Icons.Speaker className="text-green-500 !w-3 !h-3" />
 							In voice
-						</>
+						</span>
 					) : (
 						userCustomStatus
 					)}
