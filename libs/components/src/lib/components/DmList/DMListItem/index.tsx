@@ -48,8 +48,8 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			}
 		} else if (typeof user?.user?.metadata === 'object') {
 			return {
-				status: user.user.metadata.status,
-				user_status: user.user.online ? user.user.metadata.user_status || EUserStatus.ONLINE : EUserStatus.INVISIBLE
+				status: user?.user?.metadata?.status,
+				user_status: user?.user?.online ? user?.user?.metadata?.user_status || EUserStatus.ONLINE : EUserStatus.INVISIBLE
 			};
 		}
 	}, [user?.user?.metadata?.user_status]);
