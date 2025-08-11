@@ -401,6 +401,13 @@ export default class App {
 							App.mainWindow.webContents.send('reload-app');
 						}
 					},
+					{
+						label: 'Hide',
+						accelerator: 'CmdOrCtrl+W',
+						click: () => {
+							App.mainWindow.hide();
+						}
+					},
 					{ type: 'separator' },
 					{ role: 'resetZoom' },
 					{ role: 'zoomIn' },
@@ -418,7 +425,7 @@ export default class App {
 					{ role: 'zoom' },
 					...(isMac
 						? ([{ type: 'separator' }, { role: 'front' }, { type: 'separator' }, { role: 'window' }] as MenuItemConstructorOptions[])
-						: ([{ role: 'close' }] as MenuItemConstructorOptions[]))
+						: ([{ role: 'quit' }] as MenuItemConstructorOptions[]))
 				]
 			},
 			{
