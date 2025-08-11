@@ -1,16 +1,12 @@
-import { convertTimestampToTimeAgo, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
-import { ActionEmitEvent, PaperclipIcon, STORAGE_MY_USER_ID, convertTimestampToTimeAgo, load } from '@mezon/mobile-components';
+import { ActionEmitEvent, convertTimestampToTimeAgo, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { IExtendedMessage } from '@mezon/utils';
-import { DirectEntity, directActions, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { IExtendedMessage, createImgproxyUrl } from '@mezon/utils';
+import { directActions, DirectEntity, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl, IExtendedMessage } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
-import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import BuzzBadge from '../../components/BuzzBadge/BuzzBadge';
 import ImageNative from '../../components/ImageNative';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
@@ -19,8 +15,8 @@ import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
-import { UserStatusDM } from './UserStatusDM';
 import { style } from './styles';
+import { UserStatusDM } from './UserStatusDM';
 
 export const DmListItem = React.memo((props: { id: string }) => {
 	const { themeValue } = useTheme();

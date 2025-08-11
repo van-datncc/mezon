@@ -1,7 +1,6 @@
-import { useMemberStatus } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { baseColor, useTheme } from '@mezon/mobile-ui';
-import { selectDmGroupCurrent, selectMemberClanByUserId2 } from '@mezon/store-mobile';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
+import { selectDmGroupCurrent } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
