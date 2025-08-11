@@ -40,7 +40,7 @@ function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: Render
 	if (!coordinate) return null;
 
 	return (
-		<View style={styles.card}>
+		<TouchableOpacity onPress={handlePress} style={styles.card} activeOpacity={0.8}>
 			<MapView
 				style={styles.map}
 				initialRegion={{
@@ -52,20 +52,16 @@ function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: Render
 				pointerEvents="none"
 			>
 				<Marker coordinate={{ latitude: coordinate.latitude, longitude: coordinate.longitude }}>
-					<View style={styles.avatarWrapper}>
-						{!!avatarUrl && <Image source={{ uri: avatarUrl }} style={styles.avatar} />}
-					</View>
+					<View style={styles.avatarWrapper}>{!!avatarUrl && <Image source={{ uri: avatarUrl }} style={styles.avatar} />}</View>
 				</Marker>
 			</MapView>
 
-			<TouchableOpacity style={styles.info} onPress={handlePress}>
+			<View style={styles.info}>
 				<Text style={styles.title}>
-					{isSelf
-						? t('mapView.yourLocation')
-						: t('mapView.locationOf', { name: senderName || t('mapView.sender') })}
+					{isSelf ? t('mapView.yourLocation') : t('mapView.locationOf', { name: senderName || t('mapView.sender') })}
 				</Text>
-			</TouchableOpacity>
-		</View>
+			</View>
+		</TouchableOpacity>
 	);
 }
 

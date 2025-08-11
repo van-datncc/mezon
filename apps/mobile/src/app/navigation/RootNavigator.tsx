@@ -104,6 +104,12 @@ const NavigationMain = memo(
 						parse: {
 							code: (code) => `${code}`
 						}
+					},
+					[`${APP_SCREEN.INVITE_CLAN}`]: {
+						path: 'invite/:code',
+						parse: {
+							code: (code) => `${code}`
+						}
 					}
 				}
 			},
@@ -112,7 +118,7 @@ const NavigationMain = memo(
 				if (path && Platform.OS === 'android') {
 					setTimeout(() => {
 						DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, path);
-					}, 1000);
+					}, 2000);
 				}
 				return getStateFromPath(path, config);
 			}

@@ -25,7 +25,7 @@ export const style = (colors: Attributes) =>
 		},
 		info: {
 			padding: size.s_10,
-			backgroundColor: colors.primary
+			backgroundColor: colors.secondaryLight
 		},
 		title: {
 			fontWeight: 'bold',
