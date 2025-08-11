@@ -33,7 +33,7 @@ function extractDMMeta(channel: DirectEntity): DMMetaEntity {
 
 	return {
 		id: channel.id,
-		lastSeenTimestamp: isNaN(lastSeenTimestamp) ? lastSentTimestamp : lastSeenTimestamp,
+		lastSeenTimestamp: isNaN(lastSeenTimestamp) ? lastSentTimestamp - 1 : lastSeenTimestamp,
 		lastSentTimestamp: lastSentTimestamp,
 		count_mess_unread: Number(channel.count_mess_unread || 0),
 		active: channel.active,
@@ -160,7 +160,7 @@ export const selectDirectsUnreadlist = createSelector(selectAllDMMeta, (state) =
 
 export const selectIsUnreadDMById = createSelector([getDirectMetaState, (state, channelId) => channelId], (state, channelId) => {
 	const channel = state?.entities?.[channelId];
-	return channel?.lastSeenTimestamp <= channel?.lastSentTimestamp;
+	return channel?.lastSeenTimestamp < channel?.lastSentTimestamp;
 });
 
 export const selectTotalUnreadDM = createSelector(selectDirectsUnreadlist, (listUnreadDM) => {
