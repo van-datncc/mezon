@@ -272,10 +272,10 @@ const MessageItem = React.memo(
 						isHighlight && styles.highlightMessageMention,
 						isEphemeralMessage && styles.ephemeralMessage,
 						Platform.OS === 'ios' &&
-							pressed && {
-								backgroundColor: themeValue.secondaryWeight,
-								opacity: 0.8
-							}
+						pressed && {
+							backgroundColor: themeValue.secondaryWeight,
+							opacity: 0.8
+						}
 					]}
 				>
 					{!isMessageSystem && !message?.content?.fwd && (
@@ -337,7 +337,8 @@ const MessageItem = React.memo(
 												content={{
 													...(typeof message.content === 'object' ? message.content : {}),
 													mentions: message.mentions,
-													...(checkOneLinkImage ? { t: '' } : {})
+													...(checkOneLinkImage ? { t: '' } : {}),
+													...(isGoogleMapsLink ? { t: '' } : {})
 												}}
 												isEdited={isEdited}
 												translate={t}
@@ -378,6 +379,9 @@ const MessageItem = React.memo(
 											isGoogleMapsLink={isGoogleMapsLink}
 											isInviteLink={isInviteLink}
 											contentMessage={contentMessage}
+											avatarUrl={messageAvatar}
+											isSelf={message?.user?.id === userId}
+											senderName={senderDisplayName}
 										/>
 									)}
 									{/* check  */}
@@ -433,17 +437,17 @@ const MessageItem = React.memo(
 	(prevProps, nextProps) => {
 		return (
 			prevProps?.message?.id +
-				prevProps?.message?.update_time +
-				prevProps?.previousMessage?.id +
-				prevProps?.message?.code +
-				prevProps?.isHighlight +
-				prevProps?.message?.reactions ===
+			prevProps?.message?.update_time +
+			prevProps?.previousMessage?.id +
+			prevProps?.message?.code +
+			prevProps?.isHighlight +
+			prevProps?.message?.reactions ===
 			nextProps?.message?.id +
-				nextProps?.message?.update_time +
-				nextProps?.previousMessage?.id +
-				nextProps?.message?.code +
-				nextProps?.isHighlight +
-				nextProps?.message?.reactions
+			nextProps?.message?.update_time +
+			nextProps?.previousMessage?.id +
+			nextProps?.message?.code +
+			nextProps?.isHighlight +
+			nextProps?.message?.reactions
 		);
 	}
 );

@@ -2,25 +2,23 @@ import { ActionEmitEvent, load, STORAGE_MY_USER_ID } from '@mezon/mobile-compone
 import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import {
 	DirectEntity,
+	getStore,
 	selectAllChannelMembers,
 	selectAllUserClans,
 	selectClanMembersMetaEntities,
 	selectGrouplMembers,
 	useAppSelector
 } from '@mezon/store-mobile';
-import { ChannelMembersEntity, EUserStatus, UsersClanEntity } from '@mezon/utils';
+import { ChannelMembersEntity, UsersClanEntity } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { ChannelType } from 'mezon-js';
-import { ApiUser } from 'mezon-js/api.gen';
+import { ChannelType, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Pressable, SectionList, Text, TouchableOpacity, View } from 'react-native';
-import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
 import InviteToChannel from '../../screens/home/homedrawer/components/InviteToChannel';
-import { getUserStatusByMetadata } from '../../utils/helpers';
 import { threadDetailContext } from '../ThreadDetail/MenuThreadDetail';
 import { UserInformationBottomSheet } from '../UserInformationBottomSheet';
 import { MemoizedMemberItem } from './MemberItem';
@@ -39,9 +37,6 @@ export const MemberListStatus = React.memo(() => {
 	const styles = style(themeValue);
 	const currentChannel = useContext(threadDetailContext);
 	const navigation = useNavigation<any>();
-	const membersChannel = useSelector(selectAllUserClans);
-	const membersMetaEntities = useSelector(selectClanMembersMetaEntities);
-	const membersDM = useAppSelector((state) => selectGrouplMembers(state, currentChannel?.channel_id as string));
 
 	const [selectedUser, setSelectedUser] = useState<ChannelMembersEntity | null>(null);
 	const { t } = useTranslation();
@@ -69,17 +64,51 @@ export const MemberListStatus = React.memo(() => {
 		if (action === EActionButton.AddMembers) navigateToNewGroupScreen();
 	}, []);
 
-	const getUserOnlineStatus = (user: ApiUser) => {
-		if (user?.id === myUserId) {
-			return getUserStatusByMetadata(user?.metadata) !== EUserStatus.INVISIBLE;
+	const getInfoUserOnlineStatus = (
+		userId = ''
+	): {
+		status: string;
+		isMobile: boolean;
+		online: boolean;
+	} => {
+		try {
+			const store = getStore();
+			const membersMetaEntities = selectClanMembersMetaEntities(store.getState());
+			const isMobile = !!membersMetaEntities?.[userId]?.isMobile;
+			let online = !!membersMetaEntities?.[userId]?.online;
+			let status = '';
+			if (membersMetaEntities[userId]?.status) {
+				status = membersMetaEntities[userId]?.status;
+			} else if (currentChannel?.metadata?.[0]) {
+				const data = safeJSONParse(currentChannel?.metadata?.[0]);
+				status = data?.user_status || '';
+			}
+			// for case DM group
+			if (currentChannel?.is_online?.[0]) {
+				online = true;
+			}
+
+			return {
+				online,
+				status,
+				isMobile
+			};
+		} catch (e) {
+			return {
+				status: '',
+				online: false,
+				isMobile: false
+			};
 		}
-		return user?.online;
 	};
 
-	const getIsMobileStatus = (user: ApiUser) => (user?.id === myUserId ? true : user?.is_mobile);
-
 	const listMembersChannelGroupDM = useMemo(() => {
-		const members = isDMThread ? membersDM : membersChannel;
+		const store = getStore();
+		const membersMetaEntities = selectClanMembersMetaEntities(store.getState());
+		const members = isDMThread
+			? selectGrouplMembers(store.getState(), currentChannel?.channel_id as string)
+			: selectAllUserClans(store.getState() as any);
+
 		if (!membersMetaEntities || !members) {
 			return {
 				online: [],
@@ -87,20 +116,19 @@ export const MemberListStatus = React.memo(() => {
 			};
 		}
 
-		const users = members?.map((item: ChannelMembersEntity | UsersClanEntity) => ({
-			...item,
-			user: {
-				...item.user,
-				online: isDMThread
-					? getUserOnlineStatus(item?.user)
-					: item?.id === myUserId
-						? membersMetaEntities[item.id]?.status !== EUserStatus.INVISIBLE
-						: membersMetaEntities[item.id]?.status === EUserStatus.INVISIBLE
-							? false
-							: !!membersMetaEntities[item.id]?.online,
-				is_mobile: isDMThread ? getIsMobileStatus(item?.user) : !!membersMetaEntities[item.id]?.isMobile
-			}
-		})) as UsersClanEntity[];
+		const users = members?.map((item: ChannelMembersEntity | UsersClanEntity) => {
+			const inForStatusUserDM: { online: any; isMobile: any; status?: string } = getInfoUserOnlineStatus(item?.user?.id);
+
+			return {
+				...item,
+				user: {
+					...item.user,
+					online: inForStatusUserDM?.online,
+					is_mobile: inForStatusUserDM?.isMobile,
+					metadata: inForStatusUserDM?.status ? JSON.stringify({ user_status: inForStatusUserDM?.status }) : item.user.metadata
+				}
+			};
+		}) as UsersClanEntity[];
 
 		users?.sort((a, b) => {
 			if (a.user?.online === b.user?.online) {
@@ -116,7 +144,7 @@ export const MemberListStatus = React.memo(() => {
 			online: onlineUsers?.map((item) => item),
 			offline: offlineUsers?.map((item) => item)
 		};
-	}, [isDMThread, membersDM, membersChannel, membersMetaEntities]);
+	}, [currentChannel?.channel_id, isDMThread, myUserId]);
 
 	const userChannels = useAppSelector((state) => selectAllChannelMembers(state, currentChannel?.channel_id));
 	const lisMembers = useMemo(() => {
@@ -199,7 +227,7 @@ export const MemberListStatus = React.memo(() => {
 						{ title: t('common:members'), data: onlineMembers },
 						{ title: t('common:offlines'), data: offlineMembers }
 					]}
-					keyExtractor={(_, index) => `channelMember[${index}]`}
+					keyExtractor={(item, index) => `channelMember[${index}]_${item?.id}`}
 					renderItem={renderMemberItem}
 					renderSectionHeader={({ section: { title } }) => (
 						<Text style={styles.text}>

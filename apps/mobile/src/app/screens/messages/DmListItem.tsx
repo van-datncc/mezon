@@ -1,25 +1,28 @@
-import { PaperclipIcon, STORAGE_MY_USER_ID, convertTimestampToTimeAgo, load } from '@mezon/mobile-components';
+import { ActionEmitEvent, convertTimestampToTimeAgo, load, STORAGE_MY_USER_ID } from '@mezon/mobile-components';
 import { Colors, useTheme } from '@mezon/mobile-ui';
-import { directActions, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
-import { IExtendedMessage, createImgproxyUrl } from '@mezon/utils';
+import { directActions, DirectEntity, selectDirectById, selectIsUnreadDMById, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import { createImgproxyUrl, IExtendedMessage } from '@mezon/utils';
+import { useNavigation } from '@react-navigation/native';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, TouchableOpacity, View } from 'react-native';
-import MezonIconCDN from '../../componentUI/MezonIconCDN';
+import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
 import BuzzBadge from '../../components/BuzzBadge/BuzzBadge';
 import ImageNative from '../../components/ImageNative';
+import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../navigation/ScreenTypes';
+import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DmListItemLastMessage } from './DMListItemLastMessage';
-import { TypingDmItem } from './TypingDMItem';
 import { style } from './styles';
+import { UserStatusDM } from './UserStatusDM';
 
-export const DmListItem = React.memo((props: { id: string; navigation: any; onLongPress }) => {
+export const DmListItem = React.memo((props: { id: string }) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
-	const { id, navigation, onLongPress } = props;
+	const { id } = props;
+	const navigation = useNavigation<any>();
 	const directMessage = useAppSelector((state) => selectDirectById(state, id));
 
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
@@ -89,7 +92,7 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 					>
 						{renderLastMessageContent}
 						{'attachment '}
-						<PaperclipIcon width={13} height={13} color={Colors.textGray} />
+						<MezonIconCDN icon={IconCDN.attachmentIcon} width={13} height={13} color={Colors.textGray} />
 					</Text>
 				</View>
 			);
@@ -127,19 +130,16 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 		return null;
 	}, [directMessage]);
 
+	const handleLongPress = useCallback((directMessage: DirectEntity) => {
+		const data = {
+			heightFitContent: true,
+			children: <MessageMenu messageInfo={directMessage} />
+		};
+		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+	}, []);
+
 	return (
-		<TouchableOpacity
-			style={[
-				styles.messageItem
-				// currentDmGroupId === directMessage?.id && {
-				// 	backgroundColor: isTabletLandscape ? themeValue.secondary : themeValue.primary,
-				// 	borderColor: themeValue.borderHighlight,
-				// 	borderWidth: 1
-				// }
-			]}
-			onPress={redirectToMessageDetail}
-			onLongPress={() => onLongPress(directMessage)}
-		>
+		<TouchableOpacity style={[styles.messageItem]} onPress={redirectToMessageDetail} onLongPress={() => handleLongPress(directMessage)}>
 			{isTypeDMGroup ? (
 				<View style={styles.groupAvatar}>
 					<MezonIconCDN icon={IconCDN.groupIcon} />
@@ -166,7 +166,11 @@ export const DmListItem = React.memo((props: { id: string; navigation: any; onLo
 							</Text>
 						</View>
 					)}
-					<TypingDmItem directMessage={directMessage} />
+					<UserStatusDM
+						isOnline={directMessage?.is_online?.some(Boolean)}
+						metadata={directMessage?.metadata?.[0]}
+						userId={directMessage?.user_id?.[0]}
+					/>
 				</View>
 			)}
 
