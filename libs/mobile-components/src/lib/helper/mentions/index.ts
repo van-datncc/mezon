@@ -125,7 +125,6 @@ export const createFormattedString = (data: IExtendedMessage) => {
 };
 
 export const formatContentEditMessage = (message: IMessageWithUser) => {
-	console.log('log => message', message);
 	const processedContentMentionsDraft = {
 		t: message?.content?.t,
 		hg: message?.content?.hg,
