@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			marginBottom: size.s_10,
 			justifyContent: 'space-between',
 			alignItems: 'flex-start',
-			backgroundColor: colors.secondaryLight,
+			backgroundColor: colors.secondary,
 			padding: Metrics.size.l,
 			borderRadius: size.s_10
 		},

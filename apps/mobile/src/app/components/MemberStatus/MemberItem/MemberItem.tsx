@@ -3,7 +3,7 @@ import { STORAGE_MY_USER_ID, load } from '@mezon/mobile-components';
 import { ChannelMembersEntity, DirectEntity, selectCurrentClan } from '@mezon/store-mobile';
 import { IChannel, UsersClanEntity } from '@mezon/utils';
 import { memo, useMemo } from 'react';
-import { Pressable } from 'react-native-gesture-handler';
+import { Pressable } from 'react-native';
 import { useSelector } from 'react-redux';
 import { MemberProfile } from '../MemberProfile';
 

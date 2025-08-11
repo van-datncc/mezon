@@ -42,9 +42,8 @@ export const AssetsViewer = React.memo(({ channelId }: { channelId: string }) =>
 		if (currentChannel?.type !== ChannelType.CHANNEL_TYPE_DM && currentChannel?.type !== ChannelType.CHANNEL_TYPE_GROUP) {
 			return TabList;
 		}
-		const resultArray = TabList.slice(0, -1);
-		return resultArray;
-	}, []);
+		return TabList.slice(0, -1);
+	}, [TabList, currentChannel?.type]);
 
 	const handelHeaderTabChange = useCallback(
 		(index: number) => {

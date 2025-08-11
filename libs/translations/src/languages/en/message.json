@@ -140,5 +140,10 @@
     "turnOnAnonymous": "Turn on Anonymous",
     "goToTopic": "Go to Topic",
     "creator": "Creator",
-    "viewTopic": "View topic"
+    "viewTopic": "View topic",
+    "mapView": {
+        "yourLocation": "Your location",
+        "sender": "Sender",
+        "locationOf": "{{name}}'s location"
+    }
 }
