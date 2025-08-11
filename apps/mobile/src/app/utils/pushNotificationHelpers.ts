@@ -130,6 +130,7 @@ const openAppSettings = () => {
 };
 
 const getConfigDisplayNotificationAndroid = async (data: Record<string, string | object>): Promise<NotificationAndroid> => {
+	const now = Date.now();
 	const defaultConfig: NotificationAndroid = {
 		visibility: AndroidVisibility.PUBLIC,
 		channelId: (data?.sound as string) || 'default',
@@ -138,6 +139,8 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 		sound: (data?.sound as string) || 'default',
 		smallIconLevel: 10,
 		importance: AndroidImportance.HIGH,
+		timestamp: now,
+		sortKey: new Date().getTime().toString(),
 		showTimestamp: true,
 		badgeIconType: AndroidBadgeIconType.LARGE,
 		pressAction: {
@@ -163,7 +166,6 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 			...defaultConfig,
 			channelId,
 			tag: channelId,
-			sortKey: new Date().getTime().toString(),
 			category: AndroidCategory.MESSAGE,
 			groupId: groupId,
 			groupSummary: false,
