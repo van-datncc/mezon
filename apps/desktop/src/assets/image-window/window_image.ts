@@ -366,6 +366,8 @@ export const scriptThumnails = (listImage, indexSelect) => {
 			const sanitizedRealUrl = sanitizeUrl(image.realUrl || '');
 
 			return `document.getElementById('thumbnail-${index}').addEventListener('click', () => {
+        // Reset transform when changing image
+        resetTransform();
 				const selectedImage = document.getElementById('selectedImage');
 				if (selectedImage) {
 					selectedImage.src = ${JSON.stringify(sanitizedUrl)};
@@ -412,6 +414,13 @@ const scriptRotateAndZoom = () => {
 	return `
  let currentRotation = 0;
  let currentZoom = 1;
+
+ // Reset transform when changing image
+ const resetTransform = () => {
+   currentRotation = 0;
+   currentZoom = 1;
+   selectedImage.style.transform = 'none';
+ };
  document.getElementById('rotateRightBtn').addEventListener('click', () => {
  currentRotation = currentRotation + 90;
  if(currentRotation % 180 === 90){
