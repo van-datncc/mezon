@@ -335,7 +335,7 @@ const mapMessageToConversation = (message: ChannelMessage): DirectEntity => {
 		},
 		last_seen_message: {
 			id: message.id,
-			timestamp_seconds: message.create_time_seconds
+			timestamp_seconds: message.create_time_seconds ? message.create_time_seconds - 1 : undefined
 		},
 		is_online: [true],
 		active: ActiveDm.OPEN_DM,
@@ -359,7 +359,13 @@ export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageW
 				return directEntity;
 			}
 			thunkAPI.dispatch(directActions.upsertOne(directEntity));
-			thunkAPI.dispatch(directMetaActions.upsertOne(directEntity as DMMetaEntity));
+			thunkAPI.dispatch(
+				directMetaActions.upsertOne({
+					...directEntity,
+					lastSeenTimestamp: directEntity.last_seen_message?.timestamp_seconds,
+					last_sent_message: directEntity.last_sent_message?.timestamp_seconds
+				} as DMMetaEntity)
+			);
 			return directEntity;
 		} else {
 			thunkAPI.dispatch(directActions.updateMoreData(directEntity));
