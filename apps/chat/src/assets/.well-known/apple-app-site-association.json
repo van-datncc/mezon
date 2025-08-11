@@ -5,11 +5,9 @@
       {
         "appID": "E9Y2J54ZH3.mezon.mobile",
         "paths": [
+          "/invite/*",
           "/channel-app/*",
-          "/home/*",
-          "/mezon/channel-app*",
-          "/mezon/*",
-          "*"
+          "/home/*"
         ]
       }
     ]
