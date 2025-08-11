@@ -11,7 +11,6 @@ import {
 	selectCurrentTopicId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
-	selectIsTopicReady,
 	selectSession,
 	selectStatusMenu,
 	useAppDispatch,
@@ -22,7 +21,7 @@ import isElectron from 'is-electron';
 import FileSelectionButton from 'libs/components/src/lib/components/MessageBox/FileSelectionButton';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
@@ -74,16 +73,7 @@ const TopicDiscussionBox = () => {
 			const isFileOnly = !content?.t && safeAttachments.length > 0;
 			if (!content?.t && safeAttachments.length === 0) return;
 
-			await sendMessage(
-				content,
-				mentions,
-				safeAttachments,
-				references,
-				false,
-				false,
-				false,
-				0
-			);
+			await sendMessage(content, mentions, safeAttachments, references, false, false, false, 0);
 
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
@@ -94,24 +84,10 @@ const TopicDiscussionBox = () => {
 
 			setIsFetchMessageDone(true);
 		},
-		[
-			sendMessage,
-			sessionUser,
-			dispatch,
-			currentTopicId,
-			currentInputChannelId,
-			currentChannelId,
-			currentClanId
-		]
+		[sendMessage, sessionUser, dispatch, currentTopicId, currentInputChannelId, currentChannelId, currentClanId]
 	);
 
-
-
-
-
-
-	const handleTyping = useCallback(() => {
-	}, []);
+	const handleTyping = useCallback(() => {}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -145,25 +121,18 @@ const TopicDiscussionBox = () => {
 		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
 	);
 
-	const isTopicReady = useSelector(selectIsTopicReady(currentTopicId || ''));
-	const hasFetchedRef = useRef(false);
-
 	useEffect(() => {
-		if (isTopicReady && !hasFetchedRef.current) {
+		if (currentTopicId) {
 			dispatch(
 				fetchMessages({
 					channelId: currentChannelId as string,
 					clanId: currentClanId as string,
-					topicId: currentTopicId || '',
+					topicId: currentTopicId || ''
 				})
 			);
 			setIsFetchMessageDone(true);
-			hasFetchedRef.current = true;
 		}
-		if (!isTopicReady) {
-			hasFetchedRef.current = false;
-		}
-	}, [isTopicReady, currentTopicId, currentChannelId, currentClanId, dispatch]);
+	}, [currentTopicId, currentChannelId, currentClanId, dispatch]);
 
 	return (
 		<>
@@ -182,7 +151,6 @@ const TopicDiscussionBox = () => {
 				</div>
 			)}
 
-
 			<div className="flex flex-col flex-1">
 				<div className="flex-shrink-0  flex flex-col pb-4 px-4 bg-theme-chat h-auto relative">
 					{dataReferences.message_ref_id && (
@@ -191,9 +159,7 @@ const TopicDiscussionBox = () => {
 						</div>
 					)}
 					{checkAttachment && (
-				<div
-							className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}
-				>
+						<div className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}>
 							<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
 								{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 									return (
@@ -222,7 +188,10 @@ const TopicDiscussionBox = () => {
 						/>
 
 						<div className={`w-[calc(100%_-_58px)] bg-theme-surface gap-3 flex items-center rounded-e-md`}>
-							<div className={`w-full border-none rounded-r-lg gap-3 relative whitespace-pre-wrap`} onContextMenu={handleChildContextMenu}>
+							<div
+								className={`w-full border-none rounded-r-lg gap-3 relative whitespace-pre-wrap`}
+								onContextMenu={handleChildContextMenu}
+							>
 								<MentionReactInput
 									onSend={handleSend}
 									onTyping={handleTypingDebounced}
@@ -239,7 +208,6 @@ const TopicDiscussionBox = () => {
 					</div>
 				</div>
 			</div>
-
 		</>
 	);
 };
