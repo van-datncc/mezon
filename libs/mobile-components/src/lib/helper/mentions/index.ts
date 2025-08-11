@@ -101,10 +101,16 @@ export const createFormattedString = (data: IExtendedMessage) => {
 				formatContentDraft += contentInElement;
 				break;
 			case ETokenMessage.MARKDOWNS:
-				if (element?.type === EBacktickType.LINKYOUTUBE || element?.type === EBacktickType.LINK) {
+				if (element?.type === EBacktickType.LINKYOUTUBE || element?.type === EBacktickType.LINK || element?.type === EBacktickType.VOICE_LINK) {
 					formatContentDraft += contentInElement?.replace(/^```|```$/g, '');
-				} else {
+				} else if (element?.type === EBacktickType.PRE || element?.type === EBacktickType.TRIPLE) {
 					formatContentDraft += '```' + contentInElement?.replace(/^```|```$/g, '') + '```';
+				} else if (element?.type === EBacktickType.BOLD) {
+					formatContentDraft += `**${contentInElement}**`;
+				} else if (element?.type === EBacktickType.CODE || element?.type === EBacktickType.SINGLE) {
+					formatContentDraft += '`' + contentInElement?.replace(/^`|`$/g, '') + '`';
+				} else {
+					formatContentDraft += contentInElement;
 				}
 				break;
 			default:
@@ -119,6 +125,7 @@ export const createFormattedString = (data: IExtendedMessage) => {
 };
 
 export const formatContentEditMessage = (message: IMessageWithUser) => {
+	console.log('log => message', message);
 	const processedContentMentionsDraft = {
 		t: message?.content?.t,
 		hg: message?.content?.hg,
