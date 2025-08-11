@@ -363,7 +363,7 @@ export const addDirectByMessageWS = createAsyncThunk('direct/addDirectByMessageW
 				directMetaActions.upsertOne({
 					...directEntity,
 					lastSeenTimestamp: directEntity.last_seen_message?.timestamp_seconds,
-					last_sent_message: directEntity.last_sent_message?.timestamp_seconds
+					lastSentTimestamp: directEntity.last_sent_message?.timestamp_seconds
 				} as DMMetaEntity)
 			);
 			return directEntity;
