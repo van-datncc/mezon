@@ -29,6 +29,12 @@
     content="Join Mezon to play games, chill with friends, and build your community. Create your own customized space to chat, play, and hang out with people from around the world." />
   <meta name="twitter:image" content="https://mezon.ai/assets/preview.png" />
 
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; style-src 'self' 'unsafe-inline' 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; font-src 'self' data: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; object-src 'none'; worker-src 'self' blob: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; manifest-src 'self' 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; img-src 'self' data: blob: https: http: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; connect-src 'self' ws: wss: https: http: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; media-src 'self' blob: https: http: 'self' *.mezon.ai *.nccsoft.vn media.tenor.com *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net googleads.g.doubleclick.net; child-src *; frame-src *">
+
+  <!-- <meta http-equiv="X-Content-Type-Options" content="nosniff"> -->
+  <!-- <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"> -->
+
   <style>
     :root {
       --splash-background: rgba(240, 240, 240, 0.95);
@@ -76,6 +82,9 @@
   </div>
   <div id="root"></div>
   <script>
+
+    console.log('runn');
+
 
     window.requestIdleCallback =
       window.requestIdleCallback ||
