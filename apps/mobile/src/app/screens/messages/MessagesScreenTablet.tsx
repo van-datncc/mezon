@@ -1,8 +1,7 @@
-import { ActionEmitEvent } from '@mezon/mobile-components';
 import { size, useTheme } from '@mezon/mobile-ui';
-import { DirectEntity, RootState, directActions, getStoreAsync, selectDirectsOpenlistOrder, selectDmGroupCurrentId } from '@mezon/store-mobile';
-import React, { useCallback, useEffect } from 'react';
-import { AppState, DeviceEventEmitter, FlatList, Pressable, View } from 'react-native';
+import { RootState, directActions, getStoreAsync, selectDirectsOpenlistOrder, selectDmGroupCurrentId } from '@mezon/store-mobile';
+import React, { useEffect } from 'react';
+import { AppState, FlatList, Pressable, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../constants/icon_cdn';
@@ -12,7 +11,6 @@ import { FriendsTablet } from '../friend/FriendsTablet';
 import ProfileBar from '../home/homedrawer/ProfileBar';
 import ServerList from '../home/homedrawer/ServerList';
 import UserEmptyMessage from '../home/homedrawer/UserEmptyClan/UserEmptyMessage';
-import MessageMenu from '../home/homedrawer/components/MessageMenu';
 import { DirectMessageDetailTablet } from './DirectMessageDetailTablet';
 import { DmListItem } from './DmListItem';
 import MessageHeader from './MessageHeader';
@@ -53,14 +51,6 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 		navigation.navigate(APP_SCREEN.MESSAGES.STACK, { screen: APP_SCREEN.MESSAGES.NEW_MESSAGE });
 	};
 
-	const handleLongPress = useCallback((directMessage: DirectEntity) => {
-		const data = {
-			snapPoints: ['40%', '70%'],
-			children: <MessageMenu messageInfo={directMessage} />
-		};
-		DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-	}, []);
-
 	return (
 		<View style={styles.containerMessages}>
 			<View style={styles.leftContainer}>
@@ -85,7 +75,7 @@ const MessagesScreenTablet = ({ navigation }: { navigation: any }) => {
 								initialNumToRender={1}
 								maxToRenderPerBatch={1}
 								windowSize={2}
-								renderItem={({ item }) => <DmListItem id={item} navigation={navigation} key={item} onLongPress={handleLongPress} />}
+								renderItem={({ item }) => <DmListItem id={item} />}
 							/>
 						)}
 
