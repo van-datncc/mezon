@@ -20,7 +20,7 @@ export const style = (colors: Attributes) =>
 		},
 
 		iconWrapper: {
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondary,
 			padding: 15,
 			borderRadius: 50
 		},

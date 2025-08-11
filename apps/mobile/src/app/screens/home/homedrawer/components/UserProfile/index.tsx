@@ -79,7 +79,7 @@ const UserProfile = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const listDM = useSelector(selectDirectsOpenlist);
 		const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
-		const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
+		const { acceptFriend, deleteFriend, addFriend } = useFriends();
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 		const dispatch = useAppDispatch();

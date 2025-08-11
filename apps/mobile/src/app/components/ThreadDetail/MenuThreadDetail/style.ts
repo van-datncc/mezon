@@ -7,6 +7,6 @@ export const style = (colors: Attributes) =>
 			flex: 1,
 			display: 'flex',
 			flexDirection: 'column',
-			backgroundColor: colors.secondary
+			backgroundColor: colors.primary
 		}
 	});
