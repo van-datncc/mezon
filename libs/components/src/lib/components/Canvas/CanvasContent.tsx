@@ -153,12 +153,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 						formats?.header === 1 ||
 						formats?.header === 2 ||
 						formats?.header === 3 ||
-						formats?.list === 'check' ||
+						formats?.list === 'checked' ||
+						formats?.list === 'unchecked' ||
 						formats?.list === 'ordered' ||
-						formats?.list === 'ordered' ||
+						formats?.list === 'bullet' ||
 						!!formats?.blockquote
 					),
-					check: formats?.list === 'check',
+					check: formats?.list === 'checked' || formats?.list === 'unchecked',
 					ordered: formats?.list === 'ordered',
 					bullet: formats?.list === 'bullet',
 					blockquote: !!formats?.blockquote,
@@ -198,9 +199,12 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				setActiveOption(
-					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph')
-				);
+				let nextActiveOption =
+					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph');
+				if (nextActiveOption === 'checked' || nextActiveOption === 'unchecked') {
+					nextActiveOption = 'check';
+				}
+				setActiveOption(nextActiveOption as string);
 				setActiveFormats({
 					bold: !!formats.bold,
 					italic: !!formats.italic,
@@ -215,12 +219,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 						formats?.header === 1 ||
 						formats?.header === 2 ||
 						formats?.header === 3 ||
-						formats?.list === 'check' ||
+						formats?.list === 'checked' ||
+						formats?.list === 'unchecked' ||
 						formats?.list === 'ordered' ||
 						formats?.list === 'bullet' ||
 						!!formats?.blockquote
 					),
-					check: formats?.list === 'check',
+					check: formats?.list === 'checked' || formats?.list === 'unchecked',
 					ordered: formats?.list === 'ordered',
 					bullet: formats?.list === 'bullet',
 					blockquote: !!formats?.blockquote,
@@ -345,7 +350,8 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			} else if (value === 'paragraph') {
 				quill.format('header', true);
 			} else if (value === 'check') {
-				quill.format('list', 'check');
+				// Default new checklist items to unchecked
+				quill.format('list', 'unchecked');
 			} else if (value === 'ordered') {
 				quill.format('list', 'ordered');
 			} else if (value === 'bullet') {
