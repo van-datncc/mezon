@@ -167,6 +167,7 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 			channelId,
 			tag: channelId,
 			category: AndroidCategory.MESSAGE,
+			sortKey: new Date().getTime().toString(),
 			groupId: groupId,
 			groupSummary: false,
 			groupAlertBehavior: AndroidGroupAlertBehavior.ALL
