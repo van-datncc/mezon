@@ -3,5 +3,6 @@
   "offline": "ngoại tuyến",
   "online": "trực tuyến",
   "join": "Tham gia",
-  "inviteTo": "MỜI THAM GIA {{clanName}}"
+  "inviteTo": "MỜI THAM GIA {{clanName}}",
+  "noThanks": "Không cảm ơn"
 }

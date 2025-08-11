@@ -1,13 +1,7 @@
 import React, { memo } from 'react';
 
 import { registerGlobals } from '@livekit/react-native';
-import {
-	CardStyleInterpolators,
-	createStackNavigator,
-	StackCardInterpolatedStyle,
-	StackCardInterpolationProps,
-	StackCardStyleInterpolator
-} from '@react-navigation/stack';
+import { createStackNavigator, StackCardInterpolatedStyle, StackCardInterpolationProps, StackCardStyleInterpolator } from '@react-navigation/stack';
 import { Dimensions, Platform, View } from 'react-native';
 import CallingModalGroupWrapper from '../../components/CallingModalGroupWrapper';
 import CallingModalWrapper from '../../components/CallingModalWrapper';
@@ -16,6 +10,7 @@ import ChannelRouterListener from '../../screens/home/homedrawer/components/Chan
 import { RenderVideoDetail } from '../../screens/home/homedrawer/components/RenderVideoDetail';
 import HomeDefaultWrapper from '../../screens/home/homedrawer/HomeDefaultWrapper';
 import HomeScreenTablet from '../../screens/home/HomeScreenTablet';
+import InviteClanScreen from '../../screens/inviteClan/InviteClanScreen';
 import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageDetail';
 import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
@@ -168,6 +163,7 @@ export const RootAuthStack = memo(
 					<RootStack.Screen name={APP_SCREEN.CHANNEL_APP} component={ChannelAppScreen} />
 					<RootStack.Screen name={APP_SCREEN.WALLET} component={WalletScreen} />
 					<RootStack.Screen name={APP_SCREEN.SHOP.STACK} children={(props) => <ShopStack {...props} />} />
+					<RootStack.Screen name={APP_SCREEN.INVITE_CLAN} component={InviteClanScreen} />
 				</RootStack.Navigator>
 				<FCMNotificationLoader notifyInit={notifyInit} />
 				<AuthenticationLoader />

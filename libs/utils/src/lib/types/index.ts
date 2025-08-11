@@ -438,6 +438,7 @@ export type IUser = {
 
 export type MetaDateStatusUser = {
 	status: string;
+	user_status?: string;
 };
 
 export type IVoice = {

@@ -33,7 +33,7 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 				id={user?.user?.id || ''}
 				user={user}
 				avatar={user.user?.avatar_url || ''}
-				username={user.user?.display_name || user.user?.avatar_url || ''}
+				username={user.user?.display_name || user.user?.username || ''}
 				userMeta={{
 					online: !!userMetaById?.user?.online || !!isMe,
 					status: userMetaById?.user?.metadata?.status

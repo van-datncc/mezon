@@ -2,6 +2,8 @@ import isElectron from 'is-electron';
 import { Suspense, lazy, memo, useCallback, useEffect, useMemo } from 'react';
 import { LoaderFunctionArgs, Outlet, RouterProvider, createBrowserRouter, createHashRouter, useNavigation } from 'react-router-dom';
 
+import appleAppSiteAssociation from '../../assets/.well-known/apple-app-site-association.json';
+import assetLinks from '../../assets/.well-known/assetlinks.json';
 import { CustomLoaderFunction, appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
 import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
@@ -492,6 +494,28 @@ export const Routes = memo(() => {
 								)
 							}
 						]
+					},
+					{
+						path: '.well-known/apple-app-site-association',
+						loader: () => {
+							return new Response(JSON.stringify(appleAppSiteAssociation), {
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							});
+						},
+						element: null
+					},
+					{
+						path: '.well-known/assetlinks.json',
+						loader: () => {
+							return new Response(JSON.stringify(assetLinks), {
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							});
+						},
+						element: null
 					},
 					{
 						path: '*',
