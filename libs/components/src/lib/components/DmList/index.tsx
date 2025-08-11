@@ -1,5 +1,5 @@
 import { useFriends } from '@mezon/core';
-import { appActions, selectDirectsOpenlistOrder, selectTheme, useAppDispatch } from '@mezon/store';
+import { appActions, selectDirectsOpenlistOrder, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { memo, useEffect, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -42,7 +42,6 @@ function DirectMessageList() {
 const CreateMessageGroupModal = memo(
 	() => {
 		const buttonPlusRef = useRef<HTMLDivElement | null>(null);
-		const appearanceTheme = useSelector(selectTheme);
 
 		const [openCreateMessageGroup, closeCreateMessageGroup] = useModal(
 			() => (

@@ -16,6 +16,7 @@ import { Menu, Submenu, useContextMenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import ItemPanelMember from '../../components/PanelMember/ItemPanelMember';
 import { MemberMenuItem } from '../MemberContextMenu';
+import { useModals } from '../MemberContextMenu/useModals';
 import {
 	DIRECT_MESSAGE_CONTEXT_MENU_ID,
 	DMCT_GROUP_CHAT_ID,
@@ -56,7 +57,9 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 	const [warningStatus, setWarningStatus] = useState<string>('var(--bg-item-hover)');
 
 	const { openUserProfile } = useProfileModal({ currentUser });
-
+	const { openProfileItem } = useModals({
+		currentUser
+	});
 	const showMenu = useCallback(
 		(event: React.MouseEvent) => {
 			show({ event });
@@ -107,7 +110,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		unBlockFriend
 	});
 
-	const { showContextMenu, openProfileItem } = useContextMenuHandlers({
+	const { showContextMenu } = useContextMenuHandlers({
 		setCurrentUser,
 		setCurrentHandlers,
 		showMenu,
@@ -188,25 +191,6 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								setWarningStatus={setWarningStatus}
 							/>
 						)}
-
-						{/* {channelId && (
-							<MemberMenuItem
-								label={getChannelE2ee ? 'Disable E2EE' : 'Enable E2EE'}
-								onClick={currentHandlers.handleEnableE2EE}
-								rightElement={
-									getChannelE2ee ? (
-										<span className="ml-2 text-xs" role="img" aria-label="Secure, encrypted">
-											🔒
-										</span>
-									) : (
-										<span className="ml-2 text-xs" role="img" aria-label="Not encrypted">
-											🔓
-										</span>
-									)
-								}
-								setWarningStatus={setWarningStatus}
-							/>
-						)} */}
 
 						{contextMenuId !== DMCT_GROUP_CHAT_ID &&
 							channelId &&

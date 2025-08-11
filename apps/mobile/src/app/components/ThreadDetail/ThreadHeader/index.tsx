@@ -1,6 +1,7 @@
-import { ActionEmitEvent, Icons, OverflowMenuHorizontalIcon } from '@mezon/mobile-components';
-import { baseColor, size, useTheme } from '@mezon/mobile-ui';
-import { selectDmGroupCurrent } from '@mezon/store-mobile';
+import { useMemberStatus } from '@mezon/core';
+import { ActionEmitEvent } from '@mezon/mobile-components';
+import { baseColor, useTheme } from '@mezon/mobile-ui';
+import { selectDmGroupCurrent, selectMemberClanByUserId2 } from '@mezon/store-mobile';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
 import { ChannelType } from 'mezon-js';
@@ -61,7 +62,7 @@ export const ThreadHeader = memo(() => {
 		const isPrivateChannel = currentChannel?.channel_private === ChannelStatusEnum.isPrivate;
 		const isTextOrThreadChannel = [ChannelType.CHANNEL_TYPE_CHANNEL, ChannelType.CHANNEL_TYPE_THREAD].includes(currentChannel?.type);
 		if (currentChannel?.type === ChannelType.CHANNEL_TYPE_CHANNEL && isAgeRestrictedChannel) {
-			return <Icons.HashtagWarning width={20} height={20} color={themeValue.text} />;
+			return <MezonIconCDN icon={IconCDN.channelTextWarning} width={20} height={20} color={themeValue.text} />;
 		}
 		if (isPrivateChannel && isTextOrThreadChannel) {
 			return isChannel ? (
@@ -125,7 +126,7 @@ export const ThreadHeader = memo(() => {
 			)}
 			{isDMThread && (
 				<TouchableOpacity onPress={openMenu} style={styles.iconMenuHeader}>
-					<OverflowMenuHorizontalIcon color={themeValue.white} />
+					<MezonIconCDN icon={IconCDN.moreHorizontalIcon} color={themeValue.white} />
 				</TouchableOpacity>
 			)}
 		</View>

@@ -231,7 +231,6 @@ export const MemberContextMenuProvider: FC<MemberContextMenuProps> = ({ children
 		'--contexify-menu-minWidth': '188px',
 		'--contexify-separator-color': '#ADB3B9'
 	} as CSSProperties;
-
 	return (
 		<MemberContextMenuContext.Provider value={contextValue}>
 			{children}

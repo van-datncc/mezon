@@ -3,7 +3,7 @@ import { IMessageWithUser, TOPBARS_MAX_WIDTH } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import { useSelector } from 'react-redux';
-import { SimpleMemberProfile } from '../../../MemberProfile';
+import BaseProfile from '../../../MemberProfile/BaseProfile';
 import MessageAttachment from '../../../MessageWithUser/MessageAttachment';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 
@@ -31,14 +31,7 @@ export const ModalDeletePinMess = (props: ModalDeletePinMessProps) => {
 				<div className="px-4 pb-2 max-h-[60vh] overflow-y-auto hide-scrollbar w-full">
 					<div className="flex items-start gap-2 p-2 shadow-md rounded bg-theme-setting-secondary">
 						<div className="flex-shrink-0">
-							<SimpleMemberProfile
-								isHideUserName={true}
-								avatar={pinMessage.avatar || ''}
-								name={pinMessage.username ?? ''}
-								isHideStatus={true}
-								isHideIconStatus={true}
-								textColor="#fff"
-							/>
+							<BaseProfile avatar={pinMessage.avatar || ''} hideIcon={true} />
 						</div>
 						<div className="flex text-sm flex-col gap-1 text-left flex-1 min-w-0 pointer-events-none [&_.attachment-actions]:!hidden [&_button]:!hidden">
 							<div className="font-medium">
