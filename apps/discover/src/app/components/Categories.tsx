@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { CATEGORIES, COLORS } from '../constants/constants';
+import { COLORS } from '../constants/constants';
+import { useDiscover } from '../context/DiscoverContext';
 
 interface CategoriesProps {
 	selectedCategory: string;
@@ -8,8 +9,11 @@ interface CategoriesProps {
 
 const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySelect }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const { categories, categoriesLoading } = useDiscover();
 
-	const selectedCategoryData = CATEGORIES.find((cat) => cat.id === selectedCategory) || CATEGORIES[0];
+
+	const selectedCategoryData = categories.find((cat) => cat.id === selectedCategory) ||
+		categories[0];
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -22,7 +26,6 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [isOpen]);
 
-	// Lock scroll when dropdown is open
 	useEffect(() => {
 		if (isOpen) {
 			document.body.classList.add('overflow-hidden');
@@ -31,6 +34,11 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 		}
 		return () => document.body.classList.remove('overflow-hidden');
 	}, [isOpen]);
+
+
+	if (categoriesLoading || categories.length === 0) {
+		return null;
+	}
 
 	return (
 		<>
@@ -67,7 +75,7 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 									</button>
 								</div>
 								<div className="space-y-2">
-									{CATEGORIES.map((category) => (
+									{categories.map((category) => (
 										<button
 											key={category.id}
 											onClick={() => {
@@ -107,7 +115,7 @@ const Categories: React.FC<CategoriesProps> = ({ selectedCategory, onCategorySel
 			<div className="hidden lg:block w-full lg:w-64 bg-white rounded-lg shadow-sm p-4 sticky top-4">
 				<h3 className="text-lg font-semibold text-gray-800 mb-4">Categories</h3>
 				<div className="space-y-2">
-					{CATEGORIES.map((category) => (
+					{categories.map((category) => (
 						<button
 							key={category.id}
 							onClick={() => onCategorySelect(category.id)}
