@@ -47,6 +47,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 					persistApp.theme = JSON.stringify("${themeBasic}");
 					persistApp.themeApp = JSON.stringify("${themeBasic}");
 					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+					localStorage.setItem('current-theme', "${themeBasic}");
 				}
 			}
 		} catch (error) {
@@ -57,6 +58,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 				themeApp: JSON.stringify("${themeBasic}")
 			};
 			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+			localStorage.setItem('current-theme', "${themeBasic}");
 		}
 	})();
 	true;
@@ -76,8 +78,35 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 	true;
   `;
 
+	const injectedJS2 = `
+	(function() {
+		try {
+			const defaultAppData = {
+				theme: JSON.stringify("dark"),
+				themeApp: JSON.stringify("dark"),
+				"_persist": JSON.stringify({"version":-1,"rehydrated":true}),
+				"loadingStatus":JSON.stringify("loaded"),
+				"session": JSON.stringify(${session}),
+			};
+			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+			const localStorageData = localStorage.getItem('persist:apps');
+			// window.ReactNativeWebView.postMessage(localStorageData);
+		} catch (error) {
+			window.ReactNativeWebView.postMessage('error parsing persist:apps data');
+			console.error('Error parsing persist:apps data:', error);
+			// Create default app data if parsing fails
+			const defaultAppData = {
+				theme: JSON.stringify("dark"),
+				themeApp: JSON.stringify("dark")
+			};
+			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+		}
+	});
+	true;
+	`;
+
 	const onMessage = (event: any) => {
-		console.error('Received message from WebView:', event?.nativeEvent?.data);
+		console.log('Received message from WebView:', event?.nativeEvent?.data, typeof event?.nativeEvent?.data);
 	};
 
 	return (
@@ -106,7 +135,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 				originWhitelist={['*']}
 				style={styles.container}
 				injectedJavaScriptBeforeContentLoaded={injectedJS}
-				injectedJavaScript={injectedJS}
+				injectedJavaScript={injectedJS2}
 				javaScriptEnabled={true}
 				onMessage={onMessage}
 				nestedScrollEnabled={true}
