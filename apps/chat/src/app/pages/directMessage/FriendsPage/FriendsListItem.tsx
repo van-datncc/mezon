@@ -1,10 +1,11 @@
 import { BaseProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
-import { FriendsEntity } from '@mezon/store';
+import { FriendsEntity, selectCurrentTabStatus } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EUserStatus, MetaDateStatusUser } from '@mezon/utils';
+import { ETabUserStatus, EUserStatus, MetaDateStatusUser } from '@mezon/utils';
 import { useCallback, useEffect, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 type FriendProps = {
@@ -94,6 +95,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
 	const { acceptFriend, deleteFriend, blockFriend, unBlockFriend } = useFriends();
+	const currentTabStatus = useSelector(selectCurrentTabStatus);
 
 	const coords = useRef<Coords>({
 		mouseX: 0,
@@ -102,6 +104,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	});
 
 	const directMessageWithUser = useCallback(async () => {
+		if (currentTabStatus === ETabUserStatus.PENDING) return;
 		const userID = friend?.user?.id ?? '';
 		const name = friend?.user?.display_name || friend.user?.username;
 		const avatar = friend.user?.avatar_url;
