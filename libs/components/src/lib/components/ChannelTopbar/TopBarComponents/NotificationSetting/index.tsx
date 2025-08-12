@@ -10,10 +10,10 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Menu } from '@mezon/ui';
 import { ENotificationTypes, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { format } from 'date-fns';
-import { Dropdown } from 'flowbite-react';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { ReactElement, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { notificationTypesList } from '../../../PanelChannel';
 import ItemPanel from '../../../PanelChannel/ItemPanel';
@@ -107,8 +107,57 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useOnClickOutside(
+		modalRef,
+		() => {
+			if (!checkMenuOpen.current) {
+				onClose();
+			}
+		},
+		rootRef
+	);
+	const checkMenuOpen = useRef<boolean>(false);
 
+	const menu = useMemo(() => {
+		const listItem: { key: number; label: string }[] = [
+			{ key: FOR_15_MINUTES, label: 'For 15 Minutes' },
+			{ key: FOR_1_HOUR, label: 'For 1 Hour' },
+			{
+				key: FOR_3_HOURS,
+				label: 'For 3 Hours'
+			},
+			{
+				key: FOR_8_HOURS,
+				label: 'For 8 Hours'
+			},
+			{
+				key: FOR_24_HOURS,
+				label: 'For 24 Hours'
+			},
+			{
+				key: Infinity,
+				label: 'Until I turn it back on'
+			}
+		];
+		const menuItems: ReactElement[] = [];
+		listItem.map((item) =>
+			menuItems.push(
+				<Menu.Item
+					key={item.key}
+					children={item.label}
+					onClick={() => {
+						checkMenuOpen.current = false;
+						handleScheduleMute(item.key);
+					}}
+					className="cursor-pointer bg-item-hover"
+				/>
+			)
+		);
+		return <>{menuItems}</>;
+	}, []);
+	const onVisibleChange = useCallback((visible: boolean) => {
+		checkMenuOpen.current = visible;
+	}, []);
 	return (
 		<div
 			ref={modalRef}
@@ -118,30 +167,21 @@ const NotificationSetting = ({ onClose, rootRef }: { onClose: () => void; rootRe
 			<div className="flex flex-col rounded-[4px] w-[202px] shadow-sm overflow-hidden py-[6px] px-[8px]">
 				<div className="flex flex-col pb-1 mb-1 border-b-theme-primary last:border-b-0 last:mb-0 last:pb-0 ">
 					{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
-						<Dropdown
+						<Menu
 							trigger="hover"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div>
-									<ItemPanel
-										children={nameChildren}
-										subText={mutedUntil}
-										dropdown="change here"
-										onClick={() => muteOrUnMuteChannel(0)}
-									/>
-								</div>
-							)}
-							label=""
-							placement="right-start"
+							menu={menu}
+							onVisibleChange={onVisibleChange}
 							className="bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] "
 						>
-							<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
-							<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
-							<ItemPanel children="For 3 Hours" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
-							<ItemPanel children="For 8 Hours" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
-							<ItemPanel children="For 24 Hours" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
-							<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
-						</Dropdown>
+							<div>
+								<ItemPanel
+									children={nameChildren}
+									subText={mutedUntil}
+									dropdown="change here"
+									onClick={() => muteOrUnMuteChannel(0)}
+								/>
+							</div>
+						</Menu>
 					) : (
 						<ItemPanel children={nameChildren} subText={mutedUntil} onClick={() => muteOrUnMuteChannel(1)} />
 					)}

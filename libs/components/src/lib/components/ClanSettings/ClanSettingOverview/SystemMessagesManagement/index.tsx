@@ -1,10 +1,9 @@
 import { selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 import { ChannelStatusEnum } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js/api.gen';
-import React, { useMemo } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 
 type SystemMessagesManagementProps = {
 	updateSystem: ApiSystemMessage | null;
@@ -44,51 +43,51 @@ const SystemMessagesManagement = ({ updateSystem, setUpdateSystemMessageRequest,
 				break;
 		}
 	};
+	const menu = useMemo(() => {
+		const menuItems: ReactElement[] = [];
+		channelsList
+			.filter(
+				(channel) =>
+					channel.clan_id === currentClanId &&
+					channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
+					channel.channel_private !== ChannelStatusEnum.isPrivate
+			)
+			.map((channel) => {
+				if (channel.id !== selectedChannel?.id) {
+					menuItems.push(
+						<Menu.Item
+							key={channel.id}
+							className="flex flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer"
+							onClick={() => handleToggleSetting(true, ETypeUpdateSystemMessage.CHANNEL, channel.id)}
+						>
+							{channel?.channel_private ? (
+								<Icons.HashtagLocked defaultSize="w-4 h-4 dark:text-channelTextLabel" />
+							) : (
+								<Icons.Hashtag defaultSize="w-4 h-4 dark:text-channelTextLabel" />
+							)}
+							<p>{channel.channel_label ?? ''}</p>
+							<p className="uppercase ml-5 font-semibold">{channel.category_name}</p>
+						</Menu.Item>
+					);
+				}
+			});
+		return <>{menuItems}</>;
+	}, [channelsList, selectedChannel?.id]);
 	return (
 		<div className={'border-t-theme-primary mt-10 pt-10 flex flex-col '}>
 			<h3 className="text-sm font-bold uppercase mb-2">System Messages Channel</h3>
-			<Dropdown
-				placement={'bottom-start'}
-				label={''}
-				renderTrigger={() => (
-					<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm border border-theme-primary bg-theme-input ">
-						<div className={' flex flex-row items-center'}>
-							<Icons.Hashtag defaultSize="w-4 h-4 " />
-							<p>{selectedChannel?.channel_label}</p>
-							<p className={'uppercase ml-5 font-semibold'}>{selectedChannel?.category_name}</p>
-						</div>
-						<div>
-							<Icons.ArrowDownFill />
-						</div>
+			<Menu menu={menu} className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode bg-theme-input px-2 z-20'}>
+				<div className="w-full h-10 rounded-md flex flex-row p-3 justify-between items-center uppercase text-sm border border-theme-primary bg-theme-input ">
+					<div className={' flex flex-row items-center'}>
+						<Icons.Hashtag defaultSize="w-4 h-4 " />
+						<p>{selectedChannel?.channel_label}</p>
+						<p className={'uppercase ml-5 font-semibold'}>{selectedChannel?.category_name}</p>
 					</div>
-				)}
-				className={'h-fit max-h-[200px] text-xs overflow-y-scroll customSmallScrollLightMode bg-theme-input px-2 z-20'}
-			>
-				{channelsList
-					.filter(
-						(channel) =>
-							channel.clan_id === currentClanId &&
-							channel.type === ChannelType.CHANNEL_TYPE_CHANNEL &&
-							channel.channel_private !== ChannelStatusEnum.isPrivate
-					)
-					.map((channel) =>
-						channel.channel_id !== selectedChannel?.channel_id ? (
-							<Dropdown.Item
-								key={channel.id}
-								className="flex flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer"
-								onClick={() => handleToggleSetting(true, ETypeUpdateSystemMessage.CHANNEL, channel.id)}
-							>
-								{channel?.channel_private ? (
-									<Icons.HashtagLocked defaultSize="w-4 h-4 dark:text-channelTextLabel" />
-								) : (
-									<Icons.Hashtag defaultSize="w-4 h-4 dark:text-channelTextLabel" />
-								)}
-								<p>{channel.channel_label ?? ''}</p>
-								<p className="uppercase ml-5 font-semibold">{channel.category_name}</p>
-							</Dropdown.Item>
-						) : null
-					)}
-			</Dropdown>
+					<div>
+						<Icons.ArrowDownFill />
+					</div>
+				</div>
+			</Menu>
 			<p className={'text-sm py-2'}>This is the channel we send system event messages to. These can be turned off at any time</p>
 			<ToggleItem
 				label={'Send a random welcome message when someone joins this server.'}
