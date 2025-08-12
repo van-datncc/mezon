@@ -2,8 +2,6 @@ import isElectron from 'is-electron';
 import { Suspense, lazy, memo, useCallback, useEffect, useMemo } from 'react';
 import { LoaderFunctionArgs, Outlet, RouterProvider, createBrowserRouter, createHashRouter, useNavigation } from 'react-router-dom';
 
-import appleAppSiteAssociation from '../../assets/.well-known/apple-app-site-association.json';
-import assetLinks from '../../assets/.well-known/assetlinks.json';
 import { CustomLoaderFunction, appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
 import { channelLoader, shouldRevalidateChannel } from '../loaders/channelLoader';
@@ -169,22 +167,22 @@ export const Routes = memo(() => {
 					// },
 					isElectron()
 						? {
-								path: '/',
-								element: (
-									<Suspense fallback={<SuspenseFallback />}>
-										<InitialRoutes />
-									</Suspense>
-								)
-							}
+							path: '/',
+							element: (
+								<Suspense fallback={<SuspenseFallback />}>
+									<InitialRoutes />
+								</Suspense>
+							)
+						}
 						: {
-								path: '/',
-								loader: loaderWithStore(loginLoader),
-								element: (
-									<Suspense fallback={<SuspenseFallback />}>
-										<MezonPage />
-									</Suspense>
-								)
-							},
+							path: '/',
+							loader: loaderWithStore(loginLoader),
+							element: (
+								<Suspense fallback={<SuspenseFallback />}>
+									<MezonPage />
+								</Suspense>
+							)
+						},
 					{
 						path: '/apps',
 						element: (
@@ -203,22 +201,22 @@ export const Routes = memo(() => {
 						children: [
 							isElectron()
 								? {
-										path: 'login',
-										loader: loaderWithStore(loginLoader),
-										element: (
-											<Suspense fallback={<SuspenseFallback />}>
-												<Login />
-											</Suspense>
-										)
-									}
+									path: 'login',
+									loader: loaderWithStore(loginLoader),
+									element: (
+										<Suspense fallback={<SuspenseFallback />}>
+											<Login />
+										</Suspense>
+									)
+								}
 								: {
-										path: 'mezon',
-										element: (
-											<Suspense fallback={<SuspenseFallback />}>
-												<InitialRoutes />
-											</Suspense>
-										)
-									}
+									path: 'mezon',
+									element: (
+										<Suspense fallback={<SuspenseFallback />}>
+											<InitialRoutes />
+										</Suspense>
+									)
+								}
 						]
 					},
 					{
@@ -494,28 +492,6 @@ export const Routes = memo(() => {
 								)
 							}
 						]
-					},
-					{
-						path: '.well-known/apple-app-site-association',
-						loader: () => {
-							return new Response(JSON.stringify(appleAppSiteAssociation), {
-								headers: {
-									'Content-Type': 'application/json'
-								}
-							});
-						},
-						element: null
-					},
-					{
-						path: '.well-known/assetlinks.json',
-						loader: () => {
-							return new Response(JSON.stringify(assetLinks), {
-								headers: {
-									'Content-Type': 'application/json'
-								}
-							});
-						},
-						element: null
 					},
 					{
 						path: '*',

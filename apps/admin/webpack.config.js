@@ -60,38 +60,11 @@ module.exports = composePlugins(
     config.resolve = config.resolve || {};
     config.resolve.fallback = { "fs": false };
 
-    config.plugins.push(
-      new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: path.resolve(__dirname, 'src/assets/.well-known'),
-            noErrorOnMissing: true,
-            to({ context, absoluteFilename }) {
-              const filename = path.basename(absoluteFilename);
-              if (filename === 'apple-app-site-association.json') {
-                return path.posix.join('.well-known', 'apple-app-site-association');
-              }
-              return path.posix.join('.well-known', filename);
-            },
-          },
-        ],
-      })
-    );
-
     config.devServer = config.devServer || {};
 
     config.devServer.static = {
       directory: path.join(__dirname, 'src/assets'),
       publicPath: '/',
-    };
-
-    config.devServer.historyApiFallback = {
-      rewrites: [
-        {
-          from: /^\/\.well-known\/apple-app-site-association$/,
-          to: '/.well-known/apple-app-site-association.json',
-        },
-      ],
     };
 
     return merge(config, {
