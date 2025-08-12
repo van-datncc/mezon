@@ -95,9 +95,7 @@ const TopicDiscussionBox = () => {
 		[sendMessage, sessionUser, dispatch, currentInputChannelId]
 	);
 
-	const handleTyping = useCallback(() => {
-		// ignore
-	}, []);
+	const handleTyping = useCallback(() => {}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -256,15 +254,15 @@ const TopicDiscussionBox = () => {
 			)}
 
 			<div className="flex flex-col flex-1">
-				<div className="flex-shrink-0  flex flex-col pb-4 px-4 bg-theme-chat h-auto relative">
+				<div className={`flex-shrink-0  flex flex-col pb-4 px-4 bg-theme-chat h-auto relative ${isElectron() ? 'pb-9' : ' pb-4'}`}>
 					{dataReferences.message_ref_id && (
-						<div className="mb-1 px-[1px] w-full ">
+						<div className="w-full ">
 							<ReplyMessageBox channelId={currentTopicId ?? ''} dataReferences={dataReferences} />
 						</div>
 					)}
 					{checkAttachment && (
 						<div className={`${checkAttachment ? 'px-3  pb-1 pt-5  border-b-[1px] border-color-primary' : ''} bg-item-theme max-h-full`}>
-							<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll `}>
+							<div className={`max-h-full flex gap-6 !overflow-y-hidden !overflow-x-auto thread-scroll `}>
 								{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 									return (
 										<Fragment key={index}>
