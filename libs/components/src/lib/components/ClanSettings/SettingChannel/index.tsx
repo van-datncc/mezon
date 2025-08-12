@@ -8,13 +8,13 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 import { createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { formatDistance } from 'date-fns';
-import { Dropdown, Pagination } from 'flowbite-react';
+import { Pagination } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
-import { useMemo, useRef, useState } from 'react';
+import { ReactElement, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { AnchorScroll } from '../../AnchorScroll/AnchorScroll';
@@ -65,6 +65,20 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 		}
 	};
 
+	const menu = useMemo(() => {
+		const itemMenu: ReactElement[] = [
+			<Menu.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(10)}>
+				10
+			</Menu.Item>,
+			<Menu.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(20)}>
+				20
+			</Menu.Item>,
+			<Menu.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(30)}>
+				30
+			</Menu.Item>
+		];
+		return <>{itemMenu}</>;
+	}, []);
 	return (
 		<div className="h-full w-full flex flex-col gap-1 flex-1">
 			<div className="w-full flex pl-12 pr-12 justify-between items-center h-[48px] shadow text-xs font-bold uppercase border-b-theme-primary text-theme-primary">
@@ -88,26 +102,12 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 				<div className="flex flex-row justify-between items-center px-4 h-[54px] border-t-theme-primary mt-0 text-theme-primary">
 					<div className={'flex flex-row items-center '}>
 						Show
-						<Dropdown
-							value={pageSize}
-							renderTrigger={() => (
-								<div className={'flex flex-row items-center justify-center text-center border-theme-primary rounded mx-1 px-3 w-12'}>
-									<span className="mr-1">{pageSize}</span>
-									<Icons.ArrowDown />
-								</div>
-							)}
-							label={''}
-						>
-							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(10)}>
-								10
-							</Dropdown.Item>
-							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(20)}>
-								20
-							</Dropdown.Item>
-							<Dropdown.Item className={'bg-item-hover'} onClick={() => handleChangePageSize(30)}>
-								30
-							</Dropdown.Item>
-						</Dropdown>
+						<Menu menu={menu}>
+							<div className={'flex flex-row items-center justify-center text-center border-theme-primary rounded mx-1 px-3 w-12'}>
+								<span className="mr-1">{pageSize}</span>
+								<Icons.ArrowDown />
+							</div>
+						</Menu>
 						channel of {countChannel}
 					</div>
 					<Pagination currentPage={currentPage} totalPages={Math.ceil((countChannel || 0) / pageSize)} onPageChange={onPageChange} />

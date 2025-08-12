@@ -1,3 +1,4 @@
+import { AlignType } from '@rc-component/trigger';
 import RcDropdown from 'rc-dropdown';
 import 'rc-dropdown/assets/index.css';
 import { createContext, JSXElementConstructor, ReactElement, ReactNode, useContext } from 'react';
@@ -25,6 +26,8 @@ interface MenuProps {
 	menu?: ReactElement<any, string | JSXElementConstructor<any>> | (() => React.ReactElement);
 	trigger?: 'click' | 'hover';
 	onVisibleChange?: (visible: boolean) => void;
+	visible?: boolean;
+	align?: AlignType;
 }
 
 type DropdownMenuContextValue = {
@@ -45,16 +48,18 @@ export function useDropdownMenuContext(): DropdownMenuContextValue {
 	return context;
 }
 
-const Dropdown = ({ children, className, placement, holdOnClick = false, menu, trigger = 'click', onVisibleChange }: MenuProps) => {
+const Dropdown = ({ children, className, placement, holdOnClick = false, menu, trigger = 'click', onVisibleChange, visible, align }: MenuProps) => {
 	return (
 		<RcDropdown
 			trigger={trigger}
 			overlay={menu}
-			placement={placement}
+			placement={'bottomRight'}
 			overlayClassName={`text-theme-message bg-input-secondary rounded-lg ${className}`}
 			minOverlayWidthMatchTrigger
-			autoDestroy={false}
+			autoDestroy={true}
+			visible={visible}
 			onVisibleChange={onVisibleChange}
+			align={align}
 		>
 			{children}
 		</RcDropdown>
