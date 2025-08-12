@@ -225,9 +225,9 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 				const formattedTime = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1)
 					.toString()
 					.padStart(2, '0')}/${now.getFullYear()} ${now
-					.getHours()
-					.toString()
-					.padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+						.getHours()
+						.toString()
+						.padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 				setSuccessTime(formattedTime);
 				setDisableButton(false);
 				setShowConfirmModal(true);
@@ -375,7 +375,7 @@ export const SendTokenScreen = ({ navigation, route }: any) => {
 		return (
 			<Modal visible={true} supportedOrientations={['portrait', 'landscape']}>
 				{fileShared && isShowModalShare ? (
-					<Sharing data={fileShared} onClose={onCloseFileShare} />
+					<Sharing data={fileShared} topUserSuggestionId={directMessageId} onClose={onCloseFileShare} />
 				) : (
 					<ViewShot
 						ref={viewToSnapshotRef}
