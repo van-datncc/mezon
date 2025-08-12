@@ -11,7 +11,6 @@ import {
 	selectCurrentTopicId,
 	selectDataReferences,
 	selectFirstMessageOfCurrentTopic,
-	selectIsTopicReady,
 	selectSession,
 	selectStatusMenu,
 	useAppDispatch,
@@ -29,7 +28,7 @@ import {
 import isElectron from 'is-electron';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { DragEvent, Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import React, { DragEvent, Fragment, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
@@ -164,9 +163,6 @@ const TopicDiscussionBox = () => {
 		[attachmentFilteredByChannelId?.files?.length, currentInputChannelId, dispatch, setOverUploadingState]
 	);
 
-	const isTopicReady = useSelector(selectIsTopicReady(currentTopicId || ''));
-	const hasFetchedRef = useRef(false);
-
 	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -217,7 +213,7 @@ const TopicDiscussionBox = () => {
 	};
 
 	useEffect(() => {
-		if (isTopicReady && !hasFetchedRef.current) {
+		if (currentTopicId) {
 			dispatch(
 				fetchMessages({
 					channelId: currentChannelId as string,
@@ -226,12 +222,8 @@ const TopicDiscussionBox = () => {
 				})
 			);
 			setIsFetchMessageDone(true);
-			hasFetchedRef.current = true;
 		}
-		if (!isTopicReady) {
-			hasFetchedRef.current = false;
-		}
-	}, [isTopicReady, currentTopicId, currentChannelId, currentClanId, dispatch]);
+	}, [currentTopicId, currentChannelId, currentClanId, dispatch]);
 
 	return (
 		<div
