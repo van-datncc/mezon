@@ -207,24 +207,29 @@ const FriendsPage = () => {
 							<div className="w-full flex flex-col gap-3 border-b-theme-primary">
 								<span className="font-[700] text-theme-primary-active">ADD FRIEND</span>
 								<span className="font-[400] text-theme-primary text-[14px]">You can add friends with their Mezon usernames</span>
-								<div className="relative">
+								<div className="relative group">
 									<InputField
 										onChange={(e) => handleChange('username', e.target.value)}
 										type="text"
-										className={` mb-2 bg-input-secondary rounded-lg mt-1 py-3 ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
+										className={`mb-2 bg-input-secondary rounded-lg mt-1 py-3 pr-[90px] md:pr-[140px] ${isAlreadyFriend ? 'border border-red-600 outline-none' : 'focus:outline focus:outline-1 dark:outline-[#00a8fc] outline-[#006ce7]'}`}
 										value={requestAddFriend.usernames}
-										placeholder="You can add friends with their Mezon usernames"
+										placeholder="Enter username"
 										needOutline={true}
+										title="You can add friends with their Mezon usernames"
 									/>
 									{isAlreadyFriend && (
 										<div className="text-red-500 dark:text-red-400 text-[14px] pb-5">You're already friends with that user!</div>
 									)}
+									<div className="invisible group-hover:visible absolute -top-8 left-0 bg-gray-800 text-white text-sm px-2 py-1 rounded">
+										You can add friends with their Mezon usernames
+									</div>
 									<Button
-										className="absolute btn-primary btn-primary-hover  rounded-lg px-2 top-3 right-2 text-[14px] py-[5px]"
+										className="absolute btn-primary btn-primary-hover rounded-lg px-2 top-3 right-2 text-[14px] py-[5px] min-w-[80px] md:min-w-[130px]"
 										disabled={!requestAddFriend.usernames?.length}
 										onClick={handleAddFriend}
 									>
-										Send Friend Request
+										<span className="hidden md:inline">Send Friend Request</span>
+										<span className="md:hidden">Add</span>
 									</Button>
 								</div>
 							</div>

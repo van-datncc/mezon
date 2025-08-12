@@ -81,6 +81,8 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
 			case 'ArrowDown':
         case 'ArrowRight':
           if(currentIndex > 0){
+            // Reset transform when changing image
+            resetTransform();
             document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
             currentIndex--;
             const prevThumb = document.querySelectorAll('.thumbnail')[currentIndex];
@@ -101,6 +103,8 @@ function updateImagePopup(imageData: ImageData, imageWindow: BrowserWindow) {
         case 'ArrowUp':
         case 'ArrowLeft':
           if(currentIndex < ${imageData.channelImagesData.images.length} - 1){
+            // Reset transform when changing image
+            resetTransform();
             document.querySelectorAll('.thumbnail').forEach(img => img.classList.remove('active'));
             currentIndex++;
             const nextThumb = document.querySelectorAll('.thumbnail')[currentIndex];

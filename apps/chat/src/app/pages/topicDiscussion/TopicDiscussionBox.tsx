@@ -1,4 +1,4 @@
-import { AttachmentPreviewThumbnail, MentionReactInput, ReplyMessageBox, UserMentionList } from '@mezon/components';
+import { AttachmentPreviewThumbnail, FileSelectionButton, MentionReactInput, ReplyMessageBox, UserMentionList } from '@mezon/components';
 import { useChatSending, useDragAndDrop, usePermissionChecker, useReference } from '@mezon/core';
 import {
 	fetchMessages,
@@ -16,12 +16,19 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { CREATING_TOPIC, EOverriddenPermission, IMessageSendPayload, MAX_FILE_ATTACHMENTS, UploadLimitReason } from '@mezon/utils';
+import {
+	CREATING_TOPIC,
+	EOverriddenPermission,
+	IMessageSendPayload,
+	MAX_FILE_ATTACHMENTS,
+	MAX_FILE_SIZE,
+	UploadLimitReason,
+	processFile
+} from '@mezon/utils';
 import isElectron from 'is-electron';
-import FileSelectionButton from 'libs/components/src/lib/components/MessageBox/FileSelectionButton';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { DragEvent, Fragment, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
 import MemoizedChannelMessages from '../channel/ChannelMessages';
@@ -39,6 +46,7 @@ const TopicDiscussionBox = () => {
 	const currentInputChannelId = currentTopicId || CREATING_TOPIC;
 	const { removeAttachmentByIndex, checkAttachment, attachmentFilteredByChannelId } = useReference(currentInputChannelId);
 	const { setOverUploadingState } = useDragAndDrop();
+	const [topicDraggingState, setTopicDraggingState] = useState(false);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const [canSendMessage] = usePermissionChecker([EOverriddenPermission.sendMessage], currentTopicId ?? '');
@@ -84,10 +92,12 @@ const TopicDiscussionBox = () => {
 
 			setIsFetchMessageDone(true);
 		},
-		[sendMessage, sessionUser, dispatch, currentTopicId, currentInputChannelId, currentChannelId, currentClanId]
+		[sendMessage, sessionUser, dispatch, currentInputChannelId]
 	);
 
-	const handleTyping = useCallback(() => {}, []);
+	const handleTyping = useCallback(() => {
+		// ignore
+	}, []);
 
 	const handleTypingDebounced = useThrottledCallback(handleTyping, 1000);
 
@@ -118,8 +128,89 @@ const TopicDiscussionBox = () => {
 				})
 			);
 		},
-		[attachmentFilteredByChannelId?.files?.length, currentChannelId]
+		[attachmentFilteredByChannelId?.files?.length, currentInputChannelId, dispatch, setOverUploadingState]
 	);
+
+	const onPastedFiles = useCallback(
+		async (event: React.ClipboardEvent<HTMLDivElement>) => {
+			const items = (event.clipboardData || (window as unknown as { clipboardData?: DataTransfer }).clipboardData)?.items;
+			const files: File[] = [];
+			if (items) {
+				for (let i = 0; i < items.length; i++) {
+					if (items[i].type.indexOf('image') !== -1) {
+						const file = items[i].getAsFile();
+						if (file) {
+							files.push(file);
+						}
+					}
+				}
+
+				if (files.length > 0) {
+					if (files.length + (attachmentFilteredByChannelId?.files?.length || 0) > MAX_FILE_ATTACHMENTS) {
+						setOverUploadingState(true, UploadLimitReason.COUNT);
+						return;
+					}
+					const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+					dispatch(
+						referencesActions.setAtachmentAfterUpload({
+							channelId: currentInputChannelId,
+							files: updatedFiles
+						})
+					);
+				}
+			}
+		},
+		[attachmentFilteredByChannelId?.files?.length, currentInputChannelId, dispatch, setOverUploadingState]
+	);
+
+	const handleDragEnter = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.dataTransfer?.types.includes('Files')) {
+			setTopicDraggingState(true);
+		}
+	};
+
+	const handleDragOver = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+
+	const handleDragLeave = (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget as Node)) {
+			setTopicDraggingState(false);
+		}
+	};
+
+	const handleDrop = async (e: DragEvent<HTMLElement>) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setTopicDraggingState(false);
+
+		const files = e.dataTransfer.files;
+		const filesArray = Array.from(files);
+
+		if (filesArray.length + (attachmentFilteredByChannelId?.files?.length || 0) > MAX_FILE_ATTACHMENTS) {
+			setOverUploadingState(true, UploadLimitReason.COUNT);
+			return;
+		}
+
+		const oversizedFile = filesArray.find((file) => file.size > MAX_FILE_SIZE);
+		if (oversizedFile) {
+			setOverUploadingState(true, UploadLimitReason.SIZE);
+			return;
+		}
+
+		const updatedFiles = await Promise.all(filesArray.map(processFile<ApiMessageAttachment>));
+		dispatch(
+			referencesActions.setAtachmentAfterUpload({
+				channelId: currentInputChannelId,
+				files: updatedFiles
+			})
+		);
+	};
 
 	useEffect(() => {
 		if (currentTopicId) {
@@ -135,7 +226,20 @@ const TopicDiscussionBox = () => {
 	}, [currentTopicId, currentChannelId, currentClanId, dispatch]);
 
 	return (
-		<>
+		<div
+			onDragEnter={handleDragEnter}
+			onDragOver={handleDragOver}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
+			className="relative flex flex-col h-full"
+		>
+			{topicDraggingState && (
+				<div className="absolute inset-0 bg-blue-500 bg-opacity-20 border-2 border-dashed border-blue-500 rounded-lg z-50 flex items-center justify-center">
+					<div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg">
+						<p className="text-lg font-semibold">Drop files here to upload to topic</p>
+					</div>
+				</div>
+			)}
 			{(isFetchMessageDone || firstMessageOfThisTopic) && (
 				<div className={`relative ${isElectron() ? 'h-[calc(100%_-_50px_-_30px)]' : 'h-full'}`}>
 					<MemoizedChannelMessages
@@ -193,6 +297,7 @@ const TopicDiscussionBox = () => {
 								onContextMenu={handleChildContextMenu}
 							>
 								<MentionReactInput
+									handlePaste={onPastedFiles}
 									onSend={handleSend}
 									onTyping={handleTypingDebounced}
 									listMentions={UserMentionList({
@@ -208,7 +313,7 @@ const TopicDiscussionBox = () => {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

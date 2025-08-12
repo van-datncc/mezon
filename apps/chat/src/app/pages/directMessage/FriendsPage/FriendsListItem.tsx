@@ -2,7 +2,7 @@ import { BaseProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
 import { FriendsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MetaDateStatusUser } from '@mezon/utils';
+import { EUserStatus, MetaDateStatusUser } from '@mezon/utils';
 import { useCallback, useEffect, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
 import { toast } from 'react-toastify';
@@ -185,6 +185,12 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 							</>
 						}
 						status={(friend?.user?.metadata as MetaDateStatusUser)?.status}
+						userMeta={{
+							status: (friend?.user?.metadata as MetaDateStatusUser)?.status,
+							user_status: friend?.user?.online
+								? ((friend?.user?.metadata as MetaDateStatusUser)?.status as EUserStatus) || EUserStatus.ONLINE
+								: EUserStatus.INVISIBLE
+						}}
 					/>
 				</div>
 				<div className="w-20" onClick={(e) => e.stopPropagation()}>

@@ -68,10 +68,6 @@ interface IWebRTCCallParams {
 }
 
 export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerAvatar, isInChannelCalled }: IWebRTCCallParams) {
-	const getScreen = async () => {
-		const screenSources = await window.electron.getScreenSources('screen');
-		return screenSources[0];
-	};
 	const [callState, setCallState] = useState<CallState>({
 		localStream: null,
 		remoteStream: null,
@@ -167,10 +163,6 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 		};
 
 		return pc;
-	};
-
-	const isScreenTrack = (track: MediaStreamTrack | null) => {
-		return track?.kind === 'video' && (track?.label.toLowerCase().includes('screen') || track?.label.toLowerCase().includes('window'));
 	};
 
 	const getConstraintsLocal = async (isVideoCall: boolean) => {

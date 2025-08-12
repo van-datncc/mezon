@@ -10,6 +10,7 @@ export const style = (colors: Attributes) =>
 		headerWrapper: {
 			flexDirection: 'row',
 			borderBottomColor: colors.border,
+			backgroundColor: colors.primary,
 			borderBottomWidth: 1,
 			alignItems: 'center',
 			paddingHorizontal: size.s_16,
