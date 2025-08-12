@@ -1,7 +1,7 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Content, Item } from './Dropdown.Content';
-
-type Place = 'bottom' | 'right' | 'left' | 'top' | `${'left' | 'right'}-${'bottom' | 'top'}`;
+import RcDropdown from 'rc-dropdown';
+import 'rc-dropdown/assets/index.css';
+import { createContext, JSXElementConstructor, ReactElement, ReactNode, useContext } from 'react';
+import { Item } from './Dropdown.Content';
 
 type MenuTriggerProps = {
 	children: ReactNode;
@@ -18,17 +18,20 @@ const Trigger = ({ children, className }: MenuTriggerProps) => {
 Trigger.displayName = 'MenuTrigger';
 
 interface MenuProps {
-	children: ReactNode;
+	children: ReactElement<any, string | JSXElementConstructor<any>>;
 	className?: string;
-	place?: Place;
+	placement?: 'bottom' | 'top' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 	holdOnClick?: boolean;
+	menu?: ReactElement<any, string | JSXElementConstructor<any>> | (() => React.ReactElement);
+	trigger?: 'click' | 'hover';
+	onVisibleChange?: (visible: boolean) => void;
 }
 
 type DropdownMenuContextValue = {
 	triggerRef: React.RefObject<HTMLDivElement>;
 	open: boolean;
 	toggleOpen: () => void;
-	position?: React.CSSProperties;
+	placement?: 'bottom' | 'top' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 	holdOnClickHandle: () => void;
 };
 
@@ -42,72 +45,22 @@ export function useDropdownMenuContext(): DropdownMenuContextValue {
 	return context;
 }
 
-const Dropdown = ({ children, className, place = 'bottom', holdOnClick = false }: MenuProps) => {
-	const [open, setOpen] = useState(false);
-	const containerRef = useRef<HTMLDivElement>(null);
-	const triggerRef = useRef<HTMLDivElement>(null);
-	const toggleOpen = useCallback(() => {
-		setOpen((prev) => !prev);
-	}, []);
-
-	const closeListMenu = useCallback(() => {
-		setOpen(false);
-	}, []);
-
-	useEffect(() => {
-		if (!open) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as Node;
-			if (containerRef.current && !containerRef.current.contains(target)) {
-				closeListMenu();
-			}
-		}
-
-		document.addEventListener('click', handleClickOutside);
-		return () => {
-			document.removeEventListener('click', handleClickOutside);
-		};
-	}, [open, closeListMenu]);
-
-	const position = useMemo(() => {
-		switch (place) {
-			case 'bottom':
-				return { top: (containerRef.current?.offsetHeight || 0) + 10 };
-			case 'top':
-				return { bottom: (containerRef.current?.offsetHeight || 0) + 10 };
-			case 'left':
-				return { right: (containerRef.current?.offsetWidth || 0) + 10 };
-			case 'right':
-				return { left: (containerRef.current?.offsetWidth || 0) + 10 };
-			default: {
-				return;
-			}
-		}
-	}, [open]);
-
-	const holdOnClickHandle = () => {
-		if (holdOnClick) return;
-		closeListMenu();
-	};
-	const value = {
-		open,
-		triggerRef,
-		toggleOpen,
-		position,
-		holdOnClickHandle
-	};
+const Dropdown = ({ children, className, placement, holdOnClick = false, menu, trigger = 'click', onVisibleChange }: MenuProps) => {
 	return (
-		<DropdownMenuContext.Provider value={value}>
-			<div ref={containerRef} className="relative flex items-center justify-center">
-				{children}
-			</div>
-		</DropdownMenuContext.Provider>
+		<RcDropdown
+			trigger={trigger}
+			overlay={menu}
+			placement={placement}
+			overlayClassName={`text-theme-message bg-input-secondary rounded-lg ${className}`}
+			minOverlayWidthMatchTrigger
+			autoDestroy={false}
+			onVisibleChange={onVisibleChange}
+		>
+			{children}
+		</RcDropdown>
 	);
 };
 
-// gán Item vào Dropdown
 Dropdown.Item = Item;
 Dropdown.Trigger = Trigger;
-Dropdown.Content = Content;
 export default Dropdown;
