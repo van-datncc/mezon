@@ -8,7 +8,7 @@ import { useDiscover } from '../context/DiscoverContext';
 import { usePagination } from '../hooks/usePagination';
 
 export default function DiscoverPage() {
-	const { clans, loading, error, currentPage, totalPages, searchTerm, selectedCategory, handleSearch, handleCategorySelect, handlePageChange } =
+	const { clans, categories, loading, error, currentPage, totalPages, searchTerm, selectedCategory, handleSearch, handleCategorySelect, handlePageChange } =
 		useDiscover();
 
 	const { pageNumbers, isFirstPage, isLastPage } = usePagination({
@@ -33,11 +33,13 @@ export default function DiscoverPage() {
 				<Banner onSearch={handleSearch} searchTerm={searchTerm} />
 
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-8">
-					<div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-						{/* Categories sidebar */}
-						<div className="w-full lg:w-64 flex-shrink-0">
-							<Categories selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
-						</div>
+					<div className={`flex flex-col gap-4 ${categories.length > 0 ? 'lg:flex-row lg:gap-8' : ''}`}>
+						{/* Categories sidebar - chỉ hiển thị khi có categories */}
+						{categories.length > 0 && (
+							<div className="w-full lg:w-64 flex-shrink-0">
+								<Categories selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
+							</div>
+						)}
 
 						<div className="flex-1 min-w-0">
 							<div className="flex justify-between items-center mb-4 sm:mb-6">

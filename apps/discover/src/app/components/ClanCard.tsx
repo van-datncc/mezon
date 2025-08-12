@@ -62,12 +62,43 @@ const ClanCard: React.FC<ClanCardProps> = ({ clan }) => {
 					<h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 truncate">{clanName}</h3>
 				</div>
 				<p className="text-xs sm:text-sm text-gray-700 line-clamp-2 mb-1">{clan.description || 'Community clan'}</p>
-				<div className="flex items-center text-gray-500 text-[10px] sm:text-xs space-x-2 sm:space-x-3 mb-1">
+				<div className="flex items-center text-gray-500 text-[10px] sm:text-xs  mb-1">
 					<div className="flex items-center">
-						<div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 mr-1"></div>
-						<span>{formatNumber(clan.online_members)} Online</span>
+						<svg
+							className="mr-1"
+							width="12"
+							height="12"
+							viewBox="0 0 12 12"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<circle
+								cx="6"
+								cy="6"
+								r="5"
+								stroke="#22c55e"
+								strokeWidth="2"
+								fill="none"
+							>
+								<animate
+									attributeName="r"
+									from="3"
+									to="6"
+									dur="1.5s"
+									repeatCount="indefinite"
+								/>
+								<animate
+									attributeName="opacity"
+									from="1"
+									to="0"
+									dur="1.5s"
+									repeatCount="indefinite"
+								/>
+							</circle>
+							<circle cx="6" cy="6" r="3" fill="#22c55e" />
+						</svg>
+
 					</div>
-					<div className="w-1 h-1 rounded-full bg-gray-300"></div>
 					<span>{formatNumber(clan.total_members) || (isValidId ? '100+' : '0')} Members</span>
 				</div>
 				<div className="mt-1">
