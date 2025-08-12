@@ -52,6 +52,7 @@ export type MessageItemProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
+	topicChannelId?: string;
 	isNumberOfLine?: boolean;
 	currentClanId?: string;
 	showUserInformation?: boolean;
@@ -71,6 +72,7 @@ const MessageItem = React.memo(
 			showUserInformation = false,
 			preventAction = false,
 			channelId = '',
+			topicChannelId,
 			isSearchTab = false,
 			isHighlight = false
 		} = props;
@@ -281,6 +283,7 @@ const MessageItem = React.memo(
 					{!isMessageSystem && !message?.content?.fwd && (
 						<RenderMessageItemRef
 							message={message}
+							channelId={topicChannelId}
 							preventAction={preventAction}
 							isSearchTab={isSearchTab}
 							onLongPress={handleLongPressMessage}

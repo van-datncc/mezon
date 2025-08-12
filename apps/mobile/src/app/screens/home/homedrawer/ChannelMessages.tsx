@@ -219,6 +219,7 @@ const ChannelMessages = React.memo(({ channelId, topicId, clanId, mode, isDM, is
 					messageId={item.id}
 					mode={mode}
 					channelId={channelId}
+					topicChannelId={topicChannelId}
 					isHighlight={idMessageToJump?.id?.toString() === item?.id?.toString()}
 				/>
 			);
