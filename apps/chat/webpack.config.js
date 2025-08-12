@@ -81,17 +81,6 @@ module.exports = composePlugins(
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: path.resolve(__dirname, 'src/assets/.well-known'),
-            noErrorOnMissing: true,
-            to({ context, absoluteFilename }) {
-              const filename = path.basename(absoluteFilename);
-              if (filename === 'apple-app-site-association.json') {
-                return path.posix.join('.well-known', 'apple-app-site-association');
-              }
-              return path.posix.join('.well-known', filename);
-            },
-          },
-          {
             from: path.resolve(__dirname, '../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
             to: 'pdf.worker.min.mjs',
             noErrorOnMissing: true,
@@ -168,15 +157,6 @@ module.exports = composePlugins(
     config.devServer.static = {
       directory: path.join(__dirname, 'src/assets'),
       publicPath: '/',
-    };
-
-    config.devServer.historyApiFallback = {
-      rewrites: [
-        {
-          from: /^\/\.well-known\/apple-app-site-association$/,
-          to: '/.well-known/apple-app-site-association.json',
-        },
-      ],
     };
 
     return merge(config, {
