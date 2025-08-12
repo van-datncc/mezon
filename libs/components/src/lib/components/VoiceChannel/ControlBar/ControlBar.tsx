@@ -29,7 +29,6 @@ import ScreenSelectionModal from '../../ScreenSelectionModal/ScreenSelectionModa
 import { ReactionChannelInfo } from '../MyVideoConference/Reaction/types';
 import { useSendReaction } from '../MyVideoConference/Reaction/useSendReaction';
 import VoicePopout from '../VoicePopout/VoicePopout';
-import { BackgroundEffectsMenu } from './BackgroundEffectsMenu';
 import { MediaDeviceMenu } from './MediaDeviceMenu/MediaDeviceMenu';
 import { ScreenShareToggleButton } from './TrackToggle/ScreenShareToggleButton';
 import { TrackToggle } from './TrackToggle/TrackToggle';
@@ -432,9 +431,6 @@ const ControlBar = ({
 									kind="videoinput"
 									onActiveDeviceChange={(_kind, deviceId) => saveVideoInputDeviceId(deviceId ?? 'default')}
 								/>
-								{showCamera && typeof window !== 'undefined' && 'MediaStreamTrackGenerator' in window && (
-									<BackgroundEffectsMenu participant={localParticipant.localParticipant} />
-								)}
 							</>
 						)}
 					</div>
