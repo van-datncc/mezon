@@ -4,18 +4,16 @@ import {
 	selectChannelById,
 	selectCurrentClanId,
 	selectMemberClanByUserId,
-	selectTheme,
 	settingClanStickerActions,
 	updateWebhookBySpecificId,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import { handleUploadFile, useMezon } from '@mezon/transport';
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 import { ChannelIsNotThread, IChannel } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
 import { ApiMessageAttachment, ApiWebhook, MezonUpdateWebhookByIdBody } from 'mezon-js/api.gen';
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ModalSaveChanges from '../../../ClanSettingOverview/ModalSaveChanges';
 import DeleteWebhookPopup from './DeleteWebhookPopup';
@@ -302,8 +300,6 @@ const WebhookItemChannelDropdown = ({
 		setParentChannelsInClan(normalChannels);
 	}, [allChannel]);
 
-	const appearanceTheme = useSelector(selectTheme);
-
 	useEffect(() => {
 		if (!hasChange) {
 			setDataForUpdate({
@@ -313,40 +309,41 @@ const WebhookItemChannelDropdown = ({
 		}
 	}, [hasChange]);
 
+	const menu = useMemo(() => {
+		const menuItems: ReactElement[] = [];
+		parentChannelsInClan.map((channel) => {
+			if (webhookItem.channel_id !== channel.channel_id) {
+				menuItems.push(
+					<Menu.Item
+						key={channel.channel_id}
+						children={channel.channel_label ?? ''}
+						className="truncate text-theme-primary bg-item-theme-hover-important"
+						onClick={() => {
+							setDataForUpdate({
+								...dataForUpdate,
+								channelIdForUpdate: channel.channel_id
+							});
+							setDropdownValue(channel.channel_label);
+						}}
+					/>
+				);
+			}
+		});
+		return <>{menuItems}</>;
+	}, [parentChannelsInClan]);
 	return (
-		<Dropdown
+		<Menu
 			trigger="click"
-			renderTrigger={() => (
-				<div className="w-full h-[50px] rounded-md bg-theme-setting-primary flex flex-row px-3 justify-between items-center">
-					<p className="truncate max-w-[90%]">{dropdownValue}</p>
-					<div>
-						<Icons.ArrowDownFill className="text-theme-primary" />	
-					</div>
-				</div>
-			)}
-			label=""
-			placement="bottom-end"
-			className={`bg-option-theme-important  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+			menu={menu}
+			className={`bg-option-theme-important  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] thread-scroll z-20`}
 		>
-			{parentChannelsInClan.map((channel) => {
-				if (webhookItem.channel_id !== channel.channel_id) {
-					return (
-						<Dropdown.Item
-							key={channel.channel_id}
-							children={channel.channel_label ?? ''}
-							className="truncate bg-theme-setting-primary text-theme-primary bg-item-theme-hover-important"
-							onClick={() => {
-								setDataForUpdate({
-									...dataForUpdate,
-									channelIdForUpdate: channel.channel_id
-								});
-								setDropdownValue(channel.channel_label);
-							}}
-						/>
-					);
-				}
-			})}
-		</Dropdown>
+			<div className="w-full h-[50px] rounded-md bg-theme-setting-primary flex flex-row px-3 justify-between items-center">
+				<p className="truncate max-w-[90%]">{dropdownValue}</p>
+				<div>
+					<Icons.ArrowDownFill className="text-theme-primary" />
+				</div>
+			</div>
+		</Menu>
 	);
 };
 
