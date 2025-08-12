@@ -1369,6 +1369,13 @@ export enum EUserStatus {
 	INVISIBLE = 'Invisible'
 }
 
+export enum ETabUserStatus {
+	ALL = 'all',
+	ONLINE = 'online',
+	BLOCK = 'block',
+	PENDING = 'pending'
+}
+
 export type IDmCallInfo = {
 	groupId?: string;
 	isVideo?: boolean;
