@@ -22,7 +22,6 @@ export function useSendInviteMessage() {
 
 			const content: IMessageSendPayload = {
 				t: url,
-				lk: links,
 				mk: [...markdowns, ...linkInMk]
 			};
 
