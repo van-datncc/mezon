@@ -2,12 +2,14 @@ import { useChannelMembers, useEditMessage, useEmojiSuggestionContext, useEscape
 import {
 	ChannelMembersEntity,
 	MessagesEntity,
+	pinMessageActions,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectChannelDraftMessage,
 	selectCurrentChannelId,
 	selectTheme,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import {
@@ -75,6 +77,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [showModal, closeModal] = useModal(() => {
 		return <ModalDeleteMess mess={message} closeModal={closeModal} mode={mode} />;
 	}, [message?.id]);
+	const dispatch = useAppDispatch();
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (!query || emojis.length === 0) return;
@@ -202,7 +205,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		return message.content?.t;
 	}, [message.content?.t]);
 
-	const onSend = (e: React.KeyboardEvent<Element>) => {
+	const onSend = async (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
@@ -217,13 +220,28 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					processedContentDraft as IMessageSendPayload,
 					mentionNewPos as IMentionOnMessage[]
 				);
-				handleSend(
-					filterEmptyArrays(updatedProcessedContent as any),
-					message.id,
-					adjustedMentionsPos,
-					isTopic ? channelId : message?.content?.tp || '',
-					isTopic
-				);
+
+				try {
+					await handleSend(
+						filterEmptyArrays(updatedProcessedContent as any),
+						message.id,
+						adjustedMentionsPos,
+						isTopic ? channelId : message?.content?.tp || '',
+						isTopic
+					);
+
+					dispatch(
+						pinMessageActions.updatePinMessage({
+							channelId: channelId,
+							pinId: message.id,
+							pinMessage: {
+								...message,
+								content: JSON.stringify(updatedProcessedContent)
+							}
+						})
+					);
+				} catch (error) {}
+
 				handleCancelEdit();
 			}
 		}
@@ -234,7 +252,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (draftContent?.trim() === '') {
 			textareaRef.current?.blur();
 			return showModal();
@@ -245,13 +263,27 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				processedContentDraft as IMessageSendPayload,
 				mentionNewPos as IMentionOnMessage[]
 			);
-			handleSend(
-				filterEmptyArrays(updatedProcessedContent as any),
-				message.id,
-				adjustedMentionsPos,
-				isTopic ? channelId : message?.content?.tp || '',
-				isTopic
-			);
+
+			try {
+				await handleSend(
+					filterEmptyArrays(updatedProcessedContent as any),
+					message.id,
+					adjustedMentionsPos,
+					isTopic ? channelId : message?.content?.tp || '',
+					isTopic
+				);
+
+				dispatch(
+					pinMessageActions.updatePinMessage({
+						channelId: channelId,
+						pinId: message.id,
+						pinMessage: {
+							...message,
+							content: JSON.stringify(updatedProcessedContent)
+						}
+					})
+				);
+			} catch (error) {}
 		}
 		handleCancelEdit();
 	};
