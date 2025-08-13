@@ -30,9 +30,6 @@ import {
 	selectSearchMessagesLoadingStatus,
 	selectStatusMenu,
 	selectToCheckAppIsOpening,
-	selectTopicByChannelId,
-	threadsActions,
-	topicsActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -367,21 +364,6 @@ interface IChannelMainProps {
 
 export default function ChannelMain({ topicChannelId }: IChannelMainProps) {
 	const currentChannel = useSelector(selectCurrentChannel);
-	const isOpenTopic = useSelector(selectTopicByChannelId(currentChannel?.channel_id ?? ''));
-	const dispatch = useAppDispatch();
-	useEffect(() => {
-		if (isOpenTopic && isOpenTopic !== '0' && currentChannel) {
-			dispatch(topicsActions.setIsShowCreateTopic(true));
-			dispatch(
-				threadsActions.setIsShowCreateThread({
-					channelId: currentChannel.channel_id || '',
-					isShowCreateThread: false
-				})
-			);
-			dispatch(topicsActions.setCurrentTopicId(isOpenTopic));
-			dispatch(topicsActions.setChannelTopic({ channelId: currentChannel.channel_id || '', topicId: '0' }));
-		}
-	}, [isOpenTopic]);
 	let chlId = currentChannel?.id || '';
 	if (topicChannelId) {
 		chlId = topicChannelId;

@@ -3,10 +3,9 @@ import { ChannelType, User } from 'mezon-js';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Images from '../../../../assets/Images';
 import MezonAvatar from '../../../componentUI/MezonAvatar';
-import { MezonButton } from '../../../componentUI/MezonButton';
+import MezonButton from '../../../componentUI/MezonButton';
 import { style } from './styles';
 
 export type Receiver = {
@@ -24,26 +23,6 @@ export interface IFriendListItemProps {
 	isSent?: boolean;
 	onPress: (directParamId?: string, type?: number, dmGroup?: Receiver) => void;
 }
-
-export interface IListMemberInviteProps {
-	urlInvite: string;
-	searchTerm: string;
-	channelID?: string;
-}
-
-export const FastImageRes = React.memo(({ uri, isCirle = false }: { uri: string; isCirle?: boolean }) => {
-	return (
-		<FastImage
-			style={[{ width: '100%', height: '100%' }, isCirle && { borderRadius: 50 }]}
-			source={{
-				uri: uri,
-				headers: { Authorization: 'someAuthToken' },
-				priority: FastImage.priority.normal
-			}}
-			resizeMode={FastImage.resizeMode.cover}
-		/>
-	);
-});
 
 export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 	const { dmGroup, user, isSent, onPress } = props;
@@ -71,17 +50,14 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 							{dmGroup?.channel_label}
 						</Text>
 					</View>
-					<View>
-						<MezonButton
-							viewContainerStyle={[styles.inviteButton]}
-							disabled={isSent}
-							onPress={() => {
-								onPress(dmGroup.channel_id || '', dmGroup.type || 0, dmGroup);
-							}}
-						>
-							{isSent ? t('btnSent') : t('btnInvite')}
-						</MezonButton>
-					</View>
+					<MezonButton
+						title={isSent ? t('btnSent') : t('btnInvite')}
+						containerStyle={[styles.inviteButton]}
+						disabled={isSent}
+						onPress={() => {
+							onPress(dmGroup.channel_id || '', dmGroup.type || 0, dmGroup);
+						}}
+					/>
 				</TouchableOpacity>
 			) : (
 				<TouchableOpacity
@@ -97,17 +73,14 @@ export const FriendListItem = React.memo((props: IFriendListItemProps) => {
 							{user?.user?.display_name}
 						</Text>
 					</View>
-					<View>
-						<MezonButton
-							viewContainerStyle={[styles.inviteButton]}
-							disabled={isSent}
-							onPress={() => {
-								onPress('', 0, user);
-							}}
-						>
-							{isSent ? t('btnSent') : t('btnInvite')}
-						</MezonButton>
-					</View>
+					<MezonButton
+						containerStyle={[styles.inviteButton]}
+						disabled={isSent}
+						onPress={() => {
+							onPress('', 0, user);
+						}}
+						title={isSent ? t('btnSent') : t('btnInvite')}
+					/>
 				</TouchableOpacity>
 			)}
 		</View>

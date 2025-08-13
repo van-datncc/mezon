@@ -1,4 +1,3 @@
-import { toast } from 'react-toastify';
 import Banner from '../components/Banner';
 import Categories from '../components/Categories';
 import ClanList from '../components/ClanList';
@@ -8,7 +7,7 @@ import { useDiscover } from '../context/DiscoverContext';
 import { usePagination } from '../hooks/usePagination';
 
 export default function DiscoverPage() {
-	const { clans, loading, error, currentPage, totalPages, searchTerm, selectedCategory, handleSearch, handleCategorySelect, handlePageChange } =
+	const { clans, categories, loading, error, currentPage, totalPages, searchTerm, selectedCategory, handleSearch, handleCategorySelect, handlePageChange } =
 		useDiscover();
 
 	const { pageNumbers, isFirstPage, isLastPage } = usePagination({
@@ -33,11 +32,13 @@ export default function DiscoverPage() {
 				<Banner onSearch={handleSearch} searchTerm={searchTerm} />
 
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-8">
-					<div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-						{/* Categories sidebar */}
-						<div className="w-full lg:w-64 flex-shrink-0">
-							<Categories selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
-						</div>
+					<div className={`flex flex-col gap-4 ${categories.length > 0 ? 'lg:flex-row lg:gap-8' : ''}`}>
+						{/* Categories sidebar - chỉ hiển thị khi có categories */}
+						{categories.length > 0 && (
+							<div className="w-full lg:w-64 flex-shrink-0">
+								<Categories selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} />
+							</div>
+						)}
 
 						<div className="flex-1 min-w-0">
 							<div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -168,12 +169,6 @@ export default function DiscoverPage() {
 								<p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-2xl mx-auto">
 									Add your clan to Mezon Discovery to reach millions of users and grow your community.
 								</p>
-								<button
-									className={`bg-[${COLORS.PRIMARY}] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:bg-[${COLORS.PRIMARY_HOVER}] transition-colors`}
-									onClick={() => toast.warning('This feature will be implemented soon!')}
-								>
-									Make Your Community Public
-								</button>
 							</div>
 						</div>
 					</div>

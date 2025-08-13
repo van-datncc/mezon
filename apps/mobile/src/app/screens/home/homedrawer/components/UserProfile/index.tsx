@@ -79,7 +79,7 @@ const UserProfile = React.memo(
 		const { createDirectMessageWithUser } = useDirect();
 		const listDM = useSelector(selectDirectsOpenlist);
 		const userCustomStatus = useMemberCustomStatus(userId || user?.id || '');
-		const { friends: allUser = [], acceptFriend, deleteFriend, addFriend } = useFriends();
+		const { acceptFriend, deleteFriend, addFriend } = useFriends();
 		const [isShowPendingContent, setIsShowPendingContent] = useState(false);
 		const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
 		const dispatch = useAppDispatch();
@@ -284,14 +284,14 @@ const UserProfile = React.memo(
 				text: t('userAction.sendMessage'),
 				icon: <MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.text} />,
 				action: navigateToMessageDetail,
-				isShow: true
+				isShow: !!infoFriend || !!userById
 			},
 			{
 				id: 2,
 				text: t('userAction.voiceCall'),
 				icon: <MezonIconCDN icon={IconCDN.phoneCallIcon} color={themeValue.text} />,
 				action: () => handleCallUser(userId || user?.id),
-				isShow: true
+				isShow: !!infoFriend || !!userById
 			},
 			// {
 			// 	id: 3,
@@ -455,26 +455,26 @@ const UserProfile = React.memo(
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
-										userById?.user?.display_name ||
-										userById?.user?.username ||
-										user?.clan_nick ||
-										user?.user?.display_name ||
-										user?.user?.username
+									userById?.user?.display_name ||
+									userById?.user?.username ||
+									user?.clan_nick ||
+									user?.user?.display_name ||
+									user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
 								: user?.display_name ||
-									user?.user?.display_name ||
-									user?.username ||
-									user?.user?.username ||
-									(checkAnonymous ? 'Anonymous' : message?.username)}
+								user?.user?.display_name ||
+								user?.username ||
+								user?.user?.username ||
+								(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
 								? userById?.user?.username || userById?.user?.display_name
 								: user?.username ||
-									user?.user?.username ||
-									user?.display_name ||
-									user?.user?.display_name ||
-									(checkAnonymous ? 'Anonymous' : message?.username)}
+								user?.user?.username ||
+								user?.display_name ||
+								user?.user?.display_name ||
+								(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (

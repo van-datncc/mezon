@@ -12,7 +12,6 @@ import {
 	selectDmGroupCurrent,
 	selectLastMessageByChannelId,
 	selectLastSeenMessageStateByChannelId,
-	selectMemberClanByUserId2,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store-mobile';
@@ -25,14 +24,13 @@ import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { useSendSignaling } from '../../../components/CallingGroupModal';
 import ImageNative from '../../../components/ImageNative';
-import { UserStatus } from '../../../components/UserStatus';
 import { IconCDN } from '../../../constants/icon_cdn';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
-import { getUserStatusByMetadata } from '../../../utils/helpers';
 import { ConfirmBuzzMessageModal } from '../../home/homedrawer/components/ConfirmBuzzMessage';
 import { OptionChannelHeader } from '../../home/homedrawer/components/HeaderOptions';
 import HeaderTooltip from '../../home/homedrawer/components/HeaderTooltip';
+import { UserStatusDM } from '../UserStatusDM';
 
 interface HeaderProps {
 	from?: string;
@@ -91,8 +89,6 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 	const currentDmGroup = useSelector(selectDmGroupCurrent(directMessageId ?? ''));
 	const navigation = useNavigation<any>();
 	const isTabletLandscape = useTabletLandscape();
-	const user = useSelector((state) => selectMemberClanByUserId2(state, currentDmGroup?.user_id?.[0]));
-	const status = getUserStatusByMetadata(user?.user?.metadata);
 	const dispatch = useAppDispatch();
 	const { sendSignalingToParticipants } = useSendSignaling();
 
@@ -269,10 +265,10 @@ const HeaderDirectMessage: React.FC<HeaderProps> = ({ from, styles, themeValue, 
 								<Text style={[styles.textAvatar]}>{dmLabel?.charAt?.(0)?.toUpperCase()}</Text>
 							</View>
 						)}
-						<UserStatus
-							status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
-							customStatus={status}
-							iconSize={size.s_10}
+						<UserStatusDM
+							isOnline={currentDmGroup?.is_online?.some(Boolean)}
+							metadata={currentDmGroup?.metadata?.[0]}
+							userId={currentDmGroup?.user_id?.[0]}
 						/>
 					</View>
 				)}

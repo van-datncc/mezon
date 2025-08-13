@@ -45,6 +45,7 @@ import screen from './screen.json';
 import screenStack from './screenStack.json';
 import searchMessageChannel from './searchMessageChannel.json';
 import setting from './setting.json';
+import sharing from './sharing.json';
 import streamingRoom from './streamingRoom.json';
 import token from './token.json';
 import userEmptyClan from './userEmptyClan.json';
@@ -101,5 +102,6 @@ export default {
 	channelVoice,
 	token,
 	qrScanner,
-	clanSoundSetting
+	clanSoundSetting,
+	sharing
 };

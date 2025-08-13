@@ -3,5 +3,6 @@
   "offline":"offline",
   "online": "online",
   "join": "Join",
-  "inviteTo": "INVITE TO {{clanName}}"
+  "inviteTo": "INVITE TO {{clanName}}",
+  "noThanks": "No, Thanks"
 }

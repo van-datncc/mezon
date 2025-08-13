@@ -1,37 +1,37 @@
 {
   "actions": {
-      "editMessage": "Chỉnh sửa tin nhắn",
-      "reply": "Trả lời",
-      "createThread": "Tạo chuỗi",
-      "copyText": "Sao chép văn bản",
-      "deleteMessage": "Xóa tin nhắn",
-      "pinMessage": "Ghim tin nhắn",
-      "unPinMessage": "Bỏ ghim tin nhắn",
-      "markUnRead": "Đánh dấu chưa đọc",
-      "mention": "Đề cập",
-      "copyMessageLink": "Sao chép liên kết tin nhắn",
-      "report": "Báo cáo",
-      "forward": "Chuyển tiếp tin nhắn",
-      "forwardAllMessages": "Chuyển tiếp tất cả tin nhắn",
-      "location": "Vị trí",
-      "files": "Tệp",
-      "saveImage": "Lưu file phương tiện",
-      "copyMediaLink": "Sao chép liên kết file phương tiện",
-      "giveACoffee": "Mời một ly cà phê",
-      "topicDiscussion": "Thảo luận chủ đề",
-      "resend": "Gửi lại",
-      "buzz": "Buzz!!",
-      "markMessage": "Đánh dấu tin nhắn",
-      "allAlbums": "Tất cả album",
-      "linkOptions": "Tùy chọn liên kết",
-      "openLink": "Mở liên kết",
-      "copyLink": "Sao chép liên kết",
-      "shareLink": "Chia sẻ liên kết",
-      "copyLinkSuccess": "Đã sao chép liên kết vào clipboard"
+    "editMessage": "Chỉnh sửa tin nhắn",
+    "reply": "Trả lời",
+    "createThread": "Tạo chuỗi",
+    "copyText": "Sao chép văn bản",
+    "deleteMessage": "Xóa tin nhắn",
+    "pinMessage": "Ghim tin nhắn",
+    "unPinMessage": "Bỏ ghim tin nhắn",
+    "markUnRead": "Đánh dấu chưa đọc",
+    "mention": "Đề cập",
+    "copyMessageLink": "Sao chép liên kết tin nhắn",
+    "report": "Báo cáo",
+    "forward": "Chuyển tiếp tin nhắn",
+    "forwardAllMessages": "Chuyển tiếp tất cả tin nhắn",
+    "location": "Vị trí",
+    "files": "Tệp",
+    "saveImage": "Lưu file phương tiện",
+    "copyMediaLink": "Sao chép liên kết file phương tiện",
+    "giveACoffee": "Mời một ly cà phê",
+    "topicDiscussion": "Thảo luận chủ đề",
+    "resend": "Gửi lại",
+    "buzz": "Buzz!!",
+    "markMessage": "Đánh dấu tin nhắn",
+    "allAlbums": "Tất cả album",
+    "linkOptions": "Tùy chọn liên kết",
+    "openLink": "Mở liên kết",
+    "copyLink": "Sao chép liên kết",
+    "shareLink": "Chia sẻ liên kết",
+    "copyLinkSuccess": "Đã sao chép liên kết vào clipboard"
   },
   "chatBox": {
-      "replyingTo": "Đang trả lời",
-      "editingMessage": "Đang chỉnh sửa tin nhắn"
+    "replyingTo": "Đang trả lời",
+    "editingMessage": "Đang chỉnh sửa tin nhắn"
   },
   "ephemeral": {
     "headerText": "Tin nhắn riêng tư gửi {{username}}",
@@ -41,45 +41,45 @@
   },
   "pasteImage": "Dán Ảnh",
   "toast": {
-      "copyText": "Đã sao chép văn bản tin nhắn",
-      "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi một chút",
-      "pinMessage": "Tin nhắn đã được ghim",
-      "markMessage": "Đã đánh dấu tin nhắn",
-      "markMessageUnread": "Đã đánh dấu chưa đọc",
-      "markMessageUnreadFailed": "Không thể bỏ đọc"
+    "copyText": "Đã sao chép văn bản tin nhắn",
+    "attachmentIsLoading": "Tệp đính kèm đang tải, vui lòng đợi một chút",
+    "pinMessage": "Tin nhắn đã được ghim",
+    "markMessage": "Đã đánh dấu tin nhắn",
+    "markMessageUnread": "Đã đánh dấu chưa đọc",
+    "markMessageUnreadFailed": "Không thể bỏ đọc"
   },
   "directMessage": {
-      "you": "Bạn"
+    "you": "Bạn"
   },
   "edited": "(đã chỉnh sửa)",
   "newMessage": {
-      "to": "Đến",
-      "newGroup": "Nhóm mới",
-      "addFriend": "Thêm bạn",
-      "create": "Tạo",
-      "add": "Thêm",
-      "createGroupWith": "Tạo nhóm mới với"
+    "to": "Đến",
+    "newGroup": "Nhóm mới",
+    "addFriend": "Thêm bạn",
+    "create": "Tạo",
+    "add": "Thêm",
+    "createGroupWith": "Tạo nhóm mới với"
   },
   "reactions": {
     "noActionTitle": "Chưa có biểu cảm",
     "noActionDescription": "Một thế giới vắng bóng cảm xúc.",
     "removeActions": "Xóa biểu cảm"
-},
+  },
   "messageDeleteReply": "Tin nhắn gốc đã bị xóa",
   "forwardMessagesSuccessfully": "Chuyển tiếp tin nhắn thành công!",
   "forwardTo": "Chuyển tiếp đến",
   "search": "Tìm kiếm",
   "reportMessage": {
-      "reportSummary": "Tóm tắt báo cáo",
-      "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",
-      "reportCategory": "Loại báo cáo",
-      "title": "Báo cáo tin nhắn",
-      "subTitle": "Vui lòng chọn tùy chọn mô tả vấn đề tốt nhất.",
-      "selectedMessage": "Tin nhắn đã chọn",
-         "submitDescription": "Khi gửi báo cáo này, bạn xác nhận thông tin là chính xác và được gửi với thiện ý. Vui lòng tuân thủ Quy định Cộng đồng và không gửi báo cáo sai sự thật hoặc trùng lặp.",
-      "submitReport": "Gửi báo cáo",
-      "cancel": "Hủy bỏ",
-      "reportSubmitted": "Đã gửi báo cáo"
+    "reportSummary": "Tóm tắt báo cáo",
+    "reviewYourReportBeforeSubmitting": "Xem lại báo cáo của bạn trước khi gửi.",
+    "reportCategory": "Loại báo cáo",
+    "title": "Báo cáo tin nhắn",
+    "subTitle": "Vui lòng chọn tùy chọn mô tả vấn đề tốt nhất.",
+    "selectedMessage": "Tin nhắn đã chọn",
+    "submitDescription": "Khi gửi báo cáo này, bạn xác nhận thông tin là chính xác và được gửi với thiện ý. Vui lòng tuân thủ Quy định Cộng đồng và không gửi báo cáo sai sự thật hoặc trùng lặp.",
+    "submitReport": "Gửi báo cáo",
+    "cancel": "Hủy bỏ",
+    "reportSubmitted": "Đã gửi báo cáo"
   },
   "tapToSeeAttachment": "Nhấn để xem tệp đính kèm",
   "findThePerfectReaction": "Tìm biểu cảm hoàn hảo",
@@ -96,20 +96,20 @@
   "No": "Không",
   "unableSendMessage": "Không thể gửi tin nhắn. Ấn giữ để xem các tùy chọn.",
   "manage": {
-      "edit": "Chỉnh sửa",
-      "roles": "Vai trò",
-      "editRoles": "Chỉnh sửa vai trò",
-      "cancel": "Hủy bỏ"
+    "edit": "Chỉnh sửa",
+    "roles": "Vai trò",
+    "editRoles": "Chỉnh sửa vai trò",
+    "cancel": "Hủy bỏ"
   },
   "newMessages": "TIN NHẮN MỚI",
   "noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
   "blockedUserMessage": "Bạn không thể trả lời cuộc trò chuyện này",
   "messageInputPlaceHolder": "Nhập tin nhắn...",
   "shareLocationModal": {
-      "sendThisLocation": "Gửi vị trí này tới",
-      "send": "Gửi",
-      "cancel": "Hủy",
-      "coordinate": "Tọa độ"
+    "sendThisLocation": "Gửi vị trí này tới",
+    "send": "Gửi",
+    "cancel": "Hủy",
+    "coordinate": "Tọa độ"
   },
   "callLog": {
     "cancel": "Bạn đã từ chối",
@@ -121,9 +121,9 @@
     "callBack": "Gọi lại",
     "incomingCall": "Cuộc gọi đến",
     "outGoingCall": "Cuộc gọi đi",
-    "startGroupCall" : "{{username}} đã bắt đầu 1 cuộc gọi nhóm",
-    "startAudioCall" : "{{username}} đã bắt đầu 1 cuộc gọi thoại",
-    "startVideoCall" : "{{username}} đã bắt đầu 1 cuộc gọi video"
+    "startGroupCall": "{{username}} đã bắt đầu 1 cuộc gọi nhóm",
+    "startAudioCall": "{{username}} đã bắt đầu 1 cuộc gọi thoại",
+    "startVideoCall": "{{username}} đã bắt đầu 1 cuộc gọi video"
   },
   "buzz": {
     "confirmText": "Gửi",
@@ -139,6 +139,10 @@
   "turnOnAnonymous": "Bật ẩn danh",
   "goToTopic": "Đi đến Topic",
   "creator": "Người tạo",
-  "viewTopic": "Xem topic"
-
+  "viewTopic": "Xem topic",
+  "mapView": {
+    "yourLocation": "Vị trí của bạn",
+    "sender": "Người gửi",
+    "locationOf": "Vị trí của {{name}}"
+  }
 }

@@ -18,6 +18,7 @@ export const APP_SCREEN = {
 	HOME: 'HOME',
 	VIDEO_DETAIL: 'VIDEO_DETAIL',
 	CHANNEL_APP: 'CHANNEL_APP',
+	INVITE_CLAN: 'INVITE_CLAN',
 	WALLET: 'WALLET',
 
 	SERVERS: {
@@ -41,6 +42,7 @@ export const APP_SCREEN = {
 		CHAT_STREAMING: 'ROUTES.MESSAGES.CHAT_STREAMING',
 		TOPIC_DISCUSSION: 'ROUTES.MESSAGES.TOPIC_DISCUSSION',
 		CHANNEL_APP: 'ROUTES.MESSAGES.CHANNEL_APP',
+		INVITE_CLAN: 'ROUTES.MESSAGES.INVITE_CLAN',
 		FORWARD_MESSAGE: 'ROUTES.MESSAGES.FORWARD_MESSAGE'
 	},
 
@@ -72,7 +74,7 @@ export const APP_SCREEN = {
 	},
 
 	MENU_CLAN: {
-		STACK: 'ROUTES.MENU_CLAN.STACk',
+		STACK: 'ROUTES.MENU_CLAN.STACK',
 		CREATE_CATEGORY: 'ROUTES.MENU_CLAN.CREATE_CATEGORY',
 		CREATE_CHANNEL: 'ROUTES.MENU_CLAN.CREATE_CHANNEL',
 		CREATE_EVENT: 'ROUTES.MENU_CLAN.CREATE_EVENT',
@@ -103,7 +105,7 @@ export const APP_SCREEN = {
 	},
 
 	MENU_CHANNEL: {
-		STACK: 'ROUTES.MENU_CHANNEL.STACk',
+		STACK: 'ROUTES.MENU_CHANNEL.STACK',
 		SETTINGS: 'ROUTES.MENU_CHANNEL.SETTINGS',
 		SEARCH_MESSAGE_CHANNEL: 'SEARCH_MESSAGE_CHANNEL',
 		CHANNEL_PERMISSION: 'CHANNEL_PERMISSION',
@@ -215,6 +217,9 @@ export type MenuChannelStackParamList = {
 		isVideoCall?: string;
 		directMessageId?: string;
 	};
+	[APP_SCREEN.MENU_CHANNEL.QUICK_ACTION]: {
+		channelId: string;
+	};
 };
 
 type MenuClanStackParamList = {
@@ -277,10 +282,12 @@ type MenuClanStackParamList = {
 	[APP_SCREEN.MENU_CLAN.CATEGORY_SETTING]: {
 		categoryId: string;
 	};
-	[APP_SCREEN.MENU_CLAN.INTEGRATIONS]: { channelId?: string };
-	[APP_SCREEN.MENU_CLAN.WEBHOOKS]: { channelId?: string };
+	[APP_SCREEN.MENU_CLAN.INTEGRATIONS]: { channelId?: string; isClanSetting?: boolean };
+	[APP_SCREEN.MENU_CLAN.WEBHOOKS]: { channelId?: string; clanId?: string; isClanSetting?: boolean; isClanIntegration?: boolean };
 	[APP_SCREEN.MENU_CLAN.WEBHOOKS_EDIT]: {
 		webhook: ApiWebhook;
+		isClanIntegration?: boolean;
+		isClanSetting?: boolean;
 	};
 	[APP_SCREEN.MENU_CLAN.SOUND_STICKER]: undefined;
 	[APP_SCREEN.MENU_CLAN.CREATE_SOUND]: undefined;

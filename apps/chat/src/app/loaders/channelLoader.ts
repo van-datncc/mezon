@@ -1,11 +1,11 @@
-import { channelsActions, quickMenuActions, threadsActions, topicsActions } from '@mezon/store';
+import { appActions, channelsActions, quickMenuActions, threadsActions, topicsActions } from '@mezon/store';
 import { QUICK_MENU_TYPE, notificationService } from '@mezon/utils';
 import { ShouldRevalidateFunction } from 'react-router-dom';
 import { CustomLoaderFunction } from './appLoader';
 import { waitForSocketConnection } from './socketUtils';
 
 export const channelLoader: CustomLoaderFunction = async ({ params, request, dispatch }) => {
-	const { channelId, clanId } = params;
+	const { channelId, clanId, canvasId } = params;
 	const messageId = new URL(request.url).searchParams.get('messageId');
 	if (!channelId || !clanId) {
 		throw new Error('Channel ID null');
@@ -20,6 +20,9 @@ export const channelLoader: CustomLoaderFunction = async ({ params, request, dis
 	notificationService.setCurrentChannelId(channelId);
 	dispatch(topicsActions.setIsShowCreateTopic(false));
 	dispatch(topicsActions.setCurrentTopicId(''));
+	if (!canvasId) {
+		dispatch(appActions.setIsShowCanvas(false));
+	}
 	dispatch(topicsActions.setFocusTopicBox(false));
 	dispatch(threadsActions.setFocusThreadBox(false));
 	dispatch(threadsActions.hideThreadModal());

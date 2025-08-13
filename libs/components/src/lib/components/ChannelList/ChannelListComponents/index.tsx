@@ -3,6 +3,7 @@ import {
 	EventManagementOnGogoing,
 	eventManagementActions,
 	onboardingActions,
+	selectCurrentChannelId,
 	selectCurrentClan,
 	selectCurrentClanId,
 	selectEventLoading,
@@ -12,6 +13,8 @@ import {
 	selectOnboardingMode,
 	selectOngoingEvent,
 	selectProcessingByClan,
+	threadsActions,
+	topicsActions,
 	useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
@@ -55,7 +58,7 @@ export const Events = memo(() => {
 		isSettingPath: channelSettingPath,
 		isGuidePath: serverGuidePath
 	});
-
+	const currentChannelId = useSelector(selectCurrentChannelId);
 	const [openEventModal, closeEventModal] = useModal(() => {
 		return <EventModal onClose={closeModal} />;
 	}, []);
@@ -75,6 +78,10 @@ export const Events = memo(() => {
 		}
 		return selectUserProcessing?.onboarding_step !== DONE_ONBOARDING_STATUS && onboardingByClan?.mission.length > 0 && currentClan?.is_onboarding;
 	}, [selectUserProcessing?.onboarding_step, onboardingByClan?.mission.length, previewMode, currentClan?.is_onboarding]);
+	const handleClose = () => {
+		dispatch(topicsActions.setIsShowCreateTopic(false));
+		dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannelId as string, isShowCreateThread: false }));
+	};
 
 	const eventLoading = useSelector(selectEventLoading);
 
@@ -87,6 +94,7 @@ export const Events = memo(() => {
 			{currentClan && currentClan.is_onboarding && (
 				<Link
 					to={serverGuidePath}
+					onClick={handleClose}
 					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'bg-button-secondary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
@@ -125,6 +133,7 @@ export const Events = memo(() => {
 
 			<Link
 				to={memberPath}
+				onClick={handleClose}
 				className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isMemberPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
@@ -139,6 +148,7 @@ export const Events = memo(() => {
 			{checkAdminPermission ? (
 				<Link
 					to={channelSettingPath}
+					onClick={handleClose}
 					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">

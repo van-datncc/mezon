@@ -1,7 +1,6 @@
 import { channelMembersActions, selectCurrentClanId, useAppDispatch, userClanProfileActions } from '@mezon/store';
-import { Icons } from '@mezon/ui';
-import { Dropdown } from 'flowbite-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { Icons, Menu } from '@mezon/ui';
+import { ReactElement, ReactNode, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ModalLayout } from '../../../components';
 
@@ -58,6 +57,17 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 		onClose();
 	};
 
+	const menuTime = useMemo(() => {
+		const menuItems: ReactElement[] = [
+			<ItemSelect timeSetReset={timeSetReset} children="Today" onClick={() => setStatusTimer(0, false, 'Today')} />,
+			<ItemSelect timeSetReset={timeSetReset} children="4 hours" onClick={() => setStatusTimer(240, false, '4 hours')} />,
+			<ItemSelect timeSetReset={timeSetReset} children="1 hours" onClick={() => setStatusTimer(60, false, '1 hours')} />,
+			<ItemSelect timeSetReset={timeSetReset} children="30 minutes" onClick={() => setStatusTimer(30, false, '30 minutes')} />,
+			<ItemSelect timeSetReset={timeSetReset} children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
+		];
+		return <>{menuItems}</>;
+	}, [timeSetReset]);
+
 	return (
 		<ModalLayout onClose={onClose}>
 			<div className="bg-theme-setting-primary pt-4 rounded w-[440px] ">
@@ -83,31 +93,22 @@ const ModalCustomStatus = ({ name, status, onClose }: ModalCustomStatusProps) =>
 						<div className="mb-2 block">
 							<p className="text-theme-primary text-xs uppercase font-semibold">Clear after</p>
 						</div>
-						<Dropdown
-							trigger="click"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div className="flex items-center justify-between rounded-lg cursor-pointer h-9 text-theme-primary-hover bg-input-secondary px-3 text-theme-primary">
-									<li className="text-[14px] text-theme-primary w-full py-[6px] list-none select-none">{timeSetReset}</li>
-									<Icons.ArrowDown />
-								</div>
-							)}
-							label=""
-							placement="bottom-start"
-							className="bg-theme-setting-primary border-none py-0 w-[200px] [&>ul]:py-0"
-						>
-							<ItemSelect children="Today" onClick={() => setStatusTimer(0, false, 'Today')} />
-							<ItemSelect children="4 hours" onClick={() => setStatusTimer(240, false, '4 hours')} />
-							<ItemSelect children="1 hours" onClick={() => setStatusTimer(60, false, '1 hours')} />
-							<ItemSelect children="30 minutes" onClick={() => setStatusTimer(30, false, '30 minutes')} />
-							<ItemSelect children="Don't clear" onClick={() => setStatusTimer(0, true, "Don't clear")} />
-						</Dropdown>
+						<Menu menu={menuTime} className="bg-theme-setting-primary border-none py-0 w-[200px] [&>ul]:py-0">
+							<div className="flex items-center justify-between rounded-lg cursor-pointer h-9 text-theme-primary-hover bg-input-secondary px-3 text-theme-primary">
+								<li className="text-[14px] text-theme-primary w-full py-[6px] list-none select-none">{timeSetReset}</li>
+								<Icons.ArrowDown />
+							</div>
+						</Menu>
 					</div>
 					<div className="flex justify-end p-4 gap-2 rounded-b-theme-primary ">
 						<button className="py-2 h-10 px-4 rounded-lg  hover:underline text-theme-primary" type="button" onClick={onClose}>
 							Cancel
 						</button>
-						<button className="py-2 h-10 px-4 rounded-lg text-white !bg-[#5265ec] hover:!bg-[#4654c0]" type="button" onClick={handleSaveCustomStatus}>
+						<button
+							className="py-2 h-10 px-4 rounded-lg text-white !bg-[#5265ec] hover:!bg-[#4654c0]"
+							type="button"
+							onClick={handleSaveCustomStatus}
+						>
 							Save
 						</button>
 					</div>
@@ -122,17 +123,17 @@ type ItemSelectProps = {
 	dropdown?: boolean;
 	startIcon?: ReactNode;
 	onClick?: () => void;
+	timeSetReset: string;
 };
 
-const ItemSelect = ({ children, dropdown, startIcon, onClick }: ItemSelectProps) => {
+const ItemSelect = ({ children, dropdown, startIcon, onClick, timeSetReset }: ItemSelectProps) => {
 	return (
-		<div
-			onClick={onClick}
-			className="flex items-center justify-between h-11 rounded-sm bg-theme-setting-nav text-theme-primary-hover cursor-pointer text-theme-primary bg-item-theme-hover-status px-3"
-		>
+		<div onClick={onClick} className="flex w-full items-center justify-between px-3">
 			{startIcon && <div className="flex items-center justify-center h-[18px] w-[18px] mr-2">{startIcon}</div>}
-			<li className="text-[14px] w-full list-none leading-[44px] ">{children}</li>
-			<Icons.Check className="w-[18px] h-[18px]" />
+			<div>
+				<li className="text-[14px] w-full list-none leading-[44px] ">{children}</li>
+			</div>
+			{children === timeSetReset && <Icons.Check className="w-[18px] h-[18px]" />}
 		</div>
 	);
 };

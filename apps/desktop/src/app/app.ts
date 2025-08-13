@@ -20,6 +20,10 @@ const ACTIVITY_MUSIC = Object.values(EActivityMusic);
 const ACTIVITY_GAMING = Object.values(EActivityGaming);
 
 const IMAGE_WINDOW_KEY = 'IMAGE_WINDOW_KEY';
+
+const isMac = process.platform === 'darwin';
+
+
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
 	// be closed automatically when the JavaScript object is garbage collected.
@@ -314,7 +318,6 @@ export default class App {
 	}
 
 	private static setupMenu() {
-		const isMac = process.platform === 'darwin';
 
 		const appMenu: MenuItemConstructorOptions[] = [
 			{
@@ -364,7 +367,19 @@ export default class App {
 			// { role: 'fileMenu' }
 			{
 				label: 'File',
-				submenu: [isMac ? { role: 'close' } : { role: 'quit' }]
+				submenu: [
+					...(isMac
+						? ([
+							{
+								label: 'Hide Window',
+								accelerator: 'CmdOrCtrl+W',
+								click: () => {
+									App.mainWindow.hide();
+								}
+							}
+						] as MenuItemConstructorOptions[])
+						: ([{ role: 'quit' }] as MenuItemConstructorOptions[]))
+				]
 			},
 			// { role: 'editMenu' }
 			{
@@ -378,15 +393,15 @@ export default class App {
 					{ role: 'paste' },
 					...(isMac
 						? ([
-								{ role: 'pasteAndMatchStyle' },
-								{ role: 'delete' },
-								{ role: 'selectAll' },
-								{ type: 'separator' },
-								{
-									label: 'Speech',
-									submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
-								}
-							] as MenuItemConstructorOptions[])
+							{ role: 'pasteAndMatchStyle' },
+							{ role: 'delete' },
+							{ role: 'selectAll' },
+							{ type: 'separator' },
+							{
+								label: 'Speech',
+								submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+							}
+						] as MenuItemConstructorOptions[])
 						: ([{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }] as MenuItemConstructorOptions[]))
 				]
 			},
@@ -399,6 +414,13 @@ export default class App {
 						accelerator: 'CmdOrCtrl+R',
 						click: () => {
 							App.mainWindow.webContents.send('reload-app');
+						}
+					},
+					{
+						label: 'Hide',
+						accelerator: 'CmdOrCtrl+W',
+						click: () => {
+							App.mainWindow.hide();
 						}
 					},
 					{ type: 'separator' },
@@ -418,7 +440,7 @@ export default class App {
 					{ role: 'zoom' },
 					...(isMac
 						? ([{ type: 'separator' }, { role: 'front' }, { type: 'separator' }, { role: 'window' }] as MenuItemConstructorOptions[])
-						: ([{ role: 'close' }] as MenuItemConstructorOptions[]))
+						: ([{ role: 'quit' }] as MenuItemConstructorOptions[]))
 				]
 			},
 			{

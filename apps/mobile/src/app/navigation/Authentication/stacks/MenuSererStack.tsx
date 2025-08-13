@@ -32,7 +32,7 @@ import { SetupPermissions } from '../../../screens/serverRoles/SetupPermissions'
 import { APP_SCREEN } from '../../ScreenTypes';
 
 // eslint-disable-next-line no-empty-pattern
-export const MenuClanStacks = ({}: any) => {
+export const MenuClanStacks = ({ }: any) => {
 	const { themeValue } = useTheme();
 	const Stack = createStackNavigator();
 	const { t } = useTranslation(['screenStack']);
@@ -229,10 +229,10 @@ export const MenuClanStacks = ({}: any) => {
 			<Stack.Screen
 				name={APP_SCREEN.MENU_CLAN.WEBHOOKS}
 				component={Webhooks}
-				options={{
-					headerTitle: t('menuClanStack.webhooks'),
+				options={({ route }: any) => ({
+					headerTitle: route?.params?.isClanIntegration ? t('menuClanStack.clanWebhooks') : t('menuClanStack.webhooks'),
 					headerLeftLabelVisible: false
-				}}
+				})}
 			/>
 			<Stack.Screen name={APP_SCREEN.MENU_CLAN.AUDIT_LOG} component={AuditLogComponent} />
 			<Stack.Screen

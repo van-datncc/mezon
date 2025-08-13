@@ -16,10 +16,10 @@ import {
 import { Icons, Image, InputField, TextArea } from '@mezon/ui';
 import { checkIsThread, IChannel, ValidateSpecialCharacters, ValidateURL } from '@mezon/utils';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { Dropdown } from 'flowbite-react';
 import { ModalSaveChanges } from 'libs/components/src/lib/components';
+import Dropdown from 'libs/ui/src/lib/DropDown';
 import { ChannelType } from 'mezon-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -369,43 +369,27 @@ const BottomBlock = ({
 		return 'assets/images/channel_setting_logo_dark.svg';
 	}, [appearanceTheme]);
 
+	const menu = useMemo(() => {
+		const menuItems: ReactElement[] = [];
+
+		hideInactivityTimes.map((item, index) => {
+			menuItems.push(
+				<Dropdown.Item
+					key={index}
+					onClick={() => {
+						console.log('Hêr');
+						setHideTimeDropdown(item);
+					}}
+					className="truncate !bg-var(--theme-setting-nav) bg-item-hover"
+				>
+					{item}
+				</Dropdown.Item>
+			);
+		});
+		return <>{menuItems}</>;
+	}, []);
 	return (
 		<div className="flex flex-col gap-10 mt-10 text-sm text-colorTextLightMode dark:text-textPrimary">
-			<hr className="border-t border-solid dark:border-borderDivider" />
-			<div className="flex flex-col gap-2">
-				<div className="text-xs font-bold text-theme-primary">SlowMode</div>
-				<div className="w-full relative">
-					<Dropdown
-						trigger="click"
-						renderTrigger={() => (
-							<div className="w-full h-[50px] rounded-md border-theme-primary text-theme-message bg-input-secondary flex flex-row px-3 justify-between items-center">
-								<p className="truncate max-w-[90%]">{slowModeDropdown}</p>
-								<div>
-									<Icons.ArrowDownFill />
-								</div>
-							</div>
-						)}
-						label=""
-						placement="bottom-end"
-						className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
-					>
-						{slowModeValues.map((item, index) => {
-							return (
-								<Dropdown.Item
-									onClick={() => setSlowDropdown(item)}
-									key={index}
-									children={item}
-									className="truncate text-theme-primary bg-theme-setting-nav"
-								/>
-							);
-						})}
-					</Dropdown>
-				</div>
-				<div className="text-theme-primary">
-					Members will be restricted to sending one message and creating one thread per specified interval, unless they have 'Manage
-					Channel' or 'Manage Messages' permissions.
-				</div>
-			</div>
 			<hr className="border-t border-solid dark:border-borderDivider" />
 			<div className="flex flex-col gap-3">
 				<div className="flex justify-between">
@@ -431,61 +415,17 @@ const BottomBlock = ({
 				</div>
 			</div>
 
-			{/* {!thisIsSystemMessageChannel && (
-				<>
-					<hr className="border-t border-solid dark:border-borderDivider" />
-					<div className="flex flex-col gap-3">
-						<div className="flex justify-between">
-							<div className="font-semibold text-base text-theme-primary">Announcement Channel</div>
-							<input
-								className="peer relative h-4 w-8 cursor-pointer appearance-none rounded-lg
-														bg-slate-300 transition-colors after:absolute after:top-0 after:left-0 after:h-4 after:w-4 after:rounded-full
-														after:bg-slate-500 after:transition-all checked:bg-blue-200 checked:after:left-4 checked:after:bg-blue-500
-														hover:bg-slate-400 after:hover:bg-slate-600 checked:hover:bg-blue-300 checked:after:hover:bg-blue-600
-														focus:outline-none checked:focus:bg-blue-400 checked:after:focus:bg-blue-700 focus-visible:outline-none disabled:cursor-not-allowed
-														disabled:bg-slate-200 disabled:after:bg-slate-300"
-								type="checkbox"
-								checked={isCheckForSystemMsg}
-								onChange={() => setIsCheckForSystemMsg(!isCheckForSystemMsg)}
-							/>
-						</div>
-						<div>
-							Post messages that reach clans outside your own. Users can opt in to 'Following' this channel, so select posts you
-							'Publish' from here will appear directly in their own clans. Announcement channels will not receive messages from other
-							Announcement channels.
-						</div>
-					</div>
-				</>
-			)} */}
-
 			<hr className="border-t border-solid dark:border-borderDivider" />
 			<div className="flex flex-col gap-2">
 				<div className="text-xs font-bold text-theme-primary">Hide After Inactivity</div>
 				<div className="w-full relative">
-					<Dropdown
-						trigger="click"
-						renderTrigger={() => (
-							<div className="w-full h-[50px] rounded-md border-theme-primary text-theme-message bg-input-secondary flex flex-row px-3 justify-between items-center">
-								<p className="truncate max-w-[90%]">{hideTimeDropdown}</p>
-								<div>
-									<Icons.ArrowDownFill />
-								</div>
+					<Dropdown menu={menu} className="text-theme-message bg-input-secondary rounded-md">
+						<div className="w-full h-[50px] rounded-md border-theme-primary text-theme-message bg-input-secondary flex flex-row px-3 justify-between items-center">
+							<p className="truncate max-w-[90%]">{hideTimeDropdown}</p>
+							<div>
+								<Icons.ArrowDownFill />
 							</div>
-						)}
-						label=""
-						placement="bottom-end"
-						className={`bg-theme-setting-primary  border-none ml-[3px] py-[6px] px-[8px] max-h-[200px] overflow-y-scroll w-[200px] ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
-					>
-						{hideInactivityTimes.map((item, index) => {
-							return (
-								<Dropdown.Item
-									onClick={() => setHideTimeDropdown(item)}
-									key={index}
-									children={item}
-									className="truncate !bg-var(--theme-setting-nav)"
-								/>
-							);
-						})}
+						</div>
 					</Dropdown>
 				</div>
 				<div className="text-theme-primary">

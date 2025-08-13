@@ -1,0 +1,107 @@
+/* Cyber Crimson Moon Dark Theme */
+:root {
+	--bg-primary:linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), linear-gradient(141.68deg, rgb(72, 40, 140) 27.57%, rgb(219, 127, 75) 71.25%);
+	--bg-secondary: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(141.68deg, rgb(72, 40, 140) 27.57%, rgb(219, 127, 75) 71.25%);
+	--bg-outside-footer:  linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(141.68deg, rgb(72, 40, 140) 27.57%, rgb(219, 127, 75) 71.25%);
+	--bg-footer: linear-gradient(rgb(0 0 0 / 0.9), rgb(0 0 0 / 0.9)) fixed 0 0 / cover,
+		linear-gradient(64.92deg, hsl(0 100% 20%) 40%, hsl(0 100% 4%) 90%);
+
+	--bg-surface: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), linear-gradient(141.68deg, rgb(88, 51, 167)  5.57%, rgb(219, 127, 75) 71.25%);
+
+	--bg-ping-member: rgb(48, 37, 40);
+	--bg-tertiary: hsl(0 0% 20% / 0.2);
+	--bg-accent: hsl(0 50% 25% / 0.25);
+	--bg-hover: #2a0f0f;
+	--bg-modal: rgba(0, 0, 0, 0.85);
+
+	--theme-input: hsl(0 0% 30% / 0.2);
+	--theme-border-input: color-mix(in oklab, hsl(0 0% 60% / 0.4), hsl(0 88% 60% / 0.3));
+
+	--theme-base-color: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+	--theme-text-color-dark: rgb(255, 229, 229);
+	--theme-setting-primary: rgb(38, 36, 51);
+	--theme-setting-nav: rgb(30, 27, 41);
+	--private-theme: rgb(110, 13, 13);
+
+	--text-theme-primary: #acacac;
+
+	--text-theme-message: oklab(0.906424 -0.000235766 -0.0028885);
+
+	--text-theme-primary-hover: color-mix(in oklab, hsl(0 100% 90%) 40%, #ffbaba 60%);
+
+	--bg-active-friend-list: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), linear-gradient(141.68deg, rgb(72, 40, 140) 27.57%, rgb(219, 127, 75) 71.25%);
+
+	--bg-active-button: hsl(0 50% 30% / 0.25);
+	--color-text-active-button: color-mix(in oklab, hsl(0 100% 60%) 100%, hsl(0 100% 80%) 50%);
+	--bg-button-add-friend: rgb(110, 13, 13);
+
+	--border-color-primary: color-mix(
+		in oklab,
+		color-mix(in oklab, #950909 50%, #550000 50%) 30%,
+		color-mix(in oklab, hsl(0 0% 40% / 0.3), hsl(0 100% 90% / 0.3)) 100%
+	);
+
+	--bg-theme-direct-message: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), linear-gradient(141.68deg, rgb(72, 40, 140) 27.57%, rgb(219, 127, 75) 71.25%);
+
+	--text-secondary: #f7ffff;
+	--bg-item-hover: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+	--bg-item-hover-chat: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+	--bg-active-member-channel: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+
+	--bg-theme-input-primary: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5)) fixed 0 0 / cover,
+		linear-gradient(64.92deg, hsl(0 88.6% 30.98%) 16.17%, hsl(0 0% 0%) 72%) fixed 0 0 / cover;
+
+	--border-theme-primary: color-mix(in oklab, hsl(0 100% 50%) 100%, hsl(0 100% 30%) 30%);
+	--border-t-theme-primary: color-mix(in oklab, hsl(0 100% 50%) 100%, hsl(0 100% 30%) 30%);
+	--border-r-t-l-theme-primary: color-mix(in oklab, hsl(0 100% 50%) 100%, hsl(0 100% 30%) 30%);
+	--border-r-b-l-theme-primary: color-mix(in oklab, hsl(0 100% 50%) 100%, hsl(0 100% 30%) 30%);
+	--border-primary: hsl(0 0% 30% / 0.4);
+	--border-secondary: #ff4444;
+	--border-focus: #ff6666;
+	--border-divider: #330000;
+	--border-hover: #cc2222;
+	--bg-hover-select-status: #340206;
+	--mention-primary: rgba(67, 97, 238, 0.24);
+	--mention-color: #3298ff;
+	--bg-mention-hover: rgba(67, 98, 238, 0.39);
+	--color-mention-hover: #3298ff;
+	--bg-mention-evryone: #2eb08b63;
+	--color-mention-evryone: #2eb08c;
+	--bg-mention-everyone-hover: #2eb08b8c;
+	--color-mention-everyone-hover: #32b993;
+
+	--bg-highlight: color-mix(in oklab, hsla(51, 96%, 33%, 0.08), hsla(27, 98%, 46%, 0.08));
+	--bg-secondary-button-hover: hsl(0 50% 25% / 0.3);
+	--bg-theme-contexify: rgb(40, 37, 54);
+	--bg-count-page: #2a0c0c;
+	--text-count-page: #ffcccc;
+	--bg-count-page-hover: #3b0f0f;
+	--text-count-page-hover: #ffe5e5;
+	--bg-count-page-active: #6e0e0e;
+	--text-count-page-active: #ffffff;
+
+	/* modal */
+	--bg-modal-theme: color-mix(in oklab, hsl(232.5 calc(1 * 6.557%) 23.922% /1) 100%, rgb(26, 0, 0) 50%);
+	/* option  */
+	--bg-option-theme: #33272a;
+	--bg-option-active: #473d42;
+
+	--bg-button-add-friend-active: hsl(240 calc(1 * 4%) 60.784% /0.12156862745098039);
+	--text-button-add-friend-active: color-mix(in oklab, hsl(228.679 calc(1 * 96.364%) 78.431% /1) 100%, #000 0%);
+	--bg-markdown-code: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
+
+	/* scroll bar */
+	--bg-scroll-bar: #b4b2ab;
+	--thread-scroll: #787881;
+	/* pop up */
+	--bg-theme-pop: color-mix(in oklab, hsl(232.5 calc(1 * 6.557%) 23.922% /1) 100%, rgb(26, 0, 0) 50%);
+	--border-highlight-react-theme: #5865f2;
+	--bg-highlight-react-theme: rgba(154, 161, 240, 0.18);
+	--bg-input-secondary: color-mix(in oklab, hsl(0 calc(1 * 0%) 0% /0.2) 100%, hsl(0 100% 5.098039215686274% /0.2) 50%);
+	--bg-button-primary-hover: #4654c0;
+	--button-theme-primary: #5265ec;
+
+	/* border-avatar */
+	--border-color-avatar: #561c1e;
+
+}

@@ -80,6 +80,7 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
 					persistApp.theme = JSON.stringify("${themeBasic}");
 					persistApp.themeApp = JSON.stringify("${themeBasic}");
 					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+					localStorage.setItem('current-theme', "${themeBasic}");
 				}
 			}
 		} catch (error) {
@@ -90,6 +91,7 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
 				themeApp: JSON.stringify("${themeBasic}")
 			};
 			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+			localStorage.setItem('current-theme', "${themeBasic}");
 		}
 	})();
 	true;
@@ -117,6 +119,15 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
         }
         .bg-bgLightModeSecond {
         	padding-left: 0;
+				}
+				#clan-footer {
+					display: none !important;
+				}
+				.h-dvh {
+					padding-left: 0 !important;
+				}
+				#menu {
+					display: none !important
 				}
       \`;
       document.head.appendChild(style);

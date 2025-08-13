@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
-import MezonInput from '../../componentUI/MezonInput2';
+import MezonInput from '../../componentUI/MezonInput';
 import MezonMenu, { IMezonMenuSectionProps } from '../../componentUI/MezonMenu';
 import MezonSwitch from '../../componentUI/MezonSwitch';
 import { IconCDN } from '../../constants/icon_cdn';

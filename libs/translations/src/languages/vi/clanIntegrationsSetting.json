@@ -1,11 +1,14 @@
 {
   "integration": {
     "title": "Webhook",
-    "automatedMessage": "Tin nhắn và cập nhật tự động"
+    "automatedMessage": "Tin nhắn và cập nhật tự động",
+    "description": "Tùy chỉnh clan của bạn với các tích hợp. Quản lý webhook, kênh theo dõi và ứng dụng, cũng như cài đặt Twitch và YouTube cho các nhà sáng tạo.",
+    "learnMore": "Tìm hiểu thêm về việc quản lý tích hợp."
   },
   "webhooks": {
-       "description": "Webhook là công cụ giúp bạn nhận tin nhắn tự động và cập nhật dữ liệu gửi đến kênh văn bản trong clan của bạn thông qua các kết nối Internet.",
-    "learnMore": "Tìm hiểu thêm."
+    "description": "Webhook là công cụ giúp bạn nhận tin nhắn tự động và cập nhật dữ liệu gửi đến kênh văn bản trong clan của bạn thông qua các kết nối Internet.",
+    "learnMore": "Tìm hiểu thêm.",
+    "buildOne": "tạo một cái của riêng bạn"
   },
   "webhooksEdit": {
     "title": "Chỉnh sửa webhook",
@@ -20,7 +23,8 @@
     "selectAChannel": "Chọn một kênh",
     "yes": "Có",
     "deleteCaptionHook": "Xóa tiêu đề hook",
-    "deleteWebhookConfirmation": "Bạn có chắc chắn muốn xóa webhook {{webhookName}}? Hành động này không thể hoàn tác."
+    "deleteWebhookConfirmation": "Bạn có chắc chắn muốn xóa webhook {{webhookName}}? Hành động này không thể hoàn tác.",
+    "resetToken": "Đặt lại token"
   },
   "webhooksEmpty": {
     "noWebhooks": "KHÔNG CÓ WEBHOOK",
@@ -28,5 +32,12 @@
   },
   "webhooksItem": {
     "createdBy": "Được tạo vào {{webhookCreateTime}} bởi {{webhookUserOwnerName}}"
+  },
+  "webhookChannelSelect": {
+    "title": "Chọn Kênh",
+    "description": "Chọn kênh nơi bạn muốn tạo webhook",
+    "selectChannel": "Kênh",
+    "placeholder": "Chọn một kênh",
+    "create": "Tạo"
   }
 }

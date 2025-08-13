@@ -14,9 +14,9 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Menu as Dropdown } from '@mezon/ui';
 import { ContextMenuItem, IEmoji, IMessageWithUser, QUICK_MENU_TYPE, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { ReactElement, useCallback, useMemo, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import { useMessageContextMenu } from './MessageContextMenuContext';
@@ -189,6 +189,56 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		return quickMenuItems.length > 0 || isLoadingCommands;
 	}, [quickMenuItems, isLoadingCommands]);
 
+	const dropdownReact = useMemo(() => {
+		const reactItems: ReactElement[] = [];
+		const addReactionFunction = items.find((item) => item.id === 'addReaction');
+		firstFourElements.map((item, index) =>
+			reactItems.push(
+				<div className="w-[320px] " key={index}>
+					<Item
+						className="flex justify-between items-center w-full px-2 py-1"
+						key={index}
+						onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}
+					>
+						<div
+							className={`flex truncate justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium text-theme-primary text-theme-primary-hover p-1`}
+						>
+							{item.shortname}
+						</div>
+						<div className="p-1">
+							<ReactionItem
+								emojiShortCode={item.shortname || ''}
+								emojiId={item.id || ''}
+								messageId={messageId}
+								isOption={false}
+								isAddReactionPanel
+								message={message}
+								isTopic={!!isTopic}
+							/>
+						</div>
+					</Item>
+				</div>
+			)
+		);
+
+		reactItems.push(<hr className="border-b-theme-primary" />);
+		reactItems.push(
+			<Item className="w-full px-2 py-1">
+				<div
+					className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium text-theme-primary text-theme-primary-hover p-1`}
+					onClick={() => {
+						if (addReactionFunction) {
+							addReactionFunction.handleItemClick?.();
+						}
+					}}
+				>
+					<span>View More</span>
+				</div>
+			</Item>
+		);
+		return <>{reactItems}</>;
+	}, [firstFourElements]);
+
 	const children = useMemo(() => {
 		const elements: React.ReactNode[] = [];
 		for (let index = 0; index < items.length; index++) {
@@ -248,58 +298,23 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 			} else if (lableAddReaction) {
 				elements.push(
 					<Dropdown
+						align={{
+							points: ['tl', 'br']
+						}}
+						menu={dropdownReact}
 						key={item.label}
 						trigger="hover"
-						dismissOnClick={false}
-						renderTrigger={() => (
-							<div>
-								<Item key={index} onClick={item.handleItemClick} disabled={item.disabled}>
-									<div
-										className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}`}
-									>
-										<span>Add Reaction</span>
-									</div>
-								</Item>
-							</div>
-						)}
-						label=""
-						placement="right-start"
 						className=" border-none bg-theme-contexify"
 					>
-						{firstFourElements.map((item, index) => (
-							<div className="w-[320px] " key={index}>
-								<Item
-									className="flex justify-between items-center w-full px-2 py-1"
-									key={index}
-									onClick={() => handleClickEmoji(item.id || '', item.shortname || '')}
+						<div>
+							<Item key={index} onClick={item.handleItemClick} disabled={item.disabled}>
+								<div
+									className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}`}
 								>
-									<div
-										className={`flex truncate justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
-									>
-										{item.shortname}
-									</div>
-									<div className="p-1">
-										<ReactionItem
-											emojiShortCode={item.shortname || ''}
-											emojiId={item.id || ''}
-											messageId={messageId}
-											isOption={false}
-											isAddReactionPanel
-											message={message}
-											isTopic={!!isTopic}
-										/>
-									</div>
-								</Item>
-							</div>
-						))}
-						<hr className="border-b-theme-primary" />
-						<Item className="w-full px-2 py-1" key={index} onClick={item.handleItemClick} disabled={item.disabled}>
-							<div
-								className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}  p-1`}
-							>
-								<span>View More</span>
-							</div>
-						</Item>
+									<span>Add Reaction</span>
+								</div>
+							</Item>
+						</div>
 					</Dropdown>
 				);
 			} else if (!lableSlashCommands) {

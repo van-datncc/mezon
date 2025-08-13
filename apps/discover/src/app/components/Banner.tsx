@@ -23,7 +23,7 @@ const Banner: React.FC<BannerProps> = ({ onSearch, searchTerm }) => {
 			<div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop')] bg-center bg-cover"></div>
 
 			<div className="relative container mx-auto px-4 py-16 text-center">
-				<h1 className="text-4xl md:text-5xl font-bold mb-4">Find Your Comunity On Mezon</h1>
+				<h1 className="text-4xl md:text-5xl font-bold mb-4">Find Your Community On Mezon</h1>
 				<p className="text-lg md:text-xl max-w-3xl mx-auto opacity-90 mb-8">
 					Discover clans where you can hang out with people who share your interests and passions.
 				</p>

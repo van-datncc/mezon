@@ -1,6 +1,7 @@
 import { Metrics, size, useTheme } from '@mezon/mobile-ui';
 import { EMimeTypes, createImgproxyUrl } from '@mezon/utils';
 import * as Sentry from '@sentry/react-native';
+import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -25,7 +26,7 @@ type RenderImageProps = {
 	index?: number;
 	disable?: boolean;
 	onPress: (image: ImageProps) => void;
-	onLongPress?: () => void;
+	onLongPress?: (image?: ApiMessageAttachment) => void;
 	isMultiple?: boolean;
 	remainingImagesCount?: number;
 	isTablet?: boolean;
@@ -237,13 +238,19 @@ const ImageRenderer = React.memo(
 
 		const containerStyle = [styles.imageMessageRender, imageStyle];
 
+		const handleLongPressImage = () => {
+			if (!remainingImagesCount) {
+				onLongPress?.(image);
+			}
+		};
+
 		return (
 			<TouchableOpacity
 				disabled={isUploading || disable}
-				activeOpacity={0.8}
+				activeOpacity={0.3}
 				key={`${index}-${retryAttempt}`} // Add retry attempt to force re-render
 				onPress={() => onPress(image)}
-				onLongPress={onLongPress}
+				onLongPress={handleLongPressImage}
 				style={containerStyle}
 			>
 				{imageProxyObj?.isProxyImage ? (
@@ -283,3 +290,4 @@ const ImageRenderer = React.memo(
 );
 
 export { RenderImageChat };
+

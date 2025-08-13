@@ -1,13 +1,5 @@
 import { useClans } from '@mezon/core';
-import {
-	ActionEmitEvent,
-	AddIcon,
-	QUALITY_IMAGE_UPLOAD,
-	save,
-	setDefaultChannelLoader,
-	STORAGE_CLAN_ID,
-	UploadImage
-} from '@mezon/mobile-components';
+import { ActionEmitEvent, QUALITY_IMAGE_UPLOAD, save, setDefaultChannelLoader, STORAGE_CLAN_ID } from '@mezon/mobile-components';
 import { Colors, size, useTheme } from '@mezon/mobile-ui';
 import { channelsActions, checkDuplicateNameClan, clansActions, getStoreAsync, selectCurrentChannel } from '@mezon/store-mobile';
 import { handleUploadFileMobile, useMezon } from '@mezon/transport';
@@ -19,7 +11,7 @@ import * as ImagePicker from 'react-native-image-picker';
 import { CameraOptions } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
-import { MezonButton } from '../../../../../componentUI/MezonButton';
+import MezonButton from '../../../../../componentUI/MezonButton';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IFile } from '../../../../../componentUI/MezonImagePicker';
 import MezonInput from '../../../../../componentUI/MezonInput';
@@ -128,8 +120,14 @@ const CreateClanModal = memo(() => {
 				<TouchableOpacity style={styles.uploadImage} onPress={onOpen}>
 					{!urlImage ? (
 						<View style={[styles.uploadCreateClan]}>
-							<AddIcon style={styles.addIcon} height={size.s_30} width={size.s_30} color={Colors.bgButton} />
-							<UploadImage height={size.s_20} width={size.s_20} color={Colors.bgGrayLight} />
+							<MezonIconCDN
+								icon={IconCDN.circlePlusPrimaryIcon}
+								customStyle={styles.addIcon}
+								height={size.s_30}
+								width={size.s_30}
+								color={Colors.bgButton}
+							/>
+							<MezonIconCDN icon={IconCDN.cameraIcon} height={size.s_20} width={size.s_20} color={Colors.bgGrayLight} />
 							<Text style={styles.uploadText}>{t('upload')}</Text>
 						</View>
 					) : (
@@ -153,9 +151,13 @@ const CreateClanModal = memo(() => {
 			<Text style={styles.community}>
 				{t('byCreatingClan')} <Text style={styles.communityGuideLines}>Community Guidelines.</Text>
 			</Text>
-			<MezonButton disabled={!isCheckValid || isSubmitting} viewContainerStyle={styles.button} onPress={handleCreateClan}>
-				<Text style={styles.buttonText}>{t('createServer')}</Text>
-			</MezonButton>
+			<MezonButton
+				disabled={!isCheckValid || isSubmitting}
+				containerStyle={styles.button}
+				onPress={handleCreateClan}
+				title={t('createServer')}
+				titleStyle={styles.buttonText}
+			/>
 		</View>
 	);
 });

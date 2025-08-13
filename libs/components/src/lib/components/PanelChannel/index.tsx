@@ -23,6 +23,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Menu } from '@mezon/ui';
 import {
 	ENotificationTypes,
 	EOverriddenPermission,
@@ -36,9 +37,8 @@ import {
 	copyChannelLink
 } from '@mezon/utils';
 import { format } from 'date-fns';
-import { Dropdown } from 'flowbite-react';
 import { ChannelType, NotificationType } from 'mezon-js';
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -183,6 +183,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	};
 
 	const handleScheduleMute = (duration: number) => {
+		menuOpenMute.current = false;
 		if (duration !== Infinity) {
 			const now = new Date();
 			const unmuteTime = new Date(now.getTime() + duration);
@@ -220,6 +221,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	};
 
 	const setNotification = (notificationType: number | 0) => {
+		menuOpenNoti.current = false;
 		if (notificationType) {
 			const body = {
 				channel_id: channel.channel_id || '',
@@ -237,6 +239,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				})
 			);
 		}
+		handClosePannel();
 	};
 
 	useEffect(() => {
@@ -301,7 +304,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	useOnClickOutside(
 		panelRef,
 		() => {
-			if (!hasModalInChild) {
+			if (!hasModalInChild && !menuOpenMute.current && !menuOpenNoti.current) {
 				handClosePannel();
 			}
 		},
@@ -330,6 +333,60 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 		channel.type !== undefined &&
 		(channel.type === typeChannel.text || channel.type === typeChannel.thread || (isThread && channel.parent_id && channel.parent_id !== '0'));
 
+	const menuOpenMute = useRef(false);
+	const menuOpenNoti = useRef(false);
+
+	const menuMute = useMemo(() => {
+		const menuItems = [
+			<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />,
+			<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />,
+			<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />,
+			<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />,
+			<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />,
+			<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+		];
+		return <>{menuItems}</>;
+	}, []);
+
+	const menuNoti = useMemo(() => {
+		const menuItems = [
+			<ItemPanel
+				children="Use Category Default"
+				type="radio"
+				name="NotificationSetting"
+				defaultNotifi={true}
+				checked={
+					getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
+					getNotificationChannelSelected?.notification_setting_type === undefined
+				}
+				subText={defaultNotifiName}
+				onClick={() => setNotification(ENotificationTypes.DEFAULT)}
+			/>
+		];
+
+		notificationTypesList.map((notification) =>
+			menuItems.push(
+				<ItemPanel
+					children={notification.label}
+					notificationId={notification.value}
+					type="radio"
+					name="NotificationSetting"
+					key={notification.value}
+					checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
+					onClick={() => setNotification(notification.value)}
+				/>
+			)
+		);
+
+		return <>{menuItems}</>;
+	}, [notificationTypesList]);
+
+	const handleOpenMenuMute = useCallback((visible: boolean) => {
+		menuOpenMute.current = visible;
+	}, []);
+	const handleOpenMenuNoti = useCallback((visible: boolean) => {
+		menuOpenNoti.current = visible;
+	}, []);
 	return (
 		<div
 			ref={panelRef}
@@ -346,13 +403,6 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				</ItemPanel>
 			</GroupPanels>
 			<GroupPanels>
-				{/* <ItemPanel
-					children="Invite People"
-					onClick={() => {
-						dispatch(clansActions.toggleInvitePeople({ status: true, channelId: channel.id }));
-						handClosePannel();
-					}}
-				/> */}
 				<ItemPanel
 					children="Copy link"
 					onClick={() => {
@@ -371,66 +421,37 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				<>
 					<GroupPanels>
 						{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
-							<Dropdown
+							<Menu
 								trigger="hover"
-								dismissOnClick={false}
-								renderTrigger={() => (
-									<div>
-										<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
-									</div>
-								)}
-								label=""
-								placement="right-start"
+								menu={menuMute}
+								align={{
+									points: ['bl', 'br']
+								}}
 								className="bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
+								onVisibleChange={handleOpenMenuMute}
 							>
-								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
-								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
-								<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
-								<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
-								<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
-								<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
-							</Dropdown>
+								<div>
+									<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
+								</div>
+							</Menu>
 						) : (
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
 						{shouldShowNotificationSettings && (
-							<Dropdown
+							<Menu
+								menu={menuNoti}
 								trigger="hover"
-								dismissOnClick={false}
-								renderTrigger={() => (
-									<div>
-										<ItemPanel children="Notification Settings" dropdown="change here" />
-									</div>
-								)}
-								label=""
-								placement="right-start"
-								className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+								align={{
+									points: ['bl', 'br']
+								}}
+								onVisibleChange={handleOpenMenuNoti}
+								className="bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
-								<ItemPanel
-									children="Use Category Default"
-									type="radio"
-									name="NotificationSetting"
-									defaultNotifi={true}
-									checked={
-										getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
-										getNotificationChannelSelected?.notification_setting_type === undefined
-									}
-									subText={defaultNotifiName}
-									onClick={() => setNotification(ENotificationTypes.DEFAULT)}
-								/>
-								{notificationTypesList.map((notification) => (
-									<ItemPanel
-										children={notification.label}
-										notificationId={notification.value}
-										type="radio"
-										name="NotificationSetting"
-										key={notification.value}
-										checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
-										onClick={() => setNotification(notification.value)}
-									/>
-								))}
-							</Dropdown>
+								<div>
+									<ItemPanel children="Notification Settings" dropdown="change here" />
+								</div>
+							</Menu>
 						)}
 						{isFavorite ? (
 							<ItemPanel children="Unmark Favorite" onClick={removeFavoriteChannel} />
@@ -454,66 +475,34 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 				<>
 					<GroupPanels>
 						{getNotificationChannelSelected?.active === 1 || getNotificationChannelSelected?.id === '0' ? (
-							<Dropdown
+							<Menu
 								trigger="hover"
-								dismissOnClick={false}
-								renderTrigger={() => (
-									<div>
-										<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
-									</div>
-								)}
-								label=""
-								placement="right-start"
-								className=" bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
+								menu={menuMute}
+								className="bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
+								onVisibleChange={handleOpenMenuMute}
 							>
-								<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
-								<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
-								<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
-								<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
-								<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
-								<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
-							</Dropdown>
+								<div>
+									<ItemPanel children={nameChildren} dropdown="change here" onClick={() => muteOrUnMuteChannel(0)} />
+								</div>
+							</Menu>
 						) : (
 							<ItemPanel children={nameChildren} onClick={() => muteOrUnMuteChannel(1)} subText={mutedUntil} />
 						)}
 
 						{shouldShowNotificationSettings && (
-							<Dropdown
+							<Menu
+								menu={menuNoti}
 								trigger="hover"
-								dismissOnClick={false}
-								renderTrigger={() => (
-									<div>
-										<ItemPanel children="Notification Settings" dropdown="change here" />
-									</div>
-								)}
-								label=""
-								placement="right-start"
+								align={{
+									points: ['bl', 'br']
+								}}
+								onVisibleChange={handleOpenMenuNoti}
 								className="bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
 							>
-								<ItemPanel
-									children="Use Category Default"
-									type="radio"
-									name="NotificationSetting"
-									defaultNotifi={true}
-									checked={
-										getNotificationChannelSelected?.notification_setting_type === ENotificationTypes.DEFAULT ||
-										getNotificationChannelSelected?.notification_setting_type === undefined
-									}
-									subText={defaultNotifiName}
-									onClick={() => setNotification(ENotificationTypes.DEFAULT)}
-								/>
-								{notificationTypesList.map((notification) => (
-									<ItemPanel
-										children={notification.label}
-										notificationId={notification.value}
-										type="radio"
-										name="NotificationSetting"
-										key={notification.value}
-										checked={getNotificationChannelSelected?.notification_setting_type === notification.value}
-										onClick={() => setNotification(notification.value)}
-									/>
-								))}
-							</Dropdown>
+								<div>
+									<ItemPanel children="Notification Settings" dropdown="change here" />
+								</div>
+							</Menu>
 						)}
 						{currentChannel?.creator_id !== currentUserId && (
 							<ItemPanel onClick={handleOpenModalConfirm} children="Leave Thread" danger />

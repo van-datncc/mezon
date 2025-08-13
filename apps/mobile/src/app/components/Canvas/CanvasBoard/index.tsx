@@ -47,6 +47,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 					persistApp.theme = JSON.stringify("${themeBasic}");
 					persistApp.themeApp = JSON.stringify("${themeBasic}");
 					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+					localStorage.setItem('current-theme', "${themeBasic}");
 				}
 			}
 		} catch (error) {
@@ -57,6 +58,7 @@ export function CanvasScreen({ route }: MenuChannelScreenProps<ScreenChannelCanv
 				themeApp: JSON.stringify("${themeBasic}")
 			};
 			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+			localStorage.setItem('current-theme', "${themeBasic}");
 		}
 	})();
 	true;

@@ -1,1 +1,2 @@
-export * from './MemberProfile';
+export * from './BaseProfile';
+export * from './IconStatus';

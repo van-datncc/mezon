@@ -1,5 +1,5 @@
-import { ActionEmitEvent, PlusAltIcon, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
-import { size, useTheme } from '@mezon/mobile-ui';
+import { ActionEmitEvent, remove, save, STORAGE_CHANNEL_CURRENT_CACHE, STORAGE_CLAN_ID } from '@mezon/mobile-components';
+import { baseColor, size, useTheme } from '@mezon/mobile-ui';
 import { clansActions, directActions, getStoreAsync, selectOrderedClans, selectOrderedClansWithGroups, useAppDispatch } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useRef } from 'react';
@@ -7,6 +7,8 @@ import { DeviceEventEmitter, TouchableOpacity, View } from 'react-native';
 import { NestableDraggableFlatList } from 'react-native-draggable-flatlist';
 import { useSelector } from 'react-redux';
 import { ClanGroup } from '../../../../../components/ClanGroup';
+import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../../../navigation/ScreenTypes';
 import { ClanIcon } from '../ClanIcon';
@@ -144,6 +146,7 @@ export const ListClanPopup = React.memo(() => {
 
 	const handleChangeClan = useCallback(
 		async (clanId: string) => {
+			console.log('handle change clan', clanId);
 			const store = await getStoreAsync();
 			if (isTabletLandscape) {
 				navigation.navigate(APP_SCREEN.HOME as never);
@@ -208,7 +211,7 @@ export const ListClanPopup = React.memo(() => {
 					return (
 						<TouchableOpacity style={styles.createClan} onPress={onCreateClanModal}>
 							<View style={styles.wrapperPlusClan}>
-								<PlusAltIcon width={size.s_14} height={size.s_14} />
+								<MezonIconCDN icon={IconCDN.plusLargeIcon} color={baseColor.blurple} width={size.s_18} height={size.s_18} />
 							</View>
 						</TouchableOpacity>
 					);

@@ -167,22 +167,22 @@ export const Routes = memo(() => {
 					// },
 					isElectron()
 						? {
-								path: '/',
-								element: (
-									<Suspense fallback={<SuspenseFallback />}>
-										<InitialRoutes />
-									</Suspense>
-								)
-							}
+							path: '/',
+							element: (
+								<Suspense fallback={<SuspenseFallback />}>
+									<InitialRoutes />
+								</Suspense>
+							)
+						}
 						: {
-								path: '/',
-								loader: loaderWithStore(loginLoader),
-								element: (
-									<Suspense fallback={<SuspenseFallback />}>
-										<MezonPage />
-									</Suspense>
-								)
-							},
+							path: '/',
+							loader: loaderWithStore(loginLoader),
+							element: (
+								<Suspense fallback={<SuspenseFallback />}>
+									<MezonPage />
+								</Suspense>
+							)
+						},
 					{
 						path: '/apps',
 						element: (
@@ -201,22 +201,22 @@ export const Routes = memo(() => {
 						children: [
 							isElectron()
 								? {
-										path: 'login',
-										loader: loaderWithStore(loginLoader),
-										element: (
-											<Suspense fallback={<SuspenseFallback />}>
-												<Login />
-											</Suspense>
-										)
-									}
+									path: 'login',
+									loader: loaderWithStore(loginLoader),
+									element: (
+										<Suspense fallback={<SuspenseFallback />}>
+											<Login />
+										</Suspense>
+									)
+								}
 								: {
-										path: 'mezon',
-										element: (
-											<Suspense fallback={<SuspenseFallback />}>
-												<InitialRoutes />
-											</Suspense>
-										)
-									}
+									path: 'mezon',
+									element: (
+										<Suspense fallback={<SuspenseFallback />}>
+											<InitialRoutes />
+										</Suspense>
+									)
+								}
 						]
 					},
 					{

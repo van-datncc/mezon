@@ -217,8 +217,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
-			sessionRef.current = session2;
+			await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
 
 			return session;
 		},
@@ -245,9 +244,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 				return session;
 			}
 
-			const session2 = await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
-			sessionRef.current = session2;
-
+			await socketRef.current.connect(session, true, isFromMobile ? '1' : '0');
 			return session;
 		},
 		[createSocket, isFromMobile]
@@ -319,14 +316,13 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			extractAndSaveConfig(newSession, isFromMobile);
 
 			if (!socketRef.current) {
-				return newSession;
+				const socket = await createSocket();
+				socketRef.current = socket;
 			}
-
-			const session2 = await socketRef.current.connect(newSession, true, isFromMobile ? '1' : '0');
-			sessionRef.current = session2;
+			await socketRef.current.connect(newSession, true, isFromMobile ? '1' : '0');
 			return newSession;
 		},
-		[clientRef, socketRef, isFromMobile, logOutMezon]
+		[clientRef, socketRef, isFromMobile, logOutMezon, createSocket]
 	);
 
 	const connectWithSession = useCallback(

@@ -438,6 +438,7 @@ export type IUser = {
 
 export type MetaDateStatusUser = {
 	status: string;
+	user_status?: string;
 };
 
 export type IVoice = {
@@ -1366,6 +1367,13 @@ export enum EUserStatus {
 	IDLE = 'Idle',
 	DO_NOT_DISTURB = 'Do Not Disturb',
 	INVISIBLE = 'Invisible'
+}
+
+export enum ETabUserStatus {
+	ALL = 'all',
+	ONLINE = 'online',
+	BLOCK = 'block',
+	PENDING = 'pending'
 }
 
 export type IDmCallInfo = {

@@ -1,10 +1,11 @@
-import { SimpleMemberProfile } from '@mezon/components';
+import { BaseProfile } from '@mezon/components';
 import { useAppNavigation, useDirect, useFriends } from '@mezon/core';
-import { ChannelMembersEntity, FriendsEntity } from '@mezon/store';
+import { FriendsEntity, selectCurrentTabStatus } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { MemberProfileType, MetaDateStatusUser } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { ETabUserStatus, EUserStatus, MetaDateStatusUser } from '@mezon/utils';
+import { useCallback, useEffect, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 type FriendProps = {
@@ -94,6 +95,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	const { createDirectMessageWithUser } = useDirect();
 	const { toDmGroupPageFromFriendPage, navigate } = useAppNavigation();
 	const { acceptFriend, deleteFriend, blockFriend, unBlockFriend } = useFriends();
+	const currentTabStatus = useSelector(selectCurrentTabStatus);
 
 	const coords = useRef<Coords>({
 		mouseX: 0,
@@ -102,6 +104,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 	});
 
 	const directMessageWithUser = useCallback(async () => {
+		if (currentTabStatus === ETabUserStatus.PENDING) return;
 		const userID = friend?.user?.id ?? '';
 		const name = friend?.user?.display_name || friend.user?.username;
 		const avatar = friend.user?.avatar_url;
@@ -167,39 +170,33 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 		[friend]
 	);
 
-	const userFriend = useMemo(() => {
-		if (friend?.user) {
-			return friend?.user as any;
-		}
-	}, [friend?.user]);
-
 	return (
-		<div className="border-t-theme-primary group/list_friends text-theme-primary">
+		<div className="border-t-theme-primary group/list_friends text-theme-primary flex items-center h-full">
 			<div
 				key={friend?.user?.id}
 				onClick={directMessageWithUser}
-				className="py-3 flex justify-between items-center px-[12px] cursor-pointer rounded-lg bg-item-hover"
+				className="py-2 flex justify-between group flex-1 items-center px-3 cursor-pointer rounded-lg bg-item-hover"
 			>
 				<div key={friend?.user?.id} className={'flex-1'}>
-					<SimpleMemberProfile
+					<BaseProfile
 						avatar={friend?.user?.avatar_url ?? ''}
 						name={(friend?.user?.display_name || friend?.user?.username) ?? ''}
-						usernameAva={friend?.user?.username ?? ''}
-						status={{ status: friend?.user?.online, isMobile: false }}
-						isHideStatus={friend?.state !== 0}
-						isHideIconStatus={friend?.state !== 0}
-						isHideAnimation={true}
-						key={friend?.user?.id}
-						numberCharacterCollapse={100}
-						classParent={friend?.state !== undefined && friend?.state >= 1 ? '' : 'friendList h-10'}
-						positionType={MemberProfileType.LIST_FRIENDS}
-						customStatus={(friend?.user?.metadata as MetaDateStatusUser)?.status ?? ''}
-						isDM={true}
-						user={friend as ChannelMembersEntity}
-						statusOnline={userFriend?.metadata?.user_status}
+						displayName={
+							<>
+								{friend?.user?.display_name || friend?.user?.username}{' '}
+								<span className="group-hover:inline-block hidden text-theme-primary-hover">{friend?.user?.username}</span>
+							</>
+						}
+						status={(friend?.user?.metadata as MetaDateStatusUser)?.status}
+						userMeta={{
+							status: (friend?.user?.metadata as MetaDateStatusUser)?.status,
+							user_status: friend?.user?.online
+								? ((friend?.user?.metadata as MetaDateStatusUser)?.status as EUserStatus) || EUserStatus.ONLINE
+								: EUserStatus.INVISIBLE
+						}}
 					/>
 				</div>
-				<div onClick={(e) => e.stopPropagation()}>
+				<div className="w-20" onClick={(e) => e.stopPropagation()}>
 					{friend?.state === 0 && (
 						<div className="flex gap-3 items-center">
 							<button onClick={directMessageWithUser} className=" bg-button-secondary rounded-full p-2 text-theme-primary-hover">

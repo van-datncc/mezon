@@ -22,16 +22,14 @@ import {
 	useAppSelector
 } from '@mezon/store';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { IMessageTypeCallLog, createImgproxyUrl, sleep } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
-import { ChannelType, WebrtcSignalingType } from 'mezon-js';
+import { WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { SimpleMemberProfile } from '../MemberProfile';
 import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
@@ -184,7 +182,23 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
+	const menuDevice = useMemo(() => {
+		return [
+			<DeviceSelector
+				deviceList={audioOutputDevicesList}
+				currentDevice={currentOutputDevice}
+				icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
+				onSelectDevice={changeAudioOutputDevice}
+			/>,
 
+			<DeviceSelector
+				deviceList={audioInputDevicesList}
+				currentDevice={currentInputDevice}
+				icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
+				onSelectDevice={changeAudioInputDevice}
+			/>
+		];
+	}, []);
 	return (
 		<div
 			className={`${
@@ -196,20 +210,6 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					<div onClick={() => setStatusMenu(true)} className={`mx-6 ${closeMenu && !statusMenu ? '' : 'hidden'}`} role="button">
 						<Icons.OpenMenu defaultSize={`w-5 h-5`} />
 					</div>
-					<SimpleMemberProfile
-						numberCharacterCollapse={22}
-						avatar={
-							Number(currentDmGroup?.type) === ChannelType.CHANNEL_TYPE_GROUP
-								? 'assets/images/avatar-group.png'
-								: (currentDmGroup?.channel_avatar?.at(0) ?? '')
-						}
-						name={currentDmGroup?.channel_label ?? ''}
-						status={{ status: currentDmGroup?.is_online?.some(Boolean), isMobile: false }}
-						isHideStatus={true}
-						isHideIconStatus={Boolean(currentDmGroup?.user_id && currentDmGroup.user_id.length >= 2)}
-						key={currentDmGroup?.channel_id}
-						isHiddenAvatarPanel={false}
-					/>
 				</div>
 			</div>
 
@@ -371,33 +371,11 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								/>
 							</div>
 
-							<Dropdown
-								label={''}
-								renderTrigger={() => (
-									<div className="h-[56px] w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
-										<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
-									</div>
-								)}
-								className={'rounded-3xl'}
-							>
-								<div className="flex text-white px-1 w-[400px] min-w-max gap-2 h-full">
-									{/* Output */}
-									<DeviceSelector
-										deviceList={audioOutputDevicesList}
-										currentDevice={currentOutputDevice}
-										icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
-										onSelectDevice={changeAudioOutputDevice}
-									/>
-
-									{/* Input */}
-									<DeviceSelector
-										deviceList={audioInputDevicesList}
-										currentDevice={currentInputDevice}
-										icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
-										onSelectDevice={changeAudioInputDevice}
-									/>
+							<Menu className={'rounded-3xl'}>
+								<div className="h-[56px] w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
+									<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
 								</div>
-							</Dropdown>
+							</Menu>
 							<div
 								className={`h-[56px] w-[56px] rounded-full bg-red-500 hover:bg-red-700 flex items-center justify-center cursor-pointer`}
 								onClick={handleCloseCall}

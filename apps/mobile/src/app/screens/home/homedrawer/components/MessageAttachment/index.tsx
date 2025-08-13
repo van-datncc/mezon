@@ -14,7 +14,7 @@ import { style } from './styles';
 
 interface IProps {
 	attachments: ApiMessageAttachment[];
-	onLongPressImage?: () => void;
+	onLongPressImage?: (image?: ApiMessageAttachment) => void;
 	clanId: string;
 	channelId: string;
 }
@@ -98,7 +98,7 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, cl
 			const checkIsVideo = isVideo(document?.url?.toLowerCase());
 
 			if (checkIsVideo) {
-				return <RenderVideoChat key={`${document?.url}_${index}`} videoURL={document.url} onLongPress={onLongPressImage} />;
+				return <RenderVideoChat key={`${document?.url}_${index}`} videoURL={document.url} onLongPress={() => onLongPressImage(document)} />;
 			}
 
 			return (
@@ -115,7 +115,9 @@ export const MessageAttachment = React.memo(({ attachments, onLongPressImage, cl
 	return (
 		<View>
 			{videos?.length > 0 &&
-				videos.map((video, index) => <RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} onLongPress={onLongPressImage} />)}
+				videos.map((video, index) => (
+					<RenderVideoChat key={`${video?.url}_${index}`} videoURL={video?.url} onLongPress={() => onLongPressImage(video)} />
+				))}
 			<View style={styles.gridContainer}>
 				{visibleImages?.length > 0 &&
 					visibleImages?.map((image, index) => {

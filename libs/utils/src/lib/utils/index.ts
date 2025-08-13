@@ -1298,3 +1298,8 @@ export const saveParseUserStatus = (metadata: string): { status: string; user_st
 		return safeJSONParse(unescapedJSON || '{}')?.status;
 	}
 };
+
+export const getParentChannelIdIfHas = (channel: IChannel) => {
+	const channelId = channel?.parent_id && channel?.parent_id !== '0' ? channel?.parent_id : channel?.channel_id;
+	return channelId;
+};
