@@ -220,12 +220,24 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					processedContentDraft as IMessageSendPayload,
 					mentionNewPos as IMentionOnMessage[]
 				);
+
 				handleSend(
 					filterEmptyArrays(updatedProcessedContent as any),
 					message.id,
 					adjustedMentionsPos,
 					isTopic ? channelId : message?.content?.tp || '',
 					isTopic
+				);
+
+				dispatch(
+					pinMessageActions.updatePinMessage({
+						channelId: channelId,
+						pinId: message.id,
+						pinMessage: {
+							...message,
+							content: JSON.stringify(updatedProcessedContent)
+						}
+					})
 				);
 				handleCancelEdit();
 			}
