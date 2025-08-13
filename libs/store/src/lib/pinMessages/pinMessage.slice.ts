@@ -281,7 +281,6 @@ export const pinMessageSlice = createSlice({
 
 			channel.pinMessages[idx] = updated;
 			pinMessageAdapter.upsertOne(state, updated);
-			channel.cache = createCacheMetadata(CHANNEL_PIN_MESSAGES_CACHED_TIME);
 		}
 	},
 	extraReducers: (builder) => {
