@@ -92,12 +92,43 @@ export default function ClanDetailPage() {
 								)}
 							</div>
 							<div className="text-gray-600 mb-2">{clan.description || 'No description.'}</div>
-							<div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-								<div className="flex items-center gap-1">
-									<div className="w-2 h-2 rounded-full bg-green-500"></div>
-									<span>{clan.online_members?.toLocaleString('en-US') || 0} Online</span>
+							<div className="flex items-center text-gray-500 text-[10px] sm:text-xs  mb-1">
+								<div className="flex items-center">
+									<svg
+										className="mr-1"
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<circle
+											cx="6"
+											cy="6"
+											r="5"
+											stroke="#22c55e"
+											strokeWidth="2"
+											fill="none"
+										>
+											<animate
+												attributeName="r"
+												from="3"
+												to="6"
+												dur="1.5s"
+												repeatCount="indefinite"
+											/>
+											<animate
+												attributeName="opacity"
+												from="1"
+												to="0"
+												dur="1.5s"
+												repeatCount="indefinite"
+											/>
+										</circle>
+										<circle cx="6" cy="6" r="3" fill="#22c55e" />
+									</svg>
+
 								</div>
-								<span>•</span>
 								<span>{clan.total_members?.toLocaleString('en-US') || 0} Members</span>
 							</div>
 						</div>

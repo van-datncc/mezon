@@ -1,13 +1,20 @@
 import {
 	useChannelMembersActions,
 	useEscapeKeyClose,
+	useIsClanOwner,
 	useMarkAsRead,
 	useOnClickOutside,
 	usePermissionChecker,
 	UserRestrictionZone,
 	useSettingFooter
 } from '@mezon/core';
-import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
+import {
+	clansActions,
+	defaultNotificationActions,
+	selectDefaultNotificationClan,
+	selectDefaultNotificationClanByClanId,
+	useAppDispatch
+} from '@mezon/store';
 import { Menu } from '@mezon/ui';
 import { EPermission, EUserSettings, IClan } from '@mezon/utils';
 import { ApiAccount } from 'mezon-js/dist/api.gen';
@@ -32,9 +39,13 @@ interface IPanelCLanProps {
 const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMenuContext, userProfile }) => {
 	const panelRef = useRef<HTMLDivElement | null>(null);
 	const [positionTop, setPositionTop] = useState(false);
-	const [canManageCLan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
+	const isOwnerOfContextClan = useIsClanOwner(clan?.clan_id || clan?.id || '');
+	const [_, canManageClan] = usePermissionChecker([EPermission.clanOwner, EPermission.manageClan], '', clan?.clan_id ?? '');
 	const dispatch = useAppDispatch();
-	const defaultNotificationClan = useSelector(selectDefaultNotificationClan);
+
+	const defaultNotificationClan = useSelector((state) =>
+		clan?.clan_id ? selectDefaultNotificationClanByClanId(state as any, clan.clan_id) : selectDefaultNotificationClan(state as any)
+	);
 	useEffect(() => {
 		const heightPanel = panelRef.current?.clientHeight;
 		if (heightPanel && heightPanel > coords.distanceToBottom) {
@@ -59,10 +70,11 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, [statusMarkAsReadClan]);
 
 	const handleChangeSettingType = (notificationType: number) => {
+		const targetClanId = clan?.clan_id ?? clan?.id;
 		checkMenuOpen.current = false;
 		dispatch(
 			defaultNotificationActions.setDefaultNotificationClan({
-				clan_id: clan?.clan_id,
+				clan_id: targetClanId,
 				notification_type: notificationType
 			})
 		);
@@ -181,7 +193,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 						<ItemPanel children={'Edit Clan Profile'} onClick={handleOpenClanProfileSetting} />
 					</GroupPanels>
 
-					<UserRestrictionZone policy={!canManageCLan}>
+					<UserRestrictionZone policy={!(isOwnerOfContextClan || canManageClan)}>
 						<GroupPanels>
 							<ItemPanel children={'Leave Clan'} danger onClick={toggleLeaveClanPopup} />
 						</GroupPanels>

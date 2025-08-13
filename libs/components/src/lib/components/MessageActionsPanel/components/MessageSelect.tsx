@@ -30,15 +30,15 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 	const [availableOptions, setAvailableOptions] = useState(select?.options || []);
 	const dispatch = useAppDispatch();
 	const handleOptionSelect = (option: { value: string; label: string }) => {
-		if (select.disabled) {
+		if (select?.disabled) {
 			return;
 		}
 		if (selectedOptions.length >= (select?.max_options || select.options.length)) {
 			return;
 		}
-		if (!select.min_options && !select.max_options) {
+		if (!select?.min_options && !select?.max_options) {
 			setSelectedOptions([option]);
-			setAvailableOptions(select.options.filter((o) => o.value !== option.value));
+			setAvailableOptions(select?.options.filter((o) => o.value !== option.value));
 		} else {
 			setSelectedOptions((prev) => [...prev, option]);
 			setAvailableOptions((prev) => prev.filter((o) => o.value !== option.value));
@@ -96,8 +96,8 @@ export const MessageSelect: React.FC<MessageSelectProps> = ({ select, messageId,
 		return (!!select?.min_options && select?.min_options > 1) || (!!select?.max_options && select?.max_options >= 2);
 	}, [select?.min_options, select?.max_options]);
 	useEffect(() => {
-		if (select.valueSelected) {
-			handleOptionSelect(select.valueSelected);
+		if (select?.valueSelected) {
+			handleOptionSelect(select?.valueSelected);
 		}
 	}, []);
 

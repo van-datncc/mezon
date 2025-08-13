@@ -132,8 +132,8 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 	return (
 		<div className="relative max-sm:-pb-2">
 			{checkAttachment && (
-				<div className={`${checkAttachment ? 'px-3 pb-1 pt-5  bg-theme-input' : ''} text-theme-primary max-h-full`}>
-					<div className={`max-h-full flex gap-6 overflow-y-hidden overflow-x-auto thread-scroll relative z-0 `}>
+				<div className={` ${checkAttachment ? 'px-3 pb-1 pt-5  bg-theme-input' : ''} text-theme-primary max-h-full `}>
+					<div className={`max-h-full  flex-nowrap flex gap-6 !overflow-y-hidden !overflow-x-auto thread-scroll relative z-0 `}>
 						{attachmentFilteredByChannelId?.files?.map((item: ApiMessageAttachment, index: number) => {
 							return (
 								<Fragment key={index}>

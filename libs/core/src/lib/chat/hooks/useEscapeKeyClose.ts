@@ -5,16 +5,21 @@ export const useEscapeKeyClose = (ref: RefObject<HTMLElement> | undefined, onClo
 		const element = ref?.current;
 		if (!element) return;
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape' || event.key === 'Esc') {
+			if ((event.key === 'Escape' || event.key === 'Esc')) {
+				if (document.activeElement === element || element.contains(document.activeElement)) {
+					event.stopPropagation();
 				onClose();
 			}
+			}
 		};
-		if (document.activeElement !== element && !element?.contains(document.activeElement)) {
+
+		if (document.activeElement !== element && !element.contains(document.activeElement)) {
 			element.focus();
 		}
-		document.addEventListener('keydown', handleKeyDown);
+
+		element.addEventListener('keydown', handleKeyDown);
 		return () => {
-			document.removeEventListener('keydown', handleKeyDown);
+			element.removeEventListener('keydown', handleKeyDown);
 		};
 	}, [ref, onClose]);
 };

@@ -349,7 +349,4 @@ export const selectTopicsSort = createSelector(selectAllTopics, (data) => {
 	});
 });
 
-export const selectTopicByChannelId = (channelId: string) =>
-	createSelector(getTopicsState, (state: TopicDiscussionsState) => state.channelTopics[channelId] ?? null);
-
 export const selectClickedOnTopicStatus = createSelector(getTopicsState, (state) => state.isFocusTopicBox);
