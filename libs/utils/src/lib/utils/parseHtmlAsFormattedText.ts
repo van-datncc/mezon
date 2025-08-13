@@ -170,7 +170,7 @@ function parseMarkdown(html: string) {
 	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[`]{1}([^`\n]+)[`]{1}(?![^<]*<\/(code|pre)>)/g, '<code>$2</code>');
 
 	// Process bold markdown, but skip mentions
-	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*\n]+)[*]{2}(?![^<]*<\/(code|pre)>)/g, '<b>$2</b>');
+	parsedHtml = parsedHtml.replace(/(?!<(code|pre)[^<]*|<\/)[*]{2}([^*]*?)[*]{2}(?![^<]*<\/(code|pre)>)/g, '<b>$2</b>');
 
 	return parsedHtml;
 }
