@@ -13,12 +13,6 @@ const SettingRightClan: React.FC<SettingUserClanProfileEditProps> = ({ clanId })
 	const [flagOption, setFlagOption] = useState<boolean>(false);
 	const [selectedClanId, setSelectedClanId] = useState<string | undefined>(clanId as string);
 
-	console.log('clans', selectedClanId);
-	console.log(
-		'clans',
-		clans.find((clan) => clan.id === selectedClanId)
-	);
-
 	return (
 		<div className="flex flex-col">
 			<div className="flex flex-col xl:flex-row gap-x-1 text-sm font-normal">
