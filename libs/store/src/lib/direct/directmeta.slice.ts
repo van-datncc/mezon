@@ -83,18 +83,22 @@ export const directMetaSlice = createSlice({
 				});
 			}
 		},
-		setCountMessUnread: (state, action: PayloadAction<{ channelId: string; isMention: boolean }>) => {
-			const { channelId, isMention } = action.payload;
+
+		setCountMessUnread: (state, action: PayloadAction<{ channelId: string; isMention?: boolean; count?: number; isReset?: boolean }>) => {
+			const { channelId, isMention = false, count = 1, isReset = false } = action.payload;
 			const entity = state.entities[channelId];
 			if (entity?.is_mute !== true || isMention === true) {
+				const newCountMessUnread = isReset ? 0 : (entity?.count_mess_unread || 0) + count;
+				const finalCount = Math.max(0, newCountMessUnread);
 				directMetaAdapter.updateOne(state, {
 					id: channelId,
 					changes: {
-						count_mess_unread: (entity?.count_mess_unread || 0) + 1
+						count_mess_unread: finalCount
 					}
 				});
 			}
 		},
+
 		setDirectLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number }>) => {
 			directMetaAdapter.updateOne(state, {
 				id: action.payload.channelId,
