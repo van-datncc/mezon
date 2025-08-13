@@ -524,6 +524,7 @@ export const selectGrouplMembers = createSelector(
 			return {
 				channelId: groupId,
 				userChannelId: groupId,
+				creator_id: group.creator_id || '',
 				user: {
 					...group,
 					id: userId,
