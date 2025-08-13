@@ -205,7 +205,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		return message.content?.t;
 	}, [message.content?.t]);
 
-	const onSend = (e: React.KeyboardEvent<Element>) => {
+	const onSend = async (e: React.KeyboardEvent<Element>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			e.stopPropagation();
@@ -221,7 +221,51 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					mentionNewPos as IMentionOnMessage[]
 				);
 
-				handleSend(
+				try {
+					await handleSend(
+						filterEmptyArrays(updatedProcessedContent as any),
+						message.id,
+						adjustedMentionsPos,
+						isTopic ? channelId : message?.content?.tp || '',
+						isTopic
+					);
+
+					dispatch(
+						pinMessageActions.updatePinMessage({
+							channelId: channelId,
+							pinId: message.id,
+							pinMessage: {
+								...message,
+								content: JSON.stringify(updatedProcessedContent)
+							}
+						})
+					);
+				} catch (error) {}
+
+				handleCancelEdit();
+			}
+		}
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			e.stopPropagation();
+			handleCancelEdit();
+		}
+	};
+
+	const handleSave = async () => {
+		if (draftContent?.trim() === '') {
+			textareaRef.current?.blur();
+			return showModal();
+		} else if (draftContent !== '' && draftContent === originalContent) {
+			return handleCancelEdit();
+		} else {
+			const { updatedProcessedContent, adjustedMentionsPos } = prepareProcessedContent(
+				processedContentDraft as IMessageSendPayload,
+				mentionNewPos as IMentionOnMessage[]
+			);
+
+			try {
+				await handleSend(
 					filterEmptyArrays(updatedProcessedContent as any),
 					message.id,
 					adjustedMentionsPos,
@@ -239,45 +283,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						}
 					})
 				);
-				handleCancelEdit();
-			}
-		}
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			e.stopPropagation();
-			handleCancelEdit();
-		}
-	};
-
-	const handleSave = () => {
-		if (draftContent?.trim() === '') {
-			textareaRef.current?.blur();
-			return showModal();
-		} else if (draftContent !== '' && draftContent === originalContent) {
-			return handleCancelEdit();
-		} else {
-			const { updatedProcessedContent, adjustedMentionsPos } = prepareProcessedContent(
-				processedContentDraft as IMessageSendPayload,
-				mentionNewPos as IMentionOnMessage[]
-			);
-			handleSend(
-				filterEmptyArrays(updatedProcessedContent as any),
-				message.id,
-				adjustedMentionsPos,
-				isTopic ? channelId : message?.content?.tp || '',
-				isTopic
-			);
-
-			dispatch(
-				pinMessageActions.updatePinMessage({
-					channelId: channelId,
-					pinId: message.id,
-					pinMessage: {
-						...message,
-						content: JSON.stringify(updatedProcessedContent)
-					}
-				})
-			);
+			} catch (error) {}
 		}
 		handleCancelEdit();
 	};
