@@ -179,6 +179,9 @@ function MyApp() {
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
+	const openDiscoverPage = () => {
+		window.open('https://mezon.ai/clans', '_blank');
+	};
 
 	return (
 		<div className="relative overflow-hidden w-full h-full">
@@ -192,7 +195,7 @@ function MyApp() {
 			>
 				{previewMode && <PreviewOnboardingMode />}
 				{openPopupForward && <ForwardMessageModal />}
-				<SidebarMenu openCreateClanModal={openCreateClanModal} />
+				<SidebarMenu openCreateClanModal={openCreateClanModal} openDiscoverPage={openDiscoverPage} />
 				<Topbar isHidden={currentClanId !== '0' ? !currentChannel?.id : !directId} />
 				<MainContent />
 
@@ -270,7 +273,7 @@ const DirectUnreadList = memo(() => {
 });
 
 const SidebarMenu = memo(
-	({ openCreateClanModal }: { openCreateClanModal: ShowModal }) => {
+	({ openCreateClanModal, openDiscoverPage }: { openCreateClanModal: ShowModal, openDiscoverPage: ShowModal }) => {
 		const closeMenu = useSelector(selectCloseMenu);
 		const statusMenu = useSelector(selectStatusMenu);
 		const { setCloseMenu, setStatusMenu } = useMenu();
@@ -337,16 +340,25 @@ const SidebarMenu = memo(
 					</div>
 
 					<ClansList />
-
 					<div className="mt-3">
 						<NavLinkComponent>
-							<div className="flex items-center justify-between text-theme-primary group" onClick={openCreateClanModal}>
+							<div className="flex items-center justify-between text-theme-primary group" onClick={openDiscoverPage} title='Discover'>
+								<div className="w-[40px] h-[40px] rounded-xl theme-base-color flex justify-center items-center  cursor-pointer transition-all bg-add-clan-hover duration-200 size-12">
+									<svg className="text-theme-primary-active size-5" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 9C8.55229 9 9 8.55229 9 8C9 7.44772 8.55229 7 8 7C7.44772 7 7 7.44772 7 8C7 8.55229 7.44772 9 8 9Z"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M16 8C16 12.4183 12.4183 16 8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8ZM6 6L4 11L5 12L10 10L12 5L11 4L6 6Z"></path> </g></svg>
+								</div>
+							</div>
+						</NavLinkComponent>
+					</div>
+					<div className="mt-3">
+						<NavLinkComponent>
+							<div className="flex items-center justify-between text-theme-primary group" onClick={openCreateClanModal} title='Create CLans'>
 								<div className="w-[40px] h-[40px] rounded-xl theme-base-color flex justify-center items-center  cursor-pointer transition-all bg-add-clan-hover duration-200 size-12">
 									<p className="text-2xl font-semibold ">+</p>
 								</div>
 							</div>
 						</NavLinkComponent>
 					</div>
+
 				</div>
 			</div>
 		);
