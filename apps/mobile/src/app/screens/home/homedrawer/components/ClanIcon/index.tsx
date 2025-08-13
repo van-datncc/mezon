@@ -1,7 +1,7 @@
 import { useTheme } from '@mezon/mobile-ui';
 import { ClansEntity, selectBadgeCountByClanId, selectCurrentClanId } from '@mezon/store-mobile';
 import { createImgproxyUrl } from '@mezon/utils';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ScaleDecorator } from 'react-native-draggable-flatlist';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ interface IClanIconProps {
 	onPress?: any;
 	drag: () => void;
 	isActive?: boolean;
+	onLayout?: (dimensions: { width: number; height: number }) => void;
 }
 
 export const ClanIcon = memo(
@@ -23,6 +24,14 @@ export const ClanIcon = memo(
 		const badgeCountClan = useSelector(selectBadgeCountByClanId(props?.data?.clan_id ?? '')) || 0;
 
 		const isActiveCurrentClan = currentClanId === props?.data?.clan_id;
+		const onIconLayout = useCallback(
+			(event: any) => {
+				const { width, height } = event.nativeEvent.layout;
+				props.onLayout && props.onLayout({ width, height });
+			},
+			[props.onLayout]
+		);
+
 		return (
 			<ScaleDecorator activeScale={1.5}>
 				<TouchableOpacity
@@ -35,19 +44,21 @@ export const ClanIcon = memo(
 					disabled={props.isActive}
 					onLongPress={props.drag}
 				>
-					{props?.data?.logo ? (
-						<View style={[styles.logoClan, isActiveCurrentClan && styles.logoClanActive]}>
-							<ImageNative
-								url={createImgproxyUrl(props?.data?.logo ?? '', { width: 100, height: 100, resizeType: 'fit' })}
-								style={{ width: '100%', height: '100%' }}
-								resizeMode={'cover'}
-							/>
-						</View>
-					) : (
-						<View style={[styles.clanIcon, isActiveCurrentClan && styles.logoClanActive]}>
-							<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name?.charAt(0)?.toUpperCase()}</Text>
-						</View>
-					)}
+					<View onLayout={onIconLayout}>
+						{props?.data?.logo ? (
+							<View style={[styles.logoClan, isActiveCurrentClan && styles.logoClanActive]}>
+								<ImageNative
+									url={createImgproxyUrl(props?.data?.logo ?? '', { width: 100, height: 100, resizeType: 'fit' })}
+									style={{ width: '100%', height: '100%' }}
+									resizeMode={'cover'}
+								/>
+							</View>
+						) : (
+							<View style={[styles.clanIcon, isActiveCurrentClan && styles.logoClanActive]}>
+								<Text style={styles.textLogoClanIcon}>{props?.data?.clan_name?.charAt(0)?.toUpperCase()}</Text>
+							</View>
+						)}
+					</View>
 
 					{badgeCountClan > 0 && (
 						<View style={styles.badge}>
