@@ -109,6 +109,10 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			const socket = socketRef.current;
 			const isPublic = currentDmId ? false : isPublicChannel(currentChannel);
 			const currentClanId = selectCurrentClanId(store.getState());
+			const mentions = message?.mentions || [];
+			const references = message?.references || [];
+			const mentionsString = JSON.stringify(mentions);
+			const referencesString = JSON.stringify(references);
 
 			dispatch(
 				messagesActions.remove({
@@ -123,7 +127,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				isPublic,
 				messageId,
 				!!message?.attachments,
-				currentTopicId
+				currentTopicId,
+				mentionsString,
+				referencesString
 			);
 		},
 		[currentChannel, currentChannelId, currentDmId, currentTopicId, dispatch, message?.attachments, mode, socketRef, store]
