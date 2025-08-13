@@ -75,27 +75,22 @@ export const updateUserClanProfile = createAsyncThunk(
 			const currentUserClanProfile = state.userClanProfile.entities[`${clanId}${currentUser?.user?.id}`];
 			const mezon = ensureClient(getMezonCtx(thunkAPI));
 			const body: Partial<ApiUpdateClanProfileRequest> = {
-				clan_id: clanId
+				clan_id: clanId,
+				nick_name: username,
+				avatar: avatarUrl
 			};
 
-			if (username && username !== currentUserClanProfile?.nick_name) {
-				body.nick_name = username || '';
+			if (
+				(username && username !== currentUserClanProfile?.nick_name) ||
+				(avatarUrl && avatarUrl !== '' && avatarUrl !== currentUserClanProfile?.avatar)
+			) {
+				const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body as ApiUpdateClanProfileRequest);
+				if (!response) {
+					return thunkAPI.rejectWithValue([]);
+				}
+				thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
 			}
-
-			if (avatarUrl && avatarUrl !== '' && avatarUrl !== currentUserClanProfile?.avatar) {
-				body.avatar = avatarUrl || '';
-			}
-
-			const hasChanges = Object.keys(body).length > 1;
-			if (!hasChanges) {
-				return true;
-			}
-			const response = await mezon.client.updateUserProfileByClan(mezon.session, clanId, body as ApiUpdateClanProfileRequest);
-			if (!response) {
-				return thunkAPI.rejectWithValue([]);
-			}
-			thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
-			return response as true;
+			return true;
 		} catch (error) {
 			captureSentryError(error, 'userClanProfile/updateUserClanProfile');
 			return thunkAPI.rejectWithValue(error);
