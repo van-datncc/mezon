@@ -1,5 +1,12 @@
 /* eslint-disable no-console */
-import { MezonStoreProvider, appActions, initStore, selectHiddenBottomTabMobile, useAppDispatch, useAppSelector } from '@mezon/store-mobile';
+import {
+	MezonStoreProvider,
+	appActions,
+	initStore,
+	selectHiddenBottomTabMobile,
+	useAppDispatch,
+	useAppSelector
+} from '@mezon/store-mobile';
 import { extractAndSaveConfig, useMezon } from '@mezon/transport';
 import { LinkingOptions, NavigationContainer, getStateFromPath } from '@react-navigation/native';
 import React, { memo, useEffect, useMemo } from 'react';
@@ -93,7 +100,7 @@ const NavigationMain = memo(
 		};
 
 		const linking: LinkingOptions<{ any }> = {
-			prefixes: ['https://mezon.ai', 'mezon.ai://', 'mezon://'],
+			prefixes: ['https://mezon.ai', 'http://mezon.ai', 'mezon.ai://', 'mezon://'],
 			config: {
 				screens: {
 					[`${APP_SCREEN.HOME}`]: {
@@ -113,7 +120,6 @@ const NavigationMain = memo(
 					}
 				}
 			},
-			// Add this debugging to see what's happening
 			getStateFromPath: (path, config) => {
 				if (path && Platform.OS === 'android') {
 					setTimeout(() => {
