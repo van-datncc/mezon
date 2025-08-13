@@ -144,7 +144,7 @@ const IncomingHomeScreen = memo((props: any) => {
 	}, [isInCall, props?.isForceAnswer, signalingData]);
 
 	useEffect(() => {
-		if (props && props?.payload && Platform.OS === 'android') {
+		if (props && props?.payload) {
 			playVibration();
 			getDataCall();
 		}

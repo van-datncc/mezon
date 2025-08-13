@@ -17,7 +17,7 @@ const RootStack = (props) => {
 	const isLoggedIn = useSelector(selectIsLogin);
 	const { themeValue } = useTheme();
 
-	if (props?.payload && isLoggedIn && Platform.OS === 'android') return <IncomingHomeScreen {...props} />;
+	if (props?.payload && isLoggedIn) return <IncomingHomeScreen {...props} />;
 	return (
 		<Root.Navigator
 			screenOptions={{

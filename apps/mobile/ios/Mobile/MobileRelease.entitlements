@@ -11,6 +11,7 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:mezon.ai</string>
+		<string>applinks:www.mezon.ai</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
