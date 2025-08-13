@@ -1,6 +1,5 @@
 import { authActions, getApplicationDetail, selectAllApps, selectTheme, useAppDispatch } from '@mezon/store';
-import { Icons } from '@mezon/ui';
-import { Dropdown } from 'flowbite-react';
+import { Icons, Menu } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { safeJSONParse } from 'mezon-js';
 import { ApiApp } from 'mezon-js/api.gen';
@@ -99,35 +98,40 @@ const AppPageBottom = () => {
 			<div className="flex justify-between items-center mb-[32px] max-md:block">
 				<div className="flex gap-4 w-fit items-center">
 					<div>Sort by:</div>
-					<Dropdown
+					<Menu
 						trigger="click"
-						renderTrigger={() => (
-							<div className="w-[170px] h-[40px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
-								<p className="truncate max-w-[90%]">{dropdownValue}</p>
-								<div>
-									<Icons.ArrowDownFill />
-								</div>
+						menu={
+							<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20 rounded-lg shadow-lg`}>
+								<Menu.Item
+									onClick={() => {
+										handleDropdownValue('Date of Creation');
+									}}
+									className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'text-[#374151] dark:text-[#d1d5db]' : 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium'
+										}`}
+								>
+									Date of Creation
+								</Menu.Item>
+								<Menu.Item
+									onClick={() => {
+										handleDropdownValue('A-Z');
+									}}
+									className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium' : 'text-[#374151] dark:text-[#d1d5db]'
+										}`}
+								>
+									A-Z
+								</Menu.Item>
 							</div>
-						)}
-						label=""
-						placement="bottom-end"
-						className={`dark:bg-black bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+						}
+						placement="bottomRight"
+						className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px]   z-20 rounded-lg shadow-lg`}
 					>
-						<Dropdown.Item
-							children={'Date of Creation'}
-							onClick={() => {
-								handleDropdownValue('Date of Creation');
-							}}
-							className={`truncate ${isChooseAZ ? '' : selectedDropdownClass}`}
-						/>
-						<Dropdown.Item
-							children={'A-Z'}
-							onClick={() => {
-								handleDropdownValue('A-Z');
-							}}
-							className={`truncate ${isChooseAZ ? selectedDropdownClass : ''}`}
-						/>
-					</Dropdown>
+						<div className="w-[170px] h-[40px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex flex-row px-3 justify-between items-center">
+							<p className="truncate max-w-[90%]">{dropdownValue}</p>
+							<div>
+								<Icons.ArrowDownFill />
+							</div>
+						</div>
+					</Menu>
 				</div>
 				<div className="flex w-fit gap-4 max-md:mt-4">
 					<div

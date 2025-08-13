@@ -1,6 +1,5 @@
 import { getApplicationDetail, selectAllApps, selectTheme, useAppDispatch } from '@mezon/store';
-import { Icons } from '@mezon/ui';
-import { Dropdown } from 'flowbite-react';
+import { Icons, Menu } from '@mezon/ui';
 import { ApiApp } from 'mezon-js/api.gen';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -71,30 +70,35 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 
 			<div className="w-full">
 				<div className="text-[12px] font-semibold mb-1">SELECT {filteredApps.length > 0 && filteredApps[0]?.app_url ? 'APP' : 'BOT'}</div>
-				<Dropdown
-					label=""
+				<Menu
 					trigger="click"
-					renderTrigger={() => (
-						<div className="w-full h-[40px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex px-3 justify-between items-center">
-							<p className="truncate max-w-[90%]">{dropdownValue}</p>
-							<Icons.ArrowDownFill />
+					menu={
+						<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll thread-scroll z-20 rounded-lg shadow-lg`}>
+							{loading ? (
+								<div className="text-center text-gray-500 py-2">Loading...</div>
+							) : (
+								filteredApps.map((app) =>
+									app?.id && app?.appname ? (
+										<Menu.Item
+											key={app.id}
+											onClick={() => onSelectApp(app)}
+											className="truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 text-[#374151] dark:text-[#d1d5db]"
+										>
+											{app.appname}
+										</Menu.Item>
+									) : null
+								)
+							)}
 						</div>
-					)}
-					placement="bottom-end"
-					className={`dark:bg-black bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20`}
+					}
+					placement="bottomRight"
+					className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px]  z-20 rounded-lg shadow-lg`}
 				>
-					{loading ? (
-						<div className="text-center text-gray-500">Loading...</div>
-					) : (
-						filteredApps.map((app) =>
-							app?.id && app?.appname ? (
-								<Dropdown.Item key={app.id} onClick={() => onSelectApp(app)} className="truncate">
-									{app.appname}
-								</Dropdown.Item>
-							) : null
-						)
-					)}
-				</Dropdown>
+					<div className="w-full h-[40px] rounded-md dark:bg-[#1e1f22] bg-bgLightModeThird flex px-3 justify-between items-center">
+						<p className="truncate max-w-[90%]">{dropdownValue}</p>
+						<Icons.ArrowDownFill />
+					</div>
+				</Menu>
 			</div>
 
 			<div className="w-full">
