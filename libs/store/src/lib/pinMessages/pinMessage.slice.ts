@@ -262,6 +262,26 @@ export const pinMessageSlice = createSlice({
 			const pinList = state.byChannels[channelId].pinMessages?.filter((pin) => pin.message_id !== pinId);
 			state.byChannels[channelId].pinMessages = pinList;
 			state.byChannels[channelId].cache = createCacheMetadata(CHANNEL_PIN_MESSAGES_CACHED_TIME);
+		},
+		updatePinMessage: (state: PinMessageState, action: PayloadAction<{ channelId: string; pinId: string; pinMessage: PinMessageEntity }>) => {
+			const { channelId, pinId, pinMessage } = action.payload;
+			const channel = state.byChannels[channelId];
+			if (!channel?.pinMessages) return;
+
+			const idx = channel.pinMessages.findIndex((p) => p.message_id === pinId);
+			if (idx === -1) return;
+
+			const updated: PinMessageEntity = {
+				...channel.pinMessages[idx],
+				...pinMessage,
+				message_id: channel.pinMessages[idx].message_id,
+				id: channel.pinMessages[idx].id,
+				content: pinMessage.content
+			};
+
+			channel.pinMessages[idx] = updated;
+			pinMessageAdapter.upsertOne(state, updated);
+			channel.cache = createCacheMetadata(CHANNEL_PIN_MESSAGES_CACHED_TIME);
 		}
 	},
 	extraReducers: (builder) => {

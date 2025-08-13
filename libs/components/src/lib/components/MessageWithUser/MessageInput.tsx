@@ -2,12 +2,14 @@ import { useChannelMembers, useEditMessage, useEmojiSuggestionContext, useEscape
 import {
 	ChannelMembersEntity,
 	MessagesEntity,
+	pinMessageActions,
 	selectAllChannels,
 	selectAllHashtagDm,
 	selectAllRolesClan,
 	selectChannelDraftMessage,
 	selectCurrentChannelId,
 	selectTheme,
+	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
 import {
@@ -75,6 +77,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 	const [showModal, closeModal] = useModal(() => {
 		return <ModalDeleteMess mess={message} closeModal={closeModal} mode={mode} />;
 	}, [message?.id]);
+	const dispatch = useAppDispatch();
 
 	const queryEmojis = (query: string, callback: (data: any[]) => void) => {
 		if (!query || emojis.length === 0) return;
@@ -251,6 +254,17 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 				adjustedMentionsPos,
 				isTopic ? channelId : message?.content?.tp || '',
 				isTopic
+			);
+
+			dispatch(
+				pinMessageActions.updatePinMessage({
+					channelId: channelId,
+					pinId: message.id,
+					pinMessage: {
+						...message,
+						content: JSON.stringify(updatedProcessedContent)
+					}
+				})
 			);
 		}
 		handleCancelEdit();
