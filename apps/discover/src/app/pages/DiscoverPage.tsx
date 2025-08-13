@@ -1,4 +1,3 @@
-import { toast } from 'react-toastify';
 import Banner from '../components/Banner';
 import Categories from '../components/Categories';
 import ClanList from '../components/ClanList';
@@ -170,12 +169,6 @@ export default function DiscoverPage() {
 								<p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-2xl mx-auto">
 									Add your clan to Mezon Discovery to reach millions of users and grow your community.
 								</p>
-								<button
-									className={`bg-[${COLORS.PRIMARY}] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-medium hover:bg-[${COLORS.PRIMARY_HOVER}] transition-colors`}
-									onClick={() => toast.warning('This feature will be implemented soon!')}
-								>
-									Make Your Community Public
-								</button>
 							</div>
 						</div>
 					</div>
