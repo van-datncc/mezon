@@ -8,6 +8,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Menu } from '@mezon/ui';
 import {
 	ACTIVE,
 	DEFAULT_ID,
@@ -22,9 +23,8 @@ import {
 	MUTE
 } from '@mezon/utils';
 import { format } from 'date-fns';
-import { Dropdown } from 'flowbite-react';
 import { NotificationType } from 'mezon-js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Coords } from '../ChannelLink';
 import { notificationTypesList } from '../PanelChannel';
 import GroupPanels from '../PanelChannel/GroupPanels';
@@ -75,6 +75,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 			clan_id: currentClan?.clan_id || ''
 		};
 		dispatch(defaultNotificationCategoryActions.setDefaultNotificationCategory(payload));
+		handClosePannel();
 	};
 
 	const handleScheduleMute = (duration: number) => {
@@ -138,7 +139,11 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	useOnClickOutside(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, () => {
+		if (!menuOpenMute.current && !menuOpenNoti.current) {
+			handClosePannel();
+		}
+	});
 
 	const { handleMarkAsReadCategory, statusMarkAsReadCategory } = useMarkAsRead();
 	useEffect(() => {
@@ -150,6 +155,60 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 	const collapseAllCategory = () => {
 		dispatch(categoriesActions.setCollapseAllCategory({ clanId: category?.clan_id as string }));
 	};
+
+	const menuOpenMute = useRef(false);
+	const menuOpenNoti = useRef(false);
+
+	const menuMute = useMemo(() => {
+		const menuItems = [
+			<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />,
+			<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />,
+			<ItemPanel children="For 3 Hour" onClick={() => handleScheduleMute(FOR_3_HOURS)} />,
+			<ItemPanel children="For 8 Hour" onClick={() => handleScheduleMute(FOR_8_HOURS)} />,
+			<ItemPanel children="For 24 Hour" onClick={() => handleScheduleMute(FOR_24_HOURS)} />,
+			<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
+		];
+		return <>{menuItems}</>;
+	}, []);
+
+	const menuNoti = useMemo(() => {
+		const menuItems = [
+			<ItemPanel
+				children="Use Clan Default"
+				type="radio"
+				name="NotificationSetting"
+				defaultNotifi={true}
+				onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
+				checked={
+					defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT ||
+					defaultCategoryNotificationSetting?.notification_setting_type === undefined
+				}
+			/>
+		];
+
+		notificationTypesList.map((notification) =>
+			menuItems.push(
+				<ItemPanel
+					children={notification.label}
+					notificationId={notification.value}
+					type="radio"
+					name="NotificationSetting"
+					key={notification.value}
+					onClick={() => handleChangeSettingType(notification.value)}
+					checked={defaultCategoryNotificationSetting?.notification_setting_type === notification.value}
+				/>
+			)
+		);
+
+		return <>{menuItems}</>;
+	}, [notificationTypesList]);
+
+	const handleOpenMenuMute = useCallback((visible: boolean) => {
+		menuOpenMute.current = visible;
+	}, []);
+	const handleOpenMenuNoti = useCallback((visible: boolean) => {
+		menuOpenNoti.current = visible;
+	}, []);
 	return (
 		<div
 			ref={panelRef}
@@ -172,64 +231,35 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 			</GroupPanels>
 			<GroupPanels>
 				{defaultCategoryNotificationSetting?.active === ACTIVE || defaultCategoryNotificationSetting?.id === DEFAULT_ID ? (
-					<Dropdown
+					<Menu
 						trigger="hover"
-						dismissOnClick={false}
-						renderTrigger={() => (
-							<div>
-								<ItemPanel children={'Mute Category'} dropdown="change here" onClick={() => handleMuteCategory(MUTE)} />
-							</div>
-						)}
-						label=""
-						placement="right-start"
+						menu={menuMute}
+						align={{
+							points: ['bl', 'br']
+						}}
 						className="bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
+						onVisibleChange={handleOpenMenuMute}
 					>
-						<ItemPanel children="For 15 Minutes" onClick={() => handleScheduleMute(FOR_15_MINUTES)} />
-						<ItemPanel children="For 1 Hour" onClick={() => handleScheduleMute(FOR_1_HOUR)} />
-						<ItemPanel children="For 3 Hours" onClick={() => handleScheduleMute(FOR_3_HOURS)} />
-						<ItemPanel children="For 8 Hours" onClick={() => handleScheduleMute(FOR_8_HOURS)} />
-						<ItemPanel children="For 24 Hours" onClick={() => handleScheduleMute(FOR_24_HOURS)} />
-						<ItemPanel children="Until I turn it back on" onClick={() => handleScheduleMute(Infinity)} />
-					</Dropdown>
+						<div>
+							<ItemPanel children={'Mute Category'} dropdown="change here" onClick={() => handleMuteCategory(MUTE)} />
+						</div>
+					</Menu>
 				) : (
 					<ItemPanel children={'Unmute Category'} onClick={() => handleMuteCategory(ACTIVE)} subText={muteUntil} />
 				)}
 
-				<Dropdown
+				<Menu
+					menu={menuNoti}
 					trigger="hover"
-					dismissOnClick={false}
-					renderTrigger={() => (
-						<div>
-							<ItemPanel children="Notification Settings" dropdown="change here" />
-						</div>
-					)}
-					label=""
-					placement="right-start"
+					align={{
+						points: ['bl', 'br']
+					}}
 					className=" bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
 				>
-					<ItemPanel
-						children="Use Clan Default"
-						type="radio"
-						name="NotificationSetting"
-						defaultNotifi={true}
-						onClick={() => handleChangeSettingType(ENotificationTypes.DEFAULT)}
-						checked={
-							defaultCategoryNotificationSetting?.notification_setting_type === ENotificationTypes.DEFAULT ||
-							defaultCategoryNotificationSetting?.notification_setting_type === undefined
-						}
-					/>
-					{notificationTypesList.map((notification) => (
-						<ItemPanel
-							children={notification.label}
-							notificationId={notification.value}
-							type="radio"
-							name="NotificationSetting"
-							key={notification.value}
-							onClick={() => handleChangeSettingType(notification.value)}
-							checked={defaultCategoryNotificationSetting?.notification_setting_type === notification.value}
-						/>
-					))}
-				</Dropdown>
+					<div>
+						<ItemPanel children="Notification Settings" dropdown="change here" />
+					</div>
+				</Menu>
 			</GroupPanels>
 
 			<UserRestrictionZone policy={canManageCategory}>
