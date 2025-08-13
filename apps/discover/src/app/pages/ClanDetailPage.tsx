@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaCopy, FaDiscord, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
+import { FaCopy, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
 import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
 import { IoMdClose } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
@@ -30,14 +30,14 @@ export default function ClanDetailPage() {
 	];
 	const categories = (clan as any).categories || ['Science & Tech', 'Entertainment'];
 	const socials = (clan as any).socials || [
-		{ icon: <FaDiscord />, url: '#' },
-		{ icon: <FaFacebook />, url: '#' },
+		{ icon: <FaFacebook />, url: 'https://www.facebook.com/mezonworld?locale=vi_VN' },
 		{ icon: <FaReddit />, url: '#' },
 		{ icon: <FaTwitter />, url: '#' }
 	];
+	const inviteLink = `https://mezon.ai/invite/${clan?.invite_id}`;
 	const handleNavigate = () => {
 		if (clan?.clan_id) {
-			window.location.href = `${process.env.NX_CHAT_APP_REDIRECT_URI}${toClanPage(clan.clan_id)}`;
+			window.location.href = inviteLink;
 		}
 	};
 
@@ -46,7 +46,7 @@ export default function ClanDetailPage() {
 	};
 
 	const handleCopy = () => {
-		const inviteLink = `https://mezon.ai/invite/${clan?.clan_id}`;
+
 		navigator.clipboard
 			.writeText(inviteLink)
 			.then(() => {
@@ -221,7 +221,7 @@ export default function ClanDetailPage() {
 							<div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg">
 								<input
 									type="text"
-									value={`https://mezon.ai/invite/${clan?.clan_id}`}
+									value={`https://mezon.ai/invite/${clan?.invite_id}`}
 									readOnly
 									className="flex-1 bg-transparent outline-none text-sm"
 								/>
