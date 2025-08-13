@@ -473,13 +473,6 @@ export const Routes = memo(() => {
 					},
 					{
 						path: 'invite',
-						loader: loaderWithStore(authLoader),
-						shouldRevalidate: shouldRevalidateAuth,
-						element: (
-							<Suspense fallback={<SuspenseFallback />}>
-								<ProtectedRoutes />
-							</Suspense>
-						),
 						children: [
 							{
 								path: ':inviteId',
