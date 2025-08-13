@@ -8,10 +8,10 @@ import {
 	useSettingFooter
 } from '@mezon/core';
 import { clansActions, defaultNotificationActions, selectDefaultNotificationClan, useAppDispatch } from '@mezon/store';
+import { Menu } from '@mezon/ui';
 import { EPermission, EUserSettings, IClan } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
 import { ApiAccount } from 'mezon-js/dist/api.gen';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Coords } from '../ChannelLink';
@@ -46,7 +46,11 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, []);
 
 	useEscapeKeyClose(panelRef, handClosePannel);
-	useOnClickOutside(panelRef, handClosePannel);
+	useOnClickOutside(panelRef, () => {
+		if (!checkMenuOpen.current) {
+			handClosePannel();
+		}
+	});
 	const { handleMarkAsReadClan, statusMarkAsReadClan } = useMarkAsRead();
 	useEffect(() => {
 		if (statusMarkAsReadClan === 'success' || statusMarkAsReadClan === 'error') {
@@ -55,6 +59,7 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 	}, [statusMarkAsReadClan]);
 
 	const handleChangeSettingType = (notificationType: number) => {
+		checkMenuOpen.current = false;
 		dispatch(
 			defaultNotificationActions.setDefaultNotificationClan({
 				clan_id: clan?.clan_id,
@@ -110,6 +115,28 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 		}
 	};
 
+	const checkMenuOpen = useRef(false);
+	const menuNoti = useMemo(() => {
+		const menuItems: ReactElement[] = [];
+		notificationTypesList.map((notification) =>
+			menuItems.push(
+				<ItemPanel
+					children={notification.label}
+					notificationId={notification.value}
+					type="radio"
+					name="NotificationSetting"
+					key={notification.value}
+					onClick={() => handleChangeSettingType(notification.value)}
+					checked={defaultNotificationClan?.notification_setting_type === notification.value}
+				/>
+			)
+		);
+		return <>{menuItems}</>;
+	}, [notificationTypesList]);
+
+	const handleCheckMenu = useCallback((visible: boolean) => {
+		checkMenuOpen.current = visible;
+	}, []);
 	return (
 		<div
 			ref={panelRef}
@@ -133,52 +160,23 @@ const PanelClan: React.FC<IPanelCLanProps> = ({ coords, clan, setShowClanListMen
 						</ItemPanel>
 					</GroupPanels>
 					<GroupPanels>
-						<Dropdown
+						<Menu
+							menu={menuNoti}
 							trigger="hover"
-							dismissOnClick={false}
-							renderTrigger={() => (
-								<div>
-									<ItemPanel children="Notification Settings" subText={notificationLabel as string} dropdown="change here" />
-								</div>
-							)}
-							label=""
-							placement="right-start"
-							className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px] relative"
+							align={{
+								offset: [-10, -20],
+								points: ['tr']
+							}}
+							className=" bg-theme-contexify text-theme-primary border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
+							onVisibleChange={handleCheckMenu}
 						>
-							{notificationTypesList.map((notification) => (
-								<ItemPanel
-									children={notification.label}
-									notificationId={notification.value}
-									type="radio"
-									name="NotificationSetting"
-									key={notification.value}
-									onClick={() => handleChangeSettingType(notification.value)}
-									checked={defaultNotificationClan?.notification_setting_type === notification.value}
-								/>
-							))}
-						</Dropdown>
+							<div>
+								<ItemPanel children="Notification Settings" subText={notificationLabel as string} dropdown="change here" />
+							</div>
+						</Menu>
 						<ItemPanel children={'Hide Muted Channels'} type={'checkbox'} />
 					</GroupPanels>
 					<GroupPanels>
-						{/* will be add later  */}
-						{/* <UserRestrictionZone policy={canManageCLan}>
-					<Dropdown
-						trigger="hover"
-						dismissOnClick={false}
-						renderTrigger={() => (
-							<div>
-								<ItemPanel children={'Clan Settings'} dropdown="change here" />
-							</div>
-						)}
-						label=""
-						placement="right-start"
-						className="dark:!bg-bgProfileBody bg-gray-100 border-none ml-[3px] py-[6px] px-[8px] w-[200px]"
-					>
-						{serverSettingsMenuList.map((menuItem) => (
-							<ItemPanel children={menuItem.label} notificationId={menuItem.value} name="ServerSettingsMenu" key={menuItem.value} />
-						))}
-					</Dropdown>
-				</UserRestrictionZone> */}
 						<ItemPanel children={'Privacy Settings'} />
 						<ItemPanel children={'Edit Clan Profile'} onClick={handleOpenClanProfileSetting} />
 					</GroupPanels>
