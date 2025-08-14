@@ -14,7 +14,7 @@ const statusColors: Record<Status, string> = {
 	offline: 'bg-gray-400'
 };
 
-export const StatusUser2: React.FC<{ status: Status; className?: string }> = ({ status, className = ' w-[12px] h-[12px] p-[2px]' }) => {
+export const StatusUser: React.FC<{ status: Status; className?: string }> = ({ status, className = ' w-[12px] h-[12px] p-[2px]' }) => {
 	return (
 		<span className={`${className} absolute bottom-0 right-0 status-user-background rounded-full  `}>
 			<span className={`block w-full h-full rounded-full ${statusColors[status]} relative`}></span>
