@@ -65,7 +65,11 @@ export const customStyles = {
 	singleValue: (provided: any) => ({
 		...provided,
 		color: 'var(--text-secondary)'
-	})
+	}),
+	menuList: (provided: any) => ({
+		...provided,
+		maxHeight: 250,
+	}),
 };
 
 const ModalNotificationSetting = (props: ModalParam) => {
@@ -252,9 +256,11 @@ const ModalNotificationSetting = (props: ModalParam) => {
 							value={selectedOption}
 							placeholder="Select or create an option..."
 							styles={customStyles}
+
 							classNames={{
 								menuList: () => 'thread-scroll'
 							}}
+							menuPlacement="top" 
 						/>
 					</div>
 					<div className={`mt-4 overflow-visible bg-theme-setting-primary `}>
