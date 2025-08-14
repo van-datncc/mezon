@@ -13,5 +13,7 @@
     "wallet": "Wallet",
     "unmuteNotification": "Unmute",
     "inviteMembers": "Invite Members",
-    "addMembers": "Add Members"
+    "addMembers": "Add Members",
+    "copyImage": "Copied Image",
+    "copyImageFailed": "Failed to copy image: {{error}}"
 }

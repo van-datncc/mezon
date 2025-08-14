@@ -27,7 +27,8 @@
     "openLink": "Mở liên kết",
     "copyLink": "Sao chép liên kết",
     "shareLink": "Chia sẻ liên kết",
-    "copyLinkSuccess": "Đã sao chép liên kết vào clipboard"
+    "copyLinkSuccess": "Đã sao chép liên kết vào clipboard",
+    "copyImage": "Sao chép Ảnh"
   },
   "chatBox": {
     "replyingTo": "Đang trả lời",
@@ -46,7 +47,9 @@
     "pinMessage": "Tin nhắn đã được ghim",
     "markMessage": "Đã đánh dấu tin nhắn",
     "markMessageUnread": "Đã đánh dấu chưa đọc",
-    "markMessageUnreadFailed": "Không thể bỏ đọc"
+    "markMessageUnreadFailed": "Không thể bỏ đọc",
+    "copyImage": "Đã sao chép Ảnh",
+    "copyImageFailed": "Sao chép không thành công: {{error}}"
   },
   "directMessage": {
     "you": "Bạn"

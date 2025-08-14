@@ -170,7 +170,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		currentChannelId ?? ''
 	);
 	const [isAllowDelMessage] = usePermissionChecker([EOverriddenPermission.deleteMessage], message?.channel_id ?? '');
-	const { downloadImage, saveImageToCameraRoll } = useImage();
+	const { downloadImage, saveImageToCameraRoll, getImageAsBase64OrFile } = useImage();
 	const allMessagesEntities = useAppSelector((state) =>
 		selectMessageEntitiesByChannelId(state, (currentDmId ? currentDmId : currentChannelId) || '')
 	);
@@ -441,6 +441,35 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 		}
 	};
 
+	const handleActionCopyImage = async () => {
+		try {
+			dispatch(appActions.setLoadingMainMobile(true));
+			const url = message?.attachments?.[0]?.url;
+			const filetype = message?.attachments?.[0]?.filetype;
+
+			const type = filetype?.split?.('/');
+			const image = await getImageAsBase64OrFile(url, type?.[1]);
+			if (image) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('toast.copyImage'),
+						leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
+					}
+				});
+			}
+		} catch (error) {
+			console.error('Error copying image:', error);
+			Toast.show({
+				type: 'error',
+				text1: t('toast.copyImageFailed', { error }),
+			})
+		} finally {
+			dispatch(appActions.setLoadingMainMobile(false));
+			onClose();
+		}
+	};
+
 	const implementAction = (type: EMessageActionType) => {
 		switch (type) {
 			case EMessageActionType.GiveACoffee:
@@ -500,6 +529,9 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			case EMessageActionType.QuickMenu:
 				handleActionQuickMenu();
 				break;
+			case EMessageActionType.CopyImage:
+				handleActionCopyImage();
+				break;
 			default:
 				break;
 		}
@@ -545,6 +577,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 				return <MezonIconCDN icon={IconCDN.starIcon} width={size.s_20} height={size.s_18} color={themeValue.text} />;
 			case EMessageActionType.QuickMenu:
 				return <MezonIconCDN icon={IconCDN.quickAction} width={size.s_20} height={size.s_20} color={themeValue.text} />;
+			case EMessageActionType.CopyImage:
+				return <MezonIconCDN icon={IconCDN.imageIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />;
 			default:
 				return <View />;
 		}
@@ -567,6 +601,7 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			isMessageSystem;
 		const listOfActionOnlyMyMessage = [EMessageActionType.EditMessage];
 		const listOfActionOnlyOtherMessage = [EMessageActionType.Report];
+		const isHideCopyImage = !(message?.attachments?.length === 1 && message?.attachments?.[0]?.filetype?.includes('image'));
 
 		const isShowForwardAll = () => {
 			if (messagePosition === -1) return false;
@@ -586,7 +621,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			((!isMessageError && isMyMessage) || !isMyMessage) && EMessageActionType.ResendMessage,
 			(isMyMessage || isMessageSystem || isAnonymous) && EMessageActionType.GiveACoffee,
 			isHideTopicDiscussion && EMessageActionType.TopicDiscussion,
-			isDM && EMessageActionType.QuickMenu
+			isDM && EMessageActionType.QuickMenu,
+			isHideCopyImage && EMessageActionType.CopyImage
 		];
 
 		let availableMessageActions: IMessageAction[] = [];
