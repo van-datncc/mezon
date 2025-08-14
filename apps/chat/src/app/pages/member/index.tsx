@@ -1,6 +1,5 @@
 import { useMemberContext } from '@mezon/core';
-import { Icons, Menu } from '@mezon/ui';
-import { Pagination } from 'flowbite-react';
+import { Icons, Menu, Pagination } from '@mezon/ui';
 import { ReactElement, useMemo, useState } from 'react';
 import MemberTopBar from './MemberTopBar';
 import TableMember from './TableMember';
