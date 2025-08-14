@@ -3,7 +3,7 @@ import { Icons, Menu } from '@mezon/ui';
 import isElectron from 'is-electron';
 import { safeJSONParse } from 'mezon-js';
 import { ApiApp } from 'mezon-js/api.gen';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CreateAppPopup from './CreateAppPopup';
@@ -53,12 +53,9 @@ function ApplicationsPage() {
 const AppPageBottom = () => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [dropdownValue, setDropdownValue] = useState('Date of Creation');
-	const selectedDropdownClass = 'dark:bg-[#313338] bg-[#f2f3f5]';
-
 	const allApplications = useSelector(selectAllApps);
-	const [appListForDisplaying, setAppListForDisplaying] = useState<ApiApp[] | undefined>(allApplications.apps);
 
-	const alphabetSort = (arr: Array<ApiApp> | undefined) => {
+	const alphabetSort = useCallback((arr: Array<ApiApp> | undefined) => {
 		if (arr) {
 			const arrCopy = [...arr];
 			return arrCopy.sort((a, b) => {
@@ -74,24 +71,50 @@ const AppPageBottom = () => {
 			});
 		}
 		return [];
-	};
+	}, []);
+
 	const isChooseAZ = useMemo(() => {
 		return dropdownValue === 'A-Z';
 	}, [dropdownValue]);
 
-	useEffect(() => {
+	const appListForDisplaying = useMemo(() => {
 		if (isChooseAZ) {
-			setAppListForDisplaying(alphabetSort(allApplications.apps));
+			return alphabetSort(allApplications.apps);
 		} else {
-			setAppListForDisplaying(allApplications.apps);
+			return allApplications.apps;
 		}
-	}, [allApplications, isChooseAZ]);
+	}, [allApplications.apps, isChooseAZ, alphabetSort]);
 
-	const handleDropdownValue = (text: string) => {
+	const handleDropdownValue = useCallback((text: string) => {
 		setDropdownValue(text);
-	};
+	}, []);
+
+	const selectedDropdownClass = useMemo(() => 'dark:bg-[#313338] bg-[#f2f3f5]', []);
 
 	const [isSmallSizeSort, setIsSmallSizeSort] = useState(true);
+
+	const sortMenuContent = useMemo(() => (
+		<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20 rounded-lg shadow-lg`}>
+			<Menu.Item
+				onClick={() => {
+					handleDropdownValue('Date of Creation');
+				}}
+				className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'text-[#374151] dark:text-[#d1d5db]' : 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium'
+					}`}
+			>
+				Date of Creation
+			</Menu.Item>
+			<Menu.Item
+				onClick={() => {
+					handleDropdownValue('A-Z');
+				}}
+				className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium' : 'text-[#374151] dark:text-[#d1d5db]'
+					}`}
+			>
+				A-Z
+			</Menu.Item>
+		</div>
+	), [appearanceTheme, isChooseAZ, handleDropdownValue]);
 
 	return (
 		<div>
@@ -100,28 +123,7 @@ const AppPageBottom = () => {
 					<div>Sort by:</div>
 					<Menu
 						trigger="click"
-						menu={
-							<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'} z-20 rounded-lg shadow-lg`}>
-								<Menu.Item
-									onClick={() => {
-										handleDropdownValue('Date of Creation');
-									}}
-									className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'text-[#374151] dark:text-[#d1d5db]' : 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium'
-										}`}
-								>
-									Date of Creation
-								</Menu.Item>
-								<Menu.Item
-									onClick={() => {
-										handleDropdownValue('A-Z');
-									}}
-									className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 ${isChooseAZ ? 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium' : 'text-[#374151] dark:text-[#d1d5db]'
-										}`}
-								>
-									A-Z
-								</Menu.Item>
-							</div>
-						}
+						menu={sortMenuContent}
 						placement="bottomRight"
 						className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px]   z-20 rounded-lg shadow-lg`}
 					>
