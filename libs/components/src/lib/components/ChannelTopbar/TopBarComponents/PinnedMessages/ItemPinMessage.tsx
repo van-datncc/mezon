@@ -20,7 +20,15 @@ type ItemPinMessageProps = {
 
 const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { pinMessage, contentString, handleUnPinMessage, onClose, mode } = props;
-	const messageTime = convertTimeString(pinMessage?.create_time as string);
+
+	const getValidCreateTime = () => {
+		if (pinMessage?.create_time) return pinMessage.create_time;
+		if (pinMessage?.create_time_seconds) return new Date(pinMessage.create_time_seconds * 1000).toISOString();
+		return new Date().toISOString();
+	};
+
+	const validCreateTime = getValidCreateTime();
+	const messageTime = convertTimeString(validCreateTime);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(pinMessage.sender_id || '');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
@@ -88,13 +96,24 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 							/>
 						)}
 					</div>
-					{!!pinMessageAttachments.length && (
-						<MessageAttachment
-							mode={mode as ChannelStreamMode}
-							message={{ ...pinMessage, attachments: pinMessageAttachments } as IMessageWithUser}
-							defaultMaxWidth={TOPBARS_MAX_WIDTH}
-						/>
-					)}
+					{!!pinMessageAttachments.length && (() => {
+						const enhancedAttachments = pinMessageAttachments.map((att: ApiMessageAttachment) => ({
+							...att,
+							create_time: validCreateTime, 
+							sender_id: pinMessage.sender_id,
+							message_id: pinMessage.message_id
+						}));
+						return (
+							<MessageAttachment
+								mode={mode as ChannelStreamMode}
+								message={{
+									...pinMessage,
+									attachments: enhancedAttachments
+								} as IMessageWithUser}
+								defaultMaxWidth={TOPBARS_MAX_WIDTH}
+							/>
+						);
+					})()}
 				</div>
 			</div>
 			<div className="absolute h-fit flex gap-x-2 items-center opacity-0 right-2 top-2 group-hover/item-pinMess:opacity-100">

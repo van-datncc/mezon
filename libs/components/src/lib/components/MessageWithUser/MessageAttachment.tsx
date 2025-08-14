@@ -193,16 +193,23 @@ const ImageAlbum = ({
 		const attachmentData = images.find((item) => item.url === url);
 		if (!attachmentData) return;
 
+
+		const enhancedAttachmentData = {
+			...attachmentData,
+			create_time: attachmentData.create_time || message.create_time || new Date().toISOString()
+		};
+
 		if (isElectron()) {
 			const currentChatUsersEntities = getCurrentChatData()?.currentChatUsersEntities;
 			const listAttachmentsByChannel = selectAllListAttachmentByChannel(state, currentChannelId || currentDmGroupId || '');
 
 			const currentImageUploader = currentChatUsersEntities?.[attachmentData.sender_id as string];
+
 			window.electron.openImageWindow({
-				...attachmentData,
-				url: createImgproxyUrl(attachmentData.url || '', {
-					width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
-					height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+				...enhancedAttachmentData,
+				url: createImgproxyUrl(enhancedAttachmentData.url || '', {
+					width: enhancedAttachmentData.width ? (enhancedAttachmentData.width > 1600 ? 1600 : enhancedAttachmentData.width) : 0,
+					height: enhancedAttachmentData.height ? (enhancedAttachmentData.height > 900 ? 900 : enhancedAttachmentData.height) : 0,
 					resizeType: 'fit'
 				}),
 				uploaderData: {
@@ -215,7 +222,7 @@ const ImageAlbum = ({
 						currentImageUploader?.user?.avatar_url ||
 						window.location.origin + '/assets/images/anonymous-avatar.png') as string
 				},
-				realUrl: attachmentData.url || '',
+				realUrl: enhancedAttachmentData.url || '',
 				channelImagesData: {
 					channelLabel: (currentChannelId ? currentChannel?.channel_label : currentDm.channel_label) as string,
 					images: [],
@@ -227,7 +234,7 @@ const ImageAlbum = ({
 				const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 				if (listAttachmentsByChannel) {
 					const imageListWithUploaderInfo = getAttachmentDataForWindow(listAttachmentsByChannel, currentChatUsersEntities);
-					const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === attachmentData.url);
+					const selectedImageIndex = listAttachmentsByChannel.findIndex((image) => image.url === enhancedAttachmentData.url);
 					const channelImagesData: IImageWindowProps = {
 						channelLabel: (currentChannelId ? currentChannel?.channel_label : currentDm.channel_label) as string,
 						images: imageListWithUploaderInfo,
@@ -235,13 +242,13 @@ const ImageAlbum = ({
 					};
 
 					window.electron.openImageWindow({
-						...attachmentData,
-						url: createImgproxyUrl(attachmentData.url || '', {
-							width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
-							height: attachmentData.height
-								? (attachmentData.width || 0) > 1600
-									? Math.round((1600 * attachmentData.height) / (attachmentData.width || 1))
-									: attachmentData.height
+						...enhancedAttachmentData,
+						url: createImgproxyUrl(enhancedAttachmentData.url || '', {
+							width: enhancedAttachmentData.width ? (enhancedAttachmentData.width > 1600 ? 1600 : enhancedAttachmentData.width) : 0,
+							height: enhancedAttachmentData.height
+								? (enhancedAttachmentData.width || 0) > 1600
+									? Math.round((1600 * enhancedAttachmentData.height) / (enhancedAttachmentData.width || 1))
+									: enhancedAttachmentData.height
 								: 0,
 							resizeType: 'fill'
 						}),
@@ -255,7 +262,7 @@ const ImageAlbum = ({
 								currentImageUploader?.user?.avatar_url ||
 								window.location.origin + '/assets/images/anonymous-avatar.png') as string
 						},
-						realUrl: attachmentData.url || '',
+						realUrl: enhancedAttachmentData.url || '',
 						channelImagesData
 					});
 					return;
@@ -266,7 +273,7 @@ const ImageAlbum = ({
 						const attachmentList = response.attachments as IAttachmentEntity[];
 						const imageList = attachmentList?.filter((image) => image.filetype?.includes('image'));
 						const imageListWithUploaderInfo = getAttachmentDataForWindow(imageList, currentChatUsersEntities);
-						const selectedImageIndex = imageList.findIndex((image) => image.url === attachmentData.url);
+						const selectedImageIndex = imageList.findIndex((image) => image.url === enhancedAttachmentData.url);
 						return { imageListWithUploaderInfo, selectedImageIndex };
 					})
 					.then(({ imageListWithUploaderInfo, selectedImageIndex }) => {
@@ -277,10 +284,10 @@ const ImageAlbum = ({
 						};
 						window.electron.send(SEND_ATTACHMENT_DATA, { ...channelImagesData });
 						window.electron.openImageWindow({
-							...attachmentData,
-							url: createImgproxyUrl(attachmentData.url || '', {
-								width: attachmentData.width ? (attachmentData.width > 1600 ? 1600 : attachmentData.width) : 0,
-								height: attachmentData.height ? (attachmentData.height > 900 ? 900 : attachmentData.height) : 0,
+							...enhancedAttachmentData,
+							url: createImgproxyUrl(enhancedAttachmentData.url || '', {
+								width: enhancedAttachmentData.width ? (enhancedAttachmentData.width > 1600 ? 1600 : enhancedAttachmentData.width) : 0,
+								height: enhancedAttachmentData.height ? (enhancedAttachmentData.height > 900 ? 900 : enhancedAttachmentData.height) : 0,
 								resizeType: 'fit'
 							}),
 							uploaderData: {
@@ -291,7 +298,7 @@ const ImageAlbum = ({
 									'',
 								avatar: (currentImageUploader?.clan_avatar || currentImageUploader?.user?.avatar_url) as string
 							},
-							realUrl: attachmentData.url || '',
+							realUrl: enhancedAttachmentData.url || '',
 							channelImagesData
 						});
 					});
@@ -300,16 +307,17 @@ const ImageAlbum = ({
 			return;
 		}
 		dispatch(attachmentActions.setMode(mode));
+
 		dispatch(
 			attachmentActions.setCurrentAttachment({
-				id: attachmentData.message_id as string,
-				uploader: attachmentData.sender_id,
-				create_time: attachmentData.create_time
+				id: enhancedAttachmentData.message_id as string,
+				uploader: enhancedAttachmentData.sender_id || message.sender_id,
+				create_time: enhancedAttachmentData.create_time
 			})
 		);
 
 		dispatch(attachmentActions.setOpenModalAttachment(true));
-		dispatch(attachmentActions.setAttachment(attachmentData.url));
+		dispatch(attachmentActions.setAttachment(enhancedAttachmentData.url));
 
 		if ((currentClanId && currentChannelId) || currentDmGroupId) {
 			const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
