@@ -1,5 +1,5 @@
 import { useAuth } from '@mezon/core';
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 import {
 	Background,
 	BackgroundVariant,
@@ -15,7 +15,6 @@ import {
 	useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Popover } from 'flowbite-react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -396,22 +395,32 @@ const Flow = () => {
 			>
 				{!isExampleFlow && (
 					<Panel position="top-left">
-						<Popover content={<AddNodeMenuPopup />} trigger="click">
+						<Menu
+							trigger="click"
+							menu={<AddNodeMenuPopup />}
+							placement="bottomLeft"
+							className="bg-white dark:bg-[#2b2d31] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600"
+						>
 							<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md">
 								<Icons.AddIcon className="w-6 h-6" />
 							</button>
-						</Popover>
+						</Menu>
 					</Panel>
 				)}
 				<Controls />
 				<Background className="dark:bg-bgPrimary bg-bgLightPrimary text-gray-500 dark:text-gray-100" variant={BackgroundVariant.Dots} />
 			</ReactFlow>
 
-			<Popover content={<FlowChatPopup />} trigger="click">
+			<Menu
+				trigger="click"
+				menu={<FlowChatPopup />}
+				placement="bottomRight"
+				className="bg-white dark:bg-[#2b2d31] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600"
+			>
 				<button className="p-2 rounded-full hover:bg-[#cccccc66] shadow-md absolute top-[80px] right-3">
 					<Icons.IconChat className="w-6 h-6" />
 				</button>
-			</Popover>
+			</Menu>
 			{flowState.isLoading && (
 				<div className="fixed top-0 left-0 pt-2 right-0 bottom-0 bg-[#83818169] z-[999] text-center">
 					<Icons.LoadingSpinner />
