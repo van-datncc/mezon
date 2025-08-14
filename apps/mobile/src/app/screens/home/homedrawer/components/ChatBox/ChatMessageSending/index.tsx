@@ -136,7 +136,7 @@ export const ChatMessageSending = memo(
 			return text
 				?.replace?.(/@\[(.*?)\]/g, '@$1')
 				?.replace?.(/<#(.*?)>/g, '#$1')
-				?.replace?.(/\*\*(.*?)\*\*/g, '$1');
+				?.replace(/\*\*([\s\S]*?)\*\*/g, '$1');
 		};
 
 		const onEditMessage = useCallback(
