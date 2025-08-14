@@ -75,7 +75,7 @@ export const ClanGroup = memo(({ group, onClanPress, clans, drag, isActive }: Cl
 		return (
 			<View style={styles.expandedGroup}>
 				<TouchableOpacity style={styles.groupHeader} onPress={handleToggleGroup}>
-					<MezonIconCDN icon={IconCDN.forderIcon} width={size.s_24} height={size.s_24} color={themeValue.text} />
+					<MezonIconCDN icon={IconCDN.forderIcon} width={size.s_20} height={size.s_20} color={themeValue.text} />
 				</TouchableOpacity>
 
 				{groupClans?.map((clan) => (

@@ -146,7 +146,6 @@ export const ListClanPopup = React.memo(() => {
 
 	const handleChangeClan = useCallback(
 		async (clanId: string) => {
-			console.log('handle change clan', clanId);
 			const store = await getStoreAsync();
 			if (isTabletLandscape) {
 				navigation.navigate(APP_SCREEN.HOME as never);

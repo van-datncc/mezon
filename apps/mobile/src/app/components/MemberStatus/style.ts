@@ -28,7 +28,7 @@ export const style = (colors: Attributes) =>
 			justifyContent: 'space-between',
 			alignItems: 'center',
 			padding: size.s_10,
-			backgroundColor: colors.primary,
+			backgroundColor: colors.secondary,
 			borderRadius: 15,
 			marginBottom: size.s_10
 		},

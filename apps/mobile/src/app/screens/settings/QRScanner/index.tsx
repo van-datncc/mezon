@@ -14,8 +14,6 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
 import RNQRGenerator from 'rn-qr-generator';
-import LogoMezonDark from '../../../../assets/svg/logoMezonDark.svg';
-import LogoMezonLight from '../../../../assets/svg/logoMezonLight.svg';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
@@ -291,11 +289,7 @@ export const QRScanner = () => {
 					style={styles.popupLogin}
 				>
 					<View style={styles.popupLoginSub}>
-						{themeBasic === ThemeModeBase.DARK ? (
-							<LogoMezonDark width={size.s_100} height={size.s_80} />
-						) : (
-							<LogoMezonLight width={size.s_100} height={size.s_80} />
-						)}
+						<MezonIconCDN icon={IconCDN.logoMezon} width={size.s_100} height={size.s_80} useOriginalColor={true} />
 						<Text style={styles.title}>{isSuccess ? `${t('youAreIn')}` : `${t('logInOnNewDevice')}`}</Text>
 						{isSuccess ? (
 							<Text style={styles.subTitleSuccess}>{t('youAreLoggedInOnDesktop')}</Text>
