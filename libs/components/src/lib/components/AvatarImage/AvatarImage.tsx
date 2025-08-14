@@ -1,5 +1,4 @@
 import { DetailedHTMLProps, ImgHTMLAttributes, useState } from 'react';
-import { twMerge } from 'tailwind-merge';
 
 export type AvatarImageProp = {
 	username?: string;
@@ -12,7 +11,7 @@ export type AvatarImageProp = {
 export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
 
-	const computedClassName = twMerge('size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className);
+	const computedClassName = 'size-10 rounded-full object-cover min-w-5 min-h-5 cursor-pointer ' + className;
 	const handleError = () => {
 		setIsError(true);
 	};
