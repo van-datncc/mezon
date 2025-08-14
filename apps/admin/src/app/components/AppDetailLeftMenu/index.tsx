@@ -1,7 +1,7 @@
 import { getApplicationDetail, selectAllApps, selectTheme, useAppDispatch } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { ApiApp } from 'mezon-js/api.gen';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -18,29 +18,34 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const [dropdownValue, setDropdownValue] = useState<string>('Choose application');
-	const [filteredApps, setFilteredApps] = useState<ApiApp[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
-		if (!allApps?.apps) return;
+	const currentApp = useMemo(() => {
+		return allApps?.apps?.find((a) => a.id === currentAppId);
+	}, [allApps?.apps, currentAppId]);
 
-		const current = allApps.apps.find((a) => a.id === currentAppId);
-		const isApp = Boolean(current?.app_url);
+	const filteredApps = useMemo(() => {
+		if (!allApps?.apps) return [];
 
+		const isApp = Boolean(currentApp?.app_url);
 		const filtered = allApps.apps.filter((a) => (isApp ? Boolean(a.app_url) : !a.app_url));
 
-		const sorted = filtered.filter((a) => a.id != null).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+		return filtered.filter((a) => a.id != null).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+	}, [allApps?.apps, currentApp?.app_url]);
 
-		setFilteredApps(sorted);
+	const dropdownLabel = useMemo(() => {
+		return filteredApps.length > 0 && filteredApps[0]?.app_url ? 'APP' : 'BOT';
+	}, [filteredApps]);
 
-		if (current && sorted.find((a) => a.id === currentAppId) && current.appname) {
-			setDropdownValue(current.appname);
-		} else if (sorted.length > 0 && sorted[0].appname) {
-			setDropdownValue(sorted[0].appname);
+	useEffect(() => {
+		if (currentApp && filteredApps.find((a) => a.id === currentAppId) && currentApp.appname) {
+			setDropdownValue(currentApp.appname);
+		} else if (filteredApps.length > 0 && filteredApps[0].appname) {
+			setDropdownValue(filteredApps[0].appname);
 		}
-	}, [allApps, currentAppId]);
+	}, [currentApp, filteredApps, currentAppId]);
 
-	const onSelectApp = async (app: ApiApp) => {
+	const onSelectApp = useCallback(async (app: ApiApp) => {
 		if (!app.appname || !app.id) return;
 		if (app.id === currentAppId) return;
 
@@ -59,7 +64,27 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 			setLoading(false);
 		}
 		navigate(`/developers/applications/${app.id}/information`);
-	};
+	}, [currentAppId, dispatch, navigate]);
+
+	const menuContent = useMemo(() => (
+		<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll thread-scroll z-20 rounded-lg shadow-lg`}>
+			{loading ? (
+				<div className="text-center text-gray-500 py-2">Loading...</div>
+			) : (
+				filteredApps.map((app) =>
+					app?.id && app?.appname ? (
+						<Menu.Item
+							key={app.id}
+							onClick={() => onSelectApp(app)}
+							className="truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 text-[#374151] dark:text-[#d1d5db]"
+						>
+							{app.appname}
+						</Menu.Item>
+					) : null
+				)
+			)}
+		</div>
+	), [loading, filteredApps, onSelectApp]);
 
 	return (
 		<div className="flex flex-col gap-6 items-center w-full">
@@ -69,28 +94,10 @@ const AppDetailLeftMenu = ({ tabs, currentAppId }: ISideBarProps) => {
 			</Link>
 
 			<div className="w-full">
-				<div className="text-[12px] font-semibold mb-1">SELECT {filteredApps.length > 0 && filteredApps[0]?.app_url ? 'APP' : 'BOT'}</div>
+				<div className="text-[12px] font-semibold mb-1">SELECT {dropdownLabel}</div>
 				<Menu
 					trigger="click"
-					menu={
-						<div className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll thread-scroll z-20 rounded-lg shadow-lg`}>
-							{loading ? (
-								<div className="text-center text-gray-500 py-2">Loading...</div>
-							) : (
-								filteredApps.map((app) =>
-									app?.id && app?.appname ? (
-										<Menu.Item
-											key={app.id}
-											onClick={() => onSelectApp(app)}
-											className="truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150 text-[#374151] dark:text-[#d1d5db]"
-										>
-											{app.appname}
-										</Menu.Item>
-									) : null
-								)
-							)}
-						</div>
-					}
+					menu={menuContent}
 					placement="bottomRight"
 					className={`dark:bg-[#2b2d31] bg-white border-none py-[6px] px-[8px]  z-20 rounded-lg shadow-lg`}
 				>
