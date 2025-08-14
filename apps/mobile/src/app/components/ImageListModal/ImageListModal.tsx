@@ -7,8 +7,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, View, useWindowDimensions } from 'react-native';
 import GalleryAwesome, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { useThrottledCallback } from 'use-debounce';
+import MezonIconCDN from '../../componentUI/MezonIconCDN';
+import { IconCDN } from '../../constants/icon_cdn';
 import LoadingModal from '../LoadingModal/LoadingModal';
 import { ItemImageModal } from './ItemImageModal';
 import { RenderFooterModal } from './RenderFooterModal';
@@ -171,6 +174,16 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		setIsLoadingSaveImage(isLoading);
 	}, []);
 
+	const onImageCopy = useCallback(() => {
+		Toast.show({
+				type: 'success',
+				props: {
+					text2: t('copyImage'),
+					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
+				}
+			});
+	}, []);
+
 	useEffect(() => {
 		if (visibleToolbarConfig.showFooter) {
 			clearTimeout(footerTimeoutRef.current);
@@ -190,7 +203,7 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	return (
 		<View style={{ flex: 1 }}>
 			{visibleToolbarConfig.showHeader && (
-				<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} onLoading={onLoading} />
+				<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} onLoading={onLoading} onImageCopy={onImageCopy} />
 			)}
 			<GalleryAwesome
 				ref={ref}

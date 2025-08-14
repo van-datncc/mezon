@@ -28,7 +28,8 @@
         "openLink": "Open Link",
         "copyLink": "Copy Link",
         "shareLink": "Share Link",
-        "copyLinkSuccess": "Copied link to clipboard"
+        "copyLinkSuccess": "Copied link to clipboard",
+        "copyImage": "Copy Image"
     },
     "chatBox": {
         "replyingTo": "Replying to",
@@ -47,7 +48,8 @@
         "pinMessage": "Message has been pinned",
         "markMessage": "Message has been marked",
         "markMessageUnread": "Message has been unread",
-        "markMessageUnreadFailed": "Failed to unread message"
+        "markMessageUnreadFailed": "Failed to unread message",
+        "copyImage": "Copied image"
     },
     "directMessage": {
         "you": "You"

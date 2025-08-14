@@ -25,13 +25,14 @@ interface IRenderFooterModalProps {
 	imageSelected?: AttachmentEntity & { channelId?: string };
 	onImageSaved?: () => void;
 	onLoading?: (isLoading: boolean) => void;
+	onImageCopy?: () => void;
 }
 
-export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading }: IRenderFooterModalProps) => {
+export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading, onImageCopy }: IRenderFooterModalProps) => {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const uploader = useAppSelector((state) => selectMemberClanByUserId2(state, imageSelected?.uploader || ''));
-	const { downloadImage, saveImageToCameraRoll } = useImage();
+	const { downloadImage, saveImageToCameraRoll, getImageAsBase64OrFile } = useImage();
 	const currentDirectId = useSelector(selectDmGroupCurrentId);
 	const navigation = useNavigation<any>();
 	const handleDownloadImage = async () => {
@@ -49,6 +50,22 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			}
 		} catch (error) {
 			// Error is handled silently as the operation is user-facing
+		}
+		onLoading(false);
+	};
+
+	const handleCopyImage = async () => {
+		if (!imageSelected?.url) {
+			return;
+		}
+		onLoading(true);
+		try {
+			const { url, filetype } = imageSelected;
+			const type = filetype?.split?.('/');
+			await getImageAsBase64OrFile(url, type?.[1]);
+			onImageCopy();
+		} catch (error) {
+			console.error('Error copying image: ', error);
 		}
 		onLoading(false);
 	};
@@ -114,6 +131,9 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 				)}
 			</View>
 			<View style={styles.option}>
+				<TouchableOpacity onPress={handleCopyImage}>
+					<MezonIconCDN icon={IconCDN.copyIcon} color={Colors.white} />
+				</TouchableOpacity>
 				<TouchableOpacity onPress={handleForwardMessage}>
 					<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} />
 				</TouchableOpacity>
