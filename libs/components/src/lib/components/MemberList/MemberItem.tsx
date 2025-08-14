@@ -1,7 +1,6 @@
 import {
 	ChannelMembersEntity,
 	selectAccountCustomStatus,
-	selectDirectById,
 	selectDirectMemberMetaUserId,
 	selectMemberCustomStatusById,
 	useAppSelector
@@ -17,20 +16,18 @@ export type MemberItemProps = {
 	isMobile?: boolean;
 	isDM?: boolean;
 	isMe?: boolean;
+	createId?: string;
 };
 
-function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProps) {
+function MemberItem({ user, directMessageId, isDM = true, isMe, createId }: MemberItemProps) {
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById(state, user?.user?.id || '', isDM));
 	const userMetaById = useAppSelector((state) => selectDirectMemberMetaUserId(state, user?.user?.id || ''));
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
-	const directChannel = useAppSelector((state) => selectDirectById(state, directMessageId || ''));
 	const { showContextMenu, setCurrentUser, openProfileItem } = useDirectMessageContextMenu();
 	const handleClick = (event: React.MouseEvent) => {
 		setCurrentUser(user);
 		openProfileItem(event, user);
 	};
-
-	const isOwner = directChannel?.creator_id === user?.user?.id;
 
 	return (
 		<div>
@@ -43,7 +40,7 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 					online: !!userMetaById?.user?.online || !!isMe,
 					status: userMetaById?.user?.metadata?.status
 				}}
-				isOwner={isOwner}
+				isOwner={createId === user?.user?.id}
 				userStatus={isMe ? currentUserCustomStatus : userCustomStatus}
 				onContextMenu={showContextMenu}
 				onClick={handleClick}

@@ -132,40 +132,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		);
 	}, [currentUser?.user_id, infoFriend, userProfile?.user?.id]);
 
-	const hasVisibleItems = useMemo(() => {
-		if (!currentHandlers) return false;
-		if (isDm && !isSelf) return true;
-		if (channelId) return true;
-		if (!isSelf && !isDm && !isDmGroup) return true;
-		if (!isSelf && !isDmGroup && infoFriend?.state !== EStateFriend.BLOCK) {
-			if (
-				infoFriend?.state !== EStateFriend.FRIEND &&
-				infoFriend?.state !== EStateFriend.MY_PENDING &&
-				infoFriend?.state !== EStateFriend.OTHER_PENDING
-			) {
-				return true;
-			}
-		}
-		if (!isSelf && !isDmGroup && infoFriend?.state !== EStateFriend.BLOCK) {
-			if (infoFriend?.state === EStateFriend.FRIEND) {
-				return true;
-			}
-		}
-		if (!isSelf && !isDmGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser)) {
-			return true;
-		}
-		if (contextMenuId !== DMCT_GROUP_CHAT_ID && channelId) {
-			return true;
-		}
-		if (contextMenuId === DMCT_GROUP_CHAT_ID && !isSelf && isOwnerClanOrGroup) {
-			return true;
-		}
-		if (contextMenuId !== DMCT_GROUP_CHAT_ID && isDmGroup) {
-			return true;
-		}
-
-		return false;
-	}, [currentHandlers, isDm, isSelf, channelId, isDmGroup, infoFriend?.state, didIBlockUser, contextMenuId, isOwnerClanOrGroup]);
+	const shouldShowMenu = currentHandlers && !isSelf;
 
 	const contextValue: DirectMessageContextMenuContextType = {
 		setCurrentHandlers,
@@ -182,11 +149,11 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		<DirectMessageContextMenuContext.Provider value={contextValue}>
 			{children}
 
-			{hasVisibleItems && (
+			{shouldShowMenu && (
 				<Menu id={contextMenuId} style={menuStyles} className="z-50 rounded-lg border-theme-primary" animation={false}>
 					{currentHandlers && (
 						<>
-							{isDm && !isSelf && (
+							{isDm && (
 								<MemberMenuItem label="Profile" onClick={currentHandlers.handleViewProfile} setWarningStatus={setWarningStatus} />
 							)}
 
@@ -194,11 +161,11 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								<MemberMenuItem label="Mark as Read" onClick={currentHandlers.handleMarkAsRead} setWarningStatus={setWarningStatus} />
 							)}
 
-							{!isSelf && !isDm && !isDmGroup && (
+							{!isDm && !isDmGroup && (
 								<MemberMenuItem label="Message" onClick={currentHandlers.handleMessage} setWarningStatus={setWarningStatus} />
 							)}
 
-							{!isSelf && !isDmGroup && infoFriend?.state !== EStateFriend.BLOCK && (
+							{!isDmGroup && infoFriend?.state !== EStateFriend.BLOCK && (
 								<>
 									{infoFriend?.state !== EStateFriend.FRIEND &&
 										infoFriend?.state !== EStateFriend.MY_PENDING &&
@@ -221,7 +188,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 								</>
 							)}
 
-							{!isSelf && !isDmGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser) && (
+							{!isDmGroup && (infoFriend?.state === EStateFriend.FRIEND || didIBlockUser) && (
 								<MemberMenuItem
 									label={didIBlockUser ? 'Unblock' : 'Block'}
 									onClick={didIBlockUser ? currentHandlers.handleUnblockFriend : currentHandlers.handleBlockFriend}
@@ -283,7 +250,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 									</Submenu>
 								))}
 
-							{contextMenuId === DMCT_GROUP_CHAT_ID && !isSelf && isOwnerClanOrGroup && (
+							{contextMenuId === DMCT_GROUP_CHAT_ID && isOwnerClanOrGroup && (
 								<ItemPanelMember children="Remove From Group" onClick={currentHandlers.handleRemoveFromGroup} danger />
 							)}
 
