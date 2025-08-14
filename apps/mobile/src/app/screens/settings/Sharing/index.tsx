@@ -86,7 +86,7 @@ export const Sharing = ({ data, topUserSuggestionId, onClose }: ISharing) => {
 		if (!listDM?.current?.length) dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		if (data && data?.length === 1 && (data?.[0]?.weblink || data?.[0]?.text)) setDataText(data?.[0]?.weblink || data?.[0]?.text);
 		if (dataMedia?.length) convertFileFormat();
-		setDataShareTo([topUserSuggestion.current, ...listDMText, ...listChannelsText]);
+		setDataShareTo([...(topUserSuggestion.current ? [topUserSuggestion.current] : []), ...listDMText, ...listChannelsText]);
 		return () => {
 			if (timerRef.current) {
 				clearTimeout(timerRef.current);
