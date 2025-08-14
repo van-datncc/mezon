@@ -80,6 +80,7 @@ import { topicsReducer } from './topicDiscussion/topicDiscussions.slice';
 import { USER_STATUS_API_FEATURE_KEY, userStatusAPIReducer } from './userstatus/userstatusAPI.slice';
 import { voiceReducer } from './voice/voice.slice';
 import { integrationWebhookReducer } from './webhook/webhook.slice';
+import { WINDOW_CONTROLS_FEATURE_KEY, windowControlsReducer } from './windowControls/windowControls.slice';
 
 const persistedReducer = persistReducer(
 	{
@@ -303,7 +304,7 @@ const persistedOnboardingReducer = persistReducer(
 const persistedComunityReducer = persistReducer(
 	{
 		key: COMUNITY_FEATURE_KEY,
-		storage,
+		storage
 	},
 	comunityReducer
 );
@@ -403,7 +404,8 @@ const reducer = {
 	[COMPOSE_FEATURE_KEY]: persistedCompose,
 	groupCall: groupCallReducer,
 	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer,
-	[COMUNITY_FEATURE_KEY]: persistedComunityReducer
+	[COMUNITY_FEATURE_KEY]: persistedComunityReducer,
+	[WINDOW_CONTROLS_FEATURE_KEY]: windowControlsReducer
 };
 
 let storeInstance = configureStore({

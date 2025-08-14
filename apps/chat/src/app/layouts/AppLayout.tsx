@@ -10,6 +10,7 @@ import {
 	TITLE_BAR_ACTION,
 	UNMAXIMIZE_WINDOW,
 	isLinuxDesktop,
+	isMacDesktop,
 	isWindowsDesktop,
 	notificationService
 } from '@mezon/utils';
@@ -19,6 +20,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLoaderData, useLocation } from 'react-router-dom';
 import { IAppLoaderData } from '../loaders/appLoader';
+import { MacOSWindowControls } from './MacWindowsControl';
 
 type TitleBarProps = {
 	eventName: string;
@@ -187,6 +189,10 @@ const ViewModeHandler: React.FC = () => {
 
 	if (isWindowsDesktop || isLinuxDesktop) {
 		return <TitleBar eventName={viewMode === 'image' ? IMAGE_WINDOW_TITLE_BAR_ACTION : TITLE_BAR_ACTION} />;
+	}
+
+	if (isMacDesktop) {
+		return <MacOSWindowControls />;
 	}
 
 	return null;
