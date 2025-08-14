@@ -1,4 +1,3 @@
-import { Pagination } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 interface IProp {
@@ -26,9 +25,6 @@ const HistoriesWithdraw = ({ userId, onRefresh }: IProp) => {
 	const [totalPages, setTotalPages] = useState(1);
 	const [data, setData] = useState<History[]>([]);
 
-	const onPageChange = (page: number) => {
-		setCurrentPage(page);
-	};
 	const fetchHistory = async (page: number) => {
 		try {
 			const response = await fetch(`${MEZON_TREASURY_URL}/api/withdraws/user-histories`, {
@@ -150,9 +146,6 @@ const HistoriesWithdraw = ({ userId, onRefresh }: IProp) => {
 						</tbody>
 					</table>
 				</div>
-			</div>
-			<div className="flex justify-end">
-				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
 			</div>
 		</div>
 	);

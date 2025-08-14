@@ -8,10 +8,9 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { Icons, Menu } from '@mezon/ui';
+import { Icons, Menu, Pagination } from '@mezon/ui';
 import { createImgproxyUrl, getAvatarForPrioritize } from '@mezon/utils';
 import { formatDistance } from 'date-fns';
-import { Pagination } from 'flowbite-react';
 import { ChannelType } from 'mezon-js';
 import { ApiChannelMessageHeader, ApiChannelSettingItem } from 'mezon-js/api.gen';
 import { ReactElement, useMemo, useRef, useState } from 'react';
@@ -110,7 +109,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 						</Menu>
 						channel of {countChannel}
 					</div>
-					<Pagination currentPage={currentPage} totalPages={Math.ceil((countChannel || 0) / pageSize)} onPageChange={onPageChange} />
+					<Pagination totalPages={Math.ceil((countChannel || 0) / pageSize)} currentPage={currentPage} onPageChange={onPageChange} />
 				</div>
 			</AnchorScroll>
 		</div>

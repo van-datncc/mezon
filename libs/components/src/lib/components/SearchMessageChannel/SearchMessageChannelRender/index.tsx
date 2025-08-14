@@ -10,8 +10,8 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
+import { Pagination } from '@mezon/ui';
 import { convertSearchMessage, IMessageWithUser, SIZE_PAGE_SEARCH, UsersClanEntity } from '@mezon/utils';
-import { Pagination } from 'flowbite-react';
 import { ChannelMessage, ChannelStreamMode, ChannelType } from 'mezon-js';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
@@ -125,7 +125,7 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 							</div>
 							{totalResult > 25 && (
 								<div className="mt-4 h-10">
-									<Pagination
+									{/* <Pagination
 										className="flex justify-center"
 										currentPage={currentPage}
 										totalPages={Math.floor(totalResult / SIZE_PAGE_SEARCH)}
@@ -148,6 +148,11 @@ const SearchMessageChannelRender = ({ searchMessages, currentPage, totalResult, 
 												}
 											}
 										}}
+									/> */}
+									<Pagination
+										totalPages={Math.floor(totalResult / SIZE_PAGE_SEARCH)}
+										currentPage={currentPage}
+										onPageChange={onPageChange}
 									/>
 								</div>
 							)}

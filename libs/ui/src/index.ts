@@ -29,3 +29,4 @@ export { default as FormError } from './lib/Login/FormError';
 export { default as Input } from './lib/Login/Input';
 export { default as PasswordInput } from './lib/Login/PasswordInput';
 export { default as SubmitButton } from './lib/Login/SubmitButton';
+export { default as Pagination } from './lib/Pagination/index';

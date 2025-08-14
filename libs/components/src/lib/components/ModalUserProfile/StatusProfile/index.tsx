@@ -24,7 +24,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ButtonCopy } from '../../../components';
 import HistoryTransaction from '../../HistoryTransaction';
-import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 import ItemStatusUpdate from './ItemStatusUpdate';
@@ -50,7 +49,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
 	}, [userProfile?.wallet]);
-	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
 	const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
 
@@ -58,9 +56,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
 
-	const handleCloseWithdrawModal = () => {
-		setIsShowModalWithdraw(false);
-	};
 	const handleOpenHistoryModal = () => {
 		setIsShowModalHistory(true);
 	};
@@ -237,7 +232,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				title="Copy User ID"
 				className=" px-2 py-[6px] text-theme-primary-hover bg-item-theme-hover"
 			/>
-			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 
 			<WalletManagementModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />
