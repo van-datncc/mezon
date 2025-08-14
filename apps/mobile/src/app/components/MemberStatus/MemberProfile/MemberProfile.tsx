@@ -1,6 +1,6 @@
 import { IUserStatus } from '@mezon/mobile-components';
-import { size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
-import { getStore, selectMemberClanByUserId2 } from '@mezon/store-mobile';
+import { baseColor, size, useColorsRoleById, useTheme } from '@mezon/mobile-ui';
+import { getStore, selectMemberClanByUserId2, selectStatusInVoice, useAppSelector } from '@mezon/store-mobile';
 import { ChannelMembersEntity, DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
@@ -39,6 +39,7 @@ export function MemberProfile({
 }: IProps) {
 	const { themeValue } = useTheme();
 	const styles = style(themeValue);
+	const userVoiceStatus = useAppSelector((state) => selectStatusInVoice(state, user?.id || user?.user?.id || ''));
 
 	const userInfo: any = useMemo(() => {
 		if (!isDMThread) {
@@ -92,14 +93,23 @@ export function MemberProfile({
 									: userInfo?.display_name}
 							</Text>
 						)}
-						<Text style={{ color: colorUserName }}>
-							{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
-						</Text>
+						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_4 }}>
+							<Text style={{ color: colorUserName }}>
+								{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
+							</Text>
+							{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
+								<MezonIconCDN icon={IconCDN.ownerIcon} color={themeValue.borderWarning} width={16} height={16} />
+							)}
+						</View>
+						{!!userVoiceStatus && (
+							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+								<MezonIconCDN icon={IconCDN.channelVoice} color={baseColor.green} width={12} height={12} />
+								<Text style={{ color: themeValue.text, fontSize: 12, fontWeight: '500' }}>In voice</Text>
+							</View>
+						)}
 					</View>
 				)}
-				{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
-					<MezonIconCDN icon={IconCDN.ownerIcon} color={themeValue.borderWarning} width={16} height={16} />
-				)}
+
 			</View>
 			{isDMThread && currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP && <AddedByUser groupId={currentChannel?.id} userId={user?.id} />}
 		</View>

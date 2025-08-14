@@ -30,8 +30,9 @@ export const style = (colors: Attributes) =>
 			flexDirection: 'row',
 			gap: size.s_6,
 			flexGrow: 1,
-			paddingVertical: size.s_16,
-			borderBottomColor: colors.borderDim
+			borderBottomColor: colors.borderDim,
+			minHeight: size.s_50,
+			alignItems: 'center'
 		},
 		nameItem: {
 			gap: size.s_4,
