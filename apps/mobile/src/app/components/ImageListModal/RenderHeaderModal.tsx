@@ -62,8 +62,10 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 		try {
 			const { url, filetype } = imageSelected;
 			const type = filetype?.split?.('/');
-			await getImageAsBase64OrFile(url, type?.[1]);
-			onImageCopy();
+			const image = await getImageAsBase64OrFile(url, type?.[1]);
+			if (image) {
+				onImageCopy();
+			}
 		} catch (error) {
 			console.error('Error copying image: ', error);
 			onImageCopy(error);
