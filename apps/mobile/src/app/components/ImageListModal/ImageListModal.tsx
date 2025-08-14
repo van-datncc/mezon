@@ -174,14 +174,21 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 		setIsLoadingSaveImage(isLoading);
 	}, []);
 
-	const onImageCopy = useCallback(() => {
-		Toast.show({
+	const onImageCopy = useCallback((error?: string) => {
+		if (!error) {
+			Toast.show({
 				type: 'success',
 				props: {
 					text2: t('copyImage'),
 					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
 				}
 			});
+		} else {
+			Toast.show({
+				type: 'error',
+				text1: t('copyImageFailed', { error })
+			});
+		}
 	}, []);
 
 	useEffect(() => {
@@ -203,7 +210,13 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 	return (
 		<View style={{ flex: 1 }}>
 			{visibleToolbarConfig.showHeader && (
-				<RenderHeaderModal onClose={onClose} imageSelected={currentImage} onImageSaved={onImageSaved} onLoading={onLoading} onImageCopy={onImageCopy} />
+				<RenderHeaderModal
+					onClose={onClose}
+					imageSelected={currentImage}
+					onImageSaved={onImageSaved}
+					onLoading={onLoading}
+					onImageCopy={onImageCopy}
+				/>
 			)}
 			<GalleryAwesome
 				ref={ref}

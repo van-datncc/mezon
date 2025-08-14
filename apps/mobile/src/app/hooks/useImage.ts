@@ -67,6 +67,8 @@ export function useImage() {
 				base64Data = await RNFetchBlob.fs.readFile(res.path(), 'base64');
 			}
 
+			if (!base64Data) throw new Error('Failed to get base64 data');
+
 			if (Platform.OS === 'ios') {
 				const dataUri = `data:image/${extension};base64,${base64Data}`
 				await Clipboard.setString(dataUri);

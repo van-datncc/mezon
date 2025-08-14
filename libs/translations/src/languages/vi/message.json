@@ -48,7 +48,8 @@
     "markMessage": "Đã đánh dấu tin nhắn",
     "markMessageUnread": "Đã đánh dấu chưa đọc",
     "markMessageUnreadFailed": "Không thể bỏ đọc",
-    "copyImage": "Đã sao chép Ảnh"
+    "copyImage": "Đã sao chép Ảnh",
+    "copyImageFailed": "Sao chép không thành công: {{error}}"
   },
   "directMessage": {
     "you": "Bạn"

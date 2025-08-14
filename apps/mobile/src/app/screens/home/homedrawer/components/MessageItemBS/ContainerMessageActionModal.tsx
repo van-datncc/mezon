@@ -448,16 +448,22 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			const filetype = message?.attachments?.[0]?.filetype;
 
 			const type = filetype?.split?.('/');
-			await getImageAsBase64OrFile(url, type?.[1]);
-			Toast.show({
-				type: 'success',
-				props: {
-					text2: t('toast.copyImage'),
-					leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
-				}
-			});
+			const image = await getImageAsBase64OrFile(url, type?.[1]);
+			if (image) {
+				Toast.show({
+					type: 'success',
+					props: {
+						text2: t('toast.copyImage'),
+						leadingIcon: <MezonIconCDN icon={IconCDN.copyIcon} width={size.s_20} height={size.s_20} color={Colors.bgGrayLight} />
+					}
+				});
+			}
 		} catch (error) {
 			console.error('Error copying image:', error);
+			Toast.show({
+				type: 'error',
+				text1: t('toast.copyImageFailed', { error }),
+			})
 		} finally {
 			dispatch(appActions.setLoadingMainMobile(false));
 			onClose();

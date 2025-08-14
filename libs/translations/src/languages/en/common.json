@@ -14,5 +14,6 @@
     "unmuteNotification": "Unmute",
     "inviteMembers": "Invite Members",
     "addMembers": "Add Members",
-    "copyImage": "Copied Image"
+    "copyImage": "Copied Image",
+    "copyImageFailed": "Failed to copy image: {{error}}"
 }

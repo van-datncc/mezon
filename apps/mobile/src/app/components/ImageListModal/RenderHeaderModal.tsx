@@ -25,7 +25,7 @@ interface IRenderFooterModalProps {
 	imageSelected?: AttachmentEntity & { channelId?: string };
 	onImageSaved?: () => void;
 	onLoading?: (isLoading: boolean) => void;
-	onImageCopy?: () => void;
+	onImageCopy?: (error?: string) => void;
 }
 
 export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSaved, onLoading, onImageCopy }: IRenderFooterModalProps) => {
@@ -66,6 +66,7 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			onImageCopy();
 		} catch (error) {
 			console.error('Error copying image: ', error);
+			onImageCopy(error);
 		}
 		onLoading(false);
 	};
