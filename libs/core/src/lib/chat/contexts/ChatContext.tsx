@@ -2207,9 +2207,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				if (!socket) {
 					dispatch(
 						toastActions.addToast({
-							message: 'Cannot reconnect to the socket. Please restart the app.',
-							type: 'warning',
-							autoClose: false
+							message: 'Socket reconnecting...',
+							type: 'info',
+							autoClose: 3000,
+							id: 'SOCKET_RECONNECTING'
 						})
 					);
 					return;
@@ -2218,12 +2219,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const id = Date.now().toString();
 				dispatch(appActions.refreshApp({ id }));
 				setCallbackEventFn(socket as Socket);
+				
+				dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
+				dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
+				dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
 			} catch (error) {
 				dispatch(
 					toastActions.addToast({
-						message: 'Cannot reconnect to the socket. Please restart the app.',
-						type: 'warning',
-						autoClose: false
+						message: 'Socket reconnecting...',
+						type: 'info',
+						autoClose: 3000,
+						id: 'SOCKET_RECONNECTING_ERROR'
 					})
 				);
 				captureSentryError(error, 'SOCKET_RECONNECT');
