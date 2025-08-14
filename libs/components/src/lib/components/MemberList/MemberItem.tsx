@@ -16,9 +16,10 @@ export type MemberItemProps = {
 	isMobile?: boolean;
 	isDM?: boolean;
 	isMe?: boolean;
+	createId?: string;
 };
 
-function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProps) {
+function MemberItem({ user, directMessageId, isDM = true, isMe, createId }: MemberItemProps) {
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById(state, user?.user?.id || '', isDM));
 	const userMetaById = useAppSelector((state) => selectDirectMemberMetaUserId(state, user?.user?.id || ''));
 	const currentUserCustomStatus = useSelector(selectAccountCustomStatus);
@@ -27,6 +28,7 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 		setCurrentUser(user);
 		openProfileItem(event, user);
 	};
+
 	return (
 		<div>
 			<BaseMemberProfile
@@ -38,6 +40,7 @@ function MemberItem({ user, directMessageId, isDM = true, isMe }: MemberItemProp
 					online: !!userMetaById?.user?.online || !!isMe,
 					status: userMetaById?.user?.metadata?.status
 				}}
+				isOwner={createId === user?.user?.id}
 				userStatus={isMe ? currentUserCustomStatus : userCustomStatus}
 				onContextMenu={showContextMenu}
 				onClick={handleClick}
