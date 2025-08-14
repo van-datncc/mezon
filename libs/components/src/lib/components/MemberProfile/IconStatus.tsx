@@ -1,6 +1,7 @@
+import { selectIsUserTypingInChannel, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, UserStatus } from '@mezon/utils';
-import { StatusUser2 } from '../StatusUser';
+import { RenderTypingIndicator, StatusUser2 } from '../StatusUser';
 
 export const UserStatusIconDM = ({ status }: { status?: EUserStatus }) => {
 	switch (status) {
@@ -40,8 +41,23 @@ export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
 	}
 };
 
-export const UserStatusIconClan = ({ status, online }: { status?: EUserStatus | string; online?: boolean }) => {
+export const UserStatusIconClan = ({
+	status,
+	online,
+	channelId,
+	userId
+}: {
+	status?: EUserStatus | string;
+	online?: boolean;
+	channelId?: string;
+	userId?: string;
+}) => {
 	const normalizedStatus = typeof status === 'object' && status !== null ? (status as UserStatus).status?.toUpperCase() : status?.toUpperCase();
+	const isTyping = useAppSelector((state) => selectIsUserTypingInChannel(state, channelId || '', userId || ''));
+
+	if (isTyping) {
+		return RenderTypingIndicator();
+	}
 
 	if (!online) {
 		return <StatusUser2 status="offline" />;
