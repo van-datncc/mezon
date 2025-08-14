@@ -442,6 +442,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 							? message.update_time_seconds
 							: message.create_time_seconds || 0;
 
+					const isMessageMentionOrReply = (msg: ChannelMessage, currentUserId: string): boolean => {
+						const hasMention = msg.mentions?.some((mention) => mention.user_id === currentUserId) ?? false;
+						const isReply = msg.references?.some((ref) => ref.message_sender_id === currentUserId) ?? false;
+
+						return hasMention || isReply;
+					};
+
 					if (!message.clan_id || message.clan_id === '0') {
 						const dmMeta = store.getState().directmeta?.entities?.[message.channel_id];
 						if (dmMeta && messageTimestamp > dmMeta.lastSeenTimestamp && dmMeta.count_mess_unread > 0) {
@@ -453,7 +460,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 						const channelMeta = store.getState().channelmeta?.entities?.[message.channel_id];
 						const channel = store.getState().channels?.byClans?.[message.clan_id]?.entities?.entities?.[message.channel_id];
 
-						if (channelMeta && channel && messageTimestamp > channelMeta.lastSeenTimestamp && (channel.count_mess_unread || 0) > 0) {
+						if (
+							channelMeta &&
+							channel &&
+							messageTimestamp > channelMeta.lastSeenTimestamp &&
+							(channel.count_mess_unread || 0) > 0 &&
+							isMessageMentionOrReply(message, userId as string)
+						) {
 							dispatch(
 								channelsActions.updateChannelBadgeCount({
 									clanId: message.clan_id,
