@@ -74,7 +74,7 @@ const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMess
 			const resultAttach: ApiMessageAttachment & { create_time?: string } = {
 				...attachment,
 				sender_id: message.sender_id,
-				create_time: message.create_time
+				create_time: (attachment as any).create_time || message.create_time
 			};
 			images.push(resultAttach);
 			return;
