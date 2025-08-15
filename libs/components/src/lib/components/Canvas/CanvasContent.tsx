@@ -202,7 +202,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				let nextActiveOption = 'paragraph'; // Default to paragraph
+				let nextActiveOption = 'paragraph';
 
 				if (formats?.header === 1) {
 					nextActiveOption = '1';
@@ -249,7 +249,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 				});
 			} else {
 				setToolbarVisible(false);
-				setActiveOption('paragraph'); // Reset to paragraph default
+				setActiveOption('paragraph');
 				setActiveFormats({
 					bold: false,
 					italic: false,
