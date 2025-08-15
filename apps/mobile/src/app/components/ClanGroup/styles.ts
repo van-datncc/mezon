@@ -39,7 +39,7 @@ export const style = (themeValue: Attributes, colors: any) =>
 		groupIcon: {
 			width: size.s_42,
 			height: size.s_42,
-			borderRadius: size.s_10,
+			borderRadius: 8,
 			backgroundColor: themeValue.midnightBlue
 		},
 
