@@ -42,7 +42,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 	const hasSetInitialContent = useRef(false);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
-	
+
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanId = useSelector(selectCurrentClanId) || '';
 	const currentChannelId = useSelector(selectCurrentChannelId) || '';
@@ -107,7 +107,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			modules: {
 				clipboard: {
 					matchVisual: false
-				},
+				}
 			},
 			placeholder: 'Type / to insert...'
 		});
@@ -202,12 +202,25 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				let nextActiveOption =
-					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph');
-				if (nextActiveOption === 'checked' || nextActiveOption === 'unchecked') {
+				let nextActiveOption = 'paragraph'; // Default to paragraph
+
+				if (formats?.header === 1) {
+					nextActiveOption = '1';
+				} else if (formats?.header === 2) {
+					nextActiveOption = '2';
+				} else if (formats?.header === 3) {
+					nextActiveOption = '3';
+				} else if (formats?.list === 'checked' || formats?.list === 'unchecked') {
 					nextActiveOption = 'check';
+				} else if (formats?.list === 'ordered') {
+					nextActiveOption = 'ordered';
+				} else if (formats?.list === 'bullet') {
+					nextActiveOption = 'bullet';
+				} else if (formats?.blockquote === true) {
+					nextActiveOption = 'blockquote';
 				}
-				setActiveOption(nextActiveOption as string);
+
+				setActiveOption(nextActiveOption);
 				setActiveFormats({
 					bold: !!formats.bold,
 					italic: !!formats.italic,
@@ -236,6 +249,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 				});
 			} else {
 				setToolbarVisible(false);
+				setActiveOption('paragraph'); // Reset to paragraph default
 				setActiveFormats({
 					bold: false,
 					italic: false,
@@ -317,13 +331,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 		quillRef.current.root.addEventListener('paste', handlePasteEvent);
 		document.addEventListener('mousedown', handleClickOutside);
 
-			return () => {
-		quillRef.current?.off('text-change', preventBase64ImagesHandler);
-		quillRef.current?.off('selection-change', handleSelectionChange);
-		quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
-		quillRef.current?.root.removeEventListener('paste', handlePasteEvent);
-		document.removeEventListener('mousedown', handleClickOutside);
-	};
+		return () => {
+			quillRef.current?.off('text-change', preventBase64ImagesHandler);
+			quillRef.current?.off('selection-change', handleSelectionChange);
+			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
+			quillRef.current?.root.removeEventListener('paste', handlePasteEvent);
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
 	}, [isEditAndDelCanvas]);
 
 	const handleContentChange = (content: string, source: string, delta: any) => {
@@ -370,9 +384,10 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			} else if (value === '3') {
 				quill.format('header', 3);
 			} else if (value === 'paragraph') {
-				quill.format('header', true);
+				quill.format('header', false);
+				quill.format('list', false);
+				quill.format('blockquote', false);
 			} else if (value === 'check') {
-				// Default new checklist items to unchecked
 				quill.format('list', 'unchecked');
 			} else if (value === 'ordered') {
 				quill.format('list', 'ordered');
@@ -406,6 +421,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					return updatedFormats;
 				});
 			}
+			setActiveOption(value);
 			setIsOpen(false);
 		}
 	};
@@ -425,8 +441,9 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 				borderRadius: '5px'
 			};
 		} else if (type === 'option') {
+			const isActive = String(activeOption) === value || (value === 'blockquote' && activeFormats['blockquote']);
 			return {
-				color: activeFormats[format] ? '#048dba' : 'var(--text-theme-primary)'
+				color: isActive ? '#048dba !important' : 'var(--text-theme-primary)'
 			};
 		}
 		return {};
@@ -483,9 +500,14 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 											<li
 												key={option.value}
 												onClick={() => handleSelectChange(option.value)}
-												style={getStyle('option', `${option.text}`)}
+												style={getStyle('option', option.value)}
 												value={option.value}
-												className="min-h-[28px] cursor-pointer pt-[0] pr-[24px] pb-[0] pl-[10px] flex items-center"
+												className={`min-h-[28px] cursor-pointer pt-[0] pr-[24px] pb-[0] pl-[10px] flex items-center ${
+													String(activeOption) === option.value ||
+													(option.value === 'blockquote' && activeFormats['blockquote'])
+														? 'text-[#048dba]'
+														: ''
+												}`}
 											>
 												{String(activeOption) === option.value ||
 												(option.value === 'blockquote' && activeFormats['blockquote']) ? (
@@ -499,9 +521,10 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 													<span className="mr-[20px]">
 														{React.cloneElement(option.icon, {
 															color:
-																(String(activeOption) === option.value ||
-																	(option.value === 'blockquote' && activeFormats['blockquote'])) &&
-																'#048dba'
+																String(activeOption) === option.value ||
+																(option.value === 'blockquote' && activeFormats['blockquote'])
+																	? '#048dba'
+																	: 'currentColor'
 														})}
 													</span>
 												)}
