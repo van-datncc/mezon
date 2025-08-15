@@ -254,6 +254,7 @@ const PanelCategory: React.FC<IPanelCategoryProps> = ({
 					align={{
 						points: ['bl', 'br']
 					}}
+					onVisibleChange={handleOpenMenuNoti}
 					className=" bg-theme-contexify text-theme-primary border-theme-primary ml-[3px] py-[6px] px-[8px] w-[200px]"
 				>
 					<div>
