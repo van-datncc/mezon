@@ -50,6 +50,10 @@ function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: Render
 					longitudeDelta: 0.005
 				}}
 				pointerEvents="none"
+				scrollEnabled={false}
+				zoomEnabled={false}
+				zoomControlEnabled={false}
+				zoomTapEnabled={false}
 			>
 				<Marker coordinate={{ latitude: coordinate.latitude, longitude: coordinate.longitude }}>
 					<View style={styles.avatarWrapper}>{!!avatarUrl && <Image source={{ uri: avatarUrl }} style={styles.avatar} />}</View>

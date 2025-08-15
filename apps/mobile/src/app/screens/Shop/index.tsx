@@ -1,9 +1,8 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectEmojiOnSale, selectStickerOnSale } from '@mezon/store-mobile';
+import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import LogoMezonDark from '../../../assets/svg/logoMezonDark.svg';
-import LogoMezonLight from '../../../assets/svg/logoMezonLight.svg';
 import MezonIconCDN from '../../componentUI/MezonIconCDN';
 import ProductSection from '../../components/Shop/ProductSection';
 import StatusBarHeight from '../../components/StatusBarHeight/StatusBarHeight';
@@ -25,12 +24,7 @@ const ShopScreen = ({ navigation }: { navigation: any }) => {
 				<TouchableOpacity style={styles.backButton} onPress={handleClose}>
 					<MezonIconCDN icon={IconCDN.arrowLargeLeftIcon} height={size.s_24} width={size.s_24} color={themeValue.textStrong} />
 				</TouchableOpacity>
-
-				{themeBasic === 'dark' ? (
-					<LogoMezonDark width={size.s_36} height={size.s_36} />
-				) : (
-					<LogoMezonLight width={size.s_36} height={size.s_36} />
-				)}
+				<MezonIconCDN icon={IconCDN.logoMezon} width={size.s_36} height={size.s_36} useOriginalColor={true} />
 				<Text style={styles.title}>
 					<Text style={styles.mezonBold}>Mezon</Text>
 					<Text style={styles.subtitle}> Shop</Text>

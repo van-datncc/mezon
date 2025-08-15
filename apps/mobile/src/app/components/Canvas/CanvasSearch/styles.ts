@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 export const style = (colors: Attributes, isTablet?: boolean) =>
 	StyleSheet.create({
 		searchCanvas: {
-			backgroundColor: isTablet ? colors.secondary : colors.primary,
+			backgroundColor: colors.secondary,
 			borderRadius: size.s_8,
 			alignItems: 'center',
 			paddingHorizontal: size.s_12,

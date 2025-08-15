@@ -168,5 +168,6 @@ export enum IconCDN {
 	callCancelIcon = require('./iconPNG/callCancel.png'),
 	callOutGoingIcon = require('./iconPNG/callOutGoing.png'),
 	callInComingIcon = require('./iconPNG/callInComing.png'),
-	callMissIcon = require('./iconPNG/callMiss.png')
+	callMissIcon = require('./iconPNG/callMiss.png'),
+	logoMezon = require('./iconPNG/logoMezon.png')
 }
