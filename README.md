@@ -23,7 +23,6 @@
 
 ---
 
-[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/mezonai-mezon-badge.png)](https://mseep.ai/app/mezonai-mezon)
 
 ## About Mezon
 
@@ -354,3 +353,5 @@ Mezon is built on top of amazing open-source technologies:
     <a href="https://github.com/mezonai/mezon/issues/new/choose">🐛 Report an issue</a>
   </p>
 </div>
+
+[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/mezonai-mezon-badge.png)](https://mseep.ai/app/mezonai-mezon)
