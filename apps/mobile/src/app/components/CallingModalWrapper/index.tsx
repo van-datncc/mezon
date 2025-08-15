@@ -99,7 +99,7 @@ const CallingModalWrapper = () => {
 				);
 
 				if (Platform.OS === 'ios') {
-					await sleep(3000);
+					await sleep(100);
 					dispatch(appActions.setLoadingMainMobile(false));
 					navigation.navigate(APP_SCREEN.MENU_CHANNEL.STACK, {
 						screen: APP_SCREEN.MENU_CHANNEL.CALL_DIRECT,
