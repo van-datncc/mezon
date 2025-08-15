@@ -1,3 +1,5 @@
+[![MSeeP.ai Security Assessment Badge](https://mseep.net/pr/mezonai-mezon-badge.png)](https://mseep.ai/app/mezonai-mezon)
+
 <div align="center">
   <h1>Mezon</h1>
   
