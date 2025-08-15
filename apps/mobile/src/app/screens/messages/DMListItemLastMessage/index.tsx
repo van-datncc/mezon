@@ -92,7 +92,7 @@ export const DmListItemLastMessage = (props: { content: IExtendedMessage; styleT
 			if (textPart) {
 				parts.push(
 					<Text key={`${endIndex}_${textPart}`} style={[styles.message, props?.styleText && props?.styleText]}>
-						{textPart}
+						{startIndex === 0 ? textPart?.trimStart() : textPart}
 					</Text>
 				);
 			}

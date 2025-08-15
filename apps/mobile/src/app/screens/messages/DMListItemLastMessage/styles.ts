@@ -9,7 +9,7 @@ export const style = (colors: Attributes) =>
 			overflow: 'hidden'
 		},
 		dmMessageContainer: {
-			flex: 1
+			flexShrink: 1
 		},
 		message: {
 			fontSize: size.small,
@@ -17,6 +17,7 @@ export const style = (colors: Attributes) =>
 		},
 		emoji: {
 			height: size.s_12,
-			width: size.s_12
+			width: size.s_12,
+			alignSelf: 'baseline'
 		}
 	});
