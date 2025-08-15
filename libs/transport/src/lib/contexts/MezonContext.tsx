@@ -396,7 +396,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 						failCount++;
 
 						if (failCount >= MAX_WEBSOCKET_FAILS) {
-							throw new Error('Cannot reconnect to the socket. Please restart the app.');
+							throw new Error('Socket reconnecting...');
 						}
 
 						let retryTime: number;
