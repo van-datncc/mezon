@@ -7,24 +7,7 @@ import 'quill/dist/quill.snow.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { handlePaste, preventBase64Images } from './canvasPasteUtils';
-
-interface ActiveFormats {
-	bold: boolean;
-	italic: boolean;
-	underline: boolean;
-	strike: boolean;
-	'code-block': boolean;
-	link: string;
-	h1: boolean;
-	h2: boolean;
-	h3: boolean;
-	paragraph: boolean;
-	check: boolean;
-	ordered: boolean;
-	bullet: boolean;
-	blockquote: boolean;
-	image: string;
-}
+import { ActiveFormats, FormatOption, getActiveFormatsFromQuill, getActiveOptionFromFormats, getDefaultActiveFormats } from './formatUtils';
 
 type CanvasContentProps = {
 	isLightMode: boolean;
@@ -202,71 +185,14 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				let nextActiveOption = 'paragraph';
-
-				if (formats?.header === 1) {
-					nextActiveOption = '1';
-				} else if (formats?.header === 2) {
-					nextActiveOption = '2';
-				} else if (formats?.header === 3) {
-					nextActiveOption = '3';
-				} else if (formats?.list === 'checked' || formats?.list === 'unchecked') {
-					nextActiveOption = 'check';
-				} else if (formats?.list === 'ordered') {
-					nextActiveOption = 'ordered';
-				} else if (formats?.list === 'bullet') {
-					nextActiveOption = 'bullet';
-				} else if (formats?.blockquote === true) {
-					nextActiveOption = 'blockquote';
-				}
+				const nextActiveOption = getActiveOptionFromFormats(formats);
 
 				setActiveOption(nextActiveOption);
-				setActiveFormats({
-					bold: !!formats.bold,
-					italic: !!formats.italic,
-					underline: !!formats.underline,
-					strike: !!formats.strike,
-					'code-block': formats?.['code-block'] === 'plain',
-					link: formats?.link as string,
-					h1: formats?.header === 1,
-					h2: formats?.header === 2,
-					h3: formats?.header === 3,
-					paragraph: !(
-						formats?.header === 1 ||
-						formats?.header === 2 ||
-						formats?.header === 3 ||
-						formats?.list === 'checked' ||
-						formats?.list === 'unchecked' ||
-						formats?.list === 'ordered' ||
-						formats?.list === 'bullet' ||
-						!!formats?.blockquote
-					),
-					check: formats?.list === 'checked' || formats?.list === 'unchecked',
-					ordered: formats?.list === 'ordered',
-					bullet: formats?.list === 'bullet',
-					blockquote: !!formats?.blockquote,
-					image: (formats?.image as string) || ''
-				});
+				setActiveFormats(getActiveFormatsFromQuill(formats));
 			} else {
 				setToolbarVisible(false);
-				setActiveOption('paragraph');
-				setActiveFormats({
-					bold: false,
-					italic: false,
-					underline: false,
-					strike: false,
-					'code-block': false,
-					link: '',
-					h1: false,
-					h2: false,
-					h3: false,
-					paragraph: false,
-					check: false,
-					ordered: false,
-					bullet: false,
-					blockquote: false,
-					image: ''
-				});
+				setActiveOption(FormatOption.PARAGRAPH);
+				setActiveFormats(getDefaultActiveFormats());
 			}
 		};
 
