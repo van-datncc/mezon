@@ -4,7 +4,6 @@ import {
 	listenToWindowStateChanges,
 	maximizeWindow,
 	minimizeWindow,
-	selectHoveredButton,
 	selectIsMaximized,
 	selectIsWindowFocused,
 	useAppDispatch,
@@ -22,7 +21,6 @@ export const MacOSWindowControls: React.FC<MacOSWindowControlsProps> = ({ classN
 	const dispatch = useAppDispatch();
 	const isMaximized = useAppSelector(selectIsMaximized);
 	const isWindowFocused = useAppSelector(selectIsWindowFocused);
-	const hoveredButton = useAppSelector(selectHoveredButton);
 
 	// Listen for window focus/blur events
 	useEffect(() => {
@@ -56,24 +54,17 @@ export const MacOSWindowControls: React.FC<MacOSWindowControlsProps> = ({ classN
 	}, [dispatch]);
 
 	const buttonBaseClass =
-		'w-3 h-3 rounded-full border-none cursor-pointer flex items-center justify-center transition-all duration-200 ease-in-out';
+		'w-3 h-3 rounded-full cursor-default border-none flex items-center justify-center transition-all duration-200 ease-in-out group';
 
 	const MacOSButton: React.FC<{
 		onClick: () => void;
-		buttonType: string;
+		buttonType?: string;
 		backgroundColor: string;
-		title: string;
+		title?: string;
 		icon: React.ReactNode;
-	}> = ({ onClick, buttonType, backgroundColor, title, icon }) => (
-		<button
-			onClick={onClick}
-			onMouseEnter={() => dispatch(windowControlsActions.setHoveredButton(buttonType))}
-			onMouseLeave={() => dispatch(windowControlsActions.setHoveredButton(null))}
-			className={buttonBaseClass}
-			title={title}
-			style={{ backgroundColor }}
-		>
-			{hoveredButton === buttonType && isWindowFocused && icon}
+	}> = ({ onClick, backgroundColor, title, icon }) => (
+		<button onClick={onClick} className={buttonBaseClass} title={title} style={{ backgroundColor }}>
+			<span className={`opacity-0 ${isWindowFocused ? 'group-hover:opacity-100' : ''} transition-opacity duration-200`}>{icon}</span>
 		</button>
 	);
 
@@ -82,21 +73,9 @@ export const MacOSWindowControls: React.FC<MacOSWindowControlsProps> = ({ classN
 			className={`fixed top-3 left-3 flex items-center gap-2 z-[9999] ${className}`}
 			style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
 		>
-			<MacOSButton onClick={handleClose} buttonType="close" backgroundColor="#ff5f57" title="Close" icon={<Icons.MacOSCloseIcon />} />
-			<MacOSButton
-				onClick={handleMinimize}
-				buttonType="minimize"
-				backgroundColor="#ffbd2e"
-				title="Minimize"
-				icon={<Icons.MacOSMinimizeIcon />}
-			/>
-			<MacOSButton
-				onClick={handleMaximize}
-				buttonType="maximize"
-				backgroundColor="#28ca42"
-				title={isMaximized ? 'Restore' : 'Maximize'}
-				icon={<Icons.MacOSMaximizeIcon isMaximized={isMaximized} />}
-			/>
+			<MacOSButton onClick={handleClose} backgroundColor="#ff5f57" icon={<Icons.MacOSCloseIcon />} />
+			<MacOSButton onClick={handleMinimize} backgroundColor="#ffbd2e" icon={<Icons.MacOSMinimizeIcon />} />
+			<MacOSButton onClick={handleMaximize} backgroundColor="#28ca42" icon={<Icons.MacOSMaximizeIcon isMaximized={isMaximized} />} />
 		</div>
 	);
 };

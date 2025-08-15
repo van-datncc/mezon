@@ -15,13 +15,11 @@ export enum WindowControlAction {
 export interface WindowControlsState {
 	isMaximized: boolean;
 	isWindowFocused: boolean;
-	hoveredButton: string | null;
 }
 
 export const initialWindowControlsState: WindowControlsState = {
 	isMaximized: false,
-	isWindowFocused: true,
-	hoveredButton: null
+	isWindowFocused: true
 };
 
 // Async thunks for window operations
@@ -80,9 +78,6 @@ export const windowControlsSlice = createSlice({
 		setIsWindowFocused: (state, action: PayloadAction<boolean>) => {
 			state.isWindowFocused = action.payload;
 		},
-		setHoveredButton: (state, action: PayloadAction<string | null>) => {
-			state.hoveredButton = action.payload;
-		},
 		toggleMaximized: (state) => {
 			state.isMaximized = !state.isMaximized;
 		}
@@ -105,9 +100,6 @@ export const getWindowControlsState = (rootState: { [WINDOW_CONTROLS_FEATURE_KEY
 export const selectIsMaximized = createSelector(getWindowControlsState, (state) => state.isMaximized);
 
 export const selectIsWindowFocused = createSelector(getWindowControlsState, (state) => state.isWindowFocused);
-
-export const selectHoveredButton = createSelector(getWindowControlsState, (state) => state.hoveredButton);
-
 // Actions
 export const windowControlsActions = windowControlsSlice.actions;
 
