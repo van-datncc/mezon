@@ -685,7 +685,7 @@ export const RenderTextMarkdownContent = ({
 		textParts.push(
 			renderTextPalainContain(
 				themeValue,
-				t?.slice(lastIndex).replace(/^\n|\n$/, ''),
+				t?.slice(lastIndex)?.replace(!textParts?.length ? /^\n|\n$/g : '', ''),
 				lastIndex,
 				isUnReadChannel,
 				isLastMessage,
@@ -693,7 +693,7 @@ export const RenderTextMarkdownContent = ({
 				true
 			)
 		);
-	} else {
+	} else if (embedNotificationMessage) {
 		textParts.push(
 			renderTextPalainContain(
 				themeValue,
