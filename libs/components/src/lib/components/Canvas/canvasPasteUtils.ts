@@ -142,8 +142,6 @@ export const preventBase64Images = ({
     const ops = delta?.ops || [];
     let hasBase64Image = false;
 
-    console.log(ops, 'ops');
-
     ops.forEach((op: any) => {
         if (!op.insert || typeof op.insert !== 'object') return;
         if (!op.insert.image) return;
