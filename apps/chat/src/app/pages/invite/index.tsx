@@ -51,6 +51,13 @@ export default function InvitePage() {
 	const handleJoinChannel = () => {
 		joinChannel();
 		handleBackNavigate();
+		navigate(`/mezon`);
+		try {
+			window.location.href = `mezon.ai://invite/${inviteIdParam}`;
+			setLoading(false);
+		} catch (e) {
+			console.error('log  => handleJoinChannel error', e);
+		}
 	};
 
 	const appDispatch = useAppDispatch();

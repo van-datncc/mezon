@@ -1,8 +1,5 @@
 import { useAuth, useChatReaction, useDirect, useEmojiConverted, useGifs, usePermissionChecker, useSendInviteMessage } from '@mezon/core';
 import {
-	CanvasAPIEntity,
-	ChannelsEntity,
-	createEditCanvas,
 	getStore,
 	gifsStickerEmojiActions,
 	giveCoffeeActions,
@@ -23,7 +20,6 @@ import {
 import { Icons } from '@mezon/ui';
 import {
 	AMOUNT_TOKEN,
-	EEventAction,
 	EMOJI_GIVE_COFFEE,
 	EOverriddenPermission,
 	IMessageWithUser,
@@ -41,7 +37,7 @@ import {
 } from '@mezon/utils';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import clx from 'classnames';
-import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
+import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ReactionPart from '../ContextMenu/ReactionPart';
@@ -94,13 +90,12 @@ const ChannelMessageOpt = ({
 	const reactMenu = useReactMenuBuilder(message);
 	const threadMenu = useThreadMenuBuilder(message, isShowIconThread, hasPermission, isAppChannel);
 	const optionMenu = useOptionMenuBuilder(handleContextMenu);
-	const addToNote = useAddToNoteBuilder(message, defaultCanvas, currentChannel, mode);
 	const giveACoffeeMenu = useGiveACoffeeMenuBuilder(message, isTopic);
 	const checkMessageOnTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.channel_id ?? ''));
 	const checkMessageHasTopic = useAppSelector((state) => selectIsMessageChannelIdMatched(state, message?.topic_id ?? ''));
 	const doNotAllowCreateTopic = (isTopic && checkMessageOnTopic) || (isTopic && checkMessageHasTopic) || !hasPermission || !canSendMessage;
 	const createTopicMenu = useTopicMenuBuilder(message, doNotAllowCreateTopic);
-	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, addToNote, giveACoffeeMenu, optionMenu]);
+	const items = useMenuBuilder([createTopicMenu, reactMenu, replyMenu, editMenu, threadMenu, giveACoffeeMenu, optionMenu]);
 	return (
 		<div
 			className={`chooseForText z-[1] absolute min-h-[34px] p-0.5 bg-theme-contexify rounded-lg block ${!isCombine ? (message?.references ? '-top-5' : 'top-0') : '-top-5'} ${isDifferentDay ? '-top-12 mt-1' : ''} right-6 w-fit`}
@@ -291,97 +286,6 @@ function useGiveACoffeeMenuBuilder(message: IMessageWithUser, isTopic: boolean) 
 	});
 }
 
-function useAddToNoteBuilder(message: IMessageWithUser, defaultCanvas: CanvasAPIEntity | null, currentChannel: ChannelsEntity | null, mode: number) {
-	const dispatch = useAppDispatch();
-	const { userId } = useAuth();
-
-	const handleItemClick = useCallback(
-		(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-			e.currentTarget.classList.add('animate-wiggle');
-			if (!message) return;
-
-			const createCanvasBody = (content?: string, id?: string) => ({
-				channel_id: message.channel_id,
-				clan_id: message.clan_id,
-				content,
-				is_default: true,
-				...(id && { id }),
-				title: defaultCanvas?.title || 'Note',
-				status: defaultCanvas ? 0 : EEventAction.CREATED
-			});
-
-			const insertImageToJson = (jsonObject: JsonObject, imageUrl?: string) => {
-				if (!imageUrl) return;
-				const imageInsert = { insert: { image: imageUrl } };
-				jsonObject.ops.push(imageInsert);
-				jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-			};
-
-			const updateJsonWithInsert = (jsonObject: JsonObject, newInsert: string) => {
-				jsonObject.ops.push({ insert: newInsert });
-				jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-			};
-
-			const isContentExists = (jsonObject: JsonObject, newInsert: string) => {
-				return jsonObject.ops.some((op) => op.insert === newInsert);
-			};
-
-			const isImageExists = (jsonObject: JsonObject, imageUrl?: string) => {
-				return jsonObject.ops.some((op) => {
-					return typeof op.insert === 'object' && op.insert !== null && op.insert.image === imageUrl;
-				});
-			};
-
-			let formattedString;
-
-			if (!defaultCanvas || (defaultCanvas && !defaultCanvas.content)) {
-				const messageContent = message.content.t;
-				const jsonObject: JsonObject = { ops: [] };
-				if (message.attachments?.length) {
-					const newImageUrl = message.attachments[0].url;
-					insertImageToJson(jsonObject, newImageUrl);
-				}
-				if (messageContent) {
-					jsonObject.ops.push({ insert: messageContent });
-					jsonObject.ops.push({ attributes: { list: 'ordered' }, insert: '\n' });
-				}
-				formattedString = JSON.stringify(jsonObject);
-			} else {
-				const jsonObject: JsonObject = safeJSONParse(defaultCanvas.content as string);
-
-				if (message.attachments?.length) {
-					const newImageUrl = message.attachments[0].url;
-					if (!isImageExists(jsonObject, newImageUrl)) {
-						insertImageToJson(jsonObject, newImageUrl);
-					} else {
-						return;
-					}
-				} else {
-					const newInsert = message.content.t;
-					if (newInsert && !isContentExists(jsonObject, newInsert)) {
-						updateJsonWithInsert(jsonObject, newInsert);
-					} else {
-						return;
-					}
-				}
-
-				formattedString = JSON.stringify(jsonObject);
-			}
-
-			dispatch(createEditCanvas(createCanvasBody(formattedString, defaultCanvas?.id)));
-		},
-		[dispatch, message, defaultCanvas]
-	);
-
-	return useMenuBuilderPlugin((builder) => {
-		builder.when(
-			userId === currentChannel?.creator_id && mode !== ChannelStreamMode.STREAM_MODE_DM && mode !== ChannelStreamMode.STREAM_MODE_GROUP,
-			(builder) => {
-				builder.addMenuItem('addtonote', 'Add To Note', handleItemClick, <Icons.CanvasIcon defaultSize="w-5 h-5" />);
-			}
-		);
-	});
-}
 
 // Menu items plugins
 // maybe should be moved to separate files

@@ -1,8 +1,7 @@
 import { Colors, useTheme, verticalScale } from '@mezon/mobile-ui';
 import { EMimeTypes, notImplementForGifOrStickerSendFromPanel } from '@mezon/utils';
 import React from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import { openUrl } from 'react-native-markdown-display';
+import { ActivityIndicator, Linking, Text, TouchableOpacity, View } from 'react-native';
 import MezonIconCDN from '../../../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import { checkFileTypeImage, isAudio, isVideo } from '../../../../../utils/helpers';
@@ -34,7 +33,7 @@ export const RenderDocumentsChat = React.memo(({ document, onLongPress, onPressI
 	const isUploading = !document?.url?.includes('http');
 
 	return (
-		<TouchableOpacity activeOpacity={0.8} onPress={() => openUrl(document.url)} onLongPress={onLongPress} disabled={isUploading}>
+		<TouchableOpacity activeOpacity={0.8} onPress={() => Linking.openURL(document.url)} onLongPress={onLongPress} disabled={isUploading}>
 			<View style={styles.fileViewer}>
 				<MezonIconCDN icon={IconCDN.fileIcon} width={verticalScale(30)} height={verticalScale(30)} color={Colors.bgViolet} />
 				<View style={{ maxWidth: '75%' }}>

@@ -224,8 +224,8 @@ export const MemberListStatus = React.memo(() => {
 			{onlineMembers?.length > 0 || offlineMembers?.length > 0 ? (
 				<SectionList
 					sections={[
-						{ title: t('common:members'), data: onlineMembers },
-						{ title: t('common:offlines'), data: offlineMembers }
+						{ title: t('common:members'), data: onlineMembers, key: 'onlineMembers' },
+						{ title: t('common:offlines'), data: offlineMembers, key: 'offlineMembers' }
 					]}
 					keyExtractor={(item, index) => `channelMember[${index}]_${item?.id}`}
 					renderItem={renderMemberItem}

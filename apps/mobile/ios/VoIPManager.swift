@@ -11,11 +11,46 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
     private let notificationDataKey = "notificationDataCalling"
     private let activeCallUUIDKey = "activeCallUUID"
 
+    @objc
+    func handleAnswerCall(_ callUUID: String) {
+        DispatchQueue.main.async {
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                print("log => Unable to get AppDelegate")
+                return
+            }
+
+            // Create a React Native view with props
+            let bridge = RCTBridge(delegate: appDelegate.reactNativeDelegate, launchOptions: nil)
+            let initialProps: [String: Any] = ["callUUID": callUUID, "payload": "payload"]
+            let rootView = RCTRootView(bridge: bridge!, moduleName: "ComingCallApp", initialProperties: initialProps)
+
+            // Create a new UIViewController
+            let callViewController = UIViewController()
+            callViewController.view = rootView
+
+            // Set the new view controller as the rootViewController
+            appDelegate.window?.rootViewController = callViewController
+            appDelegate.window?.makeKeyAndVisible()
+        }
+    }
+
     override init() {
         super.init()
         setupPushRegistry()
+        NotificationCenter.default.addObserver(
+          self,
+          selector: #selector(onAnswerCallNotification(_:)),
+          name: NSNotification.Name("RNCallKeepPerformAnswerCallAction"),
+          object: nil
+        )
     }
 
+    @objc
+    private func onAnswerCallNotification(_ notification: Notification) {
+        if let callUUID = notification.userInfo?["callUUID"] as? String {
+            handleAnswerCall(callUUID)
+        }
+    }
     // MARK: - React Native Bridge Methods
 
     @objc
@@ -60,7 +95,7 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
             reject("NO_REGISTRY", "Push registry not initialized", nil)
             return
         }
-        
+
         guard let token = pushRegistry.pushToken(for: .voIP) else {
             reject("NO_TOKEN", "VoIP token not available", nil)
             return

@@ -1,10 +1,13 @@
 import { appActions, useAppDispatch } from '@mezon/store-mobile';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useCallback } from 'react';
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert, Linking, NativeModules, Platform } from 'react-native';
 import { PERMISSIONS, RESULTS, check, request } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import RNFetchBlob from 'rn-fetch-blob';
+
+const { ImageClipboardModule } = NativeModules;
 
 export function useImage() {
 	const dispatch = useAppDispatch();
@@ -43,6 +46,46 @@ export function useImage() {
 		},
 		[dispatch]
 	);
+
+	const getImageAsBase64OrFile = async (imageUrl: string, type?: string) => {
+		try {
+			let base64Data: string;
+			let filePath: string;
+			let extension = type || 'png';
+
+			if (imageUrl.startsWith('data:image/')) {
+				const base64Data = imageUrl.replace(/^data:image\/\w+;base64,/, '');
+				if (!type) {
+					const mimeMatch = imageUrl.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
+					if (mimeMatch?.[1]) extension = mimeMatch[1];
+				}
+				filePath = `${RNFetchBlob.fs.dirs.CacheDir}/image_${Date.now()}.${extension}`;
+				await RNFetchBlob.fs.writeFile(filePath, base64Data, 'base64');
+			} else {
+				filePath = `${RNFetchBlob.fs.dirs.CacheDir}/image_${Date.now()}.${extension}`;
+				const res = await RNFetchBlob.config({ path: filePath }).fetch('GET', imageUrl);
+				base64Data = await RNFetchBlob.fs.readFile(res.path(), 'base64');
+			}
+
+			if (!base64Data) throw new Error('Failed to get base64 data');
+
+			if (Platform.OS === 'ios') {
+				const dataUri = `data:image/${extension};base64,${base64Data}`
+				await Clipboard.setString(dataUri);
+			} else {
+				await ImageClipboardModule.setImage(base64Data);
+			}
+
+			return {
+				base64: base64Data,
+				filePath,
+				dataUri: `data:image/${extension};base64,${base64Data}`
+			};
+		} catch (err) {
+			console.error('Error processing image:', err);
+			throw err;
+		}
+	}
 
 	const checkAndRequestPermission = async () => {
 		const permission = Platform.select({
@@ -131,6 +174,7 @@ export function useImage() {
 
 	return {
 		downloadImage,
-		saveImageToCameraRoll
+		saveImageToCameraRoll,
+		getImageAsBase64OrFile
 	};
 }

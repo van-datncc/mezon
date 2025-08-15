@@ -74,7 +74,7 @@ export const AuthenticationLoader = () => {
 				setTimeout(() => {
 					loadFileSharing();
 					initFirebaseMessaging();
-				}, 2000);
+				}, 100);
 				await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 				await remove(STORAGE_KEY_TEMPORARY_ATTACHMENT);
 			} catch (error) {
@@ -136,6 +136,14 @@ export const AuthenticationLoader = () => {
 						subpath: subpath
 					});
 				}
+			}
+		} else if (path?.includes?.('invite/')) {
+			const inviteMatch = path.match(/invite\/(\d+)/);
+			const inviteId = inviteMatch?.[1];
+			if (inviteId) {
+				navigation.navigate(APP_SCREEN.INVITE_CLAN, {
+					code: inviteId
+				});
 			}
 		}
 	};

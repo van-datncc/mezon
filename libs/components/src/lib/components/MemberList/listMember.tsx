@@ -31,6 +31,7 @@ type TempMemberItemProps = {
 const TempMemberItem = memo(({ id, isOwner }: TempMemberItemProps) => {
 	const user = useAppSelector((state) => selectMemberClanByUserId2(state, id));
 	const userMeta = useAppSelector((state) => selectClanMemberMetaUserId(state, id));
+	const currentChannelID = useAppSelector(selectCurrentChannelId);
 	const userCustomStatus = useAppSelector((state) => selectMemberCustomStatusById2(state, user.user?.id || ''));
 	const avatar = user.clan_avatar ? user.clan_avatar : (user?.user?.avatar_url ?? '');
 	const username = user?.clan_nick || user?.user?.display_name || user?.user?.username || '';
@@ -47,7 +48,7 @@ const TempMemberItem = memo(({ id, isOwner }: TempMemberItemProps) => {
 					src={avatar}
 				/>
 				<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm ">
-					<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
+					<UserStatusIconClan channelId={currentChannelID || ''} userId={id || ''} status={userMeta?.status} online={userMeta?.online} />
 				</div>
 			</div>
 

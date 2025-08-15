@@ -1,11 +1,12 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { sleep } from '../helpers';
 import { Toast, ToastPayload } from './types';
 
 export const TOASTS_FEATURE_KEY = 'toasts';
 
 // Create an adapter for the toasts
 const toastsAdapter = createEntityAdapter<Toast>();
+
+const activeTimers = new Map<string, NodeJS.Timeout>();
 
 const initialState = {
 	...toastsAdapter.getInitialState(),
@@ -31,9 +32,27 @@ const addToast = createAsyncThunk(
 
 		thunkAPI.dispatch(toastsSlice.actions.addOneToast(newToast));
 
-		await sleep(3000);
+		if (newToast.autoClose !== false && typeof newToast.autoClose === 'number' && newToast.autoClose > 0) {
+			const existingTimer = activeTimers.get(id);
+			if (existingTimer) {
+				clearTimeout(existingTimer);
+			}
 
-		thunkAPI.dispatch(toastsSlice.actions.removeToast(id));
+			const timer = setTimeout(() => {
+				const currentState = thunkAPI.getState() as { toasts: typeof initialState };
+				const toastExists = selectToastById(currentState, id);
+
+				if (toastExists) {
+					thunkAPI.dispatch(toastsSlice.actions.removeToast(id));
+				}
+
+				activeTimers.delete(id);
+			}, newToast.autoClose);
+
+			activeTimers.set(id, timer);
+		}
+
+		return newToast;
 	},
 	{
 		condition: (toast, { getState }) => {
@@ -57,9 +76,19 @@ export const toastsSlice = createSlice({
 	reducers: {
 		addOneToast: toastsAdapter.addOne,
 		removeToast: (state, action: PayloadAction<string>) => {
+			const toastId = action.payload;
+			const timer = activeTimers.get(toastId);
+			if (timer) {
+				clearTimeout(timer);
+				activeTimers.delete(toastId);
+			}
+
 			toastsAdapter.removeOne(state, action.payload);
 		},
 		clearToasts: (state) => {
+			activeTimers.forEach(timer => clearTimeout(timer));
+			activeTimers.clear();
+
 			toastsAdapter.removeAll(state);
 		},
 		addToastError: (state, action: PayloadAction<{ message?: string }>) => {
@@ -87,7 +116,7 @@ export const toastActions = {
 	clearToasts,
 	addToastError,
 	removeToastError,
-	clearAllToastErrors
+	clearAllToastErrors,
 };
 
 // Create selectors using the adapter's getSelectors method
