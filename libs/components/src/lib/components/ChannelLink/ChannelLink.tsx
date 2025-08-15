@@ -316,10 +316,6 @@ const ChannelLinkComponent = ({
 			{isShowSettingChannel ? (
 				numberNotification && numberNotification > 0 ? (
 					<>
-						{/* <Icons.AddPerson
-							className={`absolute ml-auto w-4 h-4  top-[6px] right-8 cursor-pointer hidden group-hover:block dark:text-white text-black `}
-							onClick={handleCreateLinkInvite}
-						/> */}
 						<Icons.SettingProfile
 							className={`absolute ml-auto w-4 h-4  top-[6px] right-3 cursor-pointer hidden group-hover:block text-theme-primary `}
 							onClick={handleOpenCreate}
@@ -331,23 +327,13 @@ const ChannelLinkComponent = ({
 						</div>
 					</>
 				) : (
-					<>
-						{/* <Icons.AddPerson
-							className={`absolute ml-auto w-4 h-4 top-[6px] hidden group-hover:block dark:group-hover:text-white group-hover:text-black ${isActive ? 'dark:text-white text-black' : 'text-transparent'} right-8 cursor-pointer`}
-							onClick={handleCreateLinkInvite}
-						/> */}
-						<Icons.SettingProfile
-							className={`absolute ml-auto w-5 h-5 top-2 right-3 ${isActive ? 'text-theme-primary-active' : 'text-transparent'} hidden group-hover:block text-theme-primary-hover cursor-pointer`}
-							onClick={handleOpenCreate}
-						/>
-					</>
+					<Icons.SettingProfile
+						className={`absolute ml-auto w-5 h-5 top-2 right-3 ${isActive ? 'text-theme-primary-active' : 'text-transparent'} hidden group-hover:block text-theme-primary-hover cursor-pointer`}
+						onClick={handleOpenCreate}
+					/>
 				)
 			) : (
 				<>
-					{/* <Icons.AddPerson
-						className={`absolute ml-auto w-4 h-4  top-[6px] group-hover:block dark:group-hover:text-white group-hover:text-black  ${isActive ? 'dark:text-white text-black' : 'text-transparent'} hidden right-3 cursor-pointer`}
-						onClick={handleCreateLinkInvite}
-					/> */}
 					{numberNotification && numberNotification > 0 ? (
 						<div className="absolute ml-auto w-4 h-4 top-[9px] text-white right-3 group-hover:hidden bg-red-600 flex justify-center items-center rounded-full text-xs">
 							{numberNotification}
