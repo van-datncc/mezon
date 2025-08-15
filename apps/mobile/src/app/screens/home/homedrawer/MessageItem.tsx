@@ -14,7 +14,7 @@ import {
 } from '@mezon/store-mobile';
 import { ETypeLinkMedia, ID_MENTION_HERE, TypeMessage, isValidEmojiData } from '@mezon/utils';
 import { ChannelStreamMode, safeJSONParse } from 'mezon-js';
-import { ApiMessageMention } from 'mezon-js/api.gen';
+import { ApiMessageAttachment, ApiMessageMention } from 'mezon-js/api.gen';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Platform, Pressable, Text, View } from 'react-native';
@@ -52,6 +52,7 @@ export type MessageItemProps = {
 	isMessNotifyMention?: boolean;
 	mode: number;
 	channelId?: string;
+	topicChannelId?: string;
 	isNumberOfLine?: boolean;
 	currentClanId?: string;
 	showUserInformation?: boolean;
@@ -71,6 +72,7 @@ const MessageItem = React.memo(
 			showUserInformation = false,
 			preventAction = false,
 			channelId = '',
+			topicChannelId,
 			isSearchTab = false,
 			isHighlight = false
 		} = props;
@@ -167,15 +169,22 @@ const MessageItem = React.memo(
 
 		const isSendTokenLog = message?.code === TypeMessage.SendToken;
 
-		const onLongPressImage = useCallback(() => {
-			if (preventAction) return;
-			dispatch(setSelectedMessage(message));
-			const data = {
-				snapPoints: ['55%', '85%'],
-				children: <ContainerMessageActionModal message={message} mode={mode} senderDisplayName={senderDisplayName} />
-			};
-			DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
-		}, [dispatch, message, mode, preventAction, senderDisplayName]);
+		const onLongPressImage = useCallback(
+			(image?: ApiMessageAttachment) => {
+				if (preventAction) return;
+				dispatch(setSelectedMessage(message));
+				let targetMessage = message;
+				if (image) {
+					targetMessage = { ...message, attachments: [image] };
+				}
+				const data = {
+					snapPoints: ['55%', '85%'],
+					children: <ContainerMessageActionModal message={targetMessage} mode={mode} senderDisplayName={senderDisplayName} />
+				};
+				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_BOTTOM_SHEET, { isDismiss: false, data });
+			},
+			[dispatch, message, mode, preventAction, senderDisplayName]
+		);
 
 		const onPressInfoUser = useCallback(async () => {
 			if (preventAction) return;
@@ -272,15 +281,16 @@ const MessageItem = React.memo(
 						isHighlight && styles.highlightMessageMention,
 						isEphemeralMessage && styles.ephemeralMessage,
 						Platform.OS === 'ios' &&
-						pressed && {
-							backgroundColor: themeValue.secondaryWeight,
-							opacity: 0.8
-						}
+							pressed && {
+								backgroundColor: themeValue.secondaryWeight,
+								opacity: 0.8
+							}
 					]}
 				>
 					{!isMessageSystem && !message?.content?.fwd && (
 						<RenderMessageItemRef
 							message={message}
+							channelId={topicChannelId}
 							preventAction={preventAction}
 							isSearchTab={isSearchTab}
 							onLongPress={handleLongPressMessage}
@@ -437,17 +447,17 @@ const MessageItem = React.memo(
 	(prevProps, nextProps) => {
 		return (
 			prevProps?.message?.id +
-			prevProps?.message?.update_time +
-			prevProps?.previousMessage?.id +
-			prevProps?.message?.code +
-			prevProps?.isHighlight +
-			prevProps?.message?.reactions ===
+				prevProps?.message?.update_time +
+				prevProps?.previousMessage?.id +
+				prevProps?.message?.code +
+				prevProps?.isHighlight +
+				prevProps?.message?.reactions ===
 			nextProps?.message?.id +
-			nextProps?.message?.update_time +
-			nextProps?.previousMessage?.id +
-			nextProps?.message?.code +
-			nextProps?.isHighlight +
-			nextProps?.message?.reactions
+				nextProps?.message?.update_time +
+				nextProps?.previousMessage?.id +
+				nextProps?.message?.code +
+				nextProps?.isHighlight +
+				nextProps?.message?.reactions
 		);
 	}
 );

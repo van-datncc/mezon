@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaCopy, FaDiscord, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
+import { FaCopy, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
 import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
 import { IoMdClose } from 'react-icons/io';
 import { useParams } from 'react-router-dom';
@@ -30,14 +30,14 @@ export default function ClanDetailPage() {
 	];
 	const categories = (clan as any).categories || ['Science & Tech', 'Entertainment'];
 	const socials = (clan as any).socials || [
-		{ icon: <FaDiscord />, url: '#' },
-		{ icon: <FaFacebook />, url: '#' },
+		{ icon: <FaFacebook />, url: 'https://www.facebook.com/mezonworld?locale=vi_VN' },
 		{ icon: <FaReddit />, url: '#' },
 		{ icon: <FaTwitter />, url: '#' }
 	];
+	const inviteLink = `https://mezon.ai/invite/${clan?.invite_id}`;
 	const handleNavigate = () => {
 		if (clan?.clan_id) {
-			window.location.href = `${process.env.NX_CHAT_APP_REDIRECT_URI}${toClanPage(clan.clan_id)}`;
+			window.location.href = inviteLink;
 		}
 	};
 
@@ -46,7 +46,7 @@ export default function ClanDetailPage() {
 	};
 
 	const handleCopy = () => {
-		const inviteLink = `https://mezon.ai/invite/${clan?.clan_id}`;
+
 		navigator.clipboard
 			.writeText(inviteLink)
 			.then(() => {
@@ -92,12 +92,43 @@ export default function ClanDetailPage() {
 								)}
 							</div>
 							<div className="text-gray-600 mb-2">{clan.description || 'No description.'}</div>
-							<div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-								<div className="flex items-center gap-1">
-									<div className="w-2 h-2 rounded-full bg-green-500"></div>
-									<span>{clan.online_members?.toLocaleString('en-US') || 0} Online</span>
+							<div className="flex items-center text-gray-500 text-[10px] sm:text-xs  mb-1">
+								<div className="flex items-center">
+									<svg
+										className="mr-1"
+										width="12"
+										height="12"
+										viewBox="0 0 12 12"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<circle
+											cx="6"
+											cy="6"
+											r="5"
+											stroke="#22c55e"
+											strokeWidth="2"
+											fill="none"
+										>
+											<animate
+												attributeName="r"
+												from="3"
+												to="6"
+												dur="1.5s"
+												repeatCount="indefinite"
+											/>
+											<animate
+												attributeName="opacity"
+												from="1"
+												to="0"
+												dur="1.5s"
+												repeatCount="indefinite"
+											/>
+										</circle>
+										<circle cx="6" cy="6" r="3" fill="#22c55e" />
+									</svg>
+
 								</div>
-								<span>•</span>
 								<span>{clan.total_members?.toLocaleString('en-US') || 0} Members</span>
 							</div>
 						</div>
@@ -190,7 +221,7 @@ export default function ClanDetailPage() {
 							<div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg">
 								<input
 									type="text"
-									value={`https://mezon.ai/invite/${clan?.clan_id}`}
+									value={`https://mezon.ai/invite/${clan?.invite_id}`}
 									readOnly
 									className="flex-1 bg-transparent outline-none text-sm"
 								/>

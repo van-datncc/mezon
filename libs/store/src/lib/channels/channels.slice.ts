@@ -1174,6 +1174,7 @@ export const channelsSlice = createSlice({
 
 			state.byClans[clanId].previousChannels = [{ clanId, channelId }, ...(state.byClans[clanId].previousChannels || []).slice(0, 4)];
 		},
+
 		updateChannelBadgeCount: (
 			state: ChannelsState,
 			action: PayloadAction<{ clanId: string; channelId: string; count: number; isReset?: boolean }>
@@ -1183,14 +1184,16 @@ export const channelsSlice = createSlice({
 			const entity = state.byClans[clanId].entities.entities[channelId];
 			if (!entity) return;
 			const newCountMessUnread = isReset ? 0 : (entity.count_mess_unread ?? 0) + count;
-			if (entity.count_mess_unread === newCountMessUnread) return;
+			const finalCount = Math.max(0, newCountMessUnread);
+			if (entity.count_mess_unread === finalCount) return;
 			channelsAdapter.updateOne(state.byClans[clanId].entities, {
 				id: channelId,
 				changes: {
-					count_mess_unread: newCountMessUnread
+					count_mess_unread: finalCount
 				}
 			});
 		},
+
 		resetChannelsCount: (
 			state: ChannelsState,
 			action: PayloadAction<{

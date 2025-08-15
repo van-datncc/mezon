@@ -1,8 +1,9 @@
 import { useColorsRoleById } from '@mezon/core';
-import { ChannelMembersEntity } from '@mezon/store';
+import { ChannelMembersEntity, selectCurrentChannelId, selectCurrentDM } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EUserStatus, UsersClanEntity, createImgproxyUrl } from '@mezon/utils';
 import { ReactNode } from 'react';
+import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../components';
 import { UserStatusIconClan } from './IconStatus';
 
@@ -19,6 +20,8 @@ type BaseMemberProfileProps = {
 };
 
 export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwner, userStatus, onContextMenu, onClick }: BaseMemberProfileProps) => {
+	const currentChannelID = useSelector(selectCurrentChannelId);
+	const currentDmGroup = useSelector(selectCurrentDM);
 	const handleContextMenu = (event: React.MouseEvent) => {
 		const userTemplate: UsersClanEntity = {
 			...user,
@@ -50,7 +53,12 @@ export const BaseMemberProfile = ({ id, user, userMeta, username, avatar, isOwne
 						src={avatar}
 					/>
 					<div className="rounded-full right-[-4px] absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-theme-primary">
-						<UserStatusIconClan status={userMeta?.status} online={userMeta?.online} />
+						<UserStatusIconClan
+							channelId={currentChannelID || currentDmGroup.id || ''}
+							userId={user.id}
+							status={userMeta?.status}
+							online={userMeta?.online}
+						/>
 					</div>
 				</div>
 

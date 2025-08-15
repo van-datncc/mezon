@@ -40,8 +40,15 @@ const SidebarLogoItem = () => {
 		distanceToBottom: 0
 	});
 	const [openRightClickModal, closeRightClickModal] = useModal(() => {
-		return <PanelClan coords={coords} setShowClanListMenuContext={closeRightClickModal} userProfile={userProfile || undefined} />;
-	}, [coords]);
+
+	  return (
+		  <PanelClan
+			  coords={coords}
+			  setShowClanListMenuContext={closeRightClickModal}
+			  userProfile={userProfile || undefined}
+		  />
+	  );
+  }, [coords, userProfile]);
 	const handleMouseClick = async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		const mouseX = event.clientX;
 		const mouseY = event.clientY;

@@ -1,10 +1,12 @@
-import { canvasActions } from '@mezon/store';
+import { canvasActions, selectCurrentChannelId, selectCurrentClanId } from '@mezon/store';
+import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { safeJSONParse } from 'mezon-js';
-import Quill from 'quill';
+import Quill, { Delta } from 'quill';
 import 'quill/dist/quill.snow.css';
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { handlePaste, preventBase64Images } from './canvasPasteUtils';
 
 interface ActiveFormats {
 	bold: boolean;
@@ -40,6 +42,10 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 	const hasSetInitialContent = useRef(false);
 	const dispatch = useDispatch();
 	const [quill, setQuill] = useState<Quill | null>(null);
+	
+	const { sessionRef, clientRef } = useMezon();
+	const currentClanId = useSelector(selectCurrentClanId) || '';
+	const currentChannelId = useSelector(selectCurrentChannelId) || '';
 	const placeholderColor = 'var(--text-theme-primary)';
 	const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
@@ -101,7 +107,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			modules: {
 				clipboard: {
 					matchVisual: false
-				}
+				},
 			},
 			placeholder: 'Type / to insert...'
 		});
@@ -112,9 +118,6 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 				if (op.attributes && op.attributes.background) {
 					delete op.attributes.background;
 				}
-				// if (op.attributes && op.attributes.color) {
-				// 	op.attributes.color = isLightMode ? 'black' : 'white';
-				// }
 			});
 			return delta;
 		});
@@ -153,12 +156,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 						formats?.header === 1 ||
 						formats?.header === 2 ||
 						formats?.header === 3 ||
-						formats?.list === 'check' ||
+						formats?.list === 'checked' ||
+						formats?.list === 'unchecked' ||
 						formats?.list === 'ordered' ||
-						formats?.list === 'ordered' ||
+						formats?.list === 'bullet' ||
 						!!formats?.blockquote
 					),
-					check: formats?.list === 'check',
+					check: formats?.list === 'checked' || formats?.list === 'unchecked',
 					ordered: formats?.list === 'ordered',
 					bullet: formats?.list === 'bullet',
 					blockquote: !!formats?.blockquote,
@@ -198,9 +202,12 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				setActiveOption(
-					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph')
-				);
+				let nextActiveOption =
+					(formats?.header as string) || (formats?.list as string) || (formats?.blockquote === true ? 'blockquote' : 'paragraph');
+				if (nextActiveOption === 'checked' || nextActiveOption === 'unchecked') {
+					nextActiveOption = 'check';
+				}
+				setActiveOption(nextActiveOption as string);
 				setActiveFormats({
 					bold: !!formats.bold,
 					italic: !!formats.italic,
@@ -215,12 +222,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 						formats?.header === 1 ||
 						formats?.header === 2 ||
 						formats?.header === 3 ||
-						formats?.list === 'check' ||
+						formats?.list === 'checked' ||
+						formats?.list === 'unchecked' ||
 						formats?.list === 'ordered' ||
 						formats?.list === 'bullet' ||
 						!!formats?.blockquote
 					),
-					check: formats?.list === 'check',
+					check: formats?.list === 'checked' || formats?.list === 'unchecked',
 					ordered: formats?.list === 'ordered',
 					bullet: formats?.list === 'bullet',
 					blockquote: !!formats?.blockquote,
@@ -288,15 +296,34 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			}
 		};
 
+		const handlePasteEvent = async (e: ClipboardEvent) => {
+			await handlePaste({
+				event: e,
+				quillRef: quillRef.current,
+				sessionRef,
+				clientRef,
+				currentClanId,
+				currentChannelId
+			});
+		};
+
+		const preventBase64ImagesHandler = (delta: Delta, oldDelta: Delta, source: string) => {
+			preventBase64Images({ delta, oldDelta, source, quillRef: quillRef.current });
+		};
+
+		quillRef.current.on('text-change', preventBase64ImagesHandler);
 		quillRef.current.on('selection-change', handleSelectionChange);
 		quillRef.current.root.addEventListener('keydown', handleKeyDown);
+		quillRef.current.root.addEventListener('paste', handlePasteEvent);
 		document.addEventListener('mousedown', handleClickOutside);
 
-		return () => {
-			quillRef.current?.off('selection-change', handleSelectionChange);
-			quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
+			return () => {
+		quillRef.current?.off('text-change', preventBase64ImagesHandler);
+		quillRef.current?.off('selection-change', handleSelectionChange);
+		quillRef.current?.root.removeEventListener('keydown', handleKeyDown);
+		quillRef.current?.root.removeEventListener('paste', handlePasteEvent);
+		document.removeEventListener('mousedown', handleClickOutside);
+	};
 	}, [isEditAndDelCanvas]);
 
 	const handleContentChange = (content: string, source: string, delta: any) => {
@@ -345,7 +372,8 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 			} else if (value === 'paragraph') {
 				quill.format('header', true);
 			} else if (value === 'check') {
-				quill.format('list', 'check');
+				// Default new checklist items to unchecked
+				quill.format('list', 'unchecked');
 			} else if (value === 'ordered') {
 				quill.format('list', 'ordered');
 			} else if (value === 'bullet') {

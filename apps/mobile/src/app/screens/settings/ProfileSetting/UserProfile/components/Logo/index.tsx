@@ -1,16 +1,16 @@
 import { useAuth } from '@mezon/core';
 import { size, useTheme } from '@mezon/mobile-ui';
 import { appActions, clansActions, selectLogoCustom, useAppDispatch } from '@mezon/store-mobile';
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import LogoMezonDark from '../../../../../../../assets/svg/logoMezonDark.svg';
-import LogoMezonLight from '../../../../../../../assets/svg/logoMezonLight.svg';
+import MezonIconCDN from '../../../../../../componentUI/MezonIconCDN';
 import MezonImagePicker from '../../../../../../componentUI/MezonImagePicker';
+import { IconCDN } from '../../../../../../constants/icon_cdn';
 import { style } from './styles';
 
 export const DirectMessageLogo = memo(() => {
-	const { themeValue, themeBasic } = useTheme();
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const logoCustom = useSelector(selectLogoCustom);
 	const dispatch = useAppDispatch();
@@ -40,7 +40,7 @@ export const DirectMessageLogo = memo(() => {
 				defaultValue={logoCustom}
 				height={size.s_50}
 				width={size.s_50}
-				localValue={!logoCustom && (themeBasic === 'dark' ? <LogoMezonDark /> : <LogoMezonLight />)}
+				localValue={!logoCustom && <MezonIconCDN icon={IconCDN.logoMezon} width={size.s_50} height={size.s_50} useOriginalColor={true} />}
 				onLoad={handleOnLoad}
 				autoUpload
 			/>

@@ -10,7 +10,7 @@ import {
 } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { IChannel } from '@mezon/utils';
-import { useMemo } from 'react';
+import { ReactElement, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export type CategoryChannelProps = {
@@ -42,6 +42,24 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 		return listCategory.filter((cate) => cate.id !== realTimeChannel.category_id);
 	}, [listCategory, channel.category_id]);
 
+	const menu = useMemo(() => {
+		const menuItems: ReactElement[] = [];
+
+		listCateUpdate.map((category) => {
+			menuItems.push(
+				<Menu.Item
+					key={category.id}
+					className={'bg-item-theme-hover text-theme-primary-hover uppercase font-medium text-left cursor-pointer truncate'}
+					onClick={() => handleMoveChannelToNewCategory(category)}
+				>
+					{category.category_name ?? ''}
+				</Menu.Item>
+			);
+		});
+
+		return <>{menuItems}</>;
+	}, []);
+
 	return (
 		<div className="overflow-y-auto flex flex-col flex-1 shrink bg-theme-setting-primary w-1/2 pt-[94px] pb-7 pr-[10px] pl-[40px] overflow-x-hidden min-w-[700px] 2xl:min-w-[900px] max-w-[740px] hide-scrollbar">
 			<div className="text-theme-primary text-[15px] flex flex-col gap-4">
@@ -53,26 +71,11 @@ const SettingCategoryChannel = (props: CategoryChannelProps) => {
 				</div>
 				<p className="text-xs font-bold text-theme-primary mt-4">Category</p>
 
-				<Menu className="bg-input-secondary text-theme-primary">
-					<Menu.Trigger>
-						<div className="w-full h-12 rounded-md border-theme-primary text-theme-message bg-input-secondary  flex flex-row px-3 justify-between items-center uppercase">
-							<p>{realTimeChannel.category_name}</p>
-							<Icons.ArrowDownFill />
-						</div>
-					</Menu.Trigger>
-					<Menu.Content className="bg-input-secondary text-theme-primary">
-						{listCateUpdate.map((category) => {
-							return (
-								<Menu.Item
-									key={category.id}
-									className={'bg-item-theme-hover text-theme-primary-hover uppercase font-medium text-left cursor-pointer truncate'}
-									onClick={() => handleMoveChannelToNewCategory(category)}
-								>
-									{category.category_name ?? ''}
-								</Menu.Item>
-							);
-						})}
-					</Menu.Content>
+				<Menu menu={menu}>
+					<div className="w-full h-12 rounded-md border-theme-primary text-theme-message bg-input-secondary  flex flex-row px-3 justify-between items-center uppercase">
+						<p>{realTimeChannel.category_name}</p>
+						<Icons.ArrowDownFill />
+					</div>
 				</Menu>
 			</div>
 		</div>

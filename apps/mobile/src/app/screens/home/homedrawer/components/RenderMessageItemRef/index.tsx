@@ -9,20 +9,18 @@ import { style } from '../../styles';
 import { MessageReferences } from '../MessageReferences';
 
 interface RenderMessageItemRefProps {
+	channelId: string;
 	message: MessagesEntity;
 	preventAction: boolean;
 	isSearchTab?: boolean;
 	onLongPress?: () => void;
 }
 
-export const RenderMessageItemRef = ({ message, preventAction, isSearchTab, onLongPress }: RenderMessageItemRefProps) => {
+export const RenderMessageItemRef = ({ channelId, message, preventAction, isSearchTab, onLongPress }: RenderMessageItemRefProps) => {
 	const { themeValue } = useTheme();
 	const { t } = useTranslation('message');
-
 	const styles = style(themeValue);
-
 	const messageReferences = message?.references?.[0];
-
 	const isMessageReplyDeleted = message?.references?.length && !message.references?.[0]?.message_ref_id;
 
 	return (
@@ -32,7 +30,7 @@ export const RenderMessageItemRef = ({ message, preventAction, isSearchTab, onLo
 					messageReferences={messageReferences}
 					preventAction={preventAction}
 					isMessageReply={true}
-					channelId={message.channel_id}
+					channelId={channelId ?? message?.channel_id}
 					clanId={message.clan_id}
 					onLongPress={onLongPress}
 				/>

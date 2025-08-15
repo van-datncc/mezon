@@ -14,18 +14,16 @@ import {
 	userStatusActions
 } from '@mezon/store';
 import { createClient as createMezonClient, useMezon } from '@mezon/transport';
-import { Icons } from '@mezon/ui';
+import { Icons, Menu } from '@mezon/ui';
 import { EUserStatus, formatNumber } from '@mezon/utils';
-import { Dropdown } from 'flowbite-react';
 import isElectron from 'is-electron';
 import { Session } from 'mezon-js';
-import { ReactNode, useCallback, useMemo, useState } from 'react';
+import { ReactElement, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ButtonCopy } from '../../../components';
 import HistoryTransaction from '../../HistoryTransaction';
-import SettingRightWithdraw from '../../SettingProfile/SettingRightWithdraw';
 import ItemProfile from './ItemProfile';
 import ItemStatus from './ItemStatus';
 import ItemStatusUpdate from './ItemStatusUpdate';
@@ -51,7 +49,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
 	}, [userProfile?.wallet]);
-	const [isShowModalWithdraw, setIsShowModalWithdraw] = useState<boolean>(false);
 	const [isShowModalHistory, setIsShowModalHistory] = useState<boolean>(false);
 	const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
 
@@ -59,9 +56,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
 
-	const handleCloseWithdrawModal = () => {
-		setIsShowModalWithdraw(false);
-	};
 	const handleOpenHistoryModal = () => {
 		setIsShowModalHistory(true);
 	};
@@ -152,6 +146,40 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 		modalRef.current = false;
 	};
 
+	const menuStatus = useMemo(() => {
+		const menuItems: ReactElement[] = [
+			<ItemStatus
+				children="Online"
+				startIcon={<Icons.OnlineStatus />}
+				onClick={() => {
+					updateUserStatus('Online', 0, true);
+					modalRef.current = false;
+					onClose();
+				}}
+			/>,
+			<div className="w-full border-b-theme-primary opacity-70 text-center my-2"></div>,
+			<ItemStatusUpdate
+				modalRef={modalRef}
+				children="Idle"
+				startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />}
+				dropdown
+				onClick={onClose}
+			/>,
+			<ItemStatusUpdate onClick={onClose} modalRef={modalRef} children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />,
+			<ItemStatusUpdate onClick={onClose} modalRef={modalRef} children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
+		];
+		return <>{menuItems}</>;
+	}, []);
+	const handleChangeVisible = (visible: boolean) => {
+		modalRef.current = visible;
+	};
+
+	const menuAccount = useMemo(() => {
+		if (!allAccount) {
+			return (<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />) as ReactElement;
+		}
+		return (<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />) as ReactElement;
+	}, [allAccount]);
 	return (
 		<>
 			<div className="max-md:relative">
@@ -171,51 +199,32 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 					children={`${userCustomStatus ? 'Edit' : 'Set'} Custom Status`}
 					startIcon={<Icons.SmilingFace className="text-theme-primary" />}
 				/>
-				<Dropdown
+				<Menu
 					trigger="click"
-					dismissOnClick={true}
-					renderTrigger={() => (
-						<div className="capitalize text-theme-primary">
-							<ItemStatus children={status} dropdown startIcon={statusIcon(status)} />
-						</div>
-					)}
-					label=""
-					placement="right-start"
+					menu={menuStatus}
+					onVisibleChange={handleChangeVisible}
+					align={{
+						offset: [0, 10],
+						points: ['br']
+					}}
 					className=" bg-theme-contexify text-theme-primary ml-2 py-[6px] px-[8px] w-[200px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full "
 				>
-					<ItemStatus
-						children="Online"
-						startIcon={<Icons.OnlineStatus />}
-						onClick={() => {
-							updateUserStatus('Online', 0, true);
-						}}
-					/>
-					<div className="w-full border-b-theme-primary opacity-70 text-center my-2"></div>
-					<ItemStatusUpdate children="Idle" startIcon={<Icons.DarkModeIcon className="text-[#F0B232] -rotate-90" />} dropdown />
-					<ItemStatusUpdate children="Do Not Disturb" startIcon={<Icons.MinusCircleIcon />} dropdown />
-					<ItemStatusUpdate children="Invisible" startIcon={<Icons.OfflineStatus />} dropdown />
-				</Dropdown>
+					<div className="capitalize text-theme-primary">
+						<ItemStatus children={status} dropdown startIcon={statusIcon(status)} />
+					</div>
+				</Menu>
 			</div>
 			<div className="w-full border-b-theme-primary opacity-70 text-center"></div>
 			{isElectron() && (
-				<Dropdown
+				<Menu
+					menu={menuAccount}
 					trigger="click"
-					dismissOnClick={true}
-					renderTrigger={() => (
-						<div>
-							<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
-						</div>
-					)}
-					label=""
-					placement="right-start"
 					className="bg-theme-setting-primary border-none ml-2 py-[6px] px-[8px] w-[100px] max-md:!left-auto max-md:!top-auto max-md:!transform-none max-md:!min-w-full"
 				>
-					{!allAccount ? (
-						<ItemStatus children="Manage Accounts" onClick={handleOpenSwitchAccount} />
-					) : (
-						<ItemProfile username={allAccount?.username} onClick={handleSwitchAccount} />
-					)}
-				</Dropdown>
+					<div>
+						<ItemStatus children="Switch Accounts" dropdown startIcon={<Icons.ConvertAccount />} />
+					</div>
+				</Menu>
 			)}
 
 			<ButtonCopy
@@ -223,7 +232,6 @@ const StatusProfile = ({ userById, isDM, modalRef, onClose }: StatusProfileProps
 				title="Copy User ID"
 				className=" px-2 py-[6px] text-theme-primary-hover bg-item-theme-hover"
 			/>
-			{isShowModalWithdraw && <SettingRightWithdraw onClose={handleCloseWithdrawModal} />}
 			{isShowModalHistory && <HistoryTransaction onClose={handleCloseHistoryModal} />}
 
 			<WalletManagementModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />

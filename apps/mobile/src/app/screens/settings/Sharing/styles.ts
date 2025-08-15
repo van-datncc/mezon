@@ -1,8 +1,9 @@
-import { Attributes, baseColor, horizontalScale, size } from '@mezon/mobile-ui';
+import { Attributes, baseColor, size } from '@mezon/mobile-ui';
 import { StyleSheet } from 'react-native';
 
 export const style = (colors: Attributes) =>
 	StyleSheet.create({
+		// Main wrapper
 		wrapper: {
 			flex: 1,
 			justifyContent: 'center',
@@ -15,13 +16,8 @@ export const style = (colors: Attributes) =>
 			height: '100%',
 			zIndex: 1000
 		},
-		container: {
-			backgroundColor: colors.borderHighlight,
-			flex: 1,
-			padding: size.s_16,
-			marginHorizontal: size.s_16,
-			borderRadius: size.s_12
-		},
+
+		// Header section
 		header: {
 			width: '100%',
 			flexDirection: 'row',
@@ -32,7 +28,6 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_10,
 			position: 'relative'
 		},
-
 		titleHeader: {
 			fontSize: size.s_20,
 			fontWeight: 'bold',
@@ -43,6 +38,15 @@ export const style = (colors: Attributes) =>
 			zIndex: -1,
 			textAlign: 'center'
 		},
+
+		// Content container
+		container: {
+			backgroundColor: colors.borderHighlight,
+			flex: 1,
+			padding: size.s_16,
+			marginHorizontal: size.s_16,
+			borderRadius: size.s_12
+		},
 		title: {
 			fontSize: size.s_13,
 			fontWeight: '600',
@@ -50,72 +54,13 @@ export const style = (colors: Attributes) =>
 			color: colors.white,
 			textTransform: 'uppercase'
 		},
-		rowItem: {
-			marginBottom: size.s_24
-		},
-		inputWrapper: {
-			backgroundColor: colors.primary,
-			flexDirection: 'row',
-			alignItems: 'center',
-			width: '100%',
-			paddingHorizontal: size.s_8,
-			borderRadius: size.s_10
-		},
-		iconLeftInput: {
-			marginHorizontal: size.s_10,
-			width: size.s_18,
-			borderRadius: size.s_18,
-			height: size.s_18,
-			resizeMode: 'contain'
-		},
-		iconRightInput: {
-			marginLeft: size.s_4,
-			backgroundColor: colors.borderDim,
-			padding: size.s_4,
-			width: size.s_24,
-			height: size.s_24,
-			borderRadius: size.s_24,
-			justifyContent: 'center',
-			alignItems: 'center'
-		},
-		textInput: {
-			flex: 1,
-			alignItems: 'center',
-			paddingVertical: 0,
-			height: size.s_50,
-			color: colors.white
-		},
-		textChannelSelected: {
-			flex: 1,
-			alignItems: 'center',
-			paddingVertical: 0,
-			lineHeight: size.s_50,
-			color: colors.white
-		},
-		itemSuggestion: {
-			paddingVertical: size.s_10,
-			flexDirection: 'row',
-			gap: size.s_18,
-			alignItems: 'center'
-		},
-		logoSuggestion: {
-			width: size.s_24,
-			height: size.s_24,
-			borderRadius: size.s_24,
-			resizeMode: 'cover'
-		},
-		titleSuggestion: {
-			fontSize: size.label,
-			color: colors.tertiary
-		},
+
+		// Media attachment styles
 		wrapperItemMedia: {
 			width: size.s_70,
 			height: size.s_70,
 			borderRadius: size.s_6,
 			marginRight: size.s_10
-		},
-		wrapperMedia: {
-			paddingHorizontal: size.s_4
 		},
 		itemMedia: {
 			width: '100%',
@@ -133,25 +78,6 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			justifyContent: 'center'
 		},
-		fileViewer: {
-			gap: size.s_6,
-			paddingHorizontal: size.s_10,
-			maxWidth: horizontalScale(150),
-			height: '100%',
-			alignItems: 'center',
-			borderRadius: size.s_6,
-			flexDirection: 'row',
-			backgroundColor: colors.bgInputPrimary
-		},
-		fileName: {
-			fontSize: size.small,
-			color: colors.white
-		},
-		typeFile: {
-			fontSize: size.small,
-			color: colors.textNormal,
-			textTransform: 'uppercase'
-		},
 		videoOverlay: {
 			position: 'absolute',
 			backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -162,6 +88,8 @@ export const style = (colors: Attributes) =>
 			width: '100%',
 			borderRadius: size.s_6
 		},
+
+		// Chat input area
 		chatArea: {
 			width: '100%',
 			padding: size.s_16,
@@ -175,6 +103,22 @@ export const style = (colors: Attributes) =>
 			paddingHorizontal: size.s_16,
 			borderRadius: size.s_30
 		},
+		textInput: {
+			flex: 1,
+			alignItems: 'center',
+			paddingVertical: 0,
+			height: size.s_42,
+			color: colors.white
+		},
+		iconRightInput: {
+			backgroundColor: colors.borderDim,
+			padding: size.s_4,
+			width: size.s_24,
+			height: size.s_24,
+			borderRadius: size.s_24,
+			justifyContent: 'center',
+			alignItems: 'center'
+		},
 		sendButton: {
 			height: size.s_40,
 			width: size.s_40,
@@ -183,6 +127,8 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center',
 			borderRadius: size.s_50
 		},
+
+		// Layout helpers
 		inputRow: {
 			flexDirection: 'row',
 			gap: size.s_8
@@ -190,9 +136,5 @@ export const style = (colors: Attributes) =>
 		attachmentRow: {
 			marginBottom: size.s_16,
 			flexDirection: 'row'
-		},
-		searchInput: {
-			padding: size.s_16,
-			width: '100%'
 		}
 	});

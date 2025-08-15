@@ -1,5 +1,4 @@
 import { useAppNavigation } from '@mezon/core';
-import { Card } from 'flowbite-react';
 import { Check } from 'libs/ui/src/lib/Icons';
 import { useNavigate } from 'react-router-dom';
 import type { TypeSelectClan } from './types';
@@ -21,7 +20,7 @@ const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
 	};
 
 	return (
-		<Card className="max-w-[440px] w-full rounded-lg overflow-hidden border-0 bg-white text-black dark:bg-gradient-to-br dark:from-[#2b2d31] dark:to-[#313338] dark:text-white shadow-2xl transition-all duration-500 hover:shadow-[0_0_25px_rgba(88,101,242,0.3)]">
+		<div className="max-w-[440px] w-full rounded-lg overflow-hidden border-0 bg-white text-black dark:bg-gradient-to-br dark:from-[#2b2d31] dark:to-[#313338] dark:text-white shadow-2xl transition-all duration-500 hover:shadow-[0_0_25px_rgba(88,101,242,0.3)]">
 			<div className="p-8 flex flex-col items-center text-center space-y-6 relative overflow-hidden">
 				<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+')]"></div>
 
@@ -60,7 +59,7 @@ const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
 
 				<div className="absolute -bottom-10 left-0 w-full h-2 bg-gradient-to-r from-[#5865f2] via-[#23a55a] to-[#5865f2] animate-gradient-x"></div>
 			</div>
-		</Card>
+		</div>
 	);
 };
 

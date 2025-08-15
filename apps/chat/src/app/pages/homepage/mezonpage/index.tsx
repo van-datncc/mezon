@@ -2,12 +2,12 @@ import { CustomCookieConsent } from '@mezon/components';
 import mezonPackage from '@mezon/package-js';
 import { Icons, Image } from '@mezon/ui';
 import { Platform, getPlatform } from '@mezon/utils';
+import isElectron from 'is-electron';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Footer from './footer';
 import HeaderMezon from './header';
 import Layout, { useIntersectionObserver } from './layouts';
 import { SideBarMezon } from './sidebar';
-import isElectron from 'is-electron';
 
 function MezonPage() {
 	const platform = getPlatform();

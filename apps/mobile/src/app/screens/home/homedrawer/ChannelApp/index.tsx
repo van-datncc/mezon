@@ -80,6 +80,7 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
 					persistApp.theme = JSON.stringify("${themeBasic}");
 					persistApp.themeApp = JSON.stringify("${themeBasic}");
 					localStorage.setItem('persist:apps', JSON.stringify(persistApp));
+					localStorage.setItem('current-theme', "${themeBasic}");
 				}
 			}
 		} catch (error) {
@@ -90,6 +91,7 @@ const ChannelAppScreen = ({ navigation, route }: { navigation: any; route: any }
 				themeApp: JSON.stringify("${themeBasic}")
 			};
 			localStorage.setItem('persist:apps', JSON.stringify(defaultAppData));
+			localStorage.setItem('current-theme', "${themeBasic}");
 		}
 	})();
 	true;

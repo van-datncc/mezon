@@ -403,7 +403,7 @@ const ThreadBox = () => {
 				</div>
 			)}
 			<div
-				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[46px]' : 'pb-4'} px-3  h-auto relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
+				className={`flex-shrink-0 flex flex-col ${isElectron() ? 'pb-[36px]' : 'pb-4'} px-3  h-auto relative ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}
 			>
 				<div
 					className={`h-fit w-full bg-transparent shadow-md rounded-lg min-h-[45px] ${checkAttachment ? 'rounded-t-none' : 'rounded-t-lg'}`}

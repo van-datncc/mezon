@@ -1,5 +1,6 @@
 import {
 	directActions,
+	DirectEntity,
 	directMetaActions,
 	selectBuzzStateByDirectId,
 	selectDirectById,
@@ -8,7 +9,7 @@ import {
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { ChannelMembersEntity, EUserStatus, createImgproxyUrl } from '@mezon/utils';
+import { ChannelMembersEntity, createImgproxyUrl, EUserStatus } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useModal } from 'react-modal-hook';
@@ -106,6 +107,7 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 				isTypeDMGroup={isTypeDMGroup}
 				highlight={isUnReadChannel || currentDmGroupId === id}
 				userMeta={metadata}
+				direct={directMessage}
 			/>
 			{buzzStateDM?.isReset ? (
 				<BuzzBadge
@@ -136,7 +138,8 @@ const DmItemProfile = ({
 	number,
 	isTypeDMGroup,
 	highlight,
-	userMeta
+	userMeta,
+	direct
 }: {
 	highlight: boolean;
 	avatar: string;
@@ -144,6 +147,7 @@ const DmItemProfile = ({
 	number: number;
 	isTypeDMGroup: boolean;
 	userMeta?: any;
+	direct: DirectEntity;
 }) => {
 	return (
 		<div
@@ -159,7 +163,12 @@ const DmItemProfile = ({
 			/>
 			{!isTypeDMGroup && (
 				<div className="rounded-full left-7 absolute bottom-0 inline-flex items-center justify-center gap-1 p-[3px] text-sm text-theme-primary">
-					<UserStatusIconClan status={userMeta?.user_status} online={userMeta?.user_status !== EUserStatus.INVISIBLE} />
+					<UserStatusIconClan
+						channelId={direct.id}
+						userId={direct.user_id?.[0] || ''}
+						status={userMeta?.user_status}
+						online={userMeta?.user_status !== EUserStatus.INVISIBLE}
+					/>
 				</div>
 			)}
 

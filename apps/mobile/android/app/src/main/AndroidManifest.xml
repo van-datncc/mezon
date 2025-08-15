@@ -127,25 +127,38 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
-          <intent-filter android:autoVerify="true">
-              <action android:name="android.intent.action.VIEW" />
-              <category android:name="android.intent.category.DEFAULT" />
-              <category android:name="android.intent.category.BROWSABLE" />
-              <data android:scheme="https" android:host="mezon.ai" android:pathPrefix="/channel-app/" />
-              <data android:scheme="https" android:host="mezon.ai" android:pathPrefix="/home/" />
-          </intent-filter>
-          <intent-filter android:autoVerify="true">
-              <action android:name="android.intent.action.VIEW" />
-              <category android:name="android.intent.category.DEFAULT" />
-              <category android:name="android.intent.category.BROWSABLE" />
-              <data android:scheme="https" android:host="mezon.ai" />
-          </intent-filter>
-          <intent-filter android:label="filter_react_native">
-              <action android:name="android.intent.action.VIEW" />
-              <category android:name="android.intent.category.DEFAULT" />
-              <category android:name="android.intent.category.BROWSABLE" />
-              <data android:scheme="mezon.ai" />
-          </intent-filter>
+        <!-- Deep link intent filters -->
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="mezon.ai" />
+            <data android:scheme="http" android:host="mezon.ai" />
+        </intent-filter>
+
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="mezon.ai" android:pathPrefix="/channel-app" />
+            <data android:scheme="http" android:host="mezon.ai" android:pathPrefix="/channel-app" />
+        </intent-filter>
+
+        <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" android:host="mezon.ai" android:pathPrefix="/invite" />
+            <data android:scheme="http" android:host="mezon.ai" android:pathPrefix="/invite" />
+        </intent-filter>
+
+
+        <intent-filter android:label="filter_react_native">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="mezon.ai" />
+        </intent-filter>
           <!--TODO: Add this filter, if you want to support sharing text into your app-->
           <intent-filter>
               <action android:name="android.intent.action.SEND" />
@@ -212,5 +225,14 @@
       <meta-data
       android:name="com.google.android.geo.API_KEY"
       android:value=""/>
+      <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

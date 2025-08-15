@@ -677,15 +677,6 @@ function MessageContextMenu({
 		});
 
 		builder.when(
-			userId === currentChannel?.creator_id &&
-				activeMode !== ChannelStreamMode.STREAM_MODE_DM &&
-				activeMode !== ChannelStreamMode.STREAM_MODE_GROUP,
-			(builder) => {
-				builder.addMenuItem('addNote', 'Add To Note', handleAddToNote, <Icons.CanvasIconRightClick defaultSize="w-4 h-4" />);
-			}
-		);
-
-		builder.when(
 			checkPos &&
 				(canSendMessage || activeMode === ChannelStreamMode.STREAM_MODE_DM || activeMode === ChannelStreamMode.STREAM_MODE_GROUP || isTopic),
 			(builder) => {
