@@ -461,12 +461,10 @@ export const directSlice = createSlice({
 		setAll: directAdapter.setAll,
 		updateOne: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
 			if (!action.payload?.channel_id) return;
-			const { channel_id } = action.payload;
+			const { channel_id, creator_id, currentUserId, ...changes } = action.payload;
 			directAdapter.updateOne(state, {
 				id: channel_id,
-				changes: {
-					...action.payload
-				}
+				changes: changes
 			});
 		},
 		updateE2EE: (state, action: PayloadAction<Partial<ChannelUpdatedEvent & { currentUserId: string }>>) => {
