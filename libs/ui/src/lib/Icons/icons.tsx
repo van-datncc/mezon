@@ -5696,3 +5696,42 @@ export function MarketIcons(props: React.HTMLAttributes<SVGElement>) {
 		</svg>
 	);
 }
+
+export function MacOSCloseIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="6" height="6" viewBox="0 0 6 6" className="fill-black opacity-60" {...props}>
+			<path d="M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5" stroke="currentColor" strokeWidth="1" />
+		</svg>
+	);
+}
+
+export function MacOSMinimizeIcon(props: React.HTMLAttributes<SVGElement>) {
+	return (
+		<svg width="6" height="1" viewBox="0 0 6 1" className="fill-black opacity-60" {...props}>
+			<rect width="6" height="1" />
+		</svg>
+	);
+}
+
+export function MacOSMaximizeIcon({ isMaximized = false, ...props }: React.HTMLAttributes<SVGElement> & { isMaximized?: boolean }) {
+	return (
+		<svg width="6" height="6" viewBox="0 0 6 6" className="fill-black opacity-60" {...props}>
+			{isMaximized ? (
+				// Restore icon (two overlapping squares)
+				<>
+					<rect x="1" y="0" width="4" height="4" fill="none" stroke="currentColor" strokeWidth="0.8" />
+					<rect x="0" y="1" width="4" height="4" fill="none" stroke="currentColor" strokeWidth="0.8" />
+				</>
+			) : (
+				// Maximize icon (expand arrows)
+				<>
+					<path d="M1 1L5 5M5 1L1 5" stroke="currentColor" strokeWidth="0.8" fill="none" />
+					<circle cx="1" cy="1" r="0.5" fill="currentColor" />
+					<circle cx="5" cy="1" r="0.5" fill="currentColor" />
+					<circle cx="1" cy="5" r="0.5" fill="currentColor" />
+					<circle cx="5" cy="5" r="0.5" fill="currentColor" />
+				</>
+			)}
+		</svg>
+	);
+}

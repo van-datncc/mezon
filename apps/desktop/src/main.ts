@@ -9,7 +9,9 @@ import {
 	CLOSE_APP,
 	CLOSE_IMAGE_WINDOW,
 	DOWNLOAD_FILE,
+	GET_WINDOW_STATE,
 	IMAGE_WINDOW_TITLE_BAR_ACTION,
+	MAC_WINDOWS_ACTION,
 	MAXIMIZE_WINDOW,
 	MINIMIZE_WINDOW,
 	OPEN_NEW_WINDOW,
@@ -25,7 +27,6 @@ import { forceQuit } from './app/utils';
 import updateImagePopup from './assets/image-window/update_window_image';
 import openImagePopup from './assets/image-window/window_image';
 import { environment } from './environments/environment';
-// import { forceQuit } from '';
 
 export type ImageWindowProps = {
 	attachmentData: ApiMessageAttachment & { create_time?: string };
@@ -123,36 +124,7 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 			break;
 		case UNMAXIMIZE_WINDOW:
 		case MAXIMIZE_WINDOW:
-			if (process.platform === 'darwin') {
-				const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
-				const windowBounds = window.getBounds();
-				const isMaximized = windowBounds.width >= display.workArea.width && windowBounds.height >= display.workArea.height;
-				if (isMaximized) {
-					const newWidth = Math.floor(display.workArea.width * 0.8);
-					const newHeight = Math.floor(display.workArea.height * 0.8);
-					const x = Math.floor((display.workArea.width - newWidth) / 2);
-					const y = Math.floor((display.workArea.height - newHeight) / 2);
-					window.setBounds(
-						{
-							x,
-							y,
-							width: newWidth,
-							height: newHeight
-						},
-						false
-					);
-				} else {
-					window.setBounds(
-						{
-							x: display.workArea.x,
-							y: display.workArea.y,
-							width: display.workArea.width,
-							height: display.workArea.height
-						},
-						false
-					);
-				}
-			} else {
+			if (process.platform !== 'darwin') {
 				if (window.isMaximized()) {
 					window.restore();
 				} else {
@@ -173,6 +145,61 @@ const handleWindowAction = async (window: BrowserWindow, action: string) => {
 	}
 };
 
+const handleMacWindowsAction = async (window: BrowserWindow, action: string) => {
+	if (process.platform !== 'darwin' || !window || window.isDestroyed()) {
+		return;
+	}
+
+	switch (action) {
+		case MINIMIZE_WINDOW:
+			window.minimize();
+			break;
+		case UNMAXIMIZE_WINDOW:
+		case MAXIMIZE_WINDOW: {
+			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+			const windowBounds = window.getBounds();
+			const isMaximized = windowBounds.width >= display.workArea.width && windowBounds.height >= display.workArea.height;
+			if (isMaximized) {
+				const newWidth = Math.floor(display.workArea.width * 0.8);
+				const newHeight = Math.floor(display.workArea.height * 0.8);
+				const x = Math.floor((display.workArea.width - newWidth) / 2);
+				const y = Math.floor((display.workArea.height - newHeight) / 2);
+				window.setBounds(
+					{
+						x,
+						y,
+						width: newWidth,
+						height: newHeight
+					},
+					false
+				);
+			} else {
+				window.setBounds(
+					{
+						x: display.workArea.x,
+						y: display.workArea.y,
+						width: display.workArea.width,
+						height: display.workArea.height
+					},
+					false
+				);
+			}
+			break;
+		}
+		case CLOSE_APP:
+			if (forceQuit.isEnabled) {
+				window.close();
+				return;
+			}
+			window.hide();
+			break;
+
+		case CLOSE_IMAGE_WINDOW:
+			window.close();
+			break;
+	}
+};
+
 ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, _options?: Electron.BrowserWindowConstructorOptions, _params?: Record<string, string>) => {
 	// const newWindow = App.openImageWindow(props, options, params);
 	if (App.imageViewerWindow) {
@@ -186,6 +213,29 @@ ipcMain.handle(OPEN_NEW_WINDOW, (event, props: any, _options?: Electron.BrowserW
 	ipcMain.on(IMAGE_WINDOW_TITLE_BAR_ACTION, (event, action, _data) => {
 		handleWindowAction(newWindow, action);
 	});
+});
+
+// Single clean IPC listener for macOS window controls
+ipcMain.on(MAC_WINDOWS_ACTION, (event, action) => {
+	handleMacWindowsAction(App.mainWindow, action);
+});
+
+ipcMain.handle(GET_WINDOW_STATE, () => {
+	if (!App.mainWindow || App.mainWindow.isDestroyed()) {
+		return { isMaximized: false };
+	}
+
+	let isMaximized = false;
+	if (process.platform === 'darwin') {
+		const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+		const windowBounds = App.mainWindow.getBounds();
+		// Consider maximized if window is close to work area size (within 50px tolerance)
+		isMaximized = Math.abs(windowBounds.width - display.workArea.width) <= 50 && Math.abs(windowBounds.height - display.workArea.height) <= 50;
+	} else {
+		isMaximized = App.mainWindow.isMaximized();
+	}
+
+	return { isMaximized };
 });
 
 ipcMain.on(TITLE_BAR_ACTION, (event, action, _data) => {
