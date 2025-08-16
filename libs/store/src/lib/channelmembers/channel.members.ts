@@ -381,6 +381,10 @@ export const channelMembers = createSlice({
 			if (state.memberChannels[channelId]?.cache) {
 				delete state.memberChannels[channelId].cache;
 			}
+		},
+		setCustomStatusUser: (state, action: PayloadAction<{ userId: string; status: string }>) => {
+			const { userId, status } = action.payload;
+			state.customStatusUser[userId] = status;
 		}
 	},
 	extraReducers: (builder) => {
@@ -468,6 +472,7 @@ export const getChannelMembersState = (rootState: { [CHANNEL_MEMBERS_FEATURE_KEY
 };
 
 export const selectMemberStatus = createSelector(getChannelMembersState, (state) => state.onlineStatusUser);
+export const selectMemberCustomStatus = createSelector(getChannelMembersState, (state) => state.customStatusUser);
 
 export const selectMemberIdsByChannelId = createSelector(
 	[getChannelMembersState, (state, channelId: string) => channelId],
@@ -500,13 +505,14 @@ export const selectMemberCustomStatusById = createSelector(
 export const selectMemberCustomStatusById2 = createSelector(
 	[
 		selectEntitesUserClans,
+		selectMemberCustomStatus,
 		(state: RootState, userId: string) => {
 			return userId;
 		}
 	],
-	(usersClanEntities, userId) => {
+	(usersClanEntities, usersStatus, userId) => {
 		const userClan = usersClanEntities[userId];
-		return (userClan?.user?.metadata as any)?.status || '';
+		return usersStatus?.[userId] || (userClan?.user?.metadata as any)?.status || '';
 	}
 );
 
