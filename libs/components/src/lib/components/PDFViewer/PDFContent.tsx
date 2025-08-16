@@ -61,6 +61,7 @@ export const PDFContent: React.FC<PDFContentProps> = ({
 						loading={<div></div>}
 						options={pdfOptions}
 						className="react-pdf__Document"
+						externalLinkTarget="_blank"
 					>
 						<Page pageNumber={pageNumber} width={getPageWidth()} loading={<div></div>} className="react-pdf__Page" />
 					</Document>

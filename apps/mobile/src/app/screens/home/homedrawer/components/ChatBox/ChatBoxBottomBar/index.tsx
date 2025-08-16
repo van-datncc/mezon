@@ -519,10 +519,17 @@ export const ChatBoxBottomBar = memo(
 		};
 
 		const checkPasteImage = async () => {
-			const imageUri = await Clipboard.getImage();
+			try {
+				const imageUri = await Clipboard.getImage();
 
-			if (imageUri) {
-				setImageBase64(imageUri);
+				if (imageUri?.startsWith('data:image/')) {
+					const base64Data = imageUri.split(',')?.[1];
+					if (base64Data?.length > 0) {
+						setImageBase64(imageUri);
+					}
+				}
+			} catch (error) {
+				console.error('Error checking paste image:', error);
 			}
 		};
 

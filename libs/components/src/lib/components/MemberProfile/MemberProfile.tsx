@@ -75,14 +75,16 @@ export function ClanUserName({ name, userId, isOwner }: { name: string; userId: 
 	const userRolesClan = useColorsRoleById(userId || '');
 
 	return (
-		<span className="one-line text-start " style={{ color: userRolesClan.highestPermissionRoleColor }}>
-			{name}
+		<div className="flex text-start gap-1">
+			<span style={{ color: userRolesClan.highestPermissionRoleColor }} className="one-line text-start ">
+				{name}
+			</span>
 
 			{isOwner && (
-				<button className="w-[14px] h-[14px] ml-1 pt-[2px]">
+				<button className="w-[14px] text-center h-[14px] pt-[4px]">
 					<Icons.OwnerIcon />
 				</button>
 			)}
-		</span>
+		</div>
 	);
 }

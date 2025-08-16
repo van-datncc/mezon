@@ -183,7 +183,6 @@ const SettingOnBoarding = ({ onClose }: { onClose?: () => void }) => {
 					</div>
 				</MemberProvider>
 			)}
-
 		</div>
 	);
 

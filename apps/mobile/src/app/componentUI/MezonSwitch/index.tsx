@@ -32,6 +32,7 @@ export const MezonSwitch = ({ value, onValueChange, iconYesNo, iconOn, iconOff, 
 			style={[styles.switchContainer, isEnabled ? styles.switchContainerEnabled : {}, disabled ? styles.disabled : {}]}
 			onPress={toggleSwitch}
 			disabled={disabled}
+			onStartShouldSetResponder={() => true}
 		>
 			<View style={[styles.circle, isEnabled ? styles.circleEnabled : {}]}>
 				{iconYesNo ? (
