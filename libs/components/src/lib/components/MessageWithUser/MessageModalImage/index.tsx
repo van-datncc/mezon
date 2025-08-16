@@ -16,8 +16,7 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ModeResponsive, SHOW_POSITION, createImgproxyUrl, handleSaveImage } from '@mezon/utils';
-import { format } from 'date-fns';
+import { ModeResponsive, SHOW_POSITION, convertTimeString, createImgproxyUrl, handleSaveImage } from '@mezon/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageContextMenuProps, useMessageContextMenu } from '../../ContextMenu';
@@ -325,7 +324,10 @@ const SenderUser = () => {
 					{user?.clan_nick ?? user?.user?.display_name ?? user?.user?.username}
 				</div>
 				<div className="text-[12px] text-bgTextarea truncate max-sm:w-12">
-					{format(attachment?.create_time as string, 'dd/L/yyyy hh:mm a')}
+					{attachment?.create_time
+						? convertTimeString(attachment.create_time)
+						: 'N/A'
+					}
 				</div>
 			</div>
 		</div>

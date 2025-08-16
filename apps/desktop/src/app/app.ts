@@ -23,7 +23,6 @@ const IMAGE_WINDOW_KEY = 'IMAGE_WINDOW_KEY';
 
 const isMac = process.platform === 'darwin';
 
-
 export default class App {
 	// Keep a global reference of the window object, if you don't, the window will
 	// be closed automatically when the JavaScript object is garbage collected.
@@ -103,9 +102,9 @@ export default class App {
 			height: height,
 			show: false,
 			frame: false,
-			titleBarOverlay: process.platform == 'darwin' ? true : false,
-			titleBarStyle: process.platform == 'darwin' ? 'hidden' : 'default',
-			trafficLightPosition: process.platform == 'darwin' ? { x: 10, y: 10 } : undefined,
+			titleBarOverlay: false,
+			titleBarStyle: process.platform == 'darwin' ? 'hiddenInset' : 'default',
+			trafficLightPosition: process.platform == 'darwin' ? { x: -100, y: -100 } : undefined,
 			fullscreenable: false,
 			webPreferences: {
 				nodeIntegration: false,
@@ -318,7 +317,6 @@ export default class App {
 	}
 
 	private static setupMenu() {
-
 		const appMenu: MenuItemConstructorOptions[] = [
 			{
 				label: app.name,
@@ -370,14 +368,14 @@ export default class App {
 				submenu: [
 					...(isMac
 						? ([
-							{
-								label: 'Hide Window',
-								accelerator: 'CmdOrCtrl+W',
-								click: () => {
-									App.mainWindow.hide();
+								{
+									label: 'Hide Window',
+									accelerator: 'CmdOrCtrl+W',
+									click: () => {
+										App.mainWindow.hide();
+									}
 								}
-							}
-						] as MenuItemConstructorOptions[])
+							] as MenuItemConstructorOptions[])
 						: ([{ role: 'quit' }] as MenuItemConstructorOptions[]))
 				]
 			},
@@ -393,15 +391,15 @@ export default class App {
 					{ role: 'paste' },
 					...(isMac
 						? ([
-							{ role: 'pasteAndMatchStyle' },
-							{ role: 'delete' },
-							{ role: 'selectAll' },
-							{ type: 'separator' },
-							{
-								label: 'Speech',
-								submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
-							}
-						] as MenuItemConstructorOptions[])
+								{ role: 'pasteAndMatchStyle' },
+								{ role: 'delete' },
+								{ role: 'selectAll' },
+								{ type: 'separator' },
+								{
+									label: 'Speech',
+									submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }]
+								}
+							] as MenuItemConstructorOptions[])
 						: ([{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }] as MenuItemConstructorOptions[]))
 				]
 			},

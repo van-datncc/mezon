@@ -1066,6 +1066,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 	const oncustomstatus = useCallback(
 		(statusEvent: CustomStatusEvent) => {
 			dispatch(directMembersMetaActions.updateStatus({ userId: statusEvent.user_id, status: statusEvent.status }));
+			dispatch(
+				channelMembersActions.setCustomStatusUser({
+					userId: statusEvent.user_id,
+					status: statusEvent.status
+				})
+			);
 			if (statusEvent.user_id === userId) {
 				dispatch(accountActions.setCustomStatus(statusEvent.status));
 			}
@@ -2219,7 +2225,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const id = Date.now().toString();
 				dispatch(appActions.refreshApp({ id }));
 				setCallbackEventFn(socket as Socket);
-				
 				dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
 				dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
 				dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
