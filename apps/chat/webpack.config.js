@@ -114,7 +114,7 @@ module.exports = composePlugins(
       'data:',
       '*.mezon.ai',
       '*.nccsoft.vn',
-      'media.tenor.com',-
+      'media.tenor.com',
       '*.googletagmanager.com',
       '*.google-analytics.com',
       '*.googlesyndication.com',
