@@ -42,7 +42,7 @@ async function setupPDFWorker(): Promise<void> {
 	const baseUrl = window.location.origin;
 
 	const possiblePaths = [
-		`https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+		`https://cdn.mezon.ai/js/libs/4.8.69/pdf.worker.min.mjs`
 	];
 
 	for (const path of possiblePaths) {

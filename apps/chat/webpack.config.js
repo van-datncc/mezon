@@ -114,14 +114,13 @@ module.exports = composePlugins(
       'data:',
       '*.mezon.ai',
       '*.nccsoft.vn',
-      'media.tenor.com',
+      'media.tenor.com',-
       '*.googletagmanager.com',
       '*.google-analytics.com',
       '*.googlesyndication.com',
       '*.gstatic.com',
       '*.googleapis.com',
       'https://cdn.jsdelivr.net',
-      'https://unpkg.com',
       'googleads.g.doubleclick.net'
     ].join(' ');
     const basePolicies = [
