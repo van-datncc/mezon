@@ -110,6 +110,8 @@ module.exports = composePlugins(
 
     const trustedDomains = [
       '\'self\'',
+      'blob:',
+      'data:',
       '*.mezon.ai',
       '*.nccsoft.vn',
       'media.tenor.com',
@@ -119,22 +121,23 @@ module.exports = composePlugins(
       '*.gstatic.com',
       '*.googleapis.com',
       'https://cdn.jsdelivr.net',
+      'https://unpkg.com',
       'googleads.g.doubleclick.net'
     ].join(' ');
     const basePolicies = [
       `default-src 'self'`,
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${trustedDomains}`,
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: ${trustedDomains}`,
       `style-src 'self' 'unsafe-inline' ${trustedDomains}`,
       `font-src 'self' data: ${trustedDomains}`,
       `object-src 'none'`,
-      `worker-src 'self' blob: ${trustedDomains}`,
+      `worker-src 'self' blob: data: ${trustedDomains}`,
       `manifest-src 'self' ${trustedDomains}`
     ];
 
           const resourcePolicies = [
         `img-src 'self' data: blob: https: http: ${trustedDomains}`,
-        `connect-src 'self' ws: wss: https: http: ${trustedDomains}`,
-        `media-src 'self' blob: https: http: ${trustedDomains}`,
+        `connect-src 'self' ws: wss: https: http: blob: data: ${trustedDomains}`,
+        `media-src 'self' blob: https: http: data: ${trustedDomains}`,
       ];
 
     const iframePolicies = [
