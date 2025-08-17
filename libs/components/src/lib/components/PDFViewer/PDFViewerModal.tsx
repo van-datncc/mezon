@@ -42,22 +42,24 @@ async function setupPDFWorker(): Promise<void> {
 	const baseUrl = window.location.origin;
 
 	const possiblePaths = [
-		`${baseUrl}/pdf.worker.min.mjs`,
-		`${baseUrl}/assets/pdf.worker.min.mjs`,
-		`${baseUrl}/pdf.worker.min.js`,
-		`${baseUrl}/assets/pdf.worker.min.js`,
-		`https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+		`https://cdn.mezon.ai/js/libs/4.8.69/pdf.worker.min.mjs`
 	];
 
 	for (const path of possiblePaths) {
-		const isValid = await validateWorkerPath(path);
-		if (isValid) {
-			pdfjs.GlobalWorkerOptions.workerSrc = path;
-			return;
+		try {
+			const isValid = await validateWorkerPath(path);
+			
+			if (isValid) {
+				pdfjs.GlobalWorkerOptions.workerSrc = path;
+				return;
+			}
+		} catch (error) {
+			console.warn('Failed to validate PDF worker path:', path, error);
 		}
 	}
 
-	pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+	const fallbackUrl = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+	pdfjs.GlobalWorkerOptions.workerSrc = fallbackUrl;
 }
 
 export const PDFViewerModal: FC<PDFViewerModalProps> = ({ isOpen, onClose, pdfUrl, filename = 'Document.pdf' }) => {
