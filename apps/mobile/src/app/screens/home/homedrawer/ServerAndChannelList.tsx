@@ -1,8 +1,6 @@
 import { useTheme } from '@mezon/mobile-ui';
-import { sleep } from '@mezon/utils';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import BootSplash from 'react-native-bootsplash';
 import ChannelList from './ChannelList';
 import ProfileBar from './ProfileBar';
 import ServerList from './ServerList';
@@ -16,8 +14,6 @@ const ChannelListWrapper = React.memo(
 		useEffect(() => {
 			const splashTask = requestAnimationFrame(async () => {
 				setShowChannelList(true);
-				await sleep(1);
-				await BootSplash.hide({ fade: false });
 			});
 			return () => cancelAnimationFrame(splashTask);
 		}, []);

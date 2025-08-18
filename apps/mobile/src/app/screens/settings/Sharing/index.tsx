@@ -39,6 +39,7 @@ import {
 	TouchableOpacity,
 	View
 } from 'react-native';
+import { Flow } from 'react-native-animated-spinkit';
 import { Image, Video } from 'react-native-compressor';
 import FastImage from 'react-native-fast-image';
 import RNFS from 'react-native-fs';
