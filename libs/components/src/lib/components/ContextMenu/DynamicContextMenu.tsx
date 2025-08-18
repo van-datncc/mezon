@@ -16,9 +16,11 @@ import {
 } from '@mezon/store';
 import { Menu as Dropdown } from '@mezon/ui';
 import { ContextMenuItem, IEmoji, IMessageWithUser, QUICK_MENU_TYPE, SHOW_POSITION, isPublicChannel } from '@mezon/utils';
-import React, { ReactElement, useCallback, useMemo, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Item, Menu, Separator, Submenu } from 'react-contexify';
+import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
+import './ContextMenu.css';
 import { useMessageContextMenu } from './MessageContextMenuContext';
 import ReactionItem from './ReactionItem';
 import ReactionPart from './ReactionPart';
@@ -51,8 +53,19 @@ type Props = {
 	currentChannelId?: string;
 };
 
-export default function DynamicContextMenu({ menuId, items, messageId, message, isTopic, onSlashCommandExecute, currentChannelId }: Props) {
+export default function DynamicContextMenu({
+	menuId,
+	items,
+	messageId,
+	message,
+	isTopic,
+	onSlashCommandExecute,
+	currentChannelId
+}: Props): JSX.Element | null {
 	const emojiConverted = useEmojiConverted();
+	const menuRef = useRef<HTMLDivElement>(null);
+	const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+	const [isMenuVisible, setIsMenuVisible] = useState(false);
 
 	const { directId } = useAppParams();
 
@@ -66,6 +79,114 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 	const currentMessage = useAppSelector((state) =>
 		selectMessageByMessageId(state, isFocusTopicBox ? currenTopicId : currentChannel?.channel_id, messageId || '')
 	);
+
+	const calculateMenuPosition = useCallback(() => {
+		if (!menuRef.current) return;
+
+		const menuRect = menuRef.current.getBoundingClientRect();
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+
+		const mouseX = (window.event as MouseEvent)?.clientX || viewportWidth / 2;
+		const mouseY = (window.event as MouseEvent)?.clientY || viewportHeight / 2;
+
+		let bestContainer: Element | null = null;
+
+		console.log('Looking for containers, isTopic:', isTopic);
+
+		if (isTopic) {
+			bestContainer = document.querySelector('.topic-container, .TopicDiscussionBox, [data-topic="true"]');
+			console.log('Found topic container:', bestContainer);
+		}
+
+		if (!bestContainer) {
+			bestContainer = document.querySelector('.messages-container, .thread-scroll, .channel-messages');
+			console.log('Found message container:', bestContainer);
+		}
+
+		if (!bestContainer) {
+			bestContainer = document.querySelector('.overflow-y-auto, .overflow-auto, [style*="overflow"]');
+			console.log('Found overflow container:', bestContainer);
+		}
+
+		if (!bestContainer) {
+			bestContainer = document.querySelector('.main-layout, .app-layout, .chat-layout, .channel-layout');
+			console.log('Found layout container:', bestContainer);
+		}
+
+		if (!bestContainer) {
+			bestContainer = document.body;
+			console.log('Using body as container');
+		}
+
+		let newTop = mouseY;
+		let newLeft = mouseX;
+
+		if (bestContainer && bestContainer !== document.body) {
+			const containerRect = bestContainer.getBoundingClientRect();
+			console.log('Container rect:', containerRect);
+
+			const spaceRight = containerRect.right - mouseX;
+			const spaceLeft = mouseX - containerRect.left;
+			const spaceBottom = containerRect.bottom - mouseY;
+			const spaceTop = mouseY - containerRect.top;
+
+			console.log('Available space:', { spaceRight, spaceLeft, spaceBottom, spaceTop });
+
+			if (spaceRight >= menuRect.width) {
+				newLeft = mouseX;
+			} else if (spaceLeft >= menuRect.width) {
+				newLeft = mouseX - menuRect.width;
+			} else {
+				newLeft = containerRect.left + (containerRect.width - menuRect.width) / 2;
+			}
+
+			if (spaceBottom >= menuRect.height) {
+				newTop = mouseY;
+			} else if (spaceTop >= menuRect.height) {
+				newTop = mouseY - menuRect.height;
+			} else {
+				newTop = containerRect.top + (containerRect.height - menuRect.height) / 2;
+			}
+
+			if (newLeft < containerRect.left) newLeft = containerRect.left + 10;
+			if (newLeft + menuRect.width > containerRect.right) newLeft = containerRect.right - menuRect.width - 10;
+			if (newTop < containerRect.top) newTop = containerRect.top + 10;
+			if (newTop + menuRect.height > containerRect.bottom) newTop = containerRect.bottom - menuRect.height - 10;
+		}
+
+		if (newLeft < 20) newLeft = 20;
+		if (newTop < 20) newTop = 20;
+		if (newLeft + menuRect.width > viewportWidth) newLeft = viewportWidth - menuRect.width - 20;
+		if (newTop + menuRect.height > viewportHeight) newTop = viewportHeight - menuRect.height - 20;
+
+		console.log('Final position:', { newTop, newLeft });
+		setMenuPosition({ top: newTop, left: newLeft });
+	}, [isTopic]);
+
+	useEffect(() => {
+		setMenuPosition({
+			top: window.innerHeight / 2 - 100,
+			left: window.innerWidth / 2 - 150
+		});
+	}, []);
+
+	useEffect(() => {
+		if (isMenuVisible) {
+			const timer = setTimeout(() => {
+				console.log('Calculating menu position...');
+				calculateMenuPosition();
+			}, 150);
+			return () => clearTimeout(timer);
+		}
+	}, [isMenuVisible, calculateMenuPosition]);
+
+	useEffect(() => {
+		if (isMenuVisible) {
+			const timer = setTimeout(calculateMenuPosition, 100);
+			return () => clearTimeout(timer);
+		}
+	}, [isTopic, calculateMenuPosition]);
 
 	const handleClickEmoji = useCallback(
 		async (emojiId: string, emojiShortCode: string) => {
@@ -103,7 +224,8 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		'--contexify-rightSlot-color': 'var(--text-secondary)',
 		'--contexify-activeRightSlot-color': 'var(--text-secondary)',
 		'--contexify-arrow-color': 'var(--text-theme-primary)',
-		'--contexify-activeArrow-color': 'var(--text-secondary)'
+		'--contexify-activeArrow-color': 'var(--text-secondary)',
+		zIndex: 99999
 	} as React.CSSProperties;
 
 	const { posShowMenu, onVisibilityChange } = useMessageContextMenu();
@@ -370,29 +492,44 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 		shouldShowQuickMenu
 	]);
 
-	return (
+	const portalTarget = typeof document !== 'undefined' ? document.body : null;
+	if (!portalTarget) return null;
+
+	return createPortal(
 		<>
-			<style>
-				{`
-					.contexify_submenu {
-						padding: 0 !important;
-					}
-					.contexify_submenu .contexify_itemContent {
-						padding: 0 !important;
-					}
-				`}
-			</style>
-			<Menu
-				onVisibilityChange={onVisibilityChange}
-				id={menuId}
-				style={className}
-				className="z-50 rounded-lg  text-theme-primary text-theme-primary-hover border-theme-primary "
+			<style>{`
+				.contexify_submenu { padding: 0 !important; }
+				.contexify_submenu .contexify_itemContent { padding: 0 !important; }
+			`}</style>
+			<div
+				ref={menuRef}
+				className={`topic-context-menu ${isTopic ? 'topic-specific' : ''} ${isMenuVisible ? 'visible' : ''}`}
+				style={{
+					position: 'fixed',
+					top: menuPosition.top,
+					left: menuPosition.left,
+					zIndex: 99999,
+					opacity: 1,
+					visibility: 'visible',
+					transform: 'none',
+					willChange: 'auto'
+				}}
 			>
-				{checkPos && (
-					<ReactionPart emojiList={firstFourElements} messageId={messageId} isOption={false} message={message} isTopic={!!isTopic} />
-				)}
-				{children}
-			</Menu>
-		</>
-	);
+				<Menu
+					onVisibilityChange={(visible) => {
+						setIsMenuVisible(visible);
+					}}
+					id={menuId}
+					style={className}
+					className="z-50 rounded-lg text-theme-primary text-theme-primary-hover border-theme-primary"
+				>
+					{checkPos && (
+						<ReactionPart emojiList={firstFourElements} messageId={messageId} isOption={false} message={message} isTopic={!!isTopic} />
+					)}
+					{children}
+				</Menu>
+			</div>
+		</>,
+		portalTarget
+	) as JSX.Element;
 }

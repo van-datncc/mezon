@@ -1,0 +1,130 @@
+.topic-context-menu {
+	position: fixed !important;
+	z-index: 99999 !important;
+	max-width: calc(100vw - 20px) !important;
+	max-height: calc(100vh - 20px) !important;
+	pointer-events: auto !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+	transform: none !important;
+	will-change: auto !important;
+}
+
+.topic-context-menu.topic-specific {
+	max-width: calc(100% - 20px) !important;
+	max-height: calc(100% - 20px) !important;
+}
+
+.contexify_menu {
+	max-width: calc(100vw - 20px) !important;
+	max-height: calc(100vh - 20px) !important;
+	overflow: auto !important;
+	position: relative !important;
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+
+.topic-container .contexify_menu,
+.TopicDiscussionBox .contexify_menu,
+[data-topic='true'] .contexify_menu,
+.messages-container .contexify_menu,
+.channel-messages .contexify_menu,
+.thread-scroll .contexify_menu,
+.main-layout .contexify_menu,
+.app-layout .contexify_menu,
+.chat-layout .contexify_menu,
+.channel-layout .contexify_menu {
+	max-width: calc(100% - 20px) !important;
+	max-height: calc(100% - 20px) !important;
+}
+
+.topic-container,
+.TopicDiscussionBox,
+[data-topic='true'],
+.messages-container,
+.channel-messages,
+.thread-scroll,
+.main-layout,
+.app-layout,
+.chat-layout,
+.channel-layout {
+	overflow: hidden !important;
+	position: relative !important;
+}
+
+.messages-container,
+.channel-messages,
+.thread-scroll,
+.main-layout,
+.app-layout,
+.chat-layout,
+.channel-layout {
+	position: relative !important;
+	overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+	.topic-context-menu {
+		max-width: calc(100vw - 10px) !important;
+		max-height: calc(100vh - 10px) !important;
+	}
+
+	.contexify_menu {
+		max-width: calc(100vw - 10px) !important;
+		max-height: calc(100vh - 10px) !important;
+	}
+}
+
+.topic-context-menu {
+	transition:
+		opacity 0.2s ease-in-out,
+		transform 0.2s ease-in-out;
+	opacity: 1;
+	transform: scale(1);
+}
+
+.topic-context-menu.visible {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.contexify_item {
+	white-space: nowrap !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+}
+
+.contexify_submenu {
+	position: absolute !important;
+	z-index: 100000 !important;
+}
+
+.contexify_menu {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+body .topic-context-menu,
+#root .topic-context-menu,
+.app .topic-context-menu {
+	position: fixed !important;
+	z-index: 99999 !important;
+}
+
+.overflow-y-auto .topic-context-menu,
+.overflow-auto .topic-context-menu,
+[style*='overflow'] .topic-context-menu {
+	position: fixed !important;
+	z-index: 99999 !important;
+}
+
+.topic-context-menu,
+.topic-context-menu * {
+	pointer-events: auto !important;
+}
+
+.topic-context-menu {
+	z-index: 99999 !important;
+	position: fixed !important;
+}

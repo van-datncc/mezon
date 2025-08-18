@@ -229,7 +229,8 @@ const TopicDiscussionBox = () => {
 			onDragOver={handleDragOver}
 			onDragLeave={handleDragLeave}
 			onDrop={handleDrop}
-			className="relative flex flex-col h-full"
+			className="relative flex flex-col h-full topic-container"
+			data-topic="true"
 		>
 			{topicDraggingState && (
 				<div className="absolute inset-0 bg-blue-500 bg-opacity-20 border-2 border-dashed border-blue-500 rounded-lg z-50 flex items-center justify-center">

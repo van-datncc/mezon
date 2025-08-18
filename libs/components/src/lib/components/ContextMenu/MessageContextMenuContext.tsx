@@ -231,10 +231,19 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 		(event: React.MouseEvent<HTMLElement>, props: MessageContextMenuProps) => {
 			const position = props.position || null;
 			setIsMenuVisible(true);
+			const rect = event.currentTarget.getBoundingClientRect();
+			const initialPosition = {
+				top: rect.bottom + window.scrollY,
+				left: rect.left + window.scrollX
+			};
+
 			setTimeout(() => {
 				show({
 					event,
-					props,
+					props: {
+						...props,
+						initialPosition
+					},
 					position
 				});
 			}, 100);
