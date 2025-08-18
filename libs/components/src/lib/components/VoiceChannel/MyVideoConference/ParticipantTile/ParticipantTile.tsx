@@ -133,7 +133,9 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 	) : (
 		isAvatarResolved &&
 		usernameString && (
-			<div className={`size-10 text-theme-primary bg-theme-primary text-[16px] w-20 h-20 !text-4xl font-semibold`}>
+			<div
+				className={`size-10 text-theme-primary bg-theme-primary text-[16px] w-20 h-20 !text-4xl font-semibold flex items-center justify-center rounded-xl`}
+			>
 				{usernameString?.charAt(0)?.toUpperCase()}
 			</div>
 		)
