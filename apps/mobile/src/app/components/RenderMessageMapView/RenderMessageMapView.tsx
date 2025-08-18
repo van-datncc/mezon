@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Linking, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { style } from './styles';
 
 type RenderMessageMapViewProps = {
@@ -14,7 +15,8 @@ type RenderMessageMapViewProps = {
 
 function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: RenderMessageMapViewProps) {
 	const { themeValue } = useTheme();
-	const styles = style(themeValue);
+	const isTabletLandscape = useTabletLandscape();
+	const styles = style(themeValue, isTabletLandscape);
 	const { t } = useTranslation('message');
 
 	const handlePress = async () => {
@@ -44,7 +46,7 @@ function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: Render
 			<MapView
 				style={styles.map}
 				initialRegion={{
-					latitude: coordinate.latitude,
+					latitude: coordinate.latitude + 0.0005,
 					longitude: coordinate.longitude,
 					latitudeDelta: 0.005,
 					longitudeDelta: 0.005
