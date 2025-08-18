@@ -46,7 +46,7 @@ function RenderMessageMapView({ content, avatarUrl, isSelf, senderName }: Render
 			<MapView
 				style={styles.map}
 				initialRegion={{
-					latitude: coordinate.latitude + 0.0005,
+					latitude: coordinate.latitude,
 					longitude: coordinate.longitude,
 					latitudeDelta: 0.005,
 					longitudeDelta: 0.005
