@@ -28,8 +28,9 @@ import { AvatarImage } from '@mezon/components';
 import { useWebRTCCall } from '@mezon/core';
 import { IMessageTypeCallLog, createImgproxyUrl, sleep } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
-import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { ReactElement, forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -179,6 +180,25 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			setActiveVideo(null);
 		}
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
+
+	const menuDevice = useMemo(() => {
+		const menuItems: ReactElement[] = [
+			<DeviceSelector
+				deviceList={audioOutputDevicesList}
+				currentDevice={currentOutputDevice}
+				icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
+				onSelectDevice={changeAudioOutputDevice}
+			/>,
+
+			<DeviceSelector
+				deviceList={audioInputDevicesList}
+				currentDevice={currentInputDevice}
+				icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
+				onSelectDevice={changeAudioInputDevice}
+			/>
+		];
+		return <>{menuItems}</>;
+	}, [audioOutputDevicesList, audioInputDevicesList]);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
 
@@ -354,7 +374,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								/>
 							</div>
 
-							<Menu className={'rounded-3xl'}>
+							<Menu menu={menuDevice} className={'rounded-3xl'}>
 								<div className="h-[56px] w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
 									<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
 								</div>
