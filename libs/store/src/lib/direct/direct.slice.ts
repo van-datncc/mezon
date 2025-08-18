@@ -216,7 +216,7 @@ function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 							try {
 								return JSON.parse(dm?.metadata[index]);
 							} catch (e) {
-								const unescapedJSON = dm?.metadata[index].replace(/\\./g, (match: string) => {
+								const unescapedJSON = dm?.metadata[index]?.replace(/\\./g, (match: string) => {
 									switch (match) {
 										case '\\"':
 											return '"';
