@@ -114,7 +114,6 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 					const session = sessionRef.current;
 
 					if (!client || !session) {
-						console.error('Client/session not ready');
 						return;
 					}
 
@@ -127,13 +126,10 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 
 					if (attachment && attachment.url) {
 						avatarUrl = attachment.url;
-						console.log('✅ Avatar uploaded successfully:', attachment.url);
 					} else {
-						console.error('❌ Failed to upload avatar');
 						return;
 					}
 				} catch (error) {
-					console.error('❌ Error uploading avatar:', error);
 					return;
 				}
 			}
