@@ -17,6 +17,7 @@ import { IconCDN } from '../../../constants/icon_cdn';
 import useTabletLandscape from '../../../hooks/useTabletLandscape';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { normalizeString } from '../../../utils/helpers';
+import { checkNotificationPermissionAndNavigate } from '../../../utils/notificationPermissionHelper';
 import { style } from './styles';
 
 export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: any }) => {
@@ -110,15 +111,17 @@ export const NewGroupScreen = ({ navigation, route }: { navigation: any; route: 
 		);
 		const resPayload = response.payload as ApiCreateChannelDescRequest;
 		if (resPayload.channel_id) {
-			if (isTabletLandscape) {
-				await dispatch(directActions.setDmGroupCurrentId(resPayload.channel_id));
-				navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-			} else {
-				navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, {
-					directMessageId: resPayload.channel_id,
-					from: APP_SCREEN.MESSAGES.NEW_GROUP
-				});
-			}
+			await checkNotificationPermissionAndNavigate(() => {
+				if (isTabletLandscape) {
+					dispatch(directActions.setDmGroupCurrentId(resPayload.channel_id));
+					navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+				} else {
+					navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, {
+						directMessageId: resPayload.channel_id,
+						from: APP_SCREEN.MESSAGES.NEW_GROUP
+					});
+				}
+			});
 		}
 	};
 

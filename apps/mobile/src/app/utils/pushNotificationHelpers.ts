@@ -9,7 +9,7 @@ import {
 	STORAGE_MY_USER_ID
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, directActions, getFirstMessageOfTopic, getStoreAsync, topicsActions } from '@mezon/store-mobile';
-import notifee from '@notifee/react-native';
+import notifee, { AuthorizationStatus as NotifeeAuthorizationStatus } from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
 	AndroidCategory,
@@ -93,6 +93,51 @@ export const checkNotificationPermission = async () => {
 		console.error('Error checking notification permission:', error);
 	}
 };
+
+// Check notification permission cross-platform with optional ensure-request.
+// - By default (ensureRequest = false): check-only, no system prompt.
+// - If ensureRequest = true: will prompt when applicable (iOS NOT_DETERMINED, Android 13+ runtime permission not yet granted).
+export const getNotificationPermission = async (ensureRequest = false): Promise<boolean> => {
+	try {
+		if (Platform.OS === 'ios') {
+			let settings = await notifee.getNotificationSettings();
+			let status = settings.authorizationStatus;
+
+			if (ensureRequest && status === NotifeeAuthorizationStatus.NOT_DETERMINED) {
+				const req = await notifee.requestPermission();
+				status = req.authorizationStatus;
+			}
+
+			return (
+				status === NotifeeAuthorizationStatus.AUTHORIZED ||
+				status === NotifeeAuthorizationStatus.PROVISIONAL
+			);
+		}
+
+		// Android
+		const notifSettings = await notifee.getNotificationSettings();
+		const enabledInSystemSettings = notifSettings.authorizationStatus === NotifeeAuthorizationStatus.AUTHORIZED;
+
+		const androidApiLevel = typeof Platform.Version === 'string' ? parseInt(Platform.Version, 10) : Platform.Version;
+		if (androidApiLevel >= 33) {
+			const permission = PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS;
+			let granted = await PermissionsAndroid.check(permission);
+			if (ensureRequest && !granted) {
+				const res = await PermissionsAndroid.request(permission);
+				granted = res === PermissionsAndroid.RESULTS.GRANTED;
+			}
+			return granted && enabledInSystemSettings;
+		}
+
+		// Android < 13: no runtime permission; rely on system app notification toggle
+		return enabledInSystemSettings;
+	} catch (error) {
+		console.error('getNotificationPermission error:', error);
+		return false;
+	}
+};
+
+
 
 const requestNotificationPermission = async () => {
 	try {
