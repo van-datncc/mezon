@@ -462,8 +462,8 @@ export const ContainerMessageActionModal = React.memo((props: IReplyBottomSheet)
 			console.error('Error copying image:', error);
 			Toast.show({
 				type: 'error',
-				text1: t('toast.copyImageFailed', { error }),
-			})
+				text1: t('toast.copyImageFailed', { error })
+			});
 		} finally {
 			dispatch(appActions.setLoadingMainMobile(false));
 			onClose();
