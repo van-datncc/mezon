@@ -97,19 +97,19 @@ export function MemberProfile({
 							<Text style={{ color: colorUserName }}>
 								{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
 							</Text>
-							{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) && (isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
-								<MezonIconCDN icon={IconCDN.ownerIcon} color={themeValue.borderWarning} width={16} height={16} />
-							)}
+							{![ChannelType.CHANNEL_TYPE_DM].includes(currentChannel?.type) &&
+								(isDMThread ? creatorDMId : creatorClanId) === userInfo?.id && (
+									<MezonIconCDN icon={IconCDN.ownerIcon} color={themeValue.borderWarning} width={16} height={16} />
+								)}
 						</View>
 						{!!userVoiceStatus && (
 							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
 								<MezonIconCDN icon={IconCDN.channelVoice} color={baseColor.green} width={12} height={12} />
-								<Text style={{ color: themeValue.text, fontSize: 12, fontWeight: '500' }}>In voice</Text>
+								<Text style={{ color: themeValue.textNormal, fontSize: 12, fontWeight: '500' }}>In voice</Text>
 							</View>
 						)}
 					</View>
 				)}
-
 			</View>
 			{isDMThread && currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP && <AddedByUser groupId={currentChannel?.id} userId={user?.id} />}
 		</View>

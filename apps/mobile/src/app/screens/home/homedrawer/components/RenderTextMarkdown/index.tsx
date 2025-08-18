@@ -586,7 +586,7 @@ export const RenderTextMarkdownContent = ({
 								const { text, link } = parseMarkdownLink(mention);
 
 								const urlFormat = link.replace(/##voice|#thread|#stream|#app|#%22|%22|"|#/g, '');
-								const dataChannel = urlFormat.split('_');
+								const dataChannel = urlFormat.split('***');
 								const payloadChannel = {
 									type: Number(dataChannel?.[0] || 1),
 									id: dataChannel?.[1],
