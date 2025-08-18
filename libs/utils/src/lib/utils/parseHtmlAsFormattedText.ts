@@ -104,10 +104,6 @@ export function parseHtmlAsFormattedText(html: string): ApiFormattedText {
 			textIndex = index;
 			entities.push(entity);
 		} else if (node.textContent) {
-			// Skip newlines on the beginning
-			if (index === 0 && node.textContent.trim() === '') {
-				return;
-			}
 			textIndex += node.textContent.length;
 		}
 
@@ -160,7 +156,8 @@ function parseMarkdown(html: string) {
 
 	// Pre
 	parsedHtml = parsedHtml.replace(/`{3}([\s\S]*?)`{3}/g, function (match, p1) {
-		return '<pre>' + p1.replace(/\n/g, '___#new_line___') + '</pre>';
+		const trimmedContent = p1.replace(/^\n+|\n+$/g, '');
+		return '<pre>' + trimmedContent.replace(/\n/g, '___#new_line___') + '</pre>';
 	});
 
 	// parsedHtml = parsedHtml.replace(/^`{3}[\n\r]?(.*?)[\n\r]?`{3}/gms, '<pre>$1</pre>');
