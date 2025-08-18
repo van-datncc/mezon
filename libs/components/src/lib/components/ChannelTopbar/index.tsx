@@ -7,6 +7,7 @@ import {
 	audioCallActions,
 	canvasAPIActions,
 	channelsActions,
+	directActions,
 	getStore,
 	getStoreAsync,
 	groupCallActions,
@@ -40,6 +41,7 @@ import {
 	useAppSelector,
 	voiceActions
 } from '@mezon/store';
+import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, ValidateSpecialCharacters, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
@@ -47,6 +49,7 @@ import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
+import ModalEditGroup from '../ModalEditGroup';
 import { NotificationTooltip } from '../NotificationList';
 import SearchMessageChannel from '../SearchMessageChannel';
 import CanvasModal from './TopBarComponents/Canvas/CanvasModal';
@@ -102,6 +105,7 @@ const TopBarChannelText = memo(() => {
 	}, [setStatusMenu]);
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
+	const { sessionRef, clientRef } = useMezon();
 	const handleNavigateToParent = () => {
 		if (!channelParent?.id || !channelParent?.clan_id) {
 			return;
@@ -117,68 +121,107 @@ const TopBarChannelText = memo(() => {
 		return currentDmGroup?.channel_label;
 	}, [currentDmGroup?.channel_label, currentDmGroup?.type, currentDmGroup?.usernames]);
 
-	const [isEditing, setIsEditing] = useState(false);
-	const [editError, setEditError] = useState<string | null>(null);
-	const [editValue, setEditValue] = useState(channelDmGroupLabel || '');
+	// Modal Edit Group State
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [modalGroupName, setModalGroupName] = useState(channelDmGroupLabel || '');
+	const [modalImagePreview, setModalImagePreview] = useState('');
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+
+
+	// 🆕 Load DM data từ database khi component mount
 	useEffect(() => {
-		if (isEditing) setEditValue(channelDmGroupLabel || '');
-	}, [isEditing, channelDmGroupLabel]);
-
-	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const value = e.target.value;
-		setEditValue(value);
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value)) {
-			setEditError(null);
-		} else {
-			setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
+		if (currentDmGroup?.channel_id) {
+			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		}
-	};
+	}, [currentDmGroup?.channel_id, dispatch]);
 
-	const handleChangeGroupName = useCallback(
-		async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				const value = editValue.trim();
-				const regex = ValidateSpecialCharacters();
-				if (!regex.test(value)) {
-					setEditError('Please enter a valid channel name (max 64 characters, only words, numbers, _ or -).');
+	const handleOpenEditModal = useCallback(() => {
+		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
+			setModalGroupName(channelDmGroupLabel || '');
+			setModalImagePreview(currentDmGroup?.topic || ''); // Hiển thị avatar hiện tại
+			setSelectedFile(null);
+			setIsEditModalOpen(true);
+		}
+	}, [currentDmGroup?.type, channelDmGroupLabel, currentDmGroup?.topic]);
+
+	const handleCloseEditModal = useCallback(() => {
+		setIsEditModalOpen(false);
+	}, []);
+
+	const handleSaveModal = useCallback(async () => {
+		const value = modalGroupName.trim();
+		const regex = ValidateSpecialCharacters();
+
+		if (!regex.test(value)) {
+			console.error('Invalid channel name');
+			return;
+		}
+
+		const hasNameChanged = value !== channelDmGroupLabel;
+		const hasImageChanged = selectedFile !== null;
+
+		if ((hasNameChanged || hasImageChanged) && currentDmGroup?.channel_id) {
+			let avatarUrl = currentDmGroup?.topic; // Giữ avatar cũ nếu không thay đổi
+
+			// Nếu có file mới, upload lên server trước
+			if (selectedFile) {
+				try {
+					const client = clientRef.current;
+					const session = sessionRef.current;
+
+					if (!client || !session) {
+						console.error('Client/session not ready');
+						return;
+					}
+
+
+					const ext = selectedFile.name.split('.').pop() || 'jpg';
+					const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+					const path = `dm-group-avatar/${currentDmGroup?.channel_id || 'temp'}/${unique}.${ext}`;
+
+					// Upload file và nhận URL
+					const attachment = await handleUploadEmoticon(client, session, path, selectedFile);
+
+					if (attachment && attachment.url) {
+						avatarUrl = attachment.url;
+						console.log('✅ ChannelTopbar - Avatar uploaded successfully:', attachment.url);
+					} else {
+						console.error('❌ ChannelTopbar - Failed to upload avatar');
+						return;
+					}
+				} catch (error) {
+					console.error('❌ ChannelTopbar - Error uploading avatar:', error);
 					return;
 				}
-				setEditError(null);
-				dispatch(
-					channelsActions.updateChannel({
-						channel_id: currentDmGroup.channel_id as string,
-						category_id: '',
-						app_id: '',
-						channel_label: (e.target as HTMLTextAreaElement).value
-					})
-				);
-				setIsEditing(false);
 			}
-			if (e.key === 'Escape') {
-				setIsEditing(false);
-				setEditError(null);
-			}
-		},
-		[currentDmGroup, dispatch, editValue]
-	);
 
-	const handleRestoreName = useCallback(
-		(e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
-			setEditValue(channelDmGroupLabel as string);
-			setIsEditing(false);
-			setEditError(null);
-		},
-		[channelDmGroupLabel]
-	);
 
-	const handleStartEditing = useCallback(() => {
-		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
-			setIsEditing(true);
+			const payload: { channel_id: string; channel_label?: string; topic?: string } = { channel_id: currentDmGroup.channel_id as string };
+			if (hasNameChanged) payload.channel_label = value;
+			if (hasImageChanged) payload.topic = avatarUrl;
+			dispatch(directActions.updateDmGroup(payload));
 		}
-	}, [currentDmGroup?.type]);
+
+		setIsEditModalOpen(false);
+	}, [modalGroupName, selectedFile, channelDmGroupLabel, currentDmGroup, dispatch]);
+
+	const handleImageUpload = useCallback((file: File) => {
+		// 🎯 Reset preview cũ và tạo preview mới cho file được chọn
+		setModalImagePreview(''); // Reset trước
+
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const result = e.target?.result as string;
+			if (result) {
+				setModalImagePreview(result);
+			}
+		};
+		reader.readAsDataURL(file);
+
+		// Lưu file để upload sau khi bấm Save
+		setSelectedFile(file);
+	}, []);
 
 	const handleCloseCanvas = () => {
 		dispatch(appActions.setIsShowCanvas(false));
@@ -187,7 +230,6 @@ const TopBarChannelText = memo(() => {
 	return (
 		<>
 			<div className="flex relative flex-1 min-w-0 items-center gap-2  text-theme-primary">
-				{editError && <span className="absolute  text-xs top-[52px] text-colorDanger mb-1 break-words w-full">{editError}</span>}
 				<div className="flex sbm:hidden pl-3 px-2 text-theme-primary" onClick={openMenu} role="button">
 					<Icons.OpenMenu />
 				</div>
@@ -218,34 +260,21 @@ const TopBarChannelText = memo(() => {
 					<div className="flex items-center gap-3 flex-1 overflow-hidden">
 						<DmTopbarAvatar
 							isGroup={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP}
-							avatar={currentDmGroup?.channel_avatar?.[0]}
+								avatar={currentDmGroup?.topic} // 🎯 Dùng topic field để hiển thị avatar
 							avatarName={currentDmGroup?.channel_label?.at(0)}
 						/>
 
-						{isEditing ? (
-							<div className=" relative flex flex-col flex-1 min-w-0">
-								<textarea
-									key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}`}
-									rows={1}
-									className={`none-draggable-area cursor-text font-medium bg-transparent flex-1 outline-none resize-none w-full leading-10 truncate one-line text-theme-primary `}
-									value={editValue}
-									onChange={handleInputChange}
-									onKeyDown={handleChangeGroupName}
-									onBlur={handleRestoreName}
-									maxLength={64}
-									style={{ minHeight: 40, maxWidth: 250, minWidth: 0, overflow: 'hidden' }}
-								></textarea>
-							</div>
-						) : (
 							<div
 								key={`${channelDmGroupLabel}_${currentDmGroup?.channel_id as string}_display`}
-								className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'cursor-text' : 'pointer-events-none cursor-default'} font-medium bg-transparent outline-none leading-10 text-theme-primary max-w-[250px] min-w-0`}
-								onClick={handleStartEditing}
-								title={channelDmGroupLabel}
+								className={`overflow-hidden whitespace-nowrap text-ellipsis none-draggable-area ${currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP
+									? 'cursor-pointer hover:text-theme-primary-active transition-colors'
+									: 'pointer-events-none cursor-default'
+									} font-medium bg-transparent outline-none leading-10 text-theme-primary max-w-[250px] min-w-0`}
+								onClick={handleOpenEditModal}
+								title={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? 'Click to edit group' : channelDmGroupLabel}
 							>
 								{channelDmGroupLabel}
 							</div>
-						)}
 					</div>
 				)}
 			</div>
@@ -263,6 +292,19 @@ const TopBarChannelText = memo(() => {
 				)}
 				{!isMemberPath && <SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />}
 			</div>
+
+			{isEditModalOpen && (
+				<ModalEditGroup
+					isOpen={isEditModalOpen}
+					onClose={handleCloseEditModal}
+					onSave={handleSaveModal}
+					onImageUpload={handleImageUpload}
+					groupName={modalGroupName}
+					onGroupNameChange={setModalGroupName}
+					imagePreview={modalImagePreview}
+					className="z-[200]"
+				/>
+			)}
 		</>
 	);
 });
@@ -405,6 +447,13 @@ const ChannelTopbarTools = memo(
 
 const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; avatar?: string; avatarName?: string }) => {
 	if (isGroup) {
+		if (avatar) {
+			return (
+				<div className="flex items-center justify-center">
+					<img className="w-8 h-8 rounded-full object-cover" src={avatar} alt="" />
+				</div>
+			);
+		}
 		return (
 			<div className="flex items-center justify-center">
 				<img className="w-8 h-8 rounded-full object-cover" src="assets/images/avatar-group.png" alt="" />
@@ -416,7 +465,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 			{avatar ? (
 				<img className="w-8 h-8 rounded-full object-cover " src={createImgproxyUrl(avatar)} alt="" />
 			) : (
-				<div className="w-8 h-8 rounded-full uppercase flex items-center justify-center font-semibold dark:bg-bgAvatarDark bg-bgAvatarLight dark:text-bgAvatarLight text-bgAvatarDark">
+					<div className="w-8 h-8 rounded-full uppercase flex items-center justify-center font-semibold dark:bg-bgAvatarLight dark:text-bgAvatarDark text-bgAvatarLight">
 					{avatarName}
 				</div>
 			)}

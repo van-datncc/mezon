@@ -196,6 +196,46 @@ export const getDmEntityByChannelId = createAsyncThunk('channels/getChannelEntit
 	}
 });
 
+export const updateDmGroup = createAsyncThunk('direct/updateDmGroup', async (body: { channel_id: string; channel_label?: string; topic?: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+
+		const state = thunkAPI.getState() as RootState;
+		const current = state?.direct?.entities?.[body.channel_id];
+		const updatePayload: any = {};
+		if (typeof body.channel_label !== 'undefined') {
+			updatePayload.channel_label = body.channel_label;
+		} else if (typeof current?.channel_label !== 'undefined') {
+			updatePayload.channel_label = current.channel_label;
+		}
+		if (typeof body.topic !== 'undefined') {
+			updatePayload.topic = body.topic;
+		} else if (typeof current?.topic !== 'undefined') {
+			updatePayload.topic = current.topic;
+		}
+
+		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, updatePayload);
+
+		if (response) {
+			thunkAPI.dispatch(
+				directActions.updateOne({
+					channel_id: body.channel_id,
+					...(typeof body.channel_label !== 'undefined' ? { channel_label: body.channel_label } : {}),
+					...(typeof body.topic !== 'undefined' ? { topic: body.topic } : {})
+				})
+			);
+
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+		}
+
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'direct/updateDmGroup');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 	return channels.reduce<IUserItemActivity[]>((acc, dm) => {
 		if (dm?.active === 1) {
@@ -682,7 +722,10 @@ export const directSlice = createSlice({
 			.addCase(fetchDirectMessage.rejected, (state: DirectState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
-			});
+			})
+			.addCase(updateDmGroup.pending, (state: DirectState) => { })
+			.addCase(updateDmGroup.fulfilled, (state: DirectState, action) => { })
+			.addCase(updateDmGroup.rejected, (state: DirectState, action) => { });
 	}
 });
 
@@ -691,6 +734,7 @@ export const directReducer = directSlice.reducer;
 export const directActions = {
 	...directSlice.actions,
 	fetchDirectMessage,
+	updateDmGroup,
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
