@@ -47,7 +47,6 @@ import { resetCachedChatbox, resetCachedMessageActionNeedToResolve } from '../..
 import { EMessageActionType } from '../../../enums';
 import { IMessageActionNeedToResolve } from '../../../types';
 import AttachmentPreview from '../../AttachmentPreview';
-import { IModeKeyboardPicker } from '../../BottomKeyboardPicker';
 import EmojiSwitcher from '../../EmojiPicker/EmojiSwitcher';
 import { RenderTextContent } from '../../RenderTextContent';
 import { ChatBoxListener } from '../ChatBoxListener';
@@ -123,7 +122,7 @@ export const ChatBoxBottomBar = memo(
 		const [mentionTextValue, setMentionTextValue] = useState('');
 		const [listMentions, setListMentions] = useState<MentionDataProps[]>([]);
 		const [isFocus, setIsFocus] = useState<boolean>(false);
-		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<IModeKeyboardPicker>('text');
+		const [modeKeyBoardBottomSheet, setModeKeyBoardBottomSheet] = useState<string>('text');
 		const [textChange, setTextChange] = useState<string>('');
 		const [isEphemeralMode, setIsEphemeralMode] = useState<boolean>(false);
 		const [ephemeralTargetUserInfo, setEphemeralTargetUserInfo] = useState<IEphemeralTargetUserInfo>({
@@ -275,7 +274,7 @@ export const ChatBoxBottomBar = memo(
 			DeviceEventEmitter.emit(ActionEmitEvent.SHOW_KEYBOARD, null);
 		}, [dispatch, onDeleteMessageActionNeedToResolve, channelId]);
 
-		const handleKeyboardBottomSheetMode = useCallback((mode: IModeKeyboardPicker) => {
+		const handleKeyboardBottomSheetMode = useCallback((mode: string) => {
 			setModeKeyBoardBottomSheet(mode);
 			if (mode === 'emoji' || mode === 'attachment') {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
