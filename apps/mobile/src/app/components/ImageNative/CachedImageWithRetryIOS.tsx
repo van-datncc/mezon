@@ -1,5 +1,4 @@
-import * as Sentry from '@sentry/react-native';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
@@ -22,29 +21,11 @@ const extractOriginalUrl = (url: string): string | null => {
 };
 
 const CachedImageWithRetryIOS = memo(
-	({ source, urlOriginal, retryCount = 2, style, ...props }: ICachedImageWithRetryIOSProps) => {
-		const [retriesLeft, setRetriesLeft] = useState(retryCount);
+	({ source, urlOriginal, retryCount = 1, style, ...props }: ICachedImageWithRetryIOSProps) => {
 		const [key, setKey] = useState(Date.now());
 		const [loading, setLoading] = useState<boolean>(false);
 		const [isError, setIsError] = useState<boolean>(false);
 		const [fallbackUrl, setFallbackUrl] = useState<string>(urlOriginal);
-		const timeoutRef = useRef(null);
-
-		const handleError = (err) => {
-			if (retriesLeft > 0) {
-				retryLoadingImage();
-			} else {
-				handleExhaustedRetries();
-			}
-			Sentry.captureException(err);
-		};
-
-		const retryLoadingImage = () => {
-			timeoutRef.current = setTimeout(() => {
-				setRetriesLeft((prevRetries) => prevRetries - 1);
-				setKey(Date.now());
-			}, 500);
-		};
 
 		const handleExhaustedRetries = () => {
 			if (urlOriginal) {
@@ -71,16 +52,14 @@ const CachedImageWithRetryIOS = memo(
 			<View style={[styles.container, style]}>
 				{loading && <ActivityIndicator style={styles.loader} size="small" color="#333333" />}
 				<FastImage
-					key={`${key}_${retriesLeft}_${source?.uri}`}
+					key={`${key}_${source?.uri}`}
 					source={{
 						uri: isError && fallbackUrl ? fallbackUrl : source?.uri,
 						priority: FastImage.priority.high,
 						cache: FastImage.cacheControl.immutable
 					}}
 					onLoadStart={handleLoadStart}
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-expect-error
-					onError={handleError}
+					onError={handleExhaustedRetries}
 					onLoadEnd={handleLoadEnd}
 					style={StyleSheet.absoluteFill}
 					{...props}

@@ -524,7 +524,7 @@ export const ChatBoxBottomBar = memo(
 
 				if (imageUri?.startsWith('data:image/')) {
 					const base64Data = imageUri.split(',')?.[1];
-					if (base64Data?.length > 0) {
+					if (base64Data?.length > 10) {
 						setImageBase64(imageUri);
 					}
 				}
