@@ -187,7 +187,7 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 							<WelComeDm
 								name={isDmGroup ? name || `${selectedChannel?.creator_name}'s Groups` : name || username}
 								username={username}
-								avatar={isDmGroup ? directChannel?.topic : avatarDM} // 🎯 Dùng topic field cho DM group
+								avatar={isDmGroup ? directChannel?.topic : avatarDM}
 								classNameSubtext={classNameSubtext}
 								showName={showName}
 								isDmGroup={isDmGroup}

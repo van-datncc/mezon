@@ -121,7 +121,6 @@ const TopBarChannelText = memo(() => {
 		return currentDmGroup?.channel_label;
 	}, [currentDmGroup?.channel_label, currentDmGroup?.type, currentDmGroup?.usernames]);
 
-	// Modal Edit Group State
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [modalGroupName, setModalGroupName] = useState(channelDmGroupLabel || '');
 	const [modalImagePreview, setModalImagePreview] = useState('');
@@ -129,7 +128,6 @@ const TopBarChannelText = memo(() => {
 
 
 
-	// 🆕 Load DM data từ database khi component mount
 	useEffect(() => {
 		if (currentDmGroup?.channel_id) {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
@@ -139,7 +137,7 @@ const TopBarChannelText = memo(() => {
 	const handleOpenEditModal = useCallback(() => {
 		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
 			setModalGroupName(channelDmGroupLabel || '');
-			setModalImagePreview(currentDmGroup?.topic || ''); // Hiển thị avatar hiện tại
+			setModalImagePreview(currentDmGroup?.topic || ''); 
 			setSelectedFile(null);
 			setIsEditModalOpen(true);
 		}
@@ -162,9 +160,8 @@ const TopBarChannelText = memo(() => {
 		const hasImageChanged = selectedFile !== null;
 
 		if ((hasNameChanged || hasImageChanged) && currentDmGroup?.channel_id) {
-			let avatarUrl = currentDmGroup?.topic; // Giữ avatar cũ nếu không thay đổi
+			let avatarUrl = currentDmGroup?.topic; 
 
-			// Nếu có file mới, upload lên server trước
 			if (selectedFile) {
 				try {
 					const client = clientRef.current;
@@ -180,18 +177,14 @@ const TopBarChannelText = memo(() => {
 					const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 					const path = `dm-group-avatar/${currentDmGroup?.channel_id || 'temp'}/${unique}.${ext}`;
 
-					// Upload file và nhận URL
 					const attachment = await handleUploadEmoticon(client, session, path, selectedFile);
 
 					if (attachment && attachment.url) {
 						avatarUrl = attachment.url;
-						console.log('✅ ChannelTopbar - Avatar uploaded successfully:', attachment.url);
 					} else {
-						console.error('❌ ChannelTopbar - Failed to upload avatar');
 						return;
 					}
 				} catch (error) {
-					console.error('❌ ChannelTopbar - Error uploading avatar:', error);
 					return;
 				}
 			}
@@ -207,8 +200,7 @@ const TopBarChannelText = memo(() => {
 	}, [modalGroupName, selectedFile, channelDmGroupLabel, currentDmGroup, dispatch]);
 
 	const handleImageUpload = useCallback((file: File) => {
-		// 🎯 Reset preview cũ và tạo preview mới cho file được chọn
-		setModalImagePreview(''); // Reset trước
+		setModalImagePreview(''); 
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
@@ -219,7 +211,6 @@ const TopBarChannelText = memo(() => {
 		};
 		reader.readAsDataURL(file);
 
-		// Lưu file để upload sau khi bấm Save
 		setSelectedFile(file);
 	}, []);
 
@@ -260,7 +251,7 @@ const TopBarChannelText = memo(() => {
 					<div className="flex items-center gap-3 flex-1 overflow-hidden">
 						<DmTopbarAvatar
 							isGroup={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP}
-								avatar={currentDmGroup?.topic} // 🎯 Dùng topic field để hiển thị avatar
+								avatar={currentDmGroup?.topic} 
 							avatarName={currentDmGroup?.channel_label?.at(0)}
 						/>
 
