@@ -76,7 +76,6 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 		const regex = ValidateSpecialCharacters();
 
 		if (!regex.test(value)) {
-			console.error('Invalid group name');
 			return;
 		}
 
@@ -94,7 +93,6 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 					const session = sessionRef.current;
 
 					if (!client || !session) {
-						console.error('Client/session not ready');
 						return;
 					}
 
@@ -108,13 +106,10 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 
 					if (attachment && attachment.url) {
 						avatarUrl = attachment.url;
-						console.log('✅ ChatWelcome - Avatar uploaded successfully:', attachment.url);
 					} else {
-						console.error('❌ ChatWelcome - Failed to upload avatar');
 						return;
 					}
 				} catch (error) {
-					console.error('❌ ChatWelcome - Error uploading avatar:', error);
 					return;
 				}
 			}
