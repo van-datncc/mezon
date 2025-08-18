@@ -30,7 +30,6 @@ import { IMessageTypeCallLog, createImgproxyUrl, sleep } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -182,23 +181,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
-	const menuDevice = useMemo(() => {
-		return [
-			<DeviceSelector
-				deviceList={audioOutputDevicesList}
-				currentDevice={currentOutputDevice}
-				icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
-				onSelectDevice={changeAudioOutputDevice}
-			/>,
 
-			<DeviceSelector
-				deviceList={audioInputDevicesList}
-				currentDevice={currentInputDevice}
-				icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
-				onSelectDevice={changeAudioInputDevice}
-			/>
-		];
-	}, []);
 	return (
 		<div
 			className={`${
