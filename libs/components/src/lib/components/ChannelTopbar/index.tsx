@@ -7,7 +7,6 @@ import {
 	audioCallActions,
 	canvasAPIActions,
 	channelsActions,
-	directActions,
 	getStore,
 	getStoreAsync,
 	groupCallActions,
@@ -34,6 +33,8 @@ import {
 	selectNotifiSettingsEntitiesById,
 	selectSession,
 	selectStatusMenu,
+	selectUpdateDmGroupError,
+	selectUpdateDmGroupLoading,
 	threadsActions,
 	toastActions,
 	topicsActions,
@@ -41,13 +42,13 @@ import {
 	useAppSelector,
 	voiceActions
 } from '@mezon/store';
-import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, ValidateSpecialCharacters, createImgproxyUrl } from '@mezon/utils';
+import { IMessageSendPayload, IMessageTypeCallLog, SubPanelName, createImgproxyUrl } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType, NotificationType } from 'mezon-js';
 import { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useEditGroupModal } from '../../hooks/useEditGroupModal';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
 import ModalEditGroup from '../ModalEditGroup';
 import { NotificationTooltip } from '../NotificationList';
@@ -105,7 +106,7 @@ const TopBarChannelText = memo(() => {
 	}, [setStatusMenu]);
 	const navigate = useCustomNavigate();
 	const dispatch = useAppDispatch();
-	const { sessionRef, clientRef } = useMezon();
+
 	const handleNavigateToParent = () => {
 		if (!channelParent?.id || !channelParent?.clan_id) {
 			return;
@@ -121,98 +122,23 @@ const TopBarChannelText = memo(() => {
 		return currentDmGroup?.channel_label;
 	}, [currentDmGroup?.channel_label, currentDmGroup?.type, currentDmGroup?.usernames]);
 
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [modalGroupName, setModalGroupName] = useState(channelDmGroupLabel || '');
-	const [modalImagePreview, setModalImagePreview] = useState('');
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const updateDmGroupLoading = useAppSelector((state) => selectUpdateDmGroupLoading(currentDmGroup?.channel_id || '')(state));
+	const updateDmGroupError = useAppSelector((state) => selectUpdateDmGroupError(currentDmGroup?.channel_id || '')(state));
 
-
-
-	useEffect(() => {
-		if (currentDmGroup?.channel_id) {
-			dispatch(directActions.fetchDirectMessage({ noCache: true }));
-		}
-	}, [currentDmGroup?.channel_id, dispatch]);
+	// Use custom hook for edit group modal
+	const editGroupModal = useEditGroupModal({
+		channelId: currentDmGroup?.channel_id,
+		currentGroupName: channelDmGroupLabel || '',
+		currentAvatar: currentDmGroup?.topic || ''
+	});
 
 	const handleOpenEditModal = useCallback(() => {
 		if (currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP) {
-			setModalGroupName(channelDmGroupLabel || '');
-			setModalImagePreview(currentDmGroup?.topic || ''); 
-			setSelectedFile(null);
-			setIsEditModalOpen(true);
+			editGroupModal.openEditModal();
 		}
-	}, [currentDmGroup?.type, channelDmGroupLabel, currentDmGroup?.topic]);
-
-	const handleCloseEditModal = useCallback(() => {
-		setIsEditModalOpen(false);
-	}, []);
-
-	const handleSaveModal = useCallback(async () => {
-		const value = modalGroupName.trim();
-		const regex = ValidateSpecialCharacters();
-
-		if (!regex.test(value)) {
-			console.error('Invalid channel name');
-			return;
-		}
-
-		const hasNameChanged = value !== channelDmGroupLabel;
-		const hasImageChanged = selectedFile !== null;
-
-		if ((hasNameChanged || hasImageChanged) && currentDmGroup?.channel_id) {
-			let avatarUrl = currentDmGroup?.topic; 
-
-			if (selectedFile) {
-				try {
-					const client = clientRef.current;
-					const session = sessionRef.current;
-
-					if (!client || !session) {
-						console.error('Client/session not ready');
-						return;
-					}
+	}, [currentDmGroup?.type, editGroupModal]);
 
 
-					const ext = selectedFile.name.split('.').pop() || 'jpg';
-					const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
-					const path = `dm-group-avatar/${currentDmGroup?.channel_id || 'temp'}/${unique}.${ext}`;
-
-					const attachment = await handleUploadEmoticon(client, session, path, selectedFile);
-
-					if (attachment && attachment.url) {
-						avatarUrl = attachment.url;
-					} else {
-						return;
-					}
-				} catch (error) {
-					return;
-				}
-			}
-
-
-			const payload: { channel_id: string; channel_label?: string; topic?: string } = { channel_id: currentDmGroup.channel_id as string };
-			if (hasNameChanged) payload.channel_label = value;
-			if (hasImageChanged) payload.topic = avatarUrl;
-			dispatch(directActions.updateDmGroup(payload));
-		}
-
-		setIsEditModalOpen(false);
-	}, [modalGroupName, selectedFile, channelDmGroupLabel, currentDmGroup, dispatch]);
-
-	const handleImageUpload = useCallback((file: File) => {
-		setModalImagePreview(''); 
-
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const result = e.target?.result as string;
-			if (result) {
-				setModalImagePreview(result);
-			}
-		};
-		reader.readAsDataURL(file);
-
-		setSelectedFile(file);
-	}, []);
 
 	const handleCloseCanvas = () => {
 		dispatch(appActions.setIsShowCanvas(false));
@@ -284,16 +210,18 @@ const TopBarChannelText = memo(() => {
 				{!isMemberPath && <SearchMessageChannel mode={channel ? ChannelStreamMode.STREAM_MODE_CHANNEL : ChannelStreamMode.STREAM_MODE_DM} />}
 			</div>
 
-			{isEditModalOpen && (
+			{editGroupModal.isEditModalOpen && (
 				<ModalEditGroup
-					isOpen={isEditModalOpen}
-					onClose={handleCloseEditModal}
-					onSave={handleSaveModal}
-					onImageUpload={handleImageUpload}
-					groupName={modalGroupName}
-					onGroupNameChange={setModalGroupName}
-					imagePreview={modalImagePreview}
+					isOpen={editGroupModal.isEditModalOpen}
+					onClose={editGroupModal.closeEditModal}
+					onSave={editGroupModal.handleSave}
+					onImageUpload={editGroupModal.handleImageUpload}
+					groupName={editGroupModal.groupName}
+					onGroupNameChange={editGroupModal.setGroupName}
+					imagePreview={editGroupModal.imagePreview}
 					className="z-[200]"
+					isLoading={updateDmGroupLoading}
+					error={updateDmGroupError}
 				/>
 			)}
 		</>

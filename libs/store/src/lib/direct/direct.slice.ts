@@ -28,6 +28,8 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	currentDirectMessageType?: number;
 	statusDMChannelUnread: Record<string, boolean>;
 	buzzStateDirect: Record<string, BuzzArgs | null>;
+	updateDmGroupLoading: Record<string, boolean>;
+	updateDmGroupError: Record<string, string | null>;
 }
 
 export interface DirectRootState {
@@ -480,7 +482,9 @@ export const initialDirectState: DirectState = directAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	statusDMChannelUnread: {},
-	buzzStateDirect: {}
+	buzzStateDirect: {},
+	updateDmGroupLoading: {},
+	updateDmGroupError: {}
 });
 
 export const directSlice = createSlice({
@@ -723,9 +727,23 @@ export const directSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			})
-			.addCase(updateDmGroup.pending, (state: DirectState) => { })
-			.addCase(updateDmGroup.fulfilled, (state: DirectState, action) => { })
-			.addCase(updateDmGroup.rejected, (state: DirectState, action) => { });
+			.addCase(updateDmGroup.pending, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = true;
+				state.updateDmGroupError[channelId] = null;
+			})
+			.addCase(updateDmGroup.fulfilled, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = false;
+				state.updateDmGroupError[channelId] = null;
+				toast.success('Group updated successfully!');
+			})
+			.addCase(updateDmGroup.rejected, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = false;
+				state.updateDmGroupError[channelId] = action.error.message || 'Failed to update group';
+				toast.error(action.error.message || 'Failed to update group');
+			});
 	}
 });
 
@@ -771,6 +789,10 @@ export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, sel
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 
 export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);
+
+export const selectUpdateDmGroupLoading = (channelId: string) => createSelector(getDirectState, (state) => state.updateDmGroupLoading[channelId] || false);
+
+export const selectUpdateDmGroupError = (channelId: string) => createSelector(getDirectState, (state) => state.updateDmGroupError[channelId] || null);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {
 	return directMessages

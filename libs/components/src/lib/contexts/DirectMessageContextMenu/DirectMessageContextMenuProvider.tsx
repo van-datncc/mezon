@@ -9,10 +9,11 @@ import {
 	selectFriendById,
 	selectHasKeyE2ee,
 	selectNotifiSettingsEntitiesById,
+	selectUpdateDmGroupError,
+	selectUpdateDmGroupLoading,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { EMuteState, FOR_15_MINUTES, FOR_1_HOUR, FOR_24_HOURS, FOR_3_HOURS, FOR_8_HOURS } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { FC, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -20,6 +21,7 @@ import { Menu, Submenu, useContextMenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import ModalEditGroup from '../../components/ModalEditGroup';
 import ItemPanelMember from '../../components/PanelMember/ItemPanelMember';
+import { useEditGroupModal } from '../../hooks/useEditGroupModal';
 import { MemberMenuItem } from '../MemberContextMenu';
 import { useModals } from '../MemberContextMenu/useModals';
 import {
@@ -67,96 +69,20 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 	const { openProfileItem } = useModals({
 		currentUser
 	});
-	const { sessionRef, clientRef } = useMezon();
+	const updateDmGroupLoading = useAppSelector((state) => selectUpdateDmGroupLoading(currentUser?.channel_id || '')(state));
+	const updateDmGroupError = useAppSelector((state) => selectUpdateDmGroupError(currentUser?.channel_id || '')(state));
 
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [groupName, setGroupName] = useState('');
-	const [imagePreview, setImagePreview] = useState('');
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const editGroupModal = useEditGroupModal({
+		channelId: currentUser?.channelId || currentUser?.channel_id,
+		currentGroupName: currentUser?.channel_label || 'Group',
+		currentAvatar: currentUser?.topic || ''
+	});
 
 	useEffect(() => {
 		if (currentUser?.channel_id) {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
 		}
 	}, [currentUser?.channel_id, dispatch]);
-
-
-
-	const openEditGroupModal = useCallback(() => {
-		const channelId = currentUser?.channelId || currentUser?.channel_id;
-		const channelLabel = currentUser?.channel_label || 'Group';
-
-		setGroupName(channelLabel);
-		setImagePreview(currentUser?.topic || '');
-		setSelectedFile(null);
-		setIsEditModalOpen(true);
-	}, [currentUser]);
-
-	const closeEditGroupModal = useCallback(() => {
-		setIsEditModalOpen(false);
-	}, []);
-
-	const handleSave = useCallback(async () => {
-		const value = groupName.trim();
-		const channelId = currentUser?.channelId || currentUser?.channel_id;
-		const currentGroupName = currentUser?.channel_label;
-
-		const hasNameChanged = value !== currentGroupName;
-		const hasImageChanged = selectedFile !== null;
-
-		if ((hasNameChanged || hasImageChanged) && channelId) {
-			let avatarUrl = currentUser?.topic;
-
-			if (selectedFile) {
-				try {
-					const client = clientRef.current;
-					const session = sessionRef.current;
-
-					if (!client || !session) {
-						return;
-					}
-
-
-					const ext = selectedFile.name.split('.').pop() || 'jpg';
-					const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
-					const path = `dm-group-avatar/${channelId || 'temp'}/${unique}.${ext}`;
-
-					const attachment = await handleUploadEmoticon(client, session, path, selectedFile);
-
-					if (attachment && attachment.url) {
-						avatarUrl = attachment.url;
-					} else {
-						return;
-					}
-				} catch (error) {
-					return;
-				}
-			}
-
-
-			const payload: { channel_id: string; channel_label?: string; topic?: string } = { channel_id: channelId };
-			if (hasNameChanged) payload.channel_label = value;
-			if (hasImageChanged) payload.topic = avatarUrl;
-			dispatch(directActions.updateDmGroup(payload));
-		}
-
-		closeEditGroupModal();
-	}, [groupName, selectedFile, currentUser, closeEditGroupModal]);
-
-	const handleImageUpload = useCallback((file: File) => {
-		setImagePreview('');
-
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const result = e.target?.result as string;
-			if (result) {
-				setImagePreview(result);
-			}
-		};
-		reader.readAsDataURL(file);
-
-		setSelectedFile(file);
-	}, []);
 	const showMenu = useCallback(
 		(event: React.MouseEvent) => {
 			show({ event });
@@ -205,7 +131,7 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 		handleLeaveDmGroup,
 		blockFriend,
 		unBlockFriend,
-		openEditGroupModal
+		openEditGroupModal: editGroupModal.openEditModal
 	});
 
 	const { showContextMenu } = useContextMenuHandlers({
@@ -363,14 +289,16 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 			)}
 
 				<ModalEditGroup
-					isOpen={isEditModalOpen}
-					onClose={closeEditGroupModal}
-					onSave={handleSave}
-					onImageUpload={handleImageUpload}
-					groupName={groupName}
-					onGroupNameChange={setGroupName}
-					imagePreview={imagePreview}
+				isOpen={editGroupModal.isEditModalOpen}
+				onClose={editGroupModal.closeEditModal}
+				onSave={editGroupModal.handleSave}
+				onImageUpload={editGroupModal.handleImageUpload}
+				groupName={editGroupModal.groupName}
+				onGroupNameChange={editGroupModal.setGroupName}
+				imagePreview={editGroupModal.imagePreview}
 					className="z-[200]"
+				isLoading={updateDmGroupLoading}
+				error={updateDmGroupError}
 				/>
 		</DirectMessageContextMenuContext.Provider>
 	);

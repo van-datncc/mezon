@@ -12,17 +12,19 @@ import {
 	selectIsShowCreateThread,
 	selectMemberClanByUserId,
 	selectThreadCurrentChannel,
+	selectUpdateDmGroupError,
+	selectUpdateDmGroupLoading,
 	selectUserIdCurrentDm,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
-import { handleUploadEmoticon, useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
-import { ChannelStatusEnum, ValidateSpecialCharacters } from '@mezon/utils';
+import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useEditGroupModal } from '../../hooks/useEditGroupModal';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import ModalEditGroup from '../ModalEditGroup';
 
@@ -42,16 +44,13 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 	const directChannel = useAppSelector((state) => selectDirectById(state, directId));
 	const currentChannel = useSelector(selectCurrentChannel);
 	const threadCurrentChannel = useSelector(selectThreadCurrentChannel);
-	const { sessionRef, clientRef } = useMezon();
-
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [modalGroupName, setModalGroupName] = useState('');
-	const [modalImagePreview, setModalImagePreview] = useState('');
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-
-
-
+	const updateDmGroupLoading = useAppSelector((state) => selectUpdateDmGroupLoading(directChannel?.channel_id || '')(state));
+	const updateDmGroupError = useAppSelector((state) => selectUpdateDmGroupError(directChannel?.channel_id || '')(state));
+	const editGroupModal = useEditGroupModal({
+		channelId: directChannel?.channel_id,
+		currentGroupName: name || directChannel?.channel_label || 'Group',
+		currentAvatar: directChannel?.topic || ''
+	});
 	useEffect(() => {
 		if (directId) {
 			dispatch(directActions.fetchDirectMessage({ noCache: true }));
@@ -59,82 +58,8 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 	}, [directId, dispatch]);
 
 	const handleOpenEditModal = useCallback(() => {
-		const groupName = name || directChannel?.channel_label || 'Group';
-		setModalGroupName(groupName);
-		setModalImagePreview(directChannel?.topic || '');
-		setSelectedFile(null);
-		setIsEditModalOpen(true);
-	}, [name, directChannel?.channel_label, directChannel?.topic]);
-
-	const handleCloseEditModal = useCallback(() => {
-		setIsEditModalOpen(false);
-	}, []);
-
-	const handleSaveModal = useCallback(async () => {
-		const value = modalGroupName.trim();
-		const regex = ValidateSpecialCharacters();
-
-		if (!regex.test(value)) {
-			return;
-		}
-
-
-		const currentGroupName = name || directChannel?.channel_label;
-		const hasNameChanged = value !== currentGroupName;
-		const hasImageChanged = selectedFile !== null;
-
-		if ((hasNameChanged || hasImageChanged) && directChannel?.channel_id) {
-			let avatarUrl = directChannel?.topic;
-
-			if (selectedFile) {
-				try {
-					const client = clientRef.current;
-					const session = sessionRef.current;
-
-					if (!client || !session) {
-						return;
-					}
-
-
-					const ext = selectedFile.name.split('.').pop() || 'jpg';
-					const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
-					const path = `dm-group-avatar/${directChannel?.channel_id || 'temp'}/${unique}.${ext}`;
-
-
-					const attachment = await handleUploadEmoticon(client, session, path, selectedFile);
-
-					if (attachment && attachment.url) {
-						avatarUrl = attachment.url;
-					} else {
-						return;
-					}
-				} catch (error) {
-					return;
-				}
-			}
-
-
-			const payload: { channel_id: string; channel_label?: string; topic?: string } = { channel_id: directChannel.channel_id };
-			if (hasNameChanged) payload.channel_label = value;
-			if (hasImageChanged) payload.topic = avatarUrl;
-			dispatch(directActions.updateDmGroup(payload));
-		}
-
-		setIsEditModalOpen(false);
-	}, [modalGroupName, selectedFile, name, directChannel, dispatch]);
-
-	const handleImageUpload = useCallback((file: File) => {
-		setModalImagePreview('');
-
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const result = e.target?.result as string;
-			setModalImagePreview(result);
-		};
-		reader.readAsDataURL(file);
-
-		setSelectedFile(file);
-	}, []);
+		editGroupModal.openEditModal();
+	}, [editGroupModal]);
 
 	const selectedChannel =
 		mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP
@@ -194,14 +119,16 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 
 
 				<ModalEditGroup
-					isOpen={isEditModalOpen}
-					onClose={handleCloseEditModal}
-					onSave={handleSaveModal}
-					onImageUpload={handleImageUpload}
-					groupName={modalGroupName}
-					onGroupNameChange={setModalGroupName}
-					imagePreview={modalImagePreview}
+				isOpen={editGroupModal.isEditModalOpen}
+				onClose={editGroupModal.closeEditModal}
+				onSave={editGroupModal.handleSave}
+				onImageUpload={editGroupModal.handleImageUpload}
+				groupName={editGroupModal.groupName}
+				onGroupNameChange={editGroupModal.setGroupName}
+				imagePreview={editGroupModal.imagePreview}
 					className="z-[200]"
+				isLoading={updateDmGroupLoading}
+				error={updateDmGroupError}
 			/>
 		</div>
 	);
