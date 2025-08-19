@@ -1,31 +1,31 @@
 import { useChatReaction, useEmojiSuggestionContext, useEscapeKeyClose, useGifsStickersEmoji, usePermissionChecker } from '@mezon/core';
 import {
-	emojiRecentActions,
-	emojiSuggestionActions,
-	referencesActions,
-	selectAddEmojiState,
-	selectCurrentChannel,
-	selectMessageByMessageId,
-	selectModeResponsive,
-	selectThreadCurrentChannel,
-	useAppDispatch,
-	useAppSelector
+  emojiRecentActions,
+  emojiSuggestionActions,
+  referencesActions,
+  selectAddEmojiState,
+  selectCurrentChannel,
+  selectMessageByMessageId,
+  selectModeResponsive,
+  selectThreadCurrentChannel,
+  useAppDispatch,
+  useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import {
-	EEmojiCategory,
-	EPermission,
-	EmojiPlaces,
-	FOR_SALE_CATE,
-	IEmoji,
-	MAX_LENGTH_MESSAGE_BUZZ,
-	ModeResponsive,
-	RECENT_EMOJI_CATEGORY,
-	RequestInput,
-	SubPanelName,
-	getIdSaleItemFromSource,
-	getSrcEmoji,
-	isPublicChannel
+  EEmojiCategory,
+  EPermission,
+  EmojiPlaces,
+  FOR_SALE_CATE,
+  IEmoji,
+  MAX_LENGTH_MESSAGE_BUZZ,
+  ModeResponsive,
+  RECENT_EMOJI_CATEGORY,
+  RequestInput,
+  SubPanelName,
+  getIdSaleItemFromSource,
+  getSrcEmoji,
+  isPublicChannel
 } from '@mezon/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MentionItem } from 'react-mentions';
@@ -177,7 +177,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				}
 			}
 			if (props.onEmojiSelect) {
-				props.onEmojiSelect(emojiPicked, emojiId);
+				props.onEmojiSelect(emojiId, emojiPicked);
 			}
 		},
 		[
