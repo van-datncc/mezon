@@ -28,9 +28,7 @@ import {
 	hasPermission,
 	requestPermission
 } from '@react-native-firebase/messaging';
-import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, NativeModules, PermissionsAndroid, Platform } from 'react-native';
-import RNCallKeep from 'react-native-callkeep';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const messaging = getMessaging(getApp());
@@ -108,10 +106,7 @@ export const getNotificationPermission = async (ensureRequest = false): Promise<
 				status = req.authorizationStatus;
 			}
 
-			return (
-				status === NotifeeAuthorizationStatus.AUTHORIZED ||
-				status === NotifeeAuthorizationStatus.PROVISIONAL
-			);
+			return status === NotifeeAuthorizationStatus.AUTHORIZED || status === NotifeeAuthorizationStatus.PROVISIONAL;
 		}
 
 		// Android
@@ -136,8 +131,6 @@ export const getNotificationPermission = async (ensureRequest = false): Promise<
 		return false;
 	}
 };
-
-
 
 const requestNotificationPermission = async () => {
 	try {
@@ -549,19 +542,5 @@ export const getVoIPToken = async () => {
 		return await VoIPManager.getVoIPToken();
 	} catch (e) {
 		return '';
-	}
-};
-
-export const setupIncomingCall = async (body: string) => {
-	try {
-		const bodyData = safeJSONParse(body || '{}');
-		if (bodyData?.offer === 'CANCEL_CALL') {
-			const callID = '0731961b-415b-44f3-a960-dd94ef3372fc';
-			RNCallKeep.endCall(callID);
-			return;
-		}
-	} catch (error) {
-		console.error('log  => setupIncomingCall', error);
-		/* empty */
 	}
 };
