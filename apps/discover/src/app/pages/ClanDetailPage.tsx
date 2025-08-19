@@ -1,10 +1,9 @@
+import { Icons } from '@mezon/ui';
 import { useState } from 'react';
-import { FaCopy, FaFacebook, FaReddit, FaTwitter } from 'react-icons/fa';
-import { HiOutlineCalendarDays, HiOutlineChatBubbleLeftRight, HiOutlineLightBulb, HiOutlineUserGroup } from 'react-icons/hi2';
-import { IoMdClose } from 'react-icons/io';
 import QRCode from "react-qr-code";
 import { useParams } from 'react-router-dom';
 import ImageWithSkeleton from '../components/common/ImageWithSkeleton';
+import { FacebookIcon, LightBulbIcon, RedditIcon, TwitterIcon, UserGroupIcon } from '../components/icons';
 import { DEFAULT_IMAGES } from '../constants/constants';
 import { useDiscover } from '../context/DiscoverContext';
 import { useNavigation } from '../hooks/useNavigation';
@@ -33,9 +32,9 @@ export default function ClanDetailPage() {
 	];
 	const categories = (clan as any).categories || ['Science & Tech', 'Entertainment'];
 	const socials = (clan as any).socials || [
-		{ icon: <FaFacebook />, url: 'https://www.facebook.com/mezonworld?locale=vi_VN' },
-		{ icon: <FaReddit />, url: '#' },
-		{ icon: <FaTwitter />, url: '#' }
+		{ icon: <FacebookIcon />, url: 'https://www.facebook.com/mezonworld?locale=vi_VN' },
+		{ icon: <RedditIcon />, url: '#' },
+		{ icon: <TwitterIcon />, url: '#' }
 	];
 	const inviteLink = `https://mezon.ai/invite/${clan?.invite_id}`;
 	const handleNavigate = () => {
@@ -43,7 +42,6 @@ export default function ClanDetailPage() {
 			window.open(`https://mezon.ai/invite/${clan.invite_id}`, "_blank");
 		}
 	};
-
 
 	const handleShare = () => {
 		setIsShareDialogOpen(true);
@@ -157,28 +155,28 @@ export default function ClanDetailPage() {
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-							<HiOutlineChatBubbleLeftRight className="w-6 h-6 text-[#5865f2]" />
+							<Icons.IconChat className="w-6 h-6 text-[#5865f2]" />
 							<div>
 								<div className="font-semibold text-sm">How chatty?</div>
 								<div className="text-xs text-gray-500">{chatty}</div>
 							</div>
 						</div>
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-							<HiOutlineCalendarDays className="w-6 h-6 text-[#5865f2]" />
+							<Icons.CalendarIcon className="w-6 h-6 text-[#5865f2]" />
 							<div>
 								<div className="font-semibold text-sm">Server created</div>
 								<div className="text-xs text-gray-500">{createdAt}</div>
 							</div>
 						</div>
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-							<HiOutlineLightBulb className="w-6 h-6 text-[#5865f2]" />
+							<LightBulbIcon className="w-6 h-6 text-[#5865f2]" />
 							<div>
 								<div className="font-semibold text-sm">Feature</div>
 								<div className="text-xs text-gray-500">{features[0]}</div>
 							</div>
 						</div>
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-							<HiOutlineUserGroup className="w-6 h-6 text-[#5865f2]" />
+							<UserGroupIcon className="w-6 h-6 text-[#5865f2]" />
 							<div>
 								<div className="font-semibold text-sm">Community</div>
 								<div className="text-xs text-gray-500">{features[1]}</div>
@@ -214,12 +212,11 @@ export default function ClanDetailPage() {
 				</div>
 			</div>
 
-			{/* Share Dialog */}
 			{isShareDialogOpen && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 					<div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative">
 						<button onClick={() => setIsShareDialogOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-							<IoMdClose size={24} />
+							<Icons.Close className="w-6 h-6" />
 						</button>
 
 						<h2 className="text-xl font-bold mb-4">Share Clan</h2>
@@ -238,7 +235,7 @@ export default function ClanDetailPage() {
 									className={`flex items-center gap-1 px-3 py-1.5 rounded-md w-[80px] text-sm transition-colors ${isCopied ? 'bg-gray-200 text-gray-600' : 'bg-[#5865f2] text-white hover:bg-[#4752c4]'
 										}`}
 								>
-									<FaCopy size={14} />
+									<Icons.CopyIcon className="w-4 h-4" />
 									{isCopied ? 'Copied!' : 'Copy'}
 								</button>
 							</div>
@@ -264,7 +261,7 @@ export default function ClanDetailPage() {
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 					<div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 relative">
 						<button onClick={() => setIsJoinOptionsOpen(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-							<IoMdClose size={24} />
+							<Icons.Close className="w-6 h-6" />
 						</button>
 
 						<h2 className="text-xl font-bold mb-4 text-center">Join Clan</h2>
