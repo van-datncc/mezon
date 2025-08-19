@@ -108,10 +108,12 @@ export function MemberProfile({
 								<Text style={{ color: themeValue.textNormal, fontSize: 12, fontWeight: '500' }}>In voice</Text>
 							</View>
 						)}
+						{isDMThread && currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP && (
+							<AddedByUser groupId={currentChannel?.id} userId={user?.id} />
+						)}
 					</View>
 				)}
 			</View>
-			{isDMThread && currentChannel?.type === ChannelType.CHANNEL_TYPE_GROUP && <AddedByUser groupId={currentChannel?.id} userId={user?.id} />}
 		</View>
 	);
 }
