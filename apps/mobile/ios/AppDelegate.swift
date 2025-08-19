@@ -20,6 +20,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
 
+      DispatchQueue.global(qos: .background).async {
+        let callKeepConfig: [String: Any] = [
+            "appName": "Mezon",
+            "maximumCallGroups": 3,
+            "maximumCallsPerCallGroup": 1,
+            "supportsVideo": false
+        ]
+        RNCallKeep.setup(callKeepConfig)
+      }
+
       // Initialize React Native
       FirebaseApp.configure()
 
