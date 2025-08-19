@@ -25,7 +25,6 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { AvatarImage } from '../AvatarImage/AvatarImage';
 import ModalEditGroup from '../ModalEditGroup';
-import ModalPortal from '../ModalPortal';
 
 export type ChatWelComeProp = {
 	readonly name?: Readonly<string>;
@@ -194,7 +193,6 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 			</div>
 
 
-			<ModalPortal isOpen={isEditModalOpen}>
 				<ModalEditGroup
 					isOpen={isEditModalOpen}
 					onClose={handleCloseEditModal}
@@ -204,8 +202,7 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 					onGroupNameChange={setModalGroupName}
 					imagePreview={modalImagePreview}
 					className="z-[200]"
-				/>
-			</ModalPortal>
+			/>
 		</div>
 	);
 }

@@ -106,7 +106,7 @@ export { default as EventSchedule } from './components/EventSchedule';
 export { default as ModalCall } from './components/ModalCall';
 export { default as MultiStepModalE2ee } from './components/ModalSendCode';
 export { default as SettingComunity } from './components/SettingComunity';
-export { WebRTCStreamProvider, useWebRTCStream } from './components/StreamContext/StreamContext';
+export { useWebRTCStream, WebRTCStreamProvider } from './components/StreamContext/StreamContext';
 
 export * from './components/HtmlCanvas';
 
@@ -141,5 +141,4 @@ export { DmCallManager } from './components/DmCall/DmCallManager';
 export { default as InternetStatusPopover } from './components/InternetStatusPopover';
 export { default as ModalLayout } from './components/Modal';
 export { default as ModalEditGroup } from './components/ModalEditGroup';
-export { default as ModalPortal } from './components/ModalPortal';
 

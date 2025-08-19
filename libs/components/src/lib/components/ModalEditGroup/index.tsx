@@ -1,7 +1,7 @@
 import { Button } from '@mezon/ui';
 import { ValidateSpecialCharacters } from '@mezon/utils';
 import React, { useEffect, useRef, useState } from 'react';
-import Modal from '../Modal';
+import { useModal } from 'react-modal-hook';
 
 export interface ModalEditGroupProps {
 	isOpen: boolean;
@@ -47,8 +47,6 @@ const ModalEditGroup: React.FC<ModalEditGroupProps> = ({
 		}
 	}, [groupName]);
 
-	if (!isOpen) return null;
-
 	const handleImageClick = () => {
 		fileInputRef.current?.click();
 	};
@@ -66,9 +64,13 @@ const ModalEditGroup: React.FC<ModalEditGroupProps> = ({
 		onClose();
 	};
 
-	return (
-		<Modal onClose={onClose}>
-			<div className={`flex flex-col bg-theme-setting-primary rounded-lg shadow-2xl overflow-hidden max-w-[440px] w-full mx-4 ${className}`}>
+	const [showModal, hideModal] = useModal(() => (
+		<div className="fixed inset-0 z-[2147483647] flex items-center justify-center">
+			<div
+				className="absolute inset-0 bg-black/50"
+				onClick={onClose}
+			/>
+			<div className={`relative flex flex-col bg-theme-setting-primary rounded-lg shadow-2xl overflow-hidden max-w-[440px] w-full mx-4 ${className}`}>
 				{/* Header */}
 				<div className="flex items-center justify-between px-4 py-4 bg-theme-setting-nav">
 					<h2 className="font-semibold text-xl text-theme-primary select-none">Edit Group</h2>
@@ -195,8 +197,18 @@ const ModalEditGroup: React.FC<ModalEditGroupProps> = ({
 					</Button>
 				</div>
 			</div>
-		</Modal>
-	);
+		</div>
+	), [groupName, imagePreview, validationError, className, onGroupNameChange, onImageUpload, onCancel, onSave, onClose]);
+
+	useEffect(() => {
+		if (isOpen) {
+			showModal();
+		} else {
+			hideModal();
+		}
+	}, [isOpen, showModal, hideModal]);
+
+	return null;
 };
 
 export default ModalEditGroup;

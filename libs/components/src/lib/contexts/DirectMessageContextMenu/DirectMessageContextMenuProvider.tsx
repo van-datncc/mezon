@@ -19,7 +19,6 @@ import { FC, createContext, useCallback, useContext, useEffect, useMemo, useStat
 import { Menu, Submenu, useContextMenu } from 'react-contexify';
 import { useSelector } from 'react-redux';
 import ModalEditGroup from '../../components/ModalEditGroup';
-import ModalPortal from '../../components/ModalPortal';
 import ItemPanelMember from '../../components/PanelMember/ItemPanelMember';
 import { MemberMenuItem } from '../MemberContextMenu';
 import { useModals } from '../MemberContextMenu/useModals';
@@ -363,7 +362,6 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 				</Menu>
 			)}
 
-			<ModalPortal isOpen={isEditModalOpen}>
 				<ModalEditGroup
 					isOpen={isEditModalOpen}
 					onClose={closeEditGroupModal}
@@ -374,7 +372,6 @@ export const DirectMessageContextMenuProvider: FC<DirectMessageContextMenuProps>
 					imagePreview={imagePreview}
 					className="z-[200]"
 				/>
-			</ModalPortal>
 		</DirectMessageContextMenuContext.Provider>
 	);
 };
