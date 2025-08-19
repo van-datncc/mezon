@@ -56,15 +56,15 @@ export function MemberProfile({
 	const name = useMemo(() => {
 		if (userInfo) {
 			return (
-				nickName ||
+				(!isDMThread && nickName) ||
+				(!isDMThread && userInfo?.clan_nick) ||
 				userInfo?.display_name ||
-				userInfo?.username ||
-				userInfo?.clan_nick ||
 				userInfo?.user?.display_name ||
+				userInfo?.username ||
 				userInfo?.user?.username
 			);
 		}
-	}, [nickName, userInfo]);
+	}, [isDMThread, nickName, userInfo]);
 	const userColorRolesClan = useColorsRoleById(userInfo?.id || '')?.highestPermissionRoleColor;
 
 	const colorUserName = useMemo(() => {
