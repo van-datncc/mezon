@@ -55,7 +55,14 @@ export function MemberProfile({
 	const currentChannel = useContext(threadDetailContext);
 	const name = useMemo(() => {
 		if (userInfo) {
-			return nickName || userInfo?.username || userInfo.clan_nick || userInfo?.user?.username;
+			return (
+				nickName ||
+				userInfo?.display_name ||
+				userInfo?.username ||
+				userInfo?.clan_nick ||
+				userInfo?.user?.display_name ||
+				userInfo?.user?.username
+			);
 		}
 	}, [nickName, userInfo]);
 	const userColorRolesClan = useColorsRoleById(userInfo?.id || '')?.highestPermissionRoleColor;
@@ -86,13 +93,6 @@ export function MemberProfile({
 			<View style={{ ...styles.nameContainer, borderBottomWidth: 1 }}>
 				{!isHideUserName && (
 					<View style={styles.nameItem}>
-						{!!userInfo?.display_name?.length && userInfo?.display_name !== name && (
-							<Text style={{ color: themeValue.text }}>
-								{userInfo?.display_name?.length > numCharCollapse
-									? `${userInfo?.display_name?.substring(0, numCharCollapse)}...`
-									: userInfo?.display_name}
-							</Text>
-						)}
 						<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_4 }}>
 							<Text style={{ color: colorUserName }}>
 								{userInfo?.username?.length > numCharCollapse ? `${name.substring(0, numCharCollapse)}...` : name}
