@@ -81,10 +81,10 @@ export const ListClanPopup = React.memo(() => {
 
 		if (!fromItem || !toItem) return;
 
-		if (animationValuesRef.current.hoverAnim?.value) {
+		if (animationValuesRef.current?.hoverAnim?.value) {
 			const indexDiff = Math.abs(placeholderIndexRef.current - dragIndexRef.current);
 			const multiIndexDistanceOffset = DISTANCE_OFFSET * indexDiff;
-			currentDragDistanceRef.current = Math.abs(animationValuesRef.current.hoverAnim?.value) + DISTANCE_OFFSET + multiIndexDistanceOffset;
+			currentDragDistanceRef.current = Math.abs(animationValuesRef.current.hoverAnim.value) + DISTANCE_OFFSET + multiIndexDistanceOffset;
 		}
 
 		currentThresholdRef.current = calculateDynamicThreshold(dragIndexRef.current, placeholderIndexRef.current);
