@@ -277,8 +277,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		const emojis: IEmojiOnMessage[] = [];
 		const markdown: IMarkdownOnMessage[] = [];
 
-    console.log(entities, 'entities');
-
 
 		entities.forEach((entity: any) => {
 			const { type, offset, length, userId, documentId, language } = entity;
@@ -375,8 +373,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					break;
 			}
 		});
-
-    console.log({ mentions, hashtags, emojis, markdown }, 'test');
 
 
 		return { mentions, hashtags, emojis, markdown };
@@ -1194,6 +1190,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				onHandlePaste={props.handlePaste}
 				enableUndoRedo={true}
 				maxHistorySize={50}
+				hasFilesToSend={attachmentData.length > 0}
 				>
 					<Mention
 						trigger="@"
@@ -1235,7 +1232,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							);
 						}}
 						markup="@[__display__](__id__)"
-						onAdd={(id, display) => console.log(`Added user mention: ${display} (${id})`)}
 						displayPrefix="@"
 					/>
 					<Mention
@@ -1252,7 +1248,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							</div>
 						)}
 						markup="#[__display__](__id__)"
-						onAdd={(id, display) => console.log(`Added tag mention: ${display} (${id})`)}
 					/>
 					<Mention
 						trigger=":"
@@ -1284,7 +1279,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 							);
 						}}
 						appendSpaceOnAdd={true}
-						onAdd={(id, display) => console.log(`Added emoji: ${display} (${id})`)}
 					/>
 				</MentionsInput>
 			</div>

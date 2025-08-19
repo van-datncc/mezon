@@ -215,8 +215,6 @@ export default function parseHtmlAsFormattedText(
   const fragment = document.createElement('div');
   fragment.innerHTML = parseMarkdown(parseMarkdownLinks(html));
   fixImageContent(fragment);
-  console.log(fragment.innerHTML, 'fragment.innerHTML');
-
   const text = fragment.innerText.trim().replace(/\u200b+/g, '');
   const trimShift = fragment.innerText.indexOf(text[0]);
   let textIndex = -trimShift;
@@ -248,12 +246,6 @@ export default function parseHtmlAsFormattedText(
     recursionDeepness = 1;
     addEntity(node);
   });
-
-  console.log({
-    text,
-    entities: entities.length ? entities : undefined,
-  }, 'testtt123');
-
 
   return {
     text,

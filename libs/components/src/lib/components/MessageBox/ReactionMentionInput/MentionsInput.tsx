@@ -60,6 +60,7 @@ export interface MentionsInputProps {
 	onHandlePaste?: (event: React.ClipboardEvent<HTMLDivElement>) => void;
 	enableUndoRedo?: boolean;
 	maxHistorySize?: number;
+	hasFilesToSend?: boolean;
 }
 
 export interface MentionsInputHandle {
@@ -226,6 +227,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	onHandlePaste,
 	enableUndoRedo = false,
 	maxHistorySize = 50,
+	hasFilesToSend = false,
 }, ref) => {
 	const inputRef = useRef<HTMLDivElement>(null);
 
@@ -599,7 +601,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			const items = e.clipboardData.items;
 			let hasImageFiles = false;
 
-			if (items && onHandlePaste) {
+			if (items) {
 				for (let i = 0; i < items.length; i++) {
 					if (items[i].type.indexOf('image') !== -1) {
 						hasImageFiles = true;
@@ -608,7 +610,10 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 				}
 
 				if (hasImageFiles) {
-					onHandlePaste(e);
+					e.preventDefault();
+					if (onHandlePaste) {
+						onHandlePaste(e);
+					}
 					return;
 				}
 			}
@@ -621,6 +626,9 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = htmlContent;
+
+				const images = tempDiv.querySelectorAll('img');
+				images.forEach(el => el.remove());
 
 				const scripts = tempDiv.querySelectorAll('script, style, link, meta, title');
 				scripts.forEach(el => el.remove());
@@ -729,11 +737,8 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 						(messageSendKeyCombo === "ctrl-enter" && (e.ctrlKey || e.metaKey)))
 				) {
 					e.preventDefault();
-					if (onSend && html.trim()) {
+					if (onSend && (html.trim() || hasFilesToSend)) {
 						const formattedText = parseHtmlAsFormattedText(html, true, false) as FormattedText;
-            console.log(formattedText, 'formattedText');
-
-
 						onSend(formattedText);
 						setHtml("");
 						if (inputRef.current) {
