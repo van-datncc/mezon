@@ -273,6 +273,7 @@ export const AuthenticationLoader = () => {
 							Toast.hide();
 							const store = await getStoreAsync();
 							store.dispatch(directActions.setDmGroupCurrentId(''));
+							store.dispatch(messagesActions.setIdMessageToJump(null));
 							store.dispatch(appActions.setIsFromFCMMobile(true));
 							DeviceEventEmitter.emit(ActionEmitEvent.ON_PANEL_KEYBOARD_BOTTOM_SHEET, {
 								isShow: false
