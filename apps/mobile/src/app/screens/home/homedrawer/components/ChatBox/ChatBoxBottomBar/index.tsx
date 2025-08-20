@@ -313,7 +313,8 @@ export const ChatBoxBottomBar = memo(
 
 			if (!text) return;
 
-			const convertedHashtag = convertMentionsToText(text);
+			const rawConvertedHashtag = convertMentionsToText(text);
+			const convertedHashtag = convertMentionsToText(text?.replace?.(/\*\*([\s\S]*?)\*\*/g, '$1'));
 			const words = convertedHashtag?.split?.(mentionRegexSplit);
 
 			const mentionList: Array<{ user_id: string; s: number; e: number }> = [];
@@ -371,7 +372,7 @@ export const ChatBoxBottomBar = memo(
 			hashtagsOnMessage.current = hashtagList;
 			mentionsOnMessage.current = mentionList;
 			setMentionTextValue(text);
-			textValueInputRef.current = convertedHashtag;
+			textValueInputRef.current = rawConvertedHashtag;
 			chatMessageLeftAreaRef?.current?.setAttachControlVisibility(false);
 		};
 
