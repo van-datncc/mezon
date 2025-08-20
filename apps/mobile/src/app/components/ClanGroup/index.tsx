@@ -22,12 +22,24 @@ export const ClanGroup = memo(({ group, onClanPress, clans, drag, isActive }: Cl
 	const { themeValue } = useTheme();
 	const styles = style(themeValue, Colors);
 	const dispatch = useAppDispatch();
+
 	const groupClans = useMemo(() => {
-		return group?.clanIds?.map((clanId) => clans?.find((clan) => clan?.clan_id === clanId));
-	}, [clans, group?.clanIds]);
+		if (!group?.clanIds?.length) return [];
+
+		try {
+			return group.clanIds.reduce((acc: any[], clanId) => {
+				const clan = clans?.find((clan) => clan?.clan_id === clanId);
+				if (clan) acc.push(clan);
+				return acc;
+			}, []);
+		} catch (error) {
+			console.error('Error in groupClans: ', error);
+			return [];
+		}
+	}, [group?.clanIds, clans]);
 
 	const totalBadgeCount = useMemo(() => {
-		if (!group?.clanIds) return 0;
+		if (!group?.clanIds?.length) return 0;
 
 		try {
 			return group.clanIds.reduce((total, clanId) => {
@@ -41,15 +53,20 @@ export const ClanGroup = memo(({ group, onClanPress, clans, drag, isActive }: Cl
 	}, [group?.clanIds, clans]);
 
 	const handleRemoveClanFromGroup = (clanId: string) => {
-		dispatch(clansActions.removeClanFromGroup({ groupId: group?.id, clanId }));
+		if (group?.id && clanId) {
+			dispatch(clansActions.removeClanFromGroup({ groupId: group.id, clanId }));
+		}
 	};
 
 	const handleToggleGroup = () => {
-		if (group?.clanIds?.length === 1) {
-			handleRemoveClanFromGroup(group?.clanIds?.[0]);
+		if (group?.id) {
+			dispatch(clansActions.toggleGroupExpanded(group.id));
 		}
-		dispatch(clansActions.toggleGroupExpanded(group?.id));
 	};
+
+	if (!groupClans?.length) {
+		return null;
+	}
 
 	const renderClanContent = (clan: any) => {
 		return (
@@ -94,8 +111,8 @@ export const ClanGroup = memo(({ group, onClanPress, clans, drag, isActive }: Cl
 		<ScaleDecorator activeScale={1.5}>
 			<TouchableOpacity style={styles.collapsedGroup} onPress={handleToggleGroup} onLongPress={drag} disabled={isActive}>
 				<View style={styles.groupIcon}>
-					<View style={styles.multipleClansView}>
-						{groupClans?.slice(0, groupClans?.length === 2 ? 2 : 4)?.map((clan) => (
+					<View style={[styles.multipleClansView, groupClans.length === 1 && styles.singleClanView]}>
+						{groupClans?.slice(0, 4)?.map((clan) => (
 							<View key={`${clan?.clan_id}-collapsed`} style={styles.quarterClan}>
 								{renderClanContent(clan)}
 							</View>

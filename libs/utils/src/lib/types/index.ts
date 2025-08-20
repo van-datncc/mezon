@@ -1018,6 +1018,7 @@ export type RequestInput = {
 	valueTextInput: string;
 	content: string;
 	mentionRaw: MentionItem[];
+	entities?: any[];
 };
 
 export type BuzzArgs = {

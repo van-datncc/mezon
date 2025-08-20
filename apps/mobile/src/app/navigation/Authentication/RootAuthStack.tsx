@@ -84,13 +84,13 @@ export const RootAuthStack = memo(
 								open: {
 									animation: 'timing',
 									config: {
-										duration: 200
+										duration: 150
 									}
 								},
 								close: {
 									animation: 'timing',
 									config: {
-										duration: 200
+										duration: 100
 									}
 								}
 							},
@@ -115,13 +115,13 @@ export const RootAuthStack = memo(
 								open: {
 									animation: 'timing',
 									config: {
-										duration: 200
+										duration: 150
 									}
 								},
 								close: {
 									animation: 'timing',
 									config: {
-										duration: 200
+										duration: 100
 									}
 								}
 							}
