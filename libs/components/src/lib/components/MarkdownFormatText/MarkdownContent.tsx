@@ -227,7 +227,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 					</a>
 				)
 			)}
-			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} isSearchMessage={isSearchMessage} />}
+			{!isReply && isLink && content && isYouTubeLink(content) && <YouTubeEmbed url={content} isSearchMessage={isSearchMessage} isInPinMsg={isInPinMsg} />}
 			{!isLink && isBacktick && (typeOfBacktick === EBacktickType.SINGLE || typeOfBacktick === EBacktickType.CODE) ? (
 				<SingleBacktick contentBacktick={content} isInPinMsg={isInPinMsg} isLightMode={isLightMode} posInNotification={posInNotification} />
 			) : isBacktick && (typeOfBacktick === EBacktickType.TRIPLE || typeOfBacktick === EBacktickType.PRE) && !isLink ? (
@@ -322,19 +322,19 @@ const TripleBackticks: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, 
 	);
 };
 
-const YouTubeEmbed: React.FC<{ url: string; isSearchMessage?: boolean }> = ({ url, isSearchMessage }) => {
+const YouTubeEmbed: React.FC<{ url: string; isSearchMessage?: boolean; isInPinMsg?: boolean }> = ({ url, isSearchMessage, isInPinMsg }) => {
 	const embedUrl = getYouTubeEmbedUrl(url);
 	const { width, height } = getYouTubeEmbedSize(url, isSearchMessage);
 
 	return (
-		<div className="flex">
+		<div className={`flex ${isInPinMsg ? 'w-full' : ''}`}>
 			<div className="border-l-4 rounded-l border-[#ff001f]"></div>
-			<div className="p-4 bg-[#2b2d31] rounded">
+			<div className={`p-4 bg-[#2b2d31] rounded ${isInPinMsg ? 'flex-1 min-w-0' : ''}`}>
 				<iframe
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					title={url}
 					src={embedUrl}
-					style={{ width, height, border: 'none' }}
+					style={{ width, height, border: 'none', maxWidth: '100%' }}
 					allowFullScreen
 				></iframe>
 			</div>
