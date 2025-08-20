@@ -205,7 +205,7 @@ export const MarkdownContent: React.FC<MarkdownContentOpt> = ({
 	const posInReply = isJumMessageEnabled && !isTokenClickAble;
 
 	return (
-		<div className={` inline${!isLink ? ' bg-item-theme' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
+		<div className={` inline${!isLink ? ' bg-item-theme rounded-lg' : ''} ${isJumMessageEnabled ? 'whitespace-nowrap' : ''}`}>
 			{isLink && content && isGoogleMapsLink(content) ? (
 				<a
 					onClick={() => onClickLink(content)}
@@ -263,13 +263,13 @@ const SingleBacktick: React.FC<BacktickOpt> = ({ contentBacktick, isLightMode, i
 	const posInPinOrNotification = isInPinMsg || posInNotification;
 	return (
 		<span
-			className={!posInPinOrNotification ? 'text-theme-primary-active rounded-md bg-markdown-code p-2' : 'w-full'}
+			className={!posInPinOrNotification ? 'text-theme-primary-active rounded-md  p-2' : 'w-full'}
 			style={{ display: posInPinOrNotification ? '' : 'inline', padding: 2, margin: 0 }}
 		>
 			<code
 				className={`w-full text-sm font-sans px-2 ${
 					posInPinOrNotification ? 'whitespace-pre-wrap break-words' : ''
-				} ${posInPinOrNotification && isLightMode ? 'pin-msg-modeLight' : posInPinOrNotification && !isLightMode ? 'pin-msg' : null}`}
+					} ${posInPinOrNotification && ' text-theme-primary rounded-lg'}`}
 				style={{
 					fontFamily: 'sans-serif',
 					wordWrap: 'break-word',
