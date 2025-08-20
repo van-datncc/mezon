@@ -3,10 +3,7 @@ import { KeyboardEvent, RefObject, useCallback } from 'react';
 
 interface UseKeyboardHandlerProps {
 	editorRef: RefObject<HTMLDivElement | null>;
-	draftRequest: RequestInput | null | undefined;
 	updateDraft: (request: Partial<RequestInput>) => void;
-	handleUndoRedoShortcut: (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => void;
-	handleSend: (anonymousMode?: boolean) => void;
 	anonymousMode: boolean;
 	isEphemeralMode?: boolean;
 	setIsEphemeralMode?: (mode: boolean) => void;
@@ -17,10 +14,7 @@ interface UseKeyboardHandlerProps {
 
 export const useKeyboardHandler = ({
 	editorRef,
-	draftRequest,
 	updateDraft,
-	handleUndoRedoShortcut,
-	handleSend,
 	anonymousMode,
 	isEphemeralMode,
 	setIsEphemeralMode,
@@ -29,16 +23,8 @@ export const useKeyboardHandler = ({
 	ephemeralTargetUserId
 }: UseKeyboardHandlerProps) => {
 	const onKeyDown = useCallback(
-		(event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>): void => {
+		(event: KeyboardEvent<HTMLDivElement | HTMLTextAreaElement | HTMLInputElement>): void => {
 			const { key, ctrlKey, shiftKey, metaKey } = event;
-			const isComposing = event.nativeEvent.isComposing;
-
-			handleUndoRedoShortcut(event);
-
-			if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
-
-			}
-
 			switch (key) {
 				case 'Escape': {
 					if (
@@ -47,7 +33,6 @@ export const useKeyboardHandler = ({
 						setEphemeralTargetUserId &&
 						setEphemeralTargetUserDisplay
 					) {
-						event.preventDefault();
 						setIsEphemeralMode(false);
 						setEphemeralTargetUserId(null);
 						setEphemeralTargetUserDisplay(null);
@@ -67,11 +52,8 @@ export const useKeyboardHandler = ({
 			}
 		},
 		[
-			draftRequest,
-			handleSend,
 			anonymousMode,
 			updateDraft,
-			handleUndoRedoShortcut,
 			editorRef,
 			isEphemeralMode,
 			setIsEphemeralMode,

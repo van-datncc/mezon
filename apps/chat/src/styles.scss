@@ -1569,7 +1569,7 @@ input {
 }
 
 
-.text-entity-emoji, .text-entity-link.mention {
+.text-entity-emoji, .text-entity-link, .text-entity-link.mention {
   color: var(--mention-color);
   background-color: var(--mention-primary);
 }

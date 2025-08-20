@@ -7,6 +7,8 @@ export type ApiMessageEntityDefault = {
     | `${ApiMessageEntityTypes.CustomEmoji}`
     | `${ApiMessageEntityTypes.Blockquote}`
     | `${ApiMessageEntityTypes.Timestamp}`
+    | `${ApiMessageEntityTypes.Hashtag}`
+    | `${ApiMessageEntityTypes.MentionRole}`
   >;
   offset: number;
   length: number;
@@ -32,6 +34,22 @@ export type ApiMessageEntityMentionName = {
   length: number;
   userId: string;
 };
+
+
+export type ApiMessageEntityMentionTag = {
+  type: ApiMessageEntityTypes.Hashtag;
+  offset: number;
+  length: number;
+  id: string;
+};
+
+export type ApiMessageEntityMentionRole = {
+  type: ApiMessageEntityTypes.MentionRole;
+  offset: number;
+  length: number;
+  role_id: string;
+};
+
 
 export type ApiMessageEntityBlockquote = {
   type: ApiMessageEntityTypes.Blockquote;
@@ -69,7 +87,9 @@ export type ApiMessageEntity =
   | ApiMessageEntityCustomEmoji
   | ApiMessageEntityBlockquote
   | ApiMessageEntityTimestamp
-  | ApiMessageEntityQuoteFocus;
+  | ApiMessageEntityQuoteFocus
+  | ApiMessageEntityMentionRole
+  | ApiMessageEntityMentionTag;
 
 export interface ApiFormattedText {
   text: string;
@@ -86,6 +106,7 @@ export enum ApiMessageEntityTypes {
   Hashtag = "MessageEntityHashtag",
   Italic = "MessageEntityItalic",
   MentionName = "MessageEntityMentionName",
+  MentionRole = "MessageEntityMentionRole",
   Mention = "MessageEntityMention",
   Phone = "MessageEntityPhone",
   Pre = "MessageEntityPre",
@@ -417,6 +438,29 @@ function getEntityDataFromNode(
         offset,
         length,
         userId: (node as HTMLAnchorElement).dataset.userId!,
+      },
+    };
+  }
+  if (type === ApiMessageEntityTypes.MentionRole) {
+    return {
+      index,
+      entity: {
+        type,
+        offset,
+        length,
+        role_id: (node as HTMLAnchorElement).dataset.userId!,
+      },
+    };
+  }
+
+  if (type === ApiMessageEntityTypes.Hashtag) {
+    return {
+      index,
+      entity: {
+        type,
+        offset,
+        length,
+        id: (node as HTMLAnchorElement).dataset.id!,
       },
     };
   }
