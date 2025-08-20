@@ -21,7 +21,10 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
-	const [hasManageChannelPermission] = usePermissionChecker([EPermission.manageChannel], channel.channel_id ?? '');
+	const [hasManageChannelPermission, hasClanPermission] = usePermissionChecker(
+		[EPermission.manageChannel, EPermission.manageClan],
+		channel.channel_id ?? ''
+	);
 	const canEditChannelPermissions = hasManageChannelPermission;
 
 	const isThread = checkIsThread(channel as ChannelsEntity);
@@ -102,14 +105,9 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 									selectedButton={selectedButton}
 								/>
 							)}
-						{/* <ChannelSettingItemButton
-							tabName={EChannelSettingTab.INVITES}
-							handleOnClick={handleButtonClick}
-							selectedButton={selectedButton}
-						/> */}
 					</>
 				)}
-				{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && (
+				{channel.type !== ChannelType.CHANNEL_TYPE_GMEET_VOICE && hasClanPermission && (
 					<ChannelSettingItemButton
 						tabName={EChannelSettingTab.INTEGRATIONS}
 						handleOnClick={handleButtonClick}

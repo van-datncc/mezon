@@ -66,6 +66,10 @@ export const style = (themeValue: Attributes, colors: any) =>
 			alignItems: 'center'
 		},
 
+		singleClanView: {
+			justifyContent: 'flex-start'
+		},
+
 		quarterClan: {
 			width: '40%',
 			height: '40%',
