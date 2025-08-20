@@ -226,7 +226,7 @@ const MessageItem = React.memo(
 		}, []);
 
 		const handleLongPressMessage = useCallback(() => {
-			if (preventAction) return;
+			if (preventAction || isMessageSystem) return;
 			dispatch(setSelectedMessage(message));
 			const data = {
 				snapPoints: ['55%', '85%'],
@@ -261,7 +261,7 @@ const MessageItem = React.memo(
 		return (
 			<Swipeable
 				ref={swipeRef}
-				enabled={!preventAction}
+				enabled={!preventAction && !isMessageSystem}
 				dragOffsetFromLeftEdge={500}
 				dragOffsetFromRightEdge={12}
 				renderRightActions={renderRightActions}
