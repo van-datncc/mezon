@@ -134,6 +134,16 @@ export const QRScanner = () => {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_NAVIGATION_DEEPLINK, value);
 				return;
 			}
+			if (value?.includes('/invite/')) {
+				const inviteMatch = value.match(/invite\/(\d+)/);
+				const inviteId = inviteMatch?.[1];
+				if (inviteId) {
+					navigation.navigate(APP_SCREEN.INVITE_CLAN, {
+						code: inviteId
+					});
+				}
+				return;
+			}
 			const valueObj = safeJSONParse(value || '{}');
 			// case Transfer funds
 			if (valueObj?.receiver_id) {

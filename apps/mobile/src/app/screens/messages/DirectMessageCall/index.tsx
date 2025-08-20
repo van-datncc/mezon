@@ -52,7 +52,8 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		toggleAudio,
 		toggleVideo,
 		handleSignalingMessage,
-		switchCamera
+		switchCamera,
+		handleToggleIsConnected
 	} = useWebRTCCallMobile({
 		dmUserId: receiverId,
 		userId: userProfile?.user?.id as string,
@@ -155,6 +156,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
 		InCallManager.start({ media: 'audio' });
+		if (isAnswerCall) {
+			handleToggleIsConnected(false);
+		}
 		const timer = setTimeout(() => {
 			startCall(isVideoCall, isAnswerCall);
 		}, 2000);
