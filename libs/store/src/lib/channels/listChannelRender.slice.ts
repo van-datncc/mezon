@@ -126,6 +126,7 @@ export const listChannelRenderSlice = createSlice({
 			const { channelId, clanId, dataUpdate } = action.payload;
 			if (state.listChannelRender[clanId]) {
 				const indexUpdate = state.listChannelRender[clanId].findIndex((channel) => channel.id === channelId);
+
 				if (indexUpdate === -1) {
 					return;
 				}
@@ -139,6 +140,21 @@ export const listChannelRenderSlice = createSlice({
 						? dataUpdate.channel_private || (state.listChannelRender[clanId][indexUpdate] as IChannel).channel_private
 						: 0
 				};
+				if (state.listChannelRender[clanId][indexUpdate].category_id === FAVORITE_CATEGORY_ID) {
+					const indexNextUpdate = state.listChannelRender[clanId].findIndex(
+						(channel) => channel.id === channelId && channel.category_id !== FAVORITE_CATEGORY_ID
+					);
+					state.listChannelRender[clanId][indexNextUpdate] = {
+						...state.listChannelRender[clanId][indexNextUpdate],
+						channel_label: dataUpdate.channel_label || (state.listChannelRender[clanId][indexNextUpdate] as IChannel).channel_label,
+						e2ee: dataUpdate.e2ee || (state.listChannelRender[clanId][indexNextUpdate] as IChannel).e2ee,
+						topic: dataUpdate.topic || (state.listChannelRender[clanId][indexNextUpdate] as IChannel).topic,
+						age_restricted: dataUpdate.age_restricted,
+						channel_private: dataUpdate.channel_private
+							? dataUpdate.channel_private || (state.listChannelRender[clanId][indexNextUpdate] as IChannel).channel_private
+							: 0
+					};
+				}
 			}
 		},
 		updateChannelPositionInRenderedList: (state, action: PayloadAction<{ channelId: string; clanId: string; categoryId: string }>) => {
@@ -453,7 +469,7 @@ export const listChannelRenderSlice = createSlice({
 			const index = state.listChannelRender[clanId]?.findIndex((item) => item.id === categoryId);
 			if (index !== undefined && index !== -1) {
 				const category = state.listChannelRender[clanId][index] as ICategoryChannel;
-				category.channels = ([...(category.channels as string[] || []), channelId]) as string[];
+				category.channels = [...((category.channels as string[]) || []), channelId] as string[];
 				state.listChannelRender[clanId][index] = category;
 			}
 		}
