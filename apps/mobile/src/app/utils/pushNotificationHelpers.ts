@@ -100,7 +100,7 @@ export const checkNotificationPermission = async () => {
 export const getNotificationPermission = async (ensureRequest = false): Promise<boolean> => {
 	try {
 		if (Platform.OS === 'ios') {
-			let settings = await notifee.getNotificationSettings();
+			const settings = await notifee.getNotificationSettings();
 			let status = settings.authorizationStatus;
 
 			if (ensureRequest && status === NotifeeAuthorizationStatus.NOT_DETERMINED) {
@@ -108,10 +108,7 @@ export const getNotificationPermission = async (ensureRequest = false): Promise<
 				status = req.authorizationStatus;
 			}
 
-			return (
-				status === NotifeeAuthorizationStatus.AUTHORIZED ||
-				status === NotifeeAuthorizationStatus.PROVISIONAL
-			);
+			return status === NotifeeAuthorizationStatus.AUTHORIZED || status === NotifeeAuthorizationStatus.PROVISIONAL;
 		}
 
 		// Android
@@ -136,8 +133,6 @@ export const getNotificationPermission = async (ensureRequest = false): Promise<
 		return false;
 	}
 };
-
-
 
 const requestNotificationPermission = async () => {
 	try {

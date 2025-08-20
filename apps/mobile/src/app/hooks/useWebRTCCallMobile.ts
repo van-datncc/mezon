@@ -77,6 +77,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		camera: false,
 		speaker: false
 	});
+	const [isConnected, setIsConnected] = useState<boolean | null>(null);
 	const dialToneRef = useRef<Sound | null>(null);
 	const pendingCandidatesRef = useRef<(RTCIceCandidate | null)[]>([]);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
@@ -172,22 +173,17 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 				timeStartConnected.current = new Date();
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
 				mezon.socketRef.current?.forwardWebrtcSignaling(dmUserId, WebrtcSignalingType.WEBRTC_SDP_INIT, '', channelId, userId);
-				Toast.show({
-					type: 'info',
-					text1: 'Connection connected'
-				});
+				setIsConnected(true);
 				stopDialTone();
 				cancelCallFCMMobile();
 			}
 			if (pc.iceConnectionState === 'checking') {
+				setIsConnected(false);
 				endCallTimeout?.current && clearTimeout(endCallTimeout.current);
 				stopDialTone();
 			}
 			if (pc.iceConnectionState === 'disconnected') {
-				Toast.show({
-					type: 'error',
-					text1: 'Connection disconnected'
-				});
+				setIsConnected(null);
 				handleEndCall({ isCancelGoBack: false });
 			}
 		});
@@ -667,16 +663,22 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
+	const handleToggleIsConnected = (isConnected: boolean) => {
+		setIsConnected(isConnected);
+	};
+
 	return {
 		callState,
 		localMediaControl,
 		timeStartConnected,
+		isConnected,
 		startCall,
 		handleEndCall,
 		toggleAudio,
 		toggleVideo,
 		toggleSpeaker,
 		switchCamera,
-		handleSignalingMessage
+		handleSignalingMessage,
+		handleToggleIsConnected
 	};
 }
