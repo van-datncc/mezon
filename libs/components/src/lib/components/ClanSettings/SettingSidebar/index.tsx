@@ -83,7 +83,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 				))}
 				{isClanOwner && (
 					<button
-						className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left bg-item-hover`}
+						className={`mt-[5px] text-red-500 w-full py-1 px-[10px] mb-1 text-[16px] font-medium rounded text-left hover:bg-[#f67e882a]`}
 						onClick={setIsShowDeletePopup}
 					>
 						Delete clan
