@@ -1,7 +1,6 @@
 import { useOnScreen } from '@mezon/core';
-import { selectTheme, ThreadsEntity } from '@mezon/store';
-import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { selectChannelsEntitiesByClanId, selectCurrentClanId, selectTheme, ThreadsEntity, useAppSelector } from '@mezon/store';
+import { useEffect, useMemo, useRef } from 'react';
 import GroupThreads from './GroupThreads';
 import { getActiveThreads, getJoinedThreadsWithinLast30Days, getThreadsOlderThan30Days } from './hepler';
 
@@ -14,18 +13,31 @@ type ThreadListProps = {
 
 export default function ThreadList({ isLoading, threads, loadMore, preventClosePannel }: ThreadListProps) {
 	const ulRef = useRef<HTMLUListElement | null>(null);
-	const activeThreads = getActiveThreads(threads);
-	const joinedThreads = getJoinedThreadsWithinLast30Days(threads);
-	const oldThreads = getThreadsOlderThan30Days(threads);
+
+	const currentClanId = useAppSelector(selectCurrentClanId);
+	const channelsEntities = useAppSelector((state) => selectChannelsEntitiesByClanId(state, currentClanId || '')) as Record<string, any>;
+	const visibleThreads = useMemo(() => {
+		const filtered = threads.filter((t) => {
+			const channelEntity = channelsEntities?.[t.id];
+			const existsInChannels = Boolean(channelEntity);
+			const notPrivate = channelEntity ? channelEntity.channel_private !== 1 : (t as any)?.channel_private !== 1;
+			return existsInChannels && notPrivate;
+		});
+		return filtered;
+	}, [threads, channelsEntities]);
+
+	const activeThreads = getActiveThreads(visibleThreads);
+	const joinedThreads = getJoinedThreadsWithinLast30Days(visibleThreads);
+	const oldThreads = getThreadsOlderThan30Days(visibleThreads);
 
 	const { measureRef, isIntersecting, observer } = useOnScreen({ root: ulRef.current });
 
-	const lastThread = threads[threads.length - 1];
+	const lastThread = visibleThreads[visibleThreads.length - 1];
 
 	const isLastInActive = activeThreads.includes(lastThread);
 	const isLastInJoined = joinedThreads.includes(lastThread);
 	const isLastInOld = oldThreads.includes(lastThread);
-	const appearanceTheme = useSelector(selectTheme);
+	const appearanceTheme = useAppSelector(selectTheme);
 	useEffect(() => {
 		if (isIntersecting) {
 			loadMore();
