@@ -26,10 +26,11 @@ import { useDebouncedCallback } from 'use-debounce';
 
 export type OverviewChannelProps = {
 	channel: IChannel;
+	onDisplayLabelChange?: (label: string) => void;
 };
 
 const OverviewChannel = (props: OverviewChannelProps) => {
-	const { channel } = props;
+	const { channel, onDisplayLabelChange } = props;
 	const appearanceTheme = useSelector(selectTheme);
 
 	const channelId = (channel?.channel_id || (channel as any)?.id || '') as string;
@@ -160,9 +161,10 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = e.target.value;
 			setChannelLabel(value);
+			onDisplayLabelChange?.(value);
 			debouncedSetChannelName(value);
 		},
-		[debouncedSetChannelName]
+		[debouncedSetChannelName, onDisplayLabelChange]
 	);
 
 	const handleDisplayAppUrl = useCallback(
