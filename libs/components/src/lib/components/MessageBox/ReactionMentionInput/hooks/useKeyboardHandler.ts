@@ -1,8 +1,8 @@
-import { RequestInput, handleBoldShortCut } from '@mezon/utils';
+import { RequestInput } from '@mezon/utils';
 import { KeyboardEvent, RefObject, useCallback } from 'react';
 
 interface UseKeyboardHandlerProps {
-	editorRef: RefObject<HTMLInputElement | null>;
+	editorRef: RefObject<HTMLDivElement | null>;
 	draftRequest: RequestInput | null | undefined;
 	updateDraft: (request: Partial<RequestInput>) => void;
 	handleUndoRedoShortcut: (event: KeyboardEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLInputElement>) => void;
@@ -36,15 +36,7 @@ export const useKeyboardHandler = ({
 			handleUndoRedoShortcut(event);
 
 			if ((ctrlKey || metaKey) && (key === 'b' || key === 'B')) {
-				handleBoldShortCut({
-					editorRef,
-					request: draftRequest || {
-						valueTextInput: '',
-						content: '',
-						mentionRaw: []
-					},
-					setRequestInput: updateDraft
-				});
+
 			}
 
 			switch (key) {
@@ -68,13 +60,6 @@ export const useKeyboardHandler = ({
 					return;
 				}
 				case 'Enter': {
-					if (shiftKey || isComposing) {
-						return;
-					} else {
-						event.preventDefault();
-						handleSend(anonymousMode);
-						return;
-					}
 				}
 				default: {
 					return;
