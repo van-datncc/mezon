@@ -244,7 +244,7 @@ const ModalQR = ({ closeModalEdit, data }: { closeModalEdit: () => void; data: s
 				if (!blob) return;
 				try {
 					await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-					toast('Copied QR success !!');
+					toast(' Copied QR successfully !!');
 				} catch (err) {
 					console.error('Copy failed', err);
 				}
@@ -256,9 +256,9 @@ const ModalQR = ({ closeModalEdit, data }: { closeModalEdit: () => void; data: s
 		<ModalLayout onClose={closeModalEdit}>
 			<div className="bg-theme-setting-primary rounded-xl flex flex-col px-5 py-5 gap-5 justify-center items-center">
 				<div ref={containerRef} className="p-4 rounded-md bg-white w-fit flex flex-col items-center justify-center gap-2 pt-9 relative">
-					<div className="w-10 h-10 absolute -top-3 border-4 border-white rounded-full">
+					<div className="w-10 h-10 absolute -top-3 rounded-full flex items-center justify-center bg-white">
 						{currentClan?.logo ? (
-							<img src={currentClan?.logo} className="w-10 h-10 object-cover" />
+							<img src={currentClan?.logo} className="w-10 h-10 object-cover rounded-full border-4 border-white" />
 						) : (
 							<span>{currentClan?.clan_name?.charAt(0)}</span>
 						)}

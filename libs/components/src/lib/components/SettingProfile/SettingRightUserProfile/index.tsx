@@ -250,10 +250,16 @@ const SettingRightUser = ({
 	};
 
 	const qrCodeProfile = useMemo(() => {
-		const idUser = userProfile?.user?.id || '';
-		return idUser;
-	}, [userProfile]);
+		const qrData = {
+			id: userProfile?.user?.id || '',
+			name: userProfile?.user?.display_name || userProfile?.user?.username || '',
+			avatar: userProfile?.user?.avatar_url || ''
+		};
+		const endcodeData = btoa(JSON.stringify(qrData));
+		const qrDataLink = `https://mezon.ai/chat/${userProfile?.user?.username}?data=${endcodeData}`;
 
+		return qrDataLink;
+	}, [userProfile]);
 	return (
 		<>
 			<div className="flex-1 flex z-0 gap-x-8 sbm:flex-row flex-col">
