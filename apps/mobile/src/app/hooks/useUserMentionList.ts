@@ -78,7 +78,7 @@ function UseMentionList({ channelDetail, channelID, channelMode }: UserMentionLi
 		if (!Array.isArray(rolesInClan)) {
 			return [];
 		}
-		return rolesInClan.filter((role) => role?.id && role.slug !== `everyone-${role?.clan_id}`);
+		return rolesInClan.filter((role) => role?.id && role?.slug !== `everyone-${role?.clan_id}`);
 	}, [rolesInClan]);
 
 	const getMembersChannel = useCallback((): ChannelMembersEntity[] => {
