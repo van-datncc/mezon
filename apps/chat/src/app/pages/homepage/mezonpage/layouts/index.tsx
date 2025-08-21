@@ -117,7 +117,7 @@ const Layout = memo((props: LayoutProps) => {
 					</div>
 					<div className="flex flex-col items-center gap-[15px] text-cente h-100">
 						<AnimatedSection delay={0} className="transition-all duration-700 ease-in-out">
-							<Image src="assets/feature-bg.png" className="h-100 lg:h-[700px] xl:h-[700px]" />
+							<Image src="assets/feature-bg.png" className="w-full h-auto lg:max-h-[700px] xl:max-h-[700px] object-contain" />
 						</AnimatedSection>
 					</div>
 
@@ -126,9 +126,9 @@ const Layout = memo((props: LayoutProps) => {
 							<div className="flex max-md:flex-wrap gap-[14px] w-full items-stretch">
 								<AnimatedSection
 									delay={0}
-									className="relative w-[50%] flex flex-col max-md:w-full  rounded-[8px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
-									<Image src="assets/feature-mobile-mezon.png" className="w-full h-full object-cover" />
+									<Image src="assets/feature-mobile-mezon.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
 										className="absolute top-[30px] left-1/2 transform -translate-x-1/2 text-transparent text-center"
 										style={{
@@ -146,9 +146,9 @@ const Layout = memo((props: LayoutProps) => {
 								</AnimatedSection>
 								<AnimatedSection
 									delay={0}
-									className="relative w-[50%] flex flex-col max-md:w-full  rounded-[8px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
-									<Image src="assets/feature-chat-mezon.png" className="w-full h-full object-cover" />
+									<Image src="assets/feature-chat-mezon.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
 										className="w-full absolute top-[30px] left-1/2 transform -translate-x-1/2 font-semibold text-transparent text-center"
 										style={{
@@ -167,9 +167,9 @@ const Layout = memo((props: LayoutProps) => {
 							<div className="flex max-md:flex-wrap gap-[14px] w-full items-stretch">
 								<AnimatedSection
 									delay={0}
-									className="relative w-[50%] flex flex-col max-md:w-full  rounded-[8px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
-									<Image src="assets/feature-gamming.png" className="w-full h-full object-cover" />
+									<Image src="assets/feature-gamming.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
 										className="absolute top-[20px] right-[40px] font-semibold text-transparent text-right"
 										style={{
@@ -189,9 +189,9 @@ const Layout = memo((props: LayoutProps) => {
 								</AnimatedSection>
 								<AnimatedSection
 									delay={300}
-									className="relative w-[50%] flex flex-col max-md:w-full rounded-[8px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
-									<Image src="assets/feature-clan-mezon.png" className="w-full h-full object-cover" />
+									<Image src="assets/feature-clan.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
 										className="absolute top-[20px] left-[90px] font-semibold text-transparent text-left"
 										style={{
@@ -211,19 +211,19 @@ const Layout = memo((props: LayoutProps) => {
 								</AnimatedSection>
 							</div>
 
-							{!sideBarIsOpen && (
+							{/* {!sideBarIsOpen && (
 								<div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[190px] mix-blend-color-dodge will-change-transform"></div>
-							)}
+							)} */}
 						</div>
 					</div>
-					{!sideBarIsOpen && (
+					{/* {!sideBarIsOpen && (
 						<div>
 							<div className="hidden md:block absolute top-[8%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[140px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[100px] mix-blend-color-dodge will-change-transform"></div>
 						</div>
-					)}
+					)} */}
 				</div>
 			</section>
 		</div>
