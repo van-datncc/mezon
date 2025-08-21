@@ -1,3 +1,4 @@
+import { ID_MENTION_HERE } from "@mezon/utils";
 import type React from "react";
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { type MentionData, MentionProps, MentionState } from "./Mention";
@@ -8,6 +9,14 @@ export interface User {
 	username?: string;
 	displayName: string;
 	avatar?: string;
+}
+
+export interface MentionItem {
+  display: string;
+  id: string;
+  childIndex: number;
+  index: number;
+  plainTextIndex: number;
 }
 
 export interface MessageEntity {
@@ -47,6 +56,7 @@ export interface MentionsInputProps {
 	placeholder?: string;
 	onSend?: (data: FormattedText) => void;
 	onChange?: (html: string) => void;
+	onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement | HTMLInputElement>) => void;
 	className?: string;
 	style?: React.CSSProperties;
 	messageSendKeyCombo?: "enter" | "ctrl-enter";
@@ -61,10 +71,12 @@ export interface MentionsInputProps {
 	enableUndoRedo?: boolean;
 	maxHistorySize?: number;
 	hasFilesToSend?: boolean;
+  setCaretToEnd?: boolean;
 }
 
 export interface MentionsInputHandle {
 	insertEmoji: (emojiId: string, emojiDisplay: string) => void;
+	insertMentionCommand: (content: string, clearOldValue?: boolean, ) => void;
 	focus: () => void;
 	blur: () => void;
 	getElement: () => HTMLDivElement | null;
@@ -79,7 +91,6 @@ interface ActiveMentionContext {
 	config: MentionProps;
 	mentionState: MentionState;
 }
-
 
 const prepareForRegExp = (html: string): string => {
 	return html
@@ -215,6 +226,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	placeholder = "Type a message...",
 	onSend,
 	onChange,
+	onKeyDown,
 	className = "",
 	style,
 	messageSendKeyCombo = "enter",
@@ -228,6 +240,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	enableUndoRedo = false,
 	maxHistorySize = 50,
 	hasFilesToSend = false,
+	setCaretToEnd = false,
 }, ref) => {
 	const inputRef = useRef<HTMLDivElement>(null);
 
@@ -247,6 +260,21 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 		)
 		.map(child => child.props);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.innerHTML = value;
+      if (setCaretToEnd && value) {
+        requestNextMutation(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+            const textContent = inputRef.current.textContent || '';
+            setCaretPosition(inputRef.current, textContent.length);
+          }
+        });
+      }
+    }
+  } , [])
+
 	useEffect(() => {
 		if (value !== html) {
 			setHtml(value);
@@ -264,7 +292,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			config.trigger.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 		).join('|');
 
-		return new RegExp(`(^|\\s)(${triggers})[\\w]*$`, 'gi');
+		return new RegExp(`(^|\\s)(${triggers})[\\w.-]*$`, 'gi');
 	}, [mentionConfigs]);
 
 	const addToHistory = useCallback((htmlValue: string) => {
@@ -406,24 +434,62 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					contenteditable="false"
 					class="text-entity-emoji"
 					dir="auto"
-				>:${display}:</span>`;
+				>${display}</span>`;
+			} else if (config.trigger === '#' && markup === '#[__display__](__id__)') {
+				htmlToInsert = `<a
+					class="text-entity-link hashtag"
+					data-entity-type="MessageEntityHashtag"
+					data-user-id="${suggestion.id}"
+					contenteditable="false"
+					dir="auto"
+				>#${display}</a>`;
 			} else {
 				htmlToInsert = markup
 					.replace(/__id__/g, suggestion.id)
 					.replace(/__display__/g, display);
 			}
 		} else {
-			const mainUsername = suggestion.id.startsWith(displayPrefix) ? suggestion.id.substring(displayPrefix.length) : null;
-			const userDisplayName = display;
-			htmlToInsert = mainUsername
-				? `${displayPrefix}${mainUsername}`
-				: `<a
-        class="text-entity-link mention"
-        data-entity-type="MessageEntityMentionName"
-        data-user-id="${suggestion.id}"
-        contenteditable="false"
-        dir="auto"
-      >${displayPrefix}${userDisplayName}</a>`;
+			if (config.trigger === '#') {
+				htmlToInsert = `<a
+					class="text-entity-link hashtag"
+					data-entity-type="MessageEntityHashtag"
+					data-id="${suggestion.id}"
+					contenteditable="false"
+					dir="auto"
+				>#${display}</a>`;
+			} else if (config.trigger === '/') {
+				htmlToInsert = display;
+			} else {
+
+        const mainUsername = suggestion.id.startsWith(displayPrefix) ? suggestion.id.substring(displayPrefix.length) : null;
+        const userDisplayName = display;
+
+        if(suggestion.isRole) {
+           htmlToInsert = mainUsername
+            ? `${displayPrefix}${mainUsername}`
+            : `<a
+            class="text-entity-link mention"
+            data-entity-type="MessageEntityMentionRole"
+            data-user-id="${suggestion.id}"
+            contenteditable="false"
+            dir="auto"
+          >${displayPrefix}${userDisplayName}</a>`;
+        }
+        else {
+
+          htmlToInsert = mainUsername
+            ? `${displayPrefix}${mainUsername}`
+            : `<a
+            class="text-entity-link mention"
+            data-entity-type="MessageEntityMentionName"
+            data-user-id="${suggestion.id}"
+            contenteditable="false"
+            dir="auto"
+          >${suggestion.id !== ID_MENTION_HERE ? displayPrefix : ''}${userDisplayName}</a>`;
+        }
+
+
+			}
 		}
 
 		const inputEl = inputRef.current;
@@ -447,14 +513,21 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					shiftCaretPosition = displayTextLength - (fixedHtmlBeforeSelection.length - atIndex);
 				}
 			} else {
-				const mainUsername = suggestion.id.startsWith(displayPrefix) ? suggestion.id.substring(displayPrefix.length) : null;
-				const userDisplayName = display;
-				shiftCaretPosition =
-					(mainUsername ? mainUsername.length + displayPrefix.length : userDisplayName.length + displayPrefix.length) -
-					(fixedHtmlBeforeSelection.length - atIndex);
+				if (config.trigger === '/') {
+					shiftCaretPosition = display.length - (fixedHtmlBeforeSelection.length - atIndex);
+				} else {
+					const mainUsername = suggestion.id.startsWith(displayPrefix) ? suggestion.id.substring(displayPrefix.length) : null;
+					const userDisplayName = display;
+					shiftCaretPosition =
+						(mainUsername ? mainUsername.length + displayPrefix.length : userDisplayName.length + displayPrefix.length) -
+						(fixedHtmlBeforeSelection.length - atIndex);
+          suggestion.id === ID_MENTION_HERE && (shiftCaretPosition -= 1);
+				}
 			}
 
-			const newHtml = `${fixedHtmlBeforeSelection.substr(0, atIndex)}${htmlToInsert}&nbsp;`;
+			const shouldAddSpace = config.appendSpaceOnAdd !== false;
+			const spaceToAdd = shouldAddSpace ? '&nbsp;' : '';
+			const newHtml = `${fixedHtmlBeforeSelection.substr(0, atIndex)}${htmlToInsert}${spaceToAdd}`;
 			const htmlAfterSelection = cleanWebkitNewLines(inputEl.innerHTML).substring(fixedHtmlBeforeSelection.length);
 			const caretPosition = getCaretPosition(inputEl);
 
@@ -467,7 +540,8 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 				inputEl.focus();
 
 				if (!positionCaretAfterEmoji(inputEl, config, markup)) {
-					const newCaretPosition = caretPosition + shiftCaretPosition + 1;
+					const spaceOffset = shouldAddSpace ? 1 : 0;
+					const newCaretPosition = caretPosition + shiftCaretPosition + spaceOffset;
 					if (newCaretPosition >= 0) {
 						setCaretPosition(inputEl, newCaretPosition);
 					}
@@ -549,6 +623,45 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 		savedCaretPositionRef.current = null;
 	}, [onChange, setHtml, restoreCaretPosition]);
 
+	const insertMentionCommand = useCallback((content: string, clearOldValue = false) => {
+		if (!inputRef.current) {
+			return;
+		}
+
+		const inputEl = inputRef.current;
+		inputEl.focus();
+
+		if (clearOldValue) {
+			inputEl.innerHTML = '';
+			setHtml('');
+		}
+
+		const range = document.createRange();
+		range.selectNodeContents(inputEl);
+		range.collapse(false);
+
+		const selection = window.getSelection();
+		selection?.removeAllRanges();
+		selection?.addRange(range);
+
+		const htmlToInsert = content;
+		insertHtmlInSelection(htmlToInsert);
+
+		const newHtml = inputEl.innerHTML;
+		setHtml(newHtml);
+		onChange?.(newHtml);
+
+		requestNextMutation(() => {
+			const finalRange = document.createRange();
+			finalRange.selectNodeContents(inputEl);
+			finalRange.collapse(false);
+
+			const finalSelection = window.getSelection();
+			finalSelection?.removeAllRanges();
+			finalSelection?.addRange(finalRange);
+		});
+	}, [onChange, setHtml]);
+
 	const handleMentionSelect = useCallback(
 		(suggestion: MentionData) => {
 			if (!inputRef.current || !activeMentionContext) {
@@ -564,6 +677,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 
 	useImperativeHandle(ref, () => ({
 		insertEmoji,
+		insertMentionCommand,
 		saveCaretPosition,
 		focus: () => {
 			inputRef.current?.focus();
@@ -578,7 +692,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 		redo,
 		canUndo,
 		canRedo,
-	}), [insertEmoji, saveCaretPosition, undo, redo, canUndo, canRedo]);
+	}), [insertEmoji, insertMentionCommand, saveCaretPosition, undo, redo, canUndo, canRedo]);
 
 	const handleSuggestionMouseEnter = useCallback((index: number) => {
 		if (activeMentionContext) {
@@ -814,6 +928,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					}, 0);
 				}
 			}
+			onKeyDown?.(e);
 		},
 		[
 			activeMentionContext,
@@ -823,6 +938,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			isMobile,
 			disabled,
 			onChange,
+			onKeyDown,
 			enableUndoRedo,
 			undo,
 			redo,
@@ -892,7 +1008,6 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					outline: 'none'
 				}}
 			/>
-
 			{renderPopover()}
 		</div>
 	);
