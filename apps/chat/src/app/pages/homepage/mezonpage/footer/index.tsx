@@ -42,28 +42,27 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 
 	return (
 		<div>
-			<div className="bg-white relative flex flex-col items-center bg-no-repeat">
-				<div className="flex h-16 w-full bg-[url(assets/title.png)] items-center justify-center">
-					<div className="flex items-center gap-2 justify-center">
-						<Image src={`assets/logo.png`} width={120} height={35} className="object-cover" />
-					</div>
-				</div>
-				<div className="pb-[48px] pt-[20px] flex flex-col w-10/12 max-lg:w-full">
-					<div className="w-full px-[32px] max-md:px-[16px] flex justify-between gap-[48px] flex-col sm:items-center">
-						<div className="flex justify-between gap-[48px] flex-col sm:px-20 md:px-40">
-							<div className="flex gap-[32px] max-sm:flex-col items-center justify-center">
-								<span
-									className="text-[26px] leading-[30px] font-normal text-center bg-gradient-to-r from-[#7E00FF] via-[#E16AFF] to-[#4191FF] 
-            bg-clip-text text-transparent"
-								>
-									Mezon is great for playing games and chilling <br /> with friends, or even building a worldwide <br /> community.{' '}
-								</span>
+			<div
+				className="bg-[#0A052C] relative flex flex-col items-center bg-no-repeat"
+				style={{ backgroundImage: 'url(../../../assets/ellipse.svg)' }}
+			>
+				<div className="pt-[64px] pb-[48px] max-md:py-[48px] flex flex-col w-10/12 max-lg:w-full">
+					<div className="w-full px-[32px] max-md:px-[16px] flex justify-between gap-[48px] max-lg:flex-col">
+						<div className="flex justify-between gap-[48px] max-lg:flex-col">
+							<div className="flex flex-col gap-[24px] max-w-[320px]">
+								<div className="flex items-center gap-[5px]">
+									<Image src={`assets/images/mezon-logo-black.svg`} width={32} height={32} className="aspect-square object-cover" />
+									<div className="text-[22.15px] leading-[26.58px] font-semibold text-[#FFFFFF]">mezon</div>
+								</div>
+								<div className="text-[16px] leading-[24px] font-normal text-[#8FA7BF]">
+									Mezon is great for playing games and chilling with friends, or even building a worldwide community.{' '}
+								</div>
 							</div>
-							<div className="flex gap-[32px] max-sm:flex-col justify-center">
+							<div className="flex gap-[32px] max-lg:flex-col">
 								<div className="flex flex-col gap-[12px]">
 									<a
 										href="https://mezon.ai/blogs/executive-summary"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -71,7 +70,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/blogs/problem-statement"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -79,7 +78,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/blogs/solution"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -87,7 +86,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/blogs/blockchain-economy"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -95,7 +94,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/developers"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -107,13 +106,13 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 										href="https://mezon.ai/blogs/technica-architecture"
 										target="_blank"
 										rel="noreferrer"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 									>
 										Technical Architecture
 									</a>
 									<a
 										href="https://mezon.ai/blogs/readmap"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -121,7 +120,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/blogs/tokenomics"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -130,7 +129,7 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 									</a>
 									<a
 										href="https://mezon.ai/blogs/team"
-										className="pr-[2px] pl-[2px] text-xl max-md:text-lg max-sm:text-base font-semibold text-[#474747]"
+										className="pr-[2px] pl-[2px] text-[16px] leading-[24px] font-semibold text-[#7C92AF]"
 										target="_blank"
 										rel="noreferrer"
 									>
@@ -140,7 +139,8 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 							</div>
 						</div>
 						<div className="flex flex-col gap-[16px]">
-							<div className="flex gap-[16px] max-sm:flex-col">
+							<div className="text-[14px] leading-[20px] font-semibold text-[#F5F5F6]">Get the app</div>{' '}
+							<div className="flex flex-col gap-[16px]">
 								<a
 									href="https://apps.apple.com/vn/app/mezon/id6502750046"
 									target="_blank"
@@ -223,9 +223,22 @@ const Footer = ({ downloadUrl, universalUrl, portableUrl }: FooterProps) => {
 								)}
 							</div>
 						</div>
-						<div>
-							<span className="text-lg font-normal text-[#474747]">© 2024 Mezon. All rights reserved.</span>
-						</div>
+					</div>
+				</div>
+			</div>
+			<div className="bg-[#0B0E2D] py-[48px] max-md:py-[24px] flex flex-col items-center">
+				<div className="w-10/12 px-[32px] max-md:px-[16px] flex items-center gap-[32px] justify-between max-lg:gap-[24px] max-lg:w-full max-lg:flex-col-reverse max-lg:items-start">
+					<div className="text-[16px] leading-[24px] font-normal text-[#7C92AF]">© 2024 Mezon. All rights reserved.</div>
+					<div className="flex items-center gap-[24px]">
+						<a href="https://www.linkedin.com/company/106435035" target="_blank" rel="noreferrer">
+							<Image src={`assets/instagram.svg`} />
+						</a>
+						<a href="https://www.facebook.com/mezonworld" target="_blank" rel="noreferrer">
+							<Image src={`assets/facebook.svg`} />
+						</a>
+						<a href="https://github.com/mezonai/mezon" target="_blank" rel="noreferrer">
+							<Image src={`assets/twitter.svg`} />
+						</a>
 					</div>
 				</div>
 			</div>

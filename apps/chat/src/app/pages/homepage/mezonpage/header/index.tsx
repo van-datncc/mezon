@@ -63,7 +63,9 @@ const HeaderMezon = memo((props: HeaderProps) => {
 	);
 
 	return (
-		<div className={`layout fixed flex flex-col items-center w-full z-50 bg-[url(assets/title.png)] h-[80px] max-md:h-[72px]`}>
+		<div
+			className={`layout fixed flex flex-col items-center w-full z-50 bg-gradient-to-r from-[#7E00FF] via-[#9C3FE9] to-[#4B0082] h-[80px] max-md:h-[72px]`}
+		>
 			<div ref={refHeader} className={`header fixed z-50 w-10/12 max-lg:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D]`}>
 				<div className="flex items-center justify-between md:px-[32px] max-md:px-[16px] max-md:py-[14px] h-[80px] max-md:h-[72px]">
 					<div className="flex items-center gap-[40px]">
@@ -116,7 +118,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 							</a>
 						</div>
 					</div>
-					<div className="w-fit">
+					<div className={`w-fit lg:pl-5 min-[1505px]:pl-0`}>
 						<Link
 							className="hidden lg:block px-[16px] py-[10px] bg-[url(assets/button_openmezon.png)] bg-no-repeat rounded-xl text-[#6E4A9E] text-[16px] leading-[24px] font-bold whitespace-nowrap hover:opacity-90 transition-opacity"
 							to={'/mezon'}

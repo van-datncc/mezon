@@ -96,9 +96,9 @@ const Layout = memo((props: LayoutProps) => {
 					<div className="hidden max-lg:block absolute right-0 bottom-0 w-[300px] h-[300px] bg-[#8D72C5] filter blur-[100px] mix-blend-color-dodge will-change-transform"></div>
 				</div>
 			</section>
-			<section id="feature" className="flex flex-col bg-white relative w-full h-full">
+			<section id="feature" className="flex flex-col items-center bg-[#ffffff]">
 				<div
-					className={`max-lg:w-full max-md:px-[16px] py-[45px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
+					className={`w-10/12 max-lg:w-full max-md:px-[16px] py-[96px] max-md:py-[48px] ${sideBarIsOpen ? 'unset' : 'relative'} ${sideBarIsOpen ? 'overflow-hidden' : ''}`}
 				>
 					<div className="flex flex-col items-center gap-[15px] max-lg:pb-[30px] pb-[45px] text-center">
 						<h2 className="tracking-[-.02em] text-center font-semibold text-[36px] leading-[44px] text-[#F4F7F9] md:px-[32px] text-black">
@@ -117,7 +117,7 @@ const Layout = memo((props: LayoutProps) => {
 					</div>
 					<div className="flex flex-col items-center gap-[15px] text-cente h-100">
 						<AnimatedSection delay={0} className="transition-all duration-700 ease-in-out">
-							<Image src="assets/feature-bg.png" className="h-100 lg:h-[700px] xl:h-[700px]" />
+							<Image src="assets/feature-bg.png" className="w-full h-auto lg:max-h-[700px] xl:max-h-[700px] object-contain" />
 						</AnimatedSection>
 					</div>
 
@@ -126,36 +126,40 @@ const Layout = memo((props: LayoutProps) => {
 							<div className="flex max-md:flex-wrap gap-[14px] w-full items-stretch">
 								<AnimatedSection
 									delay={0}
-									className="min-h-[550px] max-md:min-h-[300px] max-lg:min-h-[400px] bg-[url('assets/feature-mobile.png')] w-[50%] flex flex-col max-md:w-full border-2 border-[#4465FF4D] hover:border-[#9C3FE9] rounded-[8px] p-[24px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
+									<Image src="assets/feature-mobile-mezon.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
-										className="text-[36px] font-semibold leading-[38px] max-md:text-[30px] max-md:leading-[30px] text-transparent text-center"
+										className="absolute top-[30px] left-1/2 transform -translate-x-1/2 text-transparent text-center"
 										style={{
 											background: 'linear-gradient(90deg, #9C3FE9 0%, #1D5AFA 100%)',
 											WebkitBackgroundClip: 'text',
 											backgroundClip: 'text'
 										}}
 									>
-										Mezon Mainnet <br></br>
-										<span className="md:mt-5 mt-10 text-[26px]  max-md:text-[18px] font-normal leading-[24px]">
+										<span className="text-[30px] leading-[48px] max-lg:text-[26px] font-bold">Mezon Mainnet </span>
+										<br></br>
+										<span className="md:mt-5 mt-10 text-[26px]  max-lg:text-[18px] font-normal leading-[24px]">
 											The Zero-Fee, High-Speed Layer 1 <br></br>Blockchain
 										</span>
 									</div>
 								</AnimatedSection>
 								<AnimatedSection
-									delay={300}
-									className="min-h-[550px] max-md:min-h-[300px] max-lg:min-h-[400px] bg-[url('assets/feature-msg.png')] w-[50%] flex flex-col max-md:w-full border-2 border-[#4465FF4D] hover:border-[#9C3FE9] rounded-[8px] p-[24px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									delay={0}
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
+									<Image src="assets/feature-chat-mezon.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
-										className="text-[36px] font-semibold leading-[38px] text-center max-md:text-[30px] max-md:leading-[30px] text-transparent text-center"
+										className="w-full absolute top-[30px] left-1/2 transform -translate-x-1/2 font-semibold text-transparent text-center"
 										style={{
 											background: 'linear-gradient(90deg, #9C3FE9 0%, #1D5AFA 100%)',
 											WebkitBackgroundClip: 'text',
 											backgroundClip: 'text'
 										}}
 									>
-										Advanced Developer <br></br>
-										<span className="md:mt-5 mt-10 text-[26px] max-md:text-[18px] font-normal leading-[24px]">API Platform</span>
+										<span className="text-[30px] max-lg:text-[26px] font-bold">Advanced Developer </span>
+										<br></br>
+										<span className="md:mt-5 mt-10 text-[26px] max-lg:text-[18px] font-normal leading-[24px]">API Platform</span>
 									</div>
 								</AnimatedSection>
 							</div>
@@ -163,10 +167,11 @@ const Layout = memo((props: LayoutProps) => {
 							<div className="flex max-md:flex-wrap gap-[14px] w-full items-stretch">
 								<AnimatedSection
 									delay={0}
-									className="min-h-[550px] max-md:min-h-[300px] max-lg:min-h-[400px] bg-[url('assets/feature-game.png')] w-[50%] flex flex-col max-md:w-full border-2 border-[#4465FF4D] hover:border-[#9C3FE9] rounded-[8px] p-[10px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
+									<Image src="assets/feature-gamming.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
-										className="font-semibold leading-[38px] max-md:leading-[30px] text-transparent text-right"
+										className="absolute top-[20px] right-[40px] font-semibold text-transparent text-right"
 										style={{
 											background: 'linear-gradient(90deg, #9C3FE9 0%, #1D5AFA 100%)',
 											WebkitBackgroundClip: 'text',
@@ -174,9 +179,9 @@ const Layout = memo((props: LayoutProps) => {
 										}}
 									>
 										{' '}
-										<span className="mr-20 text-[48px] leading-[48px] max-md:text-[36px] font-bold">Gaming</span>
+										<span className="text-[45px] leading-[48px] max-lg:text-[26px] font-bold mr-20 max-lg:mr-2.5">Gaming</span>
 										<br></br>
-										<span className="md:mt-5 mt-10 text-[26px] max-md:text-[18px] font-normal leading-[24px]">
+										<span className="md:mt-5 mt-10 text-[26px] max-lg:text-[18px] font-normal leading-[24px]">
 											{' '}
 											& Entertainment
 										</span>
@@ -184,10 +189,11 @@ const Layout = memo((props: LayoutProps) => {
 								</AnimatedSection>
 								<AnimatedSection
 									delay={300}
-									className="min-h-[550px] max-md:min-h-[300px] max-lg:min-h-[400px] bg-[url('assets/feature-clan.png')] w-[50%] flex flex-col max-md:w-full border-2 border-[#4465FF4D] hover:border-[#9C3FE9] rounded-[8px] p-[10px] gap-[40px] max-md:py-[16px] max-md:px-[16px] max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
+									className="relative w-[50%] flex flex-col max-md:w-full rounded-[12px] overflow-hidden gap-[40px] border-[4px] border-transparent hover:border-[#8D5BDF]  max-md:rounded-[12px] max-md:gap-[20px] bg-cover bg-center bg-no-repeat max-md:bg-cover max-md:bg-top max-lg:bg-cover max-lg:bg-center cursor-pointer transition-all duration-300"
 								>
+									<Image src="assets/feature-clan.png" className="block w-full h-full object-cover rounded-[8px]" />
 									<div
-										className="text-[36px] font-semibold leading-[38px] max-md:text-[30px] max-md:leading-[30px] text-transparent text-center"
+										className="absolute top-[20px] left-[90px] font-semibold text-transparent text-left"
 										style={{
 											background: 'linear-gradient(90deg, #9C3FE9 0%, #1D5AFA 100%)',
 											WebkitBackgroundClip: 'text',
@@ -195,9 +201,9 @@ const Layout = memo((props: LayoutProps) => {
 										}}
 									>
 										{' '}
-										<span className="mr-20 text-[36px] leading-[48px] max-md:text-[30px] font-bold">Customizable</span>
+										<span className="text-[30px] leading-[48px] max-lg:text-[26px] font-bold">Customizable</span>
 										<br></br>
-										<span className="md:mt-5 mt-10 text-[26px] max-md:text-[18px] font-normal leading-[24px">
+										<span className="md:mt-5 mt-10 text-[26px] max-lg:text-[18px] font-normal leading-[24px] ml-10">
 											{' '}
 											& Scalable Platform
 										</span>
@@ -205,19 +211,19 @@ const Layout = memo((props: LayoutProps) => {
 								</AnimatedSection>
 							</div>
 
-							{!sideBarIsOpen && (
+							{/* {!sideBarIsOpen && (
 								<div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[190px] mix-blend-color-dodge will-change-transform"></div>
-							)}
+							)} */}
 						</div>
 					</div>
-					{!sideBarIsOpen && (
+					{/* {!sideBarIsOpen && (
 						<div>
 							<div className="hidden md:block absolute top-[8%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[140px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute top-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute bottom-0 right-1/2 w-[300px] h-[300px] bg-[#8D72C5] rounded-full filter blur-[130px] mix-blend-color-dodge will-change-transform"></div>
 							<div className="hidden max-md:block absolute top-[40%] right-0 w-[200px] h-[400px] bg-[#8D72C5] rounded-full filter blur-[100px] mix-blend-color-dodge will-change-transform"></div>
 						</div>
-					)}
+					)} */}
 				</div>
 			</section>
 		</div>

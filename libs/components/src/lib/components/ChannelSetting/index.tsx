@@ -1,15 +1,7 @@
-import { useEscapeKeyClose, useOnClickOutside, usePermissionChecker } from '@mezon/core';
-import {
-	fetchUserChannels,
-	fetchWebhooks,
-	selectChannelById,
-	selectCloseMenu,
-	selectCurrentClanId,
-	useAppDispatch,
-	useAppSelector
-} from '@mezon/store';
+import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
+import { fetchUserChannels, selectChannelById, selectCloseMenu, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { EPermission, IChannel } from '@mezon/utils';
+import { IChannel } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import QuickMenuAccessManager from '../ClanSettings/SettingChannel/QuickMenuAccessManager';
@@ -50,15 +42,7 @@ const SettingChannel = (props: ModalSettingProps) => {
 			setMenu(false);
 		}
 	};
-	const clanId = useSelector(selectCurrentClanId) as string;
 	const dispatch = useAppDispatch();
-	const [canManageChannel] = usePermissionChecker([EPermission.manageChannel]);
-
-	useEffect(() => {
-		if (canManageChannel) {
-			dispatch(fetchWebhooks({ channelId: channel.channel_id as string, clanId: clanId }));
-		}
-	}, [channel.channel_id, canManageChannel, dispatch, clanId]);
 
 	useEffect(() => {
 		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
