@@ -59,7 +59,10 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 
 	const availableRoleList = useMemo(() => {
 		if (channel?.channel_private) {
-			return listOfChannelRole?.filter((role) => typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1);
+			return listOfChannelRole?.filter(
+				(role) =>
+					typeof role?.role_channel_active === 'number' && role?.role_channel_active === 1 && role?.slug !== `everyone-${role?.clan_id}`
+			);
 		}
 		return [];
 	}, [listOfChannelRole, channel?.channel_private]);
