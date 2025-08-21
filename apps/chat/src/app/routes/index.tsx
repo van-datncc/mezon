@@ -52,6 +52,7 @@ const Login = lazy(() => import(/* webpackChunkName: "auth-pages" */ '../pages/l
 const LoginCallback = lazy(() => import(/* webpackChunkName: "auth-pages" */ '../pages/loginCallback'));
 const LogoutCallback = lazy(() => import(/* webpackChunkName: "auth-pages" */ '../pages/logoutCallback'));
 const Main = lazy(() => import(/* webpackChunkName: "main-pages" */ '../pages/main'));
+const AddFriendPage = lazy(() => import(/* webpackChunkName: "main-pages" */ '../pages/invite/addFriendPage'));
 const MemberMain = lazy(() => import(/* webpackChunkName: "member-pages" */ '../pages/member'));
 const ChannelSettingMain = lazy(() => import(/* webpackChunkName: "setting-pages" */ '../pages/setting/channelSetting'));
 const ThreadsMain = lazy(() => import(/* webpackChunkName: "thread-pages" */ '../pages/thread'));
@@ -167,22 +168,22 @@ export const Routes = memo(() => {
 					// },
 					isElectron()
 						? {
-							path: '/',
-							element: (
-								<Suspense fallback={<SuspenseFallback />}>
-									<InitialRoutes />
-								</Suspense>
-							)
-						}
+								path: '/',
+								element: (
+									<Suspense fallback={<SuspenseFallback />}>
+										<InitialRoutes />
+									</Suspense>
+								)
+							}
 						: {
-							path: '/',
-							loader: loaderWithStore(loginLoader),
-							element: (
-								<Suspense fallback={<SuspenseFallback />}>
-									<MezonPage />
-								</Suspense>
-							)
-						},
+								path: '/',
+								loader: loaderWithStore(loginLoader),
+								element: (
+									<Suspense fallback={<SuspenseFallback />}>
+										<MezonPage />
+									</Suspense>
+								)
+							},
 					{
 						path: '/apps',
 						element: (
@@ -201,22 +202,22 @@ export const Routes = memo(() => {
 						children: [
 							isElectron()
 								? {
-									path: 'login',
-									loader: loaderWithStore(loginLoader),
-									element: (
-										<Suspense fallback={<SuspenseFallback />}>
-											<Login />
-										</Suspense>
-									)
-								}
+										path: 'login',
+										loader: loaderWithStore(loginLoader),
+										element: (
+											<Suspense fallback={<SuspenseFallback />}>
+												<Login />
+											</Suspense>
+										)
+									}
 								: {
-									path: 'mezon',
-									element: (
-										<Suspense fallback={<SuspenseFallback />}>
-											<InitialRoutes />
-										</Suspense>
-									)
-								}
+										path: 'mezon',
+										element: (
+											<Suspense fallback={<SuspenseFallback />}>
+												<InitialRoutes />
+											</Suspense>
+										)
+									}
 						]
 					},
 					{
@@ -466,6 +467,14 @@ export const Routes = memo(() => {
 												]
 											}
 										]
+									},
+									{
+										path: ':username',
+										element: (
+											<Suspense fallback={<SuspenseFallback />}>
+												<AddFriendPage />
+											</Suspense>
+										)
 									}
 								]
 							}
