@@ -11,9 +11,9 @@ interface ICachedImageWithRetryIOSProps {
 }
 
 const extractOriginalUrl = (url: string): string | null => {
-	if (url?.includes?.(process.env.NX_IMGPROXY_BASE_URL) && url?.includes?.(process.env.NX_BASE_IMG_URL)) {
+	if (url?.includes?.(process.env.NX_IMGPROXY_BASE_URL) && (url?.includes?.('https://cdn.mezon.ai') || url?.includes?.('https://cdn.mezon.vn'))) {
 		const parts = url?.split?.('/plain/');
-		if (parts?.length > 1 && parts?.[1]?.startsWith(process.env.NX_BASE_IMG_URL)) {
+		if (parts?.length > 1 && (parts?.[1]?.startsWith('https://cdn.mezon.ai') || parts?.[1]?.startsWith('https://cdn.mezon.vn'))) {
 			return parts?.[1]?.split?.('@')?.[0];
 		}
 	}
