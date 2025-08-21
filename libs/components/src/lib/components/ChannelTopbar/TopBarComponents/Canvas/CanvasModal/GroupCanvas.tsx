@@ -3,6 +3,7 @@ import { appActions, canvasActions, canvasAPIActions, selectIdCanvas, useAppDisp
 import { ICanvas } from '@mezon/utils';
 import { ButtonCopy } from 'libs/components/src/lib/components';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 type GroupCanvasProps = {
 	canvas: ICanvas;
 	channelId?: string;
@@ -58,13 +59,16 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, sel
 
 	return (
 		<div className="w-full flex gap-2 relative">
-			<div
-				className={`w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg border-theme-primary ${isSelected ? 'bg-item-theme text-theme-primary-active' : ''}`}
+			<Link
+				className={`w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg border-theme-primary ${
+					currentIdCanvas === canvasId ? 'bg-item-theme text-theme-primary-active ' : 'bg-item-hover'
+				}`}
 				role="button"
-				onClick={handleCanvasClick}
+				to={link}
+				onClick={handleOpenCanvas}
 			>
 				<div className="h-6 text-xs one-line font-semibold leading-6 ">{canvas.title ? canvas.title : 'Untitled'}</div>
-			</div>
+			</Link>
 			<ButtonCopy
 				copyText={process.env.NX_CHAT_APP_REDIRECT_URI + link}
 				className={`absolute top-2 !rounded-full overflow-hidden  ${!isDisableDelCanvas ? 'right-[35px]' : 'right-[5px]'}  `}
