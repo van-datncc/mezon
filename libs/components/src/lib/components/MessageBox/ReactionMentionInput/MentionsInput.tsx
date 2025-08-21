@@ -71,6 +71,7 @@ export interface MentionsInputProps {
 	enableUndoRedo?: boolean;
 	maxHistorySize?: number;
 	hasFilesToSend?: boolean;
+  setCaretToEnd?: boolean;
 }
 
 export interface MentionsInputHandle {
@@ -90,7 +91,6 @@ interface ActiveMentionContext {
 	config: MentionProps;
 	mentionState: MentionState;
 }
-
 
 const prepareForRegExp = (html: string): string => {
 	return html
@@ -240,6 +240,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	enableUndoRedo = false,
 	maxHistorySize = 50,
 	hasFilesToSend = false,
+	setCaretToEnd = false,
 }, ref) => {
 	const inputRef = useRef<HTMLDivElement>(null);
 
@@ -258,6 +259,21 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			isValidElement(child) && typeof child.type === 'function'
 		)
 		.map(child => child.props);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.innerHTML = value;
+      if (setCaretToEnd && value) {
+        requestNextMutation(() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+            const textContent = inputRef.current.textContent || '';
+            setCaretPosition(inputRef.current, textContent.length);
+          }
+        });
+      }
+    }
+  } , [])
 
 	useEffect(() => {
 		if (value !== html) {
@@ -418,7 +434,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					contenteditable="false"
 					class="text-entity-emoji"
 					dir="auto"
-				>:${display}:</span>`;
+				>${display}</span>`;
 			} else if (config.trigger === '#' && markup === '#[__display__](__id__)') {
 				htmlToInsert = `<a
 					class="text-entity-link hashtag"
@@ -992,7 +1008,6 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					outline: 'none'
 				}}
 			/>
-
 			{renderPopover()}
 		</div>
 	);

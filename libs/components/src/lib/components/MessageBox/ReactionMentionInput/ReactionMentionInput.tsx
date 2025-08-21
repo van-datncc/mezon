@@ -32,7 +32,6 @@ import {
   CHANNEL_INPUT_ID,
   CREATING_TOPIC,
   ChannelMembersEntity,
-  EBacktickType,
   GENERAL_INPUT_ID,
   ID_MENTION_HERE,
   IEmojiOnMessage,
@@ -44,6 +43,7 @@ import {
   MIN_THRESHOLD_CHARS,
   MentionReactInputProps,
   QUICK_MENU_TYPE,
+  RECENT_EMOJI_CATEGORY,
   RequestInput,
   SubPanelName,
   TITLE_MENTION_HERE,
@@ -55,6 +55,7 @@ import {
   extractCanvasIdsFromText,
   filterEmptyArrays,
   processBoldEntities,
+  processEntitiesDirectly,
   processMarkdownEntities,
   searchMentionsHashtag,
   threadError
@@ -130,9 +131,25 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const [mentionEveryone, setMentionEveryone] = useState(false);
 	const addEmojiState = useSelector(selectAddEmojiState);
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
-	// const { queryEmojis } = useEmojiQuery();
 
 	const { emojis } = useEmojiSuggestionContext();
+
+
+  const queryEmojis = (query: string) => {
+		if (!query || emojis.length === 0) return [];
+		const q = query.toLowerCase();
+		const matches: { id: string; display: string; src?: string }[] = [];
+
+		for (const { id, shortname, category, src } of emojis) {
+			if (category === RECENT_EMOJI_CATEGORY || !shortname || !shortname.includes(q)) continue;
+			if (!id) continue;
+			matches.push({ id, display: shortname, src });
+			if (matches.length === 20) break;
+		}
+
+		return matches;
+	};
+
 
 	const [isEphemeralMode, setIsEphemeralMode] = useState(false);
 	const [ephemeralTargetUserId, setEphemeralTargetUserId] = useState<string | null>(null);
@@ -221,123 +238,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		]
 	);
 
-	const processEntitiesDirectly = useCallback((entities: any[], content: string, rolesClan: any[]) => {
-		const mentions: IMentionOnMessage[] = [];
-		const hashtags: IHashtagOnMessage[] = [];
-		const emojis: IEmojiOnMessage[] = [];
-		const markdown: IMarkdownOnMessage[] = [];
-
-
-		entities.forEach((entity: any) => {
-			const { type, offset, length, userId, id, documentId, role_id, language } = entity;
-
-			const s = offset;
-			const e = offset + length;
-			const display = content.substring(offset, offset + length);
-
-			switch (type) {
-				case 'MessageEntityMentionName':
-					if (userId) {
-						const isRole = rolesClan.some((role) => role.roleId === userId);
-						mentions.push({
-							role_id: isRole ? userId : undefined,
-							user_id: !isRole ? userId : undefined,
-							s,
-							e,
-							display
-						});
-					}
-					break;
-
-          case 'MessageEntityMentionRole':
-              mentions.push({
-                role_id: role_id,
-                s,
-                e,
-                display
-              });
-            break;
-
-				case 'MessageEntityHashtag':
-					if (id) {
-						hashtags.push({
-							s,
-							e,
-							channelid: id
-						});
-					}
-					break;
-
-				case 'MessageEntityCustomEmoji':
-					if (documentId) {
-						emojis.push({
-							s,
-							e,
-							emojiid: documentId
-						});
-					}
-					break;
-
-				case 'MessageEntityBold':
-					markdown.push({ s, e, type: EBacktickType.BOLD });
-					break;
-
-				case 'MessageEntityItalic':
-					markdown.push({ s, e, type: EBacktickType.SINGLE });
-					break;
-
-				case 'MessageEntityUnderline':
-					markdown.push({ s, e, type: EBacktickType.CODE });
-					break;
-
-				case 'MessageEntityStrike':
-					markdown.push({ s, e, type: EBacktickType.SINGLE });
-					break;
-
-				case 'MessageEntityCode':
-					markdown.push({ s, e, type: EBacktickType.CODE });
-					break;
-
-				case 'MessageEntityPre':
-					markdown.push({
-						s,
-						e,
-						type: EBacktickType.PRE
-					});
-					break;
-
-				case 'MessageEntitySpoiler':
-					markdown.push({ s, e, type: EBacktickType.SINGLE });
-					break;
-
-				case 'MessageEntityBlockquote':
-					markdown.push({ s, e, type: EBacktickType.SINGLE });
-					break;
-
-				case 'MessageEntityTextUrl':
-					markdown.push({
-						s,
-						e,
-						type: EBacktickType.LINK
-					});
-					break;
-
-				case 'MessageEntityUrl':
-					markdown.push({
-						s,
-						e,
-						type: EBacktickType.LINK
-					});
-					break;
-
-				default:
-					break;
-			}
-		});
-
-
-		return { mentions, hashtags, emojis, markdown };
-	}, []);
 
 	const handleSendInternal = useCallback(
 		(checkedRequest: RequestInput, anonymousMessage?: boolean) => {
@@ -861,6 +761,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			entities: entities || []
 		});
 
+
 		if (newMentions?.some((mention) => (mention as any).userId === ID_MENTION_HERE)) {
 			setMentionEveryone(true);
 		} else {
@@ -1153,7 +1054,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
             title='EMOJI MATCHING'
 						trigger=":"
 						markup="::[__display__](__id__)"
-						data={emojis}
+						data={queryEmojis}
 						displayTransform={(id: any, display: any) => {
 							return `${display}`;
 						}}
@@ -1174,7 +1075,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 											/>
 										)}
 										<div className="flex flex-col min-w-0">
-											<span className="font-medium text-sm truncate">:{suggestion.display}:</span>
+											<span className="font-medium text-sm truncate">{suggestion.display}</span>
 										</div>
 									</div>
 								</div>
