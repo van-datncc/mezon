@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface MentionData {
 	id: string;
@@ -24,6 +24,7 @@ export interface MentionState {
 
 export interface MentionProps {
 	trigger: string;
+  title: string;
 	displayPrefix?: string;
 	data: MentionData[] | ((query: string) => Promise<MentionData[]>) | ((query: string) => MentionData[]);
 	renderSuggestion?: (suggestion: MentionData, search: string, highlightedDisplay: React.ReactNode, index: number, focused: boolean) => React.ReactNode;
@@ -47,6 +48,7 @@ export interface MentionProps {
 
 export default function Mention({
 	trigger,
+  title,
 	data,
 	renderSuggestion,
 	markup = `${trigger}[__display__](__id__)`,
@@ -66,8 +68,14 @@ export default function Mention({
 }: MentionProps) {
 	const [suggestions, setSuggestions] = useState<MentionData[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const abortControllerRef = useRef<AbortController | null>(null);
 
 	const loadSuggestions = useCallback(async (query: string) => {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+
 		if (Array.isArray(data)) {
 			const filtered = data
 				.filter(item => {
@@ -88,18 +96,28 @@ export default function Mention({
 		if (typeof data === 'function') {
 			try {
 				setIsLoading(true);
+				abortControllerRef.current = new AbortController();
+
 				const result = data(query);
 				if (result instanceof Promise) {
 					const resolved = await result;
-					setSuggestions(resolved.slice(0, 10));
+					if (!abortControllerRef.current?.signal.aborted) {
+						setSuggestions(resolved.slice(0, 10));
+					}
 				} else {
-					setSuggestions(result.slice(0, 10));
+					if (!abortControllerRef.current?.signal.aborted) {
+						setSuggestions(result.slice(0, 10));
+					}
 				}
 			} catch (error) {
-				console.error('Error loading mention suggestions:', error);
-				setSuggestions([]);
+				if (error instanceof Error && error.name !== 'AbortError') {
+					console.error('Error loading mention suggestions:', error);
+					setSuggestions([]);
+				}
 			} finally {
-				setIsLoading(false);
+				if (!abortControllerRef.current?.signal.aborted) {
+					setIsLoading(false);
+				}
 			}
 		}
 	}, [data]);
@@ -109,14 +127,39 @@ export default function Mention({
 		onAdd?.(suggestion.id, suggestion.display, mentionState?.startPos || 0, mentionState?.endPos || 0);
 	}, [onSelect, onAdd, mentionState]);
 
+	const debouncedLoadSuggestions = useCallback((query: string) => {
+		if (debounceTimeoutRef.current) {
+			clearTimeout(debounceTimeoutRef.current);
+		}
+
+		debounceTimeoutRef.current = setTimeout(() => {
+			loadSuggestions(query);
+		}, 150);
+	}, [loadSuggestions]);
+
 	useEffect(() => {
 		if (mentionState?.isActive && mentionState.query !== undefined) {
-			loadSuggestions(mentionState.query);
+			debouncedLoadSuggestions(mentionState.query);
 		} else {
+			if (debounceTimeoutRef.current) {
+				clearTimeout(debounceTimeoutRef.current);
+			}
+			if (abortControllerRef.current) {
+				abortControllerRef.current.abort();
+			}
 			setSuggestions([]);
 			setIsLoading(false);
 		}
-	}, [mentionState?.isActive, mentionState?.query, loadSuggestions]);
+
+		return () => {
+			if (debounceTimeoutRef.current) {
+				clearTimeout(debounceTimeoutRef.current);
+			}
+			if (abortControllerRef.current) {
+				abortControllerRef.current.abort();
+			}
+		};
+	}, [mentionState?.isActive, mentionState?.query, debouncedLoadSuggestions]);
 
 	useEffect(() => {
 		if (triggerSelection && mentionState?.isActive && suggestions.length > 0) {
@@ -127,33 +170,6 @@ export default function Mention({
 			onSelectionTriggered?.();
 		}
 	}, [triggerSelection, mentionState?.isActive, mentionState?.selectedIndex, suggestions, handleSelect, onSelectionTriggered]);
-
-	const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-		if (!mentionState?.isActive || suggestions.length === 0) {
-			return false;
-		}
-
-		switch (e.key) {
-			case 'ArrowDown':
-				e.preventDefault();
-				return true;
-			case 'ArrowUp':
-				e.preventDefault();
-				return true;
-			case 'Enter':
-			case 'Tab':
-				e.preventDefault();
-				if (suggestions[mentionState.selectedIndex]) {
-					handleSelect(suggestions[mentionState.selectedIndex]);
-				}
-				return true;
-			case 'Escape':
-				e.preventDefault();
-				return true;
-			default:
-				return false;
-		}
-	}, [mentionState, suggestions, handleSelect]);
 
 	if (!mentionState?.isActive) {
 		return null;
@@ -179,16 +195,14 @@ export default function Mention({
 			className={`mention-dropdown thread-scroll ${className} ${suggestionsClassName}`}
 			style={{ ...style, ...suggestionStyle }}
 		>
+    	<div className="flex items-center justify-between p-2 h-10">
+					<h3 className="text-xs font-bold text-theme-primary uppercase">{title}</h3>
+			</div>
 			{suggestions.map((suggestion, index) => {
 				const focused = index === (mentionState?.selectedIndex || 0);
 
 				if (renderSuggestion) {
 					const query = mentionState?.query || '';
-					const highlightedDisplay = suggestion.display.replace(
-						new RegExp(`(${query})`, 'gi'),
-						'<mark>$1</mark>'
-					);
-
 					return (
 						<div
 							key={suggestion.id}
@@ -198,7 +212,7 @@ export default function Mention({
 							{renderSuggestion(
 								suggestion,
 								query,
-								<span dangerouslySetInnerHTML={{ __html: highlightedDisplay }} />,
+								<span>{suggestion.display}</span>,
 								index,
 								focused
 							)}

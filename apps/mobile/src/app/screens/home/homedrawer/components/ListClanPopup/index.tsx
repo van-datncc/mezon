@@ -140,7 +140,7 @@ export const ListClanPopup = React.memo(() => {
 				return baseThreshold * thresholdMultiplier;
 			}
 
-			return baseThreshold * indexDiff;
+			return baseThreshold * indexDiff - indexDiff;
 		} catch (error) {
 			console.error('Error in calculateDynamicThreshold: ', error);
 			return 0;

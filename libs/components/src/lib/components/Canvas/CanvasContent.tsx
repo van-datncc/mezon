@@ -6,8 +6,25 @@ import Quill, { Delta } from 'quill';
 import 'quill/dist/quill.snow.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { handlePaste, preventBase64Images } from './canvasPasteUtils';
-import { ActiveFormats, FormatOption, getActiveFormatsFromQuill, getActiveOptionFromFormats, getDefaultActiveFormats } from './formatUtils';
+import { CanvasFormatType, QuillCodeBlockValue, QuillHeaderValue, QuillListValue, handlePaste, preventBase64Images } from './canvasPasteUtils';
+
+interface ActiveFormats {
+	bold: boolean;
+	italic: boolean;
+	underline: boolean;
+	strike: boolean;
+	'code-block': boolean;
+	link: string;
+	h1: boolean;
+	h2: boolean;
+	h3: boolean;
+	paragraph: boolean;
+	check: boolean;
+	ordered: boolean;
+	bullet: boolean;
+	blockquote: boolean;
+	image: string;
+}
 
 type CanvasContentProps = {
 	isLightMode: boolean;
@@ -32,7 +49,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 	const placeholderColor = 'var(--text-theme-primary)';
 	const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
-	const [activeOption, setActiveOption] = useState('paragraph');
+	const [activeOption, setActiveOption] = useState(CanvasFormatType.PARAGRAPH);
 
 	const [isOpen, setIsOpen] = useState(false);
 	const selectRef = useRef<HTMLDivElement>(null);
@@ -41,18 +58,18 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 
 	const options = [
 		{
-			value: 'paragraph',
+			value: CanvasFormatType.PARAGRAPH,
 			label: 'Paragraph',
 			text: 'paragraph',
 			icon: <Icons.ParagraphIcon />
 		},
-		{ value: '1', label: 'Big Heading', text: 'h1', icon: <Icons.H1Icon /> },
-		{ value: '2', label: 'Medium Heading', text: 'h2', icon: <Icons.H2Icon /> },
-		{ value: '3', label: 'Small Heading', text: 'h3', icon: <Icons.H3Icon /> },
-		{ value: 'check', label: 'Checked list', text: 'check', icon: <Icons.CheckListIcon /> },
-		{ value: 'ordered', label: 'Ordered list', text: 'ordered', icon: <Icons.OrderedListIcon /> },
-		{ value: 'bullet', label: 'Bulleted list', text: 'bullet', icon: <Icons.BulletListIcon /> },
-		{ value: 'blockquote', label: 'Blockquote', text: 'blockquote', icon: <Icons.BlockquoteIcon /> }
+		{ value: CanvasFormatType.HEADING_1, label: 'Big Heading', text: 'h1', icon: <Icons.H1Icon /> },
+		{ value: CanvasFormatType.HEADING_2, label: 'Medium Heading', text: 'h2', icon: <Icons.H2Icon /> },
+		{ value: CanvasFormatType.HEADING_3, label: 'Small Heading', text: 'h3', icon: <Icons.H3Icon /> },
+		{ value: CanvasFormatType.CHECKED_LIST, label: 'Checked list', text: 'check', icon: <Icons.CheckListIcon /> },
+		{ value: CanvasFormatType.ORDERED_LIST, label: 'Ordered list', text: 'ordered', icon: <Icons.OrderedListIcon /> },
+		{ value: CanvasFormatType.BULLET_LIST, label: 'Bulleted list', text: 'bullet', icon: <Icons.BulletListIcon /> },
+		{ value: CanvasFormatType.BLOCKQUOTE, label: 'Blockquote', text: 'blockquote', icon: <Icons.BlockquoteIcon /> }
 	];
 
 	const [activeFormats, setActiveFormats] = useState<ActiveFormats>({
@@ -130,24 +147,24 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					italic: !!formats?.italic,
 					underline: !!formats?.underline,
 					strike: !!formats?.strike,
-					'code-block': formats?.['code-block'] === 'plain',
+					'code-block': formats?.['code-block'] === QuillCodeBlockValue.PLAIN,
 					link: (formats?.link as string) || '',
-					h1: formats?.header === 1,
-					h2: formats?.header === 2,
-					h3: formats?.header === 3,
+					h1: formats?.header === QuillHeaderValue.HEADER_1,
+					h2: formats?.header === QuillHeaderValue.HEADER_2,
+					h3: formats?.header === QuillHeaderValue.HEADER_3,
 					paragraph: !(
-						formats?.header === 1 ||
-						formats?.header === 2 ||
-						formats?.header === 3 ||
-						formats?.list === 'checked' ||
-						formats?.list === 'unchecked' ||
-						formats?.list === 'ordered' ||
-						formats?.list === 'bullet' ||
+						formats?.header === QuillHeaderValue.HEADER_1 ||
+						formats?.header === QuillHeaderValue.HEADER_2 ||
+						formats?.header === QuillHeaderValue.HEADER_3 ||
+						formats?.list === QuillListValue.LIST_CHECKED ||
+						formats?.list === QuillListValue.LIST_UNCHECKED ||
+						formats?.list === QuillListValue.LIST_ORDERED ||
+						formats?.list === QuillListValue.LIST_BULLET ||
 						!!formats?.blockquote
 					),
-					check: formats?.list === 'checked' || formats?.list === 'unchecked',
-					ordered: formats?.list === 'ordered',
-					bullet: formats?.list === 'bullet',
+					check: formats?.list === QuillListValue.LIST_CHECKED || formats?.list === QuillListValue.LIST_UNCHECKED,
+					ordered: formats?.list === QuillListValue.LIST_ORDERED,
+					bullet: formats?.list === QuillListValue.LIST_BULLET,
 					blockquote: !!formats?.blockquote,
 					image: (formats?.image as string) || ''
 				});
@@ -185,14 +202,71 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					});
 				});
 				const formats = quillRef.current?.getFormat(range) || {};
-				const nextActiveOption = getActiveOptionFromFormats(formats);
+				let nextActiveOption = CanvasFormatType.PARAGRAPH; // Default to paragraph
+
+				if (formats?.header === QuillHeaderValue.HEADER_1) {
+					nextActiveOption = CanvasFormatType.HEADING_1;
+				} else if (formats?.header === QuillHeaderValue.HEADER_2) {
+					nextActiveOption = CanvasFormatType.HEADING_2;
+				} else if (formats?.header === QuillHeaderValue.HEADER_3) {
+					nextActiveOption = CanvasFormatType.HEADING_3;
+				} else if (formats?.list === QuillListValue.LIST_CHECKED || formats?.list === QuillListValue.LIST_UNCHECKED) {
+					nextActiveOption = CanvasFormatType.CHECKED_LIST;
+				} else if (formats?.list === QuillListValue.LIST_ORDERED) {
+					nextActiveOption = CanvasFormatType.ORDERED_LIST;
+				} else if (formats?.list === QuillListValue.LIST_BULLET) {
+					nextActiveOption = CanvasFormatType.BULLET_LIST;
+				} else if (formats?.blockquote === true) {
+					nextActiveOption = CanvasFormatType.BLOCKQUOTE;
+				}
 
 				setActiveOption(nextActiveOption);
-				setActiveFormats(getActiveFormatsFromQuill(formats));
+				setActiveFormats({
+					bold: !!formats.bold,
+					italic: !!formats.italic,
+					underline: !!formats.underline,
+					strike: !!formats.strike,
+					'code-block': formats?.['code-block'] === QuillCodeBlockValue.PLAIN,
+					link: formats?.link as string,
+					h1: formats?.header === QuillHeaderValue.HEADER_1,
+					h2: formats?.header === QuillHeaderValue.HEADER_2,
+					h3: formats?.header === QuillHeaderValue.HEADER_3,
+					paragraph: !(
+						formats?.header === QuillHeaderValue.HEADER_1 ||
+						formats?.header === QuillHeaderValue.HEADER_2 ||
+						formats?.header === QuillHeaderValue.HEADER_3 ||
+						formats?.list === QuillListValue.LIST_CHECKED ||
+						formats?.list === QuillListValue.LIST_UNCHECKED ||
+						formats?.list === QuillListValue.LIST_ORDERED ||
+						formats?.list === QuillListValue.LIST_BULLET ||
+						!!formats?.blockquote
+					),
+					check: formats?.list === QuillListValue.LIST_CHECKED || formats?.list === QuillListValue.LIST_UNCHECKED,
+					ordered: formats?.list === QuillListValue.LIST_ORDERED,
+					bullet: formats?.list === QuillListValue.LIST_BULLET,
+					blockquote: !!formats?.blockquote,
+					image: (formats?.image as string) || ''
+				});
 			} else {
 				setToolbarVisible(false);
-				setActiveOption(FormatOption.PARAGRAPH);
-				setActiveFormats(getDefaultActiveFormats());
+				setActiveOption(CanvasFormatType.PARAGRAPH); // Reset to paragraph default
+				setActiveFormats({
+					bold: false,
+					italic: false,
+					underline: false,
+					strike: false,
+					'code-block': false,
+					link: '',
+					h1: false,
+					h2: false,
+					h3: false,
+					paragraph: false,
+					check: false,
+					ordered: false,
+					bullet: false,
+					blockquote: false,
+					image: ''
+				});
 			}
 		};
 
@@ -303,26 +377,31 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 
 	const handleSelectChange = (value: string) => {
 		if (quill && isEditAndDelCanvas) {
-			if (value === '1') {
-				quill.format('header', 1);
-			} else if (value === '2') {
-				quill.format('header', 2);
-			} else if (value === '3') {
-				quill.format('header', 3);
-			} else if (value === 'paragraph') {
+			if (value === CanvasFormatType.HEADING_1) {
+				quill.format('header', QuillHeaderValue.HEADER_1);
+			} else if (value === CanvasFormatType.HEADING_2) {
+				quill.format('header', QuillHeaderValue.HEADER_2);
+			} else if (value === CanvasFormatType.HEADING_3) {
+				quill.format('header', QuillHeaderValue.HEADER_3);
+			} else if (value === CanvasFormatType.PARAGRAPH) {
 				quill.format('header', false);
 				quill.format('list', false);
 				quill.format('blockquote', false);
-			} else if (value === 'check') {
-				quill.format('list', 'unchecked');
-			} else if (value === 'ordered') {
-				quill.format('list', 'ordered');
-			} else if (value === 'bullet') {
-				quill.format('list', 'bullet');
-			} else if (value === 'blockquote') {
+			} else if (value === CanvasFormatType.CHECKED_LIST) {
+				quill.format('list', QuillListValue.LIST_UNCHECKED);
+			} else if (value === CanvasFormatType.ORDERED_LIST) {
+				quill.format('list', QuillListValue.LIST_ORDERED);
+			} else if (value === CanvasFormatType.BULLET_LIST) {
+				quill.format('list', QuillListValue.LIST_BULLET);
+			} else if (value === CanvasFormatType.BLOCKQUOTE) {
 				quill.format('blockquote', true);
 			}
-			if (value === '1' || value === '2' || value === '3' || value === 'paragraph') {
+			if (
+				value === CanvasFormatType.HEADING_1 ||
+				value === CanvasFormatType.HEADING_2 ||
+				value === CanvasFormatType.HEADING_3 ||
+				value === CanvasFormatType.PARAGRAPH
+			) {
 				setActiveFormats((prevFormats) => {
 					const updatedFormats = {
 						...prevFormats,
@@ -330,7 +409,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					};
 					return updatedFormats;
 				});
-			} else if (value === 'check' || value === 'ordered' || value === 'bullet') {
+			} else if (value === CanvasFormatType.CHECKED_LIST || value === CanvasFormatType.ORDERED_LIST || value === CanvasFormatType.BULLET_LIST) {
 				setActiveFormats((prevFormats) => {
 					const updatedFormats = {
 						...prevFormats,
@@ -347,7 +426,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 					return updatedFormats;
 				});
 			}
-			setActiveOption(value);
+			setActiveOption(value as CanvasFormatType);
 			setIsOpen(false);
 		}
 	};
@@ -367,7 +446,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 				borderRadius: '5px'
 			};
 		} else if (type === 'option') {
-			const isActive = String(activeOption) === value || (value === 'blockquote' && activeFormats['blockquote']);
+			const isActive = String(activeOption) === value || (value === CanvasFormatType.BLOCKQUOTE && activeFormats['blockquote']);
 			return {
 				color: isActive ? '#048dba !important' : 'var(--text-theme-primary)'
 			};
@@ -430,13 +509,13 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 												value={option.value}
 												className={`min-h-[28px] cursor-pointer pt-[0] pr-[24px] pb-[0] pl-[10px] flex items-center ${
 													String(activeOption) === option.value ||
-													(option.value === 'blockquote' && activeFormats['blockquote'])
+													(option.value === CanvasFormatType.BLOCKQUOTE && activeFormats['blockquote'])
 														? 'text-[#048dba]'
 														: ''
 												}`}
 											>
 												{String(activeOption) === option.value ||
-												(option.value === 'blockquote' && activeFormats['blockquote']) ? (
+												(option.value === CanvasFormatType.BLOCKQUOTE && activeFormats['blockquote']) ? (
 													<span className="mr-[5px] w-[10px]">
 														<Icons.CheckedIcon color="#048dba" />
 													</span>
@@ -448,7 +527,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 														{React.cloneElement(option.icon, {
 															color:
 																String(activeOption) === option.value ||
-																(option.value === 'blockquote' && activeFormats['blockquote'])
+																(option.value === CanvasFormatType.BLOCKQUOTE && activeFormats['blockquote'])
 																	? '#048dba'
 																	: 'currentColor'
 														})}
@@ -456,7 +535,7 @@ function CanvasContent({ isLightMode, content, idCanvas, isEditAndDelCanvas, onC
 												)}
 												{option.label}
 											</li>
-											{option.value === '3' && <hr className="border-gray-400 my-2" />}
+											{option.value === CanvasFormatType.HEADING_3 && <hr className="border-gray-400 my-2" />}
 										</React.Fragment>
 									))}
 								</ul>

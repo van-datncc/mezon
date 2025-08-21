@@ -61,7 +61,7 @@ export const usePasteMentions = ({ draftRequest, updateDraft, editorRef, members
       const rolesClan = selectAllRolesClan(store.getState());
 
       const { mentionList } = processMention(
-        [...(draftRequest?.mentionRaw || []), ...mentionRaw],
+        [...mentionRaw],
         rolesClan,
         membersOfChild as ChannelMembersEntity[],
         membersOfParent as ChannelMembersEntity[],
@@ -73,14 +73,8 @@ export const usePasteMentions = ({ draftRequest, updateDraft, editorRef, members
       updateDraft({
         valueTextInput: insertStringAt(draftRequest?.valueTextInput || '', transformedText || '', transformedTextInsertIndex),
         content: insertStringAt(draftRequest?.content || '', pastedContent?.content?.t?.slice(startIndex, endIndex) || '', currentFocusIndex),
-        mentionRaw: [...(draftRequest?.mentionRaw || []), ...mentionRaw]
       });
 
-      const newFocusIndex = currentFocusIndex + (pastedContent?.content?.t?.slice(startIndex, endIndex) || '').length;
-      setTimeout(() => {
-        editorRef.current?.focus();
-        // editorRef.current?.setSelectionRange(newFocusIndex, newFocusIndex);
-      }, 0);
 
       event.preventDefault();
     },
