@@ -15,6 +15,7 @@ import { DirectMessageDetailScreen } from '../../screens/messages/DirectMessageD
 import { WalletScreen } from '../../screens/wallet';
 import { APP_SCREEN } from '../ScreenTypes';
 import { AuthenticationLoader } from './AuthenticationLoader';
+import { BadgeAppIconLoader } from './BadgeAppIconLoader';
 import BottomNavigatorWrapper from './BottomNavigatorWrapper';
 import { FCMNotificationLoader } from './FCMNotificationLoader';
 import { ListenerLoader } from './ListenerLoader';
@@ -171,6 +172,7 @@ export const RootAuthStack = memo(
 				<CallingModalGroupWrapper />
 				<ChannelRouterListener />
 				<ListenerLoader />
+				<BadgeAppIconLoader />
 			</View>
 		);
 	}

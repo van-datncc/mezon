@@ -9,7 +9,8 @@ export const style = (colors: Attributes) =>
 
 		wrapperLogo: {
 			alignSelf: 'center',
-			marginHorizontal: size.s_10
+			marginHorizontal: size.s_10,
+			paddingBottom: size.s_6
 		},
 
 		badge: {
@@ -22,7 +23,7 @@ export const style = (colors: Attributes) =>
 			height: size.s_24,
 			alignItems: 'center',
 			justifyContent: 'center',
-			bottom: -5,
+			bottom: 0,
 			right: -5
 		},
 
@@ -42,5 +43,5 @@ export const style = (colors: Attributes) =>
 			backgroundColor: colors.secondary
 		},
 		contentScroll: { paddingBottom: size.s_100 },
-		separatorLine: { width: '60%', marginTop: size.s_10, alignSelf: 'center' }
+		separatorLine: { width: '60%', marginTop: size.s_6, alignSelf: 'center' }
 	});
