@@ -473,6 +473,7 @@ export const Routes = memo(() => {
 					},
 					{
 						path: 'invite',
+						loader: loaderWithStore(authLoader),
 						children: [
 							{
 								path: ':inviteId',
