@@ -118,7 +118,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 							</a>
 						</div>
 					</div>
-					<div className="w-fit">
+					<div className={`w-fit lg:pl-5 min-[1505px]:pl-0`}>
 						<Link
 							className="hidden lg:block px-[16px] py-[10px] bg-[url(assets/button_openmezon.png)] bg-no-repeat rounded-xl text-[#6E4A9E] text-[16px] leading-[24px] font-bold whitespace-nowrap hover:opacity-90 transition-opacity"
 							to={'/mezon'}
