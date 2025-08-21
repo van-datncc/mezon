@@ -74,10 +74,10 @@ import Mention from './Mention';
 import MentionsInput, { type FormattedText, type MentionsInputHandle } from './MentionsInput';
 import { ChatBoxToolbarWrapper } from './components';
 import {
-	useClickUpToEditMessage,
-	useEmojiPicker,
-	useFocusEditor,
-	useFocusManager
+  useClickUpToEditMessage,
+  useEmojiPicker,
+  useFocusEditor,
+  useFocusManager
 } from './hooks';
 import processMention from './processMention';
 import { getCanvasTitles } from './utils/canvas';
@@ -149,7 +149,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const emojiPicked = useSelector(selectEmojiObjSuggestion);
 	// const { queryEmojis } = useEmojiQuery();
 
-	const { emojis } = useEmojiSuggestionContext();
+  const { emojis } = useEmojiSuggestionContext();
 
 	const [isEphemeralMode, setIsEphemeralMode] = useState(false);
 	const [ephemeralTargetUserId, setEphemeralTargetUserId] = useState<string | null>(null);
@@ -353,20 +353,20 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					break;
 
 				case 'MessageEntityTextUrl':
-					markdown.push({
-						s,
-						e,
-						type: EBacktickType.LINK
-					});
+						markdown.push({
+							s,
+							e,
+							type: EBacktickType.LINK
+						});
 					break;
 
-				case 'MessageEntityUrl':
-					markdown.push({
-						s,
-						e,
-						type: EBacktickType.LINK
-					});
-					break;
+        case 'MessageEntityUrl':
+              markdown.push({
+                s,
+                e,
+                type: EBacktickType.LINK
+              });
+            break;
 
 
 				default:
@@ -582,7 +582,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const hasToken = mentionList.length > 0 || hashtagList.length > 0 || emojiList.length > 0; // no remove trim() if message has token
 
 
-			const { content: text, entities } = checkedRequest;
+			const { content:text, entities } = checkedRequest;
 			const mk: IMarkdownOnMessage[] = processMarkdownEntities(text, entities);
 
 			const boldMarkdownArr = processBoldEntities(mentionsToProcess, mk);
@@ -1157,8 +1157,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		<div className={`contain-layout relative bg-theme-surface rounded-lg ${props?.isThread && 'border-theme-primary'}`} ref={containerRef}>
 			<div className="relative">
 				<span
-					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary   pointer-events-none z-10 truncate transition-opacity duration-300 ${draftRequest?.valueTextInput ? 'hidden' : 'opacity-100'
-						} sm:opacity-100 max-sm:opacity-100`}
+					className={`absolute left-2 top-1/2 transform -translate-y-1/2 text-theme-primary   pointer-events-none z-10 truncate transition-opacity duration-300 ${
+						draftRequest?.valueTextInput ? 'hidden' : 'opacity-100'
+					} sm:opacity-100 max-sm:opacity-100`}
 					style={{
 						whiteSpace: 'nowrap',
 						overflow: 'hidden',
@@ -1170,8 +1171,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					{ephemeralTargetUserId ? `Ephemeral message to ${ephemeralTargetUserDisplay}...` : 'Write your thoughts here...'}
 				</span>
 				<MentionsInput
-					id={CHANNEL_INPUT_ID}
-					ref={editorRef}
+          id={CHANNEL_INPUT_ID}
+          ref={editorRef}
 					value={draftRequest?.valueTextInput ?? ''}
 					onChange={onChangeMentionInput}
 					placeholder={ephemeralTargetUserId ? `Ephemeral message to ${ephemeralTargetUserDisplay}...` : 'Write your thoughts here...'}
@@ -1184,12 +1185,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						borderRadius: '8px'
 					}}
 					onSend={(formattedText: FormattedText) => {
-						handleSendWithFormattedText(formattedText, anonymousMode);
-					}}
-					onHandlePaste={props.handlePaste}
-					enableUndoRedo={true}
-					maxHistorySize={50}
-					hasFilesToSend={attachmentData.length > 0}
+					handleSendWithFormattedText(formattedText, anonymousMode);
+				}}
+				onHandlePaste={props.handlePaste}
+				enableUndoRedo={true}
+				maxHistorySize={50}
+				hasFilesToSend={attachmentData.length > 0}
 				>
 					<Mention
 						trigger="@"
@@ -1197,8 +1198,9 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						renderSuggestion={(suggestion: any, search: string, highlightedDisplay: React.ReactNode, index: number, focused: boolean) => {
 							return (
 								<div
-									className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${focused ? 'bg-[var(--bg-item-hover)] text-theme-primary' : ''}`}
-								>
+									className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
+										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''}`}
+  								>
 									<div className="flex items-center justify-between w-full">
 										<div className="flex items-center">
 											<div className="w-8 h-8 mr-3 flex-shrink-0">
@@ -1257,7 +1259,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						renderSuggestion={(suggestion: any, search: string, highlightedDisplay: React.ReactNode, index: number, focused: boolean) => {
 							return (
 								<div
-									className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${focused ? 'bg-[var(--bg-item-hover)] text-white' : ''}`}
+								className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
+                  focused ? 'bg-[var(--bg-item-hover)] text-white' : ''}`}
 								>
 									<div className="flex items-center w-full">
 										{suggestion?.src && (
