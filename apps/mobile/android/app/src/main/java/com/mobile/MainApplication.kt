@@ -24,6 +24,7 @@ import com.mezon.mobile.NotificationPreferencesPackage;
 import com.mezon.mobile.CallStatePackage;
 import com.mezon.mobile.AudioSessionPackage;
 import com.mezon.mobile.ImageClipboardPackage;
+import com.mezon.mobile.BadgePackage;
 import io.invertase.firebase.analytics.ReactNativeFirebaseAnalyticsPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 
@@ -49,6 +50,7 @@ class MainApplication : Application(), ReactApplication {
               add(CallStatePackage())
               add(RNScreensPackage())
               add(ImageClipboardPackage())
+              add(BadgePackage())
             }
 
         override fun getJSMainModuleName(): String = "src/main"

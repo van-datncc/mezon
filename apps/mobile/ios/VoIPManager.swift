@@ -160,7 +160,7 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
             handleVoIPNotification(payload: payload) { }
         }
     }
-  
+
   @objc
   func endCurrentCallKeep(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
       if let activeUUID = getActiveCallUUID() {
@@ -182,7 +182,6 @@ class VoIPManager: RCTEventEmitter, PKPushRegistryDelegate {
 
          // Only proceed if the app is in the background or killed
         guard appState == .background else {
-           print("log  => App is in the foreground, skipping logic")
            completion()
            return
         }

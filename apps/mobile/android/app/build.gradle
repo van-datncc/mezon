@@ -93,8 +93,8 @@ android {
         applicationId "com.mezon.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 469
-        versionName "1.1.96"
+        versionCode 500
+        versionName "1.1.98"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -171,6 +171,7 @@ dependencies {
     implementation 'com.facebook.fresco:animated-webp:3.1.3'
     implementation 'com.facebook.fresco:webpsupport:3.1.3'
     implementation 'androidx.core:core:1.10.1'
+    implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     // For WebP support, without animations
     implementation 'com.facebook.fresco:webpsupport:3.1.3'
     if (hermesEnabled.toBoolean()) {
