@@ -10,7 +10,6 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import com.mezon.mobile.CustomClientFactory;
-import com.zoontek.rnbootsplash.RNBootSplash;
 import android.app.NotificationManager
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -38,8 +37,8 @@ class MainActivity : ReactActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    RNBootSplash.init(this, R.style.BootTheme)
     super.onCreate(null);
+    setTheme(R.style.AppTheme)
 
     if (isTablet(this)) {
       requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
