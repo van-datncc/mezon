@@ -28,6 +28,8 @@ export interface DirectState extends EntityState<DirectEntity, string> {
 	currentDirectMessageType?: number;
 	statusDMChannelUnread: Record<string, boolean>;
 	buzzStateDirect: Record<string, BuzzArgs | null>;
+	updateDmGroupLoading: Record<string, boolean>;
+	updateDmGroupError: Record<string, string | null>;
 }
 
 export interface DirectRootState {
@@ -196,6 +198,46 @@ export const getDmEntityByChannelId = createAsyncThunk('channels/getChannelEntit
 	}
 });
 
+export const updateDmGroup = createAsyncThunk('direct/updateDmGroup', async (body: { channel_id: string; channel_label?: string; topic?: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+
+
+		const state = thunkAPI.getState() as RootState;
+		const current = state?.direct?.entities?.[body.channel_id];
+		const updatePayload: any = {};
+		if (typeof body.channel_label !== 'undefined') {
+			updatePayload.channel_label = body.channel_label;
+		} else if (typeof current?.channel_label !== 'undefined') {
+			updatePayload.channel_label = current.channel_label;
+		}
+		if (typeof body.topic !== 'undefined') {
+			updatePayload.topic = body.topic;
+		} else if (typeof current?.topic !== 'undefined') {
+			updatePayload.topic = current.topic;
+		}
+
+		const response = await mezon.client.updateChannelDesc(mezon.session, body.channel_id, updatePayload);
+
+		if (response) {
+			thunkAPI.dispatch(
+				directActions.updateOne({
+					channel_id: body.channel_id,
+					...(typeof body.channel_label !== 'undefined' ? { channel_label: body.channel_label } : {}),
+					...(typeof body.topic !== 'undefined' ? { topic: body.topic } : {})
+				})
+			);
+
+			thunkAPI.dispatch(directActions.fetchDirectMessage({ noCache: true }));
+		}
+
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'direct/updateDmGroup');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 	return channels.reduce<IUserItemActivity[]>((acc, dm) => {
 		if (dm?.active === 1) {
@@ -216,7 +258,7 @@ function mapChannelsToUsers(channels: any[]): IUserItemActivity[] {
 							try {
 								return JSON.parse(dm?.metadata[index]);
 							} catch (e) {
-								const unescapedJSON = dm?.metadata[index].replace(/\\./g, (match: string) => {
+								const unescapedJSON = dm?.metadata[index]?.replace(/\\./g, (match: string) => {
 									switch (match) {
 										case '\\"':
 											return '"';
@@ -440,7 +482,9 @@ export const initialDirectState: DirectState = directAdapter.getInitialState({
 	socketStatus: 'not loaded',
 	error: null,
 	statusDMChannelUnread: {},
-	buzzStateDirect: {}
+	buzzStateDirect: {},
+	updateDmGroupLoading: {},
+	updateDmGroupError: {}
 });
 
 export const directSlice = createSlice({
@@ -682,6 +726,23 @@ export const directSlice = createSlice({
 			.addCase(fetchDirectMessage.rejected, (state: DirectState, action) => {
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
+			})
+			.addCase(updateDmGroup.pending, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = true;
+				state.updateDmGroupError[channelId] = null;
+			})
+			.addCase(updateDmGroup.fulfilled, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = false;
+				state.updateDmGroupError[channelId] = null;
+				toast.success('Group updated successfully!');
+			})
+			.addCase(updateDmGroup.rejected, (state: DirectState, action) => {
+				const channelId = action.meta.arg.channel_id;
+				state.updateDmGroupLoading[channelId] = false;
+				state.updateDmGroupError[channelId] = action.error.message || 'Failed to update group';
+				toast.error(action.error.message || 'Failed to update group');
 			});
 	}
 });
@@ -691,6 +752,7 @@ export const directReducer = directSlice.reducer;
 export const directActions = {
 	...directSlice.actions,
 	fetchDirectMessage,
+	updateDmGroup,
 	createNewDirectMessage,
 	joinDirectMessage,
 	closeDirectMessage,
@@ -727,6 +789,10 @@ export const selectUserIdCurrentDm = createSelector(selectAllDirectMessages, sel
 export const selectIsLoadDMData = createSelector(getDirectState, (state) => state.loadingStatus !== 'not loaded');
 
 export const selectDmGroupCurrent = (dmId: string) => createSelector(selectDirectMessageEntities, (channelEntities) => channelEntities[dmId]);
+
+export const selectUpdateDmGroupLoading = (channelId: string) => createSelector(getDirectState, (state) => state.updateDmGroupLoading[channelId] || false);
+
+export const selectUpdateDmGroupError = (channelId: string) => createSelector(getDirectState, (state) => state.updateDmGroupError[channelId] || null);
 
 export const selectDirectsOpenlist = createSelector(selectAllDirectMessages, selectEntitiesDirectMeta, (directMessages, directMetaEntities) => {
 	return directMessages

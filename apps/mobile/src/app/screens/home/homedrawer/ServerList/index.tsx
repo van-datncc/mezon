@@ -1,7 +1,7 @@
 import { size, useTheme } from '@mezon/mobile-ui';
 import { selectLogoCustom } from '@mezon/store-mobile';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { NestableScrollContainer } from 'react-native-draggable-flatlist';
 import { useSelector } from 'react-redux';
@@ -16,14 +16,24 @@ import BadgeFriendRequest from './BadgeFriendRequest';
 import { style } from './styles';
 
 const ServerList = React.memo(() => {
-	const { themeValue, themeBasic } = useTheme();
+	const { themeValue } = useTheme();
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
 	const logoCustom = useSelector(selectLogoCustom);
+	const [readyRender, setReadyRender] = useState(false);
 
 	const navigateToDM = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 	};
+
+	useEffect(() => {
+		const splashTask = requestAnimationFrame(() => {
+			setReadyRender(true);
+		});
+		return () => cancelAnimationFrame(splashTask);
+	}, []);
+
+	if (!readyRender) return null;
 
 	return (
 		<View style={styles.wrapperServerList}>

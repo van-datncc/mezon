@@ -25,6 +25,7 @@ import {
 	clanMembersMetaActions,
 	clansActions,
 	clansSlice,
+	decreaseChannelBadgeCount,
 	defaultNotificationCategoryActions,
 	directActions,
 	directMembersMetaActions,
@@ -347,15 +348,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				const attachmentList: AttachmentEntity[] =
 					message.attachments && message.attachments.length > 0
 						? message.attachments.map((attachment) => {
-								const dateTime = new Date();
-								return {
-									...attachment,
-									id: attachment.url as string,
-									message_id: message?.message_id,
-									create_time: dateTime.toISOString(),
-									uploader: message?.sender_id
-								};
-							})
+							const dateTime = new Date();
+							return {
+								...attachment,
+								id: attachment.url as string,
+								message_id: message?.message_id,
+								create_time: dateTime.toISOString(),
+								uploader: message?.sender_id
+							};
+						})
 						: [];
 
 				if (attachmentList?.length && message?.code === TypeMessage.Chat) {
@@ -437,59 +438,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 				}
 
 				if (message?.code === TypeMessage.ChatRemove && message.sender_id !== userId) {
-					const messageTimestamp =
-						message.update_time_seconds && message.update_time_seconds > 0
-							? message.update_time_seconds
-							: message.create_time_seconds || 0;
-
-					const isMessageMentionOrReply = (msg: ChannelMessage, currentUserId: string): boolean => {
-						const hasMention = msg.mentions?.some((mention) => mention.user_id === currentUserId) ?? false;
-						const isReply = msg.references?.some((ref) => ref.message_sender_id === currentUserId) ?? false;
-
-						return hasMention || isReply;
-					};
-
-					if (!message.clan_id || message.clan_id === '0') {
-						const dmMeta = store.getState().directmeta?.entities?.[message.channel_id];
-						if (dmMeta && messageTimestamp > dmMeta.lastSeenTimestamp && dmMeta.count_mess_unread > 0) {
-							dispatch(directMetaActions.setCountMessUnread({ channelId: message.channel_id, count: -1 }));
-						}
-					}
-
-					if (message.clan_id && message.clan_id !== '0') {
-						const channelMeta = store.getState().channelmeta?.entities?.[message.channel_id];
-						const channel = store.getState().channels?.byClans?.[message.clan_id]?.entities?.entities?.[message.channel_id];
-
-						if (
-							channelMeta &&
-							channel &&
-							messageTimestamp > channelMeta.lastSeenTimestamp &&
-							(channel.count_mess_unread || 0) > 0 &&
-							isMessageMentionOrReply(message, userId as string)
-						) {
-							dispatch(
-								channelsActions.updateChannelBadgeCount({
-									clanId: message.clan_id,
-									channelId: message.channel_id,
-									count: -1
-								})
-							);
-
-							dispatch(
-								listChannelsByUserActions.updateChannelBadgeCount({
-									channelId: message.channel_id,
-									count: -1
-								})
-							);
-
-							dispatch(
-								clansActions.updateClanBadgeCount({
-									clanId: message.clan_id,
-									count: -1
-								})
-							);
-						}
-					}
+					decreaseChannelBadgeCount(dispatch, {
+						message,
+						userId: userId as string,
+						store
+					});
 				}
 				// check
 			} catch (error) {
@@ -2258,68 +2211,68 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children }) =
 
 		return () => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onvoicereactionmessage = () => {};
+			socket.onvoicereactionmessage = () => { };
 
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelmessage = () => {};
+			socket.onchannelmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onchannelpresence = () => {};
+			socket.onchannelpresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onnotification = () => {};
+			socket.onnotification = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onpinmessage = () => {};
+			socket.onpinmessage = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventnotiuserchannel = () => {};
+			socket.oneventnotiuserchannel = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onlastseenupdated = () => {};
+			socket.onlastseenupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncustomstatus = () => {};
+			socket.oncustomstatus = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstatuspresence = () => {};
+			socket.onstatuspresence = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncanvasevent = () => {};
+			socket.oncanvasevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ondisconnect = () => {};
+			socket.ondisconnect = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchannelremoved = () => {};
+			socket.onuserchannelremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanremoved = () => {};
+			socket.onuserclanremoved = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclandeleted = () => {};
+			socket.onclandeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserchanneladded = () => {};
+			socket.onuserchanneladded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserclanadded = () => {};
+			socket.onuserclanadded = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onremovefriend = () => {};
+			socket.onremovefriend = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickercreated = () => {};
+			socket.onstickercreated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventemoji = () => {};
+			socket.oneventemoji = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerdeleted = () => {};
+			socket.onstickerdeleted = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onstickerupdated = () => {};
+			socket.onstickerupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onclanprofileupdated = () => {};
+			socket.onclanprofileupdated = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oncoffeegiven = () => {};
+			socket.oncoffeegiven = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onroleevent = () => {};
+			socket.onroleevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onuserstatusevent = () => {};
+			socket.onuserstatusevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.oneventwebhook = () => {};
+			socket.oneventwebhook = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.ontokensent = () => {};
+			socket.ontokensent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onjoinchannelappevent = () => {};
+			socket.onjoinchannelappevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onsdtopicevent = () => {};
+			socket.onsdtopicevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onunpinmessageevent = () => {};
+			socket.onunpinmessageevent = () => { };
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			socket.onblockfriend = () => {};
+			socket.onblockfriend = () => { };
 		};
 	}, [
 		onchannelmessage,
@@ -2393,3 +2346,4 @@ const ChatContextConsumer = ChatContext.Consumer;
 ChatContextProvider.displayName = 'ChatContextProvider';
 
 export { ChatContext, ChatContextConsumer, ChatContextProvider };
+

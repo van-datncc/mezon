@@ -135,13 +135,13 @@ export const RenderHeaderModal = React.memo(({ onClose, imageSelected, onImageSa
 			</View>
 			<View style={styles.option}>
 				<TouchableOpacity onPress={handleCopyImage}>
-					<MezonIconCDN icon={IconCDN.copyIcon} color={Colors.white} />
+					<MezonIconCDN icon={IconCDN.copyIcon} color={Colors.white} height={size.s_20} width={size.s_20} />
 				</TouchableOpacity>
 				<TouchableOpacity onPress={handleForwardMessage}>
-					<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} />
+					<MezonIconCDN icon={IconCDN.arrowAngleRightUpIcon} color={Colors.white} height={size.s_20} width={size.s_20} />
 				</TouchableOpacity>
 				<TouchableOpacity onPress={handleDownloadImage}>
-					<MezonIconCDN icon={IconCDN.downloadIcon} color={Colors.white} />
+					<MezonIconCDN icon={IconCDN.downloadIcon} color={Colors.white} height={size.s_20} width={size.s_20} />
 				</TouchableOpacity>
 			</View>
 		</View>

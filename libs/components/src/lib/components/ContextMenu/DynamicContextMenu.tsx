@@ -447,7 +447,7 @@ export default function DynamicContextMenu({
 						disabled={item.disabled}
 						onMouseEnter={() => {
 							if (lableItemWarning) {
-								setWarningStatus('#E13542');
+								setWarningStatus('#f67e882a');
 							} else {
 								setWarningStatus('var(--bg-item-hover)');
 							}
@@ -457,7 +457,7 @@ export default function DynamicContextMenu({
 						}}
 					>
 						<div
-							className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542] hover:text-[#FFFFFF] ' : 'text-theme-primary text-theme-primary-hover'}`}
+							className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542]  ' : 'text-theme-primary text-theme-primary-hover'}`}
 						>
 							<span>{item.label}</span>
 							<span> {item.icon}</span>

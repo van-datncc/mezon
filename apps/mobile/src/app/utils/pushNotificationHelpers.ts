@@ -9,7 +9,7 @@ import {
 	STORAGE_MY_USER_ID
 } from '@mezon/mobile-components';
 import { appActions, channelsActions, clansActions, directActions, getFirstMessageOfTopic, getStoreAsync, topicsActions } from '@mezon/store-mobile';
-import notifee from '@notifee/react-native';
+import notifee, { AuthorizationStatus as NotifeeAuthorizationStatus } from '@notifee/react-native';
 import {
 	AndroidBadgeIconType,
 	AndroidCategory,
@@ -28,9 +28,7 @@ import {
 	hasPermission,
 	requestPermission
 } from '@react-native-firebase/messaging';
-import { safeJSONParse } from 'mezon-js';
 import { Alert, DeviceEventEmitter, Linking, NativeModules, PermissionsAndroid, Platform } from 'react-native';
-import RNCallKeep from 'react-native-callkeep';
 import { APP_SCREEN } from '../navigation/ScreenTypes';
 import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from './helpers';
 const messaging = getMessaging(getApp());
@@ -91,6 +89,46 @@ export const checkNotificationPermission = async () => {
 		}
 	} catch (error) {
 		console.error('Error checking notification permission:', error);
+	}
+};
+
+// Check notification permission cross-platform with optional ensure-request.
+// - By default (ensureRequest = false): check-only, no system prompt.
+// - If ensureRequest = true: will prompt when applicable (iOS NOT_DETERMINED, Android 13+ runtime permission not yet granted).
+export const getNotificationPermission = async (ensureRequest = false): Promise<boolean> => {
+	try {
+		if (Platform.OS === 'ios') {
+			const settings = await notifee.getNotificationSettings();
+			let status = settings.authorizationStatus;
+
+			if (ensureRequest && status === NotifeeAuthorizationStatus.NOT_DETERMINED) {
+				const req = await notifee.requestPermission();
+				status = req.authorizationStatus;
+			}
+
+			return status === NotifeeAuthorizationStatus.AUTHORIZED || status === NotifeeAuthorizationStatus.PROVISIONAL;
+		}
+
+		// Android
+		const notifSettings = await notifee.getNotificationSettings();
+		const enabledInSystemSettings = notifSettings.authorizationStatus === NotifeeAuthorizationStatus.AUTHORIZED;
+
+		const androidApiLevel = typeof Platform.Version === 'string' ? parseInt(Platform.Version, 10) : Platform.Version;
+		if (androidApiLevel >= 33) {
+			const permission = PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS;
+			let granted = await PermissionsAndroid.check(permission);
+			if (ensureRequest && !granted) {
+				const res = await PermissionsAndroid.request(permission);
+				granted = res === PermissionsAndroid.RESULTS.GRANTED;
+			}
+			return granted && enabledInSystemSettings;
+		}
+
+		// Android < 13: no runtime permission; rely on system app notification toggle
+		return enabledInSystemSettings;
+	} catch (error) {
+		console.error('getNotificationPermission error:', error);
+		return false;
 	}
 };
 
@@ -504,19 +542,5 @@ export const getVoIPToken = async () => {
 		return await VoIPManager.getVoIPToken();
 	} catch (e) {
 		return '';
-	}
-};
-
-export const setupIncomingCall = async (body: string) => {
-	try {
-		const bodyData = safeJSONParse(body || '{}');
-		if (bodyData?.offer === 'CANCEL_CALL') {
-			const callID = '0731961b-415b-44f3-a960-dd94ef3372fc';
-			RNCallKeep.endCall(callID);
-			return;
-		}
-	} catch (error) {
-		console.error('log  => setupIncomingCall', error);
-		/* empty */
 	}
 };

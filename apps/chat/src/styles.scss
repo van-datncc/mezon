@@ -1568,82 +1568,8 @@ input {
 	opacity: 1;
 }
 
-.topic-context-menu {
-	position: absolute !important;
-	z-index: 9999 !important;
-	max-width: calc(100vw - 20px) !important;
-	max-height: calc(100vh - 20px) !important;
 
-	&.topic-specific {
-		max-width: calc(100% - 20px) !important;
-		max-height: calc(100% - 20px) !important;
-	}
-}
-
-.contexify_menu {
-	max-width: calc(100vw - 20px) !important;
-	max-height: calc(100vh - 20px) !important;
-	overflow: auto !important;
-
-	.topic-container &,
-	.TopicDiscussionBox &,
-	[data-topic='true'] & {
-		max-width: calc(100% - 20px) !important;
-		max-height: calc(100% - 20px) !important;
-	}
-}
-
-.topic-container,
-.TopicDiscussionBox,
-[data-topic='true'] {
-	overflow: hidden !important;
-	position: relative !important;
-
-	.topic-context-menu {
-		position: absolute !important;
-		z-index: 9999 !important;
-	}
-}
-
-.topic-context-menu {
-	position: fixed !important;
-	z-index: 99999 !important;
-	pointer-events: auto !important;
-	opacity: 1 !important;
-	visibility: visible !important;
-	transform: none !important;
-	will-change: auto !important;
-}
-
-.messages-container .topic-context-menu,
-.channel-messages .topic-context-menu,
-.thread-scroll .topic-context-menu,
-.main-layout .topic-context-menu,
-.app-layout .topic-context-menu,
-.chat-layout .topic-context-menu,
-.channel-layout .topic-context-menu,
-.topic-container .topic-context-menu,
-.TopicDiscussionBox .topic-context-menu,
-[data-topic='true'] .topic-context-menu {
-	position: fixed !important;
-	z-index: 99999 !important;
-}
-
-.contexify_menu {
-	display: block !important;
-	visibility: visible !important;
-	opacity: 1 !important;
-	z-index: 99999 !important;
-}
-
-.topic-context-menu,
-.contexify_menu {
-	z-index: 99999 !important;
-	position: fixed !important;
-}
-
-.contexify_item,
-.contexify_itemContent,
-.contexify_submenu {
-	z-index: 99999 !important;
+.text-entity-emoji, .text-entity-link, .text-entity-link.mention {
+  color: var(--mention-color);
+  background-color: var(--mention-primary);
 }

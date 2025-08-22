@@ -44,6 +44,6 @@ export const style = (colors: Attributes) =>
 		},
 		option: {
 			flexDirection: 'row',
-			gap: size.s_20
+			gap: size.s_10
 		}
 	});

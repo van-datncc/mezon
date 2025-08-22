@@ -60,6 +60,7 @@ export const AccountSetting = ({ navigation }: SettingScreenProps<AccountSetting
 		store.dispatch(messagesActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.clearClanGroups());
 		await remove(STORAGE_DATA_CLAN_CHANNEL_CACHE);
 		await remove(STORAGE_CHANNEL_CURRENT_CACHE);
 		await remove(STORAGE_KEY_TEMPORARY_INPUT_MESSAGES);

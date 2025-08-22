@@ -16,6 +16,7 @@ import {
 } from '@mezon/store-mobile';
 import { DEFAULT_ROLE_COLOR, IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
+import { checkNotificationPermissionAndNavigate } from 'apps/mobile/src/app/utils/notificationPermissionHelper';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -183,13 +184,16 @@ const UserProfile = React.memo(
 					message?.user?.username || user?.user?.username || user?.username || userById?.user?.username,
 					message?.avatar || user?.avatar_url || user?.user?.avatar_url || userById?.user?.avatar_url
 				);
+
 				if (response?.channel_id) {
-					if (isTabletLandscape) {
-						dispatch(directActions.setDmGroupCurrentId(directMessage?.id || ''));
-						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-					} else {
-						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
-					}
+					await checkNotificationPermissionAndNavigate(() => {
+						if (isTabletLandscape) {
+							dispatch(directActions.setDmGroupCurrentId(directMessage?.id || ''));
+							navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+						} else {
+							navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
+						}
+					});
 				}
 			},
 			[
@@ -284,14 +288,14 @@ const UserProfile = React.memo(
 				text: t('userAction.sendMessage'),
 				icon: <MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.text} />,
 				action: navigateToMessageDetail,
-				isShow: !!infoFriend || !!userById
+				isShow: (!!infoFriend && infoFriend?.state === EFriendState.Friend) || !!userById
 			},
 			{
 				id: 2,
 				text: t('userAction.voiceCall'),
 				icon: <MezonIconCDN icon={IconCDN.phoneCallIcon} color={themeValue.text} />,
 				action: () => handleCallUser(userId || user?.id),
-				isShow: !!infoFriend || !!userById
+				isShow: (!!infoFriend && infoFriend?.state === EFriendState.Friend) || !!userById
 			},
 			// {
 			// 	id: 3,

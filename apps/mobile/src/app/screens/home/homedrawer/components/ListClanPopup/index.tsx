@@ -19,7 +19,7 @@ import { style } from './styles';
 const GROUP = 'group';
 const CLAN = 'clan';
 const DISTANCE_OFFSET = 10;
-const PREVIEW_DEBOUNCE_MS = 1000;
+const PREVIEW_DEBOUNCE_MS = 750;
 
 export const ListClanPopup = React.memo(() => {
 	const { themeValue } = useTheme();
@@ -30,16 +30,15 @@ export const ListClanPopup = React.memo(() => {
 	const dispatch = useAppDispatch();
 	const orderedClansWithGroups = useSelector(selectOrderedClansWithGroups);
 	const clans = useSelector(selectOrderedClans);
-	const actualDragDistanceRef = useRef<number | null>(null);
 	const iconDimensionsRef = useRef<{ width: number; height: number } | null>(null);
 	const animationValuesRef = useRef<any>(null);
-	const thresholdRef = useRef<number | null>(null);
-	const releaseYRef = useRef<number | null>(null);
 	const dragIndexRef = useRef<number | null>(null);
 	const placeholderIndexRef = useRef<number | null>(null);
 	const groupPreviewIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [previewTargetIndex, setPreviewTargetIndex] = useState<number | null>(null);
+	const currentThresholdRef = useRef<number | null>(null);
+	const currentDragDistanceRef = useRef<number | null>(null);
 
 	useEffect(() => {
 		return () => {
@@ -52,7 +51,7 @@ export const ListClanPopup = React.memo(() => {
 	}, []);
 
 	useEffect(() => {
-		if (isDragging && dragIndexRef.current !== null && placeholderIndexRef.current !== null) {
+		if (isDragging && animationValuesRef.current?.isDraggingCell?.value) {
 			groupPreviewIntervalRef.current = setInterval(() => {
 				checkCanGroupRealTime();
 			}, PREVIEW_DEBOUNCE_MS);
@@ -67,7 +66,12 @@ export const ListClanPopup = React.memo(() => {
 	}, [isDragging]);
 
 	const checkCanGroupRealTime = () => {
-		if (!isDragging || dragIndexRef.current === null || placeholderIndexRef.current === null) {
+		if (
+			!isDragging ||
+			!animationValuesRef.current?.isDraggingCell?.value ||
+			dragIndexRef.current === null ||
+			placeholderIndexRef.current === null
+		) {
 			return;
 		}
 
@@ -77,17 +81,22 @@ export const ListClanPopup = React.memo(() => {
 
 		if (!fromItem || !toItem) return;
 
-		let currentDragDistance = 0;
-		if (animationValuesRef.current?.touchTranslate?.value) {
+		if (animationValuesRef.current?.hoverAnim?.value) {
 			const indexDiff = Math.abs(placeholderIndexRef.current - dragIndexRef.current);
 			const multiIndexDistanceOffset = DISTANCE_OFFSET * indexDiff;
-			currentDragDistance = Math.abs(animationValuesRef.current.touchTranslate.value) + DISTANCE_OFFSET + multiIndexDistanceOffset;
+			currentDragDistanceRef.current = Math.abs(animationValuesRef.current.hoverAnim.value) + DISTANCE_OFFSET + multiIndexDistanceOffset;
 		}
 
-		const currentThreshold = calculateDynamicThreshold(dragIndexRef.current, placeholderIndexRef.current);
-		const canGroup = fromItem?.type === CLAN && (toItem?.type === GROUP || toItem?.type === CLAN) && currentDragDistance < currentThreshold;
-		const newPreviewIndex = canGroup ? placeholderIndexRef.current : null;
-		newPreviewIndex !== previewTargetIndex ? setPreviewTargetIndex(newPreviewIndex) : setPreviewTargetIndex(null);
+		currentThresholdRef.current = calculateDynamicThreshold(dragIndexRef.current, placeholderIndexRef.current);
+
+		if (currentThresholdRef.current !== null && currentDragDistanceRef.current !== null) {
+			const canGroup =
+				fromItem?.type === CLAN &&
+				(toItem?.type === GROUP || toItem?.type === CLAN) &&
+				currentDragDistanceRef.current < currentThresholdRef.current;
+			const newPreviewIndex = canGroup ? placeholderIndexRef.current : null;
+			newPreviewIndex !== previewTargetIndex ? setPreviewTargetIndex(newPreviewIndex) : setPreviewTargetIndex(null);
+		}
 	};
 
 	const onCreateClanModal = useCallback(() => {
@@ -131,7 +140,7 @@ export const ListClanPopup = React.memo(() => {
 				return baseThreshold * thresholdMultiplier;
 			}
 
-			return baseThreshold * indexDiff;
+			return baseThreshold * indexDiff - indexDiff;
 		} catch (error) {
 			console.error('Error in calculateDynamicThreshold: ', error);
 			return 0;
@@ -146,12 +155,6 @@ export const ListClanPopup = React.memo(() => {
 		[isDragging]
 	);
 
-	const handleRelease = useCallback(() => {
-		if (animationValuesRef.current?.touchTranslate?.value) {
-			releaseYRef.current = animationValuesRef.current.touchTranslate.value;
-		}
-	}, []);
-
 	const handleDragBegin = useCallback((index: number) => {
 		setIsDragging(true);
 		dragIndexRef.current = index;
@@ -164,24 +167,17 @@ export const ListClanPopup = React.memo(() => {
 			dragIndexRef.current = null;
 			placeholderIndexRef.current = null;
 			setPreviewTargetIndex(null);
-			if (from === to) {
+			if (from === to || currentThresholdRef.current === null || currentDragDistanceRef.current === null) {
 				return;
 			}
 
 			try {
-				if (releaseYRef.current !== null) {
-					const indexDiff = Math.abs(to - from);
-					thresholdRef.current = calculateDynamicThreshold(from, to);
-					const multiIndexDistanceOffset = DISTANCE_OFFSET * indexDiff;
-					actualDragDistanceRef.current = Math.abs(releaseYRef.current) + DISTANCE_OFFSET + multiIndexDistanceOffset;
-				}
-
 				const currentData = orderedClansWithGroups || [];
 				const fromItem = currentData[from];
 				const toItem = currentData[to];
 
 				if (
-					actualDragDistanceRef.current >= thresholdRef.current ||
+					currentDragDistanceRef.current >= currentThresholdRef.current ||
 					(fromItem?.type === GROUP && toItem?.type === GROUP) ||
 					(fromItem?.type === GROUP && toItem?.type === CLAN)
 				) {
@@ -202,7 +198,7 @@ export const ListClanPopup = React.memo(() => {
 					});
 
 					dispatch(clansActions.updateClanGroupOrder(newClanGroupOrder));
-				} else if (actualDragDistanceRef.current < thresholdRef.current) {
+				} else if (currentDragDistanceRef.current < currentThresholdRef.current) {
 					requestAnimationFrame(() => {
 						if (fromItem?.type === CLAN && toItem?.type === GROUP) {
 							dispatch(
@@ -223,8 +219,8 @@ export const ListClanPopup = React.memo(() => {
 			} catch (error) {
 				console.error('Error in handleDragEnd', error);
 			} finally {
-				releaseYRef.current = null;
-				actualDragDistanceRef.current = null;
+				currentThresholdRef.current = null;
+				currentDragDistanceRef.current = null;
 			}
 		},
 		[orderedClansWithGroups]
@@ -303,7 +299,6 @@ export const ListClanPopup = React.memo(() => {
 				onDragBegin={handleDragBegin}
 				onDragEnd={handleDragEnd}
 				onAnimValInit={handleAnimValInit}
-				onRelease={handleRelease}
 				onPlaceholderIndexChange={handlePlaceholderIndexChange}
 				renderItem={renderItem}
 				ListEmptyComponent={<View />}
