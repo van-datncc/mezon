@@ -66,8 +66,8 @@ export const MyQRCode = () => {
 			setIsGenerating(true);
 			const res = await RNQRGenerator.generate({
 				value: payload,
-				height: Math.ceil(size.s_220),
-				width: Math.ceil(size.s_220),
+				height: Math.ceil(activeTab === 'profile' ? size.s_400 : size.s_220),
+				width: Math.ceil(activeTab === 'profile' ? size.s_400 : size.s_220),
 				correctionLevel: 'L'
 			});
 			setQrCode((pre) => ({
