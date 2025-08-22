@@ -34,8 +34,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 
 	const channelId = (channel?.channel_id || (channel as any)?.id || '') as string;
-	const channelFromStore = useAppSelector((state) => selectChannelById(state, channelId));
-	const currentChannel = (channelFromStore || channel) as IChannel;
+	const currentChannel = useAppSelector((state) => selectChannelById(state, channelId));
 
 	const channelApp = useAppSelector((state) => selectAppChannelById(state, channelId));
 
@@ -74,13 +73,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 		setIsAgeRestricted(currentChannel.age_restricted);
 		setE2eeInit(currentChannel.e2ee);
 		setIsE2ee(currentChannel.e2ee);
-	}, [
-		channelFromStore?.channel_id,
-		channelFromStore?.channel_label,
-		channelFromStore?.topic,
-		channelFromStore?.age_restricted,
-		channelFromStore?.e2ee
-	]);
+	}, [currentChannel?.channel_id, currentChannel?.channel_label, currentChannel?.topic, currentChannel?.age_restricted, currentChannel?.e2ee]);
 
 	const handleCheckboxAgeRestricted = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const checked = event.target.checked;
