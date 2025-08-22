@@ -56,7 +56,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 		<a
 			href={href}
 			onClick={(event) => scrollToSection(section, event)}
-			className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+			className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 		>
 			{label}
 		</a>
@@ -64,16 +64,15 @@ const HeaderMezon = memo((props: HeaderProps) => {
 
 	return (
 		<div
-			className={`layout fixed flex flex-col items-center w-full z-50 ${isScrolled ? 'bg-[#0B0E2D4D] z-50 shadow-[0px_4px_12px_0px_#0B0E2D26] backdrop-blur-[24px]' : ''} h-[80px] max-md:h-[72px]`}
+			className={`layout fixed flex flex-col items-center w-full z-50 bg-gradient-to-r from-[#7E00FF] via-[#9C3FE9] to-[#4B0082] h-[80px] max-md:h-[72px]`}
 		>
 			<div ref={refHeader} className={`header fixed z-50 w-10/12 max-lg:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D]`}>
 				<div className="flex items-center justify-between md:px-[32px] max-md:px-[16px] max-md:py-[14px] h-[80px] max-md:h-[72px]">
 					<div className="flex items-center gap-[40px]">
-						<Link to={'/mezon'} className="flex items-center gap-[4.92px]">
-							<Image src={`assets/images/mezon-logo-black.svg`} width={32} height={32} className="aspect-square object-cover" />
-							<div className="font-semibold text-[22.15px] leading-[26.58px] tracking-[0.06em]">mezon</div>
+						<Link to={'/mezon'} className="flex items-center gap-[4.92px] min-w-[120px]">
+							<Image src={`assets/logo.png`} width={120} height={35} className="object-cover" />
 						</Link>
-						<div className="hidden md:flex items-center gap-[32px]">
+						<div className="hidden lg:flex items-center gap-[32px]">
 							<NavLink href="#home" section="home" label="Home" />
 							<NavLink href="#overview" section="overview" label="Overview" />
 							<NavLink href="#feature" section="feature" label="Features" />
@@ -81,7 +80,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'developers/applications'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 							>
 								Developers
 							</a>
@@ -89,7 +88,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'https://top.mezon.ai'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 							>
 								Bots/Apps
 							</a>
@@ -97,7 +96,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'docs/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 							>
 								Documents
 							</a>
@@ -105,7 +104,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'clans/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 							>
 								Discover
 							</a>
@@ -113,27 +112,23 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'blogs/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="border-b-2 border-transparent shadow-none text-[16px] leading-[24px] text-[#7C92AF] font-semibold flex flex-row items-center px-[2px] hover:border-[#8FA7BF] hover:text-[#8FA7BF] focus:border-transparent focus:rounded-lg focus:shadow-[0px_0px_0px_4px_#678FFF]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
 							>
 								Blogs
 							</a>
 						</div>
 					</div>
-					<div className="w-fit">
+					<div className={`w-fit lg:pl-5 min-[1505px]:pl-0`}>
 						<Link
-							className="hidden lg:block px-[16px] py-[10px] bg-[#1024D4] rounded-lg text-[#F4F7F9] text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
+							className="hidden lg:block px-[16px] py-[10px] bg-[url(assets/button_openmezon.png)] bg-no-repeat rounded-xl text-[#6E4A9E] text-[16px] leading-[24px] font-bold whitespace-nowrap hover:opacity-90 transition-opacity"
 							to={'/mezon'}
 							onClick={() => trackHeaderLoginClick(isLogin ? 'Open Mezon' : 'Login')}
 						>
 							{isLogin ? 'Open Mezon' : 'Login'}
 						</Link>
-						<Icons.HomepageMenu className="hidden w-[40px] max-lg:block" onClick={toggleSideBar} />
+						<Icons.HomepageMenu className="hidden w-[40px] max-lg:block cursor-pointer" onClick={toggleSideBar} />
 					</div>
 				</div>
-
-				{!sideBarIsOpen && (
-					<div className="hidden max-lg:block absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[200px] bg-[#1024D4] rounded-[50%] filter blur-[75px] mix-blend-color-dodge"></div>
-				)}
 			</div>
 		</div>
 	);

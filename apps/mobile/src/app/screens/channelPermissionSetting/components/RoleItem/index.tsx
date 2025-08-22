@@ -56,7 +56,7 @@ export const RoleItem = memo(
 			<TouchableOpacity onPress={onPressRoleItem} disabled={!isCheckbox && !isAdvancedSetting}>
 				<View style={{ gap: size.s_10, flexDirection: 'row', padding: size.s_10, alignItems: 'center' }}>
 					{!isAdvancedSetting && (
-						<MezonIconCDN icon={IconCDN.bravePermission} color={themeValue.text} width={size.s_24} height={size.s_24} />
+						<MezonIconCDN icon={IconCDN.bravePermission} color={role?.color || themeValue.text} width={size.s_24} height={size.s_24} />
 					)}
 					<View style={{ flex: 1 }}>
 						<View style={{ flexDirection: 'row', gap: size.s_4, alignItems: 'center' }}>

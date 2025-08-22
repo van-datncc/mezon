@@ -11,10 +11,10 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			alignItems: 'center'
 		},
 		radioItem: {
-			width: 100,
-			borderRadius: 3,
-			paddingVertical: 5,
-			marginRight: 10
+			width: size.s_100,
+			borderRadius: size.s_4,
+			paddingVertical: size.s_4,
+			marginRight: size.s_10
 		},
 		radioItemDeActive: {
 			backgroundColor: Colors.secondary
@@ -23,7 +23,7 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			backgroundColor: Colors.bgViolet
 		},
 		inviteHeader: {
-			padding: 19,
+			padding: size.s_16,
 			width: '100%'
 		},
 		inviteList: {
@@ -34,7 +34,7 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 		inviteHeaderText: {
 			color: colors.white,
 			fontWeight: 'bold',
-			fontSize: 15,
+			fontSize: size.s_15,
 			textAlign: 'center'
 		},
 		inviteIconWrapper: {
@@ -60,38 +60,38 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 		},
 		searchFriendToInviteWrapper: {
 			backgroundColor: colors.bgInputPrimary,
-			borderRadius: 8,
+			borderRadius: size.s_8,
 			alignItems: 'center',
 			paddingHorizontal: size.s_6,
 			flexDirection: 'row'
 		},
 		searchFriendToInviteInput: {
 			width: '93%',
-			borderRadius: 8,
+			borderRadius: size.s_8,
 			color: colors.white,
 			paddingVertical: 0,
-			height: size.s_50
+			height: size.s_40
 		},
 		editInviteLinkWrapper: {
-			paddingTop: 17,
+			paddingTop: size.s_16,
 			flexDirection: 'row'
 		},
 		inviteWrapper: {
 			flex: 1,
 			backgroundColor: Colors.bgCharcoal,
 			width: '100%',
-			borderTopRightRadius: 8,
-			borderTopLeftRadius: 8
+			borderTopRightRadius: size.s_8,
+			borderTopLeftRadius: size.s_8
 		},
 		iconAreaWrapper: {
 			flexDirection: 'row',
 			justifyContent: 'space-between',
-			padding: 19,
+			padding: size.s_16,
 			borderBottomColor: Colors.bgCharcoal,
 			borderBottomWidth: 1
 		},
 		searchInviteFriendWrapper: {
-			padding: 19
+			padding: size.s_16
 		},
 		defaultText: {
 			color: colors.text
@@ -108,45 +108,45 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			width: '100%',
 			flexDirection: 'row',
 			alignItems: 'center',
-			paddingVertical: 19,
-			borderRadius: 5
+			paddingVertical: size.s_16,
+			borderRadius: size.s_4
 		},
 		inviteChannelListWrapper: {
-			marginVertical: 15,
-			paddingVertical: 20,
+			marginVertical: size.s_15,
+			paddingVertical: size.s_20,
 			borderBottomWidth: 2,
 			borderTopWidth: 2,
 			borderColor: Colors.borderPrimary,
-			paddingHorizontal: 10
+			paddingHorizontal: size.s_10
 		},
 		inviteChannelListTitle: {
 			color: Colors.header1,
-			fontSize: 16,
+			fontSize: size.s_16,
 			fontWeight: '500'
 		},
 		advancedSettingWrapper: {
-			paddingLeft: 10,
-			gap: 10
+			paddingLeft: size.s_10,
+			gap: size.s_10
 		},
 		advancedSettingTitle: {
 			color: Colors.header1,
-			fontSize: 16,
+			fontSize: size.s_16,
 			fontWeight: '500'
 		},
 		advancedSettingSubTitle: {
 			color: Colors.header2,
-			fontSize: 16,
+			fontSize: size.s_16,
 			fontWeight: '500'
 		},
 		temporaryMemberWrapper: {
 			justifyContent: 'space-between',
 			flexDirection: 'row',
-			paddingTop: 20,
-			paddingRight: 10
+			paddingTop: size.s_20,
+			paddingRight: size.s_10
 		},
 		temporaryMemberTitle: {
 			color: Colors.textGray,
-			fontSize: 16
+			fontSize: size.s_16
 		},
 		textUnknown: {
 			textAlign: 'center',
@@ -163,10 +163,29 @@ export const style = (colors: Attributes, isTabletLandscape?: boolean) =>
 			overflow: 'hidden',
 			paddingBottom: size.s_10,
 			backgroundColor: colors.primary,
-			borderTopRightRadius: 8,
-			borderTopLeftRadius: 8
+			borderTopRightRadius: size.s_8,
+			borderTopLeftRadius: size.s_8
 		},
 		bottomSheetContainer: {
 			marginHorizontal: isTabletLandscape ? marginWidth : 0
+		},
+		qrButtonContainer: {
+			paddingHorizontal: size.s_16,
+			paddingBottom: size.s_16,
+			alignItems: 'center'
+		},
+		qrButton: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			backgroundColor: colors.bgViolet,
+			paddingHorizontal: size.s_20,
+			paddingVertical: size.s_12,
+			borderRadius: size.s_8,
+			gap: size.s_8
+		},
+		qrButtonText: {
+			color: colors.white,
+			fontSize: size.s_16,
+			fontWeight: '600'
 		}
 	});

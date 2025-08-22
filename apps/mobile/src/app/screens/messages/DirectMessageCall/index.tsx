@@ -18,6 +18,7 @@ import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { useWebRTCCallMobile } from '../../../hooks/useWebRTCCallMobile';
+import { ConnectionState } from './ConnectionState';
 import { style } from './styles';
 
 interface IDirectMessageCallProps {
@@ -44,13 +45,15 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 		callState,
 		localMediaControl,
 		timeStartConnected,
+		isConnected,
 		startCall,
 		handleEndCall,
 		toggleSpeaker,
 		toggleAudio,
 		toggleVideo,
 		handleSignalingMessage,
-		switchCamera
+		switchCamera,
+		handleToggleIsConnected
 	} = useWebRTCCallMobile({
 		dmUserId: receiverId,
 		userId: userProfile?.user?.id as string,
@@ -153,6 +156,9 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 	useEffect(() => {
 		dispatch(DMCallActions.setIsInCall(true));
 		InCallManager.start({ media: 'audio' });
+		if (isAnswerCall) {
+			handleToggleIsConnected(false);
+		}
 		const timer = setTimeout(() => {
 			startCall(isVideoCall, isAnswerCall);
 		}, 2000);
@@ -190,6 +196,7 @@ export const DirectMessageCall = memo(({ route }: IDirectMessageCallProps) => {
 							<MezonIconCDN icon={IconCDN.chevronSmallLeftIcon} />
 						</TouchableOpacity>
 					</View>
+					{isConnected !== null && <ConnectionState isConnected={isConnected} />}
 					<View style={{ flexDirection: 'row', alignItems: 'center', gap: size.s_10 }}>
 						{callState.localStream && localMediaControl?.camera && (
 							<View>

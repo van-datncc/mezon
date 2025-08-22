@@ -29,6 +29,7 @@ import ImageNative from '../../../../../components/ImageNative';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { getUserStatusByMetadata } from '../../../../../utils/helpers';
+import { checkNotificationPermissionAndNavigate } from '../../../../../utils/notificationPermissionHelper';
 import { style } from './UserProfile.styles';
 import EditUserProfileBtn from './component/EditUserProfileBtn';
 import { PendingContent } from './component/PendingContent';
@@ -146,7 +147,9 @@ const UserProfile = React.memo(
 		}, [infoFriend?.state]);
 
 		const userRolesClan = useMemo(() => {
-			return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
+			return userById?.role_id
+				? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id) && role?.slug !== `everyone-${role?.clan_id}`)
+				: [];
 		}, [userById?.role_id, rolesClan]);
 
 		const isCheckOwner = useMemo(() => {
@@ -183,13 +186,16 @@ const UserProfile = React.memo(
 					message?.user?.username || user?.user?.username || user?.username || userById?.user?.username,
 					message?.avatar || user?.avatar_url || user?.user?.avatar_url || userById?.user?.avatar_url
 				);
+
 				if (response?.channel_id) {
-					if (isTabletLandscape) {
-						dispatch(directActions.setDmGroupCurrentId(directMessage?.id || ''));
-						navigation.navigate(APP_SCREEN.MESSAGES.HOME);
-					} else {
-						navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
-					}
+					await checkNotificationPermissionAndNavigate(() => {
+						if (isTabletLandscape) {
+							dispatch(directActions.setDmGroupCurrentId(directMessage?.id || ''));
+							navigation.navigate(APP_SCREEN.MESSAGES.HOME);
+						} else {
+							navigation.navigate(APP_SCREEN.MESSAGES.MESSAGE_DETAIL, { directMessageId: response?.channel_id });
+						}
+					});
 				}
 			},
 			[
@@ -284,14 +290,14 @@ const UserProfile = React.memo(
 				text: t('userAction.sendMessage'),
 				icon: <MezonIconCDN icon={IconCDN.chatIcon} color={themeValue.text} />,
 				action: navigateToMessageDetail,
-				isShow: !!infoFriend || !!userById
+				isShow: (!!infoFriend && infoFriend?.state === EFriendState.Friend) || !!userById
 			},
 			{
 				id: 2,
 				text: t('userAction.voiceCall'),
 				icon: <MezonIconCDN icon={IconCDN.phoneCallIcon} color={themeValue.text} />,
 				action: () => handleCallUser(userId || user?.id),
-				isShow: !!infoFriend || !!userById
+				isShow: (!!infoFriend && infoFriend?.state === EFriendState.Friend) || !!userById
 			},
 			// {
 			// 	id: 3,
@@ -455,26 +461,26 @@ const UserProfile = React.memo(
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
-									userById?.user?.display_name ||
-									userById?.user?.username ||
-									user?.clan_nick ||
-									user?.user?.display_name ||
-									user?.user?.username
+										userById?.user?.display_name ||
+										userById?.user?.username ||
+										user?.clan_nick ||
+										user?.user?.display_name ||
+										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
 								: user?.display_name ||
-								user?.user?.display_name ||
-								user?.username ||
-								user?.user?.username ||
-								(checkAnonymous ? 'Anonymous' : message?.username)}
+									user?.user?.display_name ||
+									user?.username ||
+									user?.user?.username ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
 								? userById?.user?.username || userById?.user?.display_name
 								: user?.username ||
-								user?.user?.username ||
-								user?.display_name ||
-								user?.user?.display_name ||
-								(checkAnonymous ? 'Anonymous' : message?.username)}
+									user?.user?.username ||
+									user?.display_name ||
+									user?.user?.display_name ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (
