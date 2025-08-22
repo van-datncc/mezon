@@ -93,7 +93,7 @@ android {
         applicationId "com.mezon.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 500
+        versionCode 503
         versionName "1.1.98"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
@@ -163,6 +163,8 @@ dependencies {
     implementation("com.facebook.react:hermes-engine:+")
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
     implementation 'com.google.firebase:firebase-analytics:21.4.0'
+    implementation "androidx.core:core-splashscreen:1.0.1"
+    implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
 
     implementation 'com.facebook.fresco:animated-gif:3.6.0'
 

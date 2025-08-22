@@ -13,7 +13,6 @@ export const BadgeAppIconLoader = () => {
 
 	const setBadgeOnAndroid = async (count: number) => {
 		try {
-			alert(count);
 			const BadgeModule = NativeModules?.BadgeModule;
 			if (count <= 0) {
 				await BadgeModule.removeBadge();
