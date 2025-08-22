@@ -124,7 +124,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								<Icons.MemberIcon defaultSize="w-5 h-[30px] min-w-5" />
 							</p>
 						</td>
-						<td className="  flex h-14 justify-center items-center">
+						<td className={` flex h-14 justify-center items-center ${role?.slug === `everyone-${role?.clan_id}` && 'ml-[2.8rem]'}`}>
 							<div className="flex gap-x-2">
 								<div className="text-[15px] cursor-pointer bg-red-500 p-2 rounded-full opacity-0 group-hover:opacity-100 group-hover:text-white">
 									{hasPermissionEdit ? (
