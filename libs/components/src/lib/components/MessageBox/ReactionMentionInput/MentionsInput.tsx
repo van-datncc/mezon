@@ -1,6 +1,8 @@
+import { autoUpdate, flip, offset, shift, useFloating } from "@floating-ui/react";
 import { ID_MENTION_HERE } from "@mezon/utils";
 import type React from "react";
-import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { type MentionData, MentionProps, MentionState } from "./Mention";
 import parseHtmlAsFormattedText from "./parseHtmlAsFormattedText";
 
@@ -72,6 +74,7 @@ export interface MentionsInputProps {
 	maxHistorySize?: number;
 	hasFilesToSend?: boolean;
   setCaretToEnd?: boolean;
+	currentChannelId?: string;
 }
 
 export interface MentionsInputHandle {
@@ -241,6 +244,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	maxHistorySize = 50,
 	hasFilesToSend = false,
 	setCaretToEnd = false,
+	currentChannelId,
 }, ref) => {
 	const inputRef = useRef<HTMLDivElement>(null);
 
@@ -253,6 +257,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 	const [undoHistory, setUndoHistory] = useState<string[]>([]);
 	const [redoHistory, setRedoHistory] = useState<string[]>([]);
 	const isUndoRedoAction = useRef<boolean>(false);
+	const [inputWidth, setInputWidth] = useState(800);
 
 	const mentionConfigs = Children.toArray(children)
 		.filter((child): child is React.ReactElement<MentionProps> =>
@@ -275,6 +280,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
     }
   } , [])
 
+
 	useEffect(() => {
 		if (value !== html) {
 			setHtml(value);
@@ -283,6 +289,10 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			}
 		}
 	}, [value]);
+
+	useEffect(() => {
+		setActiveMentionContext(null);
+	}, [currentChannelId]);
 
 	// Build regex for all triggersx
 	const buildTriggerRegex = useCallback(() => {
@@ -735,7 +745,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			const htmlContent = e.clipboardData.getData('text/html');
 			const plainText = e.clipboardData.getData('text/plain');
 
-			if (htmlContent && htmlContent !== plainText) {
+      if (htmlContent && htmlContent !== plainText) {
 				e.preventDefault();
 
 				const tempDiv = document.createElement('div');
@@ -945,12 +955,10 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 		],
 	);
 
-	const renderPopover = () => {
-		if (!activeMentionContext) {
-			return null;
-		}
+	const mentionContent = useMemo(() => {
+		if (!activeMentionContext) return null;
 
-		const popoverContent = Children.map(children, (child) => {
+		return Children.map(children, (child) => {
 			if (isValidElement(child) && typeof child.type === 'function') {
 				const childConfig = child.props as MentionProps;
 
@@ -969,29 +977,61 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 			}
 			return null;
 		});
+	}, [
+		activeMentionContext,
+		children,
+		handleMentionSelect,
+		handleSuggestionMouseEnter,
+		suggestionsClassName,
+		suggestionStyle,
+		triggerSelection
+	]);
 
+	const { refs, floatingStyles } = useFloating({
+		open: !!activeMentionContext,
+		placement: 'top-start',
+		middleware: [
+			offset(8),
+			flip(),
+			shift({ padding: 8 })
+		],
+		whileElementsMounted: autoUpdate
+	});
+
+	useEffect(() => {
+		if (activeMentionContext && inputRef.current) {
+			const width = inputRef.current.getBoundingClientRect().width;
+			setInputWidth(width);
+		}
+	}, [activeMentionContext]);
+
+	const tooltipOverlay = useMemo(() => {
 		return (
 			<div
-				className="mention-popover-container mention-popover-container bg-ping-member"
+				ref={refs.setFloating}
+				className="mention-popover-container bg-ping-member mt-[-5px]"
 				style={{
-					position: 'fixed',
-					bottom: '100%',
-					left: '0',
-					right: '0',
-					width: '100%',
-					zIndex: 9999,
-					marginBottom: '8px',
+					...floatingStyles,
+					borderRadius: '8px',
+					border: '1px solid var(--border-color)',
+					boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+					padding: 0,
+					width: inputWidth,
+					display: activeMentionContext ? 'block' : 'none',
 				}}
 			>
-				{popoverContent}
+				{mentionContent}
 			</div>
 		);
-	};
+	}, [mentionContent, refs.setFloating, floatingStyles, activeMentionContext, inputWidth]);
 
 	return (
 		<div className={`mention-input ${className}`} style={{ position: 'relative', ...style }}>
 			<div
-				ref={inputRef}
+				ref={(node) => {
+					(inputRef as any).current = node;
+					refs.setReference(node);
+				}}
 				id={id}
 				contentEditable={!disabled}
 				className="mention-input-editor"
@@ -1008,7 +1048,7 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 					outline: 'none'
 				}}
 			/>
-			{renderPopover()}
+			{activeMentionContext && createPortal(tooltipOverlay, document.body) as React.ReactElement}
 		</div>
 	);
 });

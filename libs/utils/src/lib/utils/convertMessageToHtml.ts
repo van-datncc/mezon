@@ -7,6 +7,17 @@ import {
   IMentionOnMessage
 } from '../types';
 
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&(?!amp;|lt;|gt;|quot;|#39;|nbsp;)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+    .replace(/  /g, '&nbsp;&nbsp;')
+    .replace(/\n/g, '<br>');
+};
 
 export const convertMessageToHtml = (message: IExtendedMessage): string => {
   const { t: text = '', mentions = [], hg: hashtags = [], ej: emojis = [], mk: markdown = [] } = message;
@@ -34,13 +45,19 @@ export const convertMessageToHtml = (message: IExtendedMessage): string => {
 
     if (start !== undefined && end !== undefined) {
       const mentionText = text.substring(start, end);
-      const userId = mention.user_id || mention.role_id;
-
-      if (userId) {
+      if (mention.user_id) {
         allEntities.push({
           start: start,
           end: end,
-          html: `<a class="text-entity-link mention" data-entity-type="MessageEntityMentionName" data-user-id="${userId}" contenteditable="false" dir="auto">${mentionText}</a>`,
+          html: `<a class="text-entity-link mention" data-entity-type="MessageEntityMentionName" data-user-id="${mention.user_id}" contenteditable="false" dir="auto">${mentionText}</a>`,
+          type: 'mention'
+        });
+      }
+      else if (mention.role_id) {
+        allEntities.push({
+          start: start,
+          end: end,
+          html: `<a class="text-entity-link mention" data-entity-type="MessageEntityMentionRole" data-user-id="${mention.role_id}" contenteditable="false" dir="auto">${mentionText}</a>`,
           type: 'mention'
         });
       }
@@ -55,7 +72,7 @@ export const convertMessageToHtml = (message: IExtendedMessage): string => {
         allEntities.push({
           start: hashtag.s,
           end: hashtag.e,
-          html: `<a class="text-entity-link hashtag" data-entity-type="MessageEntityHashtag" data-channel-id="${hashtag.channelid}" contenteditable="false" dir="auto">${hashtagText}</a>`,
+          html: `<a class="text-entity-link hashtag" data-entity-type="MessageEntityHashtag" data-id="${hashtag.channelid}" contenteditable="false" dir="auto">${hashtagText}</a>`,
           type: 'hashtag'
         });
       }
@@ -70,7 +87,7 @@ export const convertMessageToHtml = (message: IExtendedMessage): string => {
         allEntities.push({
           start: emoji.s,
           end: emoji.e,
-          html: `<span class="text-entity-link emoji" data-entity-type="MessageEntityCustomEmoji" data-emoji-id="${emoji.emojiid}" contenteditable="false">${emojiText}</span>`,
+          html: `<span class="text-entity-link emoji" data-entity-type="MessageEntityCustomEmoji" data-document-id="${emoji.emojiid}" contenteditable="false">${emojiText}</span>`,
           type: 'emoji'
         });
       }
@@ -118,13 +135,36 @@ export const convertMessageToHtml = (message: IExtendedMessage): string => {
   let lastIndex = 0;
 
   allEntities.forEach(entity => {
-    result += text.substring(lastIndex, entity.start);
-    result += entity.html;
+    const beforeEntityText = text.substring(lastIndex, entity.start);
+    const escapedBeforeText = escapeHtml(beforeEntityText);
+
+    result += escapedBeforeText;
+
+    if (entity.type === 'markdown') {
+      const markdownMatch = markdown.find(m => m.s === entity.start && m.e === entity.end);
+      if (markdownMatch && (markdownMatch.type === EBacktickType.PRE || markdownMatch.type === EBacktickType.CODE)) {
+        const codeContent = text.substring(entity.start, entity.end);
+        const escapedCodeContent = escapeHtml(codeContent);
+
+        if (markdownMatch.type === EBacktickType.PRE) {
+          result += `\`\`\`${escapedCodeContent}\`\`\``;
+        } else {
+          result += `\`${escapedCodeContent}\``;
+        }
+      } else {
+        result += entity.html;
+      }
+    } else {
+      result += entity.html;
+    }
+
     lastIndex = entity.end;
   });
 
-  result += text.substring(lastIndex);
+  const remainingText = text.substring(lastIndex);
+  const escapedRemainingText = escapeHtml(remainingText);
 
+  result += escapedRemainingText;
 
   return result;
 };
