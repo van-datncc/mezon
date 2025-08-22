@@ -16,7 +16,7 @@ export default function AddFriendPage() {
 	const dataEncode: { id: string; name: string; avatar: string } | null | undefined = useMemo(() => {
 		if (data) {
 			try {
-				const jsonStr = atob(data);
+				const jsonStr = decodeURIComponent(atob(data));
 				const parsed = safeJSONParse(jsonStr);
 				return parsed as { id: string; name: string; avatar: string };
 			} catch (err) {
