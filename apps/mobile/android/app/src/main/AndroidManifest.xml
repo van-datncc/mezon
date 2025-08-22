@@ -108,7 +108,7 @@
         android:screenOrientation="fullUser"
         android:showWhenLocked="false"
         android:turnScreenOn="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/BootTheme"
         android:supportsPictureInPicture="true"
         android:exported="true">
         <intent-filter>

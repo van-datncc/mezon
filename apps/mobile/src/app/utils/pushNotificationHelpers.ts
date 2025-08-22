@@ -98,7 +98,7 @@ export const checkNotificationPermission = async () => {
 export const getNotificationPermission = async (ensureRequest = false): Promise<boolean> => {
 	try {
 		if (Platform.OS === 'ios') {
-			let settings = await notifee.getNotificationSettings();
+			const settings = await notifee.getNotificationSettings();
 			let status = settings.authorizationStatus;
 
 			if (ensureRequest && status === NotifeeAuthorizationStatus.NOT_DETERMINED) {
@@ -196,16 +196,19 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 	try {
 		const groupId = await getOrCreateChannelGroup(channel);
 		const channelId = await createNotificationChannel(channel, groupId || '', (data?.sound as string) || 'default');
+		const now = Date.now();
 
 		return {
 			...defaultConfig,
 			channelId,
 			tag: channelId,
-			sortKey: new Date().getTime().toString(),
 			category: AndroidCategory.MESSAGE,
 			groupId: groupId,
 			groupSummary: false,
-			groupAlertBehavior: AndroidGroupAlertBehavior.ALL
+			groupAlertBehavior: AndroidGroupAlertBehavior.ALL,
+			sortKey: String(Number.MAX_SAFE_INTEGER - now),
+			timestamp: data.timestamp ? Number(data.timestamp) : now,
+			autoCancel: true
 		};
 	} catch (error) {
 		console.error('Error configuring Android notification:', error);
@@ -279,8 +282,8 @@ export const createLocalNotification = async (title: string, body: string, data:
 
 		const configDisplayNotificationAndroid: NotificationAndroid =
 			Platform.OS === 'android' ? await getConfigDisplayNotificationAndroid(data) : {};
-
-		const notificationId = `${data?.sender || 'unknown'}_${data?.body}_${new Date().getMilliseconds()}`;
+		const timestamp = Date.now();
+		const notificationId = `${data?.sender || 'unknown'}_${timestamp}`;
 		const isAlreadyDisplayed = await isNotificationAlreadyDisplayed(data);
 		if (isAlreadyDisplayed) {
 			return;
@@ -292,7 +295,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 			title: title.trim(),
 			body: body.trim(),
 			subtitle: isValidString(data?.subtitle) ? (data.subtitle as string) : '',
-			data: data,
+			data: { ...data, notificationTimestamp: timestamp },
 			android: configDisplayNotificationAndroid,
 			ios: {}
 		});
@@ -305,6 +308,12 @@ export const createLocalNotification = async (title: string, body: string, data:
 			);
 
 			if (groupNotifications.length > 1) {
+				const sortedNotifications = groupNotifications.sort((a, b) => {
+					const timestampA = a.notification.android?.timestamp || 0;
+					const timestampB = b.notification.android?.timestamp || 0;
+					return timestampB - timestampA;
+				});
+
 				await notifee.displayNotification({
 					id: `summary_${configDisplayNotificationAndroid.groupId}`,
 					title: 'New Messages',
@@ -314,6 +323,9 @@ export const createLocalNotification = async (title: string, body: string, data:
 						...configDisplayNotificationAndroid,
 						groupSummary: true,
 						groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY,
+						autoCancel: false,
+						timestamp: Math.max(...groupNotifications.map((n) => n.notification.android?.timestamp || 0)),
+						sortKey: String(Number.MAX_SAFE_INTEGER - Date.now()),
 						style: {
 							type: AndroidStyle.MESSAGING,
 							person: {
@@ -321,7 +333,7 @@ export const createLocalNotification = async (title: string, body: string, data:
 								icon: (configDisplayNotificationAndroid?.largeIcon || '') as string
 							},
 							group: true,
-							messages: groupNotifications.map((n) => ({
+							messages: sortedNotifications.map((n) => ({
 								text: n.notification.body || '',
 								timestamp: n.notification.android?.timestamp || Date.now(),
 								person: {
