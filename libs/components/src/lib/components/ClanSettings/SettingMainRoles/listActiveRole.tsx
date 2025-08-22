@@ -137,7 +137,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 										</span>
 									)}
 								</div>
-								{hasPermissionEdit && (
+								{hasPermissionEdit && role?.slug !== `everyone-${role?.clan_id}` && (
 									<div
 										className={`text-[15px] cursor-pointer bg-red-500 p-2 text-white rounded-full ${hasPermissionEdit ? 'opacity-100' : 'opacity-20'}`}
 										onClick={(e) => handleOpenDeleteRoleModal(e, role.id)}
