@@ -1,12 +1,11 @@
 import { size, useTheme } from '@mezon/mobile-ui';
-import { selectAccountCustomStatus, selectAllAccount } from '@mezon/store-mobile';
+import { selectAllAccount } from '@mezon/store-mobile';
 import { createImgproxyUrl, formatMoney } from '@mezon/utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Share, Text, TouchableOpacity, View } from 'react-native';
 import { Grid } from 'react-native-animated-spinkit';
 import FastImage from 'react-native-fast-image';
-import LinearGradient from 'react-native-linear-gradient';
 import { useSelector } from 'react-redux';
 import RNQRGenerator from 'rn-qr-generator';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
@@ -16,7 +15,7 @@ import { style } from './styles';
 
 type TabType = 'profile' | 'transfer';
 
-interface QRCodeCache {
+interface QRCode {
 	profile: string;
 	transfer: string;
 }
@@ -26,12 +25,10 @@ export const MyQRCode = () => {
 	const styles = style(themeValue) as any;
 	const { t } = useTranslation(['profile']);
 	const userProfile = useSelector(selectAllAccount);
-	const userCustomStatus = useSelector(selectAccountCustomStatus);
 	const { saveImageToCameraRoll } = useImage();
 	const [activeTab, setActiveTab] = useState<TabType>('profile');
-	const [isGenerating, setIsGenerating] = useState<boolean>(false);
-	const qrCodeCache = useRef<QRCodeCache>({ profile: '', transfer: '' });
-	const lastPayloadRef = useRef<{ profile: string; transfer: string }>({ profile: '', transfer: '' });
+	const [isGenerating, setIsGenerating] = useState<boolean>(true);
+	const [qrCode, setQrCode] = useState<QRCode>({ profile: '', transfer: '' });
 
 	const tokenInWallet = useMemo(() => {
 		return userProfile?.wallet || 0;
@@ -50,7 +47,7 @@ export const MyQRCode = () => {
 
 			return deeplink;
 		} catch (error) {
-			console.log('Error QR Profile Payload', error);
+			console.error('Error QR Profile Payload', error);
 			return '';
 		}
 	}, [userProfile?.user?.id, userProfile?.user?.avatar_url, userProfile?.user?.username, userProfile?.user?.display_name]);
@@ -63,107 +60,71 @@ export const MyQRCode = () => {
 		return JSON.stringify(data);
 	}, [userProfile?.user?.id, userProfile?.user?.username]);
 
-	const generateQRCode = useCallback(async (type: TabType) => {
-		const payload = type === 'profile' ? profilePayload : transferPayload;
-
-		if (lastPayloadRef.current[type] === payload && qrCodeCache.current[type]) {
-			return qrCodeCache.current[type];
-		}
-
-		setIsGenerating(true);
+	const generateQRCode = async (type: TabType) => {
 		try {
+			const payload = type === 'profile' ? profilePayload : transferPayload;
+			setIsGenerating(true);
 			const res = await RNQRGenerator.generate({
 				value: payload,
-				height: Number(size.s_150 * 2.5),
-				width: Number(size.s_150 * 2.5),
+				height: Math.ceil(size.s_220),
+				width: Math.ceil(size.s_220),
 				correctionLevel: 'L'
 			});
-
-			qrCodeCache.current[type] = res?.uri || '';
-			lastPayloadRef.current[type] = payload;
-
-			return res?.uri || '';
-		} catch (error) {
-			console.log('Error generating QR code:', error);
-			return '';
-		} finally {
+			setQrCode((pre) => ({
+				...pre,
+				[type]: res?.uri?.toString() || ''
+			}));
 			setIsGenerating(false);
+		} catch (error) {
+			console.error('Error generating QR code:', error);
 		}
-	}, [profilePayload, transferPayload]);
-
-	const handleTabChange = useCallback((tab: TabType) => {
-		setActiveTab(tab);
-	}, []);
+	};
 
 	const handleDownloadQRCode = useCallback(async () => {
 		try {
-			const qrCodeUri = qrCodeCache.current.profile;
+			const qrCodeUri = qrCode?.['profile'];
 			if (!qrCodeUri) return;
 			const filePath = qrCodeUri.startsWith('file://') ? qrCodeUri : `file://${qrCodeUri}`;
 			await saveImageToCameraRoll(filePath, 'image', true);
 		} catch (e) {
-			console.log('QR Code download error:', e);
+			console.error('QR Code download error:', e);
 		}
 	}, [saveImageToCameraRoll]);
 
 	const handleShareQRCode = useCallback(async () => {
 		try {
-			const qrCodeUri = qrCodeCache.current.profile;
+			const qrCodeUri = qrCode?.['profile'];
 			if (!qrCodeUri) return;
 			await Share.share({
 				url: qrCodeUri,
 				message: profilePayload || ''
 			});
 		} catch (e) {
-			console.log('QR Code share error:', e);
+			console.error('QR Code share error:', e);
 		}
 	}, [profilePayload]);
 
-	const currentQRCode = useMemo(() => {
-		return qrCodeCache.current[activeTab];
-	}, [activeTab, qrCodeCache.current[activeTab]]);
-
 	useEffect(() => {
 		generateQRCode(activeTab);
-	}, [generateQRCode, activeTab]);
+	}, [activeTab]);
 
-	const renderTabButton = useCallback((tab: TabType, label: string) => (
-		<TouchableOpacity
-			style={[
-				styles.tabButton,
-				activeTab === tab && styles.activeTabButton
-			]}
-			onPress={() => handleTabChange(tab)}
-		>
-			<Text style={[
-				styles.tabButtonText,
-				activeTab === tab && styles.activeTabButtonText
-			]}>
-				{label}
-			</Text>
-		</TouchableOpacity>
-	), [activeTab, handleTabChange, styles]);
+	const renderTabButton = useCallback(
+		(tab: TabType, label: string) => (
+			<TouchableOpacity style={[styles.tabButton, activeTab === tab && styles.activeTabButton]} onPress={() => setActiveTab(tab)}>
+				<Text style={[styles.tabButtonText, activeTab === tab && styles.activeTabButtonText]}>{label}</Text>
+			</TouchableOpacity>
+		),
+		[activeTab, styles]
+	);
 
-	const userInfo = useMemo(() => ({
-		avatarUrl: userProfile?.user?.avatar_url,
-		username: userProfile?.user?.username,
-		displayName: userProfile?.user?.display_name,
-	}), [userProfile?.user?.avatar_url, userProfile?.user?.username, userProfile?.user?.display_name, userCustomStatus]);
-
-	const actionButtons = useMemo(() => {
-		if (activeTab !== 'profile') return null;
-
-		return (
-			<View style={styles.actionsRow}>
-				<TouchableOpacity style={styles.actionButton} onPress={handleDownloadQRCode}>
-					<MezonIconCDN icon={IconCDN.downloadIcon} color={themeValue.primary} />
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.actionButton} onPress={handleShareQRCode}>
-					<MezonIconCDN icon={IconCDN.shareIcon} color={themeValue.primary} />
-				</TouchableOpacity>
-			</View>
-		);
-	}, [activeTab, handleDownloadQRCode, handleShareQRCode]);
+	const userInfo = useMemo(
+		() => ({
+			avatarUrl: userProfile?.user?.avatar_url,
+			username: userProfile?.user?.username,
+			displayName: userProfile?.user?.display_name
+		}),
+		[userProfile?.user?.avatar_url, userProfile?.user?.username, userProfile?.user?.display_name]
+	);
 
 	return (
 		<View style={styles.container}>
@@ -172,22 +133,8 @@ export const MyQRCode = () => {
 				{renderTabButton('transfer', t('qr_transfer', 'QR Transfer'))}
 			</View>
 
-			<LinearGradient
-				start={{ x: 0, y: 1 }}
-				end={{ x: 1, y: 0 }}
-				colors={[themeValue.primary, themeValue.secondaryLight]}
-				style={[styles.card, { minHeight: size.s_100 * 5.5 }]}
-			>
-				<View
-					style={{
-						flexDirection: 'row',
-						alignItems: 'center',
-						paddingBottom: size.s_14,
-						gap: size.s_14,
-						borderBottomColor: themeValue.border,
-						borderBottomWidth: 1
-					}}
-				>
+			<View style={[styles.card]}>
+				<View style={styles.headerCard}>
 					{userInfo.avatarUrl ? (
 						<FastImage
 							source={{
@@ -204,35 +151,39 @@ export const MyQRCode = () => {
 					<View>
 						<Text style={styles.nameProfile}>{userInfo.username || userInfo.displayName}</Text>
 						<Text style={styles.tokenProfile}>
-							{activeTab === 'profile'
-								? "Share with others"
-								: `${t('token')} ${formatMoney(Number(tokenInWallet || 0))}₫`
-							}
+							{activeTab === 'profile' ? 'Share with others' : `${t('token')} ${formatMoney(Number(tokenInWallet || 0))}₫`}
 						</Text>
 					</View>
 				</View>
 
 				<View style={styles.qrContainer}>
-					{(isGenerating || !currentQRCode) ? (
+					{isGenerating ? (
 						<Grid color={themeValue.text} size={size.s_50} />
 					) : (
 						<View style={styles.qrWrapper}>
-							<FastImage source={{ uri: currentQRCode }} style={styles.imageQR} />
+							<Image source={{ uri: qrCode?.[activeTab] }} style={styles.imageQR} />
 						</View>
 					)}
 				</View>
 
-				{actionButtons}
-
+				{!isGenerating && qrCode?.[activeTab] && activeTab === 'profile' && (
+					<View style={styles.actionsRow}>
+						<TouchableOpacity style={styles.actionButton} onPress={handleDownloadQRCode}>
+							<MezonIconCDN icon={IconCDN.downloadIcon} color={themeValue.primary} />
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.actionButton} onPress={handleShareQRCode}>
+							<MezonIconCDN icon={IconCDN.shareIcon} color={themeValue.primary} />
+						</TouchableOpacity>
+					</View>
+				)}
 				<View style={styles.descriptionContainer}>
 					<Text style={styles.descriptionText}>
 						{activeTab === 'profile'
 							? t('qr_profile_description', 'Scan this QR code to chat with me or view my profile')
-							: t('qr_transfer_description', 'Scan this QR code to transfer funds')
-						}
+							: t('qr_transfer_description', 'Scan this QR code to transfer funds')}
 					</Text>
 				</View>
-			</LinearGradient>
+			</View>
 		</View>
 	);
 };
