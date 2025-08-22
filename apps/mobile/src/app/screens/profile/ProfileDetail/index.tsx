@@ -22,13 +22,6 @@ import { APP_SCREEN } from '../../../navigation/ScreenTypes';
 import { checkNotificationPermissionAndNavigate } from '../../../utils/notificationPermissionHelper';
 import { style } from './styles';
 
-interface ProfileData {
-    user_id: string;
-    username: string;
-    display_name: string;
-    avatar_url: string;
-}
-
 enum UserRelationshipStatus {
     NOT_FRIENDS = 'not_friends',
     FRIENDS = 'friends',

@@ -15,7 +15,6 @@ export const style = (colors: Attributes) =>
             borderRadius: size.s_12,
             padding: size.s_12,
             paddingVertical: size.s_20,
-            gap: size.s_10
         },
 
         profileTitle: {
@@ -69,6 +68,7 @@ export const style = (colors: Attributes) =>
             maxWidth: '80%'
         },
         actionButton: {
+            marginTop: size.s_10,
             backgroundColor: baseColor.blurple,
             borderRadius: size.s_100,
             paddingVertical: size.s_12,
