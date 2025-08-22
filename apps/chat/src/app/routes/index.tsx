@@ -1,6 +1,6 @@
 import isElectron from 'is-electron';
 import { Suspense, lazy, memo, useCallback, useEffect, useMemo } from 'react';
-import { LoaderFunctionArgs, Outlet, RouterProvider, createBrowserRouter, createHashRouter, useNavigation } from 'react-router-dom';
+import { LoaderFunctionArgs, Navigate, Outlet, RouterProvider, createBrowserRouter, createHashRouter, useNavigation } from 'react-router-dom';
 
 import { CustomLoaderFunction, appLoader, shouldRevalidateApp } from '../loaders/appLoader';
 import { authLoader, shouldRevalidateAuth } from '../loaders/authLoader';
@@ -248,6 +248,10 @@ export const Routes = memo(() => {
 											</Suspense>
 										),
 										children: [
+											{
+												path: '',
+												element: <Navigate to="direct" />
+											},
 											{
 												path: 'clans',
 												element: (
