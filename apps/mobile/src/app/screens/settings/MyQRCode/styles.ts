@@ -39,7 +39,16 @@ export const style = (colors: Attributes) =>
 			marginTop: size.s_30,
 			marginHorizontal: size.s_30,
 			padding: size.s_10,
-			borderRadius: size.s_10
+			borderRadius: size.s_10,
+			backgroundColor: colors.secondary
+		},
+		headerCard: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			paddingBottom: size.s_14,
+			gap: size.s_14,
+			borderBottomColor: colors.border,
+			borderBottomWidth: 1
 		},
 		avatar: {
 			width: size.s_50,
@@ -79,13 +88,17 @@ export const style = (colors: Attributes) =>
 		qrWrapper: {
 			backgroundColor: colors.white,
 			padding: size.s_10,
+			alignSelf: 'center',
+			margin: 0,
+			marginLeft: 0,
+			marginRight: 0,
 			borderRadius: size.s_8,
 			alignItems: 'center',
 			justifyContent: 'center'
 		},
 		imageQR: {
-			width: size.s_100 * 2.5,
-			height: size.s_100 * 2.5,
+			width: size.s_220,
+			height: size.s_220,
 			borderRadius: size.s_6
 		},
 		descriptionContainer: {
