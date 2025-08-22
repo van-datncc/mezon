@@ -689,7 +689,6 @@ export const ChatBoxBottomBar = memo(
 								style={[styles.inputStyle, !textValueInputRef?.current && { height: size.s_40 }]}
 								children={RenderTextContent({ text: textValueInputRef?.current })}
 								onSelectionChange={textInputProps?.onSelectionChange}
-								autoCapitalize="none"
 							/>
 							<View style={styles.iconEmoji}>
 								<EmojiSwitcher onChange={handleKeyboardBottomSheetMode} mode={modeKeyBoardBottomSheet} />

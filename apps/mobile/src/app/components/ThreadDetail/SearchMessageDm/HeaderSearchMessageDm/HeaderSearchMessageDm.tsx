@@ -53,6 +53,7 @@ export default function HeaderSearchMessageDm({ initialSearchText, onClearStoreI
 					placeholderTextColor={themeValue.textDisabled}
 					placeholder={t('search')}
 					autoFocus
+					autoCapitalize="none"
 				/>
 				{textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
