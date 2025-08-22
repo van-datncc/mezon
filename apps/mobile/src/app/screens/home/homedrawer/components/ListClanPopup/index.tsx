@@ -218,7 +218,7 @@ export const ListClanPopup = React.memo(() => {
 					});
 
 					dispatch(clansActions.updateClanGroupOrder(newClanGroupOrder));
-				} else if (groupPreviewMap?.[toItem?.clan?.clan_id ?? toItem?.group?.id !== undefined]) {
+				} else if (groupPreviewMap?.[toItem?.clan?.clan_id ?? toItem?.group?.id] !== undefined) {
 					requestAnimationFrame(() => {
 						if (toItem?.type === GROUP) {
 							dispatch(
