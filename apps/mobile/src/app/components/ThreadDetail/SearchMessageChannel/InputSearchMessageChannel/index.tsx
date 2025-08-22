@@ -141,7 +141,6 @@ const InputSearchMessageChannel = ({
 					placeholderTextColor={themeValue.textDisabled}
 					placeholder={optionFilter?.title || userMention?.display ? '' : t('search')}
 					autoFocus
-					autoCapitalize="none"
 				></TextInput>
 				{textInput?.length ? (
 					<Pressable onPress={() => clearTextInput()}>
