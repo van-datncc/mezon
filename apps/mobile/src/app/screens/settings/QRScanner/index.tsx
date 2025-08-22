@@ -1,6 +1,6 @@
 import { useAuth } from '@mezon/core';
 import { ActionEmitEvent } from '@mezon/mobile-components';
-import { baseColor, Colors, size, ThemeModeBase, useTheme } from '@mezon/mobile-ui';
+import { baseColor, Colors, size, useTheme } from '@mezon/mobile-ui';
 import { appActions, getStoreAsync } from '@mezon/store-mobile';
 import { sleep } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import RNQRGenerator from 'rn-qr-generator';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN } from '../../../navigation/ScreenTypes';
+import { getQueryParam } from '../../../utils/helpers';
 import { style } from './styles';
 
 export const QRScanner = () => {
@@ -140,6 +141,18 @@ export const QRScanner = () => {
 				if (inviteId) {
 					navigation.navigate(APP_SCREEN.INVITE_CLAN, {
 						code: inviteId
+					});
+				}
+				return;
+			}
+			if (value?.includes('/chat/')) {
+				const chatMatch = value.match(/(?:^|\/)chat\/([^/?#]+)/);
+				const username = chatMatch?.[1];
+				if (username) {
+					const dataParam = getQueryParam(value, 'data');
+					navigation.navigate(APP_SCREEN.PROFILE_DETAIL, {
+						username: username,
+						data: dataParam || undefined
 					});
 				}
 				return;

@@ -110,6 +110,12 @@ const NavigationMain = memo(
 						parse: {
 							code: (code) => `${code}`
 						}
+					},
+					[`${APP_SCREEN.PROFILE_DETAIL}`]: {
+						path: 'chat/:code',
+						parse: {
+							code: (code) => `${code}`
+						}
 					}
 				}
 			},

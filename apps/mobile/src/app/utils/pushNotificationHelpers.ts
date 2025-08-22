@@ -98,7 +98,7 @@ export const checkNotificationPermission = async () => {
 export const getNotificationPermission = async (ensureRequest = false): Promise<boolean> => {
 	try {
 		if (Platform.OS === 'ios') {
-			let settings = await notifee.getNotificationSettings();
+			const settings = await notifee.getNotificationSettings();
 			let status = settings.authorizationStatus;
 
 			if (ensureRequest && status === NotifeeAuthorizationStatus.NOT_DETERMINED) {

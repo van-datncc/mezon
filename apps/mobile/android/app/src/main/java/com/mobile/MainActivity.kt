@@ -57,6 +57,14 @@ class MainActivity : ReactActivity() {
     }
   }
 
+  override fun onWindowFocusChanged(hasFocus: Boolean) {
+    try {
+        super.onWindowFocusChanged(hasFocus)
+    } catch (e: Exception) {
+        Log.e("MainActivity", "Error in onWindowFocusChanged: ${e.message}", e)
+    }
+  }
+
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]

@@ -156,7 +156,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			if (props.emojiAction === EmojiPlaces.EMOJI_EDITOR_BUZZ) {
 				const lastIndexOfInputPlainText = (buzzInputRequest?.content ?? '')?.length;
 				if (lastIndexOfInputPlainText > MAX_LENGTH_MESSAGE_BUZZ) return;
-				const buzzInputRequestMentionArr = buzzInputRequest?.mentionRaw ?? [];
+				// const buzzInputRequestMentionArr = buzzInputRequest?.mentionRaw ?? [];
 				const lastIndexOfInputValue = (buzzInputRequest?.valueTextInput ?? '')?.length;
 				const newEmoji: MentionItem = {
 					childIndex: 0,
@@ -168,7 +168,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 				if (setBuzzInputRequest) {
 					setBuzzInputRequest({
 						content: (buzzInputRequest?.content ?? '') + emojiPicked,
-						mentionRaw: [...buzzInputRequestMentionArr, newEmoji],
+						// mentionRaw: [...buzzInputRequestMentionArr, newEmoji],
 						valueTextInput: (buzzInputRequest?.valueTextInput ?? '') + `::[${emojiPicked}](${emojiId})`
 					});
 				}
@@ -197,7 +197,7 @@ function EmojiCustomPanel(props: EmojiCustomPanelOptions) {
 			setSuggestionEmojiObjPicked,
 			shiftPressedState,
 			buzzInputRequest?.content,
-			buzzInputRequest?.mentionRaw,
+			// buzzInputRequest?.mentionRaw,
 			buzzInputRequest?.valueTextInput,
 			setBuzzInputRequest,
 			toggleEmojiPanel,

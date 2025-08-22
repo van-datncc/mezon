@@ -7,7 +7,7 @@ export const style = (colors: Attributes) =>
 			alignItems: 'center'
 		},
 		containerBottom: {
-			paddingBottom: size.s_20
+			paddingBottom: size.s_14
 		},
 		listDMBadge: {
 			maxHeight: '100%',
