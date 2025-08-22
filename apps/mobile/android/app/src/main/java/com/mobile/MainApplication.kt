@@ -27,8 +27,8 @@ import com.mezon.mobile.ImageClipboardPackage;
 import com.mezon.mobile.BadgePackage;
 import io.invertase.firebase.analytics.ReactNativeFirebaseAnalyticsPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
-
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
+import android.util.Log
 
 class MainApplication : Application(), ReactApplication {
 
@@ -66,11 +66,14 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
-    LiveKitReactNative.setup(this, AudioType.CommunicationAudioType())
-    SoLoader.init(this, OpenSourceMergedSoMapping)
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      // If you opted-in for the New Architecture, we load the native entry point for this app.
-      load()
+    try {
+        LiveKitReactNative.setup(this, AudioType.CommunicationAudioType())
+        SoLoader.init(this, OpenSourceMergedSoMapping)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            load()
+        }
+    } catch (e: Exception) {
+        Log.e("MainApplication", "Error initializing React Native: ${e.message}", e)
     }
   }
 

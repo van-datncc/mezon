@@ -50,7 +50,9 @@ export const AddMemberOrRoleContent = memo(({ channel, onDismiss }: IAddMemberOr
 
 	const listOfRoleCanAdd = useMemo(() => {
 		const addedRoleIdList = listOfChannelRole?.map((role) => role?.id) || [];
-		return allClanRoles?.filter((role) => !addedRoleIdList.includes(role?.id))?.map((role) => ({ ...role, type: EOverridePermissionType.Role }));
+		return allClanRoles
+			?.filter((role) => !addedRoleIdList.includes(role?.id) && role?.slug !== `everyone-${role?.clan_id}`)
+			?.map((role) => ({ ...role, type: EOverridePermissionType.Role }));
 	}, [listOfChannelRole, allClanRoles]);
 
 	const disableAddButton = useMemo(() => {
