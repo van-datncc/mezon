@@ -6,6 +6,8 @@ import {
 	appActions,
 	channelsActions,
 	fetchUserChannels,
+	IUpdateChannelRequest,
+	listChannelRenderAction,
 	rolesClanActions,
 	selectAllUserChannel,
 	selectAllUserClans,
@@ -14,6 +16,7 @@ import {
 } from '@mezon/store-mobile';
 import { isPublicChannel } from '@mezon/utils';
 import { FlashList } from '@shopify/flash-list';
+import { ApiChangeChannelPrivateRequest } from 'mezon-js/api.gen';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DeviceEventEmitter, Text, TouchableOpacity, View } from 'react-native';
@@ -83,19 +86,41 @@ export const BasicView = memo(({ channel }: IBasicViewProps) => {
 	};
 
 	const updateChannel = useCallback(
-		async (privateChannel: boolean) => {
+		async (isPublic: boolean) => {
 			try {
 				DeviceEventEmitter.emit(ActionEmitEvent.ON_TRIGGER_MODAL, { isDismiss: true });
 				dispatch(appActions.setLoadingMainMobile(true));
 
+				const currentChannelPrivate = isPublic ? 1 : 0
+				const updateUpdateChannelRequest: ApiChangeChannelPrivateRequest = {
+					channel_id: channel?.channel_id || '',
+					channel_private: currentChannelPrivate,
+					user_ids: [userId],
+					role_ids: []
+				};
+
 				const response = await dispatch(
-					channelsActions.updateChannelPrivate({
-						channel_id: channel.id,
-						channel_private: privateChannel ? 1 : 0,
-						user_ids: [userId],
-						role_ids: []
+					channelsActions.updateChannelPrivate(updateUpdateChannelRequest)
+				);
+
+				dispatch(
+					channelsActions.updateChannelPrivateState({
+						clanId: channel?.clan_id || '',
+						channelId: channel?.channel_id || '',
+						channelPrivate: Number(!isPublic)
 					})
 				);
+				dispatch(
+					listChannelRenderAction.updateChannelInListRender({
+						channelId: channel?.channel_id || '',
+						clanId: channel?.clan_id || '',
+						dataUpdate: {
+							...updateUpdateChannelRequest,
+							channel_private: Number(!isPublic)
+						} as IUpdateChannelRequest
+					})
+				);
+
 				const isError = ERequestStatus.Rejected === response?.meta?.requestStatus;
 				if (isError) {
 					throw new Error();
