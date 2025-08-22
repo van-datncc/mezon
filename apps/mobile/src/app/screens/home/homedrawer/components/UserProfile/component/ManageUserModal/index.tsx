@@ -11,7 +11,7 @@ import {
 	useAppDispatch,
 	usersClanActions
 } from '@mezon/store-mobile';
-import { EPermission, EVERYONE_ROLE_ID } from '@mezon/utils';
+import { EPermission } from '@mezon/utils';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -134,12 +134,14 @@ export const ManageUserModal = memo<IManageUserModalProp>(({ user, visible, oncl
 
 	const editableRoleList = useMemo(() => {
 		if (!rolesClan) return [];
-		return rolesClan.filter((role) => role?.id !== EVERYONE_ROLE_ID);
+		return rolesClan.filter((role) => role?.slug !== `everyone-${role?.clan_id}`);
 	}, [rolesClan]);
 
 	const roleList = useMemo(() => {
 		if (!editMode) {
-			return activeRoleOfUser?.map((role) => ({ ...role, disabled: false })) || [];
+			return (
+				activeRoleOfUser?.map((role) => ({ ...role, disabled: false }))?.filter((role) => role?.slug !== `everyone-${role?.clan_id}`) || []
+			);
 		}
 		return (
 			editableRoleList?.map((role) => ({

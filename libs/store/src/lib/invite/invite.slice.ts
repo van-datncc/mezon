@@ -92,6 +92,23 @@ export const getLinkInvite = createAsyncThunk('invite/getLinkInvite', async ({ i
 	}
 });
 
+export const checkMutableRelationship = createAsyncThunk('invite/getMutableRelation', async ({ userId }: { userId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.isFollower(mezon.session, {
+			follow_id: userId
+		});
+		if (!response) {
+			return thunkAPI.rejectWithValue([]);
+		}
+
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'invite/getLinkInvite');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
 export const initialInviteState: InviteState = inviteAdapter.getInitialState({
 	loadingStatus: 'not loaded',
 	clans: [],

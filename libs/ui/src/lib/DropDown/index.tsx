@@ -54,7 +54,7 @@ const Dropdown = ({ children, className, placement, holdOnClick = false, menu, t
 			trigger={trigger}
 			overlay={menu}
 			placement={'bottomRight'}
-			overlayClassName={`text-theme-message bg-input-secondary rounded-lg ${className}`}
+			overlayClassName={`text-theme-message bg-[var(--theme-setting-nav)]  rounded-lg ${className}`}
 			minOverlayWidthMatchTrigger
 			autoDestroy={true}
 			visible={visible}

@@ -55,5 +55,7 @@
     "save": "Lưu"
   },
   "roleImagePicker": "Biểu tượng vai trò",
-  "notifyEveryone": "Thông báo cho tất cả những người có quyền xem kênh này."
+  "notifyEveryone": "Thông báo cho tất cả những người có quyền xem kênh này.",
+  "removeImage": "Xoá",
+  "allMembers": "Tất cả thành viên"
 }

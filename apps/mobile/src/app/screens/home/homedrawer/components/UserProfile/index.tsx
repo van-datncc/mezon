@@ -16,7 +16,6 @@ import {
 } from '@mezon/store-mobile';
 import { DEFAULT_ROLE_COLOR, IMessageWithUser } from '@mezon/utils';
 import { useNavigation } from '@react-navigation/native';
-import { checkNotificationPermissionAndNavigate } from 'apps/mobile/src/app/utils/notificationPermissionHelper';
 import { ChannelType } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +29,7 @@ import ImageNative from '../../../../../components/ImageNative';
 import { IconCDN } from '../../../../../constants/icon_cdn';
 import useTabletLandscape from '../../../../../hooks/useTabletLandscape';
 import { getUserStatusByMetadata } from '../../../../../utils/helpers';
+import { checkNotificationPermissionAndNavigate } from '../../../../../utils/notificationPermissionHelper';
 import { style } from './UserProfile.styles';
 import EditUserProfileBtn from './component/EditUserProfileBtn';
 import { PendingContent } from './component/PendingContent';
@@ -147,7 +147,9 @@ const UserProfile = React.memo(
 		}, [infoFriend?.state]);
 
 		const userRolesClan = useMemo(() => {
-			return userById?.role_id ? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id)) : [];
+			return userById?.role_id
+				? rolesClan?.filter?.((role) => userById?.role_id?.includes(role.id) && role?.slug !== `everyone-${role?.clan_id}`)
+				: [];
 		}, [userById?.role_id, rolesClan]);
 
 		const isCheckOwner = useMemo(() => {
@@ -459,26 +461,26 @@ const UserProfile = React.memo(
 							{userById
 								? !isDM
 									? userById?.clan_nick ||
-									userById?.user?.display_name ||
-									userById?.user?.username ||
-									user?.clan_nick ||
-									user?.user?.display_name ||
-									user?.user?.username
+										userById?.user?.display_name ||
+										userById?.user?.username ||
+										user?.clan_nick ||
+										user?.user?.display_name ||
+										user?.user?.username
 									: userById?.user?.display_name || userById?.user?.username
 								: user?.display_name ||
-								user?.user?.display_name ||
-								user?.username ||
-								user?.user?.username ||
-								(checkAnonymous ? 'Anonymous' : message?.username)}
+									user?.user?.display_name ||
+									user?.username ||
+									user?.user?.username ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						<Text style={[styles.subUserName]}>
 							{userById
 								? userById?.user?.username || userById?.user?.display_name
 								: user?.username ||
-								user?.user?.username ||
-								user?.display_name ||
-								user?.user?.display_name ||
-								(checkAnonymous ? 'Anonymous' : message?.username)}
+									user?.user?.username ||
+									user?.display_name ||
+									user?.user?.display_name ||
+									(checkAnonymous ? 'Anonymous' : message?.username)}
 						</Text>
 						{isCheckOwner && <EditUserProfileBtn user={userById || (user as any)} />}
 						{!isCheckOwner && (

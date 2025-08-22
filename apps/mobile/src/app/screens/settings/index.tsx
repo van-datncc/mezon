@@ -50,6 +50,7 @@ export const Settings = ({ navigation }: { navigation: any }) => {
 		store.dispatch(listChannelsByUserActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.collapseAllGroups());
 		store.dispatch(clansActions.clearClanGroups());
 		store.dispatch(clansActions.refreshStatus());
 

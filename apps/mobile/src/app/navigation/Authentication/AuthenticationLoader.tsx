@@ -43,7 +43,7 @@ import LoadingModal from '../../components/LoadingModal/LoadingModal';
 import { useCheckUpdatedVersion } from '../../hooks/useCheckUpdatedVersion';
 import useTabletLandscape from '../../hooks/useTabletLandscape';
 import { Sharing } from '../../screens/settings/Sharing';
-import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex } from '../../utils/helpers';
+import { clanAndChannelIdLinkRegex, clanDirectMessageLinkRegex, getQueryParam } from '../../utils/helpers';
 import { isShowNotification, navigateToNotification } from '../../utils/pushNotificationHelpers';
 import { APP_SCREEN } from '../ScreenTypes';
 
@@ -137,12 +137,22 @@ export const AuthenticationLoader = () => {
 					});
 				}
 			}
-		} else if (path?.includes?.('invite/')) {
+		} else if (path?.includes?.('/invite/')) {
 			const inviteMatch = path.match(/invite\/(\d+)/);
 			const inviteId = inviteMatch?.[1];
 			if (inviteId) {
 				navigation.navigate(APP_SCREEN.INVITE_CLAN, {
 					code: inviteId
+				});
+			}
+		} else if (path?.includes?.('/chat/')) {
+			const chatMatch = path.match(/(?:^|\/)chat\/([^/?#]+)/);
+			const username = chatMatch?.[1];
+			if (username) {
+				const dataParam = getQueryParam(path, 'data');
+				navigation.navigate(APP_SCREEN.PROFILE_DETAIL, {
+					username: username,
+					data: dataParam || undefined
 				});
 			}
 		}
@@ -363,6 +373,7 @@ export const AuthenticationLoader = () => {
 		store.dispatch(messagesActions.removeAll());
 		store.dispatch(clansActions.setCurrentClanId(''));
 		store.dispatch(clansActions.removeAll());
+		store.dispatch(clansActions.collapseAllGroups());
 		store.dispatch(clansActions.clearClanGroups());
 		store.dispatch(clansActions.refreshStatus());
 

@@ -58,7 +58,7 @@ function RoleImagePicker({ roleId, disable = false }: { roleId: string; disable?
 				<View style={styles.tailButton}>
 					{!!activeRole?.role_icon && !disable && (
 						<TouchableOpacity style={styles.deleteButton} onPress={handleRemoveIcon}>
-							<Text style={styles.deleteText}>remove</Text>
+							<Text style={styles.deleteText}>{t('removeImage')}</Text>
 						</TouchableOpacity>
 					)}
 					<MezonImagePicker
