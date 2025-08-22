@@ -1,11 +1,11 @@
 import { ActionEmitEvent } from '@mezon/mobile-components';
 import { Colors, size } from '@mezon/mobile-ui';
-import { AttachmentEntity, selectAllListAttachmentByChannel } from '@mezon/store-mobile';
+import { AttachmentEntity, selectAllListAttachmentByChannel, sleep } from '@mezon/store-mobile';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { ApiMessageAttachment } from 'mezon-js/api.gen';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DeviceEventEmitter, Text, View, useWindowDimensions } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Text, View, useWindowDimensions } from 'react-native';
 import GalleryAwesome, { GalleryRef, RenderItemInfo } from 'react-native-awesome-gallery';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -203,6 +203,14 @@ export const ImageListModal = React.memo((props: IImageListModalProps) => {
 			footerTimeoutRef.current && clearTimeout(footerTimeoutRef.current);
 			imageSavedTimeoutRef.current && clearTimeout(imageSavedTimeoutRef.current);
 		};
+	}, []);
+
+	useEffect(() => {
+		const sub = Dimensions.addEventListener('change', async ({ window }) => {
+			await sleep(100);
+			ref?.current?.reset();
+		});
+		return () => sub.remove();
 	}, []);
 
 	const setScaleDebounced = useThrottledCallback(setCurrentScale, 300);
