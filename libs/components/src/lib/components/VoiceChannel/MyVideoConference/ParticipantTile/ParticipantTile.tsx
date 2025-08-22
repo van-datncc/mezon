@@ -152,6 +152,7 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 								trackReference.source === Track.Source.Camera ||
 								trackReference.source === Track.Source.ScreenShare) ? (
 								<VideoTrack
+									id="focusTrack"
 									trackRef={trackReference}
 									onSubscriptionStatusChanged={handleSubscribe}
 									manageSubscription={autoManageSubscription}
