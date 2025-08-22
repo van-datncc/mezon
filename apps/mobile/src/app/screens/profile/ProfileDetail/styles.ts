@@ -28,8 +28,7 @@ export const style = (colors: Attributes) =>
 
         userInfo: {
             alignItems: 'center',
-            gap: size.s_10,
-            marginBottom: size.s_20
+            marginBottom: size.s_10
         },
 
         profileImage: {
