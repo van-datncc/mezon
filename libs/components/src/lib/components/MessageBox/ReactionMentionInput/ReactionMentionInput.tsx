@@ -1,75 +1,75 @@
 import { useEmojiSuggestionContext, useGifsStickersEmoji, useReference } from '@mezon/core';
 import {
-	ChannelsEntity,
-	channelMembersActions,
-	emojiSuggestionActions,
-	getStore,
-	quickMenuActions,
-	referencesActions,
-	selectAddEmojiState,
-	selectAllAccount,
-	selectAllChannels,
-	selectAllHashtagDm,
-	selectAllRolesClan,
-	selectAnonymousMode,
-	selectAttachmentByChannelId,
-	selectCloseMenu,
-	selectCurrentTopicId,
-	selectDataReferences,
-	selectEmojiObjSuggestion,
-	selectIdMessageRefEdit,
-	selectOpenEditMessageState,
-	selectOpenThreadMessageState,
-	selectQuickMenuByChannelId,
-	selectReactionRightState,
-	selectStatusMenu,
-	selectTheme,
-	threadsActions,
-	useAppDispatch,
-	useAppSelector
+  ChannelsEntity,
+  channelMembersActions,
+  emojiSuggestionActions,
+  getStore,
+  quickMenuActions,
+  referencesActions,
+  selectAddEmojiState,
+  selectAllAccount,
+  selectAllChannels,
+  selectAllHashtagDm,
+  selectAllRolesClan,
+  selectAnonymousMode,
+  selectAttachmentByChannelId,
+  selectCloseMenu,
+  selectCurrentTopicId,
+  selectDataReferences,
+  selectEmojiObjSuggestion,
+  selectIdMessageRefEdit,
+  selectOpenEditMessageState,
+  selectOpenThreadMessageState,
+  selectQuickMenuByChannelId,
+  selectReactionRightState,
+  selectStatusMenu,
+  threadsActions,
+  useAppDispatch,
+  useAppSelector
 } from '@mezon/store';
 import {
-	CHANNEL_INPUT_ID,
-	CREATING_TOPIC,
-	ChannelMembersEntity,
-	GENERAL_INPUT_ID,
-	ID_MENTION_HERE,
-	IEmojiOnMessage,
-	IHashtagOnMessage,
-	ILongPressType,
-	IMarkdownOnMessage,
-	IMentionOnMessage,
-	IMessageWithUser,
-	MIN_THRESHOLD_CHARS,
-	MentionReactInputProps,
-	QUICK_MENU_TYPE,
-	RECENT_EMOJI_CATEGORY,
-	RequestInput,
-	SubPanelName,
-	TITLE_MENTION_HERE,
-	ThreadStatus,
-	addMention,
-	adjustPos,
-	blankReferenceObj,
-	checkIsThread,
-	extractCanvasIdsFromText,
-	filterEmptyArrays,
-	processBoldEntities,
-	processEntitiesDirectly,
-	processMarkdownEntities,
-	searchMentionsHashtag,
-	threadError
+  CHANNEL_INPUT_ID,
+  CREATING_TOPIC,
+  ChannelMembersEntity,
+  GENERAL_INPUT_ID,
+  ID_MENTION_HERE,
+  IEmojiOnMessage,
+  IHashtagOnMessage,
+  ILongPressType,
+  IMarkdownOnMessage,
+  IMentionOnMessage,
+  IMessageWithUser,
+  MIN_THRESHOLD_CHARS,
+  MentionReactInputProps,
+  QUICK_MENU_TYPE,
+  RECENT_EMOJI_CATEGORY,
+  RequestInput,
+  SubPanelName,
+  TITLE_MENTION_HERE,
+  ThreadStatus,
+  addMention,
+  adjustPos,
+  blankReferenceObj,
+  checkIsThread,
+  extractCanvasIdsFromText,
+  filterEmptyArrays,
+  processBoldEntities,
+  processEntitiesDirectly,
+  processMarkdownEntities,
+  searchMentionsHashtag,
+  threadError
 } from '@mezon/utils';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { ApiMessageMention, ApiMessageRef } from 'mezon-js/api.gen';
 import React, { ReactElement, RefObject, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import Mention from './Mention';
-import MentionsInput, { type FormattedText, type MentionsInputHandle } from './MentionsInput';
 import { ChatBoxToolbarWrapper } from './components';
 import { useClickUpToEditMessage, useEmojiPicker, useFocusEditor, useFocusManager, useKeyboardHandler } from './hooks';
+import Mention from './Mention';
+import MentionsInput, { type FormattedText, type MentionsInputHandle } from './MentionsInput';
 import parseHtmlAsFormattedText, { ApiMessageEntityTypes } from './parseHtmlAsFormattedText';
 import processMention from './processMention';
+import SuggestItem from './SuggestItem';
 import { getCanvasTitles } from './utils/canvas';
 
 const slashCommands = [
@@ -133,7 +133,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 
 	const { emojis } = useEmojiSuggestionContext();
 
-	const queryEmojis = (query: string) => {
+
+	const queryEmojis = useCallback((query: string) => {
 		if (!query || emojis.length === 0) return [];
 		const q = query.toLowerCase();
 		const matches: { id: string; display: string; src?: string }[] = [];
@@ -146,7 +147,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		}
 
 		return matches;
-	};
+	}, [emojis]);
 
 	const [isEphemeralMode, setIsEphemeralMode] = useState(false);
 	const [ephemeralTargetUserId, setEphemeralTargetUserId] = useState<string | null>(null);
@@ -167,14 +168,12 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 
 	const isDm = props.mode === ChannelStreamMode.STREAM_MODE_DM;
 
-	const appearanceTheme = useSelector(selectTheme);
 	const userProfile = useSelector(selectAllAccount);
 	const idMessageRefEdit = useSelector(selectIdMessageRefEdit);
 	const allChannels = useAppSelector(selectAllChannels);
 	const allHashtagDm = useAppSelector(selectAllHashtagDm);
 	const { setOpenThreadMessageState, checkAttachment } = useReference(scopeId || '');
 	const [mentionData, setMentionData] = useState<ApiMessageMention[]>([]);
-	const [valueHighlight, setValueHightlight] = useState<string>('');
 	const [displayPlaintext, setDisplayPlaintext] = useState<string>('');
 	const [displayMarkup, setDisplayMarkup] = useState<string>('');
 	const [mentionUpdated, setMentionUpdated] = useState<IMentionOnMessage[]>([]);
@@ -836,7 +835,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				);
 			}
 
-			setValueHightlight(search);
 			const filteredMentions = !isEphemeralMode
 				? props.listMentions || []
 				: props.listMentions?.filter((item) => item.display !== TITLE_MENTION_HERE && item.id !== userProfile?.user?.id) || [];
@@ -868,7 +866,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 
 	const handleSearchSlashCommands = useCallback(
 		async (search: string): Promise<any[]> => {
-			setValueHightlight(search);
 
 			const store = getStore();
 			const channelQuickMenuItems = selectQuickMenuByChannelId(store.getState(), props.currentChannelId || '');
@@ -935,13 +932,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 		dispatch
 	});
 
-	// const onPasteMentions = usePasteMentions({
-	// 	draftRequest,
-	// 	updateDraft,
-	// 	editorRef: editorRef as RefObject<HTMLDivElement>,
-	// 	membersOfChild: props.membersOfChild,
-	// 	membersOfParent: props.membersOfParent
-	// });
 
 	return (
 		<div className={`contain-layout relative bg-theme-surface rounded-lg ${props?.isThread && 'border-theme-primary'}`} ref={containerRef}>
@@ -982,6 +972,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					enableUndoRedo={true}
 					maxHistorySize={50}
 					hasFilesToSend={attachmentData.length > 0}
+					currentChannelId={props.currentChannelId}
 				>
 					<Mention
 						trigger="@"
@@ -994,29 +985,21 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
 									}`}
 								>
-									<div className="flex items-center justify-between w-full">
-										<div className="flex items-center">
-											<div className="w-8 h-8 mr-3 flex-shrink-0">
-												{suggestion.avatarUrl ? (
-													<img
-														src={suggestion.avatarUrl}
-														alt={suggestion.username || suggestion.display}
-														className="w-8 h-8 rounded-full object-cover"
-													/>
-												) : (
-													<div className="w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-														{(suggestion.displayName || suggestion.display || suggestion.username || '?')
-															.charAt(0)
-															.toUpperCase()}
-													</div>
-												)}
-											</div>
-											<div className="flex flex-col min-w-0">
-												<span className="font-medium text-sm truncate">{suggestion.displayName || suggestion.display}</span>
-											</div>
-										</div>
-										{suggestion.username && <div className="text-xs opacity-75 ml-2 flex-shrink-0">{suggestion.username}</div>}
-									</div>
+									<SuggestItem
+										avatarUrl={suggestion.avatarUrl}
+										valueHightLight={search}
+										wrapSuggestItemStyle="justify-between w-full"
+
+                    subText={
+                      suggestion.display === TITLE_MENTION_HERE
+                        ? 'Notify everyone who has permission to see this channel'
+                        : (suggestion.username ?? '')
+                    }
+                    subTextStyle={(suggestion.display === TITLE_MENTION_HERE ? 'normal-case' : 'lowercase') + ' text-xs'}
+                    showAvatar={suggestion.display !== TITLE_MENTION_HERE}
+                    display={suggestion.display}
+                    color={suggestion.color}
+									/>
 								</div>
 							);
 						}}
@@ -1028,15 +1011,17 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						title="TEXT CHANNELS"
 						displayPrefix="#"
 						data={hashtagData}
-						renderSuggestion={(suggestion, search, highlightedDisplay, index, focused) => (
-							<div
-								key={suggestion.id}
-								className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
-									focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
-								}`}
-							>
-								<span className="tag-icon">#</span>
-								<div className="mention-item-name">{highlightedDisplay}</div>
+						renderSuggestion={(suggestion, search, _highlightedDisplay, _index, focused) => (
+							<div key={suggestion.id} 	className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
+                focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
+              }`}>
+								<SuggestItem
+                  valueHightLight={search}
+                  display={suggestion.display}
+                  symbol="#"
+                  subText={(suggestion).subText}
+                  channelId={suggestion.id}
+								/>
 							</div>
 						)}
 						markup="#[__display__](__id__)"
@@ -1046,29 +1031,22 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						trigger=":"
 						markup="::[__display__](__id__)"
 						data={queryEmojis}
-						displayTransform={(id: any, display: any) => {
+						displayTransform={(_id: any, display: any) => {
 							return `${display}`;
 						}}
-						renderSuggestion={(suggestion: any, search: string, highlightedDisplay: React.ReactNode, index: number, focused: boolean) => {
+						renderSuggestion={(suggestion: any, search: string, _highlightedDisplay: React.ReactNode, _index: number, focused: boolean) => {
 							return (
 								<div
 									className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
 										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
 									}`}
 								>
-									<div className="flex items-center w-full">
-										{suggestion?.src && (
-											<img
-												src={suggestion.src}
-												alt={suggestion.display}
-												className="w-6 h-6 mr-3 flex-shrink-0"
-												style={{ width: '24px', height: '24px' }}
-											/>
-										)}
-										<div className="flex flex-col min-w-0">
-											<span className="font-medium text-sm truncate">{suggestion.display}</span>
-										</div>
-									</div>
+									<SuggestItem
+										emojiId={suggestion.id}
+										display={suggestion.display}
+										valueHightLight={search}
+                    symbol={(suggestion as any).emoji}
+									/>
 								</div>
 							);
 						}}
@@ -1078,13 +1056,13 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 						trigger="/"
 						title="COMMANDS"
 						data={handleSearchSlashCommands}
-						displayTransform={(id: any, display: any) => {
+						displayTransform={(_id: any, display: any) => {
 							return `/${display}`;
 						}}
-						onAdd={(id: string, display: string, startPos: number, endPos: number) => {
+						onAdd={(id: string, _display: string, _startPos: number, _endPos: number) => {
 							handleSlashCommandSelect(id);
 						}}
-						renderSuggestion={(suggestion: any, search: string, highlightedDisplay: React.ReactNode, index: number, focused: boolean) => {
+						renderSuggestion={(suggestion: any, search: string, _highlightedDisplay: React.ReactNode, _index: number, focused: boolean) => {
 							if (suggestion.isLoading || suggestion.display === 'loading') {
 								return (
 									<div className="flex items-center gap-2 p-3 text-gray-400">
@@ -1104,14 +1082,15 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 								);
 							}
 							return (
-								<div
-									key={suggestion.id}
-									className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
-										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
-									}`}
-								>
-									<span className="tag-icon">/</span>
-									<div className="mention-item-name">{suggestion.display}</div>
+								<div key={suggestion.id} 	className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
+                  focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
+                }`}>
+									<SuggestItem
+										display={suggestion.display}
+										subText={suggestion.description}
+                    symbol="/"
+										valueHightLight={search}
+									/>
 								</div>
 							);
 						}}

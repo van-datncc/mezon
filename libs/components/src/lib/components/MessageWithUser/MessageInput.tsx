@@ -9,9 +9,8 @@ import {
   useAppDispatch
 } from '@mezon/store';
 import {
-  EBacktickType,
-  IMarkdownOnMessage,
   RECENT_EMOJI_CATEGORY,
+  TITLE_MENTION_HERE,
   addMention,
   convertMessageToHtml,
   filterEmptyArrays,
@@ -25,6 +24,8 @@ import { useSelector } from 'react-redux';
 import ModalDeleteMess from '../../components/DeleteMessageModal/ModalDeleteMess';
 import Mention from '../../components/MessageBox/ReactionMentionInput/Mention';
 import MentionsInput, { type FormattedText, type MentionsInputHandle } from '../../components/MessageBox/ReactionMentionInput/MentionsInput';
+import parseHtmlAsFormattedText from '../../components/MessageBox/ReactionMentionInput/parseHtmlAsFormattedText';
+import SuggestItem from '../../components/MessageBox/ReactionMentionInput/SuggestItem';
 import { UserMentionList } from '../../components/UserMentionList';
 
 type MessageInputProps = {
@@ -98,33 +99,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 
 
 
-	const escapeHtmlForCodeBlocks = (text: string, markdownEntities: IMarkdownOnMessage[]): string => {
-		if (!markdownEntities || markdownEntities.length === 0) return text;
-		const codeBlocks = markdownEntities.filter(mk => mk.type === EBacktickType.PRE || mk.type === EBacktickType.CODE ); // Assuming type 1 = code, type 2 = pre
-		if (codeBlocks.length === 0) return text;
-		const sortedBlocks = [...codeBlocks].sort((a, b) => (b.s || 0) - (a.s || 0));
-
-		let result = text;
-		sortedBlocks.forEach(block => {
-			const start = block.s || 0;
-			const end = block.e || 0;
-			const content = result.substring(start, end);
-			const escapedContent = content
-				.replace(/&(?!amp;|lt;|gt;|quot;|#39;|nbsp;)/g, '&amp;')
-				.replace(/</g, '&lt;')
-				.replace(/>/g, '&gt;')
-				.replace(/"/g, '&quot;')
-				.replace(/'/g, '&#39;')
-				.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-				.replace(/  /g, '&nbsp;&nbsp;')
-				.replace(/\n/g, '<br>');
-
-			result = result.substring(0, start) + escapedContent + result.substring(end);
-		});
-
-		return result;
-	};
-
 	const initialFormattedValue = useMemo(() => {
 
 		if (!message.content) return '';
@@ -136,8 +110,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 			ej: message.content.ej || [],
 			mk: message.content.mk || []
 		};
-		const htmlContent = convertMessageToHtml(extendedMessage);
-		return escapeHtmlForCodeBlocks(htmlContent, message.content.mk || []);
+		return convertMessageToHtml(extendedMessage);
+
 	}, [message.content, message.mentions]);
 
 	const [inputValue, setInputValue] = useState(initialFormattedValue);
@@ -263,6 +237,23 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 		}
 	};
 
+	const handleSave = () => {
+		if (editorRef.current) {
+			const element = editorRef.current.getElement();
+			if (element) {
+				const formattedText = parseHtmlAsFormattedText(element.innerHTML, true, false);
+				handleSendWithFormattedText(formattedText as FormattedText);
+			}
+		}
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement | HTMLTextAreaElement | HTMLInputElement>) => {
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			handleCancelEdit();
+		}
+	};
+
 	return (
 		<div className="inputEdit w-full flex flex-col">
 			<div className="w-full">
@@ -274,14 +265,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 					onSend={(formattedText: FormattedText) => {
 						handleSendWithFormattedText(formattedText);
 					}}
-					onChange={(html: string) => {
-						setInputValue(html);
-					}}
+					onKeyDown={handleKeyDown}
 					placeholder="Edit message..."
 					style={{
 						minHeight: '40px',
-						maxHeight: '200px',
-						overflow: 'auto'
 					}}
 				>
 					<Mention
@@ -298,29 +285,21 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
 									}`}
 								>
-									<div className="flex items-center justify-between w-full">
-										<div className="flex items-center">
-											<div className="w-8 h-8 mr-3 flex-shrink-0">
-												{suggestion.avatarUrl ? (
-													<img
-														src={suggestion.avatarUrl}
-														alt={suggestion.username || suggestion.display}
-														className="w-8 h-8 rounded-full object-cover"
-													/>
-												) : (
-													<div className="w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-														{(suggestion.displayName || suggestion.display || suggestion.username || '?')
-															.charAt(0)
-															.toUpperCase()}
-													</div>
-												)}
-											</div>
-											<div className="flex flex-col min-w-0">
-												<span className="font-medium text-sm truncate">{suggestion.displayName || suggestion.display}</span>
-											</div>
-										</div>
-										{suggestion.username && <div className="text-xs opacity-75 ml-2 flex-shrink-0">{suggestion.username}</div>}
-									</div>
+									<SuggestItem
+                    avatarUrl={suggestion.avatarUrl}
+                    valueHightLight={search}
+                    wrapSuggestItemStyle="justify-between w-full"
+
+                    subText={
+                      suggestion.display === TITLE_MENTION_HERE
+                        ? 'Notify everyone who has permission to see this channel'
+                        : (suggestion.username ?? '')
+                    }
+                    subTextStyle={(suggestion.display === TITLE_MENTION_HERE ? 'normal-case' : 'lowercase') + ' text-xs'}
+                    showAvatar={suggestion.display !== TITLE_MENTION_HERE}
+                    display={suggestion.display}
+                    color={suggestion.color}
+									/>
 								</div>
 							);
 						}}
@@ -336,8 +315,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 							<div key={suggestion.id} className={`bg-ping-member mention-item flex items-center px-3 py-2 cursor-pointer rounded-lg ${
 								focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
 							}`}>
-								<span className="tag-icon">#</span>
-								<div className="mention-item-name">{highlightedDisplay}</div>
+								<SuggestItem
+						     valueHightLight={search}
+                 display={suggestion.display}
+                 symbol="#"
+                 subText={(suggestion).subText}
+                 channelId={suggestion.id}
+								/>
 							</div>
 						)}
 					/>
@@ -354,19 +338,12 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 										focused ? 'bg-[var(--bg-item-hover)] text-white' : ''
 									}`}
 								>
-									<div className="flex items-center w-full">
-										{suggestion?.src && (
-											<img
-												src={suggestion.src}
-												alt={suggestion.display}
-												className="w-6 h-6 mr-3 flex-shrink-0"
-												style={{ width: '24px', height: '24px' }}
-											/>
-										)}
-										<div className="flex flex-col min-w-0">
-											<span className="font-medium text-sm truncate">:{suggestion.display}:</span>
-										</div>
-									</div>
+									<SuggestItem
+                    emojiId={suggestion.id}
+                    display={suggestion.display}
+                    valueHightLight={search}
+                    symbol={(suggestion as any).emoji}
+									/>
 								</div>
 							);
 						}}
@@ -384,9 +361,9 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageId, channelId, mode,
 						cancel
 					</p>
 					<p className="pr-[3px]">• enter to</p>
-					{/* <p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleSave}>
+					<p className="text-[#3297ff]" style={{ cursor: 'pointer' }} onClick={handleSave}>
 						save
-					</p> */}
+					</p>
 				</div>
 			</div>
 		</div>
