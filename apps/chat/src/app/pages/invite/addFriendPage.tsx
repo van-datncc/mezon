@@ -4,11 +4,12 @@ import { Icons } from '@mezon/ui';
 import { ChannelType, safeJSONParse } from 'mezon-js';
 import { ApiCreateChannelDescRequest, ApiIsFollowerResponse } from 'mezon-js/api.gen';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 export default function AddFriendPage() {
 	const [searchParams] = useSearchParams();
+	const { username } = useParams();
 	const data = searchParams.get('data');
 	const { userProfile } = useAuth();
 	const [error, setError] = useState('');
@@ -16,7 +17,7 @@ export default function AddFriendPage() {
 	const dataEncode: { id: string; name: string; avatar: string } | null | undefined = useMemo(() => {
 		if (data) {
 			try {
-				const jsonStr = decodeURIComponent(atob(data));
+				const jsonStr = atob(data);
 				const parsed = safeJSONParse(jsonStr);
 				return parsed as { id: string; name: string; avatar: string };
 			} catch (err) {
@@ -70,6 +71,19 @@ export default function AddFriendPage() {
 			setLoading(false);
 		}
 	}, [dispatch, dataEncode?.id, userProfile]);
+
+	const navigateDeeplinkMobile = () => {
+		try {
+			const strData = `${username}?data=${data}`;
+			window.location.href = `mezon.ai://invite/chat/${strData}`;
+		} catch (e) {
+			console.error('log  => navigateDeeplinkMobile error', e);
+		}
+	};
+
+	useEffect(() => {
+		navigateDeeplinkMobile();
+	}, []);
 
 	return (
 		<div className="bg-theme-primary h-screen w-screen overflow-hidden flex items-center justify-center">
