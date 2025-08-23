@@ -113,7 +113,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
 			endCallTimeout.current = null;
 			timeStartConnected.current = null;
-			AudioModule.stopDialtone();
+			stopDialTone();
 		};
 	}, []);
 
