@@ -95,7 +95,7 @@ export const Events = memo(() => {
 
 	return (
 		<>
-			{checkPreviewMode && <OnboardingGetStart link={serverGuidePath} clanId={currentClanId as string} />}
+			{!!checkPreviewMode && <OnboardingGetStart link={serverGuidePath} clanId={currentClanId as string} />}
 
 			{ongoingEvent && <EventNotification event={ongoingEvent} handleOpenDetail={handleOpenDetail} />}
 
