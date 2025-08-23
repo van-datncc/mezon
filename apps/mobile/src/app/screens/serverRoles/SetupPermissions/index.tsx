@@ -4,7 +4,7 @@ import { appActions, selectAllPermissionsDefault, selectAllRolesClan, useAppDisp
 import { EPermission } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Keyboard, Platform, Pressable, StatusBar, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, Platform, Pressable, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
 import MezonSwitch from '../../../componentUI/MezonSwitch';
 import { SeparatorWithLine } from '../../../components/Common';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { isEqualStringArrayUnordered, normalizeString } from '../../../utils/helpers';
@@ -178,106 +179,105 @@ export const SetupPermissions = ({ navigation, route }: MenuClanScreenProps<Setu
 	}, [searchPermissionText, permissionList]);
 
 	return (
-		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-			<KeyboardAvoidingView
-				behavior={'padding'}
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
-				style={styles.flex}
-			>
-				<View style={styles.header}>
-					<Pressable style={styles.backButton} onPress={handleClose}>
-						<MezonIconCDN
-							icon={isEditRoleMode ? IconCDN.arrowLargeLeftIcon : IconCDN.closeSmallBold}
-							height={size.s_20}
-							width={size.s_20}
-							color={themeValue.textStrong}
-						/>
-					</Pressable>
-					{!isEditRoleMode ? (
-						<Text style={styles.title}>{t('setupPermission.title')}</Text>
-					) : (
-						<View style={styles.roleName}>
-							<Text style={styles.name}>{clanRole?.title}</Text>
-							<Text style={styles.emptyText}>{t('roleDetail.role')}</Text>
+		<KeyboardAvoidingView
+			behavior={'padding'}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
+			style={styles.flex}
+		>
+			<StatusBarHeight />
+			<View style={styles.header}>
+				<Pressable style={styles.backButton} onPress={handleClose}>
+					<MezonIconCDN
+						icon={isEditRoleMode ? IconCDN.arrowLargeLeftIcon : IconCDN.closeSmallBold}
+						height={size.s_20}
+						width={size.s_20}
+						color={themeValue.textStrong}
+					/>
+				</Pressable>
+				{!isEditRoleMode ? (
+					<Text style={styles.title}>{t('setupPermission.title')}</Text>
+				) : (
+					<View style={styles.roleName}>
+						<Text style={styles.name}>{clanRole?.title}</Text>
+						<Text style={styles.emptyText}>{t('roleDetail.role')}</Text>
+					</View>
+				)}
+				{!isEditRoleMode || (isEditRoleMode && isNotChange) ? null : (
+					<TouchableOpacity onPress={handleEditPermissions}>
+						<View style={styles.saveButton}>
+							<Text style={styles.saveText}>{t('roleDetail.save')}</Text>
 						</View>
-					)}
-					{!isEditRoleMode || (isEditRoleMode && isNotChange) ? null : (
-						<TouchableOpacity onPress={handleEditPermissions}>
-							<View style={styles.saveButton}>
-								<Text style={styles.saveText}>{t('roleDetail.save')}</Text>
-							</View>
-						</TouchableOpacity>
-					)}
-				</View>
-				<View style={styles.wrapper}>
-					<View style={styles.flex}>
-						<View style={styles.permissionTitle}>
-							<Text style={styles.text}>{t('setupPermission.setupPermissionTitle')}</Text>
-						</View>
-
-						<MezonInput
-							value={searchPermissionText}
-							onTextChange={setSearchPermissionText}
-							placeHolder={t('setupPermission.searchPermission')}
-						/>
-
-						<View style={styles.permissionPanel}>
-							<View style={{ borderRadius: size.s_10, overflow: 'hidden' }}>
-								<FlatList
-									data={filteredPermissionList}
-									keyExtractor={(item) => item.id}
-									ItemSeparatorComponent={SeparatorWithLine}
-									initialNumToRender={1}
-									maxToRenderPerBatch={1}
-									windowSize={2}
-									renderItem={({ item }) => {
-										return (
-											<TouchableOpacity
-												onPress={() => onSelectPermissionChange(!selectedPermissions?.includes(item?.id), item?.id)}
-												disabled={item?.disabled}
-											>
-												<View style={styles.permissionItem}>
-													<View style={styles.flex}>
-														<Text
-															style={{
-																color: item?.disabled ? themeValue.textDisabled : themeValue.white
-															}}
-														>
-															{item.title}
-														</Text>
-													</View>
-
-													<MezonSwitch
-														value={selectedPermissions?.includes(item?.id)}
-														onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
-														disabled={item?.disabled}
-													/>
-												</View>
-											</TouchableOpacity>
-										);
-									}}
-								/>
-							</View>
-						</View>
+					</TouchableOpacity>
+				)}
+			</View>
+			<View style={styles.wrapper}>
+				<View style={styles.flex}>
+					<View style={styles.permissionTitle}>
+						<Text style={styles.text}>{t('setupPermission.setupPermissionTitle')}</Text>
 					</View>
 
-					{!isEditRoleMode ? (
-						<View style={styles.bottomButton}>
-							<TouchableOpacity onPress={() => handleNextStep()}>
-								<View style={styles.finishButton}>
-									<Text style={styles.buttonText}>{t('setupPermission.next')}</Text>
-								</View>
-							</TouchableOpacity>
+					<MezonInput
+						value={searchPermissionText}
+						onTextChange={setSearchPermissionText}
+						placeHolder={t('setupPermission.searchPermission')}
+					/>
 
-							<TouchableOpacity onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS)}>
-								<View style={styles.cancelButton}>
-									<Text style={styles.buttonText}>{t('skipStep')}</Text>
-								</View>
-							</TouchableOpacity>
+					<View style={styles.permissionPanel}>
+						<View style={{ borderRadius: size.s_10, overflow: 'hidden' }}>
+							<FlatList
+								data={filteredPermissionList}
+								keyExtractor={(item) => item.id}
+								ItemSeparatorComponent={SeparatorWithLine}
+								initialNumToRender={1}
+								maxToRenderPerBatch={1}
+								windowSize={2}
+								renderItem={({ item }) => {
+									return (
+										<TouchableOpacity
+											onPress={() => onSelectPermissionChange(!selectedPermissions?.includes(item?.id), item?.id)}
+											disabled={item?.disabled}
+										>
+											<View style={styles.permissionItem}>
+												<View style={styles.flex}>
+													<Text
+														style={{
+															color: item?.disabled ? themeValue.textDisabled : themeValue.white
+														}}
+													>
+														{item.title}
+													</Text>
+												</View>
+
+												<MezonSwitch
+													value={selectedPermissions?.includes(item?.id)}
+													onValueChange={(isSelect) => onSelectPermissionChange(isSelect, item?.id)}
+													disabled={item?.disabled}
+												/>
+											</View>
+										</TouchableOpacity>
+									);
+								}}
+							/>
 						</View>
-					) : null}
+					</View>
 				</View>
-			</KeyboardAvoidingView>
-		</TouchableWithoutFeedback>
+
+				{!isEditRoleMode ? (
+					<View style={styles.bottomButton}>
+						<TouchableOpacity onPress={() => handleNextStep()}>
+							<View style={styles.finishButton}>
+								<Text style={styles.buttonText}>{t('setupPermission.next')}</Text>
+							</View>
+						</TouchableOpacity>
+
+						<TouchableOpacity onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.SETUP_ROLE_MEMBERS)}>
+							<View style={styles.cancelButton}>
+								<Text style={styles.buttonText}>{t('skipStep')}</Text>
+							</View>
+						</TouchableOpacity>
+					</View>
+				) : null}
+			</View>
+		</KeyboardAvoidingView>
 	);
 };
