@@ -150,6 +150,7 @@ export const AddFriendModal = React.memo((props: IAddFriendModal) => {
 								placeholderTextColor={themeValue.textDisabled}
 								style={styles.searchInput}
 								onChangeText={(text) => handleTextChange(EAddFriendBy.Username, text)}
+								autoCapitalize="none"
 							/>
 						</View>
 						<View style={styles.byTheWayText}>

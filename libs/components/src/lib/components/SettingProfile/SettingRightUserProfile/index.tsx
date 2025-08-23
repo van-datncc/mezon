@@ -255,7 +255,7 @@ const SettingRightUser = ({
 			name: userProfile?.user?.display_name || userProfile?.user?.username || '',
 			avatar: userProfile?.user?.avatar_url || ''
 		};
-		const endcodeData = btoa(JSON.stringify(qrData));
+		const endcodeData = btoa(encodeURIComponent(JSON.stringify(qrData)));
 		const qrDataLink = `https://mezon.ai/chat/${userProfile?.user?.username}?data=${endcodeData}`;
 
 		return qrDataLink;
@@ -356,11 +356,16 @@ const SettingRightUser = ({
 					</div>
 				</div>
 				<div className="flex-1 flex flex-col gap-2 relative">
-					<p className="mt-[20px]  font-semibold tracking-wide text-sm">PREVIEW</p>
-					<PreviewSetting isLoading={isLoading} profiles={editProfile} isDM={isDM} />
-					<div className="p-4 rounded-lg bg-white">
-						<QRCode value={qrCodeProfile} className="w-full h-full" />
-					</div>
+					<p className="font-semibold tracking-wide text-sm">PREVIEW</p>
+					<PreviewSetting
+						isLoading={isLoading}
+						profiles={editProfile}
+						qrProfile={
+							<div className="p-4 rounded-lg bg-white">
+								<QRCode level="H" value={qrCodeProfile} className="w-full h-full" />
+							</div>
+						}
+					/>
 				</div>
 			</div>
 			{(urlImage !== avatar && flags) ||

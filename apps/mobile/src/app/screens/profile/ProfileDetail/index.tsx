@@ -251,7 +251,7 @@ export const ProfileDetail = memo(() => {
                     ) : (
                         <View style={styles.defaultAvatar}>
                             <Text style={styles.defaultAvatarText}>
-                                {profileData.display_name?.charAt(0)?.toUpperCase()}
+                                {profileData.display_name?.charAt(0)?.toUpperCase() || profileData.username?.charAt(0)?.toUpperCase()}
                             </Text>
                         </View>
                     )}
@@ -281,13 +281,13 @@ export const ProfileDetail = memo(() => {
                                 </>
                             )}
 
-                        {userRelationshipStatus === UserRelationshipStatus.PENDING_REQUEST && (
+                        {userRelationshipStatus === UserRelationshipStatus.MY_PENDING && (
                             <TouchableOpacity style={[styles.actionButton, styles.acceptButton]} onPress={handleAcceptRequest}>
                                 <Text style={styles.actionButtonText}>{t('acceptRequest', 'Accept Request')}</Text>
                             </TouchableOpacity>
                         )}
 
-                        {userRelationshipStatus === UserRelationshipStatus.MY_PENDING && (
+                        {userRelationshipStatus === UserRelationshipStatus.PENDING_REQUEST && (
                             <TouchableOpacity style={[styles.actionButton, styles.cancelButton]} onPress={handleCancelRequest}>
                                 <Text style={styles.actionButtonText}>{t('cancelRequest', 'Cancel Request')}</Text>
                             </TouchableOpacity>

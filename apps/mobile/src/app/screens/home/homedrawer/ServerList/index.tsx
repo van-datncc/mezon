@@ -20,20 +20,10 @@ const ServerList = React.memo(() => {
 	const styles = style(themeValue);
 	const navigation = useNavigation<any>();
 	const logoCustom = useSelector(selectLogoCustom);
-	const [readyRender, setReadyRender] = useState(false);
 
 	const navigateToDM = () => {
 		navigation.navigate(APP_SCREEN.MESSAGES.HOME);
 	};
-
-	useEffect(() => {
-		const splashTask = requestAnimationFrame(() => {
-			setReadyRender(true);
-		});
-		return () => cancelAnimationFrame(splashTask);
-	}, []);
-
-	if (!readyRender) return null;
 
 	return (
 		<View style={styles.wrapperServerList}>

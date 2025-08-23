@@ -1,5 +1,5 @@
 import { useChannels, usePermissionChecker } from '@mezon/core';
-import { ChannelsEntity, selectWelcomeChannelByClanId } from '@mezon/store';
+import { ChannelsEntity, selectChannelById, selectWelcomeChannelByClanId, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { EPermission, IChannel, checkIsThread } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
@@ -14,10 +14,11 @@ export type ChannelSettingItemProps = {
 	stateClose: boolean;
 	stateMenu: boolean;
 	onCloseModal: () => void;
+	displayChannelLabel?: string;
 };
 
 const ChannelSettingItem = (props: ChannelSettingItemProps) => {
-	const { onItemClick, channel, stateMenu, stateClose } = props;
+	const { onItemClick, channel, stateMenu, stateClose, displayChannelLabel } = props;
 	const isPrivate = channel.channel_private;
 	const [selectedButton, setSelectedButton] = useState<string | null>('Overview');
 	const [showModal, setShowModal] = useState(false);
@@ -25,9 +26,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 		[EPermission.manageChannel, EPermission.manageClan],
 		channel.channel_id ?? ''
 	);
+
+	const channelId = (channel?.channel_id || ('id' in channel ? (channel as { id?: string })?.id : '') || '') as string;
+	const channelFromStore = useAppSelector((state) => selectChannelById(state, channelId));
+	const currentChannel = (channelFromStore || channel) as IChannel;
 	const canEditChannelPermissions = hasManageChannelPermission;
 
-	const isThread = checkIsThread(channel as ChannelsEntity);
+	const isThread = checkIsThread(currentChannel as ChannelsEntity);
 
 	const handleButtonClick = (buttonName: string) => {
 		setSelectedButton(buttonName);
@@ -83,7 +88,7 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				<div className="flex justify-start max-w-[170px]">
 					{renderIcon()} &nbsp;
 					<p className="text-[#84ADFF] font-bold text-sm tracking-wider max-w-[160px] overflow-x-hidden text-ellipsis uppercase one-line">
-						{channel.channel_label}
+						{displayChannelLabel ?? currentChannel.channel_label}
 					</p>
 				</div>
 
