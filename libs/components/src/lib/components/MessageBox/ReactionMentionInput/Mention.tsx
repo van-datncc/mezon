@@ -77,18 +77,21 @@ export default function Mention({
 		}
 
 		if (Array.isArray(data)) {
-			const filtered = data
-				.filter(item => {
-					const display = item.display?.toLowerCase() || '';
-					const username = (item as any).username?.toLowerCase() || '';
-					const displayName = (item as any).displayName?.toLowerCase() || '';
-					const queryLower = query.toLowerCase();
+			const queryLower = query.toLowerCase();
+			const filtered: MentionData[] = [];
 
-					return display.includes(queryLower) ||
-						   username.includes(queryLower) ||
-						   displayName.includes(queryLower);
-				})
-				.slice(0, 10);
+			for (const item of data) {
+				if (filtered.length >= 10) break;
+
+				const display = item.display?.toLowerCase() || '';
+				const username = (item as any).username?.toLowerCase() || '';
+				const displayName = (item as any).displayName?.toLowerCase() || '';
+
+				if (display.includes(queryLower) || username.includes(queryLower) || displayName.includes(queryLower)) {
+					filtered.push(item);
+				}
+			}
+
 			setSuggestions(filtered);
 			return;
 		}
@@ -134,7 +137,7 @@ export default function Mention({
 
 		debounceTimeoutRef.current = setTimeout(() => {
 			loadSuggestions(query);
-		}, 150);
+		}, 100);
 	}, [loadSuggestions]);
 
 	useEffect(() => {

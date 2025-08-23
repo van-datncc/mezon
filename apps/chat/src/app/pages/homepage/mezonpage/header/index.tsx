@@ -56,7 +56,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 		<a
 			href={href}
 			onClick={(event) => scrollToSection(section, event)}
-			className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+			className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 		>
 			{label}
 		</a>
@@ -66,13 +66,16 @@ const HeaderMezon = memo((props: HeaderProps) => {
 		<div
 			className={`layout fixed flex flex-col items-center w-full z-50 bg-gradient-to-r from-[#7E00FF] via-[#9C3FE9] to-[#4B0082] h-[80px] max-md:h-[72px]`}
 		>
-			<div ref={refHeader} className={`header fixed z-50 w-10/12 max-lg:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D]`}>
+			<div
+				ref={refHeader}
+				className={`header fixed z-50 w-10/12 max-lg:w-full  lg:max-xl:w-full max-md:border-b-[1px] max-md:border-[#4465FF4D]`}
+			>
 				<div className="flex items-center justify-between md:px-[32px] max-md:px-[16px] max-md:py-[14px] h-[80px] max-md:h-[72px]">
 					<div className="flex items-center gap-[40px]">
 						<Link to={'/mezon'} className="flex items-center gap-[4.92px] min-w-[120px]">
 							<Image src={`assets/logo.png`} width={120} height={35} className="object-cover" />
 						</Link>
-						<div className="hidden lg:flex items-center gap-[32px]">
+						<div className="hidden lg:flex items-center gap-3 lg:max-xl:gap-[0.05rem]">
 							<NavLink href="#home" section="home" label="Home" />
 							<NavLink href="#overview" section="overview" label="Overview" />
 							<NavLink href="#feature" section="feature" label="Features" />
@@ -80,7 +83,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'developers/applications'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 							>
 								Developers
 							</a>
@@ -88,7 +91,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'https://top.mezon.ai'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 							>
 								Bots/Apps
 							</a>
@@ -96,7 +99,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'docs/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 							>
 								Documents
 							</a>
@@ -104,7 +107,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'clans/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 							>
 								Discover
 							</a>
@@ -112,7 +115,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 								href={'blogs/'}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-full hover:bg-[#de82e6]"
+								className="text-[16px] leading-[24px] text-white font-semibold flex flex-row items-center px-2 py-1 rounded-lg hover:bg-[#de82e6]"
 							>
 								Blogs
 							</a>
