@@ -1,8 +1,9 @@
 import { AlignType } from '@rc-component/trigger';
 import RcDropdown from 'rc-dropdown';
-import 'rc-dropdown/assets/index.css';
+// import 'rc-dropdown/assets/index.css';
 import { createContext, JSXElementConstructor, ReactElement, ReactNode, useContext } from 'react';
 import { Item } from './Dropdown.Content';
+import './rc-dropdown.scss';
 
 type MenuTriggerProps = {
 	children: ReactNode;

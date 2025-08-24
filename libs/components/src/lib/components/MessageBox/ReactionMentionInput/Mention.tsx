@@ -210,6 +210,10 @@ export default function Mention({
 						<div
 							key={suggestion.id}
 							onClick={() => handleSelect(suggestion)}
+							onTouchEnd={(e) => {
+								e.preventDefault();
+								handleSelect(suggestion);
+							}}
 							onMouseEnter={() => onMouseEnter?.(index)}
 						>
 							{renderSuggestion(
@@ -228,6 +232,10 @@ export default function Mention({
 						key={suggestion.id}
 						className={`mention-item ${focused ? "selected" : ""}`}
 						onClick={() => handleSelect(suggestion)}
+						onTouchEnd={(e) => {
+							e.preventDefault();
+							handleSelect(suggestion);
+						}}
 						onMouseEnter={() => onMouseEnter?.(index)}
 					>
 						<div className="mention-item-name">{suggestion.display}</div>

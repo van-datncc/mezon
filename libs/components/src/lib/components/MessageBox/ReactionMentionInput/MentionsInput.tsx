@@ -751,26 +751,61 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = htmlContent;
 
-				const images = tempDiv.querySelectorAll('img');
-				images.forEach(el => el.remove());
+				const unwantedElements = tempDiv.querySelectorAll('script, style, link, meta, title, img');
+				unwantedElements.forEach(el => el.remove());
 
-				const scripts = tempDiv.querySelectorAll('script, style, link, meta, title');
-				scripts.forEach(el => el.remove());
+				const allElements = tempDiv.querySelectorAll('*');
+				allElements.forEach(el => {
+					el.removeAttribute('style');
+					el.removeAttribute('class');
+					el.removeAttribute('bgcolor');
+					el.removeAttribute('color');
+				});
 
-				const cleanText = tempDiv.textContent || tempDiv.innerText || plainText || '';
+				tempDiv.innerHTML = tempDiv.innerHTML
+					.replace(/<\/?(div|p|h[1-6])[^>]*>/gi, '\n')
+					.replace(/<br[^>]*>/gi, '\n')
+					.replace(/<\/?(ul|ol|li)[^>]*>/gi, '\n');
 
-				const selection = window.getSelection();
-				if (selection && selection.rangeCount > 0) {
-					const range = selection.getRangeAt(0);
-					range.deleteContents();
-					range.insertNode(document.createTextNode(cleanText));
+				let cleanText = tempDiv.textContent || tempDiv.innerText || plainText || '';
 
-					const newHtml = e.currentTarget.innerHTML;
-					setHtml(newHtml);
-					onChange?.(newHtml);
+				cleanText = cleanText
+					.replace(/\r\n/g, '\n')
+					.replace(/\r/g, '\n')
+					.replace(/\n\s*\n/g, '\n')
+					.replace(/^\n+|\n+$/g, '')
+					.trim();
 
-					setTimeout(detectMention, 100);
+				if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+					document.execCommand('insertText', false, cleanText);
+				} else {
+					const selection = window.getSelection();
+					if (selection && selection.rangeCount > 0) {
+						const range = selection.getRangeAt(0);
+						range.deleteContents();
+
+						if (cleanText.includes('\n')) {
+							const textWithBreaks = cleanText.replace(/\n/g, '<br>');
+							const fragment = range.createContextualFragment(textWithBreaks);
+							range.insertNode(fragment);
+							range.collapse(false);
+						} else {
+							const textNode = document.createTextNode(cleanText);
+							range.insertNode(textNode);
+							range.setStartAfter(textNode);
+							range.collapse(false);
+						}
+
+						selection.removeAllRanges();
+						selection.addRange(range);
+					}
 				}
+
+				const newHtml = e.currentTarget.innerHTML;
+				setHtml(newHtml);
+				onChange?.(newHtml);
+
+				setTimeout(detectMention, 100);
 			}
 		},
 		[disabled, onChange, detectMention, onHandlePaste],
@@ -778,7 +813,15 @@ const MentionsInput = forwardRef<MentionsInputHandle, MentionsInputProps>(({
 
 	const handleInput = useCallback(
 		(e: React.FormEvent<HTMLDivElement>) => {
-			const newHtml = e.currentTarget.innerHTML;
+			let newHtml = e.currentTarget.innerHTML;
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = newHtml;
+			const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+			if (!textContent.trim()) {
+				newHtml = '';
+				e.currentTarget.innerHTML = '';
+			}
 
 			if (enableUndoRedo && html !== newHtml) {
 				addToHistory(html);
