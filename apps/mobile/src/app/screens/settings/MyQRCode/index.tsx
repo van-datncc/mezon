@@ -89,7 +89,7 @@ export const MyQRCode = () => {
 		} catch (e) {
 			console.error('QR Code download error:', e);
 		}
-	}, [saveImageToCameraRoll]);
+	}, [qrCode, saveImageToCameraRoll]);
 
 	const handleShareQRCode = useCallback(async () => {
 		try {
@@ -102,11 +102,13 @@ export const MyQRCode = () => {
 		} catch (e) {
 			console.error('QR Code share error:', e);
 		}
-	}, [profilePayload]);
+	}, [profilePayload, qrCode]);
 
 	useEffect(() => {
-		generateQRCode(activeTab);
-	}, [activeTab]);
+		if (!qrCode?.[activeTab]) {
+			generateQRCode(activeTab);
+		}
+	}, [activeTab, qrCode]);
 
 	const renderTabButton = useCallback(
 		(tab: TabType, label: string) => (

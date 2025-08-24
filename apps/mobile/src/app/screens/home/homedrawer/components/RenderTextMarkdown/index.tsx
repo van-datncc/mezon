@@ -395,7 +395,7 @@ export const RenderTextMarkdownContent = ({
 		const e = element.e ?? 0;
 		const contentInElement = t?.substring(s, e);
 
-		if (lastIndex < s) {
+		if (lastIndex < s && !!(textParts.length || t?.slice?.(lastIndex, s)?.trim())) {
 			textParts.push(renderTextPalainContain(themeValue, t?.slice(lastIndex, s) ?? '', index, isUnReadChannel, isLastMessage, isBuzzMessage));
 		}
 

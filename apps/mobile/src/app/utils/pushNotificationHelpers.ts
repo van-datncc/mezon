@@ -207,8 +207,7 @@ const getConfigDisplayNotificationAndroid = async (data: Record<string, string |
 			groupSummary: false,
 			groupAlertBehavior: AndroidGroupAlertBehavior.ALL,
 			sortKey: String(Number.MAX_SAFE_INTEGER - now),
-			timestamp: data.timestamp ? Number(data.timestamp) : now,
-			autoCancel: true
+			timestamp: now
 		};
 	} catch (error) {
 		console.error('Error configuring Android notification:', error);
@@ -323,7 +322,6 @@ export const createLocalNotification = async (title: string, body: string, data:
 						...configDisplayNotificationAndroid,
 						groupSummary: true,
 						groupAlertBehavior: AndroidGroupAlertBehavior.SUMMARY,
-						autoCancel: false,
 						timestamp: Math.max(...groupNotifications.map((n) => n.notification.android?.timestamp || 0)),
 						sortKey: String(Number.MAX_SAFE_INTEGER - Date.now()),
 						style: {

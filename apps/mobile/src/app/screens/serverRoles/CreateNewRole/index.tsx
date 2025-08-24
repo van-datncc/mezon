@@ -3,12 +3,13 @@ import { Colors, useTheme } from '@mezon/mobile-ui';
 import { selectCurrentClanId } from '@mezon/store-mobile';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Platform, Pressable, StatusBar, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Platform, Pressable, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import MezonIconCDN from '../../../componentUI/MezonIconCDN';
 import MezonInput from '../../../componentUI/MezonInput';
+import StatusBarHeight from '../../../components/StatusBarHeight/StatusBarHeight';
 import { IconCDN } from '../../../constants/icon_cdn';
 import { APP_SCREEN, MenuClanScreenProps } from '../../../navigation/ScreenTypes';
 import { style } from './styles';
@@ -49,55 +50,54 @@ export const CreateNewRole = ({ navigation }: MenuClanScreenProps<CreateNewRoleS
 		}
 	};
 	return (
-		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-			<KeyboardAvoidingView
-				behavior={'padding'}
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
-				style={styles.container}
-			>
-				<View style={styles.header}>
-					<Pressable style={styles.backButton} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
-						<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
-					</Pressable>
-					<Text style={styles.title}>{t('createNewRole.title')}</Text>
-				</View>
+		<KeyboardAvoidingView
+			behavior={'padding'}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5}
+			style={styles.container}
+		>
+			<StatusBarHeight />
+			<View style={styles.header}>
+				<Pressable style={styles.backButton} onPress={() => navigation.navigate(APP_SCREEN.MENU_CLAN.ROLE_SETTING)}>
+					<MezonIconCDN icon={IconCDN.closeSmallBold} height={20} width={20} color={themeValue.textStrong} />
+				</Pressable>
+				<Text style={styles.title}>{t('createNewRole.title')}</Text>
+			</View>
 
-				<View style={styles.wrapper}>
-					<View>
-						<View style={styles.desciptionWrapper}>
-							<Text style={styles.newRole}>{t('createNewRole.createANewRole')}</Text>
-							<Text style={styles.description}>{t('createNewRole.description')}</Text>
-						</View>
-						<View style={styles.input}>
-							<MezonInput
-								value={roleName}
-								onTextChange={onRoleNameChange}
-								placeHolder={t('createNewRole.newRole')}
-								label={t('createNewRole.roleName')}
-							/>
-						</View>
+			<View style={styles.wrapper}>
+				<View>
+					<View style={styles.desciptionWrapper}>
+						<Text style={styles.newRole}>{t('createNewRole.createANewRole')}</Text>
+						<Text style={styles.description}>{t('createNewRole.description')}</Text>
 					</View>
-					<View style={styles.bottom}>
-						<TouchableOpacity
-							onPress={() => {
-								if (roleName?.trim()?.length === 0) return;
-								createNewRole();
-							}}
-						>
-							<View
-								style={[
-									{
-										backgroundColor: roleName?.trim()?.length === 0 ? Colors.bgGrayDark : Colors.bgViolet
-									},
-									styles.button
-								]}
-							>
-								<Text style={styles.buttonText}>{t('createNewRole.create')}</Text>
-							</View>
-						</TouchableOpacity>
+					<View style={styles.input}>
+						<MezonInput
+							value={roleName}
+							onTextChange={onRoleNameChange}
+							placeHolder={t('createNewRole.newRole')}
+							label={t('createNewRole.roleName')}
+						/>
 					</View>
 				</View>
-			</KeyboardAvoidingView>
-		</TouchableWithoutFeedback>
+				<View style={styles.bottom}>
+					<TouchableOpacity
+						onPress={() => {
+							if (roleName?.trim()?.length === 0) return;
+							createNewRole();
+						}}
+					>
+						<View
+							style={[
+								{
+									backgroundColor: roleName?.trim()?.length === 0 ? Colors.bgGrayDark : Colors.bgViolet
+								},
+								styles.button
+							]}
+						>
+							<Text style={styles.buttonText}>{t('createNewRole.create')}</Text>
+						</View>
+					</TouchableOpacity>
+				</View>
+			</View>
+		</KeyboardAvoidingView>
 	);
 };

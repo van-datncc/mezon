@@ -17,6 +17,7 @@ import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import NotificationPreferences from '../utils/NotificationPreferences';
 import { usePermission } from './useRequestPermission';
+const { AudioModule } = NativeModules;
 
 const RTCConfig = {
 	iceServers: [
@@ -78,7 +79,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		speaker: false
 	});
 	const [isConnected, setIsConnected] = useState<boolean | null>(null);
-	const dialToneRef = useRef<Sound | null>(null);
 	const pendingCandidatesRef = useRef<(RTCIceCandidate | null)[]>([]);
 	const currentDmGroup = useSelector(selectDmGroupCurrent(channelId));
 	const mode = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM ? ChannelStreamMode.STREAM_MODE_DM : ChannelStreamMode.STREAM_MODE_GROUP;
@@ -113,6 +113,7 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 			endCallTimeout.current && clearTimeout(endCallTimeout.current);
 			endCallTimeout.current = null;
 			timeStartConnected.current = null;
+			stopDialTone();
 		};
 	}, []);
 
@@ -251,7 +252,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		try {
 			await setIsSpeaker({ isSpeaker: false });
 			if (!isAnswer) {
-				playDialTone();
 				handleSend(
 					{
 						t: `${userProfile?.user?.username} started a ${isVideoCall ? 'video' : 'audio'} call`,
@@ -582,23 +582,6 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 		}
 	};
 
-	const playDialTone = () => {
-		Sound.setCategory('Playback');
-		const sound = new Sound('dialtone.mp3', Sound.MAIN_BUNDLE, (error) => {
-			if (error) {
-				console.error('failed to load the sound', error);
-				return;
-			}
-			sound.play((success) => {
-				if (!success) {
-					console.error('Sound playback failed');
-				}
-			});
-			sound.setNumberOfLoops(-1);
-			dialToneRef.current = sound;
-		});
-	};
-
 	const playEndCall = () => {
 		Sound.setCategory('Playback');
 		const sound = new Sound('endcall.mp3', Sound.MAIN_BUNDLE, (error) => {
@@ -615,11 +598,10 @@ export function useWebRTCCallMobile({ dmUserId, channelId, userId, isVideoCall, 
 	};
 
 	const stopDialTone = () => {
-		if (dialToneRef.current) {
-			dialToneRef.current.pause();
-			dialToneRef.current.stop();
-			dialToneRef.current.release();
-			dialToneRef.current = null;
+		try {
+			AudioModule.stopDialtone();
+		} catch (e) {
+			console.error('Failed to stop dialtone', e);
 		}
 	};
 
