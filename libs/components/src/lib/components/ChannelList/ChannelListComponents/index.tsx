@@ -1,6 +1,7 @@
 import { useAppNavigation, useClans, useEventManagementQuantity, usePathMatch, usePermissionChecker } from '@mezon/core';
 import {
 	EventManagementOnGogoing,
+	channelsActions,
 	eventManagementActions,
 	onboardingActions,
 	selectCurrentChannelId,
@@ -89,6 +90,12 @@ export const Events = memo(() => {
 	const handleClose = () => {
 		dispatch(topicsActions.setIsShowCreateTopic(false));
 		dispatch(threadsActions.setIsShowCreateThread({ channelId: currentChannelId as string, isShowCreateThread: false }));
+		dispatch(
+			channelsActions.setCurrentChannelId({
+				clanId: currentClanId as string,
+				channelId: ''
+			})
+		);
 	};
 
 	const eventLoading = useSelector(selectEventLoading);
