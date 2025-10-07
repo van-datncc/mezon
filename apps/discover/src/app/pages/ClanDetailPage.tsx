@@ -155,7 +155,7 @@ export default function ClanDetailPage() {
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
 							<Icons.CalendarIcon className="w-6 h-6 text-[#5865f2]" />
 							<div>
-								<div className="font-semibold text-sm">Server created</div>
+								<div className="font-semibold text-sm">Clan created</div>
 								<div className="text-xs text-gray-500">{createdAt}</div>
 							</div>
 						</div>
