@@ -437,7 +437,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 		if (avatar) {
 			return (
 				<div className="flex items-center justify-center">
-					<img className="w-8 h-8 rounded-full object-cover" src={avatar} alt="" />
+					<img className="w-8 h-8  flex-shrink-0 rounded-full object-cover" src={avatar} alt="" />
 				</div>
 			);
 		}
