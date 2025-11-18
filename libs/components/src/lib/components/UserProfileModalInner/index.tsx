@@ -25,7 +25,7 @@ type UserProfileModalInnerProps = {
 	notify?: INotification;
 	isDM?: boolean;
 	directId?: string;
-	user?: ChannelMembersEntity;
+	user?: any;
 	avatar?: string;
 	name?: string;
 	usernameAva?: string;
@@ -203,7 +203,7 @@ const UserProfileModalInner = ({
 						<div className="flex-1 bg-theme-setting-primary rounded-lg shadow-shadowInbox">
 							<ProfileTabs activeTab={activeTab} onActiveTabChange={handleActiveTabChange} />
 							<div className="p-4 text-theme-primary	">
-								{activeTab === typeTab.ABOUT_ME && <AboutMe createTime={userById?.user?.create_time} />}
+								{activeTab === typeTab.ABOUT_ME && <AboutMe createTime={userById?.user?.create_time || user?.create_time_seconds} />}
 								{activeTab === typeTab.ACTIVITY && <Activity />}
 								{activeTab === typeTab.MUTUAL_FRIENDS && <MutualFriends />}
 								{activeTab === typeTab.MUTUAL_SERVERS && <MutualServers />}
