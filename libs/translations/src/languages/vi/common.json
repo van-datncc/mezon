@@ -482,5 +482,18 @@
 	"forward": "Chuyển tiếp",
 	"share": "Chia sẻ",
 	"download": "Tải xuống",
-	"jumpToMessage": "Đi đến tin nhắn"
+	"jumpToMessage": "Đi đến tin nhắn",
+	"modalUnknowChannel": {
+		"defaultError": "Ôi! Đã xảy ra lỗi",
+		"permissionError": "Bạn không có quyền cần thiết để truy cập nội dung này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
+		"genericError": "Chúng tôi gặp sự cố khi cố gắng truy cập nội dung này. Hãy để chúng tôi đưa bạn trở lại đúng hướng.",
+		"accessDenied": "Từ chối truy cập",
+		"accessDeniedDesc": "Bạn không có quyền truy cập kênh hoặc clan này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.",
+		"goToWelcomeChannel": "Đi đến kênh chào mừng",
+		"okayGotIt": "Đã hiểu"
+	},
+	"reportMessage": {
+		"success": "Báo cáo tin nhắn thành công",
+		"failed": "Báo cáo tin nhắn thất bại"
+	}
 }
