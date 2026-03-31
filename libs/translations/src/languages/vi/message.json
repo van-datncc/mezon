@@ -122,6 +122,7 @@
 	},
 	"newMessages": "TIN NHẮN MỚI",
 	"noSendMessagePermission": "Bạn không có quyền gửi tin nhắn",
+	"tooLongMessage": "Message quá dài",
 	"isBanned": "Bạn đã bị cấm trò chuyện",
 	"blockedUserMessage": "Bạn không thể trả lời cuộc trò chuyện này",
 	"messageInputPlaceHolder": "Nhập tin nhắn...",

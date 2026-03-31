@@ -122,6 +122,7 @@
 	},
 	"newMessages": "NEW MESSAGES",
 	"noSendMessagePermission": "You don't have permission to send message",
+	"tooLongMessage": "Too long message",
 	"isBanned": "You are banned",
 	"blockedUserMessage": "You can't reply to this conversation",
 	"messageInputPlaceHolder": "Write message...",

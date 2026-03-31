@@ -122,6 +122,7 @@
 	},
 	"newMessages": "НОВЫЕ СООБЩЕНИЯ",
 	"noSendMessagePermission": "У Вас нет разрешения на отправку сообщения.",
+	"tooLongMessage": "Слишком длинное сообщение",
 	"isBanned": "Вы забанены",
 	"blockedUserMessage": "Вы не можете ответить на этот разговор",
 	"messageInputPlaceHolder": "Написать сообщение...",
@@ -264,4 +265,3 @@
 	},
 	"unknown": "неизвестно"
 }
-
