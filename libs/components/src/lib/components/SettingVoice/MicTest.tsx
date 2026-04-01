@@ -34,7 +34,7 @@ const MicTestComponent = ({
 
 				<div className="flex items-center gap-3">
 					<button
-						className="btn-primary btn-primary-hover inline-flex items-center justify-center h-fit w-[6rem] px-4 py-2 rounded-lg cursor-pointer text-center whitespace-nowrap disabled:opacity-50"
+						className="btn-primary btn-primary-hover inline-flex items-center justify-center min-h-[40px] min-w-[7.5rem] max-w-[11rem] px-3 py-2 rounded-lg cursor-pointer text-center whitespace-normal break-words leading-tight disabled:opacity-50"
 						onClick={() => (isTesting ? onStopTest() : void onStartTest())}
 						disabled={permissionState === 'denied'}
 					>

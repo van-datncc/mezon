@@ -71,7 +71,7 @@
         "remove": "Eliminar"
     },
     "enableOnboarding": {
-        "title": "¿Le gustaría activar la incorporación?",
+        "title": "¿Quieres habilitar el onboarding?",
         "description": "Activa el onboarding para acceder a herramientas administrativas adicionales",
         "subtitle": "que te ayudan a moderar y hacer crecer tu clan eficazmente.",
         "button": "Habilitar Onboarding",

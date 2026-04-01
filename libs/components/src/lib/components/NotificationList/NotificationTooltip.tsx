@@ -3,6 +3,7 @@ import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import Tooltip from 'rc-tooltip';
 import { memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RedDot } from '../ChannelTopbar';
 import { NotificationTooltipContent } from './NotificationTooltipContent';
@@ -13,6 +14,7 @@ interface NotificationTooltipProps {
 }
 
 export const NotificationTooltip = memo(({ isGridView, isShowMember }: NotificationTooltipProps) => {
+	const { t } = useTranslation('notifications');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const badgeCount = useSelector((state) => selectBadgeClanById(state, currentClanId || ''));
 	const [visible, setVisible] = useState(false);
@@ -54,7 +56,7 @@ export const NotificationTooltip = memo(({ isGridView, isShowMember }: Notificat
 			}}
 		>
 			<button
-				title="Inbox"
+				title={t('inbox')}
 				className={`focus-visible:outline-none relative ${visible ? 'text-theme-primary-active' : ''} ${
 					(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
 						? 'text-theme-primary text-theme-primary-hover'

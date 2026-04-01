@@ -551,6 +551,12 @@ export const addGroupUserWS = createAsyncThunk('direct/addGroupUserWS', async (p
 				create_time_seconds: Date.now() / 1000
 			})
 		);
+		thunkAPI.dispatch(
+			channelMetaActions.dmMetaAdd({
+				channelId: directEntity.channel_id || directEntity.id,
+				clanId: '0'
+			})
+		);
 		thunkAPI.dispatch(directActions.upsertOne(directEntity));
 
 		return directEntity;

@@ -183,6 +183,17 @@
 	"justNow": "Только что",
 	"sampleMessage": "Посмотрите на меня, я красивая бабочка",
 	"switchingTheme": "Переключение темы...",
+	"themeOptions": {
+		"dark": "Темная тема",
+		"light": "Светлая тема",
+		"sunrise": "Тема Рассвет",
+		"purple_haze": "Фиолетовая дымка",
+		"redDark": "Темно-красная",
+		"abyss_dark": "Темная бездна",
+		"berrynade": "Ягодный микс",
+		"cisher": "Cisher",
+		"sunset": "Закат"
+	},
 	"settingsSaved": "Настройки успешно сохранены!",
 	"notifications": "Уведомления",
 	"hideNotificationsContent": "Скрыть контент уведомлений",

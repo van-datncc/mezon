@@ -21,7 +21,7 @@ function DirectMessageList() {
 	const pinnedDmIds = useSelector(selectPinnedDms);
 	const pinnedDmSet = useMemo(() => new Set(pinnedDmIds), [pinnedDmIds]);
 	const directSortSet = useMemo(() => new Set(dmGroupChatList), [dmGroupChatList]);
-
+	const directIdsSet = useMemo(() => new Set(directIds), [directIds]);
 	const { pinnedDMs, unpinnedDMs } = useMemo(() => {
 		const pinned: string[] = [];
 		const unpinned: string[] = [];
@@ -29,6 +29,7 @@ function DirectMessageList() {
 		const base = dmGroupChatList ?? [];
 
 		const push = (id: string) => {
+			if (!directIdsSet.has(id)) return;
 			if (pinnedDmSet.has(id)) pinned.push(id);
 			else unpinned.push(id);
 		};
@@ -39,7 +40,7 @@ function DirectMessageList() {
 		}
 
 		return { pinnedDMs: pinned, unpinnedDMs: unpinned };
-	}, [dmGroupChatList, directIds, pinnedDmSet]);
+	}, [dmGroupChatList, directIds, pinnedDmSet, directIdsSet, directSortSet]);
 
 	return (
 		<>

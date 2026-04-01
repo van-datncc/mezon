@@ -41,7 +41,11 @@ const ClanEffects: React.FC<{
 }> = ({ chatStreamRef, isShowChatStream, isShowCreateThread, isShowCreateTopic }) => {
 	// move code thanh.levan
 	const dispatch = useAppDispatch();
-	const { setIsShowMemberList } = useApp();
+	const { setIsShowMemberList, isShowMemberList } = useApp();
+
+	const isPanelOpen = isShowCreateThread || isShowCreateTopic;
+	const isPanelOpenRef = useRef(isPanelOpen);
+	const previousMemberListState = useRef<boolean>(isShowMemberList);
 
 	useEffect(() => {
 		const updateChatStreamWidth = () => {
@@ -59,10 +63,14 @@ const ClanEffects: React.FC<{
 	}, [isShowChatStream, chatStreamRef, dispatch]);
 
 	useEffect(() => {
-		if (isShowCreateThread || isShowCreateTopic) {
+		if (isPanelOpen && !isPanelOpenRef.current) {
+			previousMemberListState.current = isShowMemberList;
 			setIsShowMemberList(false);
+		} else if (!isPanelOpen && isPanelOpenRef.current) {
+			setIsShowMemberList(previousMemberListState.current);
 		}
-	}, [isShowCreateThread, isShowCreateTopic]);
+		isPanelOpenRef.current = isPanelOpen;
+	}, [isPanelOpen, isShowMemberList, setIsShowMemberList]);
 
 	return null;
 };

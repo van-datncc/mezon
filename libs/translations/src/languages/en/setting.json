@@ -96,6 +96,10 @@
 		"speaker": "Speaker",
 		"microphoneVolume": "Microphone Volume",
 		"speakerVolume": "Speaker Volume",
+		"noiseSuppression": {
+			"title": "Noise Suppression",
+			"toggleAriaLabel": "Toggle noise suppression"
+		},
 		"unnamedDevice": "Unnamed device",
 		"noDevices": "No devices found",
 		"micTest": {

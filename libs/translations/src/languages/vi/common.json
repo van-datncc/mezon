@@ -183,6 +183,17 @@
 	"justNow": "Vừa xong",
 	"sampleMessage": "Nhìn tôi này, tôi là một chú bướm xinh đẹp",
 	"switchingTheme": "Đang chuyển chủ đề...",
+	"themeOptions": {
+		"dark": "Chủ đề tối",
+		"light": "Chủ đề sáng",
+		"sunrise": "Chủ đề bình minh",
+		"purple_haze": "Sương tím",
+		"redDark": "Đỏ tối",
+		"abyss_dark": "Vực thẳm tối",
+		"berrynade": "Berrynade",
+		"cisher": "Cisher",
+		"sunset": "Hoàng hôn"
+	},
 	"settingsSaved": "Đã lưu cài đặt!",
 	"notifications": "Thông báo",
 	"hideNotificationsContent": "Ẩn nội dung thông báo",

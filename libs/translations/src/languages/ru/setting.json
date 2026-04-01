@@ -94,6 +94,10 @@
 		"speaker": "Динамик",
 		"microphoneVolume": "Громкость микрофона",
 		"speakerVolume": "Громкость динамика",
+		"noiseSuppression": {
+			"title": "Шумоподавление",
+			"toggleAriaLabel": "Переключить шумоподавление"
+		},
 		"unnamedDevice": "Безымянное устройство",
 		"noDevices": "Устройства не найдены",
 		"micTest": {

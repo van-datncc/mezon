@@ -1,20 +1,20 @@
 {
 	"header": {
 		"title": "Historial de transacciones",
-		"subtitle": "Ver todas tus actividades de transacciones"
+		"subtitle": "Ver toda la actividad de transacción"
 	},
 	"footers": {
-		"noti": "Has cargado todas las {{count}} transacciones",
+		"noti": "Has cargado todas tus {{count}} transacciones",
 		"fetching": "Cargando más transacciones..."
 	},
 	"filters": {
 		"all": "Todas las transacciones",
-		"sent": "Enviar transacción",
-		"received": "Transacción recibida"
+		"sent": "Transacciones enviadas",
+		"received": "Transacciones recibidas"
 	},
 	"transactionTypes": {
-		"sent": "Enviada",
-		"received": "Recibida"
+		"sent": "Enviado",
+		"received": "Recibido"
 	},
 	"currency": {
 		"code": "en-US",
@@ -23,11 +23,11 @@
 	"emptyStates": {
 		"noTransactions": {
 			"title": "No se encontró ninguna transacción",
-			"description": "Aún no has realizado ninguna transacción. Tu historial de transacciones aparecerá aquí una vez que empieces a enviar o recibir tokens."
+			"description": "Aún no has realizado ninguna transacción. Tu historial de transacciones aparecerá aquí una vez empieces a enviar o recibir tokens."
 		},
 		"noFilteredTransactions": {
 			"title": "No se encontró ninguna transacción",
-			"description": "No se encontraron transacciones para el filtro seleccionado. Por favor, prueba otro filtro o vuelve a comprobar más tarde."
+			"description": "No se encontraron transacciones para el filtro seleccionado. Prueba con otro filtro o vuelve a comprobar más tarde."
 		}
 	},
 	"transactionDetail": {

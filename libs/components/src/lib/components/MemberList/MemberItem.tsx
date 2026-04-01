@@ -4,7 +4,6 @@ import { selectAccountCustomStatus } from '@mezon/store';
 import { useSelector } from 'react-redux';
 import { useDirectMessageContextMenu } from '../../contexts';
 import { BaseMemberProfile } from '../MemberProfile/MemberProfile';
-import AddedByUser from './AddedByUser';
 export type MemberItemProps = {
 	user: ChannelMembersEntity;
 
@@ -41,7 +40,6 @@ function MemberItem({ user, directMessageId, isDM = true, isMe, createId }: Memb
 				onContextMenu={showContextMenu}
 				onClick={handleClick}
 			/>
-			<AddedByUser groupId={directMessageId || ''} userId={user?.id} />
 		</div>
 	);
 }

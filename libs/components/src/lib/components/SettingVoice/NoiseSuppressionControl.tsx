@@ -2,6 +2,7 @@ import { Icons } from '@mezon/ui';
 import { NOISE_SUPPRESSION_NORMALIZATION_FACTOR } from '@mezon/utils';
 import { DeepFilterNet3Core, DeepFilterNoiseFilterProcessor } from 'deepfilternet3-noise-filter';
 import type { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 export interface NoiseSuppressionControlRef {
@@ -30,6 +31,7 @@ export const NoiseSuppressionControl = forwardRef<NoiseSuppressionControlRef, No
 		},
 		ref
 	) => {
+		const { t } = useTranslation(['setting']);
 		const [noiseSuppressionEnabled, setNoiseSuppressionEnabled] = useState(initialNoiseSuppressionEnabled);
 		const [noiseSuppressionLevel, setNoiseSuppressionLevel] = useState(initialNoiseSuppressionLevel);
 
@@ -222,7 +224,9 @@ export const NoiseSuppressionControl = forwardRef<NoiseSuppressionControlRef, No
 		};
 		return (
 			<div className={`space-y-4 ${className}`.trim()}>
-				<div className="text-lg font-bold pt-4 text-theme-primary-active tracking-wide">Noise Suppression</div>
+				<div className="text-lg font-bold pt-4 text-theme-primary-active tracking-wide">
+					{t('setting:voice.noiseSuppression.title')}
+				</div>
 				<div className="flex items-center gap-3">
 					<button
 						onClick={toggleNoiseSuppression}
@@ -233,7 +237,7 @@ export const NoiseSuppressionControl = forwardRef<NoiseSuppressionControlRef, No
 									: 'bg-item-theme-hover text-red-500'
 								: 'bg-item-theme-hover text-theme-primary-hover'
 							}`}
-						aria-label="Toggle noise suppression"
+						aria-label={t('setting:voice.noiseSuppression.toggleAriaLabel')}
 					>
 						<Icons.NoiseSupressionIcon className="w-5 h-5">
 							{!isEnabled && <path d="M3 21 L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}

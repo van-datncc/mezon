@@ -1,6 +1,6 @@
 {
 	"accountSettings": {
-		"title": "Configuración de la cuenta",
+		"title": "Ajustes de la cuenta",
 		"account": "Cuenta",
 		"profiles": "Perfiles",
 		"privacySafety": "Privacidad y Seguridad",
@@ -30,11 +30,11 @@
 		"removeDevice": "Cerrar sesión en este dispositivo"
 	},
 	"paymentSettings": {
-		"title": "Configuración de pagos",
+		"title": "Ajustes de pagos",
 		"restoreSubscription": "Restaurar suscripción"
 	},
 	"appSettings": {
-		"title": "Configuración de la aplicación",
+		"title": "Ajustes de la aplicación",
 		"voice": "Voz",
 		"appearance": "Apariencia",
 		"accessibility": "Accesibilidad",
@@ -90,17 +90,21 @@
 	},
 	"voice": {
 		"title": "Voz",
-		"description": "Configura la configuración de tu voz.",
+		"description": "Configura los ajustes de tu voz.",
 		"microphone": "Micrófono",
-		"speaker": "Altavoz",
+		"speaker": "Altavoces",
 		"microphoneVolume": "Volumen del micrófono",
-		"speakerVolume": "Volumen del altavoz",
+		"speakerVolume": "Volumen del altavoces",
+		"noiseSuppression": {
+			"title": "Supresión de ruido",
+			"toggleAriaLabel": "Alternar supresión de ruido"
+		},
 		"unnamedDevice": "Dispositivo sin nombre",
 		"noDevices": "No se encontraron dispositivos",
 		"micTest": {
 			"title": "Prueba de micrófono",
 			"description": "¿Tienes problemas con el micrófono? Inicia una prueba y di algo divertido — reproduciremos tu voz.",
-			"letsCheck": "Vamos a comprobar",
+			"letsCheck": "Prueba",
 			"stop": "Detener prueba"
 		},
 		"errors": {

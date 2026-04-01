@@ -183,6 +183,17 @@
 	"justNow": "Just now",
 	"sampleMessage": "Look at me I'm a beautiful butterfly",
 	"switchingTheme": "Switching theme...",
+	"themeOptions": {
+		"dark": "Dark Theme",
+		"light": "Light Theme",
+		"sunrise": "Sunrise Theme",
+		"purple_haze": "Purple Haze",
+		"redDark": "Red Dark",
+		"abyss_dark": "Abyss Dark",
+		"berrynade": "Berry nade",
+		"cisher": "Cisher",
+		"sunset": "Sunset"
+	},
 	"settingsSaved": "Settings saved!",
 	"notifications": "Notifications",
 	"hideNotificationsContent": "Hide Notifications Content",

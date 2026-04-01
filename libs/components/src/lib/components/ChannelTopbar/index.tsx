@@ -694,7 +694,7 @@ const DmTopbarTools = memo(() => {
 
 		dispatch(audioCallActions.setIsBusyTone(false));
 	};
-	const isGroupCallDisabled = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP;
+	const canShowCallButtons = currentDmGroup?.type === ChannelType.CHANNEL_TYPE_DM;
 
 	const setIsUseProfileDM = useCallback(
 		async (status: boolean) => {
@@ -728,13 +728,12 @@ const DmTopbarTools = memo(() => {
 		<div className=" items-center h-full ml-auto hidden justify-end ssm:flex">
 			<div className=" items-center gap-2 flex">
 				<div className="justify-start items-center gap-[15px] flex ">
-					{!isBlockUser && !isMe && (
+					{canShowCallButtons && !isBlockUser && !isMe && (
 						<>
 							<button
 								title={t('tooltips.startVoiceCall')}
 								onClick={() => handleStartCall()}
-								disabled={isGroupCallDisabled}
-								className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+								className="text-theme-primary-hover"
 								data-e2e={generateE2eId(`chat.direct_message.header.right_container.call`)}
 							>
 								<Icons.IconPhoneDM defaultSize="size-5" />
@@ -742,8 +741,7 @@ const DmTopbarTools = memo(() => {
 							<button
 								title={t('tooltips.startVideoCall')}
 								onClick={() => handleStartCall(true)}
-								disabled={isGroupCallDisabled}
-								className={`text-theme-primary-hover ${isGroupCallDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+								className="text-theme-primary-hover"
 								data-e2e={generateE2eId(`chat.direct_message.header.right_container.video_call`)}
 							>
 								<Icons.IconMeetDM defaultSize="size-5" />

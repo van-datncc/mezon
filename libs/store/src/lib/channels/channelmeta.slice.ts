@@ -204,12 +204,23 @@ export const channelMetaSlice = createSlice({
 		updateDmLastSentMessage: (state, action: PayloadAction<{ channelId: string; message: ChannelMessage }>) => {
 			const { channelId, message } = action.payload;
 			const updatedMessage = mapMessageToConversation(message);
-
 			dmMetaAdapter.updateOne(state.dmEntities, {
 				id: channelId,
 				changes: {
 					last_sent_message: updatedMessage
 				}
+			});
+		},
+		dmMetaAdd: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
+			const { channelId, clanId } = action.payload;
+			dmMetaAdapter.addOne(state.dmEntities, {
+				clanId,
+				id: channelId,
+				isMute: false,
+				senderId: '0',
+				lastSentTimestamp: Date.now(),
+				lastSeenTimestamp: 0,
+				count_mess_unread: 0
 			});
 		}
 	}

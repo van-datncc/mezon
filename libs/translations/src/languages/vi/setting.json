@@ -96,6 +96,10 @@
 		"speaker": "Loa",
 		"microphoneVolume": "Âm lượng micro",
 		"speakerVolume": "Âm lượng loa",
+		"noiseSuppression": {
+			"title": "Khử tiếng ồn",
+			"toggleAriaLabel": "Bật hoặc tắt khử tiếng ồn"
+		},
 		"unnamedDevice": "Thiết bị chưa đặt tên",
 		"noDevices": "Không tìm thấy thiết bị",
 		"micTest": {

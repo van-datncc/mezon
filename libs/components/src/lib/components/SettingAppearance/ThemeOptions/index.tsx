@@ -76,34 +76,37 @@ const ThemeOptions = () => {
 
 			<div className="mt-3 flex flex-col">
 				<div className="flex flex-wrap gap-y-4 gap-x-[30px] mt-5">
-					{themes.map((theme) => (
-						<div key={theme.name} className="relative" onClick={() => handleThemeColorClick(theme.name)}>
-							<div
-								className={`
-									aspect-square rounded-full cursor-pointer w-[60px] h-[60px] transition-all
-									${appearanceTheme === theme.name ? 'border-2 border-indigo-600 shadow-lg' : 'border border-gray-300'}
-									${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:scale-105'}
-									${appearanceTheme === theme.name ? 'ring-2 ring-indigo-200' : ''}
-								`}
-								style={{
-									background: theme.color
-								}}
-								title={theme.displayName}
-							/>
-							<div
-								className={`
-									w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full transition-all
-									${appearanceTheme === theme.name ? 'block scale-100' : 'hidden scale-0'}
-								`}
-							>
-								<Icons.CheckIcon className="w-3 h-3 text-white" />
-							</div>
+					{themes.map((theme) => {
+						const themeDisplayName = t(`themeOptions.${theme.name}`, { defaultValue: theme.displayName });
+						return (
+							<div key={theme.name} className="relative" onClick={() => handleThemeColorClick(theme.name)}>
+								<div
+									className={`
+										aspect-square rounded-full cursor-pointer w-[60px] h-[60px] transition-all
+										${appearanceTheme === theme.name ? 'border-2 border-indigo-600 shadow-lg' : 'border border-gray-300'}
+										${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:scale-105'}
+										${appearanceTheme === theme.name ? 'ring-2 ring-indigo-200' : ''}
+									`}
+									style={{
+										background: theme.color
+									}}
+									title={themeDisplayName}
+								/>
+								<div
+									className={`
+										w-fit p-[2px] bg-indigo-600 absolute top-0 right-0 rounded-full transition-all
+										${appearanceTheme === theme.name ? 'block scale-100' : 'hidden scale-0'}
+									`}
+								>
+									<Icons.CheckIcon className="w-3 h-3 text-white" />
+								</div>
 
-							<div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity">
-								<div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">{theme.displayName}</div>
+								<div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity">
+									<div className="bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">{themeDisplayName}</div>
+								</div>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</div>
 		</div>
