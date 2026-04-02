@@ -18,6 +18,14 @@ export enum MediaType {
 	AUDIO = 1
 }
 
+type ClanStickerWithMediaType = ClanSticker & { media_type?: MediaType };
+
+type FetchStickerByUserIdPayload = {
+	stickers?: ClanSticker[];
+	fromCache?: boolean;
+	time?: number;
+};
+
 interface CustomRequest extends ApiClanStickerAddRequest {
 	media_type?: MediaType;
 }
@@ -222,7 +230,6 @@ export const createSound = createAsyncThunk('settingClanSticker/createSound', as
 	}
 });
 
-
 export const updateSound = createAsyncThunk('settingClanSticker/updateSound', async ({ request, soundId }: UpdateSoundArgs, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
@@ -269,7 +276,7 @@ export const fetchSoundByUserId = createAsyncThunk(
 			const state = thunkAPI.getState() as { settingSticker: SettingClanStickerState };
 
 			const allStickers = selectAllStickerSuggestion(state);
-			const sounds = allStickers.filter((sticker) => (sticker as any).media_type === MediaType.AUDIO);
+			const sounds = allStickers.filter((sticker) => (sticker as ClanStickerWithMediaType).media_type === MediaType.AUDIO);
 
 			return sounds;
 		} catch (error) {
@@ -301,7 +308,7 @@ export const settingClanStickerSlice = createSlice({
 	},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchStickerByUserId.fulfilled, (state: SettingClanStickerState, actions: any) => {
+			.addCase(fetchStickerByUserId.fulfilled, (state: SettingClanStickerState, actions: { payload?: FetchStickerByUserIdPayload }) => {
 				if (!actions?.payload?.fromCache) state.cache = createCacheMetadata();
 
 				if (actions?.payload?.stickers) stickerAdapter.setAll(state, actions?.payload?.stickers);
@@ -335,14 +342,16 @@ export const selectStickersByClanIdSelector = createSelector(
 	(stickers, clanId) =>
 		stickers.filter(
 			(sticker) =>
-				sticker.clan_id === clanId && ((sticker as any).media_type === MediaType.STICKER || (sticker as any).media_type === undefined)
+				sticker.clan_id === clanId &&
+				((sticker as ClanStickerWithMediaType).media_type === MediaType.STICKER ||
+					(sticker as ClanStickerWithMediaType).media_type === undefined)
 		)
 );
 
 export const selectStickersByClanId = (clanId: string) => (state: RootState) => selectStickersByClanIdSelector(state, clanId);
 
 export const selectAudioByClanId = createSelector([selectAllStickerSuggestion, (_state: RootState, clanId: string) => clanId], (stickers, clanId) =>
-	stickers.filter((sticker) => sticker.clan_id === clanId && (sticker as any).media_type === MediaType.AUDIO)
+	stickers.filter((sticker) => sticker.clan_id === clanId && (sticker as ClanStickerWithMediaType).media_type === MediaType.AUDIO)
 );
 
 export const settingStickerReducer = settingClanStickerSlice.reducer;

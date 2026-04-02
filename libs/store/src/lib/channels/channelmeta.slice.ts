@@ -282,6 +282,7 @@ export const getChannelMetaState = (rootState: { [CHANNELMETA_FEATURE_KEY]: Chan
 	rootState[CHANNELMETA_FEATURE_KEY];
 
 export const getDmMetadataState = createSelector(getChannelMetaState, (state) => state?.dmEntities);
+export const selectDmMetaEntities = createSelector(getChannelMetaState, (state) => selectAllDmMetadataEntities(state?.dmEntities));
 
 export const selectChannelMetaEntities = createSelector(getChannelMetaState, selectEntities);
 export const selectAllChannelMeta = createSelector(getChannelMetaState, selectAll);

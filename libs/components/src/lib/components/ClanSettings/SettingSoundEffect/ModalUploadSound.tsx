@@ -155,13 +155,21 @@ function WaveformPlayer({
 	useEffect(() => {
 		const el = containerRef.current;
 		if (!el) return;
+
+		const updateWidth = () => {
+			const w = el.getBoundingClientRect().width;
+			if (w > 0) setContainerWidth(Math.floor(w));
+		};
+
+		updateWidth();
+
 		const observer = new ResizeObserver((entries) => {
 			const width = entries[0]?.contentRect.width;
-			if (width) setContainerWidth(Math.floor(width));
+			if (width && width > 0) setContainerWidth(Math.floor(width));
 		});
 		observer.observe(el);
 		return () => observer.disconnect();
-	}, []);
+	}, [blob, src]);
 
 	useEffect(() => {
 		setIsPlaying(false);
@@ -404,7 +412,7 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 					setError(t('modal.errorLoadFailed'));
 				});
 		}
-	}, [sound]);
+	}, [sound, t]);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const f = e.target.files?.[0];
@@ -470,6 +478,23 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 				throw new Error('Client or session is not initialized');
 			}
 
+			if (sound && !validFile) {
+				await dispatch(
+					soundEffectActions.updateSound({
+						soundId: sound.id,
+						request: {
+							shortname: name.trim(),
+							source: sound.url,
+							category: 'Among Us',
+							clan_id: currentClanId,
+							media_type: MediaType.AUDIO
+						}
+					})
+				);
+				onSuccess({ id: sound.id, name: name.trim(), url: sound.url });
+				return;
+			}
+
 			let audioSourceBlob = validFile ?? audioBlob;
 			if (!audioSourceBlob && sound?.url) {
 				const res = await fetch(sound.url);
@@ -488,32 +513,27 @@ const ModalUploadSound = ({ sound, onSuccess, onClose }: ModalUploadSoundProps) 
 			const attachment = await handleUploadEmoticon(client, session, path, trimmed.file);
 
 			if (attachment && attachment.url) {
-				const id = getIdSaleItemFromSource(attachment.url);
 				const request = {
-					id,
-					category: 'Among Us',
-					clan_id: currentClanId,
 					shortname: name.trim(),
 					source: attachment.url,
+					category: 'Among Us',
+					clan_id: currentClanId,
 					media_type: MediaType.AUDIO
 				};
 
 				if (sound) {
 					await dispatch(
 						soundEffectActions.updateSound({
-							soundId: id,
+							soundId: sound.id,
 							request
 						})
 					);
+					onSuccess({ id: sound.id, name: name.trim(), url: attachment.url });
 				} else {
-					await dispatch(soundEffectActions.createSound({ request, clanId: currentClanId }));
+					const id = getIdSaleItemFromSource(attachment.url);
+					await dispatch(soundEffectActions.createSound({ request: { ...request, id }, clanId: currentClanId }));
+					onSuccess({ id, name: name.trim(), url: attachment.url });
 				}
-
-				onSuccess({
-					id,
-					name: name.trim(),
-					url: attachment.url
-				});
 			}
 		} catch (error) {
 			console.error('Error uploading sound:', error);

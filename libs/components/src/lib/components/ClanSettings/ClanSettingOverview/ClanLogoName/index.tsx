@@ -14,9 +14,10 @@ type ClanLogoNameProps = {
 	resetTrigger?: boolean;
 	onResetComplete?: () => void;
 	handleRemovelogo?: () => void;
+	onValidationChange?: (isValid: boolean) => void;
 };
 
-const ClanLogoName = ({ onUpload, onGetClanName, resetTrigger, onResetComplete, handleRemovelogo }: ClanLogoNameProps) => {
+const ClanLogoName = ({ onUpload, onGetClanName, resetTrigger, onResetComplete, handleRemovelogo, onValidationChange }: ClanLogoNameProps) => {
 	const { t } = useTranslation('clanSettings');
 	const { sessionRef, clientRef } = useMezon();
 	const currentClanLogo = useSelector(selectCurrentClanLogo);
@@ -64,8 +65,10 @@ const ClanLogoName = ({ onUpload, onGetClanName, resetTrigger, onResetComplete, 
 
 		if (clanName.length === 0 || clanName.length === 64 || !regex.test(clanName)) {
 			setCheckValidate(true);
+			onValidationChange?.(false);
 		} else {
 			setCheckValidate(false);
+			onValidationChange?.(true);
 		}
 	};
 
@@ -78,6 +81,7 @@ const ClanLogoName = ({ onUpload, onGetClanName, resetTrigger, onResetComplete, 
 	useEffect(() => {
 		if (clanName === currentClanName) {
 			setCheckValidate(false);
+			onValidationChange?.(true);
 		}
 	}, [clanName, currentClanName]);
 

@@ -385,7 +385,7 @@ export const fetchMessages = createAsyncThunk(
 				mezon,
 				clanId,
 				channelId,
-				messageId || lastMessageId || '0',
+				toPresent ? '0' : messageId || lastMessageId || '0',
 				direction,
 				topicId,
 				noCache,

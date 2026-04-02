@@ -43,6 +43,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentStreamInfo,
 	selectCurrentTopicId,
+	selectDirectMessageIds,
 	selectDirectsUnreadlist,
 	selectHasKeyE2ee,
 	selectIsShowChatStream,
@@ -229,6 +230,8 @@ type ShowModal = () => void;
 
 const DirectUnreadList = memo(() => {
 	const listUnreadDM = useSelector(selectDirectsUnreadlist);
+	const listDirectId = useSelector(selectDirectMessageIds);
+	const directIdSet = useMemo(() => new Set(listDirectId), [listDirectId]);
 	const [listDmRender, setListDmRender] = useState(() => [...listUnreadDM]);
 	const previousIdsRef = useRef(listDmRender.map((channel) => channel.id));
 
@@ -256,14 +259,15 @@ const DirectUnreadList = memo(() => {
 
 	const validIdsSet = useMemo(() => new Set(listUnreadDM.map((channel) => channel.id)), [listUnreadDM]);
 
-	const renderItems = useMemo(
-		() =>
-			listDmRender.map((dmGroupChatUnread) => {
-				const shouldAnimateOut = !validIdsSet.has(dmGroupChatUnread.id);
-				return <DirectUnread key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} shouldAnimateOut={shouldAnimateOut} />;
-			}),
-		[listDmRender, validIdsSet]
-	);
+	const renderItems = useMemo(() => {
+		return listDmRender.map((dmGroupChatUnread) => {
+			if (!directIdSet.has(dmGroupChatUnread.id)) return null;
+
+			const shouldAnimateOut = !validIdsSet.has(dmGroupChatUnread.id);
+
+			return <DirectUnread key={dmGroupChatUnread.id} directMessage={dmGroupChatUnread} shouldAnimateOut={shouldAnimateOut} />;
+		});
+	}, [listDmRender, validIdsSet, directIdSet]);
 
 	if (!listDmRender?.length) return null;
 

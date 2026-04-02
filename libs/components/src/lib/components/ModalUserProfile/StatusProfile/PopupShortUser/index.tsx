@@ -26,7 +26,8 @@ export const PopupFriend = ({ user, showPopupLeft }: { user: ChannelMembersEntit
 	return (
 		<div
 			className={`absolute top-0  rounded-lg bg-theme-surface shadow w-[165px] p-2 z-[1] ${showPopupLeft ? 'right-9' : 'sbm:left-9 right-9'}`}
-			onClick={() => {
+			onClick={(e) => {
+				e.stopPropagation();
 				if (user?.user?.username && user?.user?.id) {
 					showRemoveFriendModal();
 				}

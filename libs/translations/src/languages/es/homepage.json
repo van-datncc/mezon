@@ -17,7 +17,7 @@
 		"features": "Funciones",
 		"developers": "Desarrolladores",
 		"botsApps": "Bots/Apps",
-		"documents": "Documentos",
+		"documents": "Documentación",
 		"discover": "Descubrir",
 		"blogs": "Blogs",
 		"openMezon": "Abrir Mezon",
@@ -72,10 +72,12 @@
 		"hero": {
 			"title": {
 				"your": "Tu",
+				"platform": "Plataforma",
 				"live": "En vivo",
 				"work": "Trabajo",
-				"play": "Jugar",
+				"play": "Y Juegosr",
 				"platform": "Plataforma.",
+
 				"theBest": "Lo Mejor",
 				"yourCommunity": "Para tu Comunidad"
 			},
@@ -83,13 +85,13 @@
 			"talk": "Hablar",
 			"play": "Jugar",
 			"and": "Y",
-			"hangOut": "Pasa el rato",
+			"hangOut": "Pasar el rato",
 			"tryButton": "¡Prueba Mezon gratis!",
 			"choosePlatform": "Elige tu plataforma"
 		},
 		"textChannel": {
-			"titlesuper": "Ultra-rápido",
 			"titlemessage": "Mensajería",
+			"titlesuper": "Ultra-rápida",
 			"description": "Diseñado para chat, colaboración y conexión.",
 			"description2": "Mensajería ultra-rápida. Sin límites. Entrega instantánea.",
 			"learnMore": "Más información"

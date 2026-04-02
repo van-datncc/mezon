@@ -56,6 +56,7 @@ import {
 	selectCategoryById,
 	selectChannelById,
 	selectChannelByIdAndClanId,
+	selectChannelMetaEntities,
 	selectChannelThreads,
 	selectChannelsByClanId,
 	selectClanMemberByClanId,
@@ -72,6 +73,7 @@ import {
 	selectDefaultChannelIdByClanId,
 	selectDirectById,
 	selectDmGroupCurrentId,
+	selectDmMetaEntities,
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
@@ -429,9 +431,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					message.code === TypeMessage.DeleteEphemeralMsg
 				) {
 					dispatch(messagesActions.newMessage(mess));
-
-					if (message.code === TypeMessage.ChatUpdate && message?.message_id) {
-					}
 
 					if (message.code === TypeMessage.ChatRemove && message.topic_id && message.topic_id !== '0' && message?.message_id) {
 						dispatch(
@@ -840,7 +839,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			for (let index = 0; index < user?.user_ids.length; index++) {
 				const userID = user.user_ids[index];
 				if (userID === userId) {
-					const badgeCount = user.badge_counts[index] || 0;
+					const directEntities = selectDmMetaEntities(store.getState());
+					const channelMetaEntities = selectChannelMetaEntities(store.getState());
+					const badgeCount =
+						user.badge_counts[index] ||
+						directEntities?.[user.channel_id]?.count_mess_unread ||
+						channelMetaEntities?.[user.channel_id]?.count_mess_unread ||
+						0;
+
 					if (badgeCount > 0) {
 						badgeService.decrementChannel(user?.clan_id || '0', user.channel_id, badgeCount);
 					}

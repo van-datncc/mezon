@@ -27,6 +27,7 @@ const ClanSettingOverview = () => {
 	const [systemMessage, setSystemMessage] = useState<ApiSystemMessage | null>(null);
 	const [updateSystemMessageRequest, setUpdateSystemMessageRequest] = useState<ApiSystemMessageRequest | null>(null);
 	const [resetTrigger, setResetTrigger] = useState<boolean>(false);
+	const [isClanNameValid, setIsClanNameValid] = useState<boolean>(true);
 
 	const dispatch = useAppDispatch();
 
@@ -165,6 +166,7 @@ const ClanSettingOverview = () => {
 				resetTrigger={resetTrigger}
 				onResetComplete={handleResetComplete}
 				handleRemovelogo={handleRemovelogo}
+				onValidationChange={setIsClanNameValid}
 			/>
 			<ClanBannerBackground onUpload={handleUploadBackground} urlImage={clanRequest?.banner} />
 			{systemMessage && (
@@ -188,7 +190,7 @@ const ClanSettingOverview = () => {
 				<ToggleItem label={t('systemMessages.anoDesc')} value={!!clanRequest.prevent_anonymous} handleToggle={handleToggleAno} />
 			</div>
 
-			{(hasClanChanges || hasSystemMessageChanges) && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
+			{(hasClanChanges || hasSystemMessageChanges) && isClanNameValid && <ModalSaveChanges onSave={handleSave} onReset={handleReset} />}
 		</div>
 	);
 };
