@@ -161,7 +161,7 @@ export const listChannelBadgeCount = createAsyncThunk('clans/listChannelBadgeCou
 					clan_id: clanId
 				}
 			},
-			(session) => Promise.resolve([]),
+			(session) => mezon.client.listChannelBadgeCount(session, clanId),
 			'channel_badge_count'
 		);
 
