@@ -303,7 +303,7 @@ const persistedChannelMetaReducer = persistReducer(
 	{
 		key: 'channelmeta',
 		storage,
-		whitelist: ['dmEntities', 'lastSentChannelId']
+		blacklist: ['entities']
 	},
 	channelMetaReducer
 );

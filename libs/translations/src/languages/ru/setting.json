@@ -85,7 +85,8 @@
 		"description": "Выберите предпочитаемый язык.",
 		"english": "English",
 		"vietnamese": "Tiếng Việt",
-		"russian": "Русский"
+		"russian": "Русский",
+		"portuguese": "Português"
 	},
 	"voice": {
 		"title": "Голос",
