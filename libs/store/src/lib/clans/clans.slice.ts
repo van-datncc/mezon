@@ -1,11 +1,18 @@
 import { captureSentryError } from '@mezon/logger';
 import type { IClan, LoadingStatus } from '@mezon/utils';
-import { LIMIT_CLAN_ITEM, TypeCheck } from '@mezon/utils';
+import { LIMIT_CLAN_ITEM } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type { ClanUpdatedEvent } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiChannelDescription, ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api';
+import type {
+	ApiChannelDescription,
+	ApiCheckDuplicateNameRequest,
+	ApiCheckDuplicateNameResponse,
+	ApiClanDesc,
+	ApiUpdateAccountRequest,
+	MezonUpdateClanDescBody
+} from 'mezon-js/api';
 import { batch } from 'react-redux';
 import { accountActions } from '../account/account.slice';
 import { setUserAvatarOverride } from '../avatarOverride/avatarOverride';
@@ -312,17 +319,13 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
-export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
+export const checkDuplicateNameApi = createAsyncThunk('clans/duplicateNameApi', async (request: ApiCheckDuplicateNameRequest, thunkAPI) => {
 	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(clan_name, '0', TypeCheck.TYPECLAN, '0');
-
-		if (isDuplicateName?.type === TypeCheck.TYPECLAN) {
-			return isDuplicateName.exist;
-		}
-		return;
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.checkDuplicateName(mezon.session, request);
+		return response as ApiCheckDuplicateNameResponse;
 	} catch (error) {
-		captureSentryError(error, 'clans/duplicateNameClan');
+		captureSentryError(error, 'clans/duplicateNameApi');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
