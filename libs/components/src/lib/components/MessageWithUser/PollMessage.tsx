@@ -10,7 +10,7 @@ import {
 	useAppSelector,
 	votePoll
 } from '@mezon/store';
-import { getSrcEmoji } from '@mezon/utils';
+import { generateE2eId, getSrcEmoji } from '@mezon/utils';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -378,9 +378,17 @@ export const PollMessage = ({
 		<div className="block w-full">
 			<div className="max-w-[420px] rounded bg-item-theme p-3 border-theme-primary">
 				<div className="flex items-center gap-2 mb-1">
-					<h3 className="text-[15px] font-semibold text-theme-primary-active break-all flex-1 min-w-0">{question}</h3>
+					<h3
+						className="text-[15px] font-semibold text-theme-primary-active break-all flex-1 min-w-0"
+						data-e2e={generateE2eId('poll.card.question')}
+					>
+						{question}
+					</h3>
 					{(isClosed || isExpired) && (
-						<span className="px-2 py-0.5 text-xs font-semibold rounded bg-red-500/10 text-red-500 flex-shrink-0">
+						<span
+							className="px-2 py-0.5 text-xs font-semibold rounded bg-red-500/10 text-red-500 flex-shrink-0"
+							data-e2e={generateE2eId('poll.card.ended')}
+						>
 							{t('poll.ended', { defaultValue: 'Poll Ended' })}
 						</span>
 					)}
@@ -388,7 +396,7 @@ export const PollMessage = ({
 
 				{/* Subtitle */}
 				{!interactionDisabled && (
-					<p className="text-xs text-theme-primary mb-3">
+					<p className="text-xs text-theme-primary mb-3" data-e2e={generateE2eId('poll.card.answer_description')}>
 						{isClosed || isExpired
 							? t('poll.finalResults', { defaultValue: 'Final results' })
 							: allowMultipleAnswers
@@ -424,6 +432,7 @@ export const PollMessage = ({
 												? '[background:var(--bg-item-hover)] border-[var(--text-theme-primary)] hover:[background:var(--bg-active-member-channel)] hover:brightness-105 cursor-pointer'
 												: '[background:var(--bg-item-hover)] border-transparent cursor-pointer'
 								}`}
+								data-e2e={generateE2eId('poll.card.answer')}
 							>
 								{shouldShowResults && (
 									<div className="absolute inset-y-0 left-0 rounded-l min-w-0 overflow-hidden " style={{ width: `${percentage}%` }}>
@@ -460,7 +469,10 @@ export const PollMessage = ({
 										</div>
 									)}
 									{hasVoted && isVoted && (
-										<div className="w-5 h-5 rounded-full bg-theme-primary flex items-center justify-center flex-shrink-0">
+										<div
+											className="w-5 h-5 rounded-full bg-theme-primary flex items-center justify-center flex-shrink-0"
+											data-e2e={generateE2eId('poll.card.voted')}
+										>
 											<svg className="w-3 h-3 text-theme-primary-active" viewBox="0 0 12 12" fill="none">
 												<path
 													d="M2 6L5 9L10 3"
@@ -482,7 +494,7 @@ export const PollMessage = ({
 				<div className="flex items-start justify-between gap-2 pt-1 min-w-0">
 					<span className="text-xs text-theme-primary min-w-0 flex-1 break-words">
 						{interactionDisabled ? (
-							<span>
+							<span data-e2e={generateE2eId('poll.card.total_votes')}>
 								{totalVotes} {totalVotes < 2 ? t('poll.vote') : t('poll.votes')}
 							</span>
 						) : (
@@ -501,6 +513,7 @@ export const PollMessage = ({
 									}
 								}}
 								className="cursor-pointer hover:underline"
+								data-e2e={generateE2eId('poll.card.total_votes')}
 							>
 								{totalVotes} {totalVotes < 2 ? t('poll.vote') : t('poll.votes')}
 							</span>
@@ -519,6 +532,7 @@ export const PollMessage = ({
 									type="button"
 									onClick={() => setShowResults((prev) => !prev)}
 									className="px-1 py-1.5 text-sm font-medium border-theme-primary text-theme-primary hover:text-theme-primary-active rounded transition-colors"
+									data-e2e={generateE2eId('poll.card.button.show_result')}
 								>
 									{showResults ? t('poll.backToVote') : t('poll.showResults')}
 								</button>
@@ -529,6 +543,7 @@ export const PollMessage = ({
 									onClick={handleVote}
 									disabled={selectedAnswers.length === 0 || isVoting || isClosing}
 									className="px-4 py-1.5 text-sm font-medium rounded transition-colors btn-primary btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+									data-e2e={generateE2eId('poll.card.button.vote')}
 								>
 									{t('poll.voteButton')}
 								</button>
@@ -539,6 +554,7 @@ export const PollMessage = ({
 									onClick={handleRemoveVote}
 									disabled={isVoting || isClosing}
 									className="px-4 py-1.5 text-sm font-medium text-theme-primary rounded transition-colors border-theme-primary bg-button-secondary bg-secondary-button-hover disabled:opacity-50"
+									data-e2e={generateE2eId('poll.card.button.remove_vote')}
 								>
 									{t('poll.removeVote')}
 								</button>

@@ -1,5 +1,6 @@
 import { useEscapeKeyClose } from '@mezon/core';
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -62,6 +63,7 @@ function FileSelectionModal({ isOpen, onClose, onUploadFile, onCreatePoll, butto
 							className={`w-full px-4 py-3 flex items-center gap-3 transition-colors text-left rounded-md ${
 								hoveredIndex === index ? 'bg-theme-input text-theme-primary-active' : 'text-theme-primary'
 							}`}
+							data-e2e={generateE2eId('poll.button.option')}
 						>
 							<span className={hoveredIndex === index ? 'text-theme-primary-active' : 'text-theme-primary'}>{item.icon}</span>
 							<span className="font-medium text-[15px]">{item.label}</span>

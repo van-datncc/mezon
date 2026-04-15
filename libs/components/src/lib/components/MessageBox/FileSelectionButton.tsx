@@ -126,6 +126,7 @@ function FileSelectionButton({ currentChannelId }: FileSelectionButtonProps) {
 				ref={buttonRef}
 				onClick={handleOpenModal}
 				className="flex flex-row h-6 w-6 items-center justify-center cursor-pointer text-theme-primary text-theme-primary-hover"
+				data-e2e={generateE2eId('poll.button.open_modal')}
 			>
 				<Icons.AddCircle className="" />
 			</div>

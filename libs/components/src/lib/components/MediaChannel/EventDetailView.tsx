@@ -498,6 +498,7 @@ export function EventDetailView({ channelId, clanId, eventId, startTimeSeconds, 
 							<button
 								onClick={handleUploadClick}
 								className="relative rounded-xl overflow-hidden aspect-square border-2 border-dashed border-theme-secondary hover:border-buttonPrimary/50 flex flex-col items-center justify-center gap-2 text-theme-secondary hover:text-buttonPrimary transition-colors cursor-pointer bg-theme-primary"
+								data-e2e={generateE2eId('timeline.buttons.add_media')}
 							>
 								<Icons.PlusIcon defaultSize="w-8 h-8" />
 							</button>
