@@ -2,7 +2,7 @@ import { useAuth, useFriends } from '@mezon/core';
 import type { ChannelMembersEntity } from '@mezon/store';
 import { EStateFriend, giveCoffeeActions, selectCurrentUserId, selectInfoSendToken, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import type { IUser } from '@mezon/utils';
+import { generateE2eId, type IUser } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -148,6 +148,7 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 					className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer  ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
 					onClick={(e) => handleOnClickButtonFriend(e, index)}
 					key={button.title}
+					data-e2e={generateE2eId('short_profile.action.button.remove_friend')}
 				>
 					<span className="text-white" title={button.title}>
 						{button.icon}

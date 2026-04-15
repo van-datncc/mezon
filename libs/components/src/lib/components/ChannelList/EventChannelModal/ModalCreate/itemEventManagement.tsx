@@ -394,7 +394,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							handleStopPropagation(e);
 						}}
 					>
-						<div className="text-theme-primary-hover cursor-pointer" onClick={(e) => handleOpenPanel(e)}>
+						<div className="text-theme-primary-hover cursor-pointer" onClick={(e) => handleOpenPanel(e)} data-e2e={generateE2eId('clan_page.modal.create_event.event_management.item.button.open_panel')}>
 							<Icons.IconEditThreeDot className="rotate-90" />
 						</div>
 
@@ -402,6 +402,7 @@ const ItemEventManagement = (props: ItemEventManagementProps) => {
 							<button
 								onClick={() => setOpenModalShare(true)}
 								className="flex gap-x-1 rounded-lg px-4 py-2  bg-theme-primary text-theme-primary-hover  hover:bg-opacity-80 font-medium "
+								data-e2e={generateE2eId('clan_page.modal.create_event.event_management.item.button.share_event')}
 							>
 								{checkOptionVoice && <Icons.IconShareEventVoice />}
 								{checkOptionLocation && <Icons.IConShareEventLocation />}
