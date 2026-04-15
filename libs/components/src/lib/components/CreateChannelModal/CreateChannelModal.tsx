@@ -4,7 +4,6 @@ import {
 	checkDuplicateChannelInCategoryApi,
 	createNewChannel,
 	fetchApplications,
-	listChannelRenderAction,
 	selectChannelById,
 	selectCurrentCategory,
 	selectCurrentClanId,
@@ -118,15 +117,6 @@ export const CreateNewChannelModal = () => {
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
-		if (currentCategory?.category_id) {
-			dispatch(
-				listChannelRenderAction.updateCategoryChannels({
-					clanId: currentClanId as string,
-					categoryId: currentCategory?.category_id,
-					channelId: channelID ?? ''
-				})
-			);
-		}
 
 		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
