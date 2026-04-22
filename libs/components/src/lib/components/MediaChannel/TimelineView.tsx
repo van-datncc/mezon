@@ -86,6 +86,7 @@ export function TimelineView({ events, loadingStatus, onNavigateToEvents, onNavi
 					onClick={onNavigateToEvents}
 					className="p-2 rounded-lg text-theme-primary text-theme-primary-hover transition-colors"
 					title={t('fields.eventDetail.calendar')}
+					data-e2e={generateE2eId('timeline.buttons.calendar')}
 				>
 					<Icons.BulletListIcon className="w-5 h-5" />
 				</button>
