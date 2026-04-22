@@ -3,6 +3,7 @@ import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
 import { isTrackReference, LayoutContextProvider, usePinnedTracks, useTracks, type useCreateLayoutContext } from '@livekit/components-react';
 import { selectOpenExternalChatBox, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import type { Room } from 'livekit-client';
 import { RoomEvent, Track } from 'livekit-client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -225,6 +226,7 @@ export const VideoConferenceLayout = memo(
 									}`}
 									title="Chat"
 									onClick={onToggleChatBox}
+									data-e2e={generateE2eId('chat.channel_message.header.button.chat')}
 								>
 									<Icons.Chat defaultSize="w-5 h-5" />
 								</button>
