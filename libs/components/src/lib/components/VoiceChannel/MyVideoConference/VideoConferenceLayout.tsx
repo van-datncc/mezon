@@ -235,6 +235,7 @@ export const VideoConferenceLayout = memo(
 					</div>
 					<div
 						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto`}
+						data-e2e={generateE2eId('clan_page.screen.voice_room.control_bar')}
 					>
 						<ControlBar
 							isExternalCalling={isExternalCalling}

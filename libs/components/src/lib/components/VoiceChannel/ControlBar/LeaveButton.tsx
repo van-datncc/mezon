@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import { memo } from 'react';
 
 interface LeaveButtonProps {
@@ -11,6 +12,7 @@ export const LeaveButton = memo(({ onLeaveRoom }: LeaveButtonProps) => {
 			id="btn-meet-leave"
 			onClick={onLeaveRoom}
 			className="w-14 aspect-square max-md:w-10 bg-[#da373c] hover:bg-[#a12829] cursor-pointer rounded-full flex justify-center items-center"
+			data-e2e={generateE2eId('icon.end_call')}
 		>
 			<Icons.EndCall className="w-6 aspect-square max-md:w-4" />
 		</div>
