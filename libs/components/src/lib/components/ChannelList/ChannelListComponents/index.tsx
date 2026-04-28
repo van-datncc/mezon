@@ -26,7 +26,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { DONE_ONBOARDING_STATUS, EPermission, generateE2eId } from '@mezon/utils';
 import isElectron from 'is-electron';
-import type { ApiChannelAppResponse } from 'mezon-js/api';
+import type { ApiChannelAppResponse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from 'react-modal-hook';
@@ -305,7 +305,7 @@ const ChannelAppList = memo(() => {
 					window.electron.launchAppWindow(urlWithHash);
 					return;
 				}
-				window.open(urlWithHash, channel?.channel_label, 'width=900,height=700');
+				window.open(urlWithHash, channel?.channel_label, 'width=900,height=700,noopener,noreferrer');
 			}
 		}
 	};
@@ -397,7 +397,7 @@ const ListChannelApp = ({
 	useOnClickOutside(panelRef, onClose);
 
 	const handleFindChannelApp = () => {
-		window.open('https://top.mezon.ai/search?q=&tags=&type=app', '_blank');
+		window.open('https://top.mezon.ai/search?q=&tags=&type=app', '_blank', 'noopener,noreferrer');
 	};
 
 	return (
