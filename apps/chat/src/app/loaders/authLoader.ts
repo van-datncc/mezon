@@ -8,7 +8,8 @@ import {
 	fcmActions,
 	friendsActions,
 	listChannelsByUserActions,
-	listUsersByUserActions
+	listUsersByUserActions,
+	stickerSettingActions
 } from '@mezon/store';
 import { isOnline, waitForOnline } from '@mezon/transport';
 import type { CustomLoaderFunction } from './appLoader';
@@ -27,6 +28,8 @@ const connectNotification = async (dispatch: AppDispatch) => {
 };
 
 export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }) => {
+	await dispatch(accountActions.getUserProfile());
+	dispatch(stickerSettingActions.fetchStickerByUserId({ clanId: '' }));
 	dispatch(clansActions.joinClan({ clanId: '0' }));
 	dispatch(listChannelsByUserActions.fetchListChannelsByUser({}));
 	dispatch(listUsersByUserActions.fetchListUsersByUser({}));
@@ -36,7 +39,6 @@ export const authLoader: CustomLoaderFunction = async ({ dispatch, initialPath }
 	dispatch(directActions.fetchDirectMessage({}));
 	dispatch(emojiRecentActions.fetchEmojiRecent({}));
 	dispatch(emojiSuggestionActions.fetchEmoji({ clanId: '0' }));
-	dispatch(accountActions.getUserProfile());
 
 	connectNotification(dispatch);
 
