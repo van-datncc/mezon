@@ -2601,9 +2601,32 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		},
 		[sessionRef, dispatch]
 	);
+
+	const runPostReconnectActions = useCallback(() => {
+		const store = getStore();
+		dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
+		dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
+		dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new CustomEvent('mezon:socket-reconnect', { detail: { success: true } }));
+		}
+	}, [dispatch]);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Client) => {
 			socket.onrefreshsession = onrefresssession;
+
+
+			socket.onconnect = (_evt: Event) => {
+				socketState.status = 'connected';
+			};
+
+
+			socket.onreconnect = (_evt: Event) => {
+				setCallbackEventFn(socket as Client);
+				runPostReconnectActions();
+				socketState.status = 'connected';
+			};
 
 			socket.onvoicejoined = onvoicejoined;
 
@@ -2774,7 +2797,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			onMarkAsRead,
 			onaddfriend,
 			onbanneduser,
-			onrefresssession
+			onrefresssession,
+			runPostReconnectActions
 		]
 	);
 
@@ -2802,7 +2826,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			const session = selectSession(store.getState()) as ApiSession | null;
 
 			if (!session?.token?.trim() && !session?.session_id?.trim()) {
-				return;
+				return false;
 			}
 			sessionRef.current = {
 				...session,
@@ -2817,20 +2841,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				persistSession: persistReconnectSession,
 				onSessionRefreshed: onReconnectSessionRefreshed
 			});
-			
-			if (result === 'RECONNECTING') {
-				return;
+
+			if (result.status === 'RECONNECTING') {
+				return false;
 			}
-			if (result === null) {
+			if (result.status === 'MISSING_SESSION') {
 				throw new Error('Socket reconnection failed: missing client or session');
 			}
 
-			setCallbackEventFn(client as Client);
-			dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
-			dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
-			dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
+			return true;
 		},
-		[setCallbackEventFn, dispatch, sessionRef, isMobile, persistReconnectSession, onReconnectSessionRefreshed]
+		[dispatch, sessionRef, isMobile, persistReconnectSession, onReconnectSessionRefreshed]
 	);
 
 	useEffect(() => {
@@ -2840,10 +2861,14 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					interval(500).pipe(
 						exhaustMap(async () => {
 							if (clientRef.current) {
+								
 								try {
-									await executeReconnect(socketType, clientRef.current);
-									return true; // Resolves as an Observable<boolean>
+									const success = await executeReconnect(socketType, clientRef.current);
+									return success;
 								} catch (error) {
+									console.log('[ReconnectFlow] reconnect tick error', {
+										error: error instanceof Error ? error.message : String(error)
+									});
 									dispatch(
 										toastActions.addToast({
 											message: 'Socket reconnecting...',
@@ -2884,9 +2909,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const handleReconnect = useCallback(
 		(socketType: string) => {
+			if (socketState.status === 'connecting') {
+				return;
+			}
 			reconnect$.next(socketType);
 		},
-		[reconnect$]
+		[reconnect$, clientRef]
 	);
 
 	const ondisconnect = useCallback(() => {
@@ -2914,6 +2942,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onchannelpresence = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onnotification = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onreconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onpinmessage = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -2972,6 +3002,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onunblockfriend = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onbanneduser = () => {};
+			socket.onreconnect = () => {};
 		};
 	}, [
 		onchannelmessage,
