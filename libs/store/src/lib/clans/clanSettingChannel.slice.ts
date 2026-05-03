@@ -3,7 +3,7 @@ import type { EntityState } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { captureSentryError } from '@mezon/logger';
-import type { ApiChannelDescription, ApiChannelSettingItem } from 'mezon-js/api';
+import type { ApiChannelDescription, ApiChannelSettingItem } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { archiveChannel } from '../channels/channels.slice';
