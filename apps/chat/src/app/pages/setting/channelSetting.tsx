@@ -55,7 +55,7 @@ const ChannelSetting = () => {
 		if (!selectClanId) return;
 
 		await dispatch(
-			channelSettingActions.fetchChannelSettingInClan({
+			channelSettingActions.fetchActiveChannelSettingInClan({
 				clanId: selectClanId as string,
 				parentId: '0',
 				typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL,
