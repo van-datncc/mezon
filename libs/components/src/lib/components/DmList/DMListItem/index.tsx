@@ -162,7 +162,7 @@ const DmItemProfile = ({
 
 			{isTypeDMGroup ? (
 				<div className="flex flex-col justify-center ">
-					<span className="one-line text-start" data-e2e={generateE2eId(`chat.direct_message.chat_item.username`)}>
+					<span className="one-line text-start" data-e2e={generateE2eId(`chat.direct_message.chat_item.group_name`)}>
 						{name}
 					</span>
 				</div>
