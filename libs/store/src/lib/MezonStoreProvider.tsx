@@ -46,6 +46,7 @@ export function MezonStoreProvider({ children, store, loading, persistor }: Prop
 			}
 
 			const client = await createClient();
+			client.setAutoReconnect({ enabled: false });
 			if (cancelled) {
 				return;
 			}
