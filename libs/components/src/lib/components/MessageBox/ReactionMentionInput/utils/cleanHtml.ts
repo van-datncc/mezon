@@ -23,7 +23,7 @@ export function preparePastedHtml(html: string) {
 			return;
 		}
 		node.removeAttribute('style');
-		if (node.tagName === 'BR') node.replaceWith('\n');
+		if (node.tagName === 'BR') node.replaceWith(document.createElement('br'));
 		if (node.tagName === 'P') node.appendChild(document.createTextNode('\n'));
 		if (node.tagName === 'IMG' && !node.dataset.entityType) node.replaceWith(node.getAttribute('alt') || '');
 		if (node.dataset.ignoreOnPaste) node.remove();
