@@ -40,10 +40,14 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 		setCurrentPage(1);
 	}, [clanId]);
 
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchFilter]);
+
 	const onPageChange = async (page: number) => {
 		setCurrentPage(page);
 		await dispatch(
-			channelSettingActions.fetchChannelSettingInClan({
+			channelSettingActions.fetchActiveChannelSettingInClan({
 				clanId,
 				parentId: '0',
 				page,
@@ -61,7 +65,7 @@ const ListChannelSetting = ({ listChannel, clanId, countChannel, searchFilter }:
 		setCurrentPage(1);
 		if (listChannel.length < pageSizeChange) {
 			await dispatch(
-				channelSettingActions.fetchChannelSettingInClan({
+				channelSettingActions.fetchActiveChannelSettingInClan({
 					clanId,
 					parentId: '0',
 					limit: pageSizeChange,

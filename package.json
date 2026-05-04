@@ -1,6 +1,6 @@
 {
   "name": "mezon",
-  "version": "1.4.68",
+  "version": "1.4.69",
   "license": "MIT",
   "description": "Mezon application",
   "productName": "mezon",
@@ -34,7 +34,13 @@
     "package:desktop": "nx run desktop:package",
     "make:desktop": "nx run desktop:make",
     "release:desktop": "yarn build:desktop && yarn package:desktop && yarn make:desktop",
-    "prepare": "husky"
+    "prepare": "husky",
+    "ai-scan": "node ./packages/ai-scan/bin/ai-scan.mjs",
+    "ai-scan:full": "node ./packages/ai-scan/bin/ai-scan.mjs full --concurrency 3",
+    "ai-scan:plan": "node ./packages/ai-scan/bin/ai-scan.mjs plan",
+    "ai-scan:run": "node ./packages/ai-scan/bin/ai-scan.mjs run --concurrency 3",
+    "ai-scan:report": "node ./packages/ai-scan/bin/ai-scan.mjs report",
+    "ai-scan:clear": "node ./packages/ai-scan/bin/ai-scan.mjs clear"
   },
   "private": true,
   "dependencies": {
@@ -67,8 +73,8 @@
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^3.3.1",
     "deepfilternet3-noise-filter": "1.2.1",
-    "dompurify": "^3.2.4",
     "device-uuid": "^1.0.4",
+    "dompurify": "^3.2.4",
     "electron-log": "^5.2.0",
     "electron-store": "8.2.0",
     "electron-updater": "^6.6.2",
@@ -87,8 +93,8 @@
     "lodash.isequal": "^4.5.0",
     "lowlight": "^3.3.0",
     "mezon-active-windows": "0.1.38",
-    "mezon-js": "2.15.37",
-    "mezon-js-protobuf": "1.10.48",
+    "mezon-js": "2.15.46",
+    "mezon-js-protobuf": "1.10.51",
     "mmn-client-js": "1.0.16",
     "mp4box": "^2.3.0",
     "nx-electron": "^20.0.2",
@@ -239,7 +245,6 @@
     "cacache": "^18.0.0",
     "minimatch": "^9.0.7",
     "picomatch": "^4.0.4",
-    "js-yaml": "^4.1.1",
     "file-type": "^21.3.2",
     "serialize-javascript": "^7.0.5",
     "@tootallnate/once": "^3.0.1"
