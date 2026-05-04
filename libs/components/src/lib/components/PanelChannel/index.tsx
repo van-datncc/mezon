@@ -483,7 +483,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			{channel.parent_id === '0' || !channel.parent_id ? (
 				<>
 					<GroupPanels>
-						{!isHideArchive && (
+						{!isHideArchive && canManageChannel && (
 							<ItemPanel
 								children={isThread ? t('menu.notification.archiveThread') : t('menu.notification.archiveChannel')}
 								onClick={handleOpenArchiveConfirm}
@@ -556,7 +556,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			) : (
 				<>
 					<GroupPanels>
-						{!isHideArchive && (
+						{!isHideArchive && hasManageThreadPermission && (
 							<ItemPanel
 								children={isThread ? t('menu.notification.archiveThread') : t('menu.notification.archiveChannel')}
 								onClick={handleOpenArchiveConfirm}
