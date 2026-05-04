@@ -472,6 +472,14 @@ export const DATA_E2E_IDENTIFIER = {
 						view: ''
 					},
 					member_count: ''
+				},
+				override: {
+					item: {
+						button: {
+							remove: '',
+							tick: ''
+						}
+					}
 				}
 			}
 		},
@@ -646,6 +654,7 @@ export const DATA_E2E_IDENTIFIER = {
 			chat_list_container: '',
 			chat_list: '',
 			chat_item: {
+				group_name: '',
 				username: '',
 				close_dm_button: '',
 				text_area: '',

@@ -1,4 +1,5 @@
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 
 type ItemPermissionProps = {
@@ -59,6 +60,7 @@ const ItemPermission = forwardRef<{ reset: () => void }, ItemPermissionProps>((p
 						onSelect(id!, TypeChoose.Remove, false);
 						handleSelect(TypeChoose.Remove);
 					}}
+					data-e2e={generateE2eId('clan_page.settings.role.override.item.button.remove')}
 				>
 					<Icons.Close className="size-4" />
 				</button>
@@ -77,6 +79,7 @@ const ItemPermission = forwardRef<{ reset: () => void }, ItemPermissionProps>((p
 						onSelect(id!, TypeChoose.Tick, true);
 						handleSelect(TypeChoose.Tick);
 					}}
+					data-e2e={generateE2eId('clan_page.settings.role.override.item.button.tick')}
 				>
 					<Icons.IconTick className="size-4" />
 				</button>
