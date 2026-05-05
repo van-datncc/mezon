@@ -1,54 +1,7 @@
-import { authActions, selectAllAccount, useAppDispatch } from '@mezon/store';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import Button from '../Button';
 import ButtonLoading from '../Button/ButtonLoading';
-
-export function LogOutButton() {
-	const { t } = useTranslation('common');
-	const [openModal, setOpenModal] = useState<boolean>(false);
-	const dispatch = useAppDispatch();
-	const userProfile = useSelector(selectAllAccount);
-	const handleOpenModal = () => {
-		setOpenModal(true);
-	};
-	const handleLogOut = () => {
-		dispatch(authActions.logOut({ device_id: userProfile?.user?.username || '', platform: 'desktop' }));
-	};
-	const handleCloseModal = () => {
-		setOpenModal(false);
-	};
-
-	return (
-		<>
-			{openModal && <LogoutModal handleLogOut={handleLogOut} onClose={handleCloseModal} />}
-			<Button
-				onClick={handleOpenModal}
-				className="inline-flex m-4  h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-white  duration-300"
-			>
-				<span>{t('logOut')}</span>
-				<span className="relative only:-mx-5">
-					<svg
-						className="h-4 w-4 text-white"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<title id="title-38">Icon title</title>
-						<desc id="desc-38">A more detailed description of the icon</desc>
-						<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /> <polyline points="16 17 21 12 16 7" />{' '}
-						<line x1="21" y1="12" x2="9" y2="12" />
-					</svg>
-				</span>
-			</Button>
-		</>
-	);
-}
-
 interface ModalProps {
 	onClose: () => void;
 	handleLogOut: () => void;
@@ -63,7 +16,7 @@ export const LogoutModal: React.FC<ModalProps> = ({ handleLogOut, onClose }) => 
 			<div className="relative z-10 bg-theme-setting-primary p-6 rounded-[5px] text-center">
 				<h2 className="text-[30px] font-semibold mb-4  text-theme-primary">{t('logOut')}</h2>
 				<p
-					className="text-theme-primary 
+					className="text-theme-primary
 				 mb-6 text-[16px]"
 				>
 					{t('confirmLogOut')}
