@@ -106,36 +106,40 @@ export const authenticateEmail = createAsyncThunk('auth/authenticateEmail', asyn
 	if (!mezon?.clientRef.current) {
 		return thunkAPI.rejectWithValue('Client not initialized');
 	}
-	const session = await mezon?.clientRef.current?.authenticateEmail(email, password);
-	if (session && session?.id_token) {
-		const proofInput = {
-			jwt: session.id_token
-		};
-
-		await thunkAPI.dispatch(walletActions.fetchZkProofs(proofInput));
-	}
-	if (!session) {
-		return thunkAPI.rejectWithValue('Invalid session');
-	}
-
-	let merged: ApiSession;
 	try {
-		merged = await persistSessionConnectAfterLogin(mezon, session);
-	} catch (error) {
-		return thunkAPI.rejectWithValue((error as Error)?.message || 'Connect failed');
-	}
+		const session = await mezon?.clientRef.current?.authenticateEmail(email, password);
+		if (session && session?.id_token) {
+			const proofInput = {
+				jwt: session.id_token
+			};
 
-	mezon.clientRef.current.onrefreshsession = (sessionNew: ApiSession) => {
-		console.warn('Login Email Refresh Session');
-		thunkAPI.dispatch(authActions.setSessionId(sessionNew.session_id));
-		mezon.sessionRef.current = {
-			...(mezon.sessionRef.current as ApiSession),
-			...sessionNew,
-			session_id: sessionNew.session_id
+			await thunkAPI.dispatch(walletActions.fetchZkProofs(proofInput));
+		}
+		if (!session) {
+			return thunkAPI.rejectWithValue('Invalid session');
+		}
+
+		let merged: ApiSession;
+		try {
+			merged = await persistSessionConnectAfterLogin(mezon, session);
+		} catch (error) {
+			return thunkAPI.rejectWithValue((error as Error)?.message || 'Connect failed');
+		}
+
+		mezon.clientRef.current.onrefreshsession = (sessionNew: ApiSession) => {
+			console.warn('Login Email Refresh Session');
+			thunkAPI.dispatch(authActions.setSessionId(sessionNew.session_id));
+			mezon.sessionRef.current = {
+				...(mezon.sessionRef.current as ApiSession),
+				...sessionNew,
+				session_id: sessionNew.session_id
+			};
 		};
-	};
 
-	return normalizeSession(merged);
+		return normalizeSession(merged);
+	} catch (error) {
+		return thunkAPI.rejectWithValue(error);
+	}
 });
 
 export const authenticateMezon = createAsyncThunk('auth/authenticateMezon', async (code: string, thunkAPI) => {
@@ -285,7 +289,6 @@ export const authenticatePhoneSMSOTPRequest = createAsyncThunk(
 export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platform }: { device_id?: string; platform?: string }, thunkAPI) => {
 	const mezon = getMezonCtx(thunkAPI);
 	const sessionState = selectOthersSession(thunkAPI.getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
-	await mezon?.logOutMezon(device_id, platform, !sessionState);
 	mezon.createClient();
 	thunkAPI.dispatch(authActions.setLogout());
 	thunkAPI.dispatch(walletActions.setLogout());
@@ -298,6 +301,11 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 		restoreKey.push('mezon_session');
 	}
 	restoreLocalStorage(restoreKey);
+	try {
+		await mezon?.logOutMezon(device_id, platform, !sessionState);
+	} catch (error) {
+		console.error('error: ', error);
+	}
 });
 
 export const createQRLogin = createAsyncThunk('auth/getQRCode', async (_, thunkAPI) => {

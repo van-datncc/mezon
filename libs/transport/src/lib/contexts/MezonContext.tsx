@@ -14,7 +14,6 @@ import {
 import { resetMezonConnectInFlight, resetMezonSocketReconnectInFlight } from '../reconnectMezonSocket';
 import { socketState } from '../socketState';
 
-
 let sessionRefreshFailCount = 0;
 let sessionRefreshBlocked = false;
 
@@ -22,7 +21,6 @@ export function resetSessionRefreshBlock() {
 	sessionRefreshFailCount = 0;
 	sessionRefreshBlocked = false;
 }
-
 
 export const DEFAULT_WS_URL = 'sock.mezon.ai';
 export const SESSION_STORAGE_KEY = 'mezon_session';
@@ -34,7 +32,6 @@ type MezonContextProviderProps = {
 	connect?: boolean;
 	isFromMobile?: boolean;
 };
-
 
 const saveMezonConfigToStorage = (host: string, port: string, useSSL: boolean, apiUrl: string, wsUrl?: string) => {
 	try {
@@ -210,9 +207,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		(newSession: ApiSession) => {
 			sessionRef.current = newSession;
 			extractAndSaveConfig(newSession, isFromMobile);
-			if (isFromMobile) {
-		
-			} else if (typeof window !== 'undefined') {
+			if (typeof window !== 'undefined') {
 				window.dispatchEvent(
 					new CustomEvent('mezon:session-refreshed', {
 						detail: { session: newSession }
@@ -258,7 +253,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					...sessionRef.current,
 					session_id: sessionNew.session_id
 				} as ApiSession);
-				
 
 				localStorage.setItem('persist:auth', authData);
 			};
@@ -314,7 +308,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 	const createClient = useCallback(async () => {
 		const client = await createMezonClient(mezon);
-		
+
 		clientRef.current = client;
 
 		client.onrefreshsession = (session: ApiSession) => {
@@ -511,7 +505,14 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			resetMezonSocketReconnectInFlight();
 			resetMezonConnectInFlight();
 			clearSessionRefreshFromStorage();
-
+			if (clientRef.current) {
+				clientRef.current.setBasePath(
+					process.env.NX_CHAT_APP_API_GW_HOST as string,
+					process.env.NX_CHAT_APP_API_GW_PORT as string,
+					process.env.NX_CHAT_APP_API_SECURE === 'true'
+				);
+			}
+			clearSessionFromStorage();
 			if (clientRef.current && sessionRef.current && sessionRef.current?.token) {
 				await clientRef.current.sessionLogout(
 					sessionRef.current,
@@ -520,16 +521,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 					device_id || '',
 					platform || ''
 				);
-
 				sessionRef.current = null;
-				if (clearSession) {
-					clearSessionFromStorage();
-					clientRef.current.setBasePath(
-						process.env.NX_CHAT_APP_API_GW_HOST as string,
-						process.env.NX_CHAT_APP_API_GW_PORT as string,
-						process.env.NX_CHAT_APP_API_SECURE === 'true'
-					);
-				}
 			}
 		},
 		[socketRef]
