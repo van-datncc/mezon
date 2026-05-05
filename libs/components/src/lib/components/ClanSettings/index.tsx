@@ -182,7 +182,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 							!isSidebarOpen ? 'hidden sbm:flex' : 'flex fixed sbm:relative left-0 top-0 h-full z-50 sbm:z-auto'
 						} w-1/6 xl:w-1/4 min-w-56 relative bg-theme-setting-nav text-theme-primary ${closeMenu && !menu && window.innerWidth >= 768 ? 'hidden' : ''}`}
 					>
-						<div className="overflow-y-auto sbm:h-auto sbm:flex-1 h-full">
+						<div className="overflow-y-auto sbm:h-auto sbm:flex-1 h-full thread-scroll">
 							<SettingSidebar
 								onClickItem={handleSettingItemClick}
 								handleMenu={(value: boolean) => setMenu(value)}
