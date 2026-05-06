@@ -351,10 +351,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			throw new Error('Mezon client not initialized');
 		}
 		const session = await clientRef.current.checkLoginRequest(LoginRequest);
-		const config = extractAndSaveConfig(session, isFromMobile);
-		if (config) {
-			clientRef.current.setBasePath(config.host, config.port, config.useSSL);
-		}
 
 		return session;
 	}, []);
@@ -384,10 +380,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const merged: ApiSession = { ...session, ws_url: wsUrl };
 			sessionRef.current = merged;
 
-			const config = extractAndSaveConfig(merged, isFromMobile);
-			if (config) {
-				clientRef.current.setBasePath(config.host, config.port, config.useSSL);
-			}
 			if (!merged.token && !merged.session_id) {
 				throw new Error('Mezon connect lost data');
 			}
@@ -421,10 +413,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const merged: ApiSession = { ...session, ws_url: wsUrl };
 			sessionRef.current = merged;
 
-			const config = extractAndSaveConfig(merged);
-			if (config) {
-				clientRef.current.setBasePath(config.host, config.port, config.useSSL);
-			}
 			if (!merged.token && !merged.session_id) {
 				throw new Error('Mezon connect lost data');
 			}
@@ -465,11 +453,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const merged: ApiSession = { ...session, ws_url: wsUrl };
 			sessionRef.current = merged;
 
-			const config = extractAndSaveConfig(merged);
-			if (config) {
-				clientRef.current.setBasePath(config.host, config.port, config.useSSL);
-			}
-
 			if (!merged.token && !merged.session_id) {
 				throw new Error('Mezon connect lost data');
 			}
@@ -505,13 +488,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			resetMezonSocketReconnectInFlight();
 			resetMezonConnectInFlight();
 			clearSessionRefreshFromStorage();
-			if (clientRef.current) {
-				clientRef.current.setBasePath(
-					process.env.NX_CHAT_APP_API_GW_HOST as string,
-					process.env.NX_CHAT_APP_API_GW_PORT as string,
-					process.env.NX_CHAT_APP_API_SECURE === 'true'
-				);
-			}
+
 			clearSessionFromStorage();
 			if (clientRef.current && sessionRef.current && sessionRef.current?.token) {
 				await clientRef.current.sessionLogout(
