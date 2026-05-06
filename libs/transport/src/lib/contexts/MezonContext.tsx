@@ -365,7 +365,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		const useSSL = process.env.NX_CHAT_APP_API_SECURE === 'true';
 		const scheme = useSSL ? 'https://' : 'http://';
 		const basePath = `${scheme}${process.env.NX_CHAT_APP_API_GW_HOST}:${process.env.NX_CHAT_APP_API_GW_PORT}`;
-		const session = await clientRef.current.confirmLogin(sessionRef.current, basePath, confirmRequest);
+		const session = await clientRef.current.confirmLogin(sessionRef.current, confirmRequest);
 		return session;
 	}, []);
 
