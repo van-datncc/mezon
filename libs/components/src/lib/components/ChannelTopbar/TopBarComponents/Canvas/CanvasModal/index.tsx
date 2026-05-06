@@ -1,6 +1,7 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
+	canvasAPIActions,
 	selectCanvasIdsByChannelId,
 	selectCurrentChannelChannelId,
 	selectCurrentChannelCreatorId,
@@ -17,6 +18,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import ModalConfirm from '../../../../ModalConfirm';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
 import SearchCanvas from './SearchCanvas';
@@ -28,6 +30,7 @@ type CanvasProps = {
 
 const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const { t } = useTranslation('channelTopbar');
+	const { t: tCommon } = useTranslation('common');
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { canvasId: currentCanvasId } = useParams<{ canvasId: string }>();
@@ -38,6 +41,12 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [keywordSearch, setKeywordSearch] = useState('');
 	const [selectedCanvasId, setSelectedCanvasId] = useState<string | null>(currentCanvasId || null);
+	const [confirmModalProps, setConfirmModalProps] = useState<{
+		canvasId: string;
+		canvasTitle: string;
+		channelId: string;
+		clanId: string;
+	} | null>(null);
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, channelId || ''));
 	const filteredCanvases = useMemo(() => {
 		if (!keywordSearch) return canvases;
@@ -64,6 +73,30 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 
 	const handleSelectCanvas = (canvasId: string) => {
 		setSelectedCanvasId(canvasId);
+	};
+
+	const handleDeleteCanvas = async () => {
+		if (confirmModalProps && confirmModalProps.channelId && confirmModalProps.clanId) {
+			const body = {
+				id: confirmModalProps.canvasId,
+				channel_id: confirmModalProps.channelId,
+				clan_id: confirmModalProps.clanId
+			};
+			await dispatch(canvasAPIActions.deleteCanvas(body));
+			dispatch(canvasAPIActions.removeOneCanvas({ channelId: confirmModalProps.channelId, canvasId: confirmModalProps.canvasId }));
+			if (currentCanvasId === confirmModalProps.canvasId) {
+				dispatch(appActions.setIsShowCanvas(false));
+				const redirectPath = `/chat/clans/${confirmModalProps.clanId}/channels/${confirmModalProps.channelId}`;
+				navigate(redirectPath);
+			}
+		}
+		setConfirmModalProps(null);
+	};
+
+	const handleOpenConfirmDelete = (canvasId: string, canvasTitle: string) => {
+		if (channelId && currentClanId) {
+			setConfirmModalProps({ canvasId, canvasTitle, channelId, clanId: currentClanId });
+		}
 	};
 
 	const modalRef = useRef<HTMLDivElement>(null);
@@ -114,12 +147,23 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 								creatorIdChannel={creatorChannelId}
 								selectedCanvasId={selectedCanvasId}
 								onSelectCanvas={handleSelectCanvas}
+								onDeleteCanvas={handleOpenConfirmDelete}
 							/>
 						);
 					})}
 
 					{!canvases?.length && <EmptyCanvas onClick={handleCreateCanvas} />}
 				</div>
+				{confirmModalProps && (
+					<ModalConfirm
+						handleCancel={() => setConfirmModalProps(null)}
+						handleConfirm={handleDeleteCanvas}
+						modalName={confirmModalProps.canvasTitle}
+						title="Delete"
+						buttonName="Delete"
+						message={tCommon('canvas.deleteMessage')}
+					/>
+				)}
 				{/* {totalPages > 1 && (
 					<div className="py-2">
 						<Pagination
