@@ -260,13 +260,15 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const currentTime = Math.floor(Date.now() / 1000);
 			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
-			if (isArchived || channel.active === 0) {
+			try {
 				await dispatch(
 					threadsActions.writeActiveArchivedThread({
 						clanId: channel.clan_id ?? '',
 						channelId: channel.channel_id ?? ''
 					})
-				);
+				).unwrap();
+			} catch (e) {
+				// Unarchive failed, but message send will continue
 			}
 			if (needsJoin && joinningToThread) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: channel.id, activeCode: ThreadStatus.joined }));
@@ -392,7 +394,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					await addMemberToThread(currentChannel!, usersNotExistingInThread);
 				}
 
-				handleThreadActivation(currentChannel);
+				await handleThreadActivation(currentChannel);
 
 				if (isReplyOnChannel) {
 					props.onSend(
@@ -568,7 +570,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				return;
 			}
 
-			handleThreadActivation(currentChannel);
+			await handleThreadActivation(currentChannel);
 
 			if (isReplyOnChannel) {
 				props.onSend(
