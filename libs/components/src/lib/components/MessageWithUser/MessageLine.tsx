@@ -4,13 +4,11 @@ import { Icons } from '@mezon/ui';
 import type { IExtendedMessage } from '@mezon/utils';
 import { EBacktickType, ETokenMessage, INVITE_URL_REGEX, TypeMessage, convertMarkdown } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { CanvasHashtag, ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
-import { useFetchClanBanner } from '../../hooks';
-import type { InviteBannerData } from '../MessageBox/types';
 import OgpEmbed from './OgpEmbed';
 
 interface RenderContentProps {
@@ -178,35 +176,6 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 	const inviteId = url.match(INVITE_URL_REGEX)?.[1] || '';
 	const inviteInfo = useSelector(selectInviteById(inviteId || ''));
 	const joinedClan = useSelector(selectClanById(inviteInfo?.clan_id || ''));
-	const { fetchClanBannerById } = useFetchClanBanner();
-
-	const resolveInviteBanner = (invite: InviteBannerData | Record<string, unknown> | null | undefined): string => {
-		const b = invite && typeof invite === 'object' ? (invite as InviteBannerData) : null;
-		return b?.banner || b?.clan_banner || '';
-	};
-
-	useEffect(() => {
-		if (!inviteId || inviteInfo) return;
-		dispatch(inviteActions.getLinkInvite({ inviteId }));
-	}, [dispatch, inviteId, inviteInfo]);
-
-	useEffect(() => {
-		let mounted = true;
-		(async () => {
-			const resolved = resolveInviteBanner(inviteInfo as InviteBannerData | Record<string, unknown> | null | undefined);
-			if (resolved) {
-				if (mounted) setBanner(resolved);
-				return;
-			}
-			if (inviteInfo?.clan_id) {
-				const fallbackBanner = await fetchClanBannerById(inviteInfo.clan_id);
-				if (mounted && fallbackBanner) setBanner(fallbackBanner);
-			}
-		})();
-		return () => {
-			mounted = false;
-		};
-	}, [inviteInfo?.clan_id, inviteInfo, fetchClanBannerById]);
 
 	const clanTitle = inviteInfo?.clan_name || element.title || t('unknownClan');
 	const memberCount = Number(inviteInfo?.member_count || 0);
