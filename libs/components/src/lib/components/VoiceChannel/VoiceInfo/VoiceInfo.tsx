@@ -181,7 +181,7 @@ const VoiceInfo = React.memo(() => {
 							) : null
 						}
 						onClick={handleToggleShareCamera}
-						icon={showCamera ? <Icons.VoiceCameraIcon className="w-5 h-5" /> : <Icons.VoiceCameraDisabledIcon className="w-5 h-5" />}
+						icon={showCamera ? <Icons.VoiceCameraIcon className="w-6 h-6" /> : <Icons.VoiceCameraDisabledIcon className="w-6 h-6" />}
 					/>
 				)}
 
@@ -190,7 +190,7 @@ const VoiceInfo = React.memo(() => {
 						<span className="bg-[#2B2B2B] p-[6px] text-[14px] rounded">{t(showScreen ? 'stopScreenShare' : 'shareYourScreen')}</span>
 					}
 					onClick={handleToggleShareScreen}
-					icon={showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5" /> : <Icons.VoiceScreenShareIcon className="w-5 h-5" />}
+					icon={showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5 " /> : <Icons.VoiceScreenShareIcon className="w-5 h-5 " />}
 				/>
 				<ButtonControlVoice
 					danger={true}
