@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "クラン使用量概要に戻る",
+		"meetingRooms": "会議室",
 		"clanUsageStatisticsReport": "クラン使用量統計レポート",
 		"dashboardReport": "ダッシュボード",
 		"report": "レポート"
@@ -70,5 +71,27 @@
 		"tooltip": "この列で昇順/降順にソート",
 		"sortedAsc": "昇順にソート済み",
 		"sortedDesc": "降順にソート済み"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "すべてのステータス",
+		"pending": "保留中",
+		"completed": "完了",
+		"finalRoom": "最終ルーム",
+		"failed": "失敗",
+		"noTimeFilter": "時間フィルターなし",
+		"last12Hours": "過去12時間",
+		"last24Hours": "過去24時間",
+		"last2Days": "過去2日間",
+		"last7Days": "過去7日間",
+		"searchByRoomNameOrParticipant": "ルーム名または参加者で検索..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "ルーム名",
+		"status": "ステータス",
+		"createdAt": "作成日",
+		"completedAt": "完了日",
+		"actions": "操作",
+		"viewDetails": "詳細を表示",
+		"noRoomsFound": "ルームが見つかりません。"
 	}
 }

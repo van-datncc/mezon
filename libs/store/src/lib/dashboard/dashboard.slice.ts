@@ -326,6 +326,67 @@ export const exportUsersCsv = createAsyncThunk(
 
 export const DASHBOARD_FEATURE_KEY = 'dashboard';
 
+export interface RoomParticipant {
+	participantIdentity: string;
+	timestamp: string;
+}
+
+export interface Room {
+	id: string;
+	roomName: string;
+	status: string;
+	createdAt: string;
+	participants: RoomParticipant[];
+	finalizedAt: string;
+	completedAt: string;
+}
+
+interface ListRoomsApiResponse {
+	status: string;
+	total: number | string;
+	limit: number;
+	page: number;
+	rooms: Array<{
+		id: string;
+		room_name: string;
+		status: string;
+		created_at: string;
+		participants: Array<{ participant_identity: string; timestamp: string }>;
+		finalized_at: string;
+		completed_at: string;
+	}>;
+}
+
+export const fetchRooms = createAsyncThunk<
+	ListRoomsApiResponse,
+	{ status?: string; search?: string; startDate?: string; endDate?: string; limit?: number; page?: number }
+>('dashboard/fetchRooms', async ({ status, search, startDate, endDate, limit = 10, page = 1 }, thunkAPI) => {
+	try {
+		const base = API_BASE || '';
+		const state = thunkAPI.getState() as RootState;
+		const session = selectSession(state as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+		const token = session?.session_id;
+		const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+		const params = new URLSearchParams();
+		if (status) params.append('status', status);
+		if (search) params.append('search', search);
+		if (startDate) params.append('start_date', startDate);
+		if (endDate) params.append('end_date', endDate);
+		params.append('limit', String(limit));
+		params.append('page', String(page));
+
+		const res = await fetch(`${base}/dashboard/rooms?${params.toString()}`, { headers });
+		if (!res.ok) {
+			const text = await res.text().catch(() => '');
+			return thunkAPI.rejectWithValue(text || res.statusText);
+		}
+		return (await res.json()) as ListRoomsApiResponse;
+	} catch (err) {
+		return thunkAPI.rejectWithValue(err);
+	}
+});
+
 export interface DashboardState {
 	loading: boolean;
 	stats: Record<string, number>;
@@ -340,6 +401,11 @@ export interface DashboardState {
 	usersLoading: boolean;
 	tableLoading: boolean;
 	exportLoading: boolean;
+	roomsLoading: boolean;
+	rooms: Room[];
+	roomsTotal: number;
+	roomsLimit: number;
+	roomsPage: number;
 	lastUpdated?: number | null;
 	error?: string | null;
 }
@@ -358,6 +424,11 @@ export const initialDashboardState: DashboardState = {
 	usersLoading: false,
 	tableLoading: false,
 	exportLoading: false,
+	roomsLoading: false,
+	rooms: [],
+	roomsTotal: 0,
+	roomsLimit: 10,
+	roomsPage: 1,
 	lastUpdated: null,
 	error: null
 };
@@ -542,6 +613,34 @@ export const dashboardSlice = createSlice({
 			.addCase(exportUsersCsv.rejected, (state, action) => {
 				state.exportLoading = false;
 				state.error = action.payload as string | null;
+			})
+
+			.addCase(fetchRooms.pending, (state) => {
+				state.roomsLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchRooms.fulfilled, (state, action) => {
+				state.roomsLoading = false;
+				const payload = action.payload;
+				state.roomsTotal = Number(payload.total ?? 0);
+				state.roomsLimit = Number(payload.limit ?? 10);
+				state.roomsPage = Number(payload.page ?? 1);
+				state.rooms = (payload.rooms ?? []).map((r) => ({
+					id: r.id ?? '',
+					roomName: r.room_name ?? '',
+					status: r.status ?? '',
+					createdAt: r.created_at ?? '',
+					participants: (r.participants ?? []).map((p) => ({
+						participantIdentity: p.participant_identity ?? '',
+						timestamp: p.timestamp ?? ''
+					})),
+					finalizedAt: r.finalized_at ?? '',
+					completedAt: r.completed_at ?? ''
+				}));
+			})
+			.addCase(fetchRooms.rejected, (state, action) => {
+				state.roomsLoading = false;
+				state.error = action.payload as string | null;
 			});
 	}
 });
@@ -557,6 +656,13 @@ export const selectDashboardUsageTotals = (state: RootState) => selectDashboard(
 export const selectDashboardChartLoading = (state: RootState) => selectDashboard(state).chartLoading;
 export const selectDashboardTableLoading = (state: RootState) => selectDashboard(state).tableLoading;
 export const selectDashboardExportLoading = (state: RootState) => selectDashboard(state).exportLoading;
+export const selectRooms = (state: RootState): Room[] => selectDashboard(state).rooms;
+export const selectRoomsLoading = (state: RootState): boolean => selectDashboard(state).roomsLoading;
+export const selectRoomsPagination = (state: RootState): { total: number; limit: number; page: number } => ({
+	total: selectDashboard(state).roomsTotal,
+	limit: selectDashboard(state).roomsLimit,
+	page: selectDashboard(state).roomsPage
+});
 
 export const selectClanChannels = (state: RootState, clanId: string) => {
 	const raw = selectDashboard(state).channelsDataByClan?.[clanId]?.data?.channels;

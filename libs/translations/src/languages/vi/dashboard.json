@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Quay lại tổng quan sử dụng Clan",
+		"meetingRooms": "Phòng họp",
 		"clanUsageStatisticsReport": "Báo Cáo Thống Kê Sử Dụng Clan",
 		"dashboardReport": "Bảng điều khiển",
 		"report": "Báo cáo"
@@ -70,5 +71,27 @@
 		"tooltip": "Sắp xếp tăng/giảm theo cột này",
 		"sortedAsc": "Đã sắp xếp tăng dần",
 		"sortedDesc": "Đã sắp xếp giảm dần"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Tất cả trạng thái",
+		"pending": "Đang chờ",
+		"completed": "Hoàn thành",
+		"finalRoom": "Phòng cuối",
+		"failed": "Thất bại",
+		"noTimeFilter": "Không lọc theo thời gian",
+		"last12Hours": "12 giờ qua",
+		"last24Hours": "24 giờ qua",
+		"last2Days": "2 ngày qua",
+		"last7Days": "7 ngày qua",
+		"searchByRoomNameOrParticipant": "Tìm kiếm theo tên phòng hoặc người tham gia..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Tên phòng",
+		"status": "Trạng thái",
+		"createdAt": "Ngày tạo",
+		"completedAt": "Ngày hoàn thành",
+		"actions": "Hành động",
+		"viewDetails": "Xem chi tiết",
+		"noRoomsFound": "Không tìm thấy phòng nào."
 	}
 }

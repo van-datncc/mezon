@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "클랜 사용 개요로 돌아가기",
+		"meetingRooms": "회의실",
 		"clanUsageStatisticsReport": "클랜 사용 통계 보고서",
 		"dashboardReport": "대시보드",
 		"report": "보고서"
@@ -70,5 +71,27 @@
 		"tooltip": "이 열로 정렬 증가/감소",
 		"sortedAsc": "오름차순 정렬됨",
 		"sortedDesc": "내림차순 정렬됨"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "모든 상태",
+		"pending": "대기 중",
+		"completed": "완료",
+		"finalRoom": "최종 방",
+		"failed": "실패",
+		"noTimeFilter": "시간 필터 없음",
+		"last12Hours": "지난 12시간",
+		"last24Hours": "지난 24시간",
+		"last2Days": "지난 2일",
+		"last7Days": "지난 7일",
+		"searchByRoomNameOrParticipant": "방 이름 또는 참가자로 검색..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "방 이름",
+		"status": "상태",
+		"createdAt": "생성일",
+		"completedAt": "완료일",
+		"actions": "작업",
+		"viewDetails": "세부 정보 보기",
+		"noRoomsFound": "방을 찾을 수 없습니다."
 	}
 }
