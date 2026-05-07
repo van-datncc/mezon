@@ -2921,7 +2921,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					resolveWsUrl: resolveSessionWsUrl,
 					persistSession: persistReconnectSession,
 					onSessionRefreshed: onReconnectSessionRefreshed,
-					sessionIdOverride: 'test'
 				});
 
 				if (result.status === 'RECONNECTING') {
