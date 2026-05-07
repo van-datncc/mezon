@@ -1,16 +1,7 @@
 import type { ApiSession, Client } from 'mezon-js';
 import type { MutableRefObject } from 'react';
-import { firstValueFrom, timer } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
 
-import { waitForOnline$ } from './network';
 import { socketState } from './socketState';
-
-const MAX_WEBSOCKET_FAILS = 6;
-const MIN_WEBSOCKET_RETRY_TIME = 1000;
-const MAX_WEBSOCKET_RETRY_TIME = 30000;
-const JITTER_RANGE = 1000;
-const FAST_RETRY_ATTEMPTS = 5;
 
 let connectInFlight: Promise<ApiSession | null> | null = null;
 let reconnectInFlight = false;
@@ -22,15 +13,6 @@ export function resetMezonSocketReconnectInFlight(): void {
 export function resetMezonConnectInFlight(): void {
 	connectInFlight = null;
 }
-
-const waitForNetworkAndDelay = (delayMs: number): Promise<void> => {
-	return firstValueFrom(
-		waitForOnline$().pipe(
-			switchMap(() => timer(delayMs)),
-			take(1)
-		)
-	).then(() => undefined);
-};
 
 export type ReconnectMezonSocketStatus = 'SUCCESS' | 'RECONNECTING' | 'MISSING_SESSION';
 
@@ -49,14 +31,12 @@ export type ConnectMezonSocketOptions = {
 	verbose?: boolean;
 };
 
-
 export function connectMezonSocketOnce(opts: ConnectMezonSocketOptions): Promise<ApiSession | null> {
 	const { client, sessionRef } = opts;
 
 	if (!sessionRef.current) {
 		return Promise.resolve(null);
 	}
-
 
 	if (connectInFlight) {
 		return connectInFlight;
@@ -69,17 +49,12 @@ export function connectMezonSocketOnce(opts: ConnectMezonSocketOptions): Promise
 		sessionRef.current = effectiveSession;
 		opts.persistSession?.(effectiveSession);
 
-		await client.connect(
-			effectiveSession.session_id || effectiveSession.token || '',
-			wsUrl,
-			opts.createStatus ?? true,
-			opts.verbose ?? false
-		);
+
+		await client.connect(effectiveSession.session_id || effectiveSession.token || '', wsUrl, opts.createStatus ?? true, opts.verbose ?? false);
 
 		socketState.status = 'connected';
 
 		client.onrefreshsession = (sessionNew: ApiSession) => {
-		
 			if (opts.onSessionRefreshed) {
 				opts.onSessionRefreshed(sessionNew, effectiveSession);
 				return;
@@ -109,7 +84,6 @@ export function connectMezonSocketOnce(opts: ConnectMezonSocketOptions): Promise
 export async function reconnectMezonSocketWithRetry(options: {
 	client: Client;
 	sessionRef: MutableRefObject<ApiSession | null>;
-	isFromMobile: boolean;
 	resolveWsUrl: (session: Pick<ApiSession, 'ws_url'>) => string;
 	persistSession?: (effectiveSession: ApiSession) => void;
 	onSessionRefreshed?: (sessionNew: ApiSession, effectiveSession: ApiSession) => void;
@@ -118,7 +92,7 @@ export async function reconnectMezonSocketWithRetry(options: {
 		return { status: 'RECONNECTING', attempts: 0 };
 	}
 
-	const { client, sessionRef, isFromMobile, resolveWsUrl, persistSession, onSessionRefreshed } = options;
+	const { client, sessionRef, resolveWsUrl, persistSession, onSessionRefreshed } = options;
 
 	if (!sessionRef.current) {
 		return { status: 'MISSING_SESSION', attempts: 0 };
@@ -127,54 +101,21 @@ export async function reconnectMezonSocketWithRetry(options: {
 	reconnectInFlight = true;
 
 	try {
-		let failCount = 0;
+		const result = await connectMezonSocketOnce({
+			client,
+			sessionRef,
+			resolveWsUrl,
+			persistSession,
+			onSessionRefreshed
+		});
 
-		while (failCount < MAX_WEBSOCKET_FAILS) {
-			try {
-				
-				if (!sessionRef.current) {
-					console.log('[ReconnectFlow] Reconnect attempt aborted: session became null');
-					return { status: 'MISSING_SESSION', attempts: failCount };
-				}
-
-				const result = await connectMezonSocketOnce({
-					client,
-					sessionRef,
-					resolveWsUrl,
-					persistSession,
-					onSessionRefreshed
-				});
-
-				if (result === null) {
-					return { status: 'MISSING_SESSION', attempts: failCount + 1 };
-				}
-			
-				return { status: 'SUCCESS', attempts: failCount + 1 };
-			} catch (error) {
-				failCount++;
-
-				if (failCount >= MAX_WEBSOCKET_FAILS) {
-					console.log('[ReconnectFlow] Reconnect exhausted max retries');
-					throw new Error('Socket reconnection failed');
-				}
-
-				let retryTime: number;
-
-				if (isFromMobile) {
-					retryTime = 1000;
-				} else if (failCount <= FAST_RETRY_ATTEMPTS) {
-					retryTime = MIN_WEBSOCKET_RETRY_TIME + Math.random() * JITTER_RANGE;
-				} else {
-					const exponentialTime = MIN_WEBSOCKET_RETRY_TIME * Math.pow(2, failCount - FAST_RETRY_ATTEMPTS);
-					retryTime = Math.min(exponentialTime, MAX_WEBSOCKET_RETRY_TIME) + Math.random() * JITTER_RANGE;
-				}
-
-				
-				await waitForNetworkAndDelay(retryTime);
-			}
+		if (result === null) {
+			return { status: 'MISSING_SESSION', attempts: 1 };
 		}
 
-		throw new Error('Max reconnection attempts reached');
+		return { status: 'SUCCESS', attempts: 1 };
+	} catch {
+		throw new Error('Socket reconnection failed');
 	} finally {
 		reconnectInFlight = false;
 	}

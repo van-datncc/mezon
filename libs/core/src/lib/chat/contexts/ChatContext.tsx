@@ -125,6 +125,7 @@ import {
 	checkIsThread,
 	isBackgroundModeActive,
 	isLinuxDesktop,
+	isUiActive,
 	subBigInt
 } from '@mezon/utils';
 import type { Update } from '@reduxjs/toolkit';
@@ -157,7 +158,6 @@ import type {
 	ClanDeletedEvent,
 	ClanProfileUpdatedEvent,
 	ClanUpdatedEvent,
-	Client,
 	CustomStatusEvent,
 	DeleteAccountEvent,
 	EventEmoji,
@@ -192,16 +192,57 @@ import type {
 	VoiceLeavedEvent,
 	WebrtcSignalingFwd
 } from 'mezon-js';
-import { ChannelStreamMode, ChannelType, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
+import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONParse } from 'mezon-js';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Subject, interval } from 'rxjs';
-import { exhaustMap, takeWhile } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { exhaustMap, filter, takeWhile } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
+import { consumeSocketReconnectBudget, refundSocketReconnectBudgetSlot, resetSocketReconnectBudget } from '../utils/socketReconnectBudget';
 import { handleGroupCallSocketEvent } from './groupCallSocketHandler';
 
 const MobileEventEmitter = new EventEmitter();
+
+const RECONNECT_CONNECT_WATCHDOG_MS = Client.DefaultConnectTimeoutMs + 8000;
+
+const RECONNECT_RETRY_BASE_MS = 500;
+const RECONNECT_RETRY_JITTER_MS = 400;
+
+function randomReconnectSpacingMs(): number {
+	return RECONNECT_RETRY_BASE_MS + Math.floor(Math.random() * RECONNECT_RETRY_JITTER_MS);
+}
+
+function reconnectJitterTicker$(): Observable<number> {
+	return new Observable<number>((subscriber) => {
+		let cancelled = false;
+		let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+		const queueNext = () => {
+			if (cancelled) {
+				return;
+			}
+			timeoutId = setTimeout(() => {
+				timeoutId = null;
+				if (cancelled) {
+					return;
+				}
+				subscriber.next(0);
+				queueNext();
+			}, randomReconnectSpacingMs());
+		};
+
+		queueNext();
+		return () => {
+			cancelled = true;
+			if (timeoutId !== null) {
+				clearTimeout(timeoutId);
+			}
+		};
+	});
+}
+
+type ReconnectWaveTickResult = boolean | 'BUDGET_EXHAUSTED';
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -2603,7 +2644,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	);
 
 	const runPostReconnectActions = useCallback(() => {
-		const store = getStore();
+		resetSocketReconnectBudget();
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
 		dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
@@ -2612,15 +2653,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		}
 	}, [dispatch]);
 
+	const onServerDisconnectStreakLogout = useCallback(
+		(_evt: Event, streak: number) => {
+			console.error('[ReconnectFlow] Server disconnect streak logout', { streak });
+			captureSentryError(new Error(`serverDisconnectStreak=${String(streak)}`), 'SERVER_DISCONNECT_STREAK_LOGOUT');
+			resetRefreshState();
+			dispatch(authActions.setLogout());
+			dispatch(walletActions.setLogout());
+		},
+		[dispatch]
+	);
+
 	const setCallbackEventFn = React.useCallback(
 		(socket: Client) => {
 			socket.onrefreshsession = onrefresssession;
 
-
 			socket.onconnect = (_evt: Event) => {
 				socketState.status = 'connected';
 			};
-
 
 			socket.onreconnect = (_evt: Event) => {
 				setCallbackEventFn(socket as Client);
@@ -2708,6 +2758,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.oneventcreated = oneventcreated;
 
 			socket.onheartbeattimeout = onHeartbeatTimeout;
+
+			socket.onserverdisconnectstreaklogout = onServerDisconnectStreakLogout;
 
 			socket.oncoffeegiven = oncoffeegiven;
 
@@ -2798,7 +2850,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			onaddfriend,
 			onbanneduser,
 			onrefresssession,
-			runPostReconnectActions
+			runPostReconnectActions,
+			onServerDisconnectStreakLogout
 		]
 	);
 
@@ -2811,21 +2864,24 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[isMobile]
 	);
 
-	const onReconnectSessionRefreshed = useCallback((sessionNew: ApiSession, effectiveSession: ApiSession) => {
-		getStore().dispatch(authActions.setSessionId(sessionNew.session_id));
-		sessionRef.current = {
-			...effectiveSession,
-			session_id: sessionNew.session_id
-		};
-	}, [sessionRef]);
+	const onReconnectSessionRefreshed = useCallback(
+		(sessionNew: ApiSession, effectiveSession: ApiSession) => {
+			getStore().dispatch(authActions.setSessionId(sessionNew.session_id));
+			sessionRef.current = {
+				...effectiveSession,
+				session_id: sessionNew.session_id
+			};
+		},
+		[sessionRef]
+	);
 
 	const executeReconnect = useCallback(
-		async (_socketType: string, client: Client) => {
-			socketState.status = 'connecting';
+		async (_socketType: string, client: Client): Promise<ReconnectWaveTickResult> => {
 			const store = getStore();
 			const session = selectSession(store.getState()) as ApiSession | null;
 
 			if (!session?.token?.trim() && !session?.session_id?.trim()) {
+				socketState.status = 'disconnected';
 				return false;
 			}
 			sessionRef.current = {
@@ -2833,57 +2889,81 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				ws_url: resolveSessionWsUrl(session)
 			} as ApiSession;
 
-			const result = await reconnectMezonSocketWithRetry({
-				client,
-				sessionRef,
-				isFromMobile: isMobile,
-				resolveWsUrl: resolveSessionWsUrl,
-				persistSession: persistReconnectSession,
-				onSessionRefreshed: onReconnectSessionRefreshed
-			});
-
-			if (result.status === 'RECONNECTING') {
-				return false;
-			}
-			if (result.status === 'MISSING_SESSION') {
-				throw new Error('Socket reconnection failed: missing client or session');
+			if (!consumeSocketReconnectBudget()) {
+				socketState.status = 'disconnected';
+				dispatch(
+					toastActions.addToast({
+						message: 'Reconnect paused: too many attempts in 2 minutes. Try again shortly.',
+						type: 'warning',
+						autoClose: 8000,
+						id: 'SOCKET_RECONNECT_BUDGET'
+					})
+				);
+				return 'BUDGET_EXHAUSTED';
 			}
 
-			return true;
+			socketState.status = 'connecting';
+
+			let watchdogId: number | undefined;
+			if (typeof window !== 'undefined') {
+				watchdogId = window.setTimeout(() => {
+					if (socketState.status === 'connecting') {
+						socketState.status = 'disconnected';
+						console.warn('[ReconnectFlow] connect watchdog elapsed while still connecting');
+					}
+				}, RECONNECT_CONNECT_WATCHDOG_MS);
+			}
+
+			try {
+				const result = await reconnectMezonSocketWithRetry({
+					client,
+					sessionRef,
+					resolveWsUrl: resolveSessionWsUrl,
+					persistSession: persistReconnectSession,
+					onSessionRefreshed: onReconnectSessionRefreshed,
+					sessionIdOverride: 'test'
+				});
+
+				if (result.status === 'RECONNECTING') {
+					refundSocketReconnectBudgetSlot();
+					return false;
+				}
+				if (result.status === 'MISSING_SESSION') {
+					socketState.status = 'disconnected';
+					throw new Error('Socket reconnection failed: missing client or session');
+				}
+
+				return true;
+			} catch (error) {
+				socketState.status = 'disconnected';
+				throw error;
+			} finally {
+				if (watchdogId !== undefined) {
+					clearTimeout(watchdogId);
+				}
+			}
 		},
-		[dispatch, sessionRef, isMobile, persistReconnectSession, onReconnectSessionRefreshed]
+		[sessionRef, persistReconnectSession, onReconnectSessionRefreshed, dispatch]
 	);
 
 	useEffect(() => {
 		const subscription = reconnect$
 			.pipe(
 				exhaustMap((socketType) =>
-					interval(500).pipe(
-						exhaustMap(async () => {
-							if (clientRef.current) {
-								
-								try {
-									const success = await executeReconnect(socketType, clientRef.current);
-									return success;
-								} catch (error) {
-									console.log('[ReconnectFlow] reconnect tick error', {
-										error: error instanceof Error ? error.message : String(error)
-									});
-									dispatch(
-										toastActions.addToast({
-											message: 'Socket reconnecting...',
-											type: 'info',
-											autoClose: 3000,
-											id: 'SOCKET_RECONNECTING_ERROR'
-										})
-									);
-									captureSentryError(error, 'SOCKET_RECONNECT');
-									return false; // Resolves as an Observable<boolean>
-								}
+					reconnectJitterTicker$().pipe(
+						filter(() => isUiActive() && (typeof navigator === 'undefined' || navigator.onLine !== false)),
+						exhaustMap(async (): Promise<ReconnectWaveTickResult> => {
+							if (!clientRef.current) {
+								return false;
 							}
-							return false;
+							try {
+								return await executeReconnect(socketType, clientRef.current);
+							} catch (error) {
+								captureSentryError(error, 'SOCKET_RECONNECT');
+								return false;
+							}
 						}),
-						takeWhile((success) => !success, true)
+						takeWhile((result) => result !== true && result !== 'BUDGET_EXHAUSTED', true)
 					)
 				)
 			)
@@ -2907,14 +2987,21 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		};
 	}, [dispatch]);
 
+	useEffect(() => {
+		const onBudgetReset = () => {
+			dispatch(toastActions.removeToast('SOCKET_RECONNECT_BUDGET'));
+		};
+		window.addEventListener('mezon:socket-budget-reset', onBudgetReset);
+		return () => {
+			window.removeEventListener('mezon:socket-budget-reset', onBudgetReset);
+		};
+	}, [dispatch]);
+
 	const handleReconnect = useCallback(
 		(socketType: string) => {
-			if (socketState.status === 'connecting') {
-				return;
-			}
 			reconnect$.next(socketType);
 		},
-		[reconnect$, clientRef]
+		[reconnect$]
 	);
 
 	const ondisconnect = useCallback(() => {
@@ -2959,6 +3046,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.ondisconnect = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onheartbeattimeout = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onserverdisconnectstreaklogout = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserchannelremoved = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onuserclanremoved = () => {};
@@ -3002,12 +3093,15 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onunblockfriend = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onbanneduser = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onreconnect = () => {};
 		};
 	}, [
 		onchannelmessage,
 		onchannelpresence,
 		ondisconnect,
+		onHeartbeatTimeout,
+		onServerDisconnectStreakLogout,
 		onmessagetyping,
 		onmessagereaction,
 		onnotification,
@@ -3044,7 +3138,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		onpermissionset,
 		onpermissionchanged,
 		onunmuteevent,
-		onHeartbeatTimeout,
 		oneventcreated,
 		setCallbackEventFn,
 		oncoffeegiven,
