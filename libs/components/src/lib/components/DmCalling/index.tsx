@@ -257,21 +257,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					>
 						{!isShowMeetDM && (
 							<div className=" flex flex-col items-center">
-								<Icons.IconMeetDM
-									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowMeetDM={!isShowMeetDM}
-									isShowLine={true}
-								/>
+								<Icons.VoiceCameraDisabledIcon scale={1} />
 							</div>
 						)}
 
 						{isMuteMicrophone && (
 							<div className="flex flex-col items-center">
-								<Icons.Microphone
-									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isMuteMicrophone={isMuteMicrophone}
-									isShowLine={true}
-								/>
+								<Icons.VoiceMicDisabledIcon scale={2} />
 							</div>
 						)}
 					</div>
@@ -298,21 +290,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 						>
 							{!isRemoteVideo && (
 								<div className="flex flex-col items-center">
-									<Icons.IconMeetDM
-										className={`${!isRemoteVideo ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isShowMeetDM={!isRemoteVideo}
-										isShowLine={true}
-									/>
+									<Icons.VoiceCameraDisabledIcon scale={1} />
 								</div>
 							)}
 
 							{!isRemoteAudio && (
 								<div className="flex flex-col items-center">
-									<Icons.Microphone
-										className={`${!isRemoteAudio ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isMuteMicrophone={!isRemoteAudio}
-										isShowLine={true}
-									/>
+									<Icons.VoiceMicDisabledIcon scale={2} />
 								</div>
 							)}
 						</div>
@@ -350,13 +334,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								className={`h-[44px] w-[44px] sbm:h-[56px] sbm:w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 								onClick={() => onStartCall({ isVideoCall: true, isAnswer: true })}
 							>
-								<Icons.IconMeetDM />
+								<Icons.VoiceCameraIcon scale={1} />
 							</div>
 							<div
 								className={`h-[44px] w-[44px] sbm:h-[56px] sbm:w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 								onClick={() => onStartCall({ isVideoCall: false, isAnswer: true })}
 							>
-								<Icons.IconPhoneDM />
+								<Icons.VoiceMicIcon scale={2} />
 							</div>
 							<div
 								onClick={handleCloseCall}
@@ -368,24 +352,16 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					) : (
 						<div className="flex flex-row gap-1.5 sbm:gap-2 lg:gap-3 justify-center flex-wrap">
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 								onClick={toggleVideo}
 							>
-								<Icons.IconMeetDM
-									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowMeetDM={!isShowMeetDM}
-									isShowLine={true}
-								/>
+								{isShowMeetDM ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
 							</div>
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 								onClick={handleMuteToggle}
 							>
-								<Icons.Microphone
-									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isMuteMicrophone={isMuteMicrophone}
-									isShowLine={true}
-								/>
+								{isMuteMicrophone ? <Icons.VoiceMicDisabledIcon scale={2.5} /> : <Icons.VoiceMicIcon scale={2.5} />}
 							</div>
 
 							<Menu menu={menuDevice} className={'rounded-3xl'}>
