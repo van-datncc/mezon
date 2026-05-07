@@ -6,21 +6,30 @@ import useLastCallback from './useLastCallback';
 const blurCallbacks = createCallbackManager();
 const focusCallbacks = createCallbackManager();
 
-let isFocused = document.hasFocus();
+let isFocused = typeof document !== 'undefined' ? document.hasFocus() : true;
 
-window.addEventListener('blur', () => {
-	if (!isFocused) {
+let backgroundFocusListenersAttached = false;
+
+function ensureBackgroundFocusListeners(): void {
+	if (backgroundFocusListenersAttached || typeof window === 'undefined') {
 		return;
 	}
+	backgroundFocusListenersAttached = true;
+	isFocused = document.hasFocus();
+	window.addEventListener('blur', () => {
+		if (!isFocused) {
+			return;
+		}
 
-	isFocused = false;
-	blurCallbacks.runCallbacks();
-});
+		isFocused = false;
+		blurCallbacks.runCallbacks();
+	});
 
-window.addEventListener('focus', () => {
-	isFocused = true;
-	focusCallbacks.runCallbacks();
-});
+	window.addEventListener('focus', () => {
+		isFocused = true;
+		focusCallbacks.runCallbacks();
+	});
+}
 
 export function useBackgroundMode(onBlur?: AnyToVoidFunction, onFocus?: AnyToVoidFunction, isDisabled = false) {
 	const lastOnBlur = useLastCallback(onBlur);
@@ -30,6 +39,8 @@ export function useBackgroundMode(onBlur?: AnyToVoidFunction, onFocus?: AnyToVoi
 		if (isDisabled) {
 			return undefined;
 		}
+
+		ensureBackgroundFocusListeners();
 
 		if (!isFocused) {
 			lastOnBlur();
@@ -47,4 +58,15 @@ export function useBackgroundMode(onBlur?: AnyToVoidFunction, onFocus?: AnyToVoi
 
 export function isBackgroundModeActive() {
 	return !isFocused;
+}
+
+export function isUiActive(): boolean {
+	if (typeof document === 'undefined') {
+		return true;
+	}
+	if (document.visibilityState !== 'visible') {
+		return false;
+	}
+
+	return true;
 }
