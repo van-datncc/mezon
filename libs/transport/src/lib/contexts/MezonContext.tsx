@@ -110,32 +110,6 @@ export const getMezonConfig = (): MezonConfigResult => {
 		ssl: process.env.NX_CHAT_APP_API_SECURE === 'true',
 		ws_url: DEFAULT_WS_URL
 	};
-
-	try {
-		const storedConfig = localStorage.getItem(SESSION_STORAGE_KEY);
-
-		if (storedConfig) {
-			const parsedConfig = JSON.parse(storedConfig);
-			if (parsedConfig?.host && isAllowedHost(parsedConfig.host)) {
-				const wsRaw = parsedConfig.ws_url;
-				const wsTrimmed = typeof wsRaw === 'string' ? wsRaw.trim() : '';
-				return {
-					host: parsedConfig.host,
-					port: parsedConfig.port || fallback.port,
-					key: process.env.NX_CHAT_APP_API_KEY as string,
-					ssl: parsedConfig.ssl,
-					api_url: parsedConfig.api_url,
-					ws_url: wsTrimmed || DEFAULT_WS_URL
-				};
-			}
-			if (parsedConfig?.host && !isAllowedHost(parsedConfig.host)) {
-				console.error('Ignoring mezon_session with non-allowlisted host:', parsedConfig.host);
-			}
-		}
-	} catch (error) {
-		console.error('Failed to get Mezon config from localStorage:', error);
-	}
-
 	return fallback;
 };
 
