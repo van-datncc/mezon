@@ -51,8 +51,7 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 		() => [
 			{ mappedType: 'from', prefixes: ['from:', t('mentionPrefixes.from')] },
 			{ mappedType: 'mentions', prefixes: ['mentions:', 'mention:', t('mentionPrefixes.mentions')] },
-			{ mappedType: 'has', prefixes: ['has:', t('mentionPrefixes.has')] },
-			{ mappedType: 'in', prefixes: ['in:', t('mentionPrefixes.in')] }
+			{ mappedType: 'has', prefixes: ['has:', t('mentionPrefixes.has')] }
 		],
 		[t]
 	);
@@ -133,8 +132,6 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 				let fieldValue: string;
 				if (mappedType === 'mentions') {
 					fieldValue = `"user_id":"${mention.id}"`;
-				} else if (mappedType === 'in' || searchFieldName?.[mappedType] === 'channel_id') {
-					fieldValue = mention.id;
 				} else {
 					fieldValue = mentionDisplay.replace(matchedPrefix, '') || mention.id;
 				}
@@ -181,12 +178,14 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 			} else {
 				channelIdValue = channelId;
 			}
+			console.log('channelId: ', channelId);
 
 			const requestFilter = [
 				{ field_name: 'channel_id', field_value: channelIdValue },
 				{ field_name: 'clan_id', field_value: currentClanId },
 				...filteredFilters
 			];
+			console.log('requestFilter: ', requestFilter);
 
 			const requestBody = {
 				...searchedRequest,
