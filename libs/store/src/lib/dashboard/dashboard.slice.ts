@@ -357,6 +357,82 @@ interface ListRoomsApiResponse {
 	}>;
 }
 
+export interface RoomStatisticsPayload {
+	room_id?: string;
+	room_name?: string;
+	status?: string;
+	total_tracks?: number;
+	completed_tracks?: number;
+	remain_tracks?: number;
+	total_duration_sec?: number;
+	total_segments?: number;
+	created_at?: string;
+	finalized_at?: string;
+}
+
+export interface ActionItemsEntry {
+	participant_id?: string;
+	items?: string[];
+}
+
+export interface RoomSummaryDataPayload {
+	summary?: string;
+	action_items?: ActionItemsEntry[];
+}
+
+export interface RoomSummaryPayload {
+	room_id?: string;
+	room_name?: string;
+	participants?: string[];
+	summary_data?: RoomSummaryDataPayload;
+	full_text?: string;
+	created_at?: string;
+	total_segments?: number;
+}
+
+export interface TrackInfo {
+	filename?: string;
+	started_at_ns?: number;
+	ended_at_ns?: number;
+}
+
+export interface ParticipantDetail {
+	participant_identity?: string;
+	user_name?: string;
+	display_name?: string;
+	tracks?: TrackInfo[];
+}
+
+export interface GetParticipantsByRoomIdResponse {
+	status: string;
+	participants: ParticipantDetail[];
+}
+
+export interface TranscriptRoomDetailCacheEntry {
+	statistics: RoomStatisticsPayload | null;
+	summary: RoomSummaryPayload | null;
+	participants: ParticipantDetail[];
+	statisticsLoading: boolean;
+	summaryLoading: boolean;
+	participantsLoading: boolean;
+	statisticsError: string | null;
+	summaryError: string | null;
+	participantsError: string | null;
+}
+
+function unwrapDashboardJson<T>(json: unknown): T {
+	if (json && typeof json === 'object' && 'data' in json && (json as { data?: unknown }).data !== undefined) {
+		return (json as { data: T }).data;
+	}
+	return json as T;
+}
+
+function authHeadersForDashboard(getState: () => RootState): Record<string, string> {
+	const session = selectSession(getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
+	const token = session?.token;
+	return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export const fetchRooms = createAsyncThunk<
 	ListRoomsApiResponse,
 	{ status?: string; search?: string; startDate?: string; endDate?: string; limit?: number; page?: number }
@@ -387,6 +463,63 @@ export const fetchRooms = createAsyncThunk<
 	}
 });
 
+export const fetchRoomStatisticsByRoomId = createAsyncThunk(
+	'dashboard/fetchRoomStatisticsByRoomId',
+	async ({ roomId }: { roomId: string }, thunkAPI) => {
+		try {
+			const base = API_BASE || '';
+			const url = `${base}/dashboard/rooms/${encodeURIComponent(roomId)}/statistics`;
+			const res = await fetch(url, { headers: authHeadersForDashboard(thunkAPI.getState as () => RootState) });
+			if (!res.ok) {
+				const text = await res.text().catch(() => '');
+				return thunkAPI.rejectWithValue({ roomId, message: text || res.statusText });
+			}
+			const json = await res.json();
+			const body = unwrapDashboardJson<{ status?: string; statistics?: RoomStatisticsPayload }>(json);
+			return { roomId, statistics: body.statistics ?? null };
+		} catch (err) {
+			return thunkAPI.rejectWithValue({ roomId, message: String(err) });
+		}
+	}
+);
+
+export const fetchRoomSummaryByRoomId = createAsyncThunk('dashboard/fetchRoomSummaryByRoomId', async ({ roomId }: { roomId: string }, thunkAPI) => {
+	try {
+		const base = API_BASE || '';
+		const url = `${base}/dashboard/room/${encodeURIComponent(roomId)}/summary`;
+		const res = await fetch(url, { headers: authHeadersForDashboard(thunkAPI.getState as () => RootState) });
+		if (!res.ok) {
+			const text = await res.text().catch(() => '');
+			return thunkAPI.rejectWithValue({ roomId, message: text || res.statusText });
+		}
+		const json = await res.json();
+		const body = unwrapDashboardJson<{ status?: string; data?: RoomSummaryPayload }>(json);
+		return { roomId, summary: body.data ?? null };
+	} catch (err) {
+		return thunkAPI.rejectWithValue({ roomId, message: String(err) });
+	}
+});
+
+export const fetchRoomParticipantsByRoomId = createAsyncThunk(
+	'dashboard/fetchRoomParticipantsByRoomId',
+	async ({ roomId }: { roomId: string }, thunkAPI) => {
+		try {
+			const base = API_BASE || '';
+			const url = `${base}/dashboard/rooms/${encodeURIComponent(roomId)}/participants`;
+			const res = await fetch(url, { headers: authHeadersForDashboard(thunkAPI.getState as () => RootState) });
+			if (!res.ok) {
+				const text = await res.text().catch(() => '');
+				return thunkAPI.rejectWithValue({ roomId, message: text || res.statusText });
+			}
+			const json = await res.json();
+			const body = unwrapDashboardJson<GetParticipantsByRoomIdResponse>(json);
+			return { roomId, participants: body.participants ?? [] };
+		} catch (err) {
+			return thunkAPI.rejectWithValue({ roomId, message: String(err) });
+		}
+	}
+);
+
 export interface DashboardState {
 	loading: boolean;
 	stats: Record<string, number>;
@@ -408,6 +541,27 @@ export interface DashboardState {
 	roomsPage: number;
 	lastUpdated?: number | null;
 	error?: string | null;
+	transcriptRoomDetailsById: Record<string, TranscriptRoomDetailCacheEntry>;
+}
+
+function emptyTranscriptRoomDetail(): TranscriptRoomDetailCacheEntry {
+	return {
+		statistics: {
+			total_tracks: 0,
+			completed_tracks: 0,
+			remain_tracks: 0,
+			total_duration_sec: 0,
+			total_segments: 0
+		},
+		summary: null,
+		participants: [],
+		statisticsLoading: false,
+		summaryLoading: false,
+		participantsLoading: false,
+		statisticsError: null,
+		summaryError: null,
+		participantsError: null
+	};
 }
 
 export const initialDashboardState: DashboardState = {
@@ -430,7 +584,8 @@ export const initialDashboardState: DashboardState = {
 	roomsLimit: 10,
 	roomsPage: 1,
 	lastUpdated: null,
-	error: null
+	error: null,
+	transcriptRoomDetailsById: {}
 };
 
 export const dashboardSlice = createSlice({
@@ -641,6 +796,84 @@ export const dashboardSlice = createSlice({
 			.addCase(fetchRooms.rejected, (state, action) => {
 				state.roomsLoading = false;
 				state.error = action.payload as string | null;
+			})
+
+			.addCase(fetchRoomStatisticsByRoomId.pending, (state, action) => {
+				const roomId = action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].statisticsLoading = true;
+				state.transcriptRoomDetailsById[roomId].statisticsError = null;
+			})
+			.addCase(fetchRoomStatisticsByRoomId.fulfilled, (state, action) => {
+				const { roomId, statistics } = action.payload;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].statisticsLoading = false;
+				state.transcriptRoomDetailsById[roomId].statistics = statistics;
+			})
+			.addCase(fetchRoomStatisticsByRoomId.rejected, (state, action) => {
+				const payload = action.payload as { roomId?: string; message?: string } | undefined;
+				const roomId = payload?.roomId ?? action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].statisticsLoading = false;
+				state.transcriptRoomDetailsById[roomId].statisticsError = payload?.message ?? 'Failed to load statistics';
+			})
+
+			.addCase(fetchRoomSummaryByRoomId.pending, (state, action) => {
+				const roomId = action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].summaryLoading = true;
+				state.transcriptRoomDetailsById[roomId].summaryError = null;
+			})
+			.addCase(fetchRoomSummaryByRoomId.fulfilled, (state, action) => {
+				const { roomId, summary } = action.payload;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].summaryLoading = false;
+				state.transcriptRoomDetailsById[roomId].summary = summary;
+			})
+			.addCase(fetchRoomSummaryByRoomId.rejected, (state, action) => {
+				const payload = action.payload as { roomId?: string; message?: string } | undefined;
+				const roomId = payload?.roomId ?? action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].summaryLoading = false;
+				state.transcriptRoomDetailsById[roomId].summaryError = payload?.message ?? 'Failed to load summary';
+			})
+
+			.addCase(fetchRoomParticipantsByRoomId.pending, (state, action) => {
+				const roomId = action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].participantsLoading = true;
+				state.transcriptRoomDetailsById[roomId].participantsError = null;
+			})
+			.addCase(fetchRoomParticipantsByRoomId.fulfilled, (state, action) => {
+				const { roomId, participants } = action.payload;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].participantsLoading = false;
+				state.transcriptRoomDetailsById[roomId].participants = participants;
+			})
+			.addCase(fetchRoomParticipantsByRoomId.rejected, (state, action) => {
+				const payload = action.payload as { roomId?: string; message?: string } | undefined;
+				const roomId = payload?.roomId ?? action.meta.arg.roomId;
+				if (!state.transcriptRoomDetailsById[roomId]) {
+					state.transcriptRoomDetailsById[roomId] = emptyTranscriptRoomDetail();
+				}
+				state.transcriptRoomDetailsById[roomId].participantsLoading = false;
+				state.transcriptRoomDetailsById[roomId].participantsError = payload?.message ?? 'Failed to load participants';
 			});
 	}
 });
@@ -719,6 +952,19 @@ export const selectChannelUsersPagination = (state: RootState, clanId: string, c
 		limit: raw.limit ?? 10,
 		total: Number(raw.total ?? 0),
 		totalPages: raw.total_pages ?? raw.totalPages ?? 1
+	};
+};
+
+export const selectTranscriptRoomDetailEntry = (state: RootState, roomId: string): TranscriptRoomDetailCacheEntry => {
+	const existing = selectDashboard(state).transcriptRoomDetailsById[roomId];
+	return existing ?? emptyTranscriptRoomDetail();
+};
+
+export const selectTranscriptRoomDetailState = (state: RootState, roomId: string) => {
+	const existing = selectDashboard(state).transcriptRoomDetailsById[roomId];
+	return {
+		detail: existing ?? emptyTranscriptRoomDetail(),
+		hasFetched: Boolean(existing)
 	};
 };
 

@@ -7,7 +7,7 @@ const STATUS_BADGE: Record<string, string> = {
 	failed: 'bg-red-100 text-red-700'
 };
 
-export const getStatusOptions = (t: (key: string) => string) => [
+const getStatusOptions = (t: (key: string) => string) => [
 	{ value: '', label: t('meetingRoomsFilter.allStatuses') },
 	{ value: 'pending', label: t('meetingRoomsFilter.pending') },
 	{ value: 'completed', label: t('meetingRoomsFilter.completed') },
@@ -15,7 +15,7 @@ export const getStatusOptions = (t: (key: string) => string) => [
 	{ value: 'failed', label: t('meetingRoomsFilter.failed') }
 ];
 
-export const getTimeOptions = (t: (key: string) => string) => [
+const getTimeOptions = (t: (key: string) => string) => [
 	{ value: '', label: t('meetingRoomsFilter.noTimeFilter') },
 	{ value: '12h', label: t('meetingRoomsFilter.last12Hours') },
 	{ value: '24h', label: t('meetingRoomsFilter.last24Hours') },
@@ -23,4 +23,4 @@ export const getTimeOptions = (t: (key: string) => string) => [
 	{ value: '7d', label: t('meetingRoomsFilter.last7Days') }
 ];
 
-export { PAGE_SIZE, STATUS_BADGE };
+export { PAGE_SIZE, STATUS_BADGE, getStatusOptions, getTimeOptions };

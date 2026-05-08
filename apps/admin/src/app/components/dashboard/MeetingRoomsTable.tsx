@@ -4,6 +4,7 @@ import { Icons } from '@mezon/ui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useDebouncedCallback } from 'use-debounce';
 import { PAGE_SIZE, STATUS_BADGE, getStatusOptions, getTimeOptions } from '../../constants/dashboard';
 import { formatDate, formatStatus, getDateRangeFromTimeFilter } from '../../utils/dashboard/format';
@@ -15,6 +16,7 @@ interface MeetingRoomsTableProps {
 }
 
 const MeetingRoomsTable: React.FC<MeetingRoomsTableProps> = ({ onViewDetails }) => {
+	const navigate = useNavigate();
 	const { t } = useTranslation('dashboard');
 	const { t: tCommon } = useTranslation('common');
 	const dispatch = useDispatch<AppDispatch>();
@@ -181,7 +183,10 @@ const MeetingRoomsTable: React.FC<MeetingRoomsTableProps> = ({ onViewDetails }) 
 									</td>
 									<td className="px-4 py-4">
 										<button
-											onClick={() => onViewDetails?.(room)}
+											onClick={() => {
+												onViewDetails?.(room);
+												navigate(`/developers/transcript-calls/${room.id}`);
+											}}
 											className="text-blue-600 dark:text-blue-400 hover:text-blue-800 text-sm font-medium"
 										>
 											{t('meetingRoomsTable.viewDetails')}

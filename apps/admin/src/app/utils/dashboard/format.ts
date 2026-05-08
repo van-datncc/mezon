@@ -41,4 +41,36 @@ function getDateRangeFromTimeFilter(timeFilter: string): { startDate?: string; e
 	return {};
 }
 
-export { formatDate, formatStatus, getDateRangeFromTimeFilter };
+const formatDurationSec = (sec?: number): string => {
+	if (sec === undefined || sec <= 0) return '0s';
+	const s = Math.floor(sec % 60);
+	const m = Math.floor((sec / 60) % 60);
+	const h = Math.floor(sec / 3600);
+	if (h > 0) return `${h}h ${m}m ${s}s`;
+	if (m > 0) return `${m}m ${s}s`;
+	return `${s}s`;
+};
+
+const formatRoomDate = (iso?: string): string => {
+	if (!iso) return '—';
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return iso;
+	return d.toLocaleString(undefined, {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit'
+	});
+};
+
+export type CallStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+const normalizeRoomStatus = (raw?: string): CallStatus => {
+	const s = (raw ?? '').toLowerCase();
+	if (s === 'completed' || s === 'processing' || s === 'pending' || s === 'failed') return s;
+	return 'pending';
+};
+
+export { formatDate, formatDurationSec, formatRoomDate, formatStatus, getDateRangeFromTimeFilter, normalizeRoomStatus };
