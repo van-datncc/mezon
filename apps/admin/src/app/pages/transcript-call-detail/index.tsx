@@ -72,6 +72,44 @@ const TranscriptCallDetail = () => {
 		return config[status];
 	}, [status, t]);
 
+	const fullText = useMemo(() => {
+		if (detail.summary?.full_text) return detail.summary.full_text.trim();
+		if (detail.summary?.messages) {
+			return detail.summary.messages.map((m) => `[${m.timestamp}] ${m.participant_id}:\n${m.content}`).join('\n\n');
+		}
+		return '';
+	}, [detail.summary]);
+	const summaryText = detail.summary?.summary_data?.summary?.trim();
+	const actionItems = detail.summary?.summary_data?.action_items ?? [];
+
+	const participantMap = useMemo(() => {
+		const map: Record<string, string> = {};
+		detail.participants.forEach((p) => {
+			if (p.participant_identity) {
+				map[p.participant_identity] = p.display_name || p.user_name || p.participant_identity;
+			}
+		});
+		return map;
+	}, [detail.participants]);
+
+	const messageGroups = useMemo(() => {
+		if (!detail.summary?.messages) return [];
+		const groups: { participant_id: string; timestamp: string; contents: string[] }[] = [];
+		detail.summary.messages.forEach((m) => {
+			const lastGroup = groups[groups.length - 1];
+			if (lastGroup && lastGroup.participant_id === m.participant_id) {
+				lastGroup.contents.push(m.content || '');
+			} else {
+				groups.push({
+					participant_id: m.participant_id || '',
+					timestamp: m.timestamp || '',
+					contents: [m.content || '']
+				});
+			}
+		});
+		return groups;
+	}, [detail.summary?.messages]);
+
 	const [activeTab, setActiveTab] = useState<TabType>('overview');
 
 	if (!roomId) {
@@ -156,10 +194,6 @@ const TranscriptCallDetail = () => {
 		summary: t('transcriptCalls.tabs.summary'),
 		participants: t('transcriptCalls.tabs.audio')
 	};
-
-	const fullText = detail.summary?.full_text?.trim();
-	const summaryText = detail.summary?.summary_data?.summary?.trim();
-	const actionItems = detail.summary?.summary_data?.action_items ?? [];
 
 	return (
 		<div className="max-w-7xl mx-auto flex flex-col gap-6">
@@ -251,13 +285,42 @@ const TranscriptCallDetail = () => {
 					)}
 
 					{activeTab === 'fullTranscript' && (
-						<div className="space-y-2">
+						<div className="space-y-4">
 							{detail.summaryLoading ? (
 								<div className="text-sm dark:text-textSecondary">{t('transcriptCalls.loading')}</div>
 							) : detail.summaryError ? (
 								<div className="text-sm text-red-600 dark:text-red-400">{t('transcriptCalls.detail.loadError')}</div>
+							) : messageGroups.length > 0 ? (
+								<div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+									{messageGroups.map((group, idx) => {
+										const name = participantMap[group.participant_id] || group.participant_id || 'Unknown';
+
+										return (
+											<div key={idx} className="group flex flex-col gap-2">
+												<div className="flex items-center justify-between gap-3">
+													<div className="flex items-center gap-2">
+														<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">{name}</span>
+														{name !== group.participant_id && group.participant_id && (
+															<span className="text-[10px] dark:text-textSecondary text-gray-500">
+																({group.participant_id})
+															</span>
+														)}
+													</div>
+													<span className="text-[10px] dark:text-textSecondary text-gray-500">{group.timestamp}</span>
+												</div>
+												<div className="px-5 py-3 rounded-xl bg-gray-50 dark:bg-bgSecondary/40 text-sm dark:text-textDarkTheme text-gray-800 border dark:border-borderClan/20 group-hover:dark:border-borderClan/40 transition-colors leading-relaxed shadow-sm space-y-2">
+													{group.contents.map((content, cIdx) => (
+														<p key={cIdx} className="whitespace-pre-wrap">
+															{content}
+														</p>
+													))}
+												</div>
+											</div>
+										);
+									})}
+								</div>
 							) : fullText ? (
-								<pre className="text-sm whitespace-pre-wrap dark:text-textDarkTheme text-gray-900 font-sans max-h-[480px] overflow-y-auto">
+								<pre className="text-sm whitespace-pre-wrap dark:text-textDarkTheme text-gray-900 font-sans max-h-[480px] overflow-y-auto p-4 rounded-lg bg-gray-50 dark:bg-bgSecondary/20 border dark:border-borderClan/50">
 									{fullText}
 								</pre>
 							) : (
@@ -269,47 +332,70 @@ const TranscriptCallDetail = () => {
 					)}
 
 					{activeTab === 'summary' && (
-						<div className="space-y-6">
+						<div className="space-y-8">
 							{detail.summaryLoading ? (
 								<div className="text-sm dark:text-textSecondary">{t('transcriptCalls.loading')}</div>
 							) : detail.summaryError ? (
 								<div className="text-sm text-red-600 dark:text-red-400">{t('transcriptCalls.detail.loadError')}</div>
 							) : (
 								<>
-									{summaryText ? (
-										<div>
-											<div className="text-sm font-medium dark:text-textSecondary text-gray-500 mb-2">
+									<div className="space-y-3">
+										<div className="flex items-center gap-2 px-1">
+											<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">
 												{t('transcriptCalls.tabs.summary')}
-											</div>
-											<p className="text-sm dark:text-textDarkTheme text-gray-900 whitespace-pre-wrap">{summaryText}</p>
+											</span>
 										</div>
-									) : (
-										<div className="text-sm dark:text-textSecondary text-gray-500 italic">
-											{t('transcriptCalls.detail.summaryEmpty')}
+										{summaryText ? (
+											<div className="px-5 py-4 rounded-xl bg-gray-50 dark:bg-bgSecondary/40 text-sm dark:text-textDarkTheme text-gray-800 border dark:border-borderClan/20 shadow-sm leading-relaxed whitespace-pre-wrap">
+												{summaryText}
+											</div>
+										) : (
+											<div className="px-5 py-4 rounded-xl bg-gray-50/50 dark:bg-bgSecondary/20 text-sm dark:text-textSecondary text-gray-500 italic border border-dashed dark:border-borderClan/20">
+												{t('transcriptCalls.detail.summaryEmpty')}
+											</div>
+										)}
+									</div>
+
+									{actionItems.length > 0 && (
+										<div className="space-y-4">
+											<div className="flex items-center gap-2 px-1">
+												<Icons.CheckIcon className="w-4 h-4 text-green-500" />
+												<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">
+													{t('transcriptCalls.detail.actionItems')}
+												</span>
+											</div>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{actionItems.map((entry, idx) => {
+													const name = participantMap[entry.participant_id || ''] || entry.participant_id || '—';
+													return (
+														<div
+															key={`${entry.participant_id ?? idx}`}
+															className="px-5 py-4 rounded-xl bg-gray-50 dark:bg-bgSecondary/40 border dark:border-borderClan/20 shadow-sm flex flex-col gap-3"
+														>
+															<div className="flex items-center gap-2 border-b dark:border-borderClan/20 pb-2">
+																<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">
+																	{name}
+																</span>
+																{name !== entry.participant_id && entry.participant_id && (
+																	<span className="text-[10px] dark:text-textSecondary text-gray-500">
+																		({entry.participant_id})
+																	</span>
+																)}
+															</div>
+															<ul className="space-y-2">
+																{(entry.items ?? []).map((item, i) => (
+																	<li key={i} className="flex gap-2 text-sm dark:text-textDarkTheme text-gray-800">
+																		<span className="text-buttonPrimary mt-1">•</span>
+																		<span>{item}</span>
+																	</li>
+																))}
+															</ul>
+														</div>
+													);
+												})}
+											</div>
 										</div>
 									)}
-									{actionItems.length > 0 ? (
-										<div>
-											<div className="text-sm font-medium dark:text-textSecondary text-gray-500 mb-2">
-												{t('transcriptCalls.detail.actionItems')}
-											</div>
-											<ul className="space-y-3">
-												{actionItems.map((entry, idx) => (
-													<li
-														key={`${entry.participant_id ?? idx}`}
-														className="text-sm dark:text-textDarkTheme text-gray-900"
-													>
-														<div className="font-medium">{entry.participant_id ?? '—'}</div>
-														<ul className="list-disc pl-5 mt-1 space-y-1">
-															{(entry.items ?? []).map((item, i) => (
-																<li key={i}>{item}</li>
-															))}
-														</ul>
-													</li>
-												))}
-											</ul>
-										</div>
-									) : null}
 								</>
 							)}
 						</div>

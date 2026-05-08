@@ -365,7 +365,7 @@ export interface RoomStatisticsPayload {
 	completed_tracks?: number;
 	remain_tracks?: number;
 	total_duration_sec?: number;
-	total_segments?: number;
+	total_segments?: number | string;
 	created_at?: string;
 	finalized_at?: string;
 }
@@ -380,14 +380,21 @@ export interface RoomSummaryDataPayload {
 	action_items?: ActionItemsEntry[];
 }
 
+export interface RoomMessage {
+	timestamp?: string;
+	participant_id?: string;
+	content?: string;
+}
+
 export interface RoomSummaryPayload {
 	room_id?: string;
 	room_name?: string;
 	participants?: string[];
 	summary_data?: RoomSummaryDataPayload;
+	messages?: RoomMessage[];
 	full_text?: string;
 	created_at?: string;
-	total_segments?: number;
+	total_segments?: number | string;
 }
 
 export interface TrackInfo {
@@ -429,7 +436,7 @@ function unwrapDashboardJson<T>(json: unknown): T {
 
 function authHeadersForDashboard(getState: () => RootState): Record<string, string> {
 	const session = selectSession(getState() as unknown as { [AUTH_FEATURE_KEY]: AuthState });
-	const token = session?.token;
+	const token = session?.session_id;
 	return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -493,8 +500,8 @@ export const fetchRoomSummaryByRoomId = createAsyncThunk('dashboard/fetchRoomSum
 			return thunkAPI.rejectWithValue({ roomId, message: text || res.statusText });
 		}
 		const json = await res.json();
-		const body = unwrapDashboardJson<{ status?: string; data?: RoomSummaryPayload }>(json);
-		return { roomId, summary: body.data ?? null };
+		const body = unwrapDashboardJson<RoomSummaryPayload>(json);
+		return { roomId, summary: body ?? null };
 	} catch (err) {
 		return thunkAPI.rejectWithValue({ roomId, message: String(err) });
 	}
@@ -960,6 +967,7 @@ export const selectTranscriptRoomDetailEntry = (state: RootState, roomId: string
 	return existing ?? emptyTranscriptRoomDetail();
 };
 
+/** `hasFetched` is false until the first pending/fulfilled/rejected for this `roomId`. */
 export const selectTranscriptRoomDetailState = (state: RootState, roomId: string) => {
 	const existing = selectDashboard(state).transcriptRoomDetailsById[roomId];
 	return {

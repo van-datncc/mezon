@@ -18,13 +18,14 @@ export function LoadingState({ message }: LoadingStateProps) {
 interface NoDataStateProps {
 	message?: string;
 	description?: string;
+	className?: string;
 }
 
-export function NoDataState({ message, description }: NoDataStateProps) {
+export function NoDataState({ message, description, className }: NoDataStateProps) {
 	const { t } = useTranslation('dashboard');
 
 	return (
-		<div className="bg-white dark:bg-[#2b2d31] p-12 rounded-lg border dark:border-[#4d4f52] text-center">
+		<div className={`${className} bg-white dark:bg-[#2b2d31] p-12 rounded-lg border dark:border-[#4d4f52] text-center`}>
 			<svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 				<path
 					strokeLinecap="round"

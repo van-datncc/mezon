@@ -10,6 +10,7 @@ import { PAGE_SIZE, STATUS_BADGE, getStatusOptions, getTimeOptions } from '../..
 import { formatDate, formatStatus, getDateRangeFromTimeFilter } from '../../utils/dashboard/format';
 import Pagination from '../Pagination';
 import SelectControl from '../controls/SelectControl';
+import { NoDataState } from './StateComponents';
 
 interface MeetingRoomsTableProps {
 	onViewDetails?: (room: Room) => void;
@@ -108,95 +109,89 @@ const MeetingRoomsTable: React.FC<MeetingRoomsTableProps> = ({ onViewDetails }) 
 
 				<button
 					onClick={handleRefresh}
-					className="h-[40px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md flex items-center gap-2 transition-colors"
+					className="h-[40px] px-4 bg-[#5865F2] hover:bg-blue-700 text-white text-sm font-medium rounded-md flex items-center gap-2 transition-colors"
 				>
 					{tCommon('refresh')}
 				</button>
 			</div>
 
 			<div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-[#3d3f43]">
-				<table className="w-full text-sm">
-					<thead>
-						<tr className="border-b border-gray-200 dark:border-[#3d3f43]">
-							{[
-								t('meetingRoomsTable.roomName'),
-								t('meetingRoomsTable.status'),
-								t('meetingRoomsTable.createdAt'),
-								t('meetingRoomsTable.completedAt'),
-								t('meetingRoomsTable.actions')
-							].map((col) => (
-								<th
-									key={col}
-									className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
-								>
-									{col}
-								</th>
-							))}
-						</tr>
-					</thead>
-					<tbody>
-						{loading ? (
-							Array.from({ length: PAGE_SIZE }).map((_, index) => (
-								<tr key={`skeleton-${index}`} className="border-b last:border-b-0 border-gray-100 dark:border-[#2e3035]">
-									<td className="px-4 py-4">
-										<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-32"></div>
-									</td>
-									<td className="px-4 py-4">
-										<div className="h-6 bg-gray-200 dark:bg-[#4d4f52] rounded-full animate-pulse w-20"></div>
-									</td>
-									<td className="px-4 py-4">
-										<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-28"></div>
-									</td>
-									<td className="px-4 py-4">
-										<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-28"></div>
-									</td>
-									<td className="px-4 py-4">
-										<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-16"></div>
-									</td>
-								</tr>
-							))
-						) : rooms.length === 0 ? (
-							<tr>
-								<td colSpan={5}>
-									<div className="text-center py-12">
-										<div className="text-lg font-medium dark:text-textSecondary">{t('meetingRoomsTable.noRoomsFound')}</div>
-									</div>
-								</td>
+				{rooms.length === 0 ? (
+					<NoDataState className="border-none" />
+				) : (
+					<table className="w-full text-sm">
+						<thead>
+							<tr className="border-b border-gray-200 dark:border-[#3d3f43]">
+								{[
+									t('meetingRoomsTable.roomName'),
+									t('meetingRoomsTable.status'),
+									t('meetingRoomsTable.createdAt'),
+									t('meetingRoomsTable.completedAt'),
+									t('meetingRoomsTable.actions')
+								].map((col) => (
+									<th
+										key={col}
+										className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+									>
+										{col}
+									</th>
+								))}
 							</tr>
-						) : (
-							rooms.map((room) => (
-								<tr
-									key={`${room.id}-${room.createdAt}`}
-									className="border-b last:border-b-0 border-gray-100 dark:border-[#2e3035] hover:bg-gray-50 dark:hover:bg-[#25272b] transition-colors"
-								>
-									<td className="px-4 py-4 font-semibold text-gray-900 dark:text-white">{room.roomName}</td>
-									<td className="px-4 py-4">
-										<span
-											className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[room.status] ?? 'bg-gray-100 text-gray-600'}`}
+						</thead>
+						<tbody>
+							{loading
+								? Array.from({ length: PAGE_SIZE }).map((_, index) => (
+										<tr key={`skeleton-${index}`} className="border-b last:border-b-0 border-gray-100 dark:border-[#2e3035]">
+											<td className="px-4 py-4">
+												<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-32"></div>
+											</td>
+											<td className="px-4 py-4">
+												<div className="h-6 bg-gray-200 dark:bg-[#4d4f52] rounded-full animate-pulse w-20"></div>
+											</td>
+											<td className="px-4 py-4">
+												<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-28"></div>
+											</td>
+											<td className="px-4 py-4">
+												<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-28"></div>
+											</td>
+											<td className="px-4 py-4">
+												<div className="h-4 bg-gray-200 dark:bg-[#4d4f52] rounded animate-pulse w-16"></div>
+											</td>
+										</tr>
+									))
+								: rooms.map((room) => (
+										<tr
+											key={`${room.id}-${room.createdAt}`}
+											className="border-b last:border-b-0 border-gray-100 dark:border-[#2e3035] hover:bg-gray-50 dark:hover:bg-[#25272b] transition-colors"
 										>
-											{formatStatus(room.status)}
-										</span>
-									</td>
-									<td className="px-4 py-4 text-gray-500 dark:text-gray-400">{formatDate(room.createdAt)}</td>
-									<td className="px-4 py-4 text-gray-500 dark:text-gray-400">
-										{room.completedAt ? formatDate(room.completedAt) : 'N/A'}
-									</td>
-									<td className="px-4 py-4">
-										<button
-											onClick={() => {
-												onViewDetails?.(room);
-												navigate(`/developers/transcript-calls/${room.id}`);
-											}}
-											className="text-blue-600 dark:text-blue-400 hover:text-blue-800 text-sm font-medium"
-										>
-											{t('meetingRoomsTable.viewDetails')}
-										</button>
-									</td>
-								</tr>
-							))
-						)}
-					</tbody>
-				</table>
+											<td className="px-4 py-4 font-semibold text-gray-900 dark:text-white">{room.roomName}</td>
+											<td className="px-4 py-4">
+												<span
+													className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[room.status] ?? 'bg-gray-100 text-gray-600'}`}
+												>
+													{formatStatus(room.status)}
+												</span>
+											</td>
+											<td className="px-4 py-4 text-gray-500 dark:text-gray-400">{formatDate(room.createdAt)}</td>
+											<td className="px-4 py-4 text-gray-500 dark:text-gray-400">
+												{room.completedAt ? formatDate(room.completedAt) : 'N/A'}
+											</td>
+											<td className="px-4 py-4">
+												<button
+													onClick={() => {
+														onViewDetails?.(room);
+														navigate(`/developers/transcript-calls/${room.id}`);
+													}}
+													className="text-blue-600 dark:text-blue-400 hover:text-blue-800 text-sm font-medium"
+												>
+													{t('meetingRoomsTable.viewDetails')}
+												</button>
+											</td>
+										</tr>
+									))}
+						</tbody>
+					</table>
+				)}
 			</div>
 
 			<Pagination page={page} totalPages={totalPages} total={total} pageSize={PAGE_SIZE} onPageChange={setPage} />
