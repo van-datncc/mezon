@@ -1,12 +1,5 @@
 import { ListChannelSetting } from '@mezon/components';
-import {
-	ETypeFetchChannelSetting,
-	channelSettingActions,
-	selectAllChannelSuggestion,
-	selectCurrentClanId,
-	selectNumberChannelCount,
-	useAppDispatch
-} from '@mezon/store';
+import { channelSettingActions, selectAllChannelSuggestion, selectCurrentClanId, selectNumberChannelCount, useAppDispatch } from '@mezon/store';
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -50,24 +43,6 @@ const ChannelSetting = () => {
 		}
 		prevClanIdRef.current = selectClanId as string;
 	}, [selectClanId, dispatch]);
-
-	const fetchChannels = useCallback(async () => {
-		if (!selectClanId) return;
-
-		await dispatch(
-			channelSettingActions.fetchActiveChannelSettingInClan({
-				clanId: selectClanId as string,
-				parentId: '0',
-				typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL,
-				noCache: true,
-				limit: 500
-			})
-		);
-	}, [selectClanId, dispatch]);
-
-	useEffect(() => {
-		fetchChannels();
-	}, [fetchChannels]);
 
 	return (
 		<div className="p-4 h-[calc(100vh_-_56px)] flex flex-col text-theme-primary ">
