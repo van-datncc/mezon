@@ -26,10 +26,8 @@ import { Icons, Menu } from '@mezon/ui';
 import { AvatarImage } from '@mezon/components';
 import { createImgproxyUrl, IMessageTypeCallLog } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
-import type { ReactElement } from 'react';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
@@ -181,26 +179,78 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		}
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
-	const menuDevice = useMemo(() => {
-		const menuItems: ReactElement[] = [
-			<DeviceSelector
-				key={'output-device-speaker'}
-				deviceList={audioOutputDevicesList}
-				currentDevice={currentOutputDevice}
-				icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
-				onSelectDevice={changeAudioOutputDevice}
-			/>,
+	const [expandedDevice, setExpandedDevice] = useState<'input' | 'output' | null>(null);
+	const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
 
-			<DeviceSelector
-				key={'input-device-mic'}
-				deviceList={audioInputDevicesList}
-				currentDevice={currentInputDevice}
-				icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
-				onSelectDevice={changeAudioInputDevice}
-			/>
-		];
-		return <>{menuItems}</>;
-	}, [audioOutputDevicesList, audioInputDevicesList]);
+	const menuDevice = useMemo(() => {
+		return (
+			<div className="relative inline-block">
+				<div className="rounded-lg bg-neutral-800 border border-neutral-700 overflow-hidden w-[220px]">
+					<div
+						className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 border-b border-neutral-700 ${expandedDevice === 'input' ? 'bg-neutral-700' : ''}`}
+						onClick={() => setExpandedDevice(expandedDevice === 'input' ? null : 'input')}
+					>
+						<div className="flex flex-col flex-1 min-w-0 justify-start">
+							<div className="text-white font-medium text-sm">Input device</div>
+							<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+								{currentInputDevice?.label || 'System Default'}
+							</div>
+						</div>
+						<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+					</div>
+
+					<div
+						className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'output' ? 'bg-neutral-700' : ''}`}
+						onClick={() => setExpandedDevice(expandedDevice === 'output' ? null : 'output')}
+					>
+						<div className="flex flex-col flex-1 min-w-0 justify-start">
+							<div className="text-white font-medium text-sm">Output device</div>
+							<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+								{currentOutputDevice?.label || 'System Default'}
+							</div>
+						</div>
+						<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+					</div>
+				</div>
+
+				{expandedDevice === 'input' && (
+					<div className="absolute left-full top-0 ml-1 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] max-h-[320px] overflow-y-auto z-50">
+						{audioInputDevicesList.map((device) => (
+							<div
+								key={device.deviceId}
+								className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentInputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+								onClick={() => {
+									changeAudioInputDevice(device.deviceId);
+									setExpandedDevice(null);
+								}}
+							>
+								{device.deviceId === currentInputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+								<span className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap">{device.label}</span>
+							</div>
+						))}
+					</div>
+				)}
+
+				{expandedDevice === 'output' && (
+					<div className="absolute left-full top-12 ml-1 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] max-h-[360px] overflow-y-auto z-50">
+						{audioOutputDevicesList.map((device) => (
+							<div
+								key={device.deviceId}
+								className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentOutputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+								onClick={() => {
+									changeAudioOutputDevice(device.deviceId);
+									setExpandedDevice(null);
+								}}
+							>
+								{device.deviceId === currentOutputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+								<span className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap">{device.label}</span>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+		);
+	}, [currentInputDevice, currentOutputDevice, expandedDevice, audioInputDevicesList, audioOutputDevicesList]);
 
 	const localVideoContainerClass =
 		activeVideo === 'remote'
@@ -352,21 +402,32 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					) : (
 						<div className="flex flex-row gap-1.5 sbm:gap-2 lg:gap-3 justify-center flex-wrap">
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${!isShowMeetDM ? 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary' : 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400'}`}
 								onClick={toggleVideo}
 							>
 								{isShowMeetDM ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
 							</div>
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-neutral-500 dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 								onClick={handleMuteToggle}
 							>
 								{isMuteMicrophone ? <Icons.VoiceMicDisabledIcon scale={2.5} /> : <Icons.VoiceMicIcon scale={2.5} />}
 							</div>
 
-							<Menu menu={menuDevice} className={'rounded-3xl'}>
-								<div className="h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
-									<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
+							<Menu
+								menu={menuDevice}
+								className={'rounded-3xl'}
+								onVisibleChange={(visible) => {
+									setIsDeviceMenuOpen(visible);
+									if (!visible) {
+										setExpandedDevice(null);
+									}
+								}}
+							>
+								<div
+									className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] relative rounded-full flex items-center justify-center cursor-pointer transition-colors duration-200 ${isDeviceMenuOpen ? 'dark:bg-neutral-400 bg-neutral-700' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								>
+									<Icons.CallSetting className="text-white dark:text-bgTertiary" />
 								</div>
 							</Menu>
 							<div

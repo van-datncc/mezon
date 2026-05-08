@@ -210,6 +210,7 @@ export const LongArrowRight = createLazyIconWithFallback(() => import('./icons')
 export const CirclePlusFill = createLazyIconWithFallback(() => import('./icons'), 'CirclePlusFill');
 export const LoadingSpinner = createLazyIconWithFallback(() => import('./icons'), 'LoadingSpinner');
 export const StopCall = createLazyIconWithFallback(() => import('./icons'), 'StopCall');
+export const CallSetting = createLazyIconWithFallback(() => import('./icons'), 'CallSetting');
 export const StartCall = createLazyIconWithFallback(() => import('./icons'), 'StartCall');
 export const Microphone = createLazyIconWithFallback(() => import('./icons'), 'Microphone');
 export const MicEnable = createLazyIconWithFallback(() => import('./icons'), 'MicEnable');
