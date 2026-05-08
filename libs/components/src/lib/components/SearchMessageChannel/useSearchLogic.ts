@@ -178,14 +178,12 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 			} else {
 				channelIdValue = channelId;
 			}
-			console.log('channelId: ', channelId);
 
 			const requestFilter = [
 				{ field_name: 'channel_id', field_value: channelIdValue },
 				{ field_name: 'clan_id', field_value: currentClanId },
 				...filteredFilters
 			];
-			console.log('requestFilter: ', requestFilter);
 
 			const requestBody = {
 				...searchedRequest,
