@@ -132,7 +132,7 @@ export function MezonStoreProvider({ children, store, loading, persistor }: Prop
 	);
 }
 const CONNECT_GATE_POLL_MS = 1000;
-const CONNECT_GATE_MAX_WAIT_MS = 3000;
+const CONNECT_GATE_MAX_WAIT_MS = 4000;
 const CONNECT_GATE_MAX_ATTEMPTS = Math.ceil(CONNECT_GATE_MAX_WAIT_MS / CONNECT_GATE_POLL_MS);
 
 interface ConnectGateProps {
@@ -143,6 +143,8 @@ interface ConnectGateProps {
 const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 	const { clientRef } = useMezon();
 	const [loading, setLoading] = useState(!!clientRef.current?.isOpen?.());
+	const [countdown, setCountdown] = useState<number>(0);
+	const [retryCount, setRetryCount] = useState<number>(0); // State mới để lưu số lần retry
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
@@ -150,17 +152,29 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 			setLoading(true);
 			return;
 		}
-		let cancelled = false;
-		let attempts = 0;
-		let delay = CONNECT_GATE_POLL_MS;
 
-		let timeoutId: number | null = null;
+		let cancelled = false;
+		let currentAttempts = 0; // Biến nội bộ để tính toán logic
+		let currentDelay = CONNECT_GATE_POLL_MS;
+
+		let pollTimeoutId: number | null = null;
+		let countdownIntervalId: number | null = null;
 
 		const cleanup = () => {
-			if (timeoutId !== null) {
-				window.clearTimeout(timeoutId);
-				timeoutId = null;
-			}
+			if (pollTimeoutId !== null) window.clearTimeout(pollTimeoutId);
+			if (countdownIntervalId !== null) window.clearInterval(countdownIntervalId);
+		};
+
+		const startCountdown = (ms: number) => {
+			if (countdownIntervalId) window.clearInterval(countdownIntervalId);
+			let secondsLeft = Math.ceil(ms / 1000);
+			setCountdown(secondsLeft);
+
+			countdownIntervalId = window.setInterval(() => {
+				secondsLeft -= 1;
+				setCountdown(Math.max(0, secondsLeft));
+				if (secondsLeft <= 0) window.clearInterval(countdownIntervalId!);
+			}, 1000);
 		};
 
 		const poll = () => {
@@ -176,29 +190,65 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 				return;
 			}
 
-			attempts += 1;
+			currentAttempts += 1;
+			setRetryCount(currentAttempts); // Cập nhật lên UI
 
-			if (attempts >= CONNECT_GATE_MAX_ATTEMPTS) {
+			if (currentAttempts >= CONNECT_GATE_MAX_ATTEMPTS) {
 				cleanup();
 				dispatch(authActions.logOut({}));
 				setLoading(true);
 				return;
 			}
 
-			delay *= 2;
-
-			timeoutId = window.setTimeout(poll, delay);
+			currentDelay *= 2;
+			startCountdown(currentDelay);
+			pollTimeoutId = window.setTimeout(poll, currentDelay);
 		};
 
-		timeoutId = window.setTimeout(poll, delay);
+		setRetryCount(0);
+		startCountdown(currentDelay);
+		pollTimeoutId = window.setTimeout(poll, currentDelay);
 
 		return () => {
 			cancelled = true;
 			cleanup();
 		};
-	}, []);
+	}, [dispatch, clientRef]);
+
 	if (!loading) {
-		return null;
+		return (
+			<div className="fixed z-[10000] bg-black w-screen text-theme-primary h-screen flex items-center justify-center">
+				<div className="flex min-h-[200px] flex-col items-center justify-center ">
+					{/* Icon hoặc Spinner có thể thêm ở đây */}
+					<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+
+					<h3 className="mb-2 text-lg font-semibold">Đang thiết lập kết nối...</h3>
+
+					<div className="mb-4 text-sm">
+						Lần thử thứ: <span className="font-bold">{retryCount}</span>
+						<span className="mx-1">/</span>
+						{CONNECT_GATE_MAX_ATTEMPTS}
+					</div>
+
+					<div className="mb-6">
+						<p className="text-sm">
+							Sẽ thử lại sau:
+							<span className="ml-2 inline-block min-w-[3ch] text-xl font-mono font-bold text-primary">{countdown}s</span>
+						</p>
+					</div>
+
+					{/* Progress Bar Container */}
+					<div className="w-full max-w-xs overflow-hidden rounded-full bg-slate-100">
+						<div
+							className="h-2.5 bg-blue-600 transition-all duration-500 ease-out"
+							style={{ width: `${(retryCount / CONNECT_GATE_MAX_ATTEMPTS) * 100}%` }}
+						/>
+					</div>
+
+					<p className="mt-2 text-[10px] uppercase tracking-wider text-slate-100">Vui lòng không đóng trình duyệt</p>
+				</div>
+			</div>
+		);
 	}
 
 	return <>{children}</>;
