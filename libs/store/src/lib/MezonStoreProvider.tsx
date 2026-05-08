@@ -1,6 +1,7 @@
 import { connectMezonSocketOnce, extractAndSaveConfig, resolveSessionWsUrl, useMezon } from '@mezon/transport';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
 import type { Store } from 'redux';
 import type { Persistor } from 'redux-persist';
@@ -141,6 +142,7 @@ interface ConnectGateProps {
 }
 
 const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
+	const { t } = useTranslation('common');
 	const { clientRef } = useMezon();
 	const [loading, setLoading] = useState(!!clientRef.current?.isOpen?.());
 	const [countdown, setCountdown] = useState<number>(0);
@@ -154,7 +156,7 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 		}
 
 		let cancelled = false;
-		let currentAttempts = 0; // Biến nội bộ để tính toán logic
+		let currentAttempts = 0;
 		let currentDelay = CONNECT_GATE_POLL_MS;
 
 		let pollTimeoutId: number | null = null;
@@ -191,8 +193,7 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 			}
 
 			currentAttempts += 1;
-			setRetryCount(currentAttempts); // Cập nhật lên UI
-
+			setRetryCount(currentAttempts);
 			if (currentAttempts >= CONNECT_GATE_MAX_ATTEMPTS) {
 				cleanup();
 				dispatch(authActions.logOut({}));
@@ -219,33 +220,29 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 		return (
 			<div className="fixed z-[10000] bg-black w-screen text-theme-primary h-screen flex items-center justify-center">
 				<div className="flex min-h-[200px] flex-col items-center justify-center ">
-					{/* Icon hoặc Spinner có thể thêm ở đây */}
 					<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
 
-					<h3 className="mb-2 text-lg font-semibold">Đang thiết lập kết nối...</h3>
+					<h3 className="mb-2 text-lg font-semibold">Establishing a connection...</h3>
 
 					<div className="mb-4 text-sm">
-						Lần thử thứ: <span className="font-bold">{retryCount}</span>
+						Attempt number: <span className="font-bold">{retryCount}</span>
 						<span className="mx-1">/</span>
 						{CONNECT_GATE_MAX_ATTEMPTS}
 					</div>
 
 					<div className="mb-6">
 						<p className="text-sm">
-							Sẽ thử lại sau:
+							Try again within:
 							<span className="ml-2 inline-block min-w-[3ch] text-xl font-mono font-bold text-primary">{countdown}s</span>
 						</p>
 					</div>
 
-					{/* Progress Bar Container */}
 					<div className="w-full max-w-xs overflow-hidden rounded-full bg-slate-100">
 						<div
 							className="h-2.5 bg-blue-600 transition-all duration-500 ease-out"
 							style={{ width: `${(retryCount / CONNECT_GATE_MAX_ATTEMPTS) * 100}%` }}
 						/>
 					</div>
-
-					<p className="mt-2 text-[10px] uppercase tracking-wider text-slate-100">Vui lòng không đóng trình duyệt</p>
 				</div>
 			</div>
 		);
