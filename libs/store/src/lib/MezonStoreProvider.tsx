@@ -142,10 +142,12 @@ interface ConnectGateProps {
 
 const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 	const { clientRef } = useMezon();
+	const [loading, setLoading] = useState(!!clientRef.current?.isOpen?.());
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (!clientRef.current || !connectRef.current) {
+			setLoading(true);
 			return;
 		}
 		let cancelled = false;
@@ -163,11 +165,13 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 
 		const poll = () => {
 			if (cancelled) {
+				setLoading(true);
 				cleanup();
 				return;
 			}
 
 			if (clientRef.current?.isOpen?.()) {
+				setLoading(true);
 				cleanup();
 				return;
 			}
@@ -177,6 +181,7 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 			if (attempts >= CONNECT_GATE_MAX_ATTEMPTS) {
 				cleanup();
 				dispatch(authActions.logOut({}));
+				setLoading(true);
 				return;
 			}
 
@@ -192,6 +197,9 @@ const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 			cleanup();
 		};
 	}, []);
+	if (!loading) {
+		return null;
+	}
 
 	return <>{children}</>;
 };
