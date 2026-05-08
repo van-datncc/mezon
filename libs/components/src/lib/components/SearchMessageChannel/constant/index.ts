@@ -6,13 +6,11 @@ export const searchFieldName: Record<string, string> = {
 	has: 'has',
 	before: 'before',
 	after: 'after',
-	in: 'channel_id',
 	pinned: '',
 	content: 'content',
 	'>': 'username',
 	'~': 'mention',
-	'&': 'has',
-	'#': 'channel_id'
+	'&': 'has'
 };
 
 export const getSearchOptions = (t: (key: string) => string, isClanMode = true) => {
@@ -22,17 +20,12 @@ export const getSearchOptions = (t: (key: string) => string, isClanMode = true) 
 		{ title: '&', content: t('searchOptionsData.hasContentShort'), value: 'has' }
 	];
 
-	if (isClanMode) {
-		baseOptions.push({ title: '#', content: t('searchOptionsData.channelShort'), value: 'in' });
-	}
-
 	return baseOptions;
 };
 
 export const searchOptions = [
 	{ title: '>', content: 'user (from:)', value: 'username' },
 	{ title: '~', content: 'user (mentions:)', value: 'mentions' },
-	{ title: '#', content: 'channel (in:)', value: 'in' },
 	{ title: '&', content: 'link, embed or file (has:)', value: 'has' }
 ];
 
