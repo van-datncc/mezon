@@ -28,8 +28,6 @@ export function useReconnectOnForeground({ scheduleReconnect, debouncedScheduleM
 			const delayMs = debouncedScheduleMs + Math.floor(Math.random() * 1200);
 			timeoutId = setTimeout(() => {
 				timeoutId = null;
-				console.log('isUiActive');
-				
 				if (isUiActive() && socketState.status === 'disconnected') {
 					scheduleReconnect('Window focus/online event, attempting to reconnect...');
 				}
