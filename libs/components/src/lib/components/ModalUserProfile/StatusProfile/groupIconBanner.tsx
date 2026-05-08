@@ -5,9 +5,11 @@ import { Icons } from '@mezon/ui';
 import type { IUser } from '@mezon/utils';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import type { OpenModalProps } from '..';
 import { useRemoveFriendModal } from '../../../hooks/useRemoveFriendModal';
+import ShareContactModal from '../../ShareContact';
 import { PopupFriend } from './PopupShortUser';
 
 type GroupIconBannerProps = {
@@ -129,6 +131,17 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 		);
 		dispatch(giveCoffeeActions.setShowModalSendToken(true));
 	};
+
+	const [showShareContactModal, hideShareContactModal] = useModal(() => {
+		if (!user) return null;
+		return <ShareContactModal contactUser={user} onClose={hideShareContactModal} />;
+	}, [user]);
+
+	const handleOpenShareContactModal = (e: React.MouseEvent) => {
+		handleDefault(e);
+		showShareContactModal();
+	};
+
 	if (isMe || !user) return null;
 	return (
 		<>
@@ -143,6 +156,16 @@ const GroupIconBanner = (props: GroupIconBannerProps) => {
 					<Icons.Transaction className="size-4 iconWhiteImportant" />
 				</span>
 			</div>
+			{checkAddFriend === EStateFriend.FRIEND && (
+				<div
+					className="p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer"
+					onClick={handleOpenShareContactModal}
+				>
+					<span title={t('shareContact')}>
+						<Icons.IconShareContact className="size-4 iconWhiteImportant" />
+					</span>
+				</div>
+			)}
 			{buttonFriendProps?.map((button, index) => (
 				<div
 					className={`p-2 rounded-full bg-buttonMore hover:bg-buttonMoreHover relative h-fit cursor-pointer  ${checkAddFriend === EStateFriend.MY_PENDING || checkAddFriend === EStateFriend.OTHER_PENDING ? `p-2 rounded-full bg-[#4e5058] relative h-fit` : ''}`}
