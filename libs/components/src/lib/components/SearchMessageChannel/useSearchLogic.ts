@@ -171,9 +171,6 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 		if (searchedRequest && channelId && currentClanId) {
 			const channelIdFilter = searchedRequest.filters?.find((f) => f.field_name === 'channel_id');
 			const hasSpecificChannel = channelIdFilter && channelIdFilter.field_value && channelIdFilter.field_value !== '0';
-
-			const hasOtherFilters = searchedRequest.filters?.some((f) => f.field_name !== 'content' && f.field_name !== 'channel_id');
-
 			const filteredFilters = (searchedRequest.filters || []).filter((f) => f.field_name !== 'channel_id');
 
 			let channelIdValue: string;
@@ -181,10 +178,8 @@ export const useSearchLogic = (mode?: ChannelStreamMode) => {
 				channelIdValue = currentDmGroupId;
 			} else if (hasSpecificChannel && channelIdFilter?.field_value) {
 				channelIdValue = channelIdFilter.field_value;
-			} else if (hasOtherFilters) {
-				channelIdValue = channelId;
 			} else {
-				channelIdValue = '0';
+				channelIdValue = channelId;
 			}
 
 			const requestFilter = [

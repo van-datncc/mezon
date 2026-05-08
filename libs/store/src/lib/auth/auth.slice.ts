@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import type { MezonContextValue } from '@mezon/transport';
-import { extractAndSaveConfig, resolveSessionWsUrl, socketState } from '@mezon/transport';
+import { resolveSessionWsUrl, socketState } from '@mezon/transport';
 import type { LoadingStatus } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
@@ -63,11 +63,6 @@ async function persistSessionConnectAfterLogin(mezon: MezonContextValue, session
 	const wsUrl = resolveSessionWsUrl(session);
 	const merged: ApiSession = { ...session, ws_url: wsUrl };
 	mezon.sessionRef.current = merged;
-
-	const config = extractAndSaveConfig(merged);
-	if (config) {
-		mezon.clientRef.current.setBasePath(config.host, config.port, config.useSSL);
-	}
 
 	const connectId = (merged.session_id || merged.token || '').trim();
 	if (!connectId) {

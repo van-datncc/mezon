@@ -131,8 +131,8 @@ export function MezonStoreProvider({ children, store, loading, persistor }: Prop
 		</Provider>
 	);
 }
-const CONNECT_GATE_POLL_MS = 400;
-const CONNECT_GATE_MAX_WAIT_MS = 60000;
+const CONNECT_GATE_POLL_MS = 1000;
+const CONNECT_GATE_MAX_WAIT_MS = 3000;
 const CONNECT_GATE_MAX_ATTEMPTS = Math.ceil(CONNECT_GATE_MAX_WAIT_MS / CONNECT_GATE_POLL_MS);
 
 interface ConnectGateProps {
@@ -142,34 +142,64 @@ interface ConnectGateProps {
 
 const ConnectGate = ({ children, connectRef }: ConnectGateProps) => {
 	const { clientRef } = useMezon();
+	const [loading, setLoading] = useState(!!clientRef.current?.isOpen?.());
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		if (!clientRef.current || !connectRef.current) {
+			setLoading(true);
 			return;
 		}
 		let cancelled = false;
 		let attempts = 0;
-		const intervalId = window.setInterval(() => {
+		let delay = CONNECT_GATE_POLL_MS;
+
+		let timeoutId: number | null = null;
+
+		const cleanup = () => {
+			if (timeoutId !== null) {
+				window.clearTimeout(timeoutId);
+				timeoutId = null;
+			}
+		};
+
+		const poll = () => {
 			if (cancelled) {
+				setLoading(true);
+				cleanup();
 				return;
 			}
+
 			if (clientRef.current?.isOpen?.()) {
-				window.clearInterval(intervalId);
+				setLoading(true);
+				cleanup();
 				return;
 			}
+
 			attempts += 1;
+
 			if (attempts >= CONNECT_GATE_MAX_ATTEMPTS) {
-				window.clearInterval(intervalId);
-				dispatch(authActions.resetSession());
+				cleanup();
+				dispatch(authActions.logOut({}));
+				setLoading(true);
+				return;
 			}
-		}, CONNECT_GATE_POLL_MS);
+
+			delay *= 2;
+
+			timeoutId = window.setTimeout(poll, delay);
+		};
+
+		timeoutId = window.setTimeout(poll, delay);
 
 		return () => {
 			cancelled = true;
-			window.clearInterval(intervalId);
+			cleanup();
 		};
 	}, []);
+	if (!loading) {
+		return null;
+	}
 
 	return <>{children}</>;
 };
