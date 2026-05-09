@@ -103,7 +103,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { extractAndSaveConfig, reconnectMezonSocketWithRetry, resolveSessionWsUrl, useMezon } from '@mezon/transport';
+import { publishSessionUpdate, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -142,7 +142,6 @@ import type {
 	ApiNotification,
 	ApiNotificationUserChannel,
 	ApiPermissionUpdate,
-	ApiSession,
 	ApiTokenSentEvent,
 	ApiUpdateCategoryDescRequest,
 	ApiWebhook,
@@ -258,7 +257,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isMobile = false }) => {
 	const { t } = useTranslation('token');
-	const { clientRef, sessionRef, mmnRef } = useMezon();
+	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
 
@@ -2632,17 +2631,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		}
 	}, []);
 
-	const onrefresssession = useCallback(
-		(session: ApiSession) => {
-			dispatch(authActions.setSessionId(session.session_id));
-			sessionRef.current = {
-				...sessionRef.current,
-				session_id: session.session_id
-			};
-		},
-		[sessionRef, dispatch]
-	);
-
 	const runPostReconnectActions = useCallback(() => {
 		resetSocketReconnectBudget();
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
@@ -2660,14 +2648,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			resetRefreshState();
 			dispatch(authActions.setLogout());
 			dispatch(walletActions.setLogout());
+			publishSessionUpdate(null, 'logout');
 		},
 		[dispatch]
 	);
 
 	const setCallbackEventFn = React.useCallback(
 		(socket: Client) => {
-			socket.onrefreshsession = onrefresssession;
-
 			socket.onconnect = (_evt: Event) => {
 				socketState.status = 'connected';
 			};
@@ -2849,7 +2836,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			onMarkAsRead,
 			onaddfriend,
 			onbanneduser,
-			onrefresssession,
 			runPostReconnectActions,
 			onServerDisconnectStreakLogout
 		]
@@ -2857,48 +2843,20 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const reconnect$ = useMemo(() => new Subject<string>(), []);
 
-	const persistReconnectSession = useCallback(
-		(effectiveSession: ApiSession) => {
-			extractAndSaveConfig(effectiveSession, isMobile);
-		},
-		[isMobile]
-	);
-
-	const onReconnectSessionRefreshed = useCallback(
-		(sessionNew: ApiSession, effectiveSession: ApiSession) => {
-			getStore().dispatch(authActions.setSessionId(sessionNew.session_id));
-			sessionRef.current = {
-				...effectiveSession,
-				session_id: sessionNew.session_id
-			};
-		},
-		[sessionRef]
-	);
-
 	const executeReconnect = useCallback(
 		async (_socketType: string, client: Client): Promise<ReconnectWaveTickResult> => {
-			const store = getStore();
-			const session = selectSession(store.getState()) as ApiSession | null;
-
-			if (!session?.token?.trim() && !session?.session_id?.trim()) {
+			const sr = sessionRef.current;
+			if (!sr?.token?.trim() && !sr?.session_id?.trim()) {
 				socketState.status = 'disconnected';
 				return false;
 			}
-			sessionRef.current = {
-				...session,
-				ws_url: resolveSessionWsUrl(session)
-			} as ApiSession;
 
 			if (!consumeSocketReconnectBudget()) {
 				socketState.status = 'disconnected';
-				dispatch(
-					toastActions.addToast({
-						message: 'Reconnect paused: too many attempts in 2 minutes. Try again shortly.',
-						type: 'warning',
-						autoClose: 8000,
-						id: 'SOCKET_RECONNECT_BUDGET'
-					})
-				);
+				resetRefreshState();
+				dispatch(authActions.setLogout());
+				dispatch(walletActions.setLogout());
+				publishSessionUpdate(null, 'logout');
 				return 'BUDGET_EXHAUSTED';
 			}
 
@@ -2915,13 +2873,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 
 			try {
-				const result = await reconnectMezonSocketWithRetry({
-					client,
-					sessionRef,
-					resolveWsUrl: resolveSessionWsUrl,
-					persistSession: persistReconnectSession,
-					onSessionRefreshed: onReconnectSessionRefreshed,
-				});
+				const result = await reconnectSocket();
 
 				if (result.status === 'RECONNECTING') {
 					refundSocketReconnectBudgetSlot();
@@ -2942,7 +2894,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				}
 			}
 		},
-		[sessionRef, persistReconnectSession, onReconnectSessionRefreshed, dispatch]
+		[sessionRef, dispatch, reconnectSocket]
 	);
 
 	useEffect(() => {
@@ -2979,6 +2931,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			resetRefreshState();
 			dispatch(authActions.setLogout());
 			dispatch(walletActions.setLogout());
+			publishSessionUpdate(null, 'logout');
 		};
 		window.addEventListener('mezon:session-expired', onSessionExpired);
 		return () => {
