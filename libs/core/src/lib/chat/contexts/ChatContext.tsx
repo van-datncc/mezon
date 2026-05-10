@@ -2926,20 +2926,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, [reconnect$, executeReconnect, dispatch]);
 
 	useEffect(() => {
-		const onSessionExpired = () => {
-			console.error('Session expired, logging out');
-			resetRefreshState();
-			dispatch(authActions.setLogout());
-			dispatch(walletActions.setLogout());
-			publishSessionUpdate(null, 'logout');
-		};
-		window.addEventListener('mezon:session-expired', onSessionExpired);
-		return () => {
-			window.removeEventListener('mezon:session-expired', onSessionExpired);
-		};
-	}, [dispatch]);
-
-	useEffect(() => {
 		const onBudgetReset = () => {
 			dispatch(toastActions.removeToast('SOCKET_RECONNECT_BUDGET'));
 		};
