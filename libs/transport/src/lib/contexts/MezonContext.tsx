@@ -426,9 +426,11 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			const wsUrl = resolveSessionWsUrl(sr);
 			sessionRef.current = { ...sr, ws_url: wsUrl };
 
-			const credential = sessionRef.current.session_id?.trim();                                                             
-			if (!credential) return null;  
-			
+			const credential = sessionRef.current.session_id?.trim();
+			if (!credential) {
+				throw new Error('Missing Mezon session credential');
+			}
+
 			await client.connect(credential, wsUrl, options.createStatus ?? true);
 
 			socketState.status = 'connected';
@@ -457,7 +459,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 		reconnectInFlight = true;
 		try {
-			const result = await connectSocket({}, 'test');
+			const result = await connectSocket();
 			if (result === null) {
 				return { status: 'MISSING_SESSION', attempts: 1 };
 			}
