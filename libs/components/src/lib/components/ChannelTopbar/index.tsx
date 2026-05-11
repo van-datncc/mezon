@@ -1286,8 +1286,8 @@ function MemberGroup({ channelId }: { channelId: string }) {
 	const { t } = useTranslation('common');
 	const memberGroup = useSelector((state) => selectMemberByGroupId(state, channelId));
 	return (
-		<span className="h-3 text-xs leading-3">
-			{memberGroup?.length} {t('member')}
+		<span className="h-3 text-xs leading-3 lowercase">
+			{memberGroup?.length} {memberGroup?.length && memberGroup?.length > 1 ? t('members') : t('member')}
 		</span>
 	);
 }
