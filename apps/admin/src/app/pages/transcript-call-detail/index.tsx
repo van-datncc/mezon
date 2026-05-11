@@ -12,7 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import InfoRow from '../../components/dashboard/InfoRow';
 import MetricCard from '../../components/dashboard/MetricCard';
-import { formatDurationSec, formatRoomDate, normalizeRoomStatus, type CallStatus } from '../../utils/dashboard/format';
+import { STATUS_BADGE } from '../../constants/dashboard';
+import { formatDurationSec, formatRoomDate, formatStatus, normalizeRoomStatus } from '../../utils/dashboard/format';
 
 type TabType = 'overview' | 'fullTranscript' | 'summary' | 'participants';
 
@@ -46,39 +47,6 @@ const TranscriptCallDetail = () => {
 	const stats = detail.statistics;
 	const status = normalizeRoomStatus(stats?.status);
 
-	const statusConfig = useMemo(() => {
-		const config: Record<CallStatus, { label: string; bg: string; text: string }> = {
-			completed: {
-				label: t('transcriptCalls.status.completed'),
-				bg: 'bg-green-100 dark:bg-green-900/30',
-				text: 'text-green-800 dark:text-green-400'
-			},
-			processing: {
-				label: t('transcriptCalls.status.processing'),
-				bg: 'bg-blue-100 dark:bg-blue-900/30',
-				text: 'text-blue-800 dark:text-blue-400'
-			},
-			pending: {
-				label: t('transcriptCalls.status.pending'),
-				bg: 'bg-yellow-100 dark:bg-yellow-900/30',
-				text: 'text-yellow-800 dark:text-yellow-400'
-			},
-			failed: {
-				label: t('transcriptCalls.status.failed'),
-				bg: 'bg-red-100 dark:bg-red-900/30',
-				text: 'text-red-800 dark:text-red-400'
-			}
-		};
-		return config[status];
-	}, [status, t]);
-
-	const fullText = useMemo(() => {
-		if (detail.summary?.full_text) return detail.summary.full_text.trim();
-		if (detail.summary?.messages) {
-			return detail.summary.messages.map((m) => `[${m.timestamp}] ${m.participant_id}:\n${m.content}`).join('\n\n');
-		}
-		return '';
-	}, [detail.summary]);
 	const summaryText = detail.summary?.summary_data?.summary?.trim();
 	const actionItems = detail.summary?.summary_data?.action_items ?? [];
 
@@ -209,7 +177,11 @@ const TranscriptCallDetail = () => {
 					</button>
 					<span className="dark:text-textSecondary text-gray-300">/</span>
 					<h2 className="text-2xl font-bold dark:text-textDarkTheme text-gray-900 truncate max-w-[300px]">{displayId}</h2>
-					<span className={`px-2 py-1 text-xs font-medium rounded-full ${statusConfig.bg} ${statusConfig.text}`}>{statusConfig.label}</span>
+					<span
+						className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[status] ?? 'bg-gray-100 text-gray-600'}`}
+					>
+						{formatStatus(status)}
+					</span>
 				</div>
 				<button
 					type="button"
@@ -269,9 +241,9 @@ const TranscriptCallDetail = () => {
 									label={t('transcriptCalls.columns.status')}
 									value={
 										<span
-											className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusConfig.bg} ${statusConfig.text}`}
+											className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[status] ?? 'bg-gray-100 text-gray-600'}`}
 										>
-											{statusConfig.label}
+											{formatStatus(status)}
 										</span>
 									}
 								/>
@@ -319,10 +291,6 @@ const TranscriptCallDetail = () => {
 										);
 									})}
 								</div>
-							) : fullText ? (
-								<pre className="text-sm whitespace-pre-wrap dark:text-textDarkTheme text-gray-900 font-sans max-h-[480px] overflow-y-auto p-4 rounded-lg bg-gray-50 dark:bg-bgSecondary/20 border dark:border-borderClan/50">
-									{fullText}
-								</pre>
 							) : (
 								<div className="text-sm dark:text-textSecondary text-gray-500 italic">
 									{t('transcriptCalls.detail.transcriptEmpty')}
