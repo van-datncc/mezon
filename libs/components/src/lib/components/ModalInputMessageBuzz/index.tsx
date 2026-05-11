@@ -37,6 +37,23 @@ const ModalInputMessageBuzz = ({ currentChannel, mode, closeBuzzModal }: ModalIn
 		handleClosePopup();
 	}, [handleClosePopup, message, sendMessage]);
 
+	const handleMessageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+		setMessage(event.target.value);
+	}, []);
+
+	const handleMessageKeyDown = useCallback(
+		(event: React.KeyboardEvent<HTMLInputElement>) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				handleSendBuzzMsg();
+			}
+			if (event.key === 'Escape') {
+				handleClosePopup();
+			}
+		},
+		[handleClosePopup, handleSendBuzzMsg]
+	);
+
 	useOnClickOutside(panelRef, handleClosePopup);
 
 	return (
@@ -59,16 +76,8 @@ const ModalInputMessageBuzz = ({ currentChannel, mode, closeBuzzModal }: ModalIn
 						type="text"
 						ref={inputRef}
 						value={message}
-						onChange={(event) => setMessage(event.target.value)}
-						onKeyDown={(event) => {
-							if (event.key === 'Enter') {
-								event.preventDefault();
-								handleSendBuzzMsg();
-							}
-							if (event.key === 'Escape') {
-								handleClosePopup();
-							}
-						}}
+						onChange={handleMessageChange}
+						onKeyDown={handleMessageKeyDown}
 						maxLength={MAX_LENGTH_MESSAGE_BUZZ}
 						placeholder={t('enterMessage')}
 						className={`h-[42px] flex-1 min-w-0 bg-theme-input border border-theme-primary rounded-lg px-[10px] py-[8px] whitespace-nowrap overflow-x-auto overflow-y-hidden outline-none customScrollLightMode ${appearanceTheme === ThemeApp.Light ? 'lightModeScrollBarMention' : ''}`}
