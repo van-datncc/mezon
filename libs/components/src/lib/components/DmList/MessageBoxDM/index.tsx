@@ -1,6 +1,6 @@
 import { useChatSending, useEscapeKey } from '@mezon/core';
 import { referencesActions, selectDataReferences, selectSession, useAppDispatch, useAppSelector } from '@mezon/store';
-import type { IMessageSendPayload } from '@mezon/utils';
+import type { IMessageSendPayload, ThreadValue } from '@mezon/utils';
 import { blankReferenceObj } from '@mezon/utils';
 import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef } from 'react';
@@ -33,10 +33,16 @@ export function DirectMessageBox({ mode, direct }: DirectIdProps) {
 			content: IMessageSendPayload,
 			mentions?: Array<ApiMessageMention>,
 			attachments?: Array<ApiMessageAttachment>,
-			references?: Array<ApiMessageRef>
+			references?: Array<ApiMessageRef>,
+			value?: ThreadValue,
+			anonymous?: boolean,
+			mentionEveryone?: boolean,
+			displayName?: string,
+			clanNick?: string,
+			ephemeralReceiverId?: string
 		) => {
 			if (sessionUser) {
-				sendMessage(content, mentions, attachments, references);
+				sendMessage(content, mentions, attachments, references, false, mentionEveryone, false, undefined, ephemeralReceiverId);
 			} else {
 				console.error('Session is not available');
 			}
