@@ -1,5 +1,5 @@
 const WINDOW_MS = 2 * 60 * 1000;
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 3;
 
 let attemptTimes: number[] = [];
 

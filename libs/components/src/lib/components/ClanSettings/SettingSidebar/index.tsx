@@ -61,7 +61,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			if (item.id === ItemSetting.INTEGRATIONS) {
 				return hasClanPermission || hasChannelPermission;
 			}
-			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.AUDIT_LOG].includes(item.id)) {
+			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.AUDIT_LOG, ItemSetting.ARCHIVED_CHANNELS].includes(item.id)) {
 				return hasClanPermission;
 			}
 			if (item.id === ItemSetting.ON_BOARDING || item.id === ItemSetting.ON_COMUNITY) {
