@@ -59,6 +59,7 @@ export const threadError: ThreadError = {
 export const titleMission = ['Send a message in', 'Visit a channel', 'Do anything you want'];
 
 export const MIN_THRESHOLD_CHARS = 4000;
+export const PREFIX_MESSAGE_LENGTH = 150;
 export const MAX_FORWARD_ADDITIONAL_MESSAGE_LENGTH = 2000;
 
 export const SHARE_CONTACT_KEY = 'share_contact';
