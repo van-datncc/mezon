@@ -46,7 +46,7 @@ const TempMemberItem = memo(({ id, isOwner }: TempMemberItemProps) => {
 				{t('inVoice')}
 			</span>
 		) : (
-			userCustomStatus
+			userMeta?.user_status || userCustomStatus
 		);
 
 	return (
@@ -111,7 +111,7 @@ const MemoizedMemberItem = memo((props: MemberClanProps) => {
 						{t('inVoice')}
 					</span>
 				) : (
-					userCustomStatus
+					userMeta?.user_status || userCustomStatus
 				)
 			}
 			user={user}
