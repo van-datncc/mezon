@@ -291,7 +291,7 @@ const DirectUnreadList = memo(() => {
 
 	if (!listDmRender?.length) return null;
 
-	return <div>{renderItems}</div>;
+	return <div className="max-h-64 overflow-y-scroll hide-scrollbar">{renderItems}</div>;
 });
 
 const SidebarMenu = memo(
