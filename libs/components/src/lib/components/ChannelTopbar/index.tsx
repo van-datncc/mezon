@@ -81,8 +81,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEditGroupModal } from '../../hooks/useEditGroupModal';
-import CreateMessageGroup from '../DmList/CreateMessageGroup';
 import { AppChannelListIcon } from '../ChannelList/AppChannelListIcon';
+import CreateMessageGroup from '../DmList/CreateMessageGroup';
 import { UserStatusIconDM } from '../MemberProfile';
 import ModalEditGroup from '../ModalEditGroup';
 import { NotificationTooltip } from '../NotificationList';
@@ -218,7 +218,6 @@ const TopBarChannelText = memo(() => {
 		const link = toChannelPage(checkInvoice.channelId, checkInvoice.clanId);
 		navigate(link);
 	};
-
 	return (
 		<>
 			<div className="flex relative flex-1 min-w-0 items-center gap-2  text-theme-primary mr-5">
@@ -281,8 +280,11 @@ const TopBarChannelText = memo(() => {
 							title={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? t('tooltips.clickToEdit') : channelDmGroupLabel}
 							data-e2e={generateE2eId(`chat.direct_message.chat_item.namegroup`)}
 						>
-							<div className="flex flex-col justify-center">
+							<div className="flex flex-col justify-between h-8">
 								<span className="truncate min-w-0 h-4 leading-4">{channelDmGroupLabel}</span>
+								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && currentDmGroup.channel_id && (
+									<MemberGroup channelId={currentDmGroup.channel_id} />
+								)}
 								{!!checkInvoice && currentDmGroup?.type !== ChannelType.CHANNEL_TYPE_GROUP && (
 									<span
 										className="truncate min-w-0 h-4 text-xs flex gap-1 items-center cursor-pointer pointer-events-auto"
@@ -409,9 +411,7 @@ const ChannelTopbarLabel = memo(
 
 		return (
 			<div className="none-draggable-area flex items-center text-lg gap-3 min-w-0" onClick={onClick}>
-				<div className="flex w-4 flex-shrink-0 items-center justify-center text-theme-message">
-					{renderIcon()}
-				</div>
+				<div className="flex w-4 flex-shrink-0 items-center justify-center text-theme-message">{renderIcon()}</div>
 				<p className="flex-1 min-w-0 text-base font-semibold leading-5 truncate text-theme-message">{label}</p>
 			</div>
 		);
@@ -1279,6 +1279,16 @@ function GalleryButton() {
 			</button>
 			{isShowGallery && <GalleryModal onClose={handleClose} rootRef={galleryRef} />}
 		</div>
+	);
+}
+
+function MemberGroup({ channelId }: { channelId: string }) {
+	const { t } = useTranslation('common');
+	const memberGroup = useSelector((state) => selectMemberByGroupId(state, channelId));
+	return (
+		<span className="h-3 text-xs leading-3">
+			{memberGroup?.length} {t('member')}
+		</span>
 	);
 }
 
