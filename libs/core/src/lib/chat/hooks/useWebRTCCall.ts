@@ -174,7 +174,7 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 				);
 				// Just cancel call mobile if I'm the caller
 				if (isMyCaller?.current) {
-					await cancelCallFCMMobile('', true);
+					await cancelCallFCMMobile(true);
 				}
 				setIsConnected(true);
 				clearCallTimeout();
@@ -558,10 +558,10 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 		}
 	};
 
-	const cancelCallFCMMobile = async (receiverId: string = dmUserId, isConnected = false) => {
+	const cancelCallFCMMobile = async (isConnected = false) => {
 		const bodyFCMMobile = { offer: 'CANCEL_CALL', isConnected };
 		if (mezon.sessionRef.current) {
-			await mezon.clientRef.current?.makeCallPush(mezon.sessionRef.current, receiverId, JSON.stringify(bodyFCMMobile), channelId, userId);
+			await mezon.clientRef.current?.makeCallPush(mezon.sessionRef.current, dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 		}
 	};
 
