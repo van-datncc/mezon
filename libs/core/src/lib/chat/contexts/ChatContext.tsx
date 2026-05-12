@@ -80,7 +80,6 @@ import {
 	selectLatestMessageId,
 	selectLoadingStatus,
 	selectOrderedClans,
-	selectSession,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -1923,6 +1922,82 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				}
 				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
+			if (channelUpdated.active === 0) {
+				dispatch(voiceActions.removeInVoiceInChannel(channelUpdated.channel_id));
+				dispatch(appActions.clearHistoryChannel({ channelId: channelUpdated.channel_id }));
+				dispatch(
+					threadsActions.setIsShowCreateThread({
+						channelId: channelUpdated.channel_id as string,
+						isShowCreateThread: false
+					})
+				);
+				dispatch(
+					channelsActions.removeChannelApp({
+						clanId: channelUpdated.clan_id,
+						channelId: channelUpdated.channel_id
+					})
+				);
+				if (channelUpdated?.parent_id) {
+					dispatch(
+						threadsActions.setIsShowCreateThread({
+							channelId: channelUpdated.parent_id as string,
+							isShowCreateThread: false
+						})
+					);
+				}
+				const isVoiceJoined = selectVoiceInfo(store.getState());
+				if (channelUpdated?.channel_id === isVoiceJoined?.channelId) {
+					dispatch(voiceActions.resetVoiceControl());
+				}
+				dispatch(channelSettingActions.removeChannelFromSocket(channelUpdated.channel_id));
+				dispatch(channelMetaActions.deleteChannelMeta({ channelId: channelUpdated.channel_id }));
+				dispatch(channelsActions.remove({ clanId: channelUpdated.clan_id, channelId: channelUpdated.channel_id }));
+				dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
+				dispatch(updateClanBadgeRender({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id }));
+				dispatch(
+					threadsActions.removeThreadFromCache({
+						channelId: channelUpdated?.parent_id || '',
+						threadId: channelUpdated.channel_id
+					})
+				);
+				if (checkIsThread({ parent_id: channelUpdated.parent_id } as any)) {
+					dispatch(threadsActions.updateActiveCodeThread({ channelId: channelUpdated.channel_id, activeCode: 0 }));
+					if (channelUpdated.parent_id) {
+						dispatch(threadsActions.removeThreadFromCache({ channelId: channelUpdated.parent_id, threadId: channelUpdated.channel_id }));
+					}
+				}
+				const currentCh = currentChannelId ? selectChannelById(store.getState(), currentChannelId) : null;
+				const isUserInArchivedChannel = channelUpdated.channel_id === currentChannelId;
+				const isUserInChildThread = currentCh && checkIsThread(currentCh) && currentCh.parent_id === channelUpdated.channel_id;
+
+				if (isUserInArchivedChannel || isUserInChildThread) {
+					if (isMobile && currentCh?.channel_id) {
+						MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
+							channelId: currentCh.channel_id,
+							channelType: currentCh.type
+						});
+					}
+					const clanId = channelUpdated.clan_id;
+					if (!clanId) {
+						if (!isMobile) navigate(`/chat/direct/friends`);
+						return;
+					}
+					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
+					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
+					const allChannels = selectAllChannels(store.getState());
+					const fallbackChannelId = allChannels.find((ch) => ch.id !== channelUpdated.channel_id && !checkIsThread(ch))?.id;
+					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+					if (!isMobile) {
+						if (redirectChannelId) {
+							navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+						} else {
+							navigate(`/chat/clans/${clanId}/member-safety`);
+						}
+					}
+				}
+				return;
+			}
+
 			if (channelUpdated.channel_type !== ChannelType.CHANNEL_TYPE_DM && channelUpdated.channel_type !== ChannelType.CHANNEL_TYPE_GROUP) {
 				dispatch(
 					channelSettingActions.updateChannelFromSocket({
