@@ -369,7 +369,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					payload.cvtt = canvasTitles;
 				}
 
-				const removeEmptyOnPayload = filterEmptyArrays([]);
+				const removeEmptyOnPayload = filterEmptyArrays(payload);
 
 				const encoder = new TextEncoder();
 				const payloadJson = JSON.stringify(removeEmptyOnPayload);
