@@ -65,7 +65,11 @@ export const MacOSWindowControls: React.FC<MacOSWindowControlsProps> = ({ classN
 		icon: React.ReactNode;
 	}> = ({ onClick, backgroundColor, title, icon }) => (
 		<button onClick={onClick} className={buttonBaseClass} title={title} style={{ backgroundColor }}>
-			<span className={`opacity-0 ${isWindowFocused ? 'group-hover:opacity-100' : ''} transition-opacity duration-200`}>{icon}</span>
+			<span
+				className={`opacity-0 ${isWindowFocused ? 'group-hover:opacity-100' : ''} transition-opacity duration-200 flex items-center justify-center w-full h-full overflow-hidden`}
+			>
+				{icon}
+			</span>
 		</button>
 	);
 
