@@ -15,6 +15,7 @@ import {
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
+	selectClanById,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -52,6 +53,7 @@ import {
 	ONE_MILISECONDS,
 	ONE_MINUTE_MS,
 	SubPanelName,
+	buildChannelAppLaunchUrl,
 	generateE2eId,
 	isBackgroundModeActive,
 	isLinuxDesktop,
@@ -175,6 +177,8 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const isSpecialViewMode = isTimelineViewMode || isMediaChannelViewMode;
 
 	const currentClanId = useSelector(selectCurrentClanId);
+	const launchClan = useAppSelector(selectClanById(currentChannel?.clan_id ?? ''));
+	const launchClanName = launchClan?.clan_name ?? '';
 	const currentClanIsOnboarding = useSelector(selectCurrentClanIsOnboarding);
 	const missionDone = useSelector((state) => selectMissionDone(state, currentClanId as string));
 	const missionSum = useSelector((state) => selectMissionSum(state, currentClanId as string));
@@ -252,8 +256,11 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 					})
 				).unwrap();
 				if (hashData.web_app_data) {
-					const encodedHash = encodeURIComponent(hashData.web_app_data);
-					const urlWithHash = `${appChannel.app_url}?data=${encodedHash}`;
+					const urlWithHash = buildChannelAppLaunchUrl(appChannel.app_url, {
+						webAppData: hashData.web_app_data,
+						clanId: currentChannel?.clan_id ?? '',
+						clanName: launchClanName
+					});
 					if (isElectron()) {
 						window.electron.launchAppWindow(urlWithHash);
 						return;
