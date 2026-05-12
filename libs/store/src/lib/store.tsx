@@ -26,6 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import type { MezonContextValue } from '@mezon/transport';
+import { publishSessionUpdate } from '@mezon/transport';
 import { safeJSONParse } from 'mezon-js';
 import { ACTIVITIES_API_FEATURE_KEY, activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
@@ -465,35 +466,35 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 	if (typeof window !== 'undefined') {
 		let lastStorageValue: string | null = null;
 		const handleStorageChange = async (e: StorageEvent) => {
-			if (e.key === 'persist:auth' && e.newValue) {
-				try {
-					if (e.newValue === lastStorageValue) {
-						return;
+			if (e.key !== 'persist:auth') return;
+			if (e.newValue === lastStorageValue) return;
+			lastStorageValue = e.newValue;
+
+			try {
+				const currentState = store.getState();
+				const currentSession = currentState.auth?.session;
+
+				if (!e.newValue) {
+					if (currentSession) {
+						publishSessionUpdate(null, 'cross-tab');
 					}
-					lastStorageValue = e.newValue;
-
-					const newAuthState = safeJSONParse(e.newValue);
-					const sessionData = newAuthState.session ? safeJSONParse(newAuthState.session) : null;
-
-					const currentState = store.getState();
-					const currentSession = currentState.auth?.session;
-
-					const newSession = sessionData ? sessionData : null;
-					const hasSessionChanged =
-						newSession?.token !== currentSession?.token || newSession?.refresh_token !== currentSession?.refresh_token;
-
-					if (hasSessionChanged) {
-						if (newSession) {
-							window.dispatchEvent(
-								new CustomEvent('mezon:session-refreshed', {
-									detail: { session: newSession }
-								})
-							);
-						}
-					}
-				} catch (err) {
-					console.error('[Storage Sync] Failed to sync auth state:', err);
+					return;
 				}
+
+				const newAuthState = safeJSONParse(e.newValue);
+				const sessionData = newAuthState?.session ? safeJSONParse(newAuthState.session) : null;
+				const newSession = sessionData ?? null;
+
+				const hasSessionChanged =
+					newSession?.token !== currentSession?.token ||
+					newSession?.refresh_token !== currentSession?.refresh_token ||
+					newSession?.session_id !== currentSession?.session_id;
+
+				if (!hasSessionChanged) return;
+
+				publishSessionUpdate(newSession, 'cross-tab');
+			} catch (err) {
+				console.error('[Storage Sync] Failed to sync auth state:', err);
 			}
 		};
 

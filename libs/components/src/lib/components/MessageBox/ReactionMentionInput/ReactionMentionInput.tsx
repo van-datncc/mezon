@@ -46,6 +46,7 @@ import {
 	ID_MENTION_HERE,
 	IS_SAFARI,
 	MIN_THRESHOLD_CHARS,
+	PREFIX_MESSAGE_LENGTH,
 	QUICK_MENU_TYPE,
 	RECENT_EMOJI_CATEGORY,
 	SubPanelName,
@@ -260,13 +261,15 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const currentTime = Math.floor(Date.now() / 1000);
 			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
-			if (isArchived || channel.active === 0) {
+			try {
 				await dispatch(
 					threadsActions.writeActiveArchivedThread({
 						clanId: channel.clan_id ?? '',
 						channelId: channel.channel_id ?? ''
 					})
-				);
+				).unwrap();
+			} catch (e) {
+				// Unarchive failed, but message send will continue
 			}
 			if (needsJoin && joinningToThread) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: channel.id, activeCode: ThreadStatus.joined }));
@@ -392,7 +395,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					await addMemberToThread(currentChannel!, usersNotExistingInThread);
 				}
 
-				handleThreadActivation(currentChannel);
+				await handleThreadActivation(currentChannel);
 
 				if (isReplyOnChannel) {
 					props.onSend(
@@ -568,7 +571,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				return;
 			}
 
-			handleThreadActivation(currentChannel);
+			await handleThreadActivation(currentChannel);
 
 			if (isReplyOnChannel) {
 				props.onSend(
@@ -1214,8 +1217,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				isThreadbox={props.isThreadbox || false}
 				onEmojiSelect={insertEmojiDirectly}
 			/>
-			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - draftRequest.content.length}</div>
+			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">
+					{MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH - draftRequest.content.length}
+				</div>
 			)}
 		</div>
 	);

@@ -16,7 +16,7 @@ import {
 	setIsElectronUpdateAvailable
 } from '@mezon/store';
 import i18n from '@mezon/translations';
-import { clearSessionFromStorage, getMezonConfig, MezonContextProvider, useMezon } from '@mezon/transport';
+import { getMezonConfig, MezonContextProvider, useMezon } from '@mezon/transport';
 
 import { PopupManagerProvider } from '@mezon/components';
 import { getCurrentChatData, PermissionProvider, useActivities, useSettingFooter } from '@mezon/core';
@@ -106,26 +106,6 @@ const AppInitializer = () => {
 	const dispatch = useDispatch();
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const { setUserActivity, setUserAFK } = useActivities();
-
-	const { clientRef } = useMezon();
-
-	useEffect(() => {
-		if (!clientRef?.current?.setBasePath) return;
-		if (!isLogin) {
-			clearSessionFromStorage();
-
-			clientRef.current.setBasePath(
-				process.env.NX_CHAT_APP_API_GW_HOST as string,
-				process.env.NX_CHAT_APP_API_GW_PORT as string,
-				process.env.NX_CHAT_APP_API_SECURE === 'true'
-			);
-		} else {
-			const config = getMezonConfig();
-			if (config) {
-				clientRef.current.setBasePath(config.host, config.port, config.ssl);
-			}
-		}
-	}, [isLogin, clientRef]);
 
 	useEffect(() => {
 		if (!isElectron()) {

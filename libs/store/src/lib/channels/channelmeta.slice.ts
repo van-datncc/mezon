@@ -71,6 +71,7 @@ export const channelMetaSlice = createSlice({
 	initialState: initialChannelMetaState,
 	reducers: {
 		add: channelMetaAdapter.addOne,
+		upsertOne: channelMetaAdapter.upsertOne,
 		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number; senderId: string; clanId: string }>) => {
 			if (action.payload.clanId === '0') {
 				dmMetaAdapter.updateOne(state.dmEntities, {

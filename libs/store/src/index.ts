@@ -1,3 +1,4 @@
+export * from './lib/BootstrapGate';
 export * from './lib/MezonStoreProvider';
 export * from './lib/account/account.slice';
 export * from './lib/activities/activitiesAPI.slice';

@@ -488,10 +488,17 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 export const archiveChannel = createAsyncThunk('channels/archiveChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId as string);
 		const response = await mezon.client.archiveChannel(mezon.session, body.clanId, body.channelId);
 		if (response) {
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
 			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
+			if (channelData && checkIsThread(channelData as any)) {
+				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId: body.channelId, activeCode: 0 }));
+				if (channelData.parent_id) {
+					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: channelData.parent_id, threadId: body.channelId }));
+				}
+			}
 		}
 		return response;
 	} catch (error) {

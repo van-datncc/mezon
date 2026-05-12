@@ -69,6 +69,7 @@ export function getIndexerClient() {
 export function createClient(options: CreateMezonClientOptions) {
 	const { ssl, host, port, key } = options;
 	const client = new Client(key, host, port, ssl);
+	client.setAutoReconnect({ enabled: false });
 	clientInstance = client;
 	return client;
 }
