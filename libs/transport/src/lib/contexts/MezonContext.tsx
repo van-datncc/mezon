@@ -275,10 +275,35 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 		client.onrefreshsession = (sessionNew: ApiSession) => {
 			const prev = sessionRef.current;
-			const nextSid = sessionNew.session_id;
-			if (!prev || !nextSid || prev.session_id === nextSid) return;
-			const updated: ApiSession = { ...prev, session_id: nextSid };
+			const nextSid = sessionNew?.session_id;
+			console.log('[SessionFix] onrefreshsession fired', {
+				hasPrev: !!prev,
+				prevSid: prev?.session_id,
+				nextSid,
+				visibility: typeof document !== 'undefined' ? document.visibilityState : 'n/a'
+			});
+			if (!nextSid) {
+				console.warn('[SessionFix] onrefreshsession skipped: empty nextSid');
+				return;
+			}
+			if (prev && prev.session_id === nextSid) {
+				console.log('[SessionFix] onrefreshsession skipped: same session_id');
+				return;
+			}
+			const base = prev ?? sessionNew;
+			const updated: ApiSession = { ...base, session_id: nextSid };
 			sessionRef.current = updated;
+
+			try {
+				const raw = localStorage.getItem('persist:auth');
+				const outer = raw ? JSON.parse(raw) : {};
+				outer.session = JSON.stringify(updated);
+				localStorage.setItem('persist:auth', JSON.stringify(outer));
+				console.log('[SessionFix] onrefreshsession persisted to localStorage', { sid: nextSid });
+			} catch (err) {
+				console.error('[SessionFix] onrefreshsession localStorage write failed', err);
+			}
+
 			publishSessionUpdate(updated, 'refresh');
 		};
 
