@@ -259,7 +259,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const threadMeta = selectChannelMetaById(store.getState(), channel.id);
 			const needsJoin = !userProfile?.user?.id ? false : !userIds?.includes(userProfile?.user?.id);
 			const currentTime = Math.floor(Date.now() / 1000);
-			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
+			const lastMessageTimestamp = threadMeta?.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
 			try {
 				if (isArchived || channel.active !== ThreadStatus.joined) {
