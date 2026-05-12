@@ -262,12 +262,14 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
 			try {
-				await dispatch(
-					threadsActions.writeActiveArchivedThread({
-						clanId: channel.clan_id ?? '',
-						channelId: channel.channel_id ?? ''
-					})
-				).unwrap();
+				if (isArchived || channel.active !== ThreadStatus.joined) {
+					await dispatch(
+						threadsActions.writeActiveArchivedThread({
+							clanId: channel.clan_id ?? '',
+							channelId: channel.channel_id ?? ''
+						})
+					).unwrap();
+				}
 			} catch (e) {
 				// Unarchive failed, but message send will continue
 			}
