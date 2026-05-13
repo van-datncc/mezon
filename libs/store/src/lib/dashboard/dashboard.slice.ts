@@ -496,6 +496,9 @@ export const fetchRoomSummaryByRoomId = createAsyncThunk('dashboard/fetchRoomSum
 		const url = `${base}/dashboard/room/${encodeURIComponent(roomId)}/summary`;
 		const res = await fetch(url, { headers: authHeadersForDashboard(thunkAPI.getState as () => RootState) });
 		if (!res.ok) {
+			if (res.status === 404) {
+				return { roomId, summary: null };
+			}
 			const text = await res.text().catch(() => '');
 			return thunkAPI.rejectWithValue({ roomId, message: text || res.statusText });
 		}
