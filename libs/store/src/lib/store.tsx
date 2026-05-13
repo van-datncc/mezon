@@ -436,22 +436,52 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Pass the action to the next middleware or reducer
 	return next(action);
 };
+const isDev = process.env.NODE_ENV === 'development';
+
+const thunkNameLogger = () => (next: any) => (action: any) => {
+	const isThunk = typeof action.type === 'string' && action.type.includes('/');
+	if (isThunk) {
+		const [slice, actionName, status] = action.type.split('/');
+		if (status === 'pending') {
+			console.warn(`🚀 THUNK START: ${slice}/${actionName}`, {
+				arg: action.meta?.arg
+			});
+		}
+
+		if (status === 'fulfilled') {
+			console.warn(`✅ THUNK SUCCESS: ${slice}/${actionName}`);
+		}
+
+		if (status === 'rejected') {
+			console.warn(`❌ THUNK ERROR: ${slice}/${actionName}`, action.error);
+		}
+	}
+
+	return next(action);
+};
 
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
 	const store = configureStore({
 		reducer,
 		devTools: false,
 		preloadedState,
-		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware({
+		middleware: (getDefaultMiddleware) => {
+			const base = getDefaultMiddleware({
 				thunk: {
-					extraArgument: {
-						mezon
-					}
+					extraArgument: { mezon }
 				},
 				immutableCheck: false,
 				serializableCheck: false
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+			});
+
+			const withListeners = base.prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware);
+
+			if (isDev) {
+				return withListeners.prepend(thunkNameLogger);
+			}
+
+			return withListeners;
+		}
 	});
 	storeInstance = store;
 	storeCreated = true;
