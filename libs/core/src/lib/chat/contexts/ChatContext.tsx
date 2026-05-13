@@ -2437,6 +2437,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		if (signalingType <= 8 || event.data_type === WEBRTC_CLEAR_CALL) {
 			dispatch(
 				DMCallActions.addOrUpdate({
+					isInCall,
 					calleeId: event?.receiver_id,
 					signalingData: event,
 					id: event?.caller_id,
