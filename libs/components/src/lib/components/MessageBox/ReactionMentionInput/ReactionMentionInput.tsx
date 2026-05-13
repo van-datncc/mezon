@@ -46,6 +46,7 @@ import {
 	ID_MENTION_HERE,
 	IS_SAFARI,
 	MIN_THRESHOLD_CHARS,
+	PREFIX_MESSAGE_LENGTH,
 	QUICK_MENU_TYPE,
 	RECENT_EMOJI_CATEGORY,
 	SubPanelName,
@@ -370,7 +371,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					payload.cvtt = canvasTitles;
 				}
 
-				const removeEmptyOnPayload = filterEmptyArrays([]);
+				const removeEmptyOnPayload = filterEmptyArrays(payload);
 
 				const encoder = new TextEncoder();
 				const payloadJson = JSON.stringify(removeEmptyOnPayload);
@@ -1216,8 +1217,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				isThreadbox={props.isThreadbox || false}
 				onEmojiSelect={insertEmojiDirectly}
 			/>
-			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - draftRequest.content.length}</div>
+			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">
+					{MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH - draftRequest.content.length}
+				</div>
 			)}
 		</div>
 	);

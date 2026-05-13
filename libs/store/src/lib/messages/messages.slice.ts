@@ -1461,7 +1461,6 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
 
 		if (!client || !session || !channelId) {
 			throw new Error('Client is not initialized');

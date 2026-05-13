@@ -4,6 +4,7 @@
 			"title": "Kanalname",
 			"placeholder": "Kanalnamen eingeben",
 			"errorMessage": "Bitte gib einen gültigen Kanalnamen ein (maximal 64 Zeichen, nur Buchstaben, Zahlen, _ oder -).",
+			"emptyError": "Bitte gib einen Kanalnamen ein (maximal 64 Zeichen, nur Buchstaben, Zahlen, _ oder -).",
 			"duplicateError": "Dieser Kanalname existiert bereits in der Kategorie. Bitte wähle einen anderen."
 		},
 		"threadName": {

@@ -156,7 +156,6 @@ export const extractAndSaveConfig = (session: ApiSession | null, isFromMobile?: 
 export type MezonContextValue = {
 	clientRef: React.MutableRefObject<Client | null>;
 	sessionRef: React.MutableRefObject<ApiSession | null>;
-	socketRef: React.MutableRefObject<null>;
 	zkRef: React.MutableRefObject<ZkClient | null>;
 	mmnRef: React.MutableRefObject<MmnClient | null>;
 	dongRef: React.MutableRefObject<DongClient | null>;
@@ -187,7 +186,6 @@ const MezonContext = React.createContext<MezonContextValue>({} as MezonContextVa
 const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, mezon, connect, isFromMobile = false }) => {
 	const clientRef = React.useRef<Client | null>(null);
 	const sessionRef = React.useRef<ApiSession | null>(null);
-	const socketRef = React.useRef<null>(null);
 	const zkRef = React.useRef<ZkClient | null>(null);
 	const dongRef = React.useRef<DongClient | null>(null);
 	const mmnRef = React.useRef<MmnClient | null>(null);
@@ -205,7 +203,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		if (!clientRef.current) {
 			throw new Error('Mezon client not initialized');
 		}
-
 
 		if (clientRef.current.isOpen?.()) {
 			return undefined;
@@ -270,15 +267,40 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 			return Promise.resolve(clientRef.current);
 		}
 
-		const client =  createMezonClient(mezon);
+		const client = createMezonClient(mezon);
 		clientRef.current = client;
 
 		client.onrefreshsession = (sessionNew: ApiSession) => {
 			const prev = sessionRef.current;
-			const nextSid = sessionNew.session_id;
-			if (!prev || !nextSid || prev.session_id === nextSid) return;
-			const updated: ApiSession = { ...prev, session_id: nextSid };
+			const nextSid = sessionNew?.session_id;
+			console.log('[SessionFix] onrefreshsession fired', {
+				hasPrev: !!prev,
+				prevSid: prev?.session_id,
+				nextSid,
+				visibility: typeof document !== 'undefined' ? document.visibilityState : 'n/a'
+			});
+			if (!nextSid) {
+				console.warn('[SessionFix] onrefreshsession skipped: empty nextSid');
+				return;
+			}
+			if (prev && prev.session_id === nextSid) {
+				console.log('[SessionFix] onrefreshsession skipped: same session_id');
+				return;
+			}
+			const base = prev ?? sessionNew;
+			const updated: ApiSession = { ...base, session_id: nextSid };
 			sessionRef.current = updated;
+
+			try {
+				const raw = localStorage.getItem('persist:auth');
+				const outer = raw ? JSON.parse(raw) : {};
+				outer.session = JSON.stringify(updated);
+				localStorage.setItem('persist:auth', JSON.stringify(outer));
+				console.log('[SessionFix] onrefreshsession persisted to localStorage', { sid: nextSid });
+			} catch (err) {
+				console.error('[SessionFix] onrefreshsession localStorage write failed', err);
+			}
+
 			publishSessionUpdate(updated, 'refresh');
 		};
 
@@ -471,27 +493,24 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		}
 	}, [connectSocket]);
 
-	const logOutMezon = useCallback(
-		async (device_id?: string, platform?: string, clearSession?: boolean) => {
-			resetSessionRefreshBlock();
-			reconnectInFlight = false;
-			connectInFlight = null;
-			clearSessionRefreshFromStorage();
+	const logOutMezon = useCallback(async (device_id?: string, platform?: string, clearSession?: boolean) => {
+		resetSessionRefreshBlock();
+		reconnectInFlight = false;
+		connectInFlight = null;
+		clearSessionRefreshFromStorage();
 
-			clearSessionFromStorage();
-			if (clientRef.current && sessionRef.current && sessionRef.current?.token) {
-				await clientRef.current.sessionLogout(
-					sessionRef.current,
-					sessionRef.current?.token,
-					sessionRef.current?.refresh_token || '',
-					device_id || '',
-					platform || ''
-				);
-				sessionRef.current = null;
-			}
-		},
-		[socketRef]
-	);
+		clearSessionFromStorage();
+		if (clientRef.current && sessionRef.current && sessionRef.current?.token) {
+			await clientRef.current.sessionLogout(
+				sessionRef.current,
+				sessionRef.current?.token,
+				sessionRef.current?.refresh_token || '',
+				device_id || '',
+				platform || ''
+			);
+			sessionRef.current = null;
+		}
+	}, []);
 
 	const connectWithSession = useCallback(
 		async (session: ApiSession) => {
@@ -519,7 +538,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		() => ({
 			clientRef,
 			sessionRef,
-			socketRef,
 			zkRef,
 			dongRef,
 			mmnRef,
@@ -546,7 +564,6 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		[
 			clientRef,
 			sessionRef,
-			socketRef,
 			zkRef,
 			dongRef,
 			mmnRef,
