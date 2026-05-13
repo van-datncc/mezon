@@ -6935,25 +6935,23 @@ export function MarketIcons({
 
 export function MacOSCloseIcon({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', ...props }: IconProps) {
 	return (
-		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" {...props}>
-			{' '}
-			<path d="M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5" stroke="currentColor" strokeWidth="1" className="icon-MacOSCloseIcon-stroke-1" />{' '}
+		<svg width="100%" height="100%" viewBox="0 0 6 6" {...props}>
+			<path d="M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5" stroke="currentColor" strokeWidth="1" className="icon-MacOSCloseIcon-stroke-1" />
 		</svg>
 	);
 }
 
 export function MacOSMinimizeIcon({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', ...props }: IconProps) {
 	return (
-		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 1" {...props}>
-			{' '}
-			<rect width="6" height="1" />{' '}
+		<svg width="100%" height="100%" viewBox="0 0 6 1" {...props}>
+			<rect width="6" height="1" />
 		</svg>
 	);
 }
 
 export function MacOSMaximizeIcon({ isMaximized = false, ...props }: React.HTMLAttributes<SVGElement> & { isMaximized?: boolean }) {
 	return (
-		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" {...props}>
+		<svg width="100%" height="100%" viewBox="0 0 6 6" {...props}>
 			<path
 				d="M1 1L5 5M5 1L1 5"
 				stroke="currentColor"

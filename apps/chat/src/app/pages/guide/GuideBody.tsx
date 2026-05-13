@@ -289,8 +289,8 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 							title={answer.title}
 							height={'h-auto'}
 							onClick={() => handleOnClickQuestion(index)}
-							className={` w-fit h-fit rounded-xl hover:bg-transparent  justify-center items-center px-4 py-2 border-2 bg-item-theme-hover cursor-pointer font-medium flex gap-2 ${hightLight(index)}`}
-							background="bg-white dark:bg-transparent"
+							className={` w-fit h-fit rounded-xl hover:bg-transparent justify-center items-center px-4 py-2 border-2 cursor-pointer font-medium flex gap-2 ${hightLight(index)}`}
+							background={selectAnswer.includes(index) ? 'bg-item-theme' : 'bg-white dark:bg-transparent'}
 						/>
 					))}
 			</div>

@@ -259,15 +259,17 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const threadMeta = selectChannelMetaById(store.getState(), channel.id);
 			const needsJoin = !userProfile?.user?.id ? false : !userIds?.includes(userProfile?.user?.id);
 			const currentTime = Math.floor(Date.now() / 1000);
-			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
+			const lastMessageTimestamp = threadMeta?.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
 			try {
-				await dispatch(
-					threadsActions.writeActiveArchivedThread({
-						clanId: channel.clan_id ?? '',
-						channelId: channel.channel_id ?? ''
-					})
-				).unwrap();
+				if (isArchived || channel.active !== ThreadStatus.joined) {
+					await dispatch(
+						threadsActions.writeActiveArchivedThread({
+							clanId: channel.clan_id ?? '',
+							channelId: channel.channel_id ?? ''
+						})
+					).unwrap();
+				}
 			} catch (e) {
 				// Unarchive failed, but message send will continue
 			}
@@ -371,7 +373,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					payload.cvtt = canvasTitles;
 				}
 
-				const removeEmptyOnPayload = filterEmptyArrays([]);
+				const removeEmptyOnPayload = filterEmptyArrays(payload);
 
 				const encoder = new TextEncoder();
 				const payloadJson = JSON.stringify(removeEmptyOnPayload);

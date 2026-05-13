@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Zurück zur Clan-Nutzungsübersicht",
+		"meetingRooms": "Besprechungsräume",
 		"clanUsageStatisticsReport": "Clan-Nutzungsstatistik-Bericht",
 		"dashboardReport": "Dashboard",
 		"report": "Bericht"
@@ -70,5 +71,27 @@
 		"tooltip": "Nach dieser Spalte auf- oder absteigend sortieren",
 		"sortedAsc": "Aufsteigend sortiert",
 		"sortedDesc": "Absteigend sortiert"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Alle Status",
+		"pending": "Ausstehend",
+		"completed": "Abgeschlossen",
+		"finalRoom": "Endraum",
+		"failed": "Fehlgeschlagen",
+		"noTimeFilter": "Kein Zeitfilter",
+		"last12Hours": "Letzte 12 Stunden",
+		"last24Hours": "Letzte 24 Stunden",
+		"last2Days": "Letzte 2 Tage",
+		"last7Days": "Letzte 7 Tage",
+		"searchByRoomNameOrParticipant": "Nach Raumname oder Teilnehmer suchen..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Raumname",
+		"status": "Status",
+		"createdAt": "Erstellt am",
+		"completedAt": "Abgeschlossen am",
+		"actions": "Aktionen",
+		"viewDetails": "Details anzeigen",
+		"noRoomsFound": "Keine Räume gefunden."
 	}
 }

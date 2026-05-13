@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export function useSendForwardMessage() {
 	const { t } = useTranslation('forwardMessage');
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 
 	const dispatch = useAppDispatch();
 
@@ -77,7 +77,7 @@ export function useSendForwardMessage() {
 				);
 			}
 		},
-		[sessionRef, clientRef, socketRef, dispatch, t]
+		[sessionRef, clientRef, dispatch, t]
 	);
 
 	return useMemo(

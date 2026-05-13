@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { captureSentryError } from '@mezon/logger';
-import type { ActivitiesEntity, AttachmentEntity, ChannelsEntity, RootState, ThreadsEntity } from '@mezon/store';
+import type { ActivitiesEntity, AttachmentEntity, RootState, ThreadsEntity } from '@mezon/store';
 import {
 	DMCallActions,
 	EStateFriend,
@@ -79,8 +79,6 @@ import {
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
 	selectLoadingStatus,
-	selectOrderedClans,
-	selectSession,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -403,7 +401,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	const onchannelmessage = useCallback(
 		async (message: ChannelMessage) => {
 			const store = getStore();
-			const isMobile = false;
 			const currentDirectId = selectDmGroupCurrentId(store.getState());
 
 			if (!message.id || message.id === '0') {
@@ -439,11 +436,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				if ((message.content as IMessageSendPayload).callLog?.callLogType === IMessageTypeCallLog.STARTCALL && mess.isMe) {
 					dispatch(DMCallActions.setCallMessageId(message?.message_id));
 				}
-				mess.isCurrentChannel = message.channel_id === currentDirectId || (isMobile && message.channel_id === currentDirectId);
+				mess.isCurrentChannel = message.channel_id === currentDirectId;
 
-				if ((currentDirectId === undefined && !isMobile) || (isMobile && !currentDirectId)) {
+				if (currentDirectId === undefined) {
 					const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-					const idToCompare = !isMobile ? currentChannelId : currentChannelId;
+					const idToCompare = currentChannelId;
 					mess.isCurrentChannel = message.channel_id === idToCompare;
 				}
 
@@ -511,15 +508,12 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					let isNotCurrentDirect = false;
 
 					const isSameDirect = !!currentDirectId && currentDirectId === message?.channel_id;
-					if (isMobile) {
-						isNotCurrentDirect = isClanView || !currentDirectId || !isSameDirect;
-					} else {
-						const path = isElectron() ? window.location.hash : window.location.pathname;
-						const isFriendPageView = path.includes('/chat/direct/friends');
-						const isFocus = !isBackgroundModeActive();
 
-						isNotCurrentDirect = isFriendPageView || isClanView || !currentDirectId || !isSameDirect || !isFocus;
-					}
+					const path = isElectron() ? window.location.hash : window.location.pathname;
+					const isFriendPageView = path.includes('/chat/direct/friends');
+					const isFocus = !isBackgroundModeActive();
+
+					isNotCurrentDirect = isFriendPageView || isClanView || !currentDirectId || !isSameDirect || !isFocus;
 
 					if (isNotCurrentDirect) {
 						if (message.sender_id !== userId && message.code !== TypeMessage.ChatUpdate && message.code !== TypeMessage.ChatRemove) {
@@ -906,13 +900,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					if (badgeCount > 0) {
 						badgeService.decrementChannel(user?.clan_id || '0', user.channel_id, badgeCount);
 					}
-					if (isMobile && (channelId === user.channel_id || directId === user.channel_id)) {
-						MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
-							channelId: user.channel_id,
-							channelType: user.channel_type
-						});
-					}
-					if (channelId === user.channel_id && !isMobile) {
+
+					if (channelId === user.channel_id) {
 						if (user.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
 							const parentChannelId = currentChannel?.parent_id;
 							if (parentChannelId) {
@@ -933,7 +922,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 							navigate(`/chat/clans/${clanId}/member-safety`, true);
 						}
 					}
-					if (!isMobile && directId === user.channel_id) {
+					if (directId === user.channel_id) {
 						if (!channelId) {
 							navigate(`/chat/direct/friends`, true);
 						}
@@ -1006,26 +995,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					dispatch(stickerSettingActions.invalidateCache());
 
 					if (clanId === user.clan_id) {
-						if (isMobile) {
-							const clanList = selectOrderedClans(store.getState());
-							const clanIdToJump = clanList?.filter((item) => item.clan_id !== user.clan_id)?.[0]?.clan_id;
-							if (clanIdToJump) {
-								dispatch(clansActions.setCurrentClanId(clanIdToJump));
-								dispatch(clansActions.joinClan({ clanId: clanIdToJump }));
-								dispatch(
-									clansActions.changeCurrentClan({
-										clanId: clanIdToJump
-									})
-								);
-							}
-							MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
-								channelId: '',
-								channelType: 0,
-								isRemoveClan: true
-							});
-						} else {
-							navigate(`/chat/direct/friends`);
-						}
+						navigate(`/chat/direct/friends`);
 					}
 					if (user.clan_id === currentVoice?.clanId) {
 						dispatch(voiceActions.resetVoiceControl());
@@ -1472,8 +1442,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 			const channelId = e?.topic_id && e?.topic_id !== '0' ? e?.topic_id : e.channel_id;
 			const currentClanId = selectCurrentClanId(state);
-			const currentDirectId = selectDmGroupCurrentId(state);
-			const isDM = !currentClanId || currentClanId === '0' || (!!currentDirectId && isMobile);
+			const isDM = !currentClanId || currentClanId === '0';
 
 			if (!isDM) {
 				const currentChannelId = selectCurrentChannelId(state as unknown as RootState);
@@ -1526,20 +1495,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 		if (channelCreated.creator_id === userId) {
 			if (channelCreated.parent_id) {
-				const thread: ChannelsEntity = {
-					id: channelCreated.channel_id as string,
-					active: 1,
-					category_id: channelCreated.category_id,
-					creator_id: channelCreated.creator_id,
-					parent_id: channelCreated.parent_id,
-					channel_id: channelCreated.channel_id,
-					channel_label: channelCreated.channel_label,
-					channel_private: channelCreated.channel_private,
-					type: channelCreated.channel_type,
-					app_id: channelCreated.app_id,
-					clan_id: channelCreated.clan_id
-				};
-
 				if (channelCreated.channel_private === ChannelStatusEnum.isPrivate) {
 					const privateThread: ThreadsEntity = {
 						...channelCreated,
@@ -1717,38 +1672,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			dispatch(stickerSettingActions.removeStickersByClanId(clanDelete.clan_id));
 			dispatch(emojiSuggestionActions.invalidateCache());
 			dispatch(stickerSettingActions.invalidateCache());
-			dispatch(emojiSuggestionActions.fetchEmoji({ noCache: true, clanId: '0' }));
 			dispatch(channelsActions.removeByClanId(clanDelete.clan_id));
 			dispatch(topicsActions.removeClanTopics(clanDelete?.clan_id));
 			if (clanDelete.deletor !== userId && currentClanId === clanDelete.clan_id) {
-				if (isMobile) {
-					const isVoiceJoined = selectVoiceInfo(store.getState());
-					if (isVoiceJoined?.clanId === clanDelete.clan_id) {
-						dispatch(voiceActions.resetVoiceControl());
-					}
-					const currentStreamInfo = selectCurrentStreamInfo(store.getState());
-					if (currentStreamInfo?.clanId === clanDelete.clan_id) {
-						dispatch(videoStreamActions.stopStream());
-					}
-					const clanList = selectOrderedClans(store.getState());
-					const clanIdToJump = clanList?.filter((item) => item.clan_id !== clanDelete.clan_id)?.[0]?.clan_id;
-					if (clanIdToJump) {
-						dispatch(clansActions.setCurrentClanId(clanIdToJump));
-						dispatch(clansActions.joinClan({ clanId: clanIdToJump }));
-						dispatch(
-							clansActions.changeCurrentClan({
-								clanId: clanIdToJump
-							})
-						);
-					}
-					MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
-						channelId: '',
-						channelType: 0,
-						isRemoveClan: true
-					});
-				} else {
-					navigate(`/chat/direct/friends`);
-				}
+				navigate(`/chat/direct/friends`);
 				dispatch(clansSlice.actions.removeByClanID(clanDelete.clan_id));
 			}
 			dispatch(appActions.cleanHistoryClan(clanDelete.clan_id));
@@ -1811,15 +1738,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				const isUserInChildThread = currentChannel && checkIsThread(currentChannel) && currentChannel.parent_id === channelDeleted.channel_id;
 
 				if (isUserInDeletedChannel || isUserInChildThread) {
-					if (isMobile && currentChannel?.channel_id) {
-						MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
-							channelId: currentChannel.channel_id,
-							channelType: currentChannel.type
-						});
-					}
-
 					if (!clanId) {
-						if (!isMobile) navigate(`/chat/direct/friends`);
+						navigate(`/chat/direct/friends`);
 						return;
 					}
 
@@ -1830,12 +1750,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
 
-					if (!isMobile) {
-						if (redirectChannelId) {
-							navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
-						} else {
-							navigate(`/chat/clans/${clanId}/member-safety`);
-						}
+					if (redirectChannelId) {
+						navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+					} else {
+						navigate(`/chat/clans/${clanId}/member-safety`);
 					}
 				}
 				dispatch(channelMetaActions.deleteChannelMeta({ channelId: channelDeleted.channel_id }));
@@ -1923,6 +1841,82 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				}
 				return dispatch(directActions.updateOne({ ...channelUpdated, currentUserId: userId }));
 			}
+			if (channelUpdated.active === 0) {
+				dispatch(voiceActions.removeInVoiceInChannel(channelUpdated.channel_id));
+				dispatch(appActions.clearHistoryChannel({ channelId: channelUpdated.channel_id }));
+				dispatch(
+					threadsActions.setIsShowCreateThread({
+						channelId: channelUpdated.channel_id as string,
+						isShowCreateThread: false
+					})
+				);
+				dispatch(
+					channelsActions.removeChannelApp({
+						clanId: channelUpdated.clan_id,
+						channelId: channelUpdated.channel_id
+					})
+				);
+				if (channelUpdated?.parent_id) {
+					dispatch(
+						threadsActions.setIsShowCreateThread({
+							channelId: channelUpdated.parent_id as string,
+							isShowCreateThread: false
+						})
+					);
+				}
+				const isVoiceJoined = selectVoiceInfo(store.getState());
+				if (channelUpdated?.channel_id === isVoiceJoined?.channelId) {
+					dispatch(voiceActions.resetVoiceControl());
+				}
+				dispatch(channelSettingActions.removeChannelFromSocket(channelUpdated.channel_id));
+				dispatch(channelMetaActions.deleteChannelMeta({ channelId: channelUpdated.channel_id }));
+				dispatch(channelsActions.remove({ clanId: channelUpdated.clan_id, channelId: channelUpdated.channel_id }));
+				dispatch(listChannelsByUserActions.remove(channelUpdated.channel_id));
+				dispatch(updateClanBadgeRender({ channelId: channelUpdated.channel_id, clanId: channelUpdated.clan_id }));
+				dispatch(
+					threadsActions.removeThreadFromCache({
+						channelId: channelUpdated?.parent_id || '',
+						threadId: channelUpdated.channel_id
+					})
+				);
+				if (checkIsThread({ parent_id: channelUpdated.parent_id } as any)) {
+					dispatch(threadsActions.updateActiveCodeThread({ channelId: channelUpdated.channel_id, activeCode: 0 }));
+					if (channelUpdated.parent_id) {
+						dispatch(threadsActions.removeThreadFromCache({ channelId: channelUpdated.parent_id, threadId: channelUpdated.channel_id }));
+					}
+				}
+				const currentCh = currentChannelId ? selectChannelById(store.getState(), currentChannelId) : null;
+				const isUserInArchivedChannel = channelUpdated.channel_id === currentChannelId;
+				const isUserInChildThread = currentCh && checkIsThread(currentCh) && currentCh.parent_id === channelUpdated.channel_id;
+
+				if (isUserInArchivedChannel || isUserInChildThread) {
+					if (isMobile && currentCh?.channel_id) {
+						MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
+							channelId: currentCh.channel_id,
+							channelType: currentCh.type
+						});
+					}
+					const clanId = channelUpdated.clan_id;
+					if (!clanId) {
+						if (!isMobile) navigate(`/chat/direct/friends`);
+						return;
+					}
+					const welcomeChannelId = selectWelcomeChannelByClanId(store.getState(), clanId);
+					const defaultChannelId = selectDefaultChannelIdByClanId(store.getState(), clanId);
+					const allChannels = selectAllChannels(store.getState());
+					const fallbackChannelId = allChannels.find((ch) => ch.id !== channelUpdated.channel_id && !checkIsThread(ch))?.id;
+					const redirectChannelId = welcomeChannelId || defaultChannelId || fallbackChannelId;
+					if (!isMobile) {
+						if (redirectChannelId) {
+							navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+						} else {
+							navigate(`/chat/clans/${clanId}/member-safety`);
+						}
+					}
+				}
+				return;
+			}
+
 			if (channelUpdated.channel_type !== ChannelType.CHANNEL_TYPE_DM && channelUpdated.channel_type !== ChannelType.CHANNEL_TYPE_GROUP) {
 				dispatch(
 					channelSettingActions.updateChannelFromSocket({
@@ -1947,19 +1941,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						userId: userId as string
 					})
 				).unwrap();
-				if (
-					isMobile &&
-					result &&
-					channelUpdated.creator_id !== userId &&
-					(currentChannel?.channel_id === channelUpdated.channel_id || currentChannel?.parent_id === channelUpdated.channel_id)
-				) {
-					MobileEventEmitter.emit('@ON_REMOVE_USER_CHANNEL', {
-						channelId: currentChannel?.channel_id,
-						channelType: currentChannel?.type
-					});
-					dispatch(channelsActions.setCurrentChannelId({ clanId: channelUpdated.clan_id as string, channelId: '' }));
-				}
-				if (!isMobile && result && currentChannelId === channelUpdated.channel_id) {
+
+				if (result && currentChannelId === channelUpdated.channel_id) {
 					navigate(`/chat/clans/${channelUpdated.clan_id}/member-safety`);
 				}
 			}

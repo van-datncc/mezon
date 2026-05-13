@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Tillbaka till Clan användning översikt",
+		"meetingRooms": "Mötesrum",
 		"clanUsageStatisticsReport": "Clan Användningsstatistik Rapport",
 		"dashboardReport": "Kontrollpanel",
 		"report": "Rapport"
@@ -70,5 +71,27 @@
 		"tooltip": "Sortera stigande/fallande efter denna kolumn",
 		"sortedAsc": "Sorterad stigande",
 		"sortedDesc": "Sorterad fallande"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Alla statusar",
+		"pending": "Väntande",
+		"completed": "Slutförd",
+		"finalRoom": "Slutrum",
+		"failed": "Misslyckad",
+		"noTimeFilter": "Inget tidsfilter",
+		"last12Hours": "Senaste 12 timmarna",
+		"last24Hours": "Senaste 24 timmarna",
+		"last2Days": "Senaste 2 dagarna",
+		"last7Days": "Senaste 7 dagarna",
+		"searchByRoomNameOrParticipant": "Sök efter rumsnamn eller deltagare..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Rumsnamn",
+		"status": "Status",
+		"createdAt": "Skapad",
+		"completedAt": "Slutförd",
+		"actions": "Åtgärder",
+		"viewDetails": "Visa detaljer",
+		"noRoomsFound": "Inga rum hittades."
 	}
 }
