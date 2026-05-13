@@ -51,7 +51,7 @@ const ItemPermission = forwardRef<{ reset: () => void }, ItemPermissionProps>((p
 	};
 
 	return (
-		<div className="flex justify-between items-center">
+		<div className="flex justify-between items-center" data-e2e={generateE2eId('clan_page.settings.role.override.item')}>
 			<p className="font-semibold text-base">{title}</p>
 			<div className={className.wrapperClass}>
 				<button

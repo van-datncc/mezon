@@ -1,6 +1,6 @@
 import { channelSettingActions, selectArchivedChannels, selectCurrentClanId, threadsActions, toastActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { getDateLocale } from '@mezon/utils';
+import { generateE2eId, getDateLocale } from '@mezon/utils';
 import { formatDistanceToNow } from 'date-fns';
 import type { ApiChannelDescription } from 'mezon-js';
 import { useTranslation } from 'react-i18next';
@@ -58,21 +58,34 @@ const SettingArchivedChannels = () => {
 						};
 
 						return (
-							<div key={ch.channel_id} className="flex items-center bg-item-theme rounded-lg px-4 py-3 shadow">
+							<div
+								key={ch.channel_id}
+								className="flex items-center bg-item-theme rounded-lg px-4 py-3 shadow"
+								data-e2e={generateE2eId('clan_page.settings.archived_channels.item')}
+							>
 								<div className="flex items-center">
 									<span className="inline-flex w-8 h-8 bg-item-theme-active text-theme-primary-active rounded items-center justify-center mr-2">
 										{renderIcon(ch)}
 									</span>
 								</div>
 								<div className="flex-1 min-w-0">
-									<div className="font-semibold text-theme-primary text-base leading-tight">{ch.channel_label}</div>
-									<div className="text-xs text-theme-primary mt-0.5">
+									<div
+										className="font-semibold text-theme-primary text-base leading-tight"
+										data-e2e={generateE2eId('clan_page.settings.archived_channels.item.channel_name')}
+									>
+										{ch.channel_label}
+									</div>
+									<div
+										className="text-xs text-theme-primary mt-0.5"
+										data-e2e={generateE2eId('clan_page.settings.archived_channels.item.active_time')}
+									>
 										{t('archived')} {archivedAgoText}
 									</div>
 								</div>
 								<button
 									className="ml-4 px-5 py-1.5 rounded bg-[#5865f2] hover:bg-[#4752c4] text-white font-semibold text-sm transition"
 									onClick={() => handleRestore(ch.channel_id ?? '')}
+									data-e2e={generateE2eId('clan_page.settings.archived_channels.item.restore_button')}
 								>
 									{t('restore')}
 								</button>
