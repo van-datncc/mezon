@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Voltar para a visão geral de uso do Clã",
+		"meetingRooms": "Salas de reuniões",
 		"clanUsageStatisticsReport": "Relatório de Estatísticas de Uso do Clã",
 		"dashboardReport": "Painel",
 		"report": "Relatório"
@@ -70,5 +71,27 @@
 		"tooltip": "Classificar por esta coluna (asc/desc)",
 		"sortedAsc": "Classificado de forma crescente",
 		"sortedDesc": "Classificado de forma decrescente"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Todos os status",
+		"pending": "Pendente",
+		"completed": "Concluído",
+		"finalRoom": "Sala final",
+		"failed": "Falhou",
+		"noTimeFilter": "Sem filtro de tempo",
+		"last12Hours": "Últimas 12 horas",
+		"last24Hours": "Últimas 24 horas",
+		"last2Days": "Últimos 2 dias",
+		"last7Days": "Últimos 7 dias",
+		"searchByRoomNameOrParticipant": "Pesquisar por nome da sala ou participante..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Nome da sala",
+		"status": "Status",
+		"createdAt": "Criado em",
+		"completedAt": "Concluído em",
+		"actions": "Ações",
+		"viewDetails": "Ver detalhes",
+		"noRoomsFound": "Nenhuma sala encontrada."
 	}
 }
