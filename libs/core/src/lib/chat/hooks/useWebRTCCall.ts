@@ -291,7 +291,8 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 					callerAvatar,
 					callerId: userId,
 					isVideoCall,
-					channelId
+					channelId,
+					sentAt: String(Date.now())
 				};
 				await mezon.clientRef.current?.makeCallPush(mezon.sessionRef.current, dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 				// Start a 30-second timeout to end the call if no answer
@@ -559,7 +560,7 @@ export function useWebRTCCall({ dmUserId, channelId, userId, callerName, callerA
 	};
 
 	const cancelCallFCMMobile = async (isConnected = false) => {
-		const bodyFCMMobile = { offer: 'CANCEL_CALL', isConnected };
+		const bodyFCMMobile = { offer: 'CANCEL_CALL', isConnected, sentAt: String(Date.now()) };
 		if (mezon.sessionRef.current) {
 			await mezon.clientRef.current?.makeCallPush(mezon.sessionRef.current, dmUserId, JSON.stringify(bodyFCMMobile), channelId, userId);
 		}
