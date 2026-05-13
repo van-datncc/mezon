@@ -12,6 +12,8 @@ type GuideItemLayoutProps = {
 	height?: string;
 	gap?: number;
 	onClick?: () => void;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
 	noNeedHover?: boolean;
 };
 
@@ -26,6 +28,8 @@ export const GuideItemLayout = ({
 	height,
 	gap = 8,
 	onClick,
+	onMouseEnter,
+	onMouseLeave,
 	noNeedHover
 }: GuideItemLayoutProps) => {
 	return (
@@ -35,6 +39,8 @@ export const GuideItemLayout = ({
 				gap
 			}}
 			onClick={onClick}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
 			data-e2e={generateE2eId('button.base')}
 		>
 			{icon && (
