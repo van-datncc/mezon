@@ -1,5 +1,5 @@
 import type { LoadingStatus } from '@mezon/utils';
-import type { EntityState } from '@reduxjs/toolkit';
+import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { captureSentryError } from '@mezon/logger';
@@ -319,6 +319,9 @@ export const settingClanChannelSlice = createSlice({
 				}
 				return false;
 			});
+		},
+		removeArchivedChannel: (state, action: PayloadAction<string>) => {
+			state.listArchivedChannel = state.listArchivedChannel.filter((ch) => ch.channel_id !== action.payload);
 		},
 		updateChannelFromSocket: (state, action) => {
 			const channel = action.payload;

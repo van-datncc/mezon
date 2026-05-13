@@ -1,17 +1,8 @@
-import {
-	channelSettingActions,
-	channelsActions,
-	selectArchivedChannels,
-	selectCurrentClanId,
-	threadsActions,
-	toastActions,
-	useAppDispatch
-} from '@mezon/store';
+import { channelSettingActions, selectArchivedChannels, selectCurrentClanId, threadsActions, toastActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { getDateLocale } from '@mezon/utils';
 import { formatDistanceToNow } from 'date-fns';
 import type { ApiChannelDescription } from 'mezon-js';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -21,16 +12,11 @@ const SettingArchivedChannels = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const listArchivedChannel = useSelector(selectArchivedChannels);
 
-	useEffect(() => {
-		if (currentClanId) {
-			dispatch(channelSettingActions.fetchArchivedChannelsInClan(currentClanId as string));
-		}
-	}, [dispatch, currentClanId]);
-
 	const handleRestore = async (channelId: string) => {
 		if (!currentClanId) return;
 		try {
 			await dispatch(threadsActions.writeActiveArchivedThread({ clanId: currentClanId as string, channelId })).unwrap();
+			dispatch(channelSettingActions.removeArchivedChannel(channelId));
 			dispatch(
 				toastActions.addToast({
 					message: t('restoreSuccess'),
@@ -38,8 +24,6 @@ const SettingArchivedChannels = () => {
 					autoClose: 3000
 				})
 			);
-			dispatch(channelSettingActions.fetchArchivedChannelsInClan(currentClanId as string));
-			dispatch(channelsActions.fetchChannels({ clanId: currentClanId as string, noCache: true }));
 		} catch (error) {
 			console.error('Failed to restore channel:', error);
 		}
