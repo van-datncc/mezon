@@ -7,6 +7,7 @@ import { authActions } from './auth/auth.slice';
 import { useAppDispatch, type AppDispatch } from './store';
 
 const PERSIST_AUTH_KEY = 'persist:auth';
+const MAX_RETRIES = 4;
 
 function readPersistedSession(): ApiSession | null {
 	try {
@@ -49,7 +50,6 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 
 	useEffect(() => {
 		let cancelled = false;
-		const MAX_RETRIES = 4;
 		const INITIAL_DELAY = 1000;
 
 		const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -67,29 +67,33 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 
 			let connectOk = false;
 
-			if (hasSessionId) {
-				sessionRef.current = persistedSession as ApiSession;
+			await Promise.all([
+				(async () => {
+					if (hasSessionId) {
+						sessionRef.current = persistedSession as ApiSession;
+						// Retry call connect socket if it fail with MAX_RETRIES time
+						for (let i = 0; i <= MAX_RETRIES; i++) {
+							if (cancelled) return;
+							setRetryCount(i);
 
-				for (let i = 0; i <= MAX_RETRIES; i++) {
-					if (cancelled) return;
-					setRetryCount(i);
-
-					try {
-						await connectSocket();
+							try {
+								await connectSocket();
+								connectOk = true;
+								break;
+							} catch (error) {
+								if (i === MAX_RETRIES) break;
+								const nextDelay = INITIAL_DELAY * Math.pow(2, i);
+								console.error(`Connection failed. Retrying attempt ${i} in ${nextDelay}ms...`);
+								await delay(nextDelay);
+							}
+						}
+					} else {
 						connectOk = true;
-						break;
-					} catch (error) {
-						if (i === MAX_RETRIES) break;
-
-						const nextDelay = INITIAL_DELAY * Math.pow(2, i);
-						await delay(nextDelay);
 					}
-				}
-			} else {
-				connectOk = true;
-			}
+				})(),
 
-			await waitForPersistorBootstrap(persistor);
+				waitForPersistorBootstrap(persistor)
+			]);
 			if (cancelled) return;
 
 			if (!connectOk || (hasToken && !hasSessionId)) {
@@ -107,11 +111,51 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 
 	return <>{ready ? children : (fallback ?? <ConnectingScreen retryCount={retryCount} />)}</>;
 }
-const ConnectingScreen = ({ retryCount }: { retryCount: number }) => (
-	<div className="fixed z-[10000] bg-black w-screen text-theme-primary h-screen flex items-center justify-center">
-		<div className="flex min-h-[160px] flex-col items-center justify-center">
-			<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-			<h3 className="text-lg font-semibold">Establishing a connection... {retryCount > 0 ? `Try attempt : ${retryCount}` : null}</h3>
+
+const ConnectingScreen = ({ retryCount }: { retryCount: number }) => {
+	const retryDelay = 2 ** retryCount;
+	const [remainingTime, setRemainingTime] = useState(0);
+
+	useEffect(() => {
+		if (retryCount === 0) {
+			setRemainingTime(0);
+			return;
+		}
+
+		setRemainingTime(retryDelay);
+		console.log('retryDelay: ', retryDelay);
+
+		const interval = setInterval(() => {
+			setRemainingTime((prev) => {
+				if (prev === 0) {
+					clearInterval(interval);
+					return 0;
+				}
+				console.log('prev - 1: ', prev - 1);
+				return prev - 1;
+			});
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, [retryCount]);
+
+	return (
+		<div className="fixed z-[10000] bg-black w-screen text-theme-primary h-screen flex items-center justify-center">
+			<div className="flex min-h-[160px] flex-col items-center justify-center">
+				<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+
+				<h3 className="text-lg font-semibold text-center">Establishing a connection...</h3>
+
+				{retryCount > 0 && retryCount < MAX_RETRIES && (
+					<p className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300 backdrop-blur-md">
+						<span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+						<span>
+							Connection lost — retrying attempt <span className="font-semibold text-white">{retryCount}</span> in{' '}
+							<span className="font-mono text-blue-400">{remainingTime}s</span>
+						</span>
+					</p>
+				)}
+			</div>
 		</div>
-	</div>
-);
+	);
+};
