@@ -46,7 +46,10 @@ export const GuideItemLayout = ({
 			)}
 			<div className={`flex flex-1 text-sm md:text-base flex-col h-full justify-center text-theme-primary min-w-0`}>
 				{title && (
-					<div className="font-bold text-theme-primary-active break-words" data-e2e={generateE2eId('onboarding.clan_guide_page.title')}>
+					<div
+						className="font-bold text-theme-primary-active break-words w-full overflow-hidden truncate"
+						data-e2e={generateE2eId('onboarding.clan_guide_page.title')}
+					>
 						{title}
 					</div>
 				)}
