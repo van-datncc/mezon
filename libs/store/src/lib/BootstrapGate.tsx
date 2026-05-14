@@ -63,7 +63,6 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 
 			const persistedSession = readPersistedSession();
 			const hasSessionId = !!persistedSession?.session_id?.trim();
-			const hasToken = !!persistedSession?.token?.trim();
 
 			let connectOk = false;
 
@@ -98,7 +97,7 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 			]);
 			if (cancelled) return;
 
-			if (!connectOk || (hasToken && !hasSessionId)) {
+			if (!hasSessionId || !connectOk) {
 				void (dispatch as AppDispatch)(authActions.logOut({}));
 			}
 
