@@ -189,16 +189,12 @@ const DirectMessage = () => {
 			return;
 		}
 		setDetailLoadFailed(false);
-		let cancelled = false;
-		void dispatch(directActions.fetchDirectDetail({ directId: resolvedDirectId }))
-			.unwrap()
-			.catch(() => {
-				if (!cancelled) setDetailLoadFailed(true);
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [resolvedDirectId, currentDmGroup, dispatch]);
+		return;
+	}, [resolvedDirectId, currentDmGroup, dispatch, routeDirectId, loadingStatus]);
+
+	useEffect(() => {
+		// state monitoring logs removed
+	}, [resolvedDirectId, routeDirectId, currentDirectId, loadingStatus, currentDmGroup, detailLoadFailed]);
 
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -243,7 +239,7 @@ const DirectMessage = () => {
 		if (isShowCreateThread) {
 			setIsShowMemberList(false);
 		}
-	}, [isShowCreateThread]);
+	}, [isShowCreateThread, setIsShowMemberList]);
 
 	const setMarginleft = messagesContainerRef?.current?.getBoundingClientRect()
 		? window.innerWidth - messagesContainerRef?.current?.getBoundingClientRect().right + 155
@@ -277,7 +273,10 @@ const DirectMessage = () => {
 		loadedChannelsRef.current.add(resolvedDirectId);
 	}
 
-	if ((loadingStatus === 'loading' || loadingStatus === 'not loaded') && !loadedChannelsRef.current.has(resolvedDirectId)) {
+	const isWaitingForDmListOnly =
+		(loadingStatus === 'loading' || loadingStatus === 'not loaded') && !loadedChannelsRef.current.has(resolvedDirectId) && !resolvedDirectId;
+
+	if (isWaitingForDmListOnly) {
 		return null;
 	}
 
