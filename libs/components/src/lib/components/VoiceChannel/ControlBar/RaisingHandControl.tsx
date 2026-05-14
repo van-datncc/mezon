@@ -59,7 +59,7 @@ export const RaisingHandControls = memo(() => {
 
 	return (
 		<div className="relative rounded-full bg-gray-300 dark:bg-black" onClick={handleRaisingHand}>
-			<div className="w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none bg-zinc-500 dark:bg-zinc-900 lk-button">
+			<div className="w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none bg-zinc-500 dark:bg-zinc-900 lk-button">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="-5.0 -10.0 110.0 135.0"
