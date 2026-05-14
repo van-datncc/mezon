@@ -436,7 +436,7 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Pass the action to the next middleware or reducer
 	return next(action);
 };
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NX_ENV === 'development';
 
 const thunkNameLogger = () => (next: any) => (action: any) => {
 	const isThunk = typeof action.type === 'string' && action.type.includes('/');
