@@ -115,7 +115,7 @@ const ButtonAgent = ({ isExternalCalling }: { isExternalCalling: boolean }) => {
 	return (
 		<div className="relative rounded-full bg-gray-300 dark:bg-black" onClick={handleAddAgent}>
 			<div
-				className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none bg-zinc-500 dark:bg-zinc-900 lk-button ${onAgent ? '!bg-blue-500 hover:!bg-blue-600' : ''} ${disable || loading ? '!bg-slate-900 hover:!bg-slate-900 !cursor-default' : ''}`}
+				className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none bg-zinc-500 dark:bg-zinc-900 lk-button ${onAgent ? '!bg-blue-500 hover:!bg-blue-600' : ''} ${disable || loading ? '!bg-slate-900 hover:!bg-slate-900 !cursor-default' : ''}`}
 			>
 				{loading ? (
 					<Icons.LoadingSpinner />

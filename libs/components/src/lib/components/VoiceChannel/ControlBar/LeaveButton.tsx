@@ -11,10 +11,10 @@ export const LeaveButton = memo(({ onLeaveRoom }: LeaveButtonProps) => {
 		<div
 			id="btn-meet-leave"
 			onClick={onLeaveRoom}
-			className="w-14 aspect-square max-md:w-10 bg-[#da373c] hover:bg-[#a12829] cursor-pointer rounded-full flex justify-center items-center"
+			className="w-14 h-14 max-md:w-10 max-md:h-10 bg-[#da373c] hover:bg-[#a12829] cursor-pointer rounded-full flex justify-center items-center"
 			data-e2e={generateE2eId('icon.end_call')}
 		>
-			<Icons.EndCall className="w-6 aspect-square max-md:w-4" />
+			<Icons.EndCall className="w-6 h-6 max-md:w-4 max-md:h-4" />
 		</div>
 	);
 });
