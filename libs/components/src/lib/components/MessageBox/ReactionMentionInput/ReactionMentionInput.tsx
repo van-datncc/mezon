@@ -46,6 +46,7 @@ import {
 	ID_MENTION_HERE,
 	IS_SAFARI,
 	MIN_THRESHOLD_CHARS,
+	PREFIX_MESSAGE_LENGTH,
 	QUICK_MENU_TYPE,
 	RECENT_EMOJI_CATEGORY,
 	SubPanelName,
@@ -59,8 +60,8 @@ import {
 	processEntitiesDirectly,
 	searchMentionsHashtag
 } from '@mezon/utils';
+import type { ApiMessageMention, ApiMessageRef } from 'mezon-js';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import type { ApiMessageMention, ApiMessageRef } from 'mezon-js/api';
 import type { ReactElement, RefObject } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -258,15 +259,19 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			const threadMeta = selectChannelMetaById(store.getState(), channel.id);
 			const needsJoin = !userProfile?.user?.id ? false : !userIds?.includes(userProfile?.user?.id);
 			const currentTime = Math.floor(Date.now() / 1000);
-			const lastMessageTimestamp = threadMeta.lastSentTimestamp;
+			const lastMessageTimestamp = threadMeta?.lastSentTimestamp;
 			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
-			if (isArchived || channel.active === 0) {
-				await dispatch(
-					threadsActions.writeActiveArchivedThread({
-						clanId: channel.clan_id ?? '',
-						channelId: channel.channel_id ?? ''
-					})
-				);
+			try {
+				if (isArchived || channel.active !== ThreadStatus.joined) {
+					await dispatch(
+						threadsActions.writeActiveArchivedThread({
+							clanId: channel.clan_id ?? '',
+							channelId: channel.channel_id ?? ''
+						})
+					).unwrap();
+				}
+			} catch (e) {
+				// Unarchive failed, but message send will continue
 			}
 			if (needsJoin && joinningToThread) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: channel.id, activeCode: ThreadStatus.joined }));
@@ -292,7 +297,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					mentionRaw: [],
 					entities: []
 				});
-
 				return;
 			}
 
@@ -369,7 +373,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					payload.cvtt = canvasTitles;
 				}
 
-				const removeEmptyOnPayload = filterEmptyArrays([]);
+				const removeEmptyOnPayload = filterEmptyArrays(payload);
 
 				const encoder = new TextEncoder();
 				const payloadJson = JSON.stringify(removeEmptyOnPayload);
@@ -393,7 +397,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					await addMemberToThread(currentChannel!, usersNotExistingInThread);
 				}
 
-				handleThreadActivation(currentChannel);
+				await handleThreadActivation(currentChannel);
 
 				if (isReplyOnChannel) {
 					props.onSend(
@@ -519,7 +523,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				payload.cvtt = canvasTitles;
 			}
 
-			const removeEmptyOnPayload = filterEmptyArrays([]);
+			const removeEmptyOnPayload = filterEmptyArrays(payload);
 			const encoder = new TextEncoder();
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 			const utf8Bytes = encoder.encode(payloadJson);
@@ -569,7 +573,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				return;
 			}
 
-			handleThreadActivation(currentChannel);
+			await handleThreadActivation(currentChannel);
 
 			if (isReplyOnChannel) {
 				props.onSend(
@@ -1215,8 +1219,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				isThreadbox={props.isThreadbox || false}
 				onEmojiSelect={insertEmojiDirectly}
 			/>
-			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - draftRequest.content.length}</div>
+			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">
+					{MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH - draftRequest.content.length}
+				</div>
 			)}
 		</div>
 	);

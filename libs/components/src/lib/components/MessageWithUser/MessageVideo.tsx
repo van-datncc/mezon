@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/ui';
 import { calculateMediaDimensions, useIsIntersecting, useResizeObserver, type ObserveFn } from '@mezon/utils';
 import isElectron from 'is-electron';
-import type { ApiMessageAttachment } from 'mezon-js/api';
+import type { ApiMessageAttachment } from 'mezon-js';
 import type { Movie, Track } from 'mp4box';
 import { MP4BoxBuffer, createFile } from 'mp4box';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -447,7 +447,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 					)}
 
 					<div
-						className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center"
+						className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center z-30"
 						onClick={handleDownloadVideo}
 					>
 						<Icons.Download

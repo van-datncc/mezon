@@ -52,7 +52,8 @@ export const DATA_E2E_IDENTIFIER = {
 		action: {
 			button: {
 				base: '',
-				status: ''
+				status: '',
+				remove_friend: ''
 			}
 		},
 		modal: {
@@ -316,7 +317,11 @@ export const DATA_E2E_IDENTIFIER = {
 						},
 						button: {
 							open_detail_modal: '',
-							close_detail_modal: ''
+							close_detail_modal: '',
+							open_panel: '',
+							confirm_cancel_event: '',
+							share_event: '',
+							close_modal_copy_link: ''
 						}
 					}
 				}
@@ -467,6 +472,21 @@ export const DATA_E2E_IDENTIFIER = {
 						view: ''
 					},
 					member_count: ''
+				},
+				override: {
+					item: {
+						button: {
+							remove: '',
+							tick: ''
+						}
+					}
+				}
+			},
+			archived_channels: {
+				item: {
+					channel_name: '',
+					active_time: '',
+					restore_button: ''
 				}
 			}
 		},
@@ -513,6 +533,7 @@ export const DATA_E2E_IDENTIFIER = {
 		screen: {
 			voice_room: {
 				channel_name: '',
+				control_bar: '',
 				button: {
 					join_voice: ''
 				}
@@ -640,6 +661,7 @@ export const DATA_E2E_IDENTIFIER = {
 			chat_list_container: '',
 			chat_list: '',
 			chat_item: {
+				group_name: '',
 				username: '',
 				close_dm_button: '',
 				text_area: '',
@@ -1026,7 +1048,10 @@ export const DATA_E2E_IDENTIFIER = {
 			add_description: '',
 			edit_title: '',
 			save: '',
-			back: ''
+			back: '',
+			add_media: '',
+			calendar: '',
+			selected_year: ''
 		},
 		input: {
 			title: '',
@@ -1060,6 +1085,11 @@ export const DATA_E2E_IDENTIFIER = {
 			},
 			trigger: {
 				event_detail: ''
+			},
+			card: {
+				title: '',
+				description: '',
+				created_time: ''
 			}
 		}
 	},
@@ -1067,6 +1097,39 @@ export const DATA_E2E_IDENTIFIER = {
 		button: {
 			cancel: '',
 			confirm: ''
+		}
+	},
+	poll: {
+		button: {
+			open_modal: '',
+			option: ''
+		},
+		modal: {
+			input: {
+				question: '',
+				answer: '',
+				allow_multi_answer: ''
+			},
+			button: {
+				add_answer: '',
+				open_duration: '',
+				choose_duration: '',
+				delete_answer: '',
+				post: ''
+			}
+		},
+		card: {
+			question: '',
+			ended: '',
+			answer_description: '',
+			answer: '',
+			voted: '',
+			total_votes: '',
+			button: {
+				show_result: '',
+				vote: '',
+				remove_vote: ''
+			}
 		}
 	}
 };

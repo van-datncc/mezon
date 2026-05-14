@@ -12,6 +12,7 @@ import {
 	Direction_Mode,
 	EBacktickType,
 	EMessageCode,
+	EMimeTypes,
 	EOgpType,
 	LIMIT_MESSAGE,
 	MessageCrypt,
@@ -27,9 +28,7 @@ import type { EntityState, GetThunkAPI, PayloadAction, Update } from '@reduxjs/t
 import { createAsyncThunk, createEntityAdapter, createSelector, createSelectorCreator, createSlice, weakMapMemoize } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
 import { t } from 'i18next';
-import type { ChannelMessage } from 'mezon-js';
-import type { ApiChannelMessageHeader, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api';
-import type { MessageButtonClicked } from 'mezon-js/socket';
+import type { ApiChannelMessageHeader, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ChannelMessage, MessageButtonClicked } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { accountActions, selectAllAccount } from '../account/account.slice';
 import { getUserAvatarOverride, getUserClanAvatarOverride } from '../avatarOverride/avatarOverride';
@@ -44,7 +43,7 @@ import { clansActions, selectClanExists, selectClanHasUnreadMessage, selectClans
 import { selectCurrentDM, selectDirectMessageEntities } from '../direct/direct.slice';
 import { checkE2EE, selectE2eeByUserIds } from '../e2ee/e2ee.slice';
 import type { MezonValueContext } from '../helpers';
-import { ensureSession, ensureSocket, getMezonCtx, socketState, withRetry } from '../helpers';
+import { ensureSession, ensureSocket, getMezonCtx, isMezonClientSocketOpen, withRetry } from '../helpers';
 import type { ReactionEntity } from '../reactionMessage/reactionMessage.slice';
 import type { AppDispatch, RootState } from '../store';
 import { referencesActions, selectOgpData } from './references.slice';
@@ -256,8 +255,6 @@ export const fetchMessagesCached = async (
 		(session) =>
 			ensuredMezon.client.listChannelMessages(session, clanId, channelId, topicId ? undefined : messageId, direction, LIMIT_MESSAGE, topicId),
 		{
-			maxRetries: 5,
-			initialDelay: 1000,
 			scope: 'channel-messages',
 			mezon: ensuredMezon
 		}
@@ -691,76 +688,162 @@ type UpdateMessageArgs = {
 	parentChannelId?: string;
 };
 
-export const updateLastSeenMessage = createAsyncThunk(
-	'messages/updateLastSeenMessage',
-	async (
-		{ clanId, channelId, messageId, mode, badge_count, message_time, updateLast = false, isTopic = false, parentChannelId }: UpdateMessageArgs,
-		thunkAPI
-	) => {
-		const now = Math.floor(Date.now() / 1000);
-		const state = thunkAPI.getState() as RootState;
+const lastSeenSocketWriteChainByKey = new Map<string, Promise<void>>();
+const lastSeenSocketWriteGenByKey = new Map<string, number>();
 
-		if (clanId !== '0') {
-			const lookupChannelId = isTopic && parentChannelId ? parentChannelId : channelId;
-			const channel = selectChannelById(state, lookupChannelId);
-			if (!channel) {
+function lastSeenPairKey(channelId: string, messageId: string): string {
+	return `${channelId}\0${messageId}`;
+}
+
+function dedupeLastSeenQueuePayloads(items: readonly UpdateMessageArgs[]): UpdateMessageArgs[] {
+	const lastByKey = new Map<string, UpdateMessageArgs>();
+	for (const item of items) {
+		lastByKey.set(lastSeenPairKey(item.channelId, item.messageId), item);
+	}
+	return [...lastByKey.values()];
+}
+
+function enqueueSerializedLastSeenSocketRpc(channelId: string, messageId: string, run: () => Promise<void>): Promise<void> {
+	const key = lastSeenPairKey(channelId, messageId);
+	const generation = (lastSeenSocketWriteGenByKey.get(key) ?? 0) + 1;
+	lastSeenSocketWriteGenByKey.set(key, generation);
+
+	const prev = lastSeenSocketWriteChainByKey.get(key) ?? Promise.resolve();
+
+	const merged = prev
+		.catch(() => undefined)
+		.then(async () => {
+			if (lastSeenSocketWriteGenByKey.get(key) !== generation) {
 				return;
 			}
-		} else {
-			const dmEntities = selectDirectMessageEntities(state);
-			if (!dmEntities[channelId]) {
-				return;
-			}
+			await run();
+		});
+
+	lastSeenSocketWriteChainByKey.set(key, merged);
+	void merged.finally(() => {
+		if (lastSeenSocketWriteChainByKey.get(key) === merged) {
+			lastSeenSocketWriteChainByKey.delete(key);
 		}
+	});
+	return merged;
+}
 
-		const channelsLoadingStatus = selectLoadingStatus(state);
-		const clansLoadingStatus = selectClansLoadingStatus(state);
-		if (clanId !== '0' && (channelsLoadingStatus === 'loading' || clansLoadingStatus === 'loading')) {
-			thunkAPI.dispatch(messagesActions.queueLastSeenMessage({ clanId, channelId, messageId, mode, badge_count, message_time }));
+const lastSeenSocketRpcFingerprintByPairKey = new Map<string, string>();
+
+async function performDedupedSerializedLastSeenSocketRpc(params: {
+	mezon: MezonValueContext;
+	clanId: string;
+	channelId: string;
+	mode: number;
+	messageId: string;
+	messageTimeSeconds: number;
+	badgeCount: number;
+}): Promise<void> {
+	const { mezon, clanId, channelId, mode, messageId, messageTimeSeconds, badgeCount } = params;
+	const pairKey = lastSeenPairKey(channelId, messageId);
+	const fingerprint = `${clanId}|${mode}|${badgeCount}|${messageTimeSeconds}|${messageId}`;
+
+	await enqueueSerializedLastSeenSocketRpc(channelId, messageId, async () => {
+		if (lastSeenSocketRpcFingerprintByPairKey.get(pairKey) === fingerprint) {
 			return;
 		}
+		const client = mezon.clientRef.current;
+		if (!client) return;
+		await client.writeLastSeenMessage(mezon.session, clanId, channelId, mode, messageId, messageTimeSeconds, badgeCount);
+		lastSeenSocketRpcFingerprintByPairKey.set(pairKey, fingerprint);
+	});
+}
 
-		let badgeCount = badge_count;
+async function executeUpdateLastSeenMessageBody(args: UpdateMessageArgs, thunkAPI: GetThunkAPI<unknown>): Promise<void> {
+	const { clanId, channelId, messageId, mode, badge_count, message_time, updateLast = false, isTopic = false, parentChannelId } = args;
+	const now = Math.floor(Date.now() / 1000);
+	const state = thunkAPI.getState() as RootState;
 
-		if (clanId !== '0') {
-			const currentChannelBadge = getCurrentChannelBadgeCount({ getState: () => thunkAPI.getState() as RootState }, clanId, channelId);
-			badgeCount = currentChannelBadge;
+	if (clanId !== '0') {
+		const lookupChannelId = isTopic && parentChannelId ? parentChannelId : channelId;
+		const channel = selectChannelById(state, lookupChannelId);
+		if (!channel) {
+			return;
+		}
+	} else {
+		const dmEntities = selectDirectMessageEntities(state);
+		if (!dmEntities[channelId]) {
+			return;
+		}
+	}
+
+	const channelsLoadingStatus = selectLoadingStatus(state);
+	const clansLoadingStatus = selectClansLoadingStatus(state);
+	if (clanId !== '0' && (channelsLoadingStatus === 'loading' || clansLoadingStatus === 'loading')) {
+		thunkAPI.dispatch(messagesActions.queueLastSeenMessage({ clanId, channelId, messageId, mode, badge_count, message_time }));
+		return;
+	}
+
+	let badgeCount = badge_count;
+
+	if (clanId !== '0') {
+		const currentChannelBadge = getCurrentChannelBadgeCount({ getState: () => thunkAPI.getState() as RootState }, clanId, channelId);
+		badgeCount = currentChannelBadge;
+	}
+
+	if (clanId !== '0') {
+		badgeService.resetChannel({
+			clanId,
+			channelId,
+			badgeCount,
+			timestamp: message_time ?? now,
+			messageId,
+			isTopic
+		});
+	} else {
+		badgeService.resetDm(channelId, message_time ?? now, messageId);
+	}
+
+	if (clanId && clanId !== '0') {
+		const latestState = thunkAPI.getState() as RootState;
+		const hasUnread = selectClanHasUnreadMessage(latestState, clanId);
+		if (hasUnread) {
+			requestIdleCallback(() => {
+				thunkAPI.dispatch(clansActions.updateHasUnreadBasedOnChannels({ clanId }));
+			});
+		}
+	}
+
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		if (!isMezonClientSocketOpen(mezon)) {
+			thunkAPI.dispatch(messagesActions.queueLastSeenMessage({ clanId, channelId, messageId, mode, badge_count: badgeCount, message_time }));
+			return;
+		}
+		const queuedMessages = (thunkAPI.getState() as RootState).messages?.queuedLastSeenMessages;
+		const outboundPairKey = lastSeenPairKey(channelId, messageId);
+		const queuedAlsoTargetsThisSeen = queuedMessages.some((q) => lastSeenPairKey(q.channelId, q.messageId) === outboundPairKey);
+
+		if (queuedMessages.length > 0) {
+			await thunkAPI.dispatch(processQueuedLastSeenMessages()).unwrap();
 		}
 
-		if (clanId !== '0') {
-			badgeService.resetChannel({
+		if (!queuedAlsoTargetsThisSeen) {
+			await performDedupedSerializedLastSeenSocketRpc({
+				mezon,
 				clanId,
 				channelId,
-				badgeCount,
-				timestamp: message_time ?? now,
+				mode,
 				messageId,
-				isTopic
+				messageTimeSeconds: message_time ?? now,
+				badgeCount
 			});
-		} else {
-			badgeService.resetDm(channelId, message_time ?? now, messageId);
 		}
+	} catch (e) {
+		console.error(e, 'updateLastSeenMessage writeSocket');
+		thunkAPI.dispatch(messagesActions.queueLastSeenMessage({ clanId, channelId, messageId, mode, badge_count: badgeCount, message_time }));
+	}
+}
 
-		if (clanId && clanId !== '0') {
-			const latestState = thunkAPI.getState() as RootState;
-			const hasUnread = selectClanHasUnreadMessage(latestState, clanId);
-			if (hasUnread) {
-				requestIdleCallback(() => {
-					thunkAPI.dispatch(clansActions.updateHasUnreadBasedOnChannels({ clanId }));
-				});
-			}
-		}
-
-		try {
-			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const queuedMessages = (thunkAPI.getState() as RootState).messages?.queuedLastSeenMessages;
-			if (queuedMessages.length > 0) {
-				await thunkAPI.dispatch(processQueuedLastSeenMessages()).unwrap();
-			}
-			await mezon.socketRef.current?.writeLastSeenMessage(clanId, channelId, mode, messageId, message_time ?? now, badgeCount);
-		} catch (e) {
-			console.error(e, 'updateLastSeenMessage writeSocket');
-			thunkAPI.dispatch(messagesActions.queueLastSeenMessage({ clanId, channelId, messageId, mode, badge_count: badgeCount, message_time }));
-		}
+export const updateLastSeenMessage = createAsyncThunk(
+	'messages/updateLastSeenMessage',
+	async (args: UpdateMessageArgs, thunkAPI) => {
+		await executeUpdateLastSeenMessageBody(args, thunkAPI);
 	},
 	{
 		condition: ({ channelId, messageId }, { getState }) => {
@@ -787,15 +870,11 @@ export const processQueuedLastSeenMessages = createAsyncThunk('messages/processQ
 
 	thunkAPI.dispatch(messagesActions.clearQueuedLastSeenMessages());
 
-	for (const queuedMessage of queuedMessages) {
+	const uniqueQueued = dedupeLastSeenQueuePayloads(queuedMessages);
+	for (const queuedMessage of uniqueQueued) {
 		const channelEntity = state.channelmeta?.entities?.[queuedMessage.channelId];
 		const actualBadgeCount = channelEntity?.count_mess_unread || queuedMessage.badge_count;
-		await thunkAPI.dispatch(
-			updateLastSeenMessage({
-				...queuedMessage,
-				badge_count: actualBadgeCount
-			})
-		);
+		await executeUpdateLastSeenMessageBody({ ...queuedMessage, badge_count: actualBadgeCount }, thunkAPI);
 	}
 });
 
@@ -938,6 +1017,7 @@ export const sendMessageViaApi = createAsyncThunk('messages/sendMessageViaApi', 
 			thunkAPI.dispatch(messagesActions.addNewMessage(fakeMess));
 		}
 
+		// eslint-disable-next-line no-useless-catch
 		try {
 			thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 			thunkAPI.dispatch(messagesActions.markAsSent({ id, mess: fakeMess }));
@@ -968,7 +1048,7 @@ export const sendMessageViaApi = createAsyncThunk('messages/sendMessageViaApi', 
 						channelId,
 						timestamp,
 						messageId: messageResult.channel_id,
-						clanId: clanId
+						clanId
 					})
 				);
 			}
@@ -1004,6 +1084,7 @@ export type EditMessageViaApiPayload = {
 export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', async (payload: EditMessageViaApiPayload, thunkAPI) => {
 	const { channelId, clanId, mode, isPublic, messageId, content, mentions, attachments, hideEditted, topicId, isTopic } = payload;
 
+	// eslint-disable-next-line no-useless-catch
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const session = mezon.sessionRef.current;
@@ -1018,11 +1099,13 @@ export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', 
 			t: content.t?.trim()
 		};
 		const stringifiedContent = JSON.stringify(trimContent);
+		const finalTopicId = topicId || '0';
+		const updateChannelId = finalTopicId !== '0' ? finalTopicId : channelId || '0';
 
 		const res = await client.updateChannelMessage(
 			session,
 			clanId || '0',
-			channelId || '0',
+			updateChannelId,
 			mode,
 			isPublic,
 			messageId || '0',
@@ -1030,7 +1113,7 @@ export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', 
 			mentions,
 			attachments,
 			hideEditted,
-			topicId || '0',
+			finalTopicId,
 			!!isTopic
 		);
 
@@ -1079,9 +1162,8 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
 
-		if (!client || !session || !socket || !channelId) {
+		if (!client || !session || !channelId) {
 			throw new Error('Client is not initialized');
 		}
 
@@ -1147,8 +1229,9 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 		let res;
 
 		try {
-			if (socketState.isConnected) {
-				res = await socket.writeChatMessage(
+			if (client) {
+				res = await client.writeChatMessage(
+					mezon.session,
 					clanId,
 					channelId,
 					mode,
@@ -1289,7 +1372,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 						channelId,
 						timestamp,
 						messageId: messageResult.message_id,
-						clanId: clanId
+						clanId
 					})
 				);
 			}
@@ -1378,9 +1461,8 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
 
-		if (!client || !session || !socket || !channelId) {
+		if (!client || !session || !channelId) {
 			throw new Error('Client is not initialized');
 		}
 
@@ -1398,7 +1480,8 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 			avatarToUse = undefined;
 		}
 
-		await socket.writeEphemeralMessage(
+		await client.writeEphemeralMessage(
+			session,
 			[receiverId],
 			clanId,
 			channelId,
@@ -1553,7 +1636,7 @@ export const sendTypingUser = createAsyncThunk(
 	'messages/sendTypingUser',
 	async ({ clanId, channelId, mode, isPublic, username, topicId = '' }: SendMessageArgs, thunkAPI) => {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const ack = mezon.socketRef.current?.writeMessageTyping(clanId, channelId, mode, isPublic, username, topicId || undefined);
+		const ack = mezon.clientRef.current?.writeMessageTyping(mezon.session, clanId, channelId, mode, isPublic, username, topicId || undefined);
 		return ack;
 	}
 );
@@ -1654,17 +1737,7 @@ export const messagesSlice = createSlice({
 		},
 
 		newMessage: (state, action: PayloadAction<MessagesEntity>) => {
-			const {
-				code,
-				channel_id: channelId,
-				id: messageId,
-				isSending,
-				isMe,
-				isAnonymous,
-				content,
-				topic_id,
-				referenced_message
-			} = action.payload;
+			const { code, channel_id: channelId, id: messageId, isSending, isMe, isAnonymous, content, topic_id, attachments } = action.payload;
 
 			if (!channelId || !messageId) return state;
 
@@ -1724,7 +1797,13 @@ export const messagesSlice = createSlice({
 									const message = state.channelMessages[channelId].entities[mid];
 									// temporary remove sending message that has the same content
 									// for later update, we could use some kind of id to identify the message
-									if (message?.content?.t === newContent?.t && message?.channel_id === channelId) {
+
+									if (
+										((message?.content?.t === newContent?.t && message?.content?.t) ||
+											message?.attachments?.[0]?.filename === attachments?.[0]?.filename ||
+											attachments?.[0].filetype === EMimeTypes.sticker) &&
+										message?.channel_id === channelId
+									) {
 										const tempId = (message as ChannelMessageWithClientMeta | undefined)?.temp_id;
 										if (tempId) {
 											if (sendTimeoutMap.has(tempId)) {
@@ -1753,7 +1832,7 @@ export const messagesSlice = createSlice({
 				case TypeMessage.ChatUpdate:
 				case TypeMessage.UpdateEphemeralMsg: {
 					const updateTimeSeconds = action.payload.update_time_seconds;
-					let changes: Partial<MessagesEntity> = {
+					const changes: Partial<MessagesEntity> = {
 						content: action.payload.content,
 						mentions: action.payload.mentions,
 						hide_editted: action.payload.hide_editted,

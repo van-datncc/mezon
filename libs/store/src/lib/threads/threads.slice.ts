@@ -3,10 +3,10 @@ import type { IMessageWithUser, IThread, LoadingStatus } from '@mezon/utils';
 import { LIMIT, ThreadStatus, TypeCheck, getParentChannelIdIfHas } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ApiChannelDescription } from 'mezon-js/api';
+import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { channelsActions, selectCurrentChannel } from '../channels/channels.slice';
+import { channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
@@ -89,7 +89,14 @@ export const fetchThreadsCached = async (
 	const threadsState = currentState[THREADS_FEATURE_KEY];
 	const channelData = threadsState.byChannels?.[channelId] || getInitialChannelState();
 
-	const apiKey = createApiKey('fetchThreads', channelId, clanId, mezon.session.username || '', threadId || '', page || 1);
+	const apiKey = createApiKey(
+		'fetchThreads',
+		channelId,
+		clanId,
+		mezon.session?.token || currentState.auth?.session?.token || '',
+		threadId || '',
+		page || 1
+	);
 
 	const shouldForceCall = shouldForceApiCall(apiKey, channelData.cache, noCache);
 
@@ -253,9 +260,13 @@ export const checkDuplicateThread = createAsyncThunk(
 	async ({ thread_name, channel_id, clan_id }: { thread_name: string; channel_id: string; clan_id: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, channel_id, TypeCheck.TYPETHREAD, clan_id);
-			if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
-				return isDuplicateName.exist;
+			const isDuplicateName = await mezon.clientRef.current?.checkDuplicateName(mezon.session, {
+				name: thread_name,
+				condition_id: channel_id,
+				type: TypeCheck.TYPETHREAD
+			});
+			if (isDuplicateName?.is_duplicate) {
+				return isDuplicateName?.is_duplicate;
 			}
 		} catch (error) {
 			captureSentryError(error, 'threads/duplicateNameCthread');
@@ -292,6 +303,13 @@ export const writeActiveArchivedThread = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			await mezon.client.activeArchivedThread(mezon.session, clanId, channelId);
 			thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.joined }));
+			const state = thunkAPI.getState() as RootState;
+			const threadChannel = selectChannelById(state, channelId);
+			const parentId = threadChannel?.parent_id;
+
+			if (parentId) {
+				await thunkAPI.dispatch(threadsActions.fetchThreads({ channelId: parentId, clanId, noCache: true })).unwrap();
+			}
 			return { channelId, activeCode: ThreadStatus.joined };
 		} catch (error) {
 			captureSentryError(error, 'threads/writeActiveArchivedThread');

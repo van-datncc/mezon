@@ -28,8 +28,8 @@ import {
 	isYouTubeLink,
 	uniqueUsers
 } from '@mezon/utils';
+import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js';
 import { ChannelStreamMode } from 'mezon-js';
-import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -49,7 +49,7 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 	const thread = useAppSelector((state) => selectChannelById(state, channelId)) || {};
 	const dispatch = useAppDispatch();
 
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const { addMemberToThread } = useChannelMembers({
 		channelId,
 		mode: ChannelStreamMode.STREAM_MODE_THREAD
@@ -73,9 +73,8 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
-			const socket = socketRef.current;
 
-			if (!client || !session || !socket || !thread || !currentClanId) {
+			if (!client || !session || !thread || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
 
@@ -159,7 +158,8 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 				}
 			}
 
-			await socket.writeChatMessage(
+			await client.writeChatMessage(
+				session,
 				currentClanId,
 				thread.channel_id as string,
 				ChannelStreamMode.STREAM_MODE_THREAD,
@@ -188,7 +188,7 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 			);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[sessionRef, clientRef, socketRef, currentClanId, mode, dispatch, channelId, t]
+		[sessionRef, clientRef, currentClanId, mode, dispatch, channelId, t]
 	);
 
 	const sendMessageTyping = React.useCallback(async () => {
@@ -212,12 +212,12 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 			};
 			const session = sessionRef.current;
 			const client = clientRef.current;
-			const socket = socketRef.current;
 
-			if (!client || !session || !socket || !currentClanId) {
+			if (!client || !session || !currentClanId) {
 				throw new Error('Client is not initialized');
 			}
-			await socket.updateChatMessage(
+			await client.updateChatMessage(
+				session,
 				currentClanId,
 				channelId,
 				ChannelStreamMode.STREAM_MODE_THREAD,
@@ -226,7 +226,7 @@ export function useThreadMessage({ channelId, mode, username }: UseThreadMessage
 				editMessage
 			);
 		},
-		[sessionRef, clientRef, socketRef, currentClanId, channelId, mode, thread]
+		[sessionRef, clientRef, currentClanId, channelId, mode, thread]
 	);
 
 	return useMemo(

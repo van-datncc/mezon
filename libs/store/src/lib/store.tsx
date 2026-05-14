@@ -26,6 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import type { MezonContextValue } from '@mezon/transport';
+import { publishSessionUpdate } from '@mezon/transport';
 import { safeJSONParse } from 'mezon-js';
 import { ACTIVITIES_API_FEATURE_KEY, activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
@@ -405,7 +406,7 @@ let storeCreated = false;
 
 // Event-based "store ready" promise replaces 100ms polling in getStoreAsync — single shared awaiter, no background timers.
 let _resolveStoreReady: ((store: typeof storeInstance) => void) | null = null;
-let _storeReadyPromise: Promise<typeof storeInstance> = new Promise((resolve) => {
+const _storeReadyPromise: Promise<typeof storeInstance> = new Promise((resolve) => {
 	_resolveStoreReady = resolve;
 });
 
@@ -435,22 +436,52 @@ const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
 	// Pass the action to the next middleware or reducer
 	return next(action);
 };
+const isDev = process.env.NX_ENV === 'development';
+
+const thunkNameLogger = () => (next: any) => (action: any) => {
+	const isThunk = typeof action.type === 'string' && action.type.includes('/');
+	if (isThunk) {
+		const [slice, actionName, status] = action.type.split('/');
+		if (status === 'pending') {
+			console.warn(`🚀 THUNK START: ${slice}/${actionName}`, {
+				arg: action.meta?.arg
+			});
+		}
+
+		if (status === 'fulfilled') {
+			console.warn(`✅ THUNK SUCCESS: ${slice}/${actionName}`);
+		}
+
+		if (status === 'rejected') {
+			console.warn(`❌ THUNK ERROR: ${slice}/${actionName}`, action.error);
+		}
+	}
+
+	return next(action);
+};
 
 export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRootState) => {
 	const store = configureStore({
 		reducer,
 		devTools: false,
 		preloadedState,
-		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware({
+		middleware: (getDefaultMiddleware) => {
+			const base = getDefaultMiddleware({
 				thunk: {
-					extraArgument: {
-						mezon
-					}
+					extraArgument: { mezon }
 				},
 				immutableCheck: false,
 				serializableCheck: false
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+			});
+
+			const withListeners = base.prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware);
+
+			if (isDev) {
+				return withListeners.prepend(thunkNameLogger);
+			}
+
+			return withListeners;
+		}
 	});
 	storeInstance = store;
 	storeCreated = true;
@@ -465,37 +496,35 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 	if (typeof window !== 'undefined') {
 		let lastStorageValue: string | null = null;
 		const handleStorageChange = async (e: StorageEvent) => {
-			if (e.key === 'persist:auth' && e.newValue) {
-				try {
-					if (e.newValue === lastStorageValue) {
-						return;
+			if (e.key !== 'persist:auth') return;
+			if (e.newValue === lastStorageValue) return;
+			lastStorageValue = e.newValue;
+
+			try {
+				const currentState = store.getState();
+				const currentSession = currentState.auth?.session;
+
+				if (!e.newValue) {
+					if (currentSession) {
+						publishSessionUpdate(null, 'cross-tab');
 					}
-					lastStorageValue = e.newValue;
-
-					const newAuthState = safeJSONParse(e.newValue);
-					const sessionData = newAuthState.session ? safeJSONParse(newAuthState.session) : null;
-					const activeAccount = newAuthState.activeAccount ? safeJSONParse(newAuthState.activeAccount) : null;
-
-					const currentState = store.getState();
-					const currentActiveAccount = currentState.auth?.activeAccount;
-					const currentSession = currentState.auth?.session?.[currentActiveAccount || ''];
-
-					const newSession = sessionData && activeAccount ? sessionData[activeAccount] : null;
-					const hasSessionChanged =
-						newSession?.token !== currentSession?.token || newSession?.refresh_token !== currentSession?.refresh_token;
-
-					if (hasSessionChanged) {
-						if (newSession) {
-							window.dispatchEvent(
-								new CustomEvent('mezon:session-refreshed', {
-									detail: { session: newSession }
-								})
-							);
-						}
-					}
-				} catch (err) {
-					console.error('[Storage Sync] Failed to sync auth state:', err);
+					return;
 				}
+
+				const newAuthState = safeJSONParse(e.newValue);
+				const sessionData = newAuthState?.session ? safeJSONParse(newAuthState.session) : null;
+				const newSession = sessionData ?? null;
+
+				const hasSessionChanged =
+					newSession?.token !== currentSession?.token ||
+					newSession?.refresh_token !== currentSession?.refresh_token ||
+					newSession?.session_id !== currentSession?.session_id;
+
+				if (!hasSessionChanged) return;
+
+				publishSessionUpdate(newSession, 'cross-tab');
+			} catch (err) {
+				console.error('[Storage Sync] Failed to sync auth state:', err);
 			}
 		};
 

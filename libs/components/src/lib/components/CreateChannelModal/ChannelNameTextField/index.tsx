@@ -2,7 +2,7 @@ import { selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ValidateSpecialCharacters, generateE2eId } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChannelLableModal } from '../ChannelLabel';
 
@@ -11,7 +11,6 @@ interface ChannelNameModalProps {
 	channelNameProps: string;
 	onChange: (value: string) => void;
 	onCheckValidate?: (check: boolean) => void;
-	onHandleChangeValue?: () => void;
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	error?: string;
 	placeholder: string;
@@ -25,22 +24,10 @@ export type ChannelNameModalRef = {
 };
 
 export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
-	const {
-		channelNameProps,
-		type,
-		onChange,
-		onCheckValidate,
-		onHandleChangeValue,
-		onKeyDown,
-		error,
-		placeholder,
-		shouldValidate,
-		categoryId,
-		clanId
-	} = props;
+	const { channelNameProps, type, onChange, onCheckValidate, onKeyDown, error, placeholder, shouldValidate, categoryId, clanId } = props;
 	const { t } = useTranslation('createChannel');
-	const [checkValidate, setCheckValidate] = useState(true);
-	const [checkNameChannel, setCheckNameChannel] = useState(true);
+	const [checkValidate, setCheckValidate] = useState(false);
+	const [checkNameChannel, setCheckNameChannel] = useState(false);
 	const theme = useAppSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const messages = {
@@ -97,12 +84,6 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 	useImperativeHandle(ref, () => ({
 		checkInput: () => checkValidate || checkNameChannel
 	}));
-
-	useEffect(() => {
-		if (onHandleChangeValue) {
-			onHandleChangeValue();
-		}
-	}, [checkValidate, checkNameChannel, onHandleChangeValue]);
 
 	return (
 		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">

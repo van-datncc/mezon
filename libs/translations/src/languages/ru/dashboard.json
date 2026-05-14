@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Назад к обзору использования клана",
+		"meetingRooms": "Переговорные комнаты",
 		"clanUsageStatisticsReport": "Отчет о статистике использования клана",
 		"dashboardReport": "Панель активностей",
 		"report": "Пожаловаться"
@@ -70,6 +71,27 @@
 		"tooltip": "Сортировать по возрастанию/убыванию по этому столбцу",
 		"sortedAsc": "Отсортировано по возрастанию",
 		"sortedDesc": "Отсортировано по убыванию"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Все статусы",
+		"pending": "В ожидании",
+		"completed": "Завершено",
+		"finalRoom": "Финальная комната",
+		"failed": "Ошибка",
+		"noTimeFilter": "Без фильтра времени",
+		"last12Hours": "Последние 12 часов",
+		"last24Hours": "Последние 24 часа",
+		"last2Days": "Последние 2 дня",
+		"last7Days": "Последние 7 дней",
+		"searchByRoomNameOrParticipant": "Поиск по названию комнаты или участнику..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Название комнаты",
+		"status": "Статус",
+		"createdAt": "Создано",
+		"completedAt": "Завершено",
+		"actions": "Действия",
+		"viewDetails": "Подробнее",
+		"noRoomsFound": "Комнаты не найдены."
 	}
 }
-

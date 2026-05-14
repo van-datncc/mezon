@@ -2,7 +2,7 @@ import type { IMessage, PreSendAttachment } from '@mezon/utils';
 import { AttachmentTypeUpload, MAX_FILE_ATTACHMENTS } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ApiMessageRef } from 'mezon-js/api';
+import { safeJSONParse, type ApiMessageRef } from 'mezon-js';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -85,7 +85,20 @@ export const referencesSlice = createSlice({
 				if (state.dataReferences[channelId]) {
 					delete state.dataReferences[channelId];
 				}
-				state.dataReferences[channelId] = dataReferences;
+
+				const data = dataReferences;
+				if (dataReferences.content) {
+					try {
+						const contentParse: { t: string } = safeJSONParse(dataReferences.content);
+						if (contentParse?.t && contentParse.t.length > 200) {
+							const content = contentParse.t.slice(0, 200);
+							data.content = JSON.stringify({ ...contentParse, t: content });
+						}
+					} catch (error) {
+						console.error(error);
+					}
+				}
+				state.dataReferences[channelId] = data;
 			}
 		},
 

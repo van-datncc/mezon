@@ -1,8 +1,8 @@
 import type { LoadingStatus } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import type { ApiChannelDescription, ApiChannelMessageHeader, ChannelMessage } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiChannelDescription, ApiChannelMessageHeader, ChannelMessage } from 'mezon-js/api';
 import { selectAllAccount } from '../account/account.slice';
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
 
@@ -71,6 +71,7 @@ export const channelMetaSlice = createSlice({
 	initialState: initialChannelMetaState,
 	reducers: {
 		add: channelMetaAdapter.addOne,
+		upsertOne: channelMetaAdapter.upsertOne,
 		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number; senderId: string; clanId: string }>) => {
 			if (action.payload.clanId === '0') {
 				dmMetaAdapter.updateOne(state.dmEntities, {

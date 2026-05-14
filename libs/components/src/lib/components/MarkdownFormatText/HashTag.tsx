@@ -71,9 +71,9 @@ const ChannelHashtag = ({
 	const isValidChannel = isTextChannel || isStreamingChannel || isThreadChannel || isVoiceChannel || existHashtagAndChannelView || isAppChannel;
 
 	return isValidChannel ? (
-		<div
+		<span
 			onClick={tokenClickAble}
-			className={`no-underline font-medium rounded-sm  inline whitespace-nowrap cursor-pointer bg-mention color-mention${!isJumMessageEnabled ? ' hover-mention ' : `hover:none cursor-text`} `}
+			className={`no-underline font-medium rounded-sm inline whitespace-nowrap cursor-pointer bg-mention color-mention${!isJumMessageEnabled ? ' hover-mention ' : `hover:none cursor-text`} `}
 		>
 			{isVoiceChannel ? (
 				<Icons.Speaker defaultSize={`inline mt-[-0.2rem] w-4 h-4`} defaultFill="#3297FF" />
@@ -82,7 +82,9 @@ const ChannelHashtag = ({
 			) : isAppChannel ? (
 				<Icons.AppChannelIcon className={`inline mt-[-0.2rem] w-4 h-4`} />
 			) : isTextChannel ? (
-				!channel.channel_private || channel.channel_private === 0 ? (
+				channel?.age_restricted === 1 ? (
+					<Icons.HashtagWarning defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
+				) : !channel.channel_private || channel.channel_private === 0 ? (
 					<Icons.Hashtag defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
 				) : (
 					<Icons.HashtagLocked defaultSize={`inline-block -mt-[0.2rem] w-4 h-4`} />
@@ -94,8 +96,8 @@ const ChannelHashtag = ({
 					<Icons.ThreadIconLocker className={`inline-block -mt-[0.2rem] w-4 h-4 `} />
 				)
 			) : null}
-			{channel ? channel.channel_label : channelLabel || null}
-		</div>
+			<span className="inline">{channel ? channel.channel_label : channelLabel || null}</span>
+		</span>
 	) : (
 		<PrivateChannel onClick={openUnknown} isLink={isLink} />
 	);

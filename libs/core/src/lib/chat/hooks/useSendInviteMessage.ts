@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export function useSendInviteMessage() {
 	const { t } = useTranslation('linkMessageInvite');
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const client = clientRef.current;
 
 	const sendInviteMessage = React.useCallback(
@@ -67,10 +67,9 @@ export function useSendInviteMessage() {
 
 			const session = sessionRef.current;
 			const client = clientRef.current;
-			const socket = socketRef.current;
 
-			if (!client || !session || !socket || !channel_id) {
-				console.error(client, session, socket, channel_id);
+			if (!client || !session || !channel_id) {
+				console.error(client, session, channel_id);
 				throw new Error('Client is not initialized');
 			}
 
@@ -95,7 +94,7 @@ export function useSendInviteMessage() {
 				code
 			);
 		},
-		[sessionRef, clientRef, socketRef, t]
+		[sessionRef, clientRef, t]
 	);
 
 	return useMemo(

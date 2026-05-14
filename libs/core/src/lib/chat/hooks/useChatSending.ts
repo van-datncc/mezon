@@ -14,8 +14,8 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import type { IMessageSendPayload } from '@mezon/utils';
+import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js';
 import { ChannelStreamMode } from 'mezon-js';
-import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -55,7 +55,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 	const anonymousMode = useSelector((state) => selectAnonymousMode(state, getClanId as string));
 	const topicAnonymousMode = useSelector(selectTopicAnonymousMode);
 	const initTopicMessageId = useSelector(selectInitTopicMessageId);
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const isCreatingTopicRef = useRef(false);
 
 	const createTopic = useCallback(async () => {
@@ -258,19 +258,20 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
-			const socket = socketRef.current;
-			if (!client || !session || !socket || !channelOrDirect) {
+			if (!client || !session || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
 			const trimContent: IMessageSendPayload = {
 				...content,
 				t: content.t?.trim()
 			};
+			const finalTopicId = topic_id || (isTopic ? currentTopicId || '0' : '0');
+			const updateChannelId = finalTopicId !== '0' ? finalTopicId : (channelIdOrDirectId ?? '0');
 			try {
 				await client.updateChannelMessage(
 					session,
 					getClanId || '0',
-					channelIdOrDirectId ?? '0',
+					updateChannelId,
 					mode,
 					isPublic,
 					messageId || '0',
@@ -278,14 +279,14 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 					mentions,
 					attachments,
 					hide_editted,
-					topic_id || '0',
+					finalTopicId,
 					!!isTopic
 				);
 			} catch (e) {
 				console.error(e);
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
+		[sessionRef, clientRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic, currentTopicId]
 	);
 
 	return useMemo(

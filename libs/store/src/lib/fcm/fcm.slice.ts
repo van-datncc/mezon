@@ -1,8 +1,8 @@
 import { notificationService } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import type { Session } from 'mezon-js';
-import { selectSession } from '../auth/auth.slice';
+import type { ApiSession } from 'mezon-js';
+import { selectCurrentUserId } from '../account/account.slice';
 import { ensureSession, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
 
@@ -20,7 +20,7 @@ const initialState: fcm = {
 };
 
 type FcmDeviceTokenPayload = {
-	session: Session;
+	session: ApiSession;
 	tokenId: string;
 	deviceId: string;
 	platform?: string;
@@ -55,12 +55,8 @@ export const registFcmDeviceToken = createAsyncThunk(
 export const connectNotificationService = createAsyncThunk('fcm/connectNotificationService', async (_, thunkAPI) => {
 	try {
 		const state = thunkAPI.getState() as RootState;
-		const sessionData = selectSession(state as Parameters<typeof selectSession>[0]);
-
-		if (!sessionData?.token || !sessionData?.user_id) {
-			return thunkAPI.rejectWithValue('No active session');
-		}
-
+		const userId =
+			selectCurrentUserId(state) || (typeof state.auth?.session?.user_id === 'string' ? state.auth.session.user_id.trim() : '') || '';
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
 		const response = await withRetry((session) => mezon.client.registFCMDeviceToken(session, state.fcm.deviceId || '', '', 'desktop', ''), {
@@ -70,15 +66,18 @@ export const connectNotificationService = createAsyncThunk('fcm/connectNotificat
 			mezon
 		});
 
-		if (response.token) {
-			notificationService.connect(response.token, sessionData.user_id);
-		} else if (state.fcm.token) {
-			notificationService.connect(state.fcm.token, sessionData.user_id);
+		const notifyToken = `${response.token || state.fcm.token || ''}`.trim();
+		if (!notifyToken) {
+			console.warn('connectNotificationService: no notification token from API or store; WebSocket not started.');
+		} else if (!userId) {
+			console.warn('connectNotificationService: userId missing (profile and session); WebSocket not started.');
+		} else {
+			void notificationService.connect(notifyToken, userId);
 		}
 
 		return {
 			token: response.token || '',
-			userId: sessionData.user_id,
+			userId,
 			deviceId: response.device_id
 		};
 	} catch (e) {

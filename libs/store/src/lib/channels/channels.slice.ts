@@ -12,16 +12,18 @@ import { ModeResponsive, TypeCheck, checkIsThread, mapChannelToAppEntity } from 
 import type { EntityState, GetThunkAPI, PayloadAction, Update } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
-import type { ChannelCreatedEvent, ChannelDeletedEvent, ChannelUpdatedEvent } from 'mezon-js';
-import { ChannelType } from 'mezon-js';
 import type {
 	ApiAddFavoriteChannelRequest,
 	ApiChangeChannelPrivateRequest,
 	ApiChannelAppResponse,
 	ApiChannelDescription,
 	ApiCreateChannelDescRequest,
-	ApiMarkAsReadRequest
-} from 'mezon-js/api';
+	ApiMarkAsReadRequest,
+	ChannelCreatedEvent,
+	ChannelDeletedEvent,
+	ChannelUpdatedEvent
+} from 'mezon-js';
+import { ChannelType } from 'mezon-js';
 import { appActions } from '../app/app.slice';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
@@ -309,7 +311,7 @@ export const joinChat = createAsyncThunk('channels/joinChat', async ({ clanId, c
 
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const channel = await mezon.socketRef.current?.joinChat(clanId, channelId, channelType, isPublic);
+		const channel = await mezon.clientRef.current?.joinChat(mezon.session, clanId, channelId, channelType, isPublic);
 		return channel;
 	} catch (error) {
 		captureSentryError(error, 'channels/joinChat');
@@ -479,6 +481,28 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 		}
 	} catch (error) {
 		captureSentryError(error, 'channels/deleteChannel');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const archiveChannel = createAsyncThunk('channels/archiveChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId as string);
+		const response = await mezon.client.archiveChannel(mezon.session, body.clanId, body.channelId);
+		if (response) {
+			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
+			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
+			if (channelData && checkIsThread(channelData as any)) {
+				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId: body.channelId, activeCode: 0 }));
+				if (channelData.parent_id) {
+					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: channelData.parent_id, threadId: body.channelId }));
+				}
+			}
+		}
+		return response;
+	} catch (error) {
+		captureSentryError(error, 'channels/archiveChannel');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -1190,9 +1214,7 @@ export const channelsSlice = createSlice({
 					if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
 						rememberChannel = parsed as Record<string, string>;
 					}
-				} catch {
-				}
-				
+				} catch {}
 				rememberChannel[clanId] = channelId;
 				localStorage.setItem('remember_channel', JSON.stringify(rememberChannel));
 			}
@@ -1506,6 +1528,18 @@ export const channelsSlice = createSlice({
 				state.error = action.error.message;
 			});
 
+		builder
+			.addCase(archiveChannel.pending, (state: ChannelsState) => {
+				state.loadingStatus = 'loading';
+			})
+			.addCase(archiveChannel.fulfilled, (state: ChannelsState, action) => {
+				state.loadingStatus = 'loaded';
+			})
+			.addCase(archiveChannel.rejected, (state: ChannelsState, action) => {
+				state.loadingStatus = 'error';
+				state.error = action.error.message;
+			});
+
 		builder.addCase(fetchAppChannels.fulfilled, (state: ChannelsState, action) => {
 			const clanId = action.meta.arg.clanId;
 			if (!state.byClans[clanId]) {
@@ -1589,6 +1623,7 @@ export const channelsActions = {
 	joinChat,
 	createNewChannel,
 	deleteChannel,
+	archiveChannel,
 	updateChannel,
 	updateChannelPrivate,
 	fetchAppChannels,

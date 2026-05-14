@@ -290,7 +290,7 @@ export default function ChannelStream({
 	const isJoin = useSelector(selectIsJoin);
 	const { userProfile } = useAuth();
 	const { sessionRef } = useMezon();
-	const accessToken = sessionRef.current?.token;
+	const accessToken = sessionRef.current?.session_id;
 	const dispatch = useAppDispatch();
 	const [showMembers, setShowMembers] = useState(true);
 	const [showEndCallButton, setShowEndCallButton] = useState(true);
@@ -446,7 +446,7 @@ export default function ChannelStream({
 								>
 									<Icons.ArrowDown
 										defaultFill="white"
-										defaultSize={`size-6 transition-all duration-300 ${showMembers ? '' : '-rotate-180'}`}
+										className={`size-6 transition-all duration-300 ${showMembers ? '' : '-rotate-180'}`}
 									/>
 									<Icons.MemberList defaultFill="text-white" />
 								</div>

@@ -31,6 +31,8 @@ export const ONE_MINUTE_MS = 60000;
 export const GUEST_NAME = 'guest';
 export const FOR_SALE_CATE = 'forsale';
 
+export const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
+
 export const INVITE_URL_REGEX = /\/invite\/([A-Za-z0-9_-]+)/i;
 
 export const PREDEFINED_EMOJI_CATEGORIES = [
@@ -56,7 +58,8 @@ export const threadError: ThreadError = {
 
 export const titleMission = ['Send a message in', 'Visit a channel', 'Do anything you want'];
 
-export const MIN_THRESHOLD_CHARS = 4000;
+export const MIN_THRESHOLD_CHARS = 3700;
+export const PREFIX_MESSAGE_LENGTH = 8;
 export const MAX_FORWARD_ADDITIONAL_MESSAGE_LENGTH = 2000;
 
 export const SHARE_CONTACT_KEY = 'share_contact';

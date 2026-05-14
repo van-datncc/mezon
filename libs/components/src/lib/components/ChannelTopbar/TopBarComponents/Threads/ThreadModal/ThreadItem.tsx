@@ -70,7 +70,7 @@ const ThreadItem = ({ thread, isPublicThread = false, preventClosePannel }: Thre
 		preventClosePannel.current = false;
 		dispatch(channelsActions.upsertOne({ clanId, channel: thread as ChannelsEntity }));
 		dispatch(
-			channelMetaActions.add({
+			channelMetaActions.upsertOne({
 				clanId,
 				id: thread.id,
 				isMute: false,

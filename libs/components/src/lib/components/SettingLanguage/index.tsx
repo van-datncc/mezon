@@ -45,6 +45,12 @@ export const SettingLanguage = ({ menuIsOpen }: ISettingLanguageProps) => {
 				flag: <TatarFlag />
 			},
 			{
+				title: `${t('setting:language.german')}`,
+				value: 'de',
+				contributedBy: 'robits',
+				flag: <GermanyFlag />
+			},
+			{
 				title: `${t('setting:language.italian')}`,
 				value: 'it',
 				contributedBy: 'robits',
@@ -65,12 +71,14 @@ export const SettingLanguage = ({ menuIsOpen }: ISettingLanguageProps) => {
 			{
 				title: `${t('setting:language.korean')}`,
 				value: 'kr',
-				contributedBy: 'robits'
+				contributedBy: 'robits',
+				flag: <SouthKoreaFlag />
 			},
 			{
 				title: `${t('setting:language.swedish')}`,
 				value: 'swe',
-				contributedBy: 'robits'
+				contributedBy: 'robits',
+				flag: <SwedenFlag />
 			}
 		];
 	}, [t]);
@@ -319,6 +327,81 @@ const PortugalFlag = () => (
 			<rect x="1" y="4" width="12" height="24" fill="#006600" />
 			<rect x="13" y="4" width="18" height="24" fill="#ff0000" />
 			<circle cx="13" cy="16" r="4.5" fill="#ffcc00" />
+		</g>
+		<path
+			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
+			opacity=".15"
+		></path>
+	</svg>
+);
+const GermanyFlag = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+		<defs>
+			<clipPath id="de-clip">
+				<rect x="1" y="4" width="30" height="24" rx="4" ry="4" />
+			</clipPath>
+		</defs>
+		<g clipPath="url(#de-clip)">
+			<rect x="1" y="4" width="30" height="8" fill="#000" />
+			<rect x="1" y="12" width="30" height="8" fill="#FF0000" />
+			<rect x="1" y="20" width="30" height="8" fill="#FFCC00" />
+		</g>
+		<path
+			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
+			opacity=".15"
+		></path>
+	</svg>
+);
+
+const KR_FLAG_TRIGRAM_SOLID = 'M-6-26H6v2H-6Zm0 3H6v2H-6Zm0 3H6v2H-6Z';
+
+const SouthKoreaFlag = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+		<defs>
+			<clipPath id="kr-clip">
+				<rect x="1" y="4" width="30" height="24" rx="4" ry="4" />
+			</clipPath>
+		</defs>
+		<g clipPath="url(#kr-clip)">
+			<rect x="1" y="4" width="30" height="24" fill="#fff" />
+			<g transform="translate(1,4) scale(0.05859375,0.046875)">
+				<g fillRule="evenodd" transform="rotate(-56.3 367.2 -111.2)scale(9.375)">
+					<g fill="#000001">
+						<path d={KR_FLAG_TRIGRAM_SOLID} />
+						<path d={KR_FLAG_TRIGRAM_SOLID} transform="translate(0,44)" />
+					</g>
+					<path stroke="#fff" fill="none" d="M0 17v10" />
+					<path fill="#cd212a" d="M0-12a12 12 0 0 1 0 24Z" />
+					<path fill="#0047a0" d="M0-12a12 12 0 0 0 0 24A6 6 0 0 0 0 0Z" />
+					<circle cy="-6" r="6" fill="#cd212a" />
+				</g>
+				<g fillRule="evenodd" transform="rotate(-123.7 196.5 59.5)scale(9.375)">
+					<g fill="#000001">
+						<path d={KR_FLAG_TRIGRAM_SOLID} />
+						<path d={KR_FLAG_TRIGRAM_SOLID} transform="translate(0,44)" />
+					</g>
+					<path stroke="#fff" fill="none" d="M0-23.5v3M0 17v3.5m0 3v3" />
+				</g>
+			</g>
+		</g>
+		<path
+			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
+			opacity=".15"
+		></path>
+	</svg>
+);
+
+const SwedenFlag = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+		<defs>
+			<clipPath id="se-clip">
+				<rect x="1" y="4" width="30" height="24" rx="4" ry="4" />
+			</clipPath>
+		</defs>
+		<g clipPath="url(#se-clip)">
+			<rect x="1" y="4" width="30" height="24" fill="#006aa7" />
+			<rect x="8" y="4" width="4" height="24" fill="#fecc00" />
+			<rect x="1" y="14" width="30" height="4" fill="#fecc00" />
 		</g>
 		<path
 			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"

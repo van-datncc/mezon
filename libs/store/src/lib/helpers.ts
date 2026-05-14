@@ -1,7 +1,7 @@
 import type { MezonContextValue } from '@mezon/transport';
 import { isOnline, socketState } from '@mezon/transport';
 import type { GetThunkAPI } from '@reduxjs/toolkit';
-import type { Client, Session } from 'mezon-js';
+import type { ApiSession, Client } from 'mezon-js';
 import type { DongClient, IndexerClient, MmnClient, ZkClient } from 'mmn-client-js';
 import type { GetThunkAPIWithMezon } from './typings';
 
@@ -16,35 +16,57 @@ export const getMezonCtx = (thunkAPI: GetThunkAPI<unknown>) => {
 
 export type MezonValueContext = MezonContextValue & {
 	client: Client;
-	session: Session;
+	session: ApiSession;
 	zkClient: ZkClient | null;
 	mmnClient: MmnClient | null;
 	dongClient: DongClient | null;
 	indexerClient: IndexerClient | null;
-	getLatestSession: () => Session | null;
+	getLatestSession: () => ApiSession | null;
 };
 
-export async function ensureSession(mezon: MezonContextValue): Promise<MezonValueContext> {
-	return new Promise((resolve, reject) => {
-		const interval = setInterval(() => {
-			if (mezon?.clientRef?.current && mezon?.sessionRef?.current) {
-				clearInterval(interval);
-				resolve(ensureClient(mezon));
-			}
-		}, 100);
-	});
+const SESSION_TRANSPORT_TIMEOUT_MS = 60000;
+
+function sessionHasCredentials(s: ApiSession | null | undefined): boolean {
+	if (!s) return false;
+	const token = !!s.token?.trim();
+	const sid = !!s.session_id?.trim();
+	if (!token && !sid) return false;
+	if (token && !sid) return false;
+	return true;
 }
 
+async function awaitMezonClient(mezon: MezonContextValue, deadline: number): Promise<void> {
+	while (!mezon.clientRef?.current) {
+		if (Date.now() > deadline) {
+			throw new Error('Timed out waiting for Mezon client');
+		}
+		await sleep(100);
+	}
+}
+
+export async function ensureSession(mezon: MezonContextValue): Promise<MezonValueContext> {
+	const deadline = Date.now() + SESSION_TRANSPORT_TIMEOUT_MS;
+	await awaitMezonClient(mezon, deadline);
+	return ensureClient(mezon);
+}
+
+const SOCKET_READY_TIMEOUT_MS = 60000;
+
 export async function ensureSocket(mezon: MezonContextValue): Promise<MezonValueContext> {
-	return new Promise((resolve, reject) => {
-		const interval = setInterval(() => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if (mezon.socketRef.current && (mezon.socketRef.current as any).adapter && (mezon.socketRef.current as any).adapter.isOpen()) {
-				clearInterval(interval);
-				resolve(ensureClient(mezon));
-			}
-		}, 100);
-	});
+	const deadline = Date.now() + SOCKET_READY_TIMEOUT_MS;
+	await awaitMezonClient(mezon, deadline);
+
+	const client = mezon.clientRef.current as Client;
+
+	let waitIterations = 0;
+	while (typeof client.isOpen !== 'function' || !client.isOpen()) {
+		waitIterations += 1;
+		if (Date.now() > deadline) {
+			throw new Error('Socket connection has not been established yet.');
+		}
+		await sleep(100);
+	}
+	return ensureClient(mezon);
 }
 
 export async function ensureClientAsync(mezon: MezonContextValue): Promise<MezonValueContext> {
@@ -111,6 +133,7 @@ export interface RetryConfig {
 	signal?: AbortSignal;
 	scope?: string;
 	mezon?: MezonValueContext;
+	requireMezonSocket?: boolean;
 }
 
 const activeScopeControllers = new Map<string, AbortController>();
@@ -138,40 +161,8 @@ export function checkInternetConnectionCached(): boolean {
 	return isOnline();
 }
 
-function isNetworkError(error: unknown): boolean {
-	if (error instanceof TypeError && error.message.includes('fetch')) return true;
-	if (!isOnline()) return true;
-	const msg = String((error as RetryableError)?.message || '').toLowerCase();
-	const code = (error as RetryableError)?.code || '';
-	const networkPatterns = ['timeout', 'etimedout', 'econnreset', 'enotfound', 'econnrefused', 'socket hang up', 'network error', 'econnaborted'];
-	if (code === 'NETWORK_ERROR' || code === 'ECONNABORTED') return true;
-	return networkPatterns.some((p) => msg.includes(p));
-}
-
-type RequiredRetryConfig = Required<Omit<RetryConfig, 'signal' | 'scope' | 'mezon'>>;
-
-const DEFAULT_RETRY_CONFIG: RequiredRetryConfig = {
-	maxRetries: 3,
-	initialDelay: 1000,
-	maxDelay: 10000,
-	backoffMultiplier: 2,
-	useExponentialBackoff: true,
-	timeout: 30000,
-	checkOnlineStatus: true,
-	shouldRetry: (error: RetryableError) => isNetworkError(error),
-	onRetry: () => {
-		// Default: no-op
-	}
-};
-
-function calculateRetryDelay(attemptNumber: number, config: RequiredRetryConfig): number {
-	if (!config.useExponentialBackoff) {
-		return config.initialDelay;
-	}
-
-	const exponentialDelay = config.initialDelay * Math.pow(config.backoffMultiplier, attemptNumber - 1);
-	const jitter = Math.random() * 0.3 * exponentialDelay;
-	return Math.min(exponentialDelay + jitter, config.maxDelay);
+export function isMezonClientSocketOpen(mezon: MezonValueContext): boolean {
+	return socketState.isConnected;
 }
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
@@ -181,9 +172,10 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T
 	]);
 }
 
-export async function withRetry<T>(fn: (() => Promise<T>) | ((session: Session) => Promise<T>), config: RetryConfig = {}): Promise<T> {
-	const mergedConfig: RequiredRetryConfig = { ...DEFAULT_RETRY_CONFIG, ...config };
-	let lastError: RetryableError | undefined;
+export async function withRetry<T>(fn: (() => Promise<T>) | ((session: ApiSession) => Promise<T>), config: RetryConfig = {}): Promise<T> {
+	const timeoutMs = config.timeout ?? 30000;
+	const mezonCtx = config.mezon;
+	const enforceMezonSocket = !!mezonCtx && config.requireMezonSocket !== false;
 
 	const scopeController = createScopeAbortController(config.scope);
 	const signal = config.signal || scopeController?.signal;
@@ -194,73 +186,30 @@ export async function withRetry<T>(fn: (() => Promise<T>) | ((session: Session) 
 
 	const executeCall = (): Promise<T> => {
 		if (config.mezon) {
-			const latestSession = config.mezon.getLatestSession();
-			if (!latestSession) {
-				throw new Error('No session available');
+			const latestSession = config.mezon.sessionRef.current;
+			if (!sessionHasCredentials(latestSession)) {
+				throw new Error('Mezon API called without session credentials');
 			}
-			return (fn as (session: Session) => Promise<T>)(latestSession);
+			return (fn as (session: ApiSession) => Promise<T>)(latestSession as ApiSession);
 		}
 		return (fn as () => Promise<T>)();
 	};
 
 	try {
-		for (let attempt = 0; attempt <= mergedConfig.maxRetries; attempt++) {
-			if (signal?.aborted) {
-				throw new Error('Request cancelled');
-			}
-
-			try {
-				const result = await withTimeout(executeCall(), mergedConfig.timeout);
-
-				if (config.scope && scopeController) {
-					activeScopeControllers.delete(config.scope);
-				}
-
-				return result;
-			} catch (error) {
-				if (signal?.aborted) {
-					throw new Error('Request cancelled');
-				}
-
-				const retryableError = error as RetryableError;
-				lastError = retryableError;
-
-				if (attempt >= mergedConfig.maxRetries) {
-					break;
-				}
-
-				if (!mergedConfig.shouldRetry(retryableError, attempt + 1)) {
-					throw error;
-				}
-
-				let delay = calculateRetryDelay(attempt + 1, mergedConfig);
-
-				if (mergedConfig.checkOnlineStatus) {
-					const hasConnection = await checkInternetConnectionCached();
-					if (!hasConnection) {
-						delay = Math.min(5000, mergedConfig.maxDelay);
-					}
-				}
-
-				mergedConfig.onRetry(retryableError, attempt + 1, delay);
-
-				await Promise.race([
-					sleep(delay),
-					new Promise((_, reject) => {
-						if (signal) {
-							signal.addEventListener('abort', () => reject(new Error('Request cancelled')), { once: true });
-						}
-					})
-				]);
-			}
+		if (signal?.aborted) {
+			throw new Error('Request cancelled');
 		}
+
+		if (enforceMezonSocket && mezonCtx && !isMezonClientSocketOpen(mezonCtx)) {
+			throw new Error('Socket connection has not been established yet.');
+		}
+
+		return await withTimeout(executeCall(), timeoutMs);
 	} finally {
 		if (config.scope && scopeController) {
 			activeScopeControllers.delete(config.scope);
 		}
 	}
-
-	throw lastError || new Error('All retries failed');
 }
 
 export const restoreLocalStorage = (keys: string[]) => {
@@ -281,32 +230,35 @@ export interface SocketDataRequest {
 	[key: string]: unknown;
 }
 
-const SOCKET_ONLY_APIS = ['ListLogedDevice', 'ListClanBadgeCount'];
-
 export async function fetchDataWithSocketFallback<T>(
 	mezon: MezonValueContext,
 	socketRequest: SocketDataRequest,
-	restApiFallback: (session: Session) => Promise<T>,
-	responseKey?: string,
-	retryConfig?: RetryConfig
+	restApiFallback: (session: ApiSession) => Promise<T>,
+	_responseKey?: string
 ): Promise<T> {
-	const socket = mezon.socketRef?.current;
-	let response: T | undefined;
+	const scope = socketRequest.api_name;
+	const scopeController = createScopeAbortController(scope);
+	const signal = scopeController?.signal;
 
-	const shouldUseSocket = SOCKET_ONLY_APIS.includes(socketRequest.api_name);
+	if (signal?.aborted) {
+		throw new Error('Request cancelled');
+	}
 
-	if (shouldUseSocket && socket?.isOpen()) {
-		try {
-			const data = await socket.listDataSocket(socketRequest);
-
-			response = responseKey ? data?.[responseKey] : data;
-		} catch (err) {
-			console.error(err, socketRequest);
+	try {
+		const latestSession = mezon.sessionRef.current;
+		if (!sessionHasCredentials(latestSession)) {
+			throw new Error('Mezon API called without session credentials');
+		}
+		if (!isMezonClientSocketOpen(mezon)) {
+			throw new Error('Socket connection not open.');
+		}
+		if (signal?.aborted) {
+			throw new Error('Request cancelled');
+		}
+		return await restApiFallback(latestSession as ApiSession);
+	} finally {
+		if (scope && scopeController) {
+			activeScopeControllers.delete(scope);
 		}
 	}
-
-	if (!response) {
-		response = await withRetry(restApiFallback, { ...retryConfig, scope: socketRequest.api_name, mezon });
-	}
-	return response;
 }
