@@ -447,7 +447,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 					)}
 
 					<div
-						className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center"
+						className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center z-30"
 						onClick={handleDownloadVideo}
 					>
 						<Icons.Download
