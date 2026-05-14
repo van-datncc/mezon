@@ -82,7 +82,9 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 								break;
 							} catch (error) {
 								if (i === MAX_RETRIES) break;
-								const nextDelay = INITIAL_DELAY * Math.pow(2, i);
+								const baseDelay = INITIAL_DELAY * Math.pow(2, i);
+								// Add jitter time for not all client call in same time
+								const nextDelay = baseDelay + Math.random() * 500;
 								console.error(`Connection failed. Retrying attempt ${i} in ${nextDelay}ms...`);
 								await delay(nextDelay);
 							}
@@ -113,7 +115,7 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 }
 
 const ConnectingScreen = ({ retryCount }: { retryCount: number }) => {
-	const retryDelay = 2 ** retryCount;
+	const retryDelay = Math.round(2 ** retryCount);
 	const [remainingTime, setRemainingTime] = useState(0);
 
 	useEffect(() => {
@@ -123,7 +125,6 @@ const ConnectingScreen = ({ retryCount }: { retryCount: number }) => {
 		}
 
 		setRemainingTime(retryDelay);
-		console.log('retryDelay: ', retryDelay);
 
 		const interval = setInterval(() => {
 			setRemainingTime((prev) => {
@@ -131,7 +132,6 @@ const ConnectingScreen = ({ retryCount }: { retryCount: number }) => {
 					clearInterval(interval);
 					return 0;
 				}
-				console.log('prev - 1: ', prev - 1);
 				return prev - 1;
 			});
 		}, 1000);
