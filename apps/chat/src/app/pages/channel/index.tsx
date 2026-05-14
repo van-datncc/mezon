@@ -522,8 +522,8 @@ const OnboardingGuide = ({
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag className="text-theme-primary" />
-					<div className=" flex flex-col">
-						<div className="text-base font-semibold text-theme-primary">{currentMission.title} </div>
+					<div className=" flex flex-col w-full overflow-hidden">
+						<div className="text-base font-semibold text-theme-primary w-full truncate">{currentMission.title} </div>
 						<div className="text-[10px] font-normal text-theme-primary">
 							{' '}
 							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}
