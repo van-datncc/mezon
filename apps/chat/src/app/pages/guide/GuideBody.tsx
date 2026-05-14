@@ -82,7 +82,8 @@ function GuideBody() {
 	const answerPercent = totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
 
 	useEffect(() => {
-		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
+		if (!currentClanId) return;
+		dispatch(fetchOnboarding({ clan_id: currentClanId }));
 	}, [currentClanId, dispatch]);
 
 	return (
@@ -274,7 +275,7 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 						const isActive = selectAnswer.includes(index) || hoveredIndex === index;
 						return (
 							<GuideItemLayout
-								key={answer.title}
+								key={`${question.id}-${index}`}
 								icon={answer.emoji}
 								description={<span className="">{answer.description}</span>}
 								title={answer.title}
@@ -288,7 +289,6 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 										? 'bg-item-theme text-theme-primary-active border-theme-primary'
 										: 'bg-white dark:bg-transparent text-theme-primary border-gray-200 dark:border-gray-700'
 								}`}
-								background={isActive ? 'bg-item-theme' : ''}
 							/>
 						);
 					})}
