@@ -1,5 +1,6 @@
 import { useEventManagement, useOnClickOutside } from '@mezon/core';
 import type { EventManagementEntity } from '@mezon/store';
+import { generateE2eId } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,7 +61,11 @@ const ModalDelEvent = (props: ModalDelEventProps) => {
 						<button onClick={closeModal} className="px-4 py-2 hover:underline rounded">
 							{t('actions.neverMind')}
 						</button>
-						<button onClick={handleDeleteEvent} className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white">
+						<button
+							onClick={handleDeleteEvent}
+							className="px-4 py-2 bg-[#DA363C] rounded hover:bg-opacity-85 text-white"
+							data-e2e={generateE2eId('clan_page.modal.create_event.event_management.item.button.confirm_cancel_event')}
+						>
 							{t('actions.cancelEvent')}
 						</button>
 					</div>

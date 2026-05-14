@@ -1,6 +1,7 @@
 import type { ChannelTimeline } from '@mezon/store';
 import { channelMediaActions, selectChannelMediaByChannelId, selectChannelMediaLoadingStatus, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MediaImage } from './MediaImage';
@@ -81,6 +82,7 @@ export function EventsView({ channelId, clanId, onBack, onNavigateToEventDetail,
 						className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
 							selectedYear === year ? 'btn-primary' : 'bg-theme-primary text-theme-secondary bg-item-hover-chat'
 						}`}
+						data-e2e={generateE2eId('timeline.buttons.selected_year')}
 					>
 						{year}
 					</button>
@@ -127,9 +129,23 @@ export function EventsView({ channelId, clanId, onBack, onNavigateToEventDetail,
 											{t('fields.mediaHighlights.special')}
 										</span>
 									)}
-									{event.title && <h4 className="text-sm font-semibold text-theme-primary">{event.title}</h4>}
+									{event.title && (
+										<h4
+											className="text-sm font-semibold text-theme-primary"
+											data-e2e={generateE2eId('timeline.events.card.title')}
+										>
+											{event.title}
+										</h4>
+									)}
 								</div>
-								{event.description && <p className="text-xs text-theme-secondary mb-3 line-clamp-2">{event.description}</p>}
+								{event.description && (
+									<p
+										className="text-xs text-theme-secondary mb-3 line-clamp-2"
+										data-e2e={generateE2eId('timeline.events.card.description')}
+									>
+										{event.description}
+									</p>
+								)}
 
 								{images.length > 0 && (
 									<div className="mb-2">
@@ -161,7 +177,7 @@ export function EventsView({ channelId, clanId, onBack, onNavigateToEventDetail,
 								{date && (
 									<div className="flex items-center gap-2 text-theme-secondary text-xs mt-2">
 										<Icons.History className="w-3.5 h-3.5" />
-										<span>
+										<span data-e2e={generateE2eId('timeline.events.card.created_time')}>
 											{date.month} {date.day}, {date.year}
 										</span>
 									</div>
