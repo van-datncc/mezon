@@ -280,7 +280,7 @@ const TopBarChannelText = memo(() => {
 							title={currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP ? t('tooltips.clickToEdit') : channelDmGroupLabel}
 							data-e2e={generateE2eId(`chat.direct_message.chat_item.namegroup`)}
 						>
-							<div className="flex flex-col justify-between h-8">
+							<div className="flex flex-col justify-center gap-1 h-8">
 								<span className="truncate min-w-0 h-4 leading-4">{channelDmGroupLabel}</span>
 								{currentDmGroup?.type === ChannelType.CHANNEL_TYPE_GROUP && currentDmGroup.channel_id && (
 									<MemberGroup channelId={currentDmGroup.channel_id} />
