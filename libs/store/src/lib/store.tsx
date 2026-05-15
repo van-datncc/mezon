@@ -443,17 +443,7 @@ const thunkNameLogger = () => (next: any) => (action: any) => {
 	if (isThunk) {
 		const [slice, actionName, status] = action.type.split('/');
 		if (status === 'pending') {
-			console.warn(`🚀 THUNK START: ${slice}/${actionName}`, {
-				arg: action.meta?.arg
-			});
-		}
-
-		if (status === 'fulfilled') {
-			console.warn(`✅ THUNK SUCCESS: ${slice}/${actionName}`);
-		}
-
-		if (status === 'rejected') {
-			console.warn(`❌ THUNK ERROR: ${slice}/${actionName}`, action.error);
+			console.warn(`🚀 : ${slice}/${actionName}`);
 		}
 	}
 
