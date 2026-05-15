@@ -2,19 +2,19 @@ import type { ThreadsEntity } from '@mezon/store';
 import { ThreadStatus } from '@mezon/utils';
 
 // is thread public and last message within 30days
-export const getActiveThreads = (threads: ThreadsEntity[]): ThreadsEntity[] => {
+export const getJoinedThreads = (threads: ThreadsEntity[]): ThreadsEntity[] => {
 	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
 
 	const result = threads.filter((thread) => {
 		const lastMessageTimestamp = thread?.last_sent_message?.timestamp_seconds;
 		const isWithin30Days = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) < thirtyDaysInSeconds;
-		return thread.active === ThreadStatus.activePublic && isWithin30Days;
+		return thread.active === ThreadStatus.joined && isWithin30Days;
 	});
 
 	return result;
 };
-export const getJoinedThreadsWithinLast30Days = (threads: ThreadsEntity[]): ThreadsEntity[] => {
+export const getActiveThreads = (threads: ThreadsEntity[]): ThreadsEntity[] => {
 	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
 
@@ -39,8 +39,8 @@ export const getThreadsOlderThan30Days = (threads: ThreadsEntity[]): ThreadsEnti
 	const olderThreads: ThreadsEntity[] = [];
 
 	for (const thread of threads) {
-		const timestamp = Number(thread.last_sent_message?.timestamp_seconds);
-		if (!timestamp) {
+		const timestamp = thread.active || Number(thread.last_sent_message?.timestamp_seconds);
+		if (!thread.active) {
 			olderThreads.push(thread);
 			continue;
 		}

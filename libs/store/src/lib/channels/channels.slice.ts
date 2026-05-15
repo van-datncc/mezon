@@ -8,7 +8,7 @@ import type {
 	IChannel,
 	LoadingStatus
 } from '@mezon/utils';
-import { ModeResponsive, TypeCheck, checkIsThread, mapChannelToAppEntity } from '@mezon/utils';
+import { ModeResponsive, ThreadStatus, TypeCheck, checkIsThread, mapChannelToAppEntity } from '@mezon/utils';
 import type { EntityState, GetThunkAPI, PayloadAction, Update } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
@@ -715,7 +715,10 @@ export const addThreadToChannels = createAsyncThunk(
 				thunkAPI.dispatch(
 					channelsActions.upsertOne({
 						clanId,
-						channel: { ...matchedThread, active: 1 } as ChannelsEntity
+						channel: {
+							...matchedThread,
+							active: matchedThread.active ? ThreadStatus.joined : ThreadStatus.activePublic
+						} as ChannelsEntity
 					})
 				);
 			}
@@ -1214,7 +1217,9 @@ export const channelsSlice = createSlice({
 					if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
 						rememberChannel = parsed as Record<string, string>;
 					}
-				} catch {}
+				} catch (e) {
+					console.error(e);
+				}
 				rememberChannel[clanId] = channelId;
 				localStorage.setItem('remember_channel', JSON.stringify(rememberChannel));
 			}
