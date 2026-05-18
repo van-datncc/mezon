@@ -635,6 +635,11 @@ export default class App {
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
+		if (process.platform === 'linux') {
+			app.commandLine.appendSwitch('ozone-platform', 'wayland');
+			app.commandLine.appendSwitch('disable-features', 'Vulkan');
+		}
+
 		App.BrowserWindow = browserWindow;
 		App.application = app;
 
