@@ -27,6 +27,7 @@ import { AvatarImage } from '@mezon/components';
 import { createImgproxyUrl, IMessageTypeCallLog } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 type DmCallingProps = {
@@ -34,9 +35,18 @@ type DmCallingProps = {
 	directId: string;
 };
 
+function dmCallingDeviceMenuSubtitle(device: MediaDeviceInfo | null, systemDefaultLabel: string): string {
+	if (!device) return '';
+	const label = device.label?.trim();
+	if (label) return label;
+	if (device.deviceId === 'default') return systemDefaultLabel;
+	return '';
+}
+
 // DmCalling check later
 const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }, DmCallingProps>(({ dmGroupId, directId }, ref) => {
 	const dispatch = useAppDispatch();
+	const { t, i18n } = useTranslation('channelVoice');
 	const currentDmGroup = useSelector((state) => selectDmGroupById(state, dmGroupId ?? ''));
 	const { setStatusMenu } = useMenu();
 	const userProfile = useSelector(selectAllAccount);
@@ -182,75 +192,104 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const [expandedDevice, setExpandedDevice] = useState<'input' | 'output' | null>(null);
 	const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
 
+	const systemDefaultLabel = t('device.systemDefault');
+
 	const menuDevice = useMemo(() => {
+		const flyoutPanelBase =
+			'z-50 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] overflow-y-auto shadow-lg ' +
+			'absolute left-full top-0 ml-1 ' +
+			'max-sbm:static max-sbm:left-auto max-sbm:top-auto max-sbm:ml-0 max-sbm:mt-0 max-sbm:min-w-0 max-sbm:w-full max-sbm:max-h-[min(40vh,280px)] max-sbm:rounded-none max-sbm:border-x-0 max-sbm:border-b-0 max-sbm:shadow-none';
+
 		return (
 			<div className="relative inline-block">
-				<div className="rounded-lg bg-neutral-800 border border-neutral-700 overflow-hidden w-[220px]">
-					<div
-						className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 border-b border-neutral-700 ${expandedDevice === 'input' ? 'bg-neutral-700' : ''}`}
-						onClick={() => setExpandedDevice(expandedDevice === 'input' ? null : 'input')}
-					>
-						<div className="flex flex-col flex-1 min-w-0 justify-start">
-							<div className="text-white font-medium text-sm">Input device</div>
-							<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
-								{currentInputDevice?.label || 'System Default'}
+				<div className="rounded-lg bg-neutral-800 border border-neutral-700 w-[220px] overflow-visible">
+					<div className="relative border-b border-neutral-700">
+						<div
+							className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'input' ? 'bg-neutral-700' : ''}`}
+							onClick={() => setExpandedDevice(expandedDevice === 'input' ? null : 'input')}
+						>
+							<div className="flex flex-col flex-1 min-w-0 justify-start">
+								<div className="text-white font-medium text-sm">{t('device.inputDevice')}</div>
+								<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+									{dmCallingDeviceMenuSubtitle(currentInputDevice, systemDefaultLabel)}
+								</div>
 							</div>
+							<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
 						</div>
-						<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+						{expandedDevice === 'input' && (
+							<div className={`${flyoutPanelBase} max-h-[320px]`}>
+								{audioInputDevicesList.map((device) => (
+									<div
+										key={device.deviceId}
+										className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentInputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+										onClick={() => {
+											changeAudioInputDevice(device.deviceId);
+											setExpandedDevice(null);
+										}}
+									>
+										{device.deviceId === currentInputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+										<div className="flex flex-col flex-1 min-w-0">
+											<span className="truncate overflow-hidden whitespace-nowrap">{device.label || '\u200b'}</span>
+											{device.deviceId === 'default' && !device.label?.trim() && (
+												<span className="text-neutral-400 text-xs">{systemDefaultLabel}</span>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 
-					<div
-						className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'output' ? 'bg-neutral-700' : ''}`}
-						onClick={() => setExpandedDevice(expandedDevice === 'output' ? null : 'output')}
-					>
-						<div className="flex flex-col flex-1 min-w-0 justify-start">
-							<div className="text-white font-medium text-sm">Output device</div>
-							<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
-								{currentOutputDevice?.label || 'System Default'}
+					<div className="relative">
+						<div
+							className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'output' ? 'bg-neutral-700' : ''}`}
+							onClick={() => setExpandedDevice(expandedDevice === 'output' ? null : 'output')}
+						>
+							<div className="flex flex-col flex-1 min-w-0 justify-start">
+								<div className="text-white font-medium text-sm">{t('device.outputDevice')}</div>
+								<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+									{dmCallingDeviceMenuSubtitle(currentOutputDevice, systemDefaultLabel)}
+								</div>
 							</div>
+							<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
 						</div>
-						<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+						{expandedDevice === 'output' && (
+							<div className={`${flyoutPanelBase} max-h-[360px]`}>
+								{audioOutputDevicesList.map((device) => (
+									<div
+										key={device.deviceId}
+										className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentOutputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+										onClick={() => {
+											changeAudioOutputDevice(device.deviceId);
+											setExpandedDevice(null);
+										}}
+									>
+										{device.deviceId === currentOutputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+										<div className="flex flex-col flex-1 min-w-0">
+											<span className="truncate overflow-hidden whitespace-nowrap">{device.label || '\u200b'}</span>
+											{device.deviceId === 'default' && !device.label?.trim() && (
+												<span className="text-neutral-400 text-xs">{systemDefaultLabel}</span>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
-
-				{expandedDevice === 'input' && (
-					<div className="absolute left-full top-0 ml-1 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] max-h-[320px] overflow-y-auto z-50">
-						{audioInputDevicesList.map((device) => (
-							<div
-								key={device.deviceId}
-								className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentInputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
-								onClick={() => {
-									changeAudioInputDevice(device.deviceId);
-									setExpandedDevice(null);
-								}}
-							>
-								{device.deviceId === currentInputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
-								<span className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap">{device.label}</span>
-							</div>
-						))}
-					</div>
-				)}
-
-				{expandedDevice === 'output' && (
-					<div className="absolute left-full top-12 ml-1 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] max-h-[360px] overflow-y-auto z-50">
-						{audioOutputDevicesList.map((device) => (
-							<div
-								key={device.deviceId}
-								className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentOutputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
-								onClick={() => {
-									changeAudioOutputDevice(device.deviceId);
-									setExpandedDevice(null);
-								}}
-							>
-								{device.deviceId === currentOutputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
-								<span className="flex-1 min-w-0 truncate overflow-hidden whitespace-nowrap">{device.label}</span>
-							</div>
-						))}
-					</div>
-				)}
 			</div>
 		);
-	}, [currentInputDevice, currentOutputDevice, expandedDevice, audioInputDevicesList, audioOutputDevicesList]);
+	}, [
+		i18n.language,
+		systemDefaultLabel,
+		currentInputDevice,
+		currentOutputDevice,
+		expandedDevice,
+		audioInputDevicesList,
+		audioOutputDevicesList,
+		changeAudioInputDevice,
+		changeAudioOutputDevice
+	]);
 
 	const localVideoContainerClass =
 		activeVideo === 'remote'
@@ -265,6 +304,9 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			: activeVideo === 'remote'
 				? 'relative w-full h-full'
 				: 'relative w-[400px] h-[300px] max-sbm:w-full max-sbm:h-[200px]';
+
+	const deviceSettingsTriggerLabel =
+		dmCallingDeviceMenuSubtitle(currentInputDevice, systemDefaultLabel) || dmCallingDeviceMenuSubtitle(currentOutputDevice, systemDefaultLabel);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
 
@@ -425,9 +467,10 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								}}
 							>
 								<div
-									className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] relative rounded-full flex items-center justify-center cursor-pointer transition-colors duration-200 ${isDeviceMenuOpen ? 'dark:bg-neutral-400 bg-neutral-700' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+									title={deviceSettingsTriggerLabel || undefined}
+									className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:min-w-[56px] lg:max-w-[min(200px,28vw)] lg:w-auto lg:px-3 relative rounded-full flex items-center justify-center cursor-pointer transition-colors duration-200 min-w-0 ${isDeviceMenuOpen ? 'dark:bg-neutral-400 bg-neutral-700' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 								>
-									<Icons.CallSetting className="text-white dark:text-bgTertiary" />
+									<Icons.CallSetting className="text-white dark:text-bgTertiary shrink-0" />
 								</div>
 							</Menu>
 							<div
