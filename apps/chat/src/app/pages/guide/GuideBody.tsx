@@ -21,7 +21,7 @@ import {
 import { Icons } from '@mezon/ui';
 import { DONE_ONBOARDING_STATUS, generateE2eId, titleMission } from '@mezon/utils';
 import type { ApiOnboardingItem } from 'mezon-js';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -37,38 +37,35 @@ function GuideBody() {
 	const selectUserProcessing = useSelector((state) => selectProcessingByClan(state, currentClanId as string));
 	const answerByClanId = useAppSelector((state) => selectAnswerByClanId(state, currentClanId as string));
 
-	const handleDoMission = useCallback(
-		(mission: ApiOnboardingItem, index: number) => {
-			if (index === missionDone || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS) {
-				switch (mission.task_type) {
-					case ETypeMission.SEND_MESSAGE: {
-						const link = toChannelPage(mission.channel_id as string, currentClanId as string);
-						navigate(link);
-						break;
-					}
-					case ETypeMission.VISIT: {
-						const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
-						navigate(linkChannel);
-						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
-						doneAllMission(index);
-						break;
-					}
-					case ETypeMission.DOSOMETHING: {
-						dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
-						doneAllMission(index);
-						break;
-					}
-					default:
-						break;
-				}
-			}
-		},
-		[missionSum]
-	);
-
 	const doneAllMission = (indexMision: number) => {
 		if (indexMision + 1 === missionSum) {
 			dispatch(onboardingActions.doneOnboarding({ clan_id: currentClanId as string }));
+		}
+	};
+
+	const handleDoMission = (mission: ApiOnboardingItem, index: number) => {
+		if (index === missionDone || selectUserProcessing?.onboarding_step === DONE_ONBOARDING_STATUS) {
+			switch (mission.task_type) {
+				case ETypeMission.SEND_MESSAGE: {
+					const link = toChannelPage(mission.channel_id as string, currentClanId as string);
+					navigate(link);
+					break;
+				}
+				case ETypeMission.VISIT: {
+					const linkChannel = toChannelPage(mission.channel_id as string, currentClanId as string);
+					navigate(linkChannel);
+					dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
+					doneAllMission(index);
+					break;
+				}
+				case ETypeMission.DOSOMETHING: {
+					dispatch(onboardingActions.doneMission({ clan_id: currentClanId as string }));
+					doneAllMission(index);
+					break;
+				}
+				default:
+					break;
+			}
 		}
 	};
 
@@ -85,8 +82,9 @@ function GuideBody() {
 	const answerPercent = totalAnswersLength > 0 ? (totalNumberAnswer * 100) / totalAnswersLength : 0;
 
 	useEffect(() => {
-		dispatch(fetchOnboarding({ clan_id: currentClanId as string }));
-	}, []);
+		if (!currentClanId) return;
+		dispatch(fetchOnboarding({ clan_id: currentClanId }));
+	}, [currentClanId, dispatch]);
 
 	return (
 		<div className="w-full h-full pt-4 ">
@@ -246,6 +244,7 @@ const GuideItemMission = ({ mission, onClick, tick }: TypeItemMission) => {
 const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 	const dispatch = useAppDispatch();
 	const selectAnswer = useSelector((state) => selectAnswerByQuestionId(state, question.id as string));
+	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
 	const currentClanId = useSelector(selectCurrentClanId);
 	const handleOnClickQuestion = (index: number) => {
@@ -265,15 +264,6 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 			})
 		);
 	};
-	const hightLight = useCallback(
-		(index: number) => {
-			if (selectAnswer.includes(index)) {
-				return 'bg-item-theme text-theme-primary-active border-theme-primary cursor-pointer';
-			}
-			return;
-		},
-		[selectAnswer.length]
-	);
 	return (
 		<div className="w-full p-4 flex flex-col gap-2 bg-white dark:bg-transparent">
 			<p className="text-theme-primary-active font-semibold" data-e2e={generateE2eId('onboarding.clan_guide_page.question')}>
@@ -281,18 +271,27 @@ const QuestionItems = ({ question }: { question: ApiOnboardingItem }) => {
 			</p>
 			<div className="flex flex-wrap gap-2 flex-1">
 				{question.answers &&
-					question.answers.map((answer, index) => (
-						<GuideItemLayout
-							key={answer.title}
-							icon={answer.emoji}
-							description={<span className="">{answer.description}</span>}
-							title={answer.title}
-							height={'h-auto'}
-							onClick={() => handleOnClickQuestion(index)}
-							className={` w-fit h-fit rounded-xl hover:bg-transparent justify-center items-center px-4 py-2 border-2 cursor-pointer font-medium flex gap-2 ${hightLight(index)}`}
-							background={selectAnswer.includes(index) ? 'bg-item-theme' : 'bg-white dark:bg-transparent'}
-						/>
-					))}
+					question.answers.map((answer, index) => {
+						const isActive = selectAnswer.includes(index) || hoveredIndex === index;
+						return (
+							<GuideItemLayout
+								key={`${question.id}-${index}`}
+								icon={answer.emoji}
+								description={<span className="">{answer.description}</span>}
+								title={answer.title}
+								height={'h-auto'}
+								onClick={() => handleOnClickQuestion(index)}
+								onMouseEnter={() => setHoveredIndex(index)}
+								onMouseLeave={() => setHoveredIndex(null)}
+								noNeedHover
+								className={`w-fit h-fit rounded-xl justify-center items-center px-4 py-2 border-2 cursor-pointer font-medium flex gap-2 transition-colors ${
+									isActive
+										? 'bg-item-theme text-theme-primary-active border-theme-primary'
+										: 'bg-white dark:bg-transparent text-theme-primary border-gray-200 dark:border-gray-700'
+								}`}
+							/>
+						);
+					})}
 			</div>
 		</div>
 	);
