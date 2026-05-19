@@ -11,6 +11,8 @@ export type AvatarImageProp = {
 	srcImgProxy?: string;
 } & DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
+const avatarColors = ['bg-[#ade603]', 'bg-[#00b2cc]', 'bg-[#fda63c]', 'bg-[#e16dcc]', 'bg-[#e8467b]', 'bg-[#9c7cfd]', 'bg-[#22e2b3]'];
+
 export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
 
@@ -52,10 +54,10 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 
 	if (!src || isError) {
 		const avatarChar = username?.charAt(0)?.toUpperCase() || '';
-
+		const color = avatarChar.charCodeAt(0) % 6;
 		return (
 			<div
-				className={`size-10 bg-bgAvatarDark  rounded-full flex justify-center items-center text-bgAvatarLight text-[16px] ${className} ${classNameText}`}
+				className={`size-10 ${avatarColors[color]}  rounded-full flex justify-center items-center text-white text-[16px] ${className} ${classNameText}`}
 				data-e2e={generateE2eId('avatar.image')}
 			>
 				{avatarChar}
