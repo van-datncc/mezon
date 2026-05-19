@@ -117,7 +117,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								{role.role_icon ? (
 									<img src={role.role_icon} alt="" className={'size-5'} />
 								) : (
-									<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" defaultFill={`${role.color || DEFAULT_ROLE_COLOR}`} />
+									<Icons.RoleIcon defaultSize="w-5 h-[30px] min-w-5 mr-2" defaultFill1={role.color || DEFAULT_ROLE_COLOR} />
 								)}
 
 								{!hasPermissionEdit && <Icons.IconLock defaultSize="size-3 text-contentTertiary" />}
@@ -135,10 +135,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 									data-e2e={generateE2eId('clan_page.settings.role.item.member_count')}
 								>
 									{role.role_user_list?.role_users?.length ?? 0}
-									<Icons.MemberIcon
-										defaultSize="w-4 h-4 min-w-4"
-										className="shrink-0 text-colorTextLightMode dark:text-zinc-400"
-									/>
+									<Icons.MemberIcon defaultSize="w-4 h-4 min-w-4" className="shrink-0 text-colorTextLightMode dark:text-zinc-400" />
 								</p>
 							)}
 						</td>

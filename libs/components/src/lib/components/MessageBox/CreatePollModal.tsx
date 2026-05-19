@@ -1,6 +1,6 @@
 import { EmojiSuggestionProvider, useEscapeKeyClose } from '@mezon/core';
 import { Icons } from '@mezon/ui';
-import { getSrcEmoji } from '@mezon/utils';
+import { generateE2eId, getSrcEmoji } from '@mezon/utils';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmojiRolePanel } from '../EmojiPicker/EmojiRolePanel';
@@ -162,6 +162,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 								placeholder={t('poll.questionPlaceholder')}
 								className="w-full px-3 py-2 bg-theme-input text-theme-primary-active rounded border-theme-primary focus-input"
 								maxLength={300}
+								data-e2e={generateE2eId('poll.modal.input.question')}
 							/>
 							<div className="mt-1 text-right text-xs text-theme-primary">{question.length} / 300</div>
 						</div>
@@ -195,6 +196,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 											onChange={(e) => handleAnswerChange(index, e.target.value)}
 											placeholder={t('poll.answerPlaceholder')}
 											className="w-full pl-11 pr-11 py-2 bg-theme-input text-theme-primary-active rounded border-theme-primary focus-input"
+											data-e2e={generateE2eId('poll.modal.input.answer')}
 										/>
 
 										{answers.length > 2 && (
@@ -202,6 +204,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 												type="button"
 												onClick={() => handleRemoveAnswer(index)}
 												className="absolute right-3 top-1/2 -translate-y-1/2 text-theme-primary hover:text-colorDangerHover transition-colors"
+												data-e2e={generateE2eId('poll.modal.button.delete_answer')}
 											>
 												<Icons.TrashIcon className="w-5 h-5" />
 											</button>
@@ -215,6 +218,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 									type="button"
 									onClick={handleAddAnswer}
 									className="mt-2 flex items-center gap-2 text-sm text-theme-primary hover:text-theme-primary-active transition-colors"
+									data-e2e={generateE2eId('poll.modal.button.add_answer')}
 								>
 									<Icons.AddIcon className="w-4 h-4" />
 									{t('poll.addAnotherAnswer')}
@@ -230,6 +234,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 									type="button"
 									onClick={() => setDurationDropdownOpen((open) => !open)}
 									className="w-full pl-3 pr-10 py-2 bg-theme-input text-theme-primary-active rounded border-theme-primary focus-input bg-item-hover cursor-pointer text-left flex items-center"
+									data-e2e={generateE2eId('poll.modal.button.open_duration')}
 								>
 									{t(DURATION_OPTIONS.find((o) => o.value === duration)?.labelKey ?? 'poll.duration24Hours')}
 								</button>
@@ -249,6 +254,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 													setDurationDropdownOpen(false);
 												}}
 												className="w-full px-3 py-2 text-left text-theme-primary-active bg-item-theme-hover hover:border-l-2 hover:border-l-buttonPrimary cursor-pointer transition-colors duration-150 border-l-2 border-l-transparent"
+												data-e2e={generateE2eId('poll.modal.button.choose_duration')}
 											>
 												{t(option.labelKey)}
 											</button>
@@ -268,6 +274,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 									checked={allowMultipleAnswers}
 									onChange={(e) => setAllowMultipleAnswers(e.target.checked)}
 									className="w-5 h-5 rounded border-theme-primary accent-buttonPrimary cursor-pointer"
+									data-e2e={generateE2eId('poll.modal.input.allow_multi_answer')}
 								/>
 							</label>
 							<span className="mb-1 text-sm text-theme-primary-active">{t('poll.allowMultipleAnswers')}</span>
@@ -278,6 +285,7 @@ function CreatePollModal({ onClose, onSubmit }: CreatePollModalProps) {
 							onClick={handlePost}
 							disabled={!canPost}
 							className="px-6 py-2 rounded font-semibold transition-colors bg-buttonPrimary hover:bg-buttonPrimaryHover text-theme-primary-active disabled:opacity-50 disabled:cursor-not-allowed"
+							data-e2e={generateE2eId('poll.modal.button.post')}
 						>
 							{t('poll.post')}
 						</button>

@@ -115,8 +115,6 @@ export const updateUserClanProfile = createAsyncThunk(
 					setUserClanAvatarOverride(currentUser.user.id, clanId, avatarUrl);
 					thunkAPI.dispatch(accountActions.incrementAvatarVersion());
 				}
-
-				thunkAPI.dispatch(fetchUserClanProfile({ clanId }));
 			}
 			return true;
 		} catch (error) {

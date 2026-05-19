@@ -257,6 +257,7 @@ const ChannelLinkComponent = ({ clanId, channel, isPrivate, isUnReadChannel, num
 									<Icons.HashtagLocked
 										className={` ${iconFillClasses.hashtagLocked} w-4 h-4`}
 										defaultFill1="var(--hashtag-locked-fill-1)"
+										data-e2e={generateE2eId('clan_page.channel_list.item.icon.hashtag_lock')}
 									/>
 								)}
 							{channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && (

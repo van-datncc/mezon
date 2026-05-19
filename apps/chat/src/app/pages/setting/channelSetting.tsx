@@ -1,7 +1,7 @@
 import { ListChannelSetting } from '@mezon/components';
 import {
-	ETypeFetchChannelSetting,
 	channelSettingActions,
+	ETypeFetchChannelSetting,
 	selectAllChannelSuggestion,
 	selectCurrentClanId,
 	selectNumberChannelCount,
@@ -51,23 +51,18 @@ const ChannelSetting = () => {
 		prevClanIdRef.current = selectClanId as string;
 	}, [selectClanId, dispatch]);
 
-	const fetchChannels = useCallback(async () => {
+	useEffect(() => {
 		if (!selectClanId) return;
-
-		await dispatch(
+		dispatch(
 			channelSettingActions.fetchActiveChannelSettingInClan({
-				clanId: selectClanId as string,
+				clanId: selectClanId,
 				parentId: '0',
-				typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL,
-				noCache: true,
-				limit: 500
+				page: 1,
+				limit: 10,
+				typeFetch: ETypeFetchChannelSetting.FETCH_CHANNEL
 			})
 		);
 	}, [selectClanId, dispatch]);
-
-	useEffect(() => {
-		fetchChannels();
-	}, [fetchChannels]);
 
 	return (
 		<div className="p-4 h-[calc(100vh_-_56px)] flex flex-col text-theme-primary ">

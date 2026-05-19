@@ -28,7 +28,7 @@ const ExitSetting = (props: ModalExitProps) => {
 						className="rounded-full p-[10px] border-theme-primary bg-button-secondary bg-secondary-button-hover cursor-pointer"
 						data-e2e={generateE2eId('user_setting.account.exit_setting')}
 					>
-						<Icons.CloseButton className="w-4" />
+						<Icons.CloseButton />
 					</div>
 					<div className="font-semibold text-[13px] text-theme-primary">ESC</div>
 				</div>

@@ -33,13 +33,22 @@ export const getJoinedThreadsWithinLast30Days = (threads: ThreadsEntity[]): Thre
 };
 
 export const getThreadsOlderThan30Days = (threads: ThreadsEntity[]): ThreadsEntity[] => {
-	const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+	const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
 	const currentTime = Math.floor(Date.now() / 1000);
 
-	const result = threads.filter(
-		(thread) =>
-			thread.last_sent_message?.timestamp_seconds && currentTime - Number(thread.last_sent_message.timestamp_seconds) > thirtyDaysInSeconds
-	);
+	const olderThreads: ThreadsEntity[] = [];
 
-	return result;
+	for (const thread of threads) {
+		const timestamp = Number(thread.last_sent_message?.timestamp_seconds);
+		if (!timestamp) {
+			olderThreads.push(thread);
+			continue;
+		}
+		const timeSinceLastMessage = currentTime - timestamp;
+		if (timeSinceLastMessage > THIRTY_DAYS_IN_SECONDS) {
+			olderThreads.push(thread);
+		}
+	}
+
+	return olderThreads;
 };

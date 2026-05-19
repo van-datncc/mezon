@@ -6,8 +6,6 @@ const win = window as Window & {
 	electron?: { on?: (event: string, cb: () => void) => void };
 };
 
-console.log('polyfills initialized');
-
 
 win.requestIdleCallback =
 	win.requestIdleCallback ||

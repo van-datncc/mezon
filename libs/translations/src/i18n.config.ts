@@ -4,6 +4,7 @@ import resourcesToBackend from 'i18next-resources-to-backend';
 import { initReactI18next } from 'react-i18next';
 
 export const defaultNS = 'common';
+const defaultNamespaces = ['common', 'friends'];
 
 const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe'] as const;
 type SupportedLng = (typeof SUPPORTED_LNGS)[number];
@@ -81,6 +82,7 @@ i18n.use(languageDetector)
 	)
 	.init({
 		defaultNS,
+		ns: defaultNamespaces,
 		fallbackLng: 'en',
 		supportedLngs: SUPPORTED_LNGS as unknown as string[],
 		detection: {

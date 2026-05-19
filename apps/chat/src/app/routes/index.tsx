@@ -70,9 +70,7 @@ const Main = lazy(() => import(/* webpackChunkName: "main-pages" */ '../pages/ma
 const AddFriendPage = lazy(() => import(/* webpackChunkName: "main-pages" */ '../pages/invite/addFriendPage'));
 const MemberMain = lazy(() => import(/* webpackChunkName: "member-pages" */ '../pages/member'));
 const ChannelSettingMain = lazy(() => import(/* webpackChunkName: "setting-pages" */ '../pages/setting/channelSetting'));
-const Canvas = lazy(() =>
-	import(/* webpackChunkName: "canvas" */ '@mezon/components').then((m) => ({ default: m.Canvas }))
-);
+const Canvas = lazy(() => import(/* webpackChunkName: "canvas" */ '@mezon/components').then((m) => ({ default: m.Canvas })));
 const ThreadsMain = lazy(() => import(/* webpackChunkName: "thread-pages" */ '../pages/thread'));
 
 const SuspenseFallback = () => {
@@ -182,8 +180,7 @@ export const Routes = memo(() => {
 							<Suspense fallback={<SuspenseFallback />}>
 								<MeetPage />
 							</Suspense>
-						),
-						loader: loaderWithStore(authLoader)
+						)
 					},
 					// {
 					// 	path: 'popout',
