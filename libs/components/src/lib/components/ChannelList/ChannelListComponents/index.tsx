@@ -11,6 +11,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentClanIsOnboarding,
+	selectCurrentClanName,
 	selectEventLoading,
 	selectMissionDone,
 	selectMissionSum,
@@ -24,7 +25,7 @@ import {
 } from '@mezon/store';
 
 import { Icons } from '@mezon/ui';
-import { DONE_ONBOARDING_STATUS, EPermission, generateE2eId } from '@mezon/utils';
+import { DONE_ONBOARDING_STATUS, EPermission, buildChannelAppLaunchUrl, generateE2eId } from '@mezon/utils';
 import isElectron from 'is-electron';
 import type { ApiChannelAppResponse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -276,6 +277,7 @@ const NUMBER_APPS_SHOW_OFF = 4;
 const ChannelAppList = memo(() => {
 	const allChannelApp = useSelector(selectAppChannelsList);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClanName = useSelector(selectCurrentClanName) ?? '';
 	const expandRef = useRef<HTMLDivElement>(null);
 	const dispatch = useAppDispatch();
 	const showList = allChannelApp.length > NUMBER_APPS_SHOW_OFF + 1 ? allChannelApp.slice(0, NUMBER_APPS_SHOW_OFF) : allChannelApp;
@@ -299,8 +301,11 @@ const ChannelAppList = memo(() => {
 			if (hashData.web_app_data) {
 				const store = getStore();
 				const channel = selectChannelById(store.getState(), appChannel.channel_id);
-				const encodedHash = encodeURIComponent(hashData.web_app_data);
-				const urlWithHash = `${appChannel.app_url}?data=${encodedHash}`;
+				const urlWithHash = buildChannelAppLaunchUrl(appChannel.app_url, {
+					webAppData: hashData.web_app_data,
+					clanId: currentClanId ?? '',
+					clanName: currentClanName
+				});
 				if (isElectron()) {
 					window.electron.launchAppWindow(urlWithHash);
 					return;

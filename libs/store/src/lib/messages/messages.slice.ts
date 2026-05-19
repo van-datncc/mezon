@@ -710,12 +710,14 @@ function enqueueSerializedLastSeenSocketRpc(channelId: string, messageId: string
 
 	const prev = lastSeenSocketWriteChainByKey.get(key) ?? Promise.resolve();
 
-	const merged = prev.catch(() => undefined).then(async () => {
-		if (lastSeenSocketWriteGenByKey.get(key) !== generation) {
-			return;
-		}
-		await run();
-	});
+	const merged = prev
+		.catch(() => undefined)
+		.then(async () => {
+			if (lastSeenSocketWriteGenByKey.get(key) !== generation) {
+				return;
+			}
+			await run();
+		});
 
 	lastSeenSocketWriteChainByKey.set(key, merged);
 	void merged.finally(() => {
@@ -747,8 +749,6 @@ async function performDedupedSerializedLastSeenSocketRpc(params: {
 		}
 		const client = mezon.clientRef.current;
 		if (!client) return;
-
-		console.count(messageId + channelId);
 		await client.writeLastSeenMessage(mezon.session, clanId, channelId, mode, messageId, messageTimeSeconds, badgeCount);
 		lastSeenSocketRpcFingerprintByPairKey.set(pairKey, fingerprint);
 	});
@@ -817,9 +817,7 @@ async function executeUpdateLastSeenMessageBody(args: UpdateMessageArgs, thunkAP
 		}
 		const queuedMessages = (thunkAPI.getState() as RootState).messages?.queuedLastSeenMessages;
 		const outboundPairKey = lastSeenPairKey(channelId, messageId);
-		const queuedAlsoTargetsThisSeen = queuedMessages.some(
-			(q) => lastSeenPairKey(q.channelId, q.messageId) === outboundPairKey
-		);
+		const queuedAlsoTargetsThisSeen = queuedMessages.some((q) => lastSeenPairKey(q.channelId, q.messageId) === outboundPairKey);
 
 		if (queuedMessages.length > 0) {
 			await thunkAPI.dispatch(processQueuedLastSeenMessages()).unwrap();
@@ -1463,7 +1461,6 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
 		const session = mezon.sessionRef.current;
 		const client = mezon.clientRef.current;
-		const socket = mezon.socketRef.current;
 
 		if (!client || !session || !channelId) {
 			throw new Error('Client is not initialized');

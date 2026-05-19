@@ -1,10 +1,10 @@
-import { fetchChannels, selectAllChannels, selectCurrentClanId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { ChannelStatusEnum, generateE2eId } from '@mezon/utils';
 import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
 import type { ReactElement } from 'react';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 enum ETypeUpdateSystemMessage {
@@ -30,20 +30,9 @@ const SystemMessagesManagement = ({
 	setClanRequest
 }: SystemMessagesManagementProps) => {
 	const { t } = useTranslation('clanSettings');
-	const dispatch = useAppDispatch();
 	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
 
-	useEffect(() => {
-		if (currentClanId && channelsList.length === 0) {
-			dispatch(
-				fetchChannels({
-					clanId: currentClanId,
-					channelType: ChannelType.CHANNEL_TYPE_CHANNEL
-				})
-			);
-		}
-	}, [currentClanId, dispatch, channelsList.length]);
 	const selectedChannel = useMemo(() => {
 		return channelsList.find((channel) => channel.id === channelSelectedId);
 	}, [channelsList, channelSelectedId]);

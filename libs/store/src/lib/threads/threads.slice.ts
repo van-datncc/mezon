@@ -6,7 +6,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { channelsActions, selectCurrentChannel } from '../channels/channels.slice';
+import { channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
@@ -303,6 +303,13 @@ export const writeActiveArchivedThread = createAsyncThunk(
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			await mezon.client.activeArchivedThread(mezon.session, clanId, channelId);
 			thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.joined }));
+			const state = thunkAPI.getState() as RootState;
+			const threadChannel = selectChannelById(state, channelId);
+			const parentId = threadChannel?.parent_id;
+
+			if (parentId) {
+				await thunkAPI.dispatch(threadsActions.fetchThreads({ channelId: parentId, clanId, noCache: true })).unwrap();
+			}
 			return { channelId, activeCode: ThreadStatus.joined };
 		} catch (error) {
 			captureSentryError(error, 'threads/writeActiveArchivedThread');
@@ -423,6 +430,13 @@ export const threadsSlice = createSlice({
 			}
 
 			threadsAdapter.upsertOne(state.byChannels[channelId], thread);
+		},
+		updateThreadFromSocket: (state, action: PayloadAction<{ threadId: string; parentId: string; changes: Partial<ThreadsEntity> }>) => {
+			const { threadId, parentId, changes } = action.payload;
+			const channelData = state.byChannels?.[parentId];
+			if (channelData) {
+				threadsAdapter.updateOne(channelData, { id: threadId, changes });
+			}
 		},
 		resetThreadSearchedResult: (state: ThreadsState, action: PayloadAction<string>) => {
 			const channelId = action.payload;

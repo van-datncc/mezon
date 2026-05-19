@@ -64,7 +64,7 @@ const OgpEmbed: React.FC<OgpEmbedProps> = ({ url, title, description, image, mes
 };
 
 const DeleteOgpButton = ({ messageId }: { messageId?: string }) => {
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const [loading, setLoading] = useState(false);
 	const { t } = useTranslation('message');
 

@@ -23,6 +23,7 @@ const GeneralInformation = lazy(() => import('../pages/AppGeneralInformation'));
 const Installation = lazy(() => import('../pages/installation'));
 const Install = lazy(() => import('../pages/install'));
 const OAuth2 = lazy(() => import('../pages/OAuth2'));
+const TranscriptCallDetailPage = lazy(() => import('../pages/transcript-call-detail'));
 
 export const Routes = () => {
 	const dispatch = useAppDispatch();
@@ -77,6 +78,10 @@ export const Routes = () => {
 								{
 									path: 'dashboard',
 									element: <DashboardPage />
+								},
+								{
+									path: 'transcript-calls/:callId',
+									element: <TranscriptCallDetailPage />
 								},
 								{
 									path: 'applications/:applicationId',

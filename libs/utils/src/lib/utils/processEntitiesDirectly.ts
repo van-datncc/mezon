@@ -23,7 +23,30 @@ export const processEntitiesDirectly = (entities: any[], content: string, rolesC
 		const display = content.substring(offset, offset + length);
 		const lines = display.split('\n');
 		const firstLine = lines[0]?.trim();
-		const languages = new Set(['c', 'c++', 'c#', 'js', 'ts', 'py', 'java', 'javascript', 'typescript', 'python', 'go', 'rust', 'kotlin', 'sql']);
+		const languages = new Set([
+			'c',
+			'c++',
+			'c#',
+			'js',
+			'ts',
+			'py',
+			'java',
+			'javascript',
+			'typescript',
+			'python',
+			'go',
+			'rust',
+			'kotlin',
+			'sql',
+			'html',
+			'json',
+			'css',
+			'swift',
+			'yaml',
+			'json',
+			'php',
+			'jsx'
+		]);
 		let language = undefined;
 		switch (type) {
 			case 'MessageEntityMentionName':

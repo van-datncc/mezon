@@ -8,7 +8,7 @@ import type {
 	IChannel,
 	LoadingStatus
 } from '@mezon/utils';
-import { ModeResponsive, TypeCheck, checkIsThread, mapChannelToAppEntity } from '@mezon/utils';
+import { ModeResponsive, ThreadStatus, TypeCheck, checkIsThread, mapChannelToAppEntity } from '@mezon/utils';
 import type { EntityState, GetThunkAPI, PayloadAction, Update } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
@@ -488,10 +488,17 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 export const archiveChannel = createAsyncThunk('channels/archiveChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId as string);
 		const response = await mezon.client.archiveChannel(mezon.session, body.clanId, body.channelId);
 		if (response) {
 			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
 			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
+			if (channelData && checkIsThread(channelData as any)) {
+				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId: body.channelId, activeCode: 0 }));
+				if (channelData.parent_id) {
+					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: channelData.parent_id, threadId: body.channelId }));
+				}
+			}
 		}
 		return response;
 	} catch (error) {
@@ -708,7 +715,10 @@ export const addThreadToChannels = createAsyncThunk(
 				thunkAPI.dispatch(
 					channelsActions.upsertOne({
 						clanId,
-						channel: { ...matchedThread, active: 1 } as ChannelsEntity
+						channel: {
+							...matchedThread,
+							active: matchedThread.active ? ThreadStatus.joined : ThreadStatus.activePublic
+						} as ChannelsEntity
 					})
 				);
 			}
@@ -1207,7 +1217,9 @@ export const channelsSlice = createSlice({
 					if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
 						rememberChannel = parsed as Record<string, string>;
 					}
-				} catch {}
+				} catch (e) {
+					console.error(e);
+				}
 				rememberChannel[clanId] = channelId;
 				localStorage.setItem('remember_channel', JSON.stringify(rememberChannel));
 			}
