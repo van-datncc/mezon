@@ -61,7 +61,19 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	return (
 		<div className="flex flex-row items-center justify-between px-4 h-[48px] min-h-[50px] border-b-theme-primary  z-10 bg-theme-chat">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
-				{threadCurrentChannel?.channel_private ? <Icons.ThreadIconLocker /> : <Icons.ThreadIcon />}
+				{threadCurrentChannel?.channel_private ? (
+					<Icons.ThreadIconLocker
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme)"
+					/>
+				) : (
+					<Icons.ThreadIcon
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme)"
+					/>
+				)}
 				<span className="text-base font-semibold text-theme-primary-active">
 					{threadCurrentChannel ? threadCurrentChannel.channel_label : t('createThread.newThread')}
 				</span>

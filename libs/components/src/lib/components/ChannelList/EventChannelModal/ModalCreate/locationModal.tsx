@@ -132,9 +132,17 @@ const LocationModal = (props: LocationModalProps) => {
 					)
 				) : isThread ? (
 					isPrivateChannel ? (
-						<Icons.ThreadIconLocker />
+						<Icons.ThreadIconLocker
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
 					) : (
-						<Icons.ThreadIcon />
+						<Icons.ThreadIcon
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
 					)
 				) : null;
 
