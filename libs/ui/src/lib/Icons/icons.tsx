@@ -1465,7 +1465,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({
 	);
 };
 
-export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(122,122,122,1)', ...props }) => {
+export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'currentColor', ...props }) => {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 151 150" className={defaultSize} {...props}>
 			<g>
@@ -1479,7 +1479,7 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', de
 	);
 };
 
-export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'rgba(123,123,123,1)', ...props }: IconProps) {
+export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', ...props }: IconProps) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 153" className={defaultSize} {...props}>
 			<g>
@@ -1493,7 +1493,7 @@ export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'rgba(
 	);
 }
 
-export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(123,123,123,1)', ...props }: IconProps) => {
+export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'currentColor', ...props }: IconProps) => {
 	return (
 		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 151 150" className={defaultSize} {...props}>
 			<g>

@@ -68,7 +68,7 @@ const SuggestItem = ({
 		const threadFillClass =
 			isUnread || (count && count > 0)
 				? '[--thread-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
-				: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)]';
+				: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] hover:[--thread-fill-1:var(--bg-icon-theme-active)]';
 
 		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isAgeRestrictedChannel) {
