@@ -14529,10 +14529,10 @@ mezon-js-protobuf@1.10.53, mezon-js-protobuf@^1.10.53:
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js@2.15.53:
-  version "2.15.53"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.53.tgz#f7133ea5e4fe0c0267c3df256ef47d320aeb3177"
-  integrity sha512-imL8SkTEf0OxaL56LrSQuB/C8/QQPwpYdDrfu4kzyXFcH8NRob5at85UT3L62KoumnwFCcwd6YuIHXHz2JXf+Q==
+mezon-js@2.15.54:
+  version "2.15.54"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.54.tgz#be37a821d9e88ee104da03fa7f6819d3408ca51d"
+  integrity sha512-I6dW87oQ5zVsQyjRzVeEQGk8R2bn0pra5wFYe9fanjzQdr1EGp6BjRthbfD1WlERiXVXMW1FmCkVnTW6LR6ZqA==
   dependencies:
     base64-arraybuffer "^1.0.2"
     js-base64 "^3.7.8"
@@ -20296,9 +20296,9 @@ webpack-dev-middleware@^7.4.2:
     schema-utils "^4.0.0"
 
 webpack-dev-server@^5.2.1:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-5.2.3.tgz#7f36a78be7ac88833fd87757edee31469a9e47d3"
-  integrity sha512-9Gyu2F7+bg4Vv+pjbovuYDhHX+mqdqITykfzdM9UyKqKHlsE5aAjRhR+oOEfXW5vBeu8tarzlJFIZva4ZjAdrQ==
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-5.2.4.tgz#6e6306ce59848ed322c235e48b326632b1eed6d6"
+  integrity sha512-GqDPGZN9bRqKBTkp4aWkobDDHMsrXKoGSdOH56smIri8qR0JG8gfL8/v/f/OZR3/OKXjG8uwJbFVhKm/FNU/UA==
   dependencies:
     "@types/bonjour" "^3.5.13"
     "@types/connect-history-api-fallback" "^1.5.4"
