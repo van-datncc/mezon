@@ -20,9 +20,9 @@ export interface ChannelMetaEntity {
 	last_sent_message?: ApiChannelMessageHeader;
 }
 
-function extractChannelMeta(channel: ApiChannelDescription, clanId: string): ChannelMetaEntity {
+function extractChannelMeta(channel: ApiChannelDescription & { id?: string }, clanId: string): ChannelMetaEntity {
 	return {
-		id: channel.channel_id || '0',
+		id: channel.id || channel.channel_id || '0',
 		lastSeenTimestamp:
 			Number.isNaN(channel.last_seen_message?.timestamp_seconds) || !channel.last_seen_message?.timestamp_seconds
 				? 0

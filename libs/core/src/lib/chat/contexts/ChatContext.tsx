@@ -1756,11 +1756,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						navigate(`/chat/clans/${clanId}/member-safety`);
 					}
 				}
-				dispatch(channelMetaActions.deleteChannelMeta({ channelId: channelDeleted.channel_id }));
 				dispatch(channelsActions.deleteChannelSocket(channelDeleted));
 				dispatch(listChannelsByUserActions.remove(channelDeleted.channel_id));
 				dispatch(updateClanBadgeRender({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
 				dispatch(channelsActions.removeChannelApp({ channelId: channelDeleted.channel_id, clanId: channelDeleted.clan_id }));
+				dispatch(channelMetaActions.deleteChannelMeta({ channelId: channelDeleted.channel_id }));
 
 				dispatch(
 					threadsActions.removeThreadFromCache({
