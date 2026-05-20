@@ -4,7 +4,7 @@ import { selectTheme, useAppSelector } from '@mezon/store';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import GroupThreads from './GroupThreads';
-import { getActiveThreads, getJoinedThreads, getThreadsOlderThan30Days } from './hepler';
+import { filterThreadList } from './hepler';
 
 type ThreadListProps = {
 	isLoading: boolean;
@@ -17,17 +17,10 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 	const { t } = useTranslation('channelTopbar');
 	const ulRef = useRef<HTMLUListElement | null>(null);
 
-	const activeThreads = getActiveThreads(threads);
-	const joinedThreads = getJoinedThreads(threads);
-	const oldThreads = getThreadsOlderThan30Days(threads);
+	const { listJoin, listArchived, listOther } = filterThreadList(threads);
 
 	const { measureRef, isIntersecting, observer } = useOnScreen({ root: ulRef.current });
 
-	const lastThread = threads[threads.length - 1];
-
-	const isLastInActive = activeThreads.includes(lastThread);
-	const isLastInJoined = joinedThreads.includes(lastThread);
-	const isLastInOld = oldThreads.includes(lastThread);
 	const appearanceTheme = useAppSelector(selectTheme);
 	useEffect(() => {
 		if (isIntersecting) {
@@ -41,24 +34,9 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 			ref={ulRef}
 			className={`pb-4 pr-4 pl-4 overflow-y-auto overflow-x-hidden h-[500px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 		>
-			<GroupThreads
-				preventClosePannel={preventClosePannel}
-				title={t('activeThreads')}
-				threads={activeThreads}
-				measureRef={isLastInActive ? measureRef : undefined}
-			/>
-			<GroupThreads
-				preventClosePannel={preventClosePannel}
-				title={t('joinedThreads')}
-				threads={joinedThreads}
-				measureRef={isLastInJoined ? measureRef : undefined}
-			/>
-			<GroupThreads
-				preventClosePannel={preventClosePannel}
-				title={t('olderThreads')}
-				threads={oldThreads}
-				measureRef={isLastInOld ? measureRef : undefined}
-			/>
+			<GroupThreads preventClosePannel={preventClosePannel} title={t('activeThreads')} threads={listOther} />
+			<GroupThreads preventClosePannel={preventClosePannel} title={t('joinedThreads')} threads={listJoin} />
+			<GroupThreads preventClosePannel={preventClosePannel} title={t('olderThreads')} threads={listArchived} />
 			{isLoading && <li>{t('loading')}</li>}
 		</ul>
 	);
