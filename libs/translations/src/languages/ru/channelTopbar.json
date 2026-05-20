@@ -28,7 +28,7 @@
 	"directMessage": "Личное сообщение",
 	"activeThreads": "Активные ветки",
 	"joinedThreads": "Мои ветки",
-	"olderThreads": "Старые ветки",
+	"archivedThreads": "Старые ветки",
 	"loading": "Загрузка...",
 	"topic": "Тема",
 	"reactions": "Реакции",

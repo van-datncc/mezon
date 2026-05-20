@@ -6,7 +6,7 @@ export const filterThreadList = (threads: ThreadsEntity[]) =>
 		(acc, thread) => {
 			if (thread.active === ThreadStatus.joined) {
 				acc.listJoin.push(thread);
-			} else if (thread.active === 0) {
+			} else if (thread.active === ThreadStatus.archived) {
 				acc.listArchived.push(thread);
 			} else {
 				acc.listOther.push(thread);

@@ -34,9 +34,9 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 			ref={ulRef}
 			className={`pb-4 pr-4 pl-4 overflow-y-auto overflow-x-hidden h-[500px] ${appearanceTheme === 'light' ? 'customScrollLightMode' : 'app-scroll'}`}
 		>
-			<GroupThreads preventClosePannel={preventClosePannel} title={t('activeThreads')} threads={listOther} />
 			<GroupThreads preventClosePannel={preventClosePannel} title={t('joinedThreads')} threads={listJoin} />
-			<GroupThreads preventClosePannel={preventClosePannel} title={t('olderThreads')} threads={listArchived} />
+			<GroupThreads preventClosePannel={preventClosePannel} title={t('activeThreads')} threads={listOther} />
+			<GroupThreads preventClosePannel={preventClosePannel} title={t('archivedThreads')} threads={listArchived} />
 			{isLoading && <li>{t('loading')}</li>}
 		</ul>
 	);

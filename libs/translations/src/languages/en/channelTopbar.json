@@ -29,7 +29,7 @@
 	"directMessage": "Direct message",
 	"activeThreads": "Active Threads",
 	"joinedThreads": "Joined Threads",
-	"olderThreads": "Older Threads",
+	"archivedThreads": "Older Threads",
 	"loading": "Loading...",
 	"topic": "Topic",
 	"reactions": "React",
