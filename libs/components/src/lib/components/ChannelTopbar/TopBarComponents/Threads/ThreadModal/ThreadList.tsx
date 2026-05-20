@@ -1,7 +1,6 @@
-import { useOnScreen } from '@mezon/core';
 import type { ThreadsEntity } from '@mezon/store';
 import { selectTheme, useAppSelector } from '@mezon/store';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import GroupThreads from './GroupThreads';
 import { filterThreadList } from './hepler';
@@ -19,15 +18,7 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 
 	const { listJoin, listArchived, listOther } = filterThreadList(threads);
 
-	const { measureRef, isIntersecting, observer } = useOnScreen({ root: ulRef.current });
-
 	const appearanceTheme = useAppSelector(selectTheme);
-	useEffect(() => {
-		if (isIntersecting) {
-			loadMore();
-			observer?.disconnect();
-		}
-	}, [isIntersecting, loadMore]);
 
 	return (
 		<ul
