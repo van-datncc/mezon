@@ -382,7 +382,13 @@ const ChannelTopbarLabel = memo(
 					case ChannelType.CHANNEL_TYPE_CHANNEL:
 						return <Icons.Hashtag />;
 					case ChannelType.CHANNEL_TYPE_THREAD:
-						return <Icons.ThreadIcon />;
+						return (
+							<Icons.ThreadIcon
+								defaultFill1="var(--bg-icon-theme)"
+								defaultFill4="var(--bg-theme-secounnd)"
+								defaultFill5="var(--bg-icon-theme)"
+							/>
+						);
 					case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
 						return <Icons.Speaker />;
 					case ChannelType.CHANNEL_TYPE_STREAMING:
@@ -397,7 +403,13 @@ const ChannelTopbarLabel = memo(
 				case ChannelType.CHANNEL_TYPE_CHANNEL:
 					return <Icons.HashtagLocked />;
 				case ChannelType.CHANNEL_TYPE_THREAD:
-					return <Icons.ThreadIconLocker />;
+					return (
+						<Icons.ThreadIconLocker
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
+					);
 				case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
 					return <Icons.SpeakerLocked />;
 				case ChannelType.CHANNEL_TYPE_STREAMING:
@@ -966,7 +978,12 @@ function ThreadButton() {
 				onClick={handleToggleThreads}
 				onContextMenu={(e) => e.preventDefault()}
 			>
-				<Icons.ThreadIcon className="w-5 h-5" defaultFill1="var(--thread-fill-1)" defaultFill4="var(--thread-fill-4)" />
+				<Icons.ThreadIcon
+					className="w-5 h-5"
+					defaultFill1="var(--thread-fill-1)"
+					defaultFill4="var(--thread-fill-4)"
+					defaultFill5="var(--thread-fill-1)"
+				/>
 			</button>
 			{isShowThread && <ThreadModal onClose={handleToggleThreads} rootRef={threadRef} />}
 		</div>

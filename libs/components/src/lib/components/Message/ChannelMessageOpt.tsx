@@ -462,7 +462,7 @@ function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boole
 
 	return createMenuBuilderPlugin((builder) => {
 		builder.when(isShowIconThread && hasPermission && !isAppChannel && !isTopic, (builder) => {
-			builder.addMenuItem('thread', t('createThread'), handleItemClick, <Icons.ThreadIcon isWhite={thread} />);
+			builder.addMenuItem('thread', t('createThread'), handleItemClick, <Icons.ThreadIcon isWhite={thread} defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />);
 		});
 	});
 }
