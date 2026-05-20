@@ -240,7 +240,7 @@
 			"overview": "Tổng quan",
 			"fullTranscript": "Bản ghi đầy đủ",
 			"summary": "Tóm tắt",
-			"audio": "Âm thanh"
+			"participants": "Người tham gia"
 		},
 		"detail": {
 			"title": "Chi tiết Bản ghi Cuộc gọi",
@@ -249,18 +249,19 @@
 			"loadError": "Không thể tải phòng này.",
 			"summaryEmpty": "Chưa có tóm tắt.",
 			"transcriptEmpty": "Chưa có nội dung bản ghi.",
-			"audioEmpty": "Không có file âm thanh cho phòng này.",
 			"actionItems": "Việc cần làm",
-			"audioFilename": "Tệp",
-			"audioParticipant": "Người tham gia",
 			"participants": "Người tham gia",
+			"participantsEmpty": "Không có người tham gia cho cuộc gọi này.",
 			"metrics": {
 				"totalTracks": "Tổng Tracks",
 				"completed": "Đã hoàn thành",
 				"duration": "Thời lượng",
 				"segments": "Phân đoạn"
 			},
-			"notFound": "Không tìm thấy bản ghi cuộc gọi"
+			"notFound": "Không tìm thấy bản ghi cuộc gọi",
+			"unknown": "không xác định",
+			"username": "Tên tài khoản",
+			"displayName": "Tên hiển thị"
 		}
 	}
 }

@@ -15,14 +15,9 @@ import MetricCard from '../../components/dashboard/MetricCard';
 import { STATUS_BADGE } from '../../constants/dashboard';
 import { formatDurationSec, formatRoomDate, formatStatus, normalizeRoomStatus } from '../../utils/dashboard/format';
 
-type TabType = 'overview' | 'fullTranscript' | 'summary' | 'participants';
+type TabType = 'overview' | 'participants' | 'fullTranscript' | 'summary';
 
-const getFileName = (url?: string) => {
-	if (!url) return '—';
-	return url.split('/').pop() || url;
-};
-
-const TABS: TabType[] = ['overview', 'fullTranscript', 'summary', 'participants'];
+const TABS: TabType[] = ['overview', 'participants', 'fullTranscript', 'summary'];
 
 const TranscriptCallDetail = () => {
 	const { t } = useTranslation('adminApplication');
@@ -158,9 +153,9 @@ const TranscriptCallDetail = () => {
 
 	const tabLabels: Record<TabType, string> = {
 		overview: t('transcriptCalls.tabs.overview'),
+		participants: t('transcriptCalls.tabs.participants'),
 		fullTranscript: t('transcriptCalls.tabs.fullTranscript'),
-		summary: t('transcriptCalls.tabs.summary'),
-		participants: t('transcriptCalls.tabs.audio')
+		summary: t('transcriptCalls.tabs.summary')
 	};
 
 	return (
@@ -269,16 +264,16 @@ const TranscriptCallDetail = () => {
 
 										return (
 											<div key={idx} className="group flex flex-col gap-2">
-												<div className="flex items-center justify-between gap-3">
-													<div className="flex items-center gap-2">
-														<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">{name}</span>
-														{name !== group.participant_id && group.participant_id && (
-															<span className="text-[10px] dark:text-textSecondary text-gray-500">
-																({group.participant_id})
-															</span>
-														)}
-													</div>
-													<span className="text-[10px] dark:text-textSecondary text-gray-500">{group.timestamp}</span>
+												<div className="flex items-baseline gap-2 flex-wrap pb-1">
+													<span className="text-md font-bold dark:text-textDarkTheme text-gray-900">{name}</span>
+													{name !== group.participant_id && group.participant_id && (
+														<span className="text-xs dark:text-textSecondary text-gray-500">
+															({group.participant_id})
+														</span>
+													)}
+													<span className="text-md dark:text-textSecondary text-gray-400 font-medium">
+														• {formatRoomDate(group.timestamp)}
+													</span>
 												</div>
 												<div className="px-5 py-3 rounded-xl bg-gray-50 dark:bg-bgSecondary/40 text-sm dark:text-textDarkTheme text-gray-800 border dark:border-borderClan/20 group-hover:dark:border-borderClan/40 transition-colors leading-relaxed shadow-sm space-y-2">
 													{group.contents.map((content, cIdx) => (
@@ -327,7 +322,6 @@ const TranscriptCallDetail = () => {
 									{actionItems.length > 0 && (
 										<div className="space-y-4">
 											<div className="flex items-center gap-2 px-1">
-												<Icons.CheckIcon className="w-4 h-4 text-green-500" />
 												<span className="text-sm font-bold dark:text-textDarkTheme text-gray-900">
 													{t('transcriptCalls.detail.actionItems')}
 												</span>
@@ -375,60 +369,73 @@ const TranscriptCallDetail = () => {
 								<div className="text-sm dark:text-textSecondary">{t('transcriptCalls.loading')}</div>
 							) : detail.participantsError ? (
 								<div className="text-sm text-red-600 dark:text-red-400">{t('transcriptCalls.detail.loadError')}</div>
-							) : detail.participants.filter((p) => p.tracks && p.tracks.some((t) => t.filename)).length === 0 ? (
+							) : detail.participants.filter((p) => p.user_name).length === 0 ? (
 								<div className="flex flex-col items-center justify-center gap-4 py-8">
-									<Icons.HeadPhoneICon className="w-12 h-12 dark:text-textSecondary text-gray-300" />
-									<div className="text-sm dark:text-textSecondary text-gray-500">{t('transcriptCalls.detail.audioEmpty')}</div>
+									<Icons.IconUserProfileDM className="w-12 h-12 dark:text-textSecondary text-gray-300" />
+									<div className="text-sm dark:text-textSecondary text-gray-500">
+										{t('transcriptCalls.detail.participantsEmpty')}
+									</div>
 								</div>
 							) : (
-								<div className="space-y-6">
-									{detail.participants
-										.filter((p) => p.tracks && p.tracks.some((t) => t.filename))
-										.map((p, idx) => (
-											<div
-												key={`${p.participant_identity ?? idx}`}
-												className="border dark:border-borderClan rounded-lg overflow-hidden"
-											>
-												<div className="bg-gray-50 dark:bg-bgTertiary px-4 py-3 border-b dark:border-borderClan flex justify-between items-center">
-													<div className="flex flex-col">
-														<span className="font-bold dark:text-textDarkTheme text-gray-900">
-															{p.display_name || p.user_name || p.participant_identity || '—'}
+								<>
+									{/* Desktop and Tablet View */}
+									<div className="hidden md:block overflow-x-auto rounded-lg border dark:border-[#4d4f52] border-gray-200">
+										<table className="w-full text-left border-collapse">
+											<thead>
+												<tr className="bg-gray-50 dark:bg-bgTertiary text-xs font-semibold uppercase dark:text-textSecondary text-gray-500 border-b dark:border-borderClan/50 border-gray-200">
+													<th className="px-6 py-3.5">{t('transcriptCalls.detail.username')}</th>
+													<th className="px-6 py-3.5">{t('transcriptCalls.detail.displayName')}</th>
+												</tr>
+											</thead>
+											<tbody className="divide-y dark:divide-[#4d4f52] divide-gray-200 bg-white dark:bg-bgSecondary">
+												{detail.participants
+													.filter((p) => p.user_name)
+													.map((p) => (
+														<tr
+															key={p.participant_identity}
+															className="hover:bg-gray-50/50 dark:hover:bg-bgTertiary/30 transition-colors"
+														>
+															<td className="px-6 py-4 text-sm dark:text-textSecondary text-gray-600">
+																{p.user_name || t('transcriptCalls.detail.unknown')}
+															</td>
+															<td className="px-6 py-4 text-sm font-semibold dark:text-textDarkTheme text-gray-900">
+																{p.display_name || t('transcriptCalls.detail.unknown')}
+															</td>
+														</tr>
+													))}
+											</tbody>
+										</table>
+									</div>
+
+									{/* Mobile View */}
+									<div className="block md:hidden space-y-3">
+										{detail.participants
+											.filter((p) => p.user_name)
+											.map((p) => (
+												<div
+													key={p.participant_identity}
+													className="p-3 rounded-xl bg-white dark:bg-bgSecondary border dark:border-[#4d4f52] border-gray-100 shadow-sm flex flex-col gap-1.5 hover:bg-gray-50/50 dark:hover:bg-bgTertiary/30 transition-colors"
+												>
+													<div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-100 dark:border-[#4d4f52]/40 text-xs">
+														<span className="dark:text-textSecondary text-gray-400">
+															{t('transcriptCalls.detail.username')}
+														</span>
+														<span className="text-xs dark:text-textSecondary text-gray-600 truncate font-semibold">
+															{p.user_name || t('transcriptCalls.detail.unknown')}
 														</span>
 													</div>
-													<span className="text-xs dark:text-textSecondary text-gray-500 italic">
-														{p.tracks?.length ?? 0} {t('transcriptCalls.detail.metrics.totalTracks').toLowerCase()}
-													</span>
+													<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
+														<span className="dark:text-textSecondary text-gray-400">
+															{t('transcriptCalls.detail.displayName')}
+														</span>
+														<span className="text-sm font-semibold dark:text-textDarkTheme text-gray-900 truncate">
+															{p.display_name || t('transcriptCalls.detail.unknown')}
+														</span>
+													</div>
 												</div>
-												<div className="bg-white dark:bg-bgSecondary divide-y dark:divide-borderClan divide-gray-50">
-													{p.tracks
-														?.filter((t) => t.filename)
-														.map((track, tIdx) => (
-															<div
-																key={tIdx}
-																className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-gray-50/50 dark:hover:bg-bgTertiary/30 transition-colors"
-															>
-																<div className="flex-1 min-w-0">
-																	<span
-																		className="text-xs font-mono dark:text-textSecondary text-gray-500 block"
-																		title={track.filename}
-																	>
-																		{getFileName(track.filename)}
-																	</span>
-																</div>
-																<div className="flex-1 max-w-[500px]">
-																	{track.filename && (
-																		<audio controls className="h-8 w-full">
-																			<source src={track.filename} type="audio/mpeg" />
-																			Your browser does not support the audio element.
-																		</audio>
-																	)}
-																</div>
-															</div>
-														))}
-												</div>
-											</div>
-										))}
-								</div>
+											))}
+									</div>
+								</>
 							)}
 						</div>
 					)}
