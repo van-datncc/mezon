@@ -1,7 +1,7 @@
 import { useChatSending, useOnClickOutside } from '@mezon/core';
 import type { DirectEntity } from '@mezon/store';
 import { selectTheme } from '@mezon/store';
-import { MAX_LENGTH_MESSAGE_BUZZ, ThemeApp, TypeMessage, generateE2eId } from '@mezon/utils';
+import { CHANNEL_INPUT_ID, GENERAL_INPUT_ID, MAX_LENGTH_MESSAGE_BUZZ, ThemeApp, TypeMessage, generateE2eId } from '@mezon/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -29,13 +29,35 @@ const ModalInputMessageBuzz = ({ currentChannel, mode, closeBuzzModal }: ModalIn
 		closeBuzzModal();
 	}, [closeBuzzModal]);
 
+	const focusChatInput = useCallback(() => {
+		const editor = document.getElementById(CHANNEL_INPUT_ID) || document.getElementById(GENERAL_INPUT_ID);
+		if (!editor) return;
+
+		editor.focus();
+		if (typeof window.getSelection !== 'undefined' && typeof document.createRange !== 'undefined') {
+			try {
+				const range = document.createRange();
+				range.selectNodeContents(editor);
+				range.collapse(false);
+				const sel = window.getSelection();
+				sel?.removeAllRanges();
+				sel?.addRange(range);
+			} catch {
+				// ignore
+			}
+		}
+	}, []);
+
 	const handleSendBuzzMsg = useCallback(() => {
 		const trimmedMessage = message.trim();
 		if (!trimmedMessage) return;
 
 		sendMessage({ t: trimmedMessage, ej: [] }, [], [], [], undefined, undefined, undefined, TypeMessage.MessageBuzz);
 		handleClosePopup();
-	}, [handleClosePopup, message, sendMessage]);
+		requestAnimationFrame(() => {
+			focusChatInput();
+		});
+	}, [focusChatInput, handleClosePopup, message, sendMessage]);
 
 	const handleMessageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
 		setMessage(event.target.value);
