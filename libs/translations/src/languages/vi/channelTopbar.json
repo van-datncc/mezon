@@ -28,7 +28,7 @@
 	},
 	"directMessage": "Tin nhắn trực tiếp",
 	"activeThreads": "Chủ đề đang hoạt động",
-	"joinedThreadsLast30Days": "Chủ đề đã tham gia (30 ngày qua)",
+	"joinedThreads": "Chủ đề đã tham gia",
 	"olderThreads": "Chủ đề cũ hơn",
 	"loading": "Đang tải...",
 	"topic": "Chủ đề",

@@ -28,7 +28,7 @@
 	},
 	"directMessage": "Mensagem direta",
 	"activeThreads": "Tópicos ativos",
-	"joinedThreadsLast30Days": "Tópicos participados (últimos 30 dias)",
+	"joinedThreads": "Tópicos participados",
 	"olderThreads": "Tópicos mais antigos",
 	"loading": "Carregando...",
 	"topic": "Tópico",

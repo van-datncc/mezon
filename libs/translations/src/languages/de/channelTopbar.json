@@ -28,7 +28,7 @@
 	},
 	"directMessage": "Direktnachrichten",
 	"activeThreads": "Aktive Threads",
-	"joinedThreadsLast30Days": "Beigetretene Threads (letzte 30 Tage)",
+	"joinedThreads": "Beigetretene Threads",
 	"olderThreads": "Ältere Threads",
 	"loading": "Wird geladen...",
 	"topic": "Thema",

@@ -28,7 +28,7 @@
 	},
 	"directMessage": "ダイレクトメッセージ",
 	"activeThreads": "アクティブスレッド",
-	"joinedThreadsLast30Days": "参加したスレッド（過去30日）",
+	"joinedThreads": "参加したスレッド",
 	"olderThreads": "古いスレッド",
 	"loading": "読み込み中...",
 	"topic": "トピック",

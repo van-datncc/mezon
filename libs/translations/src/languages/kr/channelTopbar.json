@@ -28,7 +28,7 @@
 	},
 	"directMessage": "다이렉트 메시지",
 	"activeThreads": "활성 스레드",
-	"joinedThreadsLast30Days": "참가한 스레드 (지난 30 일)",
+	"joinedThreads": "참가한 스레드",
 	"olderThreads": "이전 스레드",
 	"loading": "로딩 중...",
 	"topic": "주제",
