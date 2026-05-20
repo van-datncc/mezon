@@ -834,7 +834,7 @@ function MessageContextMenu({
 			);
 		});
 		builder.when(enableCreateThreadItem && !isPollMessage, (builder) => {
-			builder.addMenuItem('createThread', t('createThread'), () => handleCreateThread(), <Icons.ThreadIconRightClick defaultSize="w-4 h-4" defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />);
+			builder.addMenuItem('createThread', t('createThread'), () => handleCreateThread(), <Icons.ThreadIconRightClick defaultSize="w-4 h-4" />);
 		});
 		builder.when(checkPos && !isPollMessage, (builder) => {
 			builder.addMenuItem(
