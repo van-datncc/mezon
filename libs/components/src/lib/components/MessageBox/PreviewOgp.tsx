@@ -84,7 +84,9 @@ function PreviewOgp({ contextId }: PreviewOgpProps) {
 						image: invite?.clan_logo || '',
 						banner: resolvedBanner,
 						is_community: Boolean((invite as InviteBannerData)?.is_community),
-						type: 'invite'
+						type: 'invite',
+						clan_id: invite?.clan_id,
+						member_count: invite?.member_count
 					};
 				} else {
 					const res = await fetch(`${process.env.NX_OGP_URL}`, {
@@ -112,7 +114,11 @@ function PreviewOgp({ contextId }: PreviewOgpProps) {
 						image: previewData?.image || '',
 						title: previewData?.title || '',
 						description: previewData?.description || '',
-						type: previewData?.type || ''
+						type: previewData?.type || '',
+						member_count: previewData.member_count,
+						clan_id: previewData.clan_id,
+						banner: previewData.banner,
+						is_community: previewData.is_community
 					})
 				);
 			} catch (error: unknown) {

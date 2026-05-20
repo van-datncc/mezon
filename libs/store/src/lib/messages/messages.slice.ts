@@ -1218,7 +1218,12 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				s: content.t?.length || 0,
 				e: (content.t?.length || 0) + 1,
 				type: EBacktickType.OGP_PREVIEW,
-				index: ogpData.index
+				index: ogpData.index,
+				clan_id: ogpData.clan_id,
+				url: ogpData.url,
+				member_count: ogpData.member_count,
+				banner: ogpData.banner,
+				is_community: ogpData.is_community
 			});
 			content = {
 				...content,
