@@ -3888,12 +3888,7 @@ export function HatIcon({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(45,41,15
 	);
 }
 
-export function FullScreen({
-	defaultSize = 'w-5 h-5 ',
-	defaultFill1 = 'rgba(98,98,98,1)',
-	defaultFill2 = 'rgba(254,254,254,1)',
-	...props
-}: IconProps) {
+export function FullScreen({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', defaultFill2 = 'currentColor', ...props }: IconProps) {
 	return (
 		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 152 151" {...props}>
 			<g>
