@@ -189,9 +189,19 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-item-theme text-theme-primary flex items-center justify-center ">
 				{isPrivate === ChannelStatusEnum.isPrivate ? (
-					<Icons.ThreadIconLocker className="w-10 h-10" />
+					<Icons.ThreadIconLocker
+						className="w-10 h-10"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme)"
+					/>
 				) : (
-					<Icons.ThreadIcon className="w-10 h-10" />
+					<Icons.ThreadIcon
+						className="w-10 h-10"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme)"
+					/>
 				)}
 			</div>
 			<div>

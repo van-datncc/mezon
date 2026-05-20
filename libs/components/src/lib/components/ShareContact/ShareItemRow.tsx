@@ -43,9 +43,19 @@ export const ShareItemRow = ({ item, isSelected, onToggle, searchText, t }: Shar
 							<Icons.HashtagLocked className="w-5 h-5 text-theme-secondary" />
 						)
 					) : item.isPublic ? (
-						<Icons.ThreadIcon className="w-5 h-5 text-theme-secondary" />
+						<Icons.ThreadIcon
+							className="w-5 h-5"
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
 					) : (
-						<Icons.ThreadIconLocker className="w-5 h-5 text-theme-secondary" />
+						<Icons.ThreadIconLocker
+							className="w-5 h-5"
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
 					)}
 					<span className="text-theme-primary text-sm flex-1">{item.displayName}</span>
 					{item.clanName && (

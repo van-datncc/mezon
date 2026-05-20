@@ -375,9 +375,18 @@ const ItemInfor = ({
 						!isApp &&
 						(isThread ? (
 							privateChannel ? (
-								<Icons.ThreadIconLocker className="w-5 h-5 " />
+								<Icons.ThreadIconLocker
+									className="w-5 h-5 "
+									defaultFill1="var(--bg-icon-theme)"
+									defaultFill4="var(--bg-theme-secounnd)"
+									defaultFill5="var(--bg-icon-theme)"
+								/>
 							) : (
-								<Icons.ThreadIcon />
+								<Icons.ThreadIcon
+									defaultFill1="var(--bg-icon-theme)"
+									defaultFill4="var(--bg-theme-secounnd)"
+									defaultFill5="var(--bg-icon-theme)"
+								/>
 							)
 						) : isAgeRestrictedChannel ? (
 							<Icons.HashtagWarning />
