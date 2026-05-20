@@ -115,10 +115,10 @@ function PreviewOgp({ contextId }: PreviewOgpProps) {
 						title: previewData?.title || '',
 						description: previewData?.description || '',
 						type: previewData?.type || '',
-						member_count: previewData.member_count,
-						clan_id: previewData.clan_id,
-						banner: previewData.banner,
-						is_community: previewData.is_community
+						member_count: previewData?.member_count,
+						clan_id: previewData?.clan_id,
+						banner: previewData?.banner,
+						is_community: previewData?.is_community
 					})
 				);
 			} catch (error: unknown) {
