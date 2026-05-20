@@ -559,7 +559,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 }
 
 function MessageVideo(props: MessageImage) {
-	if (!isElectronMac()) {
+	if (isElectronMac()) {
 		return <MacElectronVideo {...props} />;
 	}
 	return <DefaultVideo {...props} />;
