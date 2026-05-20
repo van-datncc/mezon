@@ -4,6 +4,7 @@ import { channelUsersActions, selectCurrentClanId, selectMemberClanByUserId, sel
 import { Icons } from '@mezon/ui';
 import type { IChannel } from '@mezon/utils';
 import { createImgproxyUrl, generateE2eId, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -15,15 +16,35 @@ type ListMemberPermissionProps = {
 };
 
 const ListMemberPermission = (props: ListMemberPermissionProps) => {
-	const { channel } = props;
+	const { channel, selectedUserIds } = props;
 
 	const dispatch = useAppDispatch();
 	const idUsers = useSelector((state) => selectUserChannelIds(state, channel.id));
+	const displayUserIds = useMemo(() => {
+		const seen = new Set<string>();
+		const ordered: string[] = [];
+		for (const id of idUsers) {
+			if (id && !seen.has(id)) {
+				seen.add(id);
+				ordered.push(id);
+			}
+		}
+		for (const id of selectedUserIds) {
+			if (id && !seen.has(id)) {
+				seen.add(id);
+				ordered.push(id);
+			}
+		}
+		return ordered;
+	}, [idUsers, selectedUserIds]);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const navigate = useCustomNavigate();
 	const userProfile = useAuth();
 	const { toMembersPage } = useAppNavigation();
 	const deleteMember = async (userId: string) => {
+		if (!idUsers.includes(userId)) {
+			return;
+		}
 		const body: removeChannelUsersPayload = {
 			channelId: channel.id,
 			userId,
@@ -36,7 +57,7 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 		}
 	};
 
-	return idUsers.map((id) => (
+	return displayUserIds.map((id) => (
 		<ItemMemberPermission
 			key={id}
 			id={id}

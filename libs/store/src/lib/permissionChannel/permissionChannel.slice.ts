@@ -59,13 +59,17 @@ export type banChannelUsersPayload = {
 
 export const removeChannelUsers = createAsyncThunk(
 	'channelUsers/removeChannelUsers',
-	async ({ channelId, userId }: removeChannelUsersPayload, thunkAPI) => {
+	async ({ channelId, userId, channelType }: removeChannelUsersPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const userIds = [userId];
 			const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
+			}
+
+			if (channelId && channelType) {
+				thunkAPI.dispatch(userChannelsActions.removeUserChannel({ channelId, userRemoves: userIds }));
 			}
 
 			return response;
