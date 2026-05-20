@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import type { Persistor } from 'redux-persist';
 import { authActions } from './auth/auth.slice';
-import { useAppDispatch, type AppDispatch } from './store';
+import { useAppDispatch } from './store';
 
 const PERSIST_AUTH_KEY = 'persist:auth';
 const MAX_RETRIES = 4;
@@ -49,66 +49,62 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 	const [retryCount, setRetryCount] = useState(0);
 
 	useEffect(() => {
-		let cancelled = false;
 		const INITIAL_DELAY = 1000;
 
 		const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 		const init = async () => {
 			const client = await createClient();
-			if (cancelled || !client) {
-				if (!cancelled) setReady(true);
+			if (!client) {
+				setReady(true);
 				return;
 			}
 
 			const persistedSession = readPersistedSession();
 			const hasSessionId = !!persistedSession?.session_id?.trim();
 
+			if (!hasSessionId) {
+				dispatch(authActions.logOut({}));
+				setReady(true);
+				return;
+			}
+
 			let connectOk = false;
 
 			await Promise.all([
 				(async () => {
-					if (hasSessionId) {
-						sessionRef.current = persistedSession as ApiSession;
-						// Retry call connect socket if it fail with MAX_RETRIES time
-						for (let i = 0; i <= MAX_RETRIES; i++) {
-							if (cancelled) return;
-							setRetryCount(i);
+					sessionRef.current = persistedSession as ApiSession;
+					// Retry call connect socket if it fail with MAX_RETRIES time
+					for (let i = 0; i <= MAX_RETRIES; i++) {
+						setRetryCount(i);
 
-							try {
-								await connectSocket();
-								connectOk = true;
-								break;
-							} catch (error) {
-								if (i === MAX_RETRIES) break;
-								const baseDelay = INITIAL_DELAY * Math.pow(2, i);
-								// Add jitter time for not all client call in same time
-								const nextDelay = baseDelay + Math.random() * 500;
-								console.error(`Connection failed. Retrying attempt ${i} in ${nextDelay}ms...`);
-								await delay(nextDelay);
-							}
+						try {
+							await connectSocket();
+							connectOk = true;
+							break;
+						} catch (error) {
+							if (i === MAX_RETRIES) break;
+							const baseDelay = INITIAL_DELAY * Math.pow(2, i);
+							// Add jitter time for not all client call in same time
+							const nextDelay = baseDelay + Math.random() * 500;
+							console.error(`Connection failed. Retrying attempt ${i} in ${nextDelay}ms...`);
+							await delay(nextDelay);
 						}
-					} else {
-						connectOk = true;
 					}
 				})(),
 
 				waitForPersistorBootstrap(persistor)
 			]);
-			if (cancelled) return;
 
 			if (!hasSessionId || !connectOk) {
-				void (dispatch as AppDispatch)(authActions.logOut({}));
+				dispatch(authActions.logOut({}));
 			}
 
 			setReady(true);
 		};
 
 		init();
-		return () => {
-			cancelled = true;
-		};
-	}, [persistor, createClient, sessionRef, connectSocket, dispatch]);
+	}, []);
 
 	return <>{ready ? children : (fallback ?? <ConnectingScreen retryCount={retryCount} />)}</>;
 }
