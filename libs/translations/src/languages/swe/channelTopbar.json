@@ -29,7 +29,7 @@
 	"directMessage": "Direktmeddelande",
 	"activeThreads": "Aktiva trådar",
 	"joinedThreads": "Anslutna trådar",
-	"olderThreads": "Äldre trådar",
+	"archivedThreads": "Äldre trådar",
 	"loading": "Laddar...",
 	"topic": "Ämne",
 	"invoice": "I röstkanal",
