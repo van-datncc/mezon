@@ -73,7 +73,6 @@ export interface IMarkdownOnMessage extends IMarkdown, IStartEndIndex {
 	language?: string;
 	url?: string;
 	member_count?: number;
-	clan_id?: string;
 	banner?: string;
 	is_community?: boolean;
 }

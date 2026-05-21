@@ -1219,7 +1219,7 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				e: (content.t?.length || 0) + 1,
 				type: EBacktickType.OGP_PREVIEW,
 				index: ogpData.index,
-				clan_id: ogpData.clan_id,
+				clanId: ogpData.clan_id,
 				url: ogpData.url,
 				member_count: ogpData.member_count,
 				banner: ogpData.banner,

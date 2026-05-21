@@ -50,7 +50,6 @@ export interface ElementToken {
 	title?: string;
 	image?: string;
 	description?: string;
-	clan_id?: string;
 	banner?: string;
 	index?: number;
 	language?: string;
@@ -189,7 +188,7 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 	const handleJoinOrGoTo = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.stopPropagation();
 		if (isJoined && element?.clanId) {
-			navigate(`/chat/clans/${element?.clanId}/members-safe`);
+			navigate(`/chat/clans/${element?.clanId}/member-safety`);
 			return;
 		}
 		try {
