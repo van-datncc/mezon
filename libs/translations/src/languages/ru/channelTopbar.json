@@ -27,8 +27,8 @@
 	},
 	"directMessage": "Личное сообщение",
 	"activeThreads": "Активные ветки",
-	"joinedThreadsLast30Days": "Мои ветки (последние 30 дней)",
-	"olderThreads": "Старые ветки",
+	"joinedThreads": "Мои ветки",
+	"archivedThreads": "Старые ветки",
 	"loading": "Загрузка...",
 	"topic": "Тема",
 	"reactions": "Реакции",
@@ -165,4 +165,3 @@
 	"moreFile": "новый файл",
 	"moreFiles": "новые файлы"
 }
-

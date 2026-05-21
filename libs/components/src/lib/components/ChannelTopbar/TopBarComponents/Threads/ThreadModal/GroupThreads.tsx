@@ -1,5 +1,5 @@
-import { ThreadsEntity } from '@mezon/store';
-import { MutableRefObject } from 'react';
+import type { ThreadsEntity } from '@mezon/store';
+import type { MutableRefObject } from 'react';
 import ThreadItem from './ThreadItem';
 
 interface GroupThreadsProps {

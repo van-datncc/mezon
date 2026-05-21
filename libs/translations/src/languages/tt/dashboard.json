@@ -42,6 +42,7 @@
 	},
 	"page": {
 		"backToOverview": "Клан куллану күзәтүенә кире кайту",
+		"meetingRooms": "Киңәшмә бүлмәләре",
 		"clanUsageStatisticsReport": "Клан куллану статистикасы хисабы",
 		"dashboardReport": "Эшчәнлекләр панеле",
 		"report": "Шикаять итү"
@@ -70,5 +71,27 @@
 		"tooltip": "Бу багана буенча үсә/кими барышлы сортировкалау",
 		"sortedAsc": "Үсә барышлы сортировкаланган",
 		"sortedDesc": "Кими барышлы сортировкаланган"
+	},
+	"meetingRoomsFilter": {
+		"allStatuses": "Барлык статуслар",
+		"pending": "Көтелә",
+		"completed": "Тәмамланды",
+		"finalRoom": "Соңгы бүлмә",
+		"failed": "Уңышсыз",
+		"noTimeFilter": "Вакыт фильтрысыз",
+		"last12Hours": "Соңгы 12 сәгать",
+		"last24Hours": "Соңгы 24 сәгать",
+		"last2Days": "Соңгы 2 көн",
+		"last7Days": "Соңгы 7 көн",
+		"searchByRoomNameOrParticipant": "Бүлмә исеме яки катнашучы буенча эзләү..."
+	},
+	"meetingRoomsTable": {
+		"roomName": "Бүлмә исеме",
+		"status": "Статус",
+		"createdAt": "Ясалган вакыт",
+		"completedAt": "Тәмамланган вакыт",
+		"actions": "Гамәлләр",
+		"viewDetails": "Тәфсилләрне карау",
+		"noRoomsFound": "Бүлмәләр табылмады."
 	}
 }

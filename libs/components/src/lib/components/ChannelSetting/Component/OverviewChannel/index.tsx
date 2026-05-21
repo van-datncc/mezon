@@ -42,10 +42,10 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [appUrlInit, setAppUrlInit] = useState(channelApp?.app_url || '');
 	const [appUrl, setAppUrl] = useState(appUrlInit);
 	const dispatch = useAppDispatch();
-	const [channelLabelInit, setChannelLabelInit] = useState(currentChannel.channel_label || '');
-	const [topicInit, setTopicInit] = useState(currentChannel.topic);
-	const [ageRestrictedInit, setAgeRestrictedInit] = useState(currentChannel.age_restricted);
-	const [e2eeInit, setE2eeInit] = useState(currentChannel.e2ee);
+	const [channelLabelInit, setChannelLabelInit] = useState(currentChannel?.channel_label || '');
+	const [topicInit, setTopicInit] = useState(currentChannel?.topic);
+	const [ageRestrictedInit, setAgeRestrictedInit] = useState(currentChannel?.age_restricted);
+	const [e2eeInit, setE2eeInit] = useState(currentChannel?.e2ee);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [topic, setTopic] = useState(topicInit);
 	const [channelLabel, setChannelLabel] = useState(channelLabelInit);
@@ -58,13 +58,13 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [isE2ee, setIsE2ee] = useState(e2eeInit);
 
 	const fetchSystemMessage = async () => {
-		if (!currentChannel.clan_id) return;
-		await dispatch(fetchSystemMessageByClanId({ clanId: currentChannel.clan_id }));
+		if (!currentChannel?.clan_id) return;
+		await dispatch(fetchSystemMessageByClanId({ clanId: currentChannel?.clan_id }));
 	};
 
 	useEffect(() => {
 		fetchSystemMessage();
-	}, [currentChannel.channel_id]);
+	}, [currentChannel?.channel_id]);
 	useEffect(() => {
 		if (!currentChannel) return;
 		setChannelLabelInit(currentChannel.channel_label || '');
@@ -90,8 +90,8 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 	const [isCheckForSystemMsg, setIsCheckForSystemMsg] = useState(false);
 	const currentSystemMessage = useSelector(selectClanSystemMessage);
 	const thisIsSystemMessageChannel = useMemo(() => {
-		return currentChannel.channel_id === currentSystemMessage;
-	}, [currentChannel.channel_id, currentSystemMessage]);
+		return currentChannel?.channel_id === currentSystemMessage;
+	}, [currentChannel?.channel_id, currentSystemMessage]);
 
 	const label = useMemo(() => {
 		return isThread ? 'thread' : 'channel';
@@ -220,7 +220,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 
 		const updateChannel = {
 			clan_id: currentChannel.clan_id,
-			channel_id: currentChannel.channel_id || '0',
+			channel_id: currentChannel?.channel_id || '0',
 			channel_label: channelLabel,
 			category_id: currentChannel.category_id,
 			app_url: updatedAppUrl,
@@ -328,9 +328,7 @@ const OverviewChannel = (props: OverviewChannelProps) => {
 					maxLength={Number(process.env.NX_MAX_LENGTH_NAME_ALLOWED)}
 				/>
 				{(checkValidateEmpty || checkValidate) && (
-					<p className="text-[#e44141] text-xs italic font-thin">
-						{checkValidateEmpty || checkValidate}
-					</p>
+					<p className="text-[#e44141] text-xs italic font-thin">{checkValidateEmpty || checkValidate}</p>
 				)}
 
 				{channel.type === ChannelType.CHANNEL_TYPE_APP && (

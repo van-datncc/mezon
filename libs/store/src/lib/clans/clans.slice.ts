@@ -1,6 +1,6 @@
 import { captureSentryError } from '@mezon/logger';
 import type { IClan, LoadingStatus } from '@mezon/utils';
-import { LIMIT_CLAN_ITEM } from '@mezon/utils';
+import { FOR_1_HOUR_SEC, LIMIT_CLAN_ITEM, ONE_MILISECONDS } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type {
@@ -503,16 +503,23 @@ export const listClanBadgeCount = createAsyncThunk('clans/listClanBadgeCount', a
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await fetchDataWithSocketFallback(
-			mezon,
-			{
-				api_name: 'ListClanBadgeCount'
-			},
-			(session) => mezon.client.listClanBadgeCount(session),
-			'clan_badge_count'
-		);
+		const apiKey = createApiKey('listClanBadgeCount', mezon.session.session_id || '');
 
-		return response?.list_badge || [];
+		const shouldForceCall = shouldForceApiCall(apiKey, { expiresAt: Date.now() + FOR_1_HOUR_SEC * ONE_MILISECONDS, lastFetched: Date.now() });
+		if (shouldForceCall) {
+			const response = await fetchDataWithSocketFallback(
+				mezon,
+				{
+					api_name: 'ListClanBadgeCount'
+				},
+				(session) => mezon.client.listClanBadgeCount(session),
+				'clan_badge_count'
+			);
+
+			markApiFirstCalled(apiKey);
+			return response?.list_badge || [];
+		}
+		return null;
 	} catch (error) {
 		captureSentryError(error, 'clans/listClanBadgeCount');
 		return thunkAPI.rejectWithValue(error);
@@ -930,14 +937,16 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'loaded';
 			}
 		);
-		builder.addCase(listClanBadgeCount.fulfilled, (state: ClansState, action: PayloadAction<ClanUnreadState[]>) => {
-			const normalizedPayload: ClanUnreadState[] = action.payload.map((item) => ({
-				...item,
-				badge: item.badge <= 0 ? 0 : item.badge
-			}));
+		builder.addCase(listClanBadgeCount.fulfilled, (state: ClansState, action: PayloadAction<ClanUnreadState[] | null>) => {
+			if (action.payload) {
+				const normalizedPayload: ClanUnreadState[] = action.payload.map((item) => ({
+					...item,
+					badge: item.badge <= 0 ? 0 : item.badge
+				}));
 
-			clanUnreadAdapter.setAll(state.clanUnreadStates, normalizedPayload);
-			state.loadingStatus = 'loaded';
+				clanUnreadAdapter.setAll(state.clanUnreadStates, normalizedPayload);
+				state.loadingStatus = 'loaded';
+			}
 		});
 	}
 });

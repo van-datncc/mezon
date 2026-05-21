@@ -3,6 +3,7 @@ import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
 import { isTrackReference, LayoutContextProvider, usePinnedTracks, useTracks, type useCreateLayoutContext } from '@livekit/components-react';
 import { selectOpenExternalChatBox, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import type { Room } from 'livekit-client';
 import { RoomEvent, Track } from 'livekit-client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -231,6 +232,7 @@ export const VideoConferenceLayout = memo(
 									}`}
 									title="Chat"
 									onClick={onToggleChatBox}
+									data-e2e={generateE2eId('chat.channel_message.header.button.chat')}
 								>
 									<Icons.Chat className="w-5 h-5" />
 								</button>
@@ -239,6 +241,7 @@ export const VideoConferenceLayout = memo(
 					</div>
 					<div
 						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto`}
+						data-e2e={generateE2eId('clan_page.screen.voice_room.control_bar')}
 					>
 						<ControlBar
 							isExternalCalling={isExternalCalling}

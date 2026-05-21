@@ -55,7 +55,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 	const anonymousMode = useSelector((state) => selectAnonymousMode(state, getClanId as string));
 	const topicAnonymousMode = useSelector(selectTopicAnonymousMode);
 	const initTopicMessageId = useSelector(selectInitTopicMessageId);
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const isCreatingTopicRef = useRef(false);
 
 	const createTopic = useCallback(async () => {
@@ -286,7 +286,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 				console.error(e);
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic, currentTopicId]
+		[sessionRef, clientRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic, currentTopicId]
 	);
 
 	return useMemo(

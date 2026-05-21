@@ -74,7 +74,7 @@ function DirectMessageList() {
 				</div>
 			</div>
 			<div className={`flex-1 font-medium  px-2`}>
-				<div className="flex flex-col gap-1 text-center relative" data-e2e={generateE2eId(`chat.direct_message.chat_list`)}>
+				<div className="flex flex-col gap-1 text-center relative" data-e2e={generateE2eId('chat.direct_message.chat_list_container')}>
 					<ListDMChannel listDM={unpinnedDMs} pinnedCount={pinnedDMs.length} />
 				</div>
 			</div>

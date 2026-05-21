@@ -12,6 +12,8 @@ type GuideItemLayoutProps = {
 	height?: string;
 	gap?: number;
 	onClick?: () => void;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
 	noNeedHover?: boolean;
 };
 
@@ -26,6 +28,8 @@ export const GuideItemLayout = ({
 	height,
 	gap = 8,
 	onClick,
+	onMouseEnter,
+	onMouseLeave,
 	noNeedHover
 }: GuideItemLayoutProps) => {
 	return (
@@ -35,6 +39,8 @@ export const GuideItemLayout = ({
 				gap
 			}}
 			onClick={onClick}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
 			data-e2e={generateE2eId('button.base')}
 		>
 			{icon && (
@@ -46,7 +52,10 @@ export const GuideItemLayout = ({
 			)}
 			<div className={`flex flex-1 text-sm md:text-base flex-col h-full justify-center text-theme-primary min-w-0`}>
 				{title && (
-					<div className="font-bold text-theme-primary-active break-words" data-e2e={generateE2eId('onboarding.clan_guide_page.title')}>
+					<div
+						className="font-bold text-theme-primary-active break-words w-full overflow-hidden truncate"
+						data-e2e={generateE2eId('onboarding.clan_guide_page.title')}
+					>
 						{title}
 					</div>
 				)}

@@ -54,7 +54,14 @@ function MessageWithSystem({
 					>
 						{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 flex-shrink-0" />}
 						{message?.code === TypeMessage.UpcomingEvent && <Icons.UpcomingEventIcon defaultSize="size-8 flex-shrink-0" />}
-						{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 flex-shrink-0" />}
+						{message?.code === TypeMessage.CreateThread && (
+							<Icons.ThreadIcon
+								defaultSize="size-6 flex-shrink-0"
+								defaultFill1="var(--bg-icon-theme)"
+								defaultFill4="var(--bg-theme-secounnd)"
+								defaultFill5="var(--bg-icon-theme)"
+							/>
+						)}
 						{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6 flex-shrink-0" />}
 						{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8 flex-shrink-0" />}
 						<MessageLineSystem

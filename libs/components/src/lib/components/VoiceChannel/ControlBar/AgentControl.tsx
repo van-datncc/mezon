@@ -7,16 +7,16 @@ import type { RemoteParticipant } from 'livekit-client';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-export const AgentControl = memo(({ isExternalCalling }: { isExternalCalling: boolean }) => {
+export const AgentControl = memo(({ isExternalCalling, isShowMember }: { isExternalCalling: boolean; isShowMember: boolean }) => {
 	const [hasChannelPermission] = usePermissionChecker([EPermission.manageChannel]);
 	const account = useSelector(selectAllAccount);
 	if ((!hasChannelPermission && !isExternalCalling) || (isExternalCalling && !account)) {
 		return null;
 	}
-	return <ButtonAgent isExternalCalling={isExternalCalling} />;
+	return <ButtonAgent isExternalCalling={isExternalCalling} isShowMember={isShowMember} />;
 });
 
-const ButtonAgent = ({ isExternalCalling }: { isExternalCalling: boolean }) => {
+const ButtonAgent = ({ isExternalCalling, isShowMember }: { isExternalCalling: boolean; isShowMember: boolean }) => {
 	const room = useRoomContext();
 	const [onAgent, setOnAgent] = useState(false);
 	const currentVoice = useSelector(selectVoiceInfo);
@@ -113,9 +113,9 @@ const ButtonAgent = ({ isExternalCalling }: { isExternalCalling: boolean }) => {
 	}, [onAgent]);
 
 	return (
-		<div className="relative rounded-full bg-gray-300 dark:bg-black" onClick={handleAddAgent}>
+		<div className="relative rounded-full " onClick={handleAddAgent}>
 			<div
-				className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none bg-zinc-500 dark:bg-zinc-900 lk-button ${onAgent ? '!bg-blue-500 hover:!bg-blue-600' : ''} ${disable || loading ? '!bg-slate-900 hover:!bg-slate-900 !cursor-default' : ''}`}
+				className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none lk-button ${isShowMember ? 'bg-zinc-700 dark:bg-zinc-900' : 'bg-zinc-900'} ${onAgent ? '!bg-blue-500 hover:!bg-blue-600' : ''} ${disable || loading ? '!bg-slate-900 hover:!bg-slate-900 !cursor-default' : ''}`}
 			>
 				{loading ? (
 					<Icons.LoadingSpinner />

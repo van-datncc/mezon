@@ -1,13 +1,11 @@
-import { getStore, selectAllChannels } from '@mezon/store';
 import { searchMentionsHashtag } from '@mezon/utils';
-import { ChannelStreamMode, ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mention as MentionComponent, MentionsInput as MentionsInputComponent } from 'react-mentions';
 import { UserMentionList } from '../UserMentionList';
 import SelectGroup from './SelectGroup';
 import SelectItemUser from './SelectItemUser';
-import type { ChannelOption, HasOption, SearchInputProps } from './types';
+import type { HasOption, SearchInputProps } from './types';
 
 const MentionsInput = MentionsInputComponent as any;
 const Mention = MentionComponent as any;
@@ -39,31 +37,13 @@ const SearchInput = ({
 	setIsShowSearchOptions
 }: SearchInputProps) => {
 	const { t } = useTranslation('searchMessageChannel');
-	const isClanMode = mode === ChannelStreamMode.STREAM_MODE_CHANNEL;
 	const mentionPrefixFrom = t('mentionPrefixes.from');
 	const mentionPrefixMentions = t('mentionPrefixes.mentions');
 	const mentionPrefixHas = t('mentionPrefixes.has');
-	const mentionPrefixIn = t('mentionPrefixes.in');
 	const userListData = UserMentionList({
 		channelID: channelId,
 		channelMode: mode
 	});
-
-	const channelOptions: ChannelOption[] = useMemo(() => {
-		const allChannels = selectAllChannels(getStore().getState());
-		const textChannels = allChannels
-			.filter(
-				(channel) =>
-					(channel.type === ChannelType.CHANNEL_TYPE_CHANNEL || channel.type === ChannelType.CHANNEL_TYPE_THREAD) &&
-					channel.clan_id === currentClanId
-			)
-			.map((channel) => ({
-				id: channel.channel_id || channel.id,
-				display: channel.channel_label || ''
-			}));
-
-		return [...textChannels];
-	}, [currentClanId]);
 
 	const [valueHighlight, setValueHighlight] = useState<string>('');
 	const [activeTrigger, setActiveTrigger] = useState<string>('');
@@ -72,8 +52,7 @@ const SearchInput = ({
 		() => ({
 			'>': t('fromUser'),
 			'~': t('mentionsUser'),
-			'&': t('hasContent'),
-			'#': t('inChannel')
+			'&': t('hasContent')
 		}),
 		[t]
 	);
@@ -104,20 +83,6 @@ const SearchInput = ({
 		const filtered = HAS_OPTIONS.filter((opt) => opt.display.toLowerCase().includes(search.toLowerCase()));
 		callback(filtered.length > 0 ? filtered : HAS_OPTIONS);
 	}, []);
-
-	const handleSearchChannel = useCallback(
-		(search: string, callback: any) => {
-			setActiveTrigger('#');
-			setValueHighlight(search);
-			if (!search) {
-				callback(channelOptions);
-				return;
-			}
-			const filtered = channelOptions.filter((channel) => channel.display.toLowerCase().includes(search.toLowerCase()));
-			callback(filtered.length > 0 ? filtered : channelOptions);
-		},
-		[channelOptions]
-	);
 
 	const renderSuggestionsContainer = useCallback(
 		(children: any) => (
@@ -218,26 +183,6 @@ const SearchInput = ({
 				)}
 				style={MentionsInputStyle}
 			/>
-
-			{isClanMode ? (
-				<Mention
-					markup="#[__display__](__id__)"
-					appendSpaceOnAdd={true}
-					data={handleSearchChannel}
-					trigger="#"
-					displayTransform={(id: string, display: string) => `${mentionPrefixIn}${display}`}
-					renderSuggestion={(suggestion: any, search: any, highlightedDisplay: any, index: any, focused: any) => (
-						<SelectItemUser
-							search={valueHighlight}
-							isFocused={focused}
-							title={t('prefixes.in')}
-							content={t(suggestion.display) || suggestion.display}
-							onClick={() => setIsShowSearchOptions('')}
-						/>
-					)}
-					style={MentionsInputStyle}
-				/>
-			) : null}
 		</MentionsInput>
 	);
 };

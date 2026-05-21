@@ -1,5 +1,6 @@
 import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import {
+	channelSettingActions,
 	deleteClan,
 	fetchClanWebhooks,
 	fetchWebhooks,
@@ -79,6 +80,9 @@ const ClanSetting = (props: ModalSettingProps) => {
 			} else if (canManagerChannel) {
 				dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
 			}
+		}
+		if (settingItem.id === ItemSetting.ARCHIVED_CHANNELS) {
+			dispatch(channelSettingActions.fetchArchivedChannelsInClan(currentClanId));
 		}
 	};
 

@@ -1,4 +1,12 @@
-import { ChatContext, ChatContextProvider, ColorRoleProvider, useDragAndDrop, useFriends, useIdleRender } from '@mezon/core';
+import {
+	ChatContext,
+	ChatContextProvider,
+	ColorRoleProvider,
+	useDragAndDrop,
+	useFriends,
+	useIdleRender,
+	useReconnectOnForeground
+} from '@mezon/core';
 import {
 	appActions,
 	e2eeActions,
@@ -12,7 +20,7 @@ import { IS_SAFARI, MessageCrypt, UploadLimitReason, throttle } from '@mezon/uti
 
 import { TooManyUpload, WebRTCStreamProvider, useClanLimitModalErrorHandler } from '@mezon/components';
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store';
-import { MezonSuspense, isOnline$, socketState } from '@mezon/transport';
+import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { memo, useContext, useEffect, useMemo } from 'react';
@@ -35,6 +43,12 @@ const GlobalEventListener = () => {
 
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
 
+
+	useReconnectOnForeground({
+		scheduleReconnect: handleReconnect,
+		debouncedScheduleMs: 3000
+	});
+
 	const handleReconnectSuccess = useMemo(
 		() =>
 			throttle(() => {
@@ -55,39 +69,8 @@ const GlobalEventListener = () => {
 	}, []);
 
 	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		const reconnectSocket = () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-
-			timeoutId = setTimeout(() => {
-				if (document.visibilityState === 'visible' && !document.hidden && !socketState.isConnected) {
-					handleReconnect('Window focus/online event, attempting to reconnect...');
-				}
-			}, 3000);
-		};
-
-		const sub = isOnline$().subscribe((online) => {
-			if (online) {
-				reconnectSocket();
-			}
-		});
-		window.addEventListener('focus', reconnectSocket);
-		document.addEventListener('visibilitychange', reconnectSocket);
-
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-			sub.unsubscribe();
-			window.removeEventListener('focus', reconnectSocket);
-			document.removeEventListener('visibilitychange', reconnectSocket);
-		};
-	}, []);
-
-	useEffect(() => {
 		if (typeof window === 'undefined') return;
+
 		window.addEventListener('mezon:socket-reconnect', handleReconnectSuccess);
 		return () => {
 			window.removeEventListener('mezon:socket-reconnect', handleReconnectSuccess);
