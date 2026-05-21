@@ -28,7 +28,7 @@
 	},
 	"directMessage": "Direktmeddelande",
 	"activeThreads": "Aktiva trådar",
-	"joinedThreadsLast30Days": "Anslutna trådar (senaste 30 dagarna)",
+	"joinedThreads": "Anslutna trådar",
 	"olderThreads": "Äldre trådar",
 	"loading": "Laddar...",
 	"topic": "Ämne",

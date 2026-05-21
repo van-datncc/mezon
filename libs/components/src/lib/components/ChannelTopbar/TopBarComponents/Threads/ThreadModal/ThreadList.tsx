@@ -4,7 +4,7 @@ import { selectTheme, useAppSelector } from '@mezon/store';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import GroupThreads from './GroupThreads';
-import { getActiveThreads, getJoinedThreadsWithinLast30Days, getThreadsOlderThan30Days } from './hepler';
+import { getActiveThreads, getJoinedThreads, getThreadsOlderThan30Days } from './hepler';
 
 type ThreadListProps = {
 	isLoading: boolean;
@@ -18,7 +18,7 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 	const ulRef = useRef<HTMLUListElement | null>(null);
 
 	const activeThreads = getActiveThreads(threads);
-	const joinedThreads = getJoinedThreadsWithinLast30Days(threads);
+	const joinedThreads = getJoinedThreads(threads);
 	const oldThreads = getThreadsOlderThan30Days(threads);
 
 	const { measureRef, isIntersecting, observer } = useOnScreen({ root: ulRef.current });
@@ -49,7 +49,7 @@ export default function ThreadList({ isLoading, threads, loadMore, preventCloseP
 			/>
 			<GroupThreads
 				preventClosePannel={preventClosePannel}
-				title={t('joinedThreadsLast30Days')}
+				title={t('joinedThreads')}
 				threads={joinedThreads}
 				measureRef={isLastInJoined ? measureRef : undefined}
 			/>

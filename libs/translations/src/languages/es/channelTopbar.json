@@ -27,7 +27,7 @@
 	},
 	"directMessage": "Mensaje directo",
 	"activeThreads": "Hilos activos",
-	"joinedThreadsLast30Days": "Hilos unidos (últimos 30 días)",
+	"joinedThreads": "Hilos unidos",
 	"olderThreads": "Hilos anteriores",
 	"loading": "Cargando...",
 	"topic": "Tema",

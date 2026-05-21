@@ -27,7 +27,7 @@
 	},
 	"directMessage": "Шәхси хәбәр",
 	"activeThreads": "Актив ботакламалар",
-	"joinedThreadsLast30Days": "Минем ботакламаларым (соңгы 30 көн)",
+	"joinedThreads": "Минем ботакламаларым",
 	"olderThreads": "Иске ботакламалар",
 	"loading": "Йөкләү...",
 	"topic": "Тема",

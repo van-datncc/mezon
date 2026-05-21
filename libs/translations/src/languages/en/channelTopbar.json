@@ -28,7 +28,7 @@
 	},
 	"directMessage": "Direct message",
 	"activeThreads": "Active Threads",
-	"joinedThreadsLast30Days": "Joined Threads (Last 30 Days)",
+	"joinedThreads": "Joined Threads",
 	"olderThreads": "Older Threads",
 	"loading": "Loading...",
 	"topic": "Topic",
