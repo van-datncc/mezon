@@ -41,7 +41,9 @@ export const writeQuickMenuEvent = createAsyncThunk(
 			mentionEveryone,
 			avatar,
 			code,
-			topicId
+			topicId,
+			message_id,
+			message_sender_id
 		}: {
 			channelId: string;
 			clanId: string;
@@ -57,6 +59,8 @@ export const writeQuickMenuEvent = createAsyncThunk(
 			avatar?: string;
 			code?: number;
 			topicId?: string;
+			message_id?: string;
+			message_sender_id?: string;
 		},
 		thunkAPI
 	) => {
@@ -83,7 +87,9 @@ export const writeQuickMenuEvent = createAsyncThunk(
 				mentionEveryone || false,
 				avatar,
 				code || 0,
-				topicId
+				topicId,
+				message_id,
+				message_sender_id
 			);
 
 			return {
