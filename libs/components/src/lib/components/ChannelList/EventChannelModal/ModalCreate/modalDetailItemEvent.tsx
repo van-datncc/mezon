@@ -16,6 +16,7 @@ import { createImgproxyUrl, generateE2eId } from '@mezon/utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../../AvatarImage/AvatarImage';
 import { renderDescriptionWithLinks } from '../eventHelper';
 import { timeFomat } from '../timeFomatEvent';
 
@@ -270,16 +271,13 @@ const InterestedDetail = ({ userIds }: InterestedDetailProps) => {
 				userData.map((user, index) => {
 					const name = user?.clan_nick || user?.user?.display_name || user?.user?.username;
 					const avatarUrl = user?.clan_avatar || user?.user?.avatar_url;
-					const avatarLetter = name?.trim().charAt(0).toUpperCase();
 
 					return (
 						<div key={index} className="flex items-center gap-x-3 rounded bg-item-theme-hover p-2">
 							{avatarUrl ? (
 								<img src={createImgproxyUrl(avatarUrl)} alt={name} className="size-7 rounded-full object-cover" />
 							) : (
-								<div className="size-7 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight">
-									{avatarLetter || '?'}
-								</div>
+								<AvatarColor username={name || ''} className="size-7" />
 							)}
 							<p className="text-theme-primary">{name}</p>
 						</div>

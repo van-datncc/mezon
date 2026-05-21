@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import type { DetailedHTMLProps, ImgHTMLAttributes } from 'react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 export type AvatarImageProp = {
 	username?: string;
@@ -77,3 +77,16 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 		/>
 	);
 };
+
+export const AvatarColor = memo(({ username, className }: { username: string; className?: string }) => {
+	const avatarChar = username?.charAt(0)?.toUpperCase() || '';
+	const color = avatarChar.charCodeAt(0) % 7;
+	return (
+		<div
+			className={`${avatarColors[color]} uppercase rounded-full flex justify-center items-center text-white font-semibold ${className}`}
+			data-e2e={generateE2eId('avatar.image')}
+		>
+			{avatarChar}
+		</div>
+	);
+});
