@@ -53,7 +53,8 @@ export const DATA_E2E_IDENTIFIER = {
 			button: {
 				base: '',
 				status: '',
-				remove_friend: ''
+				remove_friend: '',
+				share_contact: ''
 			}
 		},
 		modal: {
@@ -1091,6 +1092,11 @@ export const DATA_E2E_IDENTIFIER = {
 				description: '',
 				created_time: ''
 			}
+		}
+	},
+	invoice: {
+		button: {
+			component: ''
 		}
 	},
 	friend_remove_modal: {
