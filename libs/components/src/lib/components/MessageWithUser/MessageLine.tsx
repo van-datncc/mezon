@@ -54,6 +54,7 @@ export interface ElementToken {
 	index?: number;
 	language?: string;
 	member_count?: number;
+	is_community?: boolean;
 	url?: string;
 }
 
@@ -183,7 +184,7 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 	const isInvalidInvite = element.title === 'Invite Error';
 	const clanImage = element.image || '';
 	const clanInitial = (clanTitle || 'M').trim().charAt(0).toUpperCase();
-	const isCommunityEnabled = false;
+	const isCommunityEnabled = !!element?.is_community;
 
 	const handleJoinOrGoTo = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.stopPropagation();
