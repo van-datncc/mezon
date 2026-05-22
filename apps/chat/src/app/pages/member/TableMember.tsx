@@ -21,9 +21,8 @@ const TableMember: React.FC<ITableMemberProps> = ({ currentPage, pageSize, dataM
 			<TableMemberHeader />
 			<div className="flex flex-col overflow-y-auto px-4 py-2 border-b-theme-primary">
 				{displayUsersClan.map((user) => {
-					const u = user.user as (typeof user.user & { join_time_seconds?: number; create_time_second?: number }) | undefined;
-					const accountCreatedSeconds = Number(u?.create_time_seconds ?? u?.create_time_second ?? 0);
-					const memberSinceSeconds = Number(u?.join_time_seconds ?? u?.create_time_seconds ?? u?.create_time_second ?? 0);
+					const accountCreatedSeconds = Number(user.user?.create_time_seconds ?? user.create_time_seconds ?? 0);
+					const memberSinceSeconds = Number(user.user?.join_time_seconds ?? user.join_time_seconds ?? 0);
 
 					return (
 						<TableMemberItem

@@ -91,6 +91,8 @@ export type IPermissionUser = ApiPermission & {
 export type IUsersClan = ClanUserListClanUser & {
 	prioritizeName?: string;
 	id: string;
+	join_time_seconds?: number;
+	create_time_seconds?: number;
 };
 
 export type IRolesClan = ApiRole & {
