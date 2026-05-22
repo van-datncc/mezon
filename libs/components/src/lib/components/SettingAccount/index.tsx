@@ -162,13 +162,6 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 							<h4 className="uppercase font-bold text-xs  mb-1">{t('username')}</h4>
 							<p>{userProfile?.user?.username}</p>
 						</div>
-						<div
-							className=" h-fit rounded-lg px-6 py-1 cursor-pointer border-theme-primary bg-theme-input text-theme-primary-hover bg-secondary-button-hover	"
-							onClick={handleClick}
-							data-e2e={generateE2eId(`user_setting.account.edit_username`)}
-						>
-							{t('edit')}
-						</div>
 					</div>
 				</div>
 				<div className="rounded-md bg-theme-setting-primary shadow  m-4 p-4">
