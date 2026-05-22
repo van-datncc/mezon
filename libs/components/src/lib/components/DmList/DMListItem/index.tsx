@@ -2,7 +2,6 @@ import { useMemberStatus } from '@mezon/core';
 import type { DirectEntity } from '@mezon/store';
 import {
 	directActions,
-	selectAllAccount,
 	selectBuzzStateByDirectId,
 	selectDirectById,
 	selectIsUnreadDMById,
@@ -45,7 +44,6 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 	const isTypeDMGroup = directMessage?.type === ChannelType.CHANNEL_TYPE_GROUP;
 	const isUnReadChannel = useAppSelector((state) => selectIsUnreadDMById(state, directMessage?.id as string));
 	const buzzStateDM = useAppSelector((state) => selectBuzzStateByDirectId(state, directMessage?.channel_id ?? ''));
-	const userCurrent = useAppSelector(selectAllAccount);
 
 	const [openUnknown, closeUnknown] = useModal(() => {
 		if (isTypeDMGroup) {
@@ -98,7 +96,9 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 			onClick={handleClickDM}
 			data-e2e={generateE2eId(`chat.direct_message.chat_list`)}
 		>
-			<DmItemProfileWrapper
+			<DmItemProfile
+				avatar={isTypeDMGroup ? directMessage?.channel_avatar || '/assets/images/avatar-group.png' : (directMessage?.avatars?.at(-1) ?? '')}
+				name={directMessage?.channel_label || ''}
 				number={directMessage?.member_count || 0}
 				isTypeDMGroup={isTypeDMGroup}
 				highlight={isUnReadChannel || currentDmGroupId === id}
@@ -129,44 +129,6 @@ export default memo(DMListItem, (prev, cur) => {
 	return prev.id === cur.id && prev.isActive === cur.isActive;
 });
 
-const DmItemProfileWrapper = ({
-	number,
-	isTypeDMGroup,
-	highlight,
-	direct,
-	t
-}: {
-	highlight: boolean;
-	number: number;
-	isTypeDMGroup: boolean;
-	direct: DirectEntity;
-	t: (key: string) => string;
-}) => {
-	let avatar = '';
-	let name = '';
-	if (isTypeDMGroup) {
-		avatar = direct?.channel_avatar || '/assets/images/avatar-group.png';
-		name = direct?.channel_label || '';
-	} else {
-		avatar = direct?.channel_avatar || direct?.avatars?.at(-1) || '';
-		name = direct?.channel_label || '';
-	}
-	const peerUserId = isTypeDMGroup ? '' : direct?.peer_user_id || direct?.user_ids?.[0] || '';
-
-	return (
-		<DmItemProfile
-			avatar={avatar}
-			name={name}
-			number={number}
-			isTypeDMGroup={isTypeDMGroup}
-			highlight={highlight}
-			direct={direct}
-			peerUserId={peerUserId}
-			t={t}
-		/>
-	);
-};
-
 const DmItemProfile = ({
 	avatar,
 	name,
@@ -174,7 +136,6 @@ const DmItemProfile = ({
 	isTypeDMGroup,
 	highlight,
 	direct,
-	peerUserId,
 	t
 }: {
 	highlight: boolean;
@@ -183,10 +144,9 @@ const DmItemProfile = ({
 	number: number;
 	isTypeDMGroup: boolean;
 	direct: DirectEntity;
-	peerUserId: string;
 	t: (key: string) => string;
 }) => {
-	const userStatus = useMemberStatus(peerUserId);
+	const userStatus = useMemberStatus(direct?.user_ids?.[0] || '');
 	return (
 		<div
 			className={`relative flex gap-2 items-center text-theme-primary-hover  ${highlight ? 'text-theme-primary-active' : 'text-theme-primary'}`}
@@ -207,7 +167,7 @@ const DmItemProfile = ({
 					</span>
 				</div>
 			) : (
-				<DmInvoiceProfile name={name} directId={direct?.id} userId={peerUserId} status={userStatus.status} />
+				<DmInvoiceProfile name={name} directId={direct?.id} userId={direct?.user_ids?.[0] || ''} status={userStatus.status} />
 			)}
 		</div>
 	);

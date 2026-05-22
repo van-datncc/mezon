@@ -200,26 +200,23 @@ const ModalUserProfile = ({
 	const handleOnKeyPress = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
 			if (e.key === 'Enter' && content && onLoading.current === false) {
-				const targetUser = isFooterProfile ? userProfile : userById;
-
-				if (targetUser) {
+				if (userById) {
 					sendMessage(
-						isFooterProfile ? userId || targetUser?.user?.id || '' : targetUser?.user?.id || '',
-						targetUser?.user?.display_name || targetUser?.user?.username,
-						targetUser?.user?.username,
-						targetUser?.user?.avatar_url
+						isFooterProfile ? userId || userById?.user?.id || '' : userById?.user?.id || '',
+						userById?.user?.display_name || userById?.user?.username,
+						userById?.user?.username,
+						userById.user?.avatar_url
 					);
 					onLoading.current = true;
 					return;
 				}
-
 				sendMessage(
 					(isFooterProfile ? userId : userID === message?.sender_id ? message?.sender_id : message?.references?.[0].message_sender_id) || ''
 				);
 				onLoading.current = true;
 			}
 		},
-		[userById, userProfile, content, isFooterProfile, userId, userID, message]
+		[userById, content, isFooterProfile]
 	);
 
 	return (
@@ -306,10 +303,7 @@ const ModalUserProfile = ({
 									className={`w-full border-theme-primary text-theme-primary color-text-secondary rounded-[5px] bg-theme-contexify p-[5px] `}
 									placeholder={t('placeholders.messageUser', {
 										username: isFooterProfile
-											? userById?.user?.display_name ||
-												userProfile?.user?.display_name ||
-												userProfile?.user?.username ||
-												userById?.user?.username
+											? userById?.user?.display_name || userProfile?.user?.display_name || userById?.user?.username
 											: !isDM
 												? userById?.clan_nick || userById?.user?.display_name || userById?.user?.username || usernameShow
 												: userById?.user?.display_name || userById?.user?.username || usernameShow
