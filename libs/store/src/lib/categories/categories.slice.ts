@@ -265,7 +265,7 @@ const getInitialClanState = () => {
 		entities: categoriesAdapter.getInitialState(),
 		sortChannelByCategoryId: {},
 		categoryExpandState: {},
-		showEmptyCategory: true
+		showEmptyCategory: false
 	};
 };
 
