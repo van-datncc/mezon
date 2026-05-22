@@ -2509,7 +2509,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		badgeService.markAsReadChannel(
 			markAsReadEvent.clan_id as string,
 			markAsReadEvent.channel_id,
-			[markAsReadEvent.channel_id, ...channelIds],
+			[...channelIds],
 			channelUpdates,
 			relatedChannels.map((channel) => ({
 				channelId: channel.id,
