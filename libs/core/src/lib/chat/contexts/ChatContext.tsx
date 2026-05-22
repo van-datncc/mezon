@@ -2445,7 +2445,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			const targetUserId = blockFriend.user_id;
 
 			if (targetUserId === myId) {
-				void dispatch(friendsActions.fetchListFriends({ noCache: true }));
 				return;
 			}
 
