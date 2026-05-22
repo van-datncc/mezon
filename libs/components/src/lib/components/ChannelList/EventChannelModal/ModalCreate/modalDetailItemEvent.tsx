@@ -130,7 +130,6 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 	};
 	const avatarDefault = userCreate?.clan_avatar || userCreate?.user?.avatar_url;
 	const userName = userCreate?.clan_nick || userCreate?.user?.display_name || userCreate?.user?.username;
-	const avatarLetter = userName?.trim().charAt(0).toUpperCase();
 
 	return (
 		<div className="px-4 py-8 space-y-2 text-theme-primary max-h-[370px] h-fit hide-scrollbar overflow-auto">
@@ -237,9 +236,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 				{avatarDefault ? (
 					<img src={createImgproxyUrl(avatarDefault)} alt={userName} className="size-5 rounded-full object-cover" />
 				) : (
-					<div className="size-5 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight text-lg ">
-						{avatarLetter || '?'}
-					</div>
+					<AvatarColor username={userName || ''} className="size-5" />
 				)}
 				<p>{t('eventDetail.createdBy', { username: userName })}</p>
 			</div>

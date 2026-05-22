@@ -81,7 +81,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEditGroupModal } from '../../hooks/useEditGroupModal';
-import { avatarColors } from '../AvatarImage/AvatarImage';
+import { AvatarColor } from '../AvatarImage/AvatarImage';
 import { AppChannelListIcon } from '../ChannelList/AppChannelListIcon';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
 import { UserStatusIconDM } from '../MemberProfile';
@@ -546,8 +546,6 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 			</div>
 		);
 	}
-
-	const color = (avatarName || '').toUpperCase().charCodeAt(0) % 7;
 	return (
 		<div className="flex items-center justify-center ">
 			{avatar ? (
@@ -558,12 +556,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 					data-e2e={generateE2eId(`avatar.image`)}
 				/>
 			) : (
-				<div
-					className={`size-8 ${avatarColors[color]} uppercase rounded-full flex justify-center items-center text-white font-semibold`}
-					data-e2e={generateE2eId('avatar.image')}
-				>
-					{avatarName}
-				</div>
+				<AvatarColor username={avatarName || ''} className="size-8" />
 			)}
 		</div>
 	);
