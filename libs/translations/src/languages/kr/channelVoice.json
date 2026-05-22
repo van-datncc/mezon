@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "마이크",
 		"outputDevice": "오디오",
-		"camera": "카메라"
+		"camera": "카메라",
+		"systemDefault": "시스템 기본값"
 	},
 	"toast": {
 		"connectionConnected": "연결 성공",

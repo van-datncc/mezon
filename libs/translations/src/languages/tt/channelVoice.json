@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "Кертү корамасы",
 		"outputDevice": "Чыгару корамасы",
-		"camera": "Камера"
+		"camera": "Камера",
+		"systemDefault": "Система буенча килешүче"
 	},
 	"toast": {
 		"connectionConnected": "Бәйләнеш урнаштырылды",
