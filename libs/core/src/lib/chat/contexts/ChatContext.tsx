@@ -2516,15 +2516,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				count: (channelMeta?.[channel.id]?.count_mess_unread ?? 0) * -1
 			}))
 		);
-
-		const threadIds = relatedChannels.flatMap((channel) => channel.threadIds || []);
-		if (threadIds.length) {
-			const threadUpdates = threadIds.map((channelId) => ({
-				channelId,
-				messageId: selectLatestMessageId(store.getState(), channelId) || undefined
-			}));
-			dispatch(channelMetaActions.setChannelsLastSeenTimestamp(threadUpdates));
-		}
 	}, []);
 
 	const onaddfriend = useCallback((user: AddFriend) => {
