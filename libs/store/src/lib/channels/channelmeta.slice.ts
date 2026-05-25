@@ -235,7 +235,7 @@ export const channelMetaSlice = createSlice({
 				id: channelId,
 				isMute: false,
 				senderId: '0',
-				lastSentTimestamp: Date.now(),
+				lastSentTimestamp: Date.now() / 1000,
 				lastSeenTimestamp: 0,
 				count_mess_unread: 0
 			});
