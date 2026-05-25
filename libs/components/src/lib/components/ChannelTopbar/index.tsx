@@ -81,6 +81,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEditGroupModal } from '../../hooks/useEditGroupModal';
+import { AvatarColor } from '../AvatarImage/AvatarImage';
 import { AppChannelListIcon } from '../ChannelList/AppChannelListIcon';
 import CreateMessageGroup from '../DmList/CreateMessageGroup';
 import { UserStatusIconDM } from '../MemberProfile';
@@ -555,9 +556,7 @@ const DmTopbarAvatar = ({ isGroup, avatar, avatarName }: { isGroup: boolean; ava
 					data-e2e={generateE2eId(`avatar.image`)}
 				/>
 			) : (
-				<div className="w-8 h-8 flex-shrink-0 rounded-full uppercase flex items-center justify-center font-semibold bg-bgAvatarDark  text-bgAvatarLight">
-					{avatarName}
-				</div>
+				<AvatarColor username={avatarName || ''} className="size-8" />
 			)}
 		</div>
 	);
