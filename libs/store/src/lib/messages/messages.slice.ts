@@ -2481,7 +2481,7 @@ export const selectMessageEntityById = createCachedSelector(
 export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	[selectMessageEntitiesByChannelId, selectMessageIdsByChannelId, (_, __, senderId) => senderId],
 	(entities, ids, senderId) => {
-		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
+		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId && entities?.[id]?.code !== TypeMessage.SendToken);
 		return matchedId ? entities[matchedId] : null;
 	}
 );
