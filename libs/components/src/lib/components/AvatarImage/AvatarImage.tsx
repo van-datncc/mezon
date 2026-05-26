@@ -1,7 +1,7 @@
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import type { DetailedHTMLProps, ImgHTMLAttributes } from 'react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 export type AvatarImageProp = {
 	username?: string;
@@ -11,7 +11,7 @@ export type AvatarImageProp = {
 	srcImgProxy?: string;
 } & DetailedHTMLProps<ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
 
-const avatarColors = ['bg-[#ade603]', 'bg-[#00b2cc]', 'bg-[#fda63c]', 'bg-[#e16dcc]', 'bg-[#e8467b]', 'bg-[#9c7cfd]', 'bg-[#22e2b3]'];
+export const avatarColors = ['bg-[#ade603]', 'bg-[#00b2cc]', 'bg-[#fda63c]', 'bg-[#e16dcc]', 'bg-[#e8467b]', 'bg-[#9c7cfd]', 'bg-[#22e2b3]'];
 
 export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', isAnonymous, classNameText, ...rest }: AvatarImageProp) => {
 	const [isError, setIsError] = useState(false);
@@ -54,7 +54,7 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 
 	if (!src || isError) {
 		const avatarChar = username?.charAt(0)?.toUpperCase() || '';
-		const color = avatarChar.charCodeAt(0) % 6;
+		const color = avatarChar.charCodeAt(0) % 7;
 		return (
 			<div
 				className={`size-10 ${avatarColors[color]}  rounded-full flex justify-center items-center text-white text-[16px] ${className} ${classNameText}`}
@@ -77,3 +77,16 @@ export const AvatarImage = ({ username, src, srcImgProxy, alt, className = '', i
 		/>
 	);
 };
+
+export const AvatarColor = memo(({ username, className }: { username: string; className?: string }) => {
+	const avatarChar = username?.charAt(0)?.toUpperCase() || '';
+	const color = avatarChar ? avatarChar.charCodeAt(0) % 7 : 0;
+	return (
+		<div
+			className={`${avatarColors[color]} uppercase rounded-full flex justify-center items-center text-white font-semibold ${className}`}
+			data-e2e={generateE2eId('avatar.image')}
+		>
+			{avatarChar}
+		</div>
+	);
+});

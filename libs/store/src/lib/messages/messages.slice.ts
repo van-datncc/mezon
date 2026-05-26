@@ -1218,7 +1218,12 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 				s: content.t?.length || 0,
 				e: (content.t?.length || 0) + 1,
 				type: EBacktickType.OGP_PREVIEW,
-				index: ogpData.index
+				index: ogpData.index,
+				clanId: ogpData.clan_id,
+				url: ogpData.url,
+				member_count: ogpData.member_count,
+				banner: ogpData.banner,
+				is_community: ogpData.is_community
 			});
 			content = {
 				...content,
@@ -2476,7 +2481,7 @@ export const selectMessageEntityById = createCachedSelector(
 export const selectLassSendMessageEntityBySenderId = createCachedSelector(
 	[selectMessageEntitiesByChannelId, selectMessageIdsByChannelId, (_, __, senderId) => senderId],
 	(entities, ids, senderId) => {
-		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId);
+		const matchedId = [...ids].reverse().find((id) => entities?.[id]?.sender_id === senderId && entities?.[id]?.code !== TypeMessage.SendToken);
 		return matchedId ? entities[matchedId] : null;
 	}
 );
