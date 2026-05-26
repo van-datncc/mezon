@@ -16,6 +16,7 @@ import { generateE2eId } from '@mezon/utils';
 import type { RefObject } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ModalConfirm from '../../../../ModalConfirm';
@@ -91,17 +92,43 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 			}
 		}
 		setConfirmModalProps(null);
+		closeModalConfirm();
 	};
 
 	const handleOpenConfirmDelete = (canvasId: string, canvasTitle: string) => {
 		if (channelId && currentClanId) {
 			setConfirmModalProps({ canvasId, canvasTitle, channelId, clanId: currentClanId });
+			openModalConfirm();
 		}
 	};
 
 	const modalRef = useRef<HTMLDivElement>(null);
+
+	const [openModalConfirm, closeModalConfirm] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={() => {
+					setConfirmModalProps(null);
+					closeModalConfirm();
+					modalRef.current?.focus();
+				}}
+				handleConfirm={handleDeleteCanvas}
+				modalName={confirmModalProps?.canvasTitle}
+				title="Delete"
+				buttonName="Delete"
+				message={tCommon('canvas.deleteMessage')}
+			/>
+		);
+	}, [confirmModalProps]);
+
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useOnClickOutside(
+		modalRef,
+		() => {
+			if (!confirmModalProps) onClose();
+		},
+		rootRef
+	);
 
 	return (
 		<div
@@ -154,29 +181,6 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 
 					{!canvases?.length && <EmptyCanvas onClick={handleCreateCanvas} />}
 				</div>
-				{confirmModalProps && (
-					<ModalConfirm
-						handleCancel={() => setConfirmModalProps(null)}
-						handleConfirm={handleDeleteCanvas}
-						modalName={confirmModalProps.canvasTitle}
-						title="Delete"
-						buttonName="Delete"
-						message={tCommon('canvas.deleteMessage')}
-					/>
-				)}
-				{/* {totalPages > 1 && (
-					<div className="py-2">
-						<Pagination
-							theme={customTheme(totalPages <= 5)}
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={onPageChange}
-							previousLabel=""
-							nextLabel=""
-							showIcons={totalPages > 5}
-						/>
-					</div>
-				)} */}
 			</div>
 		</div>
 	);
