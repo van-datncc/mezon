@@ -68,10 +68,6 @@ export const removeChannelUsers = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 
-			if (channelId && channelType) {
-				thunkAPI.dispatch(userChannelsActions.removeUserChannel({ channelId, userRemoves: userIds }));
-			}
-
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channelUsers/removeChannelUsers');
