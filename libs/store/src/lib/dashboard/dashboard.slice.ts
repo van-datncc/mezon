@@ -399,8 +399,8 @@ export interface RoomSummaryPayload {
 
 export interface TrackInfo {
 	filename?: string;
-	started_at_ns?: number;
-	ended_at_ns?: number;
+	started_at_ns?: string;
+	ended_at_ns?: string;
 }
 
 export interface ParticipantDetail {

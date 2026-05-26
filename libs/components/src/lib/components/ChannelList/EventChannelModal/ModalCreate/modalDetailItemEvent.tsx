@@ -16,6 +16,7 @@ import { createImgproxyUrl, generateE2eId } from '@mezon/utils';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../../AvatarImage/AvatarImage';
 import { renderDescriptionWithLinks } from '../eventHelper';
 import { timeFomat } from '../timeFomatEvent';
 
@@ -129,7 +130,6 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 	};
 	const avatarDefault = userCreate?.clan_avatar || userCreate?.user?.avatar_url;
 	const userName = userCreate?.clan_nick || userCreate?.user?.display_name || userCreate?.user?.username;
-	const avatarLetter = userName?.trim().charAt(0).toUpperCase();
 
 	return (
 		<div className="px-4 py-8 space-y-2 text-theme-primary max-h-[370px] h-fit hide-scrollbar overflow-auto">
@@ -236,9 +236,7 @@ const EventInfoDetail = (props: EventInfoDetailProps) => {
 				{avatarDefault ? (
 					<img src={createImgproxyUrl(avatarDefault)} alt={userName} className="size-5 rounded-full object-cover" />
 				) : (
-					<div className="size-5 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight text-lg ">
-						{avatarLetter || '?'}
-					</div>
+					<AvatarColor username={userName || ''} className="size-5" />
 				)}
 				<p>{t('eventDetail.createdBy', { username: userName })}</p>
 			</div>
@@ -270,16 +268,13 @@ const InterestedDetail = ({ userIds }: InterestedDetailProps) => {
 				userData.map((user, index) => {
 					const name = user?.clan_nick || user?.user?.display_name || user?.user?.username;
 					const avatarUrl = user?.clan_avatar || user?.user?.avatar_url;
-					const avatarLetter = name?.trim().charAt(0).toUpperCase();
 
 					return (
 						<div key={index} className="flex items-center gap-x-3 rounded bg-item-theme-hover p-2">
 							{avatarUrl ? (
 								<img src={createImgproxyUrl(avatarUrl)} alt={name} className="size-7 rounded-full object-cover" />
 							) : (
-								<div className="size-7 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight">
-									{avatarLetter || '?'}
-								</div>
+								<AvatarColor username={name || ''} className="size-7" />
 							)}
 							<p className="text-theme-primary">{name}</p>
 						</div>

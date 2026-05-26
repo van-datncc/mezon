@@ -242,7 +242,7 @@
 			"overview": "Overview",
 			"fullTranscript": "Full Transcript",
 			"summary": "Summary",
-			"audio": "Audio"
+			"participants": "Participant"
 		},
 		"detail": {
 			"title": "Call Transcript Detail",
@@ -251,18 +251,19 @@
 			"loadError": "Could not load this room.",
 			"summaryEmpty": "No summary available.",
 			"transcriptEmpty": "No transcript text available.",
-			"audioEmpty": "No audio files listed for this room.",
 			"actionItems": "Action items",
-			"audioFilename": "File",
-			"audioParticipant": "Participant",
 			"participants": "Participants",
+			"participantsEmpty": "No participants listed for this room.",
 			"metrics": {
 				"totalTracks": "Total Tracks",
 				"completed": "Completed",
 				"duration": "Duration",
 				"segments": "Segments"
 			},
-			"notFound": "Call transcript not found"
+			"notFound": "Call transcript not found",
+			"unknown": "unknown",
+			"username": "Username",
+			"displayName": "Display Name"
 		}
 	}
 }

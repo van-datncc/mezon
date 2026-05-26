@@ -46,6 +46,10 @@ export interface OgpEntity {
 	description?: string;
 	channel_id: string;
 	type?: string;
+	clan_id?: string;
+	member_count?: number;
+	banner?: string;
+	is_community?: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -266,6 +270,10 @@ export const referencesSlice = createSlice({
 				description?: string;
 				channel_id: string;
 				type?: string;
+				clan_id?: string;
+				member_count?: number;
+				banner?: string;
+				is_community?: boolean;
 			} | null>
 		) {
 			state.ogpData = action.payload;

@@ -20,9 +20,9 @@ export interface ChannelMetaEntity {
 	last_sent_message?: ApiChannelMessageHeader;
 }
 
-function extractChannelMeta(channel: ApiChannelDescription, clanId: string): ChannelMetaEntity {
+function extractChannelMeta(channel: ApiChannelDescription & { id?: string }, clanId: string): ChannelMetaEntity {
 	return {
-		id: channel.channel_id || '0',
+		id: channel.id || channel.channel_id || '0',
 		lastSeenTimestamp:
 			Number.isNaN(channel.last_seen_message?.timestamp_seconds) || !channel.last_seen_message?.timestamp_seconds
 				? 0
@@ -224,7 +224,8 @@ export const channelMetaSlice = createSlice({
 			dmMetaAdapter.updateOne(state.dmEntities, {
 				id: channelId,
 				changes: {
-					last_sent_message: updatedMessage
+					last_sent_message: updatedMessage,
+					lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
 				}
 			});
 		},
@@ -235,7 +236,7 @@ export const channelMetaSlice = createSlice({
 				id: channelId,
 				isMute: false,
 				senderId: '0',
-				lastSentTimestamp: Date.now(),
+				lastSentTimestamp: Date.now() / 1000,
 				lastSeenTimestamp: 0,
 				count_mess_unread: 0
 			});

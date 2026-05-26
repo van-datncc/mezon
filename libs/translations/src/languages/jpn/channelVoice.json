@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "マイク",
 		"outputDevice": "オーディオ",
-		"camera": "カメラ"
+		"camera": "カメラ",
+		"systemDefault": "システムの既定"
 	},
 	"toast": {
 		"connectionConnected": "接続に成功しました",
