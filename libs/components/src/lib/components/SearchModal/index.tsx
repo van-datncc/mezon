@@ -10,6 +10,7 @@ import {
 	selectAllChannelsByUser,
 	selectAllDirectMessages,
 	selectAllUsesInAllClansEntities,
+	selectClansEntities,
 	selectEntitesUserClans,
 	selectPreviousChannels,
 	useAppDispatch,
@@ -36,9 +37,10 @@ function SearchModal({ onClose }: SearchModalProps) {
 	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
 	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
 	const listChannelsRef = useRef(useAppSelector(selectAllChannelsByUser));
+	const listClansRef = useRef(useAppSelector(selectClansEntities));
 	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
 	const previousChannelsRef = useRef(useSelector(selectPreviousChannels));
-
+	const listClans = listClansRef.current;
 	const allClanUsersEntities = allClanUsersEntitiesRef.current;
 	const dmGroupChatList = dmGroupChatListRef.current;
 	const listChannels = listChannelsRef.current;
@@ -93,7 +95,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 				list.push({
 					id: item?.channel_id ?? '',
 					name: item?.channel_label ?? '',
-					subText: item?.clan_name ?? '',
+					subText: item?.clan_id ? listClans?.[item.clan_id]?.clan_name || '' : item.clan_name || '',
 					icon: '#',
 					clanId: item?.clan_id ?? '',
 					channelId: item?.channel_id ?? '',
@@ -110,7 +112,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 			}
 		});
 		return list;
-	}, [listChannels]);
+	}, [listChannels, listClans]);
 
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
