@@ -12081,9 +12081,9 @@ invariant@^2.0.0, invariant@^2.2.4:
     loose-envify "^1.0.0"
 
 ip-address@^10.0.1:
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.1.0.tgz#d8dcffb34d0e02eb241427444a6e23f5b0595aa4"
-  integrity sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.2.0.tgz#805fc178b20c518bd4c8548b24fe30892d7f3206"
+  integrity sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==
 
 ip-regex@^5.0.0:
   version "5.0.0"
@@ -14529,10 +14529,10 @@ mezon-js-protobuf@1.10.53, mezon-js-protobuf@^1.10.53:
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js@2.15.53:
-  version "2.15.53"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.53.tgz#f7133ea5e4fe0c0267c3df256ef47d320aeb3177"
-  integrity sha512-imL8SkTEf0OxaL56LrSQuB/C8/QQPwpYdDrfu4kzyXFcH8NRob5at85UT3L62KoumnwFCcwd6YuIHXHz2JXf+Q==
+mezon-js@2.15.54:
+  version "2.15.54"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.54.tgz#be37a821d9e88ee104da03fa7f6819d3408ca51d"
+  integrity sha512-I6dW87oQ5zVsQyjRzVeEQGk8R2bn0pra5wFYe9fanjzQdr1EGp6BjRthbfD1WlERiXVXMW1FmCkVnTW6LR6ZqA==
   dependencies:
     base64-arraybuffer "^1.0.2"
     js-base64 "^3.7.8"
