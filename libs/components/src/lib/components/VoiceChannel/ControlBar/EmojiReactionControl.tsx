@@ -5,6 +5,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
 import { memo, useCallback } from 'react';
 import { GifStickerEmojiPopup } from '../../GifsStickersEmojis';
+import { voiceChromeIconClass } from '../voiceChromeStyles';
 
 interface EmojiReactionControlProps {
 	isGridView?: boolean;
@@ -15,7 +16,7 @@ interface EmojiReactionControlProps {
 }
 
 export const EmojiReactionControl = memo(
-	({ isGridView, isShowMember, showEmojiPanel, onVisibleChange, onEmojiSelect }: EmojiReactionControlProps) => {
+	({ showEmojiPanel, onVisibleChange, onEmojiSelect }: EmojiReactionControlProps) => {
 		const handleEmojiSelect = useCallback(
 			(emojiId: string, emoji: string) => {
 				onEmojiSelect(emojiId, emoji);
@@ -23,11 +24,7 @@ export const EmojiReactionControl = memo(
 			[onEmojiSelect]
 		);
 
-		const iconClassName = `cursor-pointer ${
-			(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-				? 'text-theme-primary text-theme-primary-hover'
-				: 'text-gray-300 hover:text-white'
-		}`;
+		const iconClassName = `cursor-pointer ${voiceChromeIconClass}`;
 
 		return (
 			<Tooltip

@@ -72,15 +72,15 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, sel
 		<>
 			<div className="w-full flex gap-2 relative" data-e2e={generateE2eId('chat.channel_message.header.button.canvas.item')}>
 				<Link
-					className={`w-full py-2 pl-4 pr-4 cursor-pointer rounded-lg border-theme-primary ${
-						currentCanvasId === canvasId ? 'bg-item-theme text-theme-primary-active ' : 'bg-item-hover'
-					}`}
+					className={`block w-full py-2 pl-4 cursor-pointer rounded-lg border-theme-primary overflow-hidden ${
+						!isDisableDelCanvas ? 'pr-16' : 'pr-10'
+					} ${currentCanvasId === canvasId ? 'bg-item-theme text-theme-primary-active ' : 'bg-item-hover'}`}
 					role="button"
 					to={link}
 					onClick={handleOpenCanvas}
 				>
 					<div
-						className="h-6 text-xs one-line font-semibold leading-6 "
+						className="h-6 text-xs truncate font-semibold leading-6"
 						data-e2e={generateE2eId('chat.channel_message.header.button.canvas.item.title')}
 					>
 						{canvas.title ? canvas.title : 'Untitled'}

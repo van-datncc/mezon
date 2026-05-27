@@ -3,6 +3,7 @@ import { ChannelStreamMode } from 'mezon-js';
 import Tooltip from 'rc-tooltip';
 import { memo, useCallback } from 'react';
 import SoundSquare from '../../GifsStickersEmojis/SoundSquare';
+import { voiceChromeIconClass } from '../voiceChromeStyles';
 
 interface SoundReactionControlProps {
 	isGridView?: boolean;
@@ -13,7 +14,7 @@ interface SoundReactionControlProps {
 }
 
 export const SoundReactionControl = memo(
-	({ isGridView, isShowMember, showSoundPanel, onVisibleChange, onSoundSelect }: SoundReactionControlProps) => {
+	({ showSoundPanel, onVisibleChange, onSoundSelect }: SoundReactionControlProps) => {
 		const handleClose = useCallback(() => {
 			onVisibleChange(false);
 		}, [onVisibleChange]);
@@ -25,11 +26,7 @@ export const SoundReactionControl = memo(
 			[onSoundSelect]
 		);
 
-		const iconClassName = `cursor-pointer ${
-			(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-				? 'text-theme-primary text-theme-primary-hover'
-				: 'text-gray-300 hover:text-white'
-		}`;
+		const iconClassName = `cursor-pointer ${voiceChromeIconClass}`;
 
 		return (
 			<Tooltip

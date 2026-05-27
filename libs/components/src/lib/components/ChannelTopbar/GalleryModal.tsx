@@ -650,7 +650,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 				<div className="bg-theme-setting-nav flex flex-col p-[16px]">
 					<div className="flex flex-row items-center justify-between mb-3">
 						<div className="flex flex-row items-center gap-4">
-							<Icons.ImageThumbnail className="w-4 h-4" />
+							<Icons.ImageThumbnail />
 							<span className="text-base font-semibold cursor-default">{t('gallery.title')}</span>
 						</div>
 						<button onClick={onClose} className="text-theme-primary-hover">

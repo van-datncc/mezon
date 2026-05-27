@@ -26,6 +26,7 @@ type SuggestItemProps = {
 	channel?: SearchItemProps;
 	count?: number;
 	isUnread?: boolean;
+	isRowFocused?: boolean;
 	color?: string;
 };
 
@@ -44,6 +45,7 @@ const SuggestItem = ({
 	channel,
 	count,
 	isUnread,
+	isRowFocused = false,
 	color
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannelsByUser);
@@ -65,10 +67,15 @@ const SuggestItem = ({
 		const { channel_private, type } = specificChannel;
 		const isAgeRestrictedChannel = (specificChannel as { age_restricted?: number }).age_restricted === 1;
 
-		const threadFillClass =
-			isUnread || (count && count > 0)
-				? '[--thread-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
-				: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] hover:[--thread-fill-1:var(--bg-icon-theme-active)]';
+		const isThreadEmphasized = isUnread || Boolean(count && count > 0) || isRowFocused;
+		const threadFillClass = isThreadEmphasized
+			? '[--thread-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
+			: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] group-hover:[--thread-fill-1:var(--bg-icon-theme-active)]';
+
+		const isThreadLockerBodyEmphasized = isRowFocused;
+		const threadLockerFillClass = isThreadLockerBodyEmphasized
+			? '[--thread-body-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
+			: '[--thread-body-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] group-hover:[--thread-body-fill-1:var(--bg-icon-theme-active)]';
 
 		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isAgeRestrictedChannel) {
@@ -96,10 +103,10 @@ const SuggestItem = ({
 			if (channel_private === 1) {
 				return (
 					<Icons.ThreadIconLocker
-						className={`w-5 h-5 ${threadFillClass}`}
-						defaultFill1="var(--thread-fill-1)"
+						className={`w-5 h-5 ${threadLockerFillClass}`}
+						defaultFill1="var(--thread-body-fill-1)"
 						defaultFill4="var(--thread-fill-4)"
-						defaultFill5="var(--thread-fill-1)"
+						defaultFill5="var(--bg-icon-theme-active)"
 					/>
 				);
 			}
@@ -121,7 +128,7 @@ const SuggestItem = ({
 		}
 
 		return null;
-	}, [specificChannel, isUnread, count]);
+	}, [specificChannel, isUnread, count, isRowFocused]);
 
 	useEffect(() => {
 		if (channel) {

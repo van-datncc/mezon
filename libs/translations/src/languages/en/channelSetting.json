@@ -35,7 +35,7 @@
 			"description": "Change privacy settings and customize how members can interact with this channel."
 		},
 		"quickAction": {
-			"title": "Quick Action"
+			"title": "Quick Command"
 		},
 		"privateChannelInvite": {
 			"addMember": "Add Member"
@@ -176,7 +176,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Quick Actions",
+		"title": "Quick Command",
 		"description": "Manage flash messages and quick menus for this channel",
 		"keyTitle": "Key (Example: hello)",
 		"valueTitle": "Content (Example: Good morning, Have a good day !)",
@@ -185,7 +185,7 @@
 		"create": "Create",
 		"update": "Update",
 		"delete": "Delete",
-		"deleteModal": "Delete Quick Action",
+		"deleteModal": "Delete Quick Command",
 		"deleteTitle": "Please confirm if you would like to delete {{command}}? This action cannot be undone.",
 		"flashMessage": "Flash Message",
 		"flashMessages": "Flash Messages",

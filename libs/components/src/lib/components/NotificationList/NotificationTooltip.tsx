@@ -6,6 +6,7 @@ import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RedDot } from '../ChannelTopbar';
+import { voiceChromeIconActiveClass, voiceChromeIconClass } from '../VoiceChannel/voiceChromeStyles';
 import { NotificationTooltipContent } from './NotificationTooltipContent';
 
 interface NotificationTooltipProps {
@@ -13,11 +14,12 @@ interface NotificationTooltipProps {
 	isShowMember?: boolean;
 }
 
-export const NotificationTooltip = memo(({ isGridView, isShowMember }: NotificationTooltipProps) => {
+export const NotificationTooltip = memo(({ isShowMember }: NotificationTooltipProps) => {
 	const { t } = useTranslation('notifications');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const badgeCount = useSelector((state) => selectBadgeClanById(state, currentClanId || ''));
 	const [visible, setVisible] = useState(false);
+	const isVoiceHeader = isShowMember !== undefined;
 
 	const handleVisibleChange = (visible: boolean) => {
 		setVisible(visible);
@@ -43,6 +45,12 @@ export const NotificationTooltip = memo(({ isGridView, isShowMember }: Notificat
 		};
 	}, [visible]);
 
+	const buttonColorClass = isVoiceHeader
+		? visible
+			? voiceChromeIconActiveClass
+			: voiceChromeIconClass
+		: `text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${visible ? 'text-[var(--bg-icon-theme-active)]' : ''}`;
+
 	return (
 		<Tooltip
 			placement="bottomRight"
@@ -55,13 +63,13 @@ export const NotificationTooltip = memo(({ isGridView, isShowMember }: Notificat
 				offset: [0, 8]
 			}}
 		>
-		<button
-			title={t('inbox')}
-			className={`focus-visible:outline-none relative group text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${visible ? 'text-[var(--bg-icon-theme-active)]' : ''} ${visible ? '[--inbox-fill-1:var(--bg-icon-theme-active)] [--inbox-fill-2:var(--bg-theme-secounnd)]' : '[--inbox-fill-1:var(--bg-icon-theme)] [--inbox-fill-2:var(--bg-theme-secounnd)] hover:[--inbox-fill-1:var(--bg-icon-theme-active)]'}`}
-			onContextMenu={(e) => e.preventDefault()}
-			data-e2e={generateE2eId('chat.channel_message.header.button.inbox')}
-		>
-				<Icons.Inbox className="size-5" defaultFill1="var(--inbox-fill-1)" defaultFill2="var(--inbox-fill-2)" />
+			<button
+				title={t('inbox')}
+				className={`focus-visible:outline-none relative group ${buttonColorClass}`}
+				onContextMenu={(e) => e.preventDefault()}
+				data-e2e={generateE2eId('chat.channel_message.header.button.inbox')}
+			>
+				<Icons.Inbox className="size-5" />
 				{badgeCount > 0 && <RedDot />}
 			</button>
 		</Tooltip>

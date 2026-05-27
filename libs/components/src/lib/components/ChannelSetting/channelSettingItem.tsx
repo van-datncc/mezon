@@ -56,9 +56,23 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 	const renderIcon = () => {
 		if (channel.type === ChannelType.CHANNEL_TYPE_THREAD) {
 			if (isPrivate) {
-				return <Icons.ThreadIconLocker className="w-5 h-5 -mt-1 min-w-5 block dark:text-[#AEAEAE] text-colorTextLightMode" defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />;
+				return (
+					<Icons.ThreadIconLocker
+						className="w-5 h-5 -mt-1 min-w-5 block dark:text-[#AEAEAE] text-colorTextLightMode"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme-active)"
+					/>
+				);
 			}
-			return <Icons.ThreadIcon className="w-5 h-5 -mt-1 min-w-5" defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />;
+			return (
+				<Icons.ThreadIcon
+					className="w-5 h-5 -mt-1 min-w-5"
+					defaultFill1="var(--bg-icon-theme)"
+					defaultFill4="var(--bg-theme-secounnd)"
+					defaultFill5="var(--bg-icon-theme)"
+				/>
+			);
 		}
 
 		if (channel.type === ChannelType.CHANNEL_TYPE_CHANNEL) {
