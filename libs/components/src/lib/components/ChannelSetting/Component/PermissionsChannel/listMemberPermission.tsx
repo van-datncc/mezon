@@ -91,9 +91,8 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 	const avatarPrioritize = getAvatarForPrioritize(user?.clan_avatar, user?.user?.avatar_url);
 
 	const handleDelete = () => {
-		if (setSelectedUserIds && selectedUserIds) {
-			const newSelectedUserIds = selectedUserIds.filter((userId) => userId !== id);
-			setSelectedUserIds(newSelectedUserIds);
+		if (setSelectedUserIds) {
+			setSelectedUserIds(selectedUserIds.filter((userId) => userId !== id));
 		}
 		if (!channelOwner) {
 			onDelete();
