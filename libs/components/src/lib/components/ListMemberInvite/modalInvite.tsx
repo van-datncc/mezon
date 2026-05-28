@@ -2,10 +2,14 @@
 import { useInvite } from '@mezon/core';
 import {
 	fetchSystemMessageByClanId,
+	getStore,
+	referencesActions,
 	selectClanById,
+	selectCurrentClan,
 	selectCurrentClanId,
 	selectCurrentClanLogo,
 	selectCurrentClanName,
+	selectMembersClanCount,
 	useAppDispatch
 } from '@mezon/store';
 import { Button } from '@mezon/ui';
@@ -56,6 +60,25 @@ const ModalInvite = (props: ModalParam) => {
 
 			const intiveIdChannel = (channelID ? channelID : welcomeChannel.channel_id) as string;
 			const res = await createLinkInviteUser(effectiveClanId ?? '', intiveIdChannel, 10);
+
+			const state = getStore().getState();
+			const currentClan = selectCurrentClan(state);
+			const membersCount = selectMembersClanCount(state);
+			dispatch(
+				referencesActions.setOgpData({
+					channel_id: channelID ? channelID : welcomeChannel.channel_id || '',
+					image: currentClan?.logo || '',
+					index: 0,
+					url: `${isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin}/invite/${res.invite_link}`,
+					banner: currentClan?.banner || '',
+					member_count: membersCount,
+					clan_id: effectiveClanId || '',
+					is_community: currentClan?.is_community,
+					type: 'invite',
+					title: currentClan?.clan_name || ''
+				})
+			);
+
 			if (res && res?.invite_link) {
 				setUrlInvite(`${isElectron() ? process.env.NX_CHAT_APP_REDIRECT_URI : window.location.origin}/invite/${res.invite_link}`);
 			}
