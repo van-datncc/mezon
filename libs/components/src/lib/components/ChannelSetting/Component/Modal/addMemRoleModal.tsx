@@ -70,7 +70,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 	);
 
 	const usersClan = useSelector(selectAllUserClans);
-	const userChannelIds = getUserChannelIdsFromStore(channel.channel_id);
+	const userChannelIds = getUserChannelIdsFromStore(channel.id);
 
 	const listUserInvite = useMemo(() => {
 		if (channel.channel_private !== 1) {
