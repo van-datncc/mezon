@@ -23,7 +23,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 		() =>
 			listItemWithoutRecent.reduce<ClassifiedLists>(
 				(acc, item) => {
-					const hasCountUnread = item.count_messsage_unread && item.count_messsage_unread > 0;
+					const hasCountUnread = (item.count_messsage_unread ?? 0) > 0;
 					const isTextChannel = item.type === ChannelType.CHANNEL_TYPE_CHANNEL;
 					const isThreadChannel = item.type === ChannelType.CHANNEL_TYPE_THREAD;
 					const isDMMessage = item.type === ChannelType.CHANNEL_TYPE_DM;
@@ -32,7 +32,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 					const hasUnreadChannel =
 						(isTextChannel && (hasUnread || !!item.count_messsage_unread)) ||
 						(isThreadChannel && (hasUnread || !!item.count_messsage_unread));
-					const hasUnreadDmGr = (isDMMessage && hasUnread) || (isGrMessage && hasUnread);
+					const hasUnreadDmGr = (isDMMessage && (hasUnread || hasCountUnread)) || (isGrMessage && (hasUnread || hasCountUnread));
 					const isInListRecent = listRecent.some((recentItem) => recentItem.id === item.id);
 
 					if ((hasCountUnread && isTextChannel) || (hasCountUnread && isThreadChannel)) {
@@ -44,7 +44,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 				},
 				{ mentionList: [], unreadList: [] }
 			),
-		[listItemWithoutRecent]
+		[listItemWithoutRecent, listRecent]
 	);
 
 	const { mentionList, unreadList } = classificationList;

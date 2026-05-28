@@ -49,7 +49,7 @@ const withChannelMetaUnread = (lastSent: number, lastSeen: number, countUnread: 
 	return {
 		lastSentTimeStamp: Math.max(lastSent, meta.lastSentTimestamp ?? 0),
 		lastSeenTimeStamp: meta.lastSeenTimestamp ?? 0,
-		count_messsage_unread: meta.count_mess_unread || undefined
+		count_messsage_unread: meta.count_mess_unread ?? undefined
 	};
 };
 
@@ -57,17 +57,15 @@ function SearchModal({ onClose }: SearchModalProps) {
 	const { t } = useTranslation('common');
 	const dispatch = useAppDispatch();
 	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
-	const dmGroupChatListRef = useRef(useAppSelector(selectAllDirectMessages));
+	const dmGroupChatList = useAppSelector(selectAllDirectMessages);
 	const listChannels = useAppSelector(selectAllChannelsByUser);
 	const channelMetaEntities = useAppSelector(selectChannelMetaEntities);
 	const dmMetaEntities = useAppSelector(selectDmMetaEntities);
 	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
-	const previousChannelsRef = useRef(useSelector(selectPreviousChannels));
+	const previousChannels = useAppSelector(selectPreviousChannels);
 
 	const allClanUsersEntities = allClanUsersEntitiesRef.current;
-	const dmGroupChatList = dmGroupChatListRef.current;
 	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
-	const previousChannels = previousChannelsRef.current;
 
 	const { userProfile } = useAuth();
 	const accountId = userProfile?.user?.id ?? '';
