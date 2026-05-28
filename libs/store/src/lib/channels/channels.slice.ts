@@ -696,33 +696,39 @@ export const addThreadToChannels = createAsyncThunk(
 			const channelIdToFetch = parentChannelId || currentChannelId;
 
 			if (!channelIdToFetch || channelIdToFetch === channelId) {
-				return;
+				return true;
 			}
 
-			const data = await thunkAPI
-				.dispatch(
-					threadsActions.fetchThread({
-						channelId: channelIdToFetch,
-						clanId,
-						threadId: channelId
-					})
-				)
-				.unwrap();
+			try {
+				const data = await thunkAPI
+					.dispatch(
+						threadsActions.fetchThread({
+							channelId: channelIdToFetch,
+							clanId,
+							threadId: channelId
+						})
+					)
+					.unwrap();
 
-			const matchedThread = data?.threads?.find((thread) => thread.id === channelId || thread.channel_id === channelId);
+				const matchedThread = data?.threads?.find((thread) => thread.id === channelId || thread.channel_id === channelId);
 
-			if (matchedThread) {
-				thunkAPI.dispatch(
-					channelsActions.upsertOne({
-						clanId,
-						channel: {
-							...matchedThread,
-							active: matchedThread.active ? ThreadStatus.joined : ThreadStatus.activePublic
-						} as ChannelsEntity
-					})
-				);
+				if (matchedThread) {
+					thunkAPI.dispatch(
+						channelsActions.upsertOne({
+							clanId,
+							channel: {
+								...matchedThread,
+								active: matchedThread.active ? ThreadStatus.joined : ThreadStatus.activePublic
+							} as ChannelsEntity
+						})
+					);
+				}
+				return true;
+			} catch (error) {
+				return false;
 			}
 		}
+		return true;
 	}
 );
 
