@@ -594,11 +594,27 @@ export const directSlice = createSlice({
 		remove: directAdapter.removeOne,
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
-			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
-			const existingShowPinBadge = entities[action.payload.id]?.showPinBadge;
+			const existingEntity = entities[action.payload.id];
+			const existingShowPinBadge = existingEntity?.showPinBadge;
 			const dataUpdate = action.payload;
-			if (existLabel && existLabel?.length <= 1) {
-				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
+
+			const hasIncomingLabel = Boolean(dataUpdate.channel_label?.trim());
+			const hasExistingLabel = Boolean(existingEntity?.channel_label?.trim());
+			if (!hasIncomingLabel && hasExistingLabel) {
+				dataUpdate.channel_label = existingEntity?.channel_label;
+			}
+
+			if ((dataUpdate.avatars?.length ?? 0) === 0 && (existingEntity?.avatars?.length ?? 0) > 0) {
+				dataUpdate.avatars = existingEntity?.avatars;
+			}
+			if ((dataUpdate.display_names?.length ?? 0) === 0 && (existingEntity?.display_names?.length ?? 0) > 0) {
+				dataUpdate.display_names = existingEntity?.display_names;
+			}
+			if ((dataUpdate.usernames?.length ?? 0) === 0 && (existingEntity?.usernames?.length ?? 0) > 0) {
+				dataUpdate.usernames = existingEntity?.usernames;
+			}
+			if ((dataUpdate.user_ids?.length ?? 0) === 0 && (existingEntity?.user_ids?.length ?? 0) > 0) {
+				dataUpdate.user_ids = existingEntity?.user_ids;
 			}
 
 			if (existingShowPinBadge !== undefined) {
@@ -734,7 +750,7 @@ export const directSlice = createSlice({
 			state,
 			action: PayloadAction<{ dmId: string; user_id: string; avatar: string; display_name: string; about_me?: string }>
 		) => {
-			const { dmId, user_id, avatar, display_name, about_me } = action.payload;
+			const { dmId, user_id, avatar, display_name } = action.payload;
 			const dmGroup = state.entities?.[dmId];
 
 			if (!dmGroup || !user_id) return;
