@@ -14,7 +14,6 @@ import { Icons } from '@mezon/ui';
 import type { LocalParticipant, LocalTrackPublication, RemoteParticipant, RemoteTrackPublication } from 'livekit-client';
 import { DisconnectReason, RoomEvent, Track } from 'livekit-client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { voiceChromeIconClass } from '../voiceChromeStyles';
 import ControlBar from '../ControlBar/ControlBar';
 import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
 import { GridLayout } from './GridLayout/GridLayout';
@@ -194,18 +193,18 @@ export const GroupVideoConference = memo(
 							<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5">
 								<div className="flex justify-start gap-2">
 									<span>
-										<Icons.Speaker className={`w-6 h-6 ${voiceChromeIconClass}`} />
+										<Icons.Speaker className="w-6 h-6 text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									</span>
-									<p className={`text-base font-semibold cursor-default one-line ${voiceChromeIconClass}`}>
+									<p className="text-base font-semibold cursor-default one-line text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]">
 										{channelLabel}
 									</p>
 								</div>
 								<div className="flex justify-start gap-4">
 									<span onClick={toggleViewMode} className="cursor-pointer">
 										{focusTrack ? (
-											<Icons.VoiceGridIcon className={voiceChromeIconClass} />
+											<Icons.VoiceGridIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 										) : (
-											<Icons.VoiceFocusIcon className={voiceChromeIconClass} />
+											<Icons.VoiceFocusIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 										)}
 									</span>
 								</div>

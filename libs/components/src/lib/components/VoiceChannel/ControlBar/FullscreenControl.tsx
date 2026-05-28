@@ -1,6 +1,5 @@
 import { Icons } from '@mezon/ui';
 import { memo } from 'react';
-import { voiceChromeIconClass } from '../voiceChromeStyles';
 
 interface FullscreenControlProps {
 	isGridView?: boolean;
@@ -10,7 +9,7 @@ interface FullscreenControlProps {
 }
 
 export const FullscreenControl = memo(({ isFullScreen, onToggle }: FullscreenControlProps) => {
-	const iconClassName = `cursor-pointer ${voiceChromeIconClass}`;
+	const iconClassName = 'cursor-pointer text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]';
 
 	return (
 		<div onClick={onToggle}>

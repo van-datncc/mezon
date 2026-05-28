@@ -10,7 +10,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { NotificationTooltip } from '../../NotificationList/NotificationTooltip';
 import ControlBar from '../ControlBar/ControlBar';
-import { voiceChromeIconActiveClass, voiceChromeIconClass } from '../voiceChromeStyles';
 import { CarouselLayout } from './FocusLayout/CarouselLayout/CarouselLayout';
 import { FocusLayout, FocusLayoutContainer } from './FocusLayout/FocusLayoutContainer';
 import { GridLayout } from './GridLayout/GridLayout';
@@ -127,7 +126,6 @@ export const VideoConferenceLayout = memo(
 		}, []);
 
 		const isChatOpen = isExternalCalling ? openChatBox : isShowChatVoice;
-		const voiceHeaderIconClass = isChatOpen ? voiceChromeIconActiveClass : voiceChromeIconClass;
 
 		const toggleViewMode = useCallback(() => {
 			if (focusTrack) {
@@ -196,33 +194,40 @@ export const VideoConferenceLayout = memo(
 									{!isExternalCalling ? (
 										<Icons.Speaker
 											defaultSize="w-6 h-6"
-											className={voiceChromeIconClass}
+											className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]"
 											defaultFill1="currentColor"
 											defaultFill2="currentColor"
 											defaultFill3="currentColor"
 										/>
 									) : (
-										<Icons.SpeakerLocked defaultSize="w-6 h-6" className={voiceChromeIconClass} />
+										<Icons.SpeakerLocked
+											defaultSize="w-6 h-6"
+											className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]"
+										/>
 									)}
 								</span>
-								<p className={`text-base font-semibold cursor-default one-line ${voiceChromeIconClass}`}>{channelLabel}</p>
+								<p className="text-base font-semibold cursor-default one-line text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]">
+									{channelLabel}
+								</p>
 							</div>
 							<div className="flex justify-start gap-4">
-								{!isExternalCalling && !propTracks && <NotificationTooltip isGridView={!focusTrack} isShowMember={isShowMember} />}
+								{!isExternalCalling && !propTracks && <NotificationTooltip />}
 								<span onClick={toggleViewMode} className="cursor-pointer">
 									{focusTrack ? (
-										<Icons.VoiceGridIcon className={voiceChromeIconClass} />
+										<Icons.VoiceGridIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									) : (
-										<Icons.VoiceFocusIcon className={voiceChromeIconClass} />
+										<Icons.VoiceFocusIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									)}
 								</span>
 								<button
-									className={`relative focus-visible:outline-none ${voiceHeaderIconClass}`}
+									className={`relative focus-visible:outline-none text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${
+										isChatOpen ? 'text-[var(--bg-icon-theme-active)]' : ''
+									}`}
 									title="Chat"
 									onClick={onToggleChatBox}
 									data-e2e={generateE2eId('chat.channel_message.header.button.chat')}
 								>
-									<Icons.Chat className={`w-5 h-5 ${voiceHeaderIconClass}`} />
+									<Icons.Chat className="w-5 h-5" />
 								</button>
 							</div>
 						</div>

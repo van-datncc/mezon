@@ -6,20 +6,13 @@ import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RedDot } from '../ChannelTopbar';
-import { voiceChromeIconActiveClass, voiceChromeIconClass } from '../VoiceChannel/voiceChromeStyles';
 import { NotificationTooltipContent } from './NotificationTooltipContent';
 
-interface NotificationTooltipProps {
-	isGridView?: boolean;
-	isShowMember?: boolean;
-}
-
-export const NotificationTooltip = memo(({ isShowMember }: NotificationTooltipProps) => {
+export const NotificationTooltip = memo(() => {
 	const { t } = useTranslation('notifications');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const badgeCount = useSelector((state) => selectBadgeClanById(state, currentClanId || ''));
 	const [visible, setVisible] = useState(false);
-	const isVoiceHeader = isShowMember !== undefined;
 
 	const handleVisibleChange = (visible: boolean) => {
 		setVisible(visible);
@@ -45,12 +38,6 @@ export const NotificationTooltip = memo(({ isShowMember }: NotificationTooltipPr
 		};
 	}, [visible]);
 
-	const buttonColorClass = isVoiceHeader
-		? visible
-			? voiceChromeIconActiveClass
-			: voiceChromeIconClass
-		: `text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${visible ? 'text-[var(--bg-icon-theme-active)]' : ''}`;
-
 	return (
 		<Tooltip
 			placement="bottomRight"
@@ -65,7 +52,9 @@ export const NotificationTooltip = memo(({ isShowMember }: NotificationTooltipPr
 		>
 			<button
 				title={t('inbox')}
-				className={`focus-visible:outline-none relative group ${buttonColorClass}`}
+				className={`focus-visible:outline-none relative group text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${
+					visible ? 'text-[var(--bg-icon-theme-active)]' : ''
+				}`}
 				onContextMenu={(e) => e.preventDefault()}
 				data-e2e={generateE2eId('chat.channel_message.header.button.inbox')}
 			>

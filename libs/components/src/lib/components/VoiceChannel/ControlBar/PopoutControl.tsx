@@ -1,6 +1,5 @@
 import { Icons } from '@mezon/ui';
 import { memo } from 'react';
-import { voiceChromeIconClass } from '../voiceChromeStyles';
 
 interface PopoutControlProps {
 	isGridView?: boolean;
@@ -10,7 +9,7 @@ interface PopoutControlProps {
 }
 
 export const PopoutControl = memo(({ isOpenPopOut, onToggle }: PopoutControlProps) => {
-	const iconClassName = `cursor-pointer ${voiceChromeIconClass}`;
+	const iconClassName = 'cursor-pointer text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]';
 
 	return (
 		<div onClick={onToggle}>
