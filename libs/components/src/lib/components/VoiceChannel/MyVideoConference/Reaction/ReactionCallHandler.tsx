@@ -4,6 +4,7 @@ import { getSrcEmoji } from '@mezon/utils';
 import type { VoiceReactionSend } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../../AvatarImage/AvatarImage';
 import { soundReactionsService } from './soundReactionsService';
 import type { DisplayedEmoji, DisplayedHand } from './types';
 
@@ -236,9 +237,7 @@ export const ReactionCallHandler = memo(() => {
 										{item.avatar ? (
 											<img src={item.avatar} className="w-8 h-8 rounded-full" />
 										) : (
-											<div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-semibold">
-												{item.name.charAt(0).toUpperCase()}
-											</div>
+											<AvatarColor username={item.name} className="size-8" />
 										)}
 										<div className="text-sm text-black flex-1 truncate font-semibold">{item.name}</div>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5.0 -10.0 110.0 135.0" className="h-8" fill="#efbc39">
