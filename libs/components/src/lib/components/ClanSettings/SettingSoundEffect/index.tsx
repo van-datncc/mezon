@@ -15,6 +15,7 @@ import { generateE2eId } from '@mezon/utils';
 import type { ClanSticker } from 'mezon-js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AvatarColor } from '../../AvatarImage/AvatarImage';
 import ModalUploadSound from './ModalUploadSound';
 interface ExtendedClanSticker extends ClanSticker {
 	media_type?: MediaType;
@@ -173,7 +174,6 @@ const SettingSoundEffect = () => {
 const CreatorInfo = ({ creatorId }: { creatorId: string }) => {
 	const creator = useAppSelector((state) => selectMemberClanByUserId(state, creatorId));
 	const avatarDefault = creator?.clan_nick || creator?.user?.display_name || creator?.user?.username || '';
-	const avatarLetter = avatarDefault?.trim().charAt(0).toUpperCase();
 	const avatarUrl = creator?.clan_avatar || creator?.user?.avatar_url;
 	if (!creator) return null;
 	return (
@@ -185,9 +185,7 @@ const CreatorInfo = ({ creatorId }: { creatorId: string }) => {
 					alt="User avatar"
 				/>
 			) : (
-				<div className="size-4 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight text-[12px]">
-					{avatarLetter}
-				</div>
+				<AvatarColor username={avatarDefault || ''} className={`size-4`} />
 			)}
 
 			<p className="text-xs text-theme-primary max-w-20 truncate">{creator?.clan_nick || creator?.user?.username}</p>

@@ -28,7 +28,7 @@ import { safeJSONParse } from 'mezon-js';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AvatarImage } from '../../../AvatarImage/AvatarImage';
+import { AvatarColor, AvatarImage } from '../../../AvatarImage/AvatarImage';
 import { useActiveSoundReaction } from '../Reaction/useActiveSoundReaction';
 import { FocusToggle } from './FocusToggle';
 
@@ -173,14 +173,7 @@ export const ParticipantTile: (props: ParticipantTileProps & React.RefAttributes
 			src={resolvedAvatar}
 		/>
 	) : (
-		isAvatarResolved &&
-		voiceUsername && (
-			<div
-				className={`size-10 text-theme-primary bg-theme-primary text-[16px] w-20 h-20 !text-4xl font-semibold flex items-center justify-center rounded-xl`}
-			>
-				{voiceUsername?.charAt(0)?.toUpperCase()}
-			</div>
-		)
+		isAvatarResolved && voiceUsername && <AvatarColor username={voiceUsername?.charAt(0)?.toUpperCase()} className="size-20 !text-4xl" />
 	);
 
 	const dispatch = useAppDispatch();

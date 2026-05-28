@@ -1,12 +1,10 @@
 import { ButtonCopy } from '@mezon/components';
 import { useAuth } from '@mezon/core';
-import { appActions, canvasAPIActions, useAppDispatch } from '@mezon/store';
+import { appActions, useAppDispatch } from '@mezon/store';
 import type { ICanvas } from '@mezon/utils';
 import { generateE2eId } from '@mezon/utils';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import ModalConfirm from '../../../../ModalConfirm';
 type GroupCanvasProps = {
 	canvas: ICanvas;
 	channelId?: string;
@@ -15,16 +13,15 @@ type GroupCanvasProps = {
 	onClose: () => void;
 	selectedCanvasId: string | null;
 	onSelectCanvas: (canvasId: string) => void;
+	onDeleteCanvas: (canvasId: string, canvasTitle: string) => void;
 };
 
-const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, selectedCanvasId, onSelectCanvas }: GroupCanvasProps) => {
+const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, selectedCanvasId, onSelectCanvas, onDeleteCanvas }: GroupCanvasProps) => {
 	const { t } = useTranslation('common');
 	const canvasId = canvas.id;
 	const { canvasId: currentCanvasId } = useParams<{ canvasId: string }>();
 	const { userProfile } = useAuth();
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
-	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const isDisableDelCanvas = Boolean(
 		canvas.creator_id && canvas.creator_id !== userProfile?.user?.id && creatorIdChannel !== userProfile?.user?.id
 	);
@@ -34,35 +31,6 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, sel
 		onClose();
 	};
 
-	const handleCanvasClick = () => {
-		if (canvasId) {
-			onSelectCanvas(canvasId);
-			handleOpenCanvas();
-		}
-	};
-
-	const handleDeleteCanvas = async () => {
-		if (canvasId && channelId && clanId) {
-			const body = {
-				id: canvasId,
-				channel_id: channelId,
-				clan_id: clanId
-			};
-			await dispatch(canvasAPIActions.deleteCanvas(body));
-			dispatch(canvasAPIActions.removeOneCanvas({ channelId, canvasId }));
-			if (currentCanvasId === canvasId) {
-				dispatch(appActions.setIsShowCanvas(false));
-				const redirectPath =
-					canvas.parent_id && canvas.parent_id !== '0'
-						? `/chat/clans/${clanId}/channels/${channelId}`
-						: `/chat/clans/${clanId}/channels/${channelId}`;
-				navigate(redirectPath);
-			}
-		}
-		setShowConfirmModal(false);
-	};
-
-	const isSelected = selectedCanvasId === canvasId && canvasId;
 	const link =
 		canvas.parent_id && canvas.parent_id !== '0'
 			? `/chat/clans/${clanId}/channels/${channelId}/canvas/${canvasId}`
@@ -93,7 +61,11 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, sel
 				{!isDisableDelCanvas && (
 					<button
 						title="Delete Canvas"
-						onClick={() => setShowConfirmModal(true)}
+						onClick={() => {
+							if (canvasId) {
+								onDeleteCanvas(canvasId, canvas.title ?? 'Untitled');
+							}
+						}}
 						className="absolute top-1/2 -translate-y-1/2 right-2 group flex items-center justify-center w-6 h-6 rounded-full bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
 						data-e2e={generateE2eId('chat.channel_message.header.button.canvas.item.button.delete')}
 					>
@@ -109,17 +81,6 @@ const GroupCanvas = ({ canvas, channelId, clanId, onClose, creatorIdChannel, sel
 					</button>
 				)}
 			</div>
-
-			{showConfirmModal && (
-				<ModalConfirm
-					handleCancel={() => setShowConfirmModal(false)}
-					handleConfirm={handleDeleteCanvas}
-					modalName={canvas.title || 'Untitled'}
-					title="Delete"
-					buttonName="Delete"
-					message={t('canvas.deleteMessage')}
-				/>
-			)}
 		</>
 	);
 };

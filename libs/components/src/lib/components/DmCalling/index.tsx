@@ -26,19 +26,27 @@ import { Icons, Menu } from '@mezon/ui';
 import { AvatarImage } from '@mezon/components';
 import { createImgproxyUrl, IMessageTypeCallLog } from '@mezon/utils';
 import { WebrtcSignalingType } from 'mezon-js';
-import type { ReactElement } from 'react';
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import DeviceSelector from './DeviceSelector';
 
 type DmCallingProps = {
 	readonly dmGroupId?: Readonly<string>;
 	directId: string;
 };
 
+function dmCallingDeviceMenuSubtitle(device: MediaDeviceInfo | null, systemDefaultLabel: string): string {
+	if (!device) return '';
+	const label = device.label?.trim();
+	if (label) return label;
+	if (device.deviceId === 'default') return systemDefaultLabel;
+	return '';
+}
+
 // DmCalling check later
 const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: boolean) => void }, DmCallingProps>(({ dmGroupId, directId }, ref) => {
 	const dispatch = useAppDispatch();
+	const { t, i18n } = useTranslation('channelVoice');
 	const currentDmGroup = useSelector((state) => selectDmGroupById(state, dmGroupId ?? ''));
 	const { setStatusMenu } = useMenu();
 	const userProfile = useSelector(selectAllAccount);
@@ -46,7 +54,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
 	const avatarImages = currentDmGroup?.avatars || [];
-	const nameImages = currentDmGroup?.display_names || [];
+	const nameImages = currentDmGroup?.usernames || [];
 	const isMuteMicrophone = useSelector(selectIsMuteMicrophone);
 	const isShowMeetDM = useSelector(selectIsShowMeetDM);
 	const isInCall = useSelector(selectIsInCall);
@@ -181,26 +189,107 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 		}
 	}, [isInCall, isRemoteVideo, isShowMeetDM]);
 
-	const menuDevice = useMemo(() => {
-		const menuItems: ReactElement[] = [
-			<DeviceSelector
-				key={'output-device-speaker'}
-				deviceList={audioOutputDevicesList}
-				currentDevice={currentOutputDevice}
-				icon={<Icons.Speaker defaultFill={'text-white ml-2'} />}
-				onSelectDevice={changeAudioOutputDevice}
-			/>,
+	const [expandedDevice, setExpandedDevice] = useState<'input' | 'output' | null>(null);
+	const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false);
 
-			<DeviceSelector
-				key={'input-device-mic'}
-				deviceList={audioInputDevicesList}
-				currentDevice={currentInputDevice}
-				icon={<Icons.MicEnable className={'h-5 w-5 text-white ml-2'} />}
-				onSelectDevice={changeAudioInputDevice}
-			/>
-		];
-		return <>{menuItems}</>;
-	}, [audioOutputDevicesList, audioInputDevicesList]);
+	const systemDefaultLabel = t('device.systemDefault');
+
+	const menuDevice = useMemo(() => {
+		const flyoutPanelBase =
+			'z-50 rounded-lg bg-neutral-900 border border-neutral-700 overflow-hidden min-w-[280px] overflow-y-auto shadow-lg ' +
+			'absolute left-full top-0 ml-1 ' +
+			'max-sbm:static max-sbm:left-auto max-sbm:top-auto max-sbm:ml-0 max-sbm:mt-0 max-sbm:min-w-0 max-sbm:w-full max-sbm:max-h-[min(40vh,280px)] max-sbm:rounded-none max-sbm:border-x-0 max-sbm:border-b-0 max-sbm:shadow-none';
+
+		return (
+			<div className="relative inline-block">
+				<div className="rounded-lg bg-neutral-800 border border-neutral-700 w-[220px] overflow-visible">
+					<div className="relative border-b border-neutral-700">
+						<div
+							className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'input' ? 'bg-neutral-700' : ''}`}
+							onClick={() => setExpandedDevice(expandedDevice === 'input' ? null : 'input')}
+						>
+							<div className="flex flex-col flex-1 min-w-0 justify-start">
+								<div className="text-white font-medium text-sm">{t('device.inputDevice')}</div>
+								<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+									{dmCallingDeviceMenuSubtitle(currentInputDevice, systemDefaultLabel)}
+								</div>
+							</div>
+							<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+						</div>
+						{expandedDevice === 'input' && (
+							<div className={`${flyoutPanelBase} max-h-[320px]`}>
+								{audioInputDevicesList.map((device) => (
+									<div
+										key={device.deviceId}
+										className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentInputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+										onClick={() => {
+											changeAudioInputDevice(device.deviceId);
+											setExpandedDevice(null);
+										}}
+									>
+										{device.deviceId === currentInputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+										<div className="flex flex-col flex-1 min-w-0">
+											<span className="truncate overflow-hidden whitespace-nowrap">{device.label || '\u200b'}</span>
+											{device.deviceId === 'default' && !device.label?.trim() && (
+												<span className="text-neutral-400 text-xs">{systemDefaultLabel}</span>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+
+					<div className="relative">
+						<div
+							className={`px-4 py-3 hover:bg-neutral-700 cursor-pointer flex gap-3 justify-between items-center transition-colors duration-200 ${expandedDevice === 'output' ? 'bg-neutral-700' : ''}`}
+							onClick={() => setExpandedDevice(expandedDevice === 'output' ? null : 'output')}
+						>
+							<div className="flex flex-col flex-1 min-w-0 justify-start">
+								<div className="text-white font-medium text-sm">{t('device.outputDevice')}</div>
+								<div className="text-neutral-400 text-xs truncate overflow-hidden whitespace-nowrap">
+									{dmCallingDeviceMenuSubtitle(currentOutputDevice, systemDefaultLabel)}
+								</div>
+							</div>
+							<Icons.ArrowRight defaultSize={'w-4 h-4'} defaultFill1={'rgba(249,249,249,1)'} />
+						</div>
+						{expandedDevice === 'output' && (
+							<div className={`${flyoutPanelBase} max-h-[360px]`}>
+								{audioOutputDevicesList.map((device) => (
+									<div
+										key={device.deviceId}
+										className={`px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm transition-colors duration-200 flex items-center gap-2 ${device.deviceId === currentOutputDevice?.deviceId ? 'text-blue-400 bg-neutral-700' : 'text-white'}`}
+										onClick={() => {
+											changeAudioOutputDevice(device.deviceId);
+											setExpandedDevice(null);
+										}}
+									>
+										{device.deviceId === currentOutputDevice?.deviceId && <Icons.Check defaultSize="w-4 h-4" />}
+										<div className="flex flex-col flex-1 min-w-0">
+											<span className="truncate overflow-hidden whitespace-nowrap">{device.label || '\u200b'}</span>
+											{device.deviceId === 'default' && !device.label?.trim() && (
+												<span className="text-neutral-400 text-xs">{systemDefaultLabel}</span>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		);
+	}, [
+		i18n.language,
+		systemDefaultLabel,
+		currentInputDevice,
+		currentOutputDevice,
+		expandedDevice,
+		audioInputDevicesList,
+		audioOutputDevicesList,
+		changeAudioInputDevice,
+		changeAudioOutputDevice
+	]);
 
 	const localVideoContainerClass =
 		activeVideo === 'remote'
@@ -215,6 +304,9 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 			: activeVideo === 'remote'
 				? 'relative w-full h-full'
 				: 'relative w-[400px] h-[300px] max-sbm:w-full max-sbm:h-[200px]';
+
+	const deviceSettingsTriggerLabel =
+		dmCallingDeviceMenuSubtitle(currentInputDevice, systemDefaultLabel) || dmCallingDeviceMenuSubtitle(currentOutputDevice, systemDefaultLabel);
 
 	if (!isInCall && !isInChannelCalled) return <div />;
 
@@ -257,21 +349,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					>
 						{!isShowMeetDM && (
 							<div className=" flex flex-col items-center">
-								<Icons.IconMeetDM
-									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowMeetDM={!isShowMeetDM}
-									isShowLine={true}
-								/>
+								<Icons.VoiceCameraDisabledIcon scale={1} />
 							</div>
 						)}
 
 						{isMuteMicrophone && (
 							<div className="flex flex-col items-center">
-								<Icons.Microphone
-									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isMuteMicrophone={isMuteMicrophone}
-									isShowLine={true}
-								/>
+								<Icons.VoiceMicDisabledIcon scale={2} />
 							</div>
 						)}
 					</div>
@@ -298,21 +382,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 						>
 							{!isRemoteVideo && (
 								<div className="flex flex-col items-center">
-									<Icons.IconMeetDM
-										className={`${!isRemoteVideo ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isShowMeetDM={!isRemoteVideo}
-										isShowLine={true}
-									/>
+									<Icons.VoiceCameraDisabledIcon scale={1} />
 								</div>
 							)}
 
 							{!isRemoteAudio && (
 								<div className="flex flex-col items-center">
-									<Icons.Microphone
-										className={`${!isRemoteAudio ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-										isMuteMicrophone={!isRemoteAudio}
-										isShowLine={true}
-									/>
+									<Icons.VoiceMicDisabledIcon scale={2} />
 								</div>
 							)}
 						</div>
@@ -330,7 +406,7 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								key={index}
 								height={'60px'}
 								alt={`Avatar ${index + 1}`}
-								username={nameImages[index] ? nameImages[index] : `Avatar ${index + 1}`}
+								username={nameImages[index] ? nameImages[index] : ``}
 								className="min-w-[55px] min-h-[55px] max-w-[55px] max-h-[55px] sbm:min-w-[75px] sbm:min-h-[75px] sbm:max-w-[75px] sbm:max-h-[75px] font-semibold"
 								srcImgProxy={createImgproxyUrl(avatar ?? '', {
 									width: 300,
@@ -350,13 +426,13 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 								className={`h-[44px] w-[44px] sbm:h-[56px] sbm:w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 								onClick={() => onStartCall({ isVideoCall: true, isAnswer: true })}
 							>
-								<Icons.IconMeetDM />
+								<Icons.VoiceCameraIcon scale={1} />
 							</div>
 							<div
 								className={`h-[44px] w-[44px] sbm:h-[56px] sbm:w-[56px] rounded-full bg-green-500 hover:bg-green-700 flex items-center justify-center cursor-pointer`}
 								onClick={() => onStartCall({ isVideoCall: false, isAnswer: true })}
 							>
-								<Icons.IconPhoneDM />
+								<Icons.VoiceMicIcon scale={2} />
 							</div>
 							<div
 								onClick={handleCloseCall}
@@ -368,29 +444,33 @@ const DmCalling = forwardRef<{ triggerCall: (isVideoCall?: boolean, isAnswer?: b
 					) : (
 						<div className="flex flex-row gap-1.5 sbm:gap-2 lg:gap-3 justify-center flex-wrap">
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer  ${!isShowMeetDM ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${!isShowMeetDM ? 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary' : 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400'}`}
 								onClick={toggleVideo}
 							>
-								<Icons.IconMeetDM
-									className={`${!isShowMeetDM ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isShowMeetDM={!isShowMeetDM}
-									isShowLine={true}
-								/>
+								{isShowMeetDM ? <Icons.VoiceCameraIcon scale={1.5} /> : <Icons.VoiceCameraDisabledIcon scale={1.5} />}
 							</div>
 							<div
-								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-bgLightMode dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] rounded-full flex items-center justify-center cursor-pointer ${isMuteMicrophone ? 'dark:bg-bgSecondary bg-neutral-500 dark:hover:bg-neutral-400 hover:bg-neutral-400' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
 								onClick={handleMuteToggle}
 							>
-								<Icons.Microphone
-									className={`${isMuteMicrophone ? 'text-bgPrimary dark:text-white' : 'text-white dark:text-bgTertiary'}`}
-									isMuteMicrophone={isMuteMicrophone}
-									isShowLine={true}
-								/>
+								{isMuteMicrophone ? <Icons.VoiceMicDisabledIcon scale={2.5} /> : <Icons.VoiceMicIcon scale={2.5} />}
 							</div>
 
-							<Menu menu={menuDevice} className={'rounded-3xl'}>
-								<div className="h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:w-[56px] relative rounded-full flex items-center justify-center cursor-pointer dark:bg-bgLightMode dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary">
-									<Icons.ThreeDot className="text-white dark:text-bgTertiary" />
+							<Menu
+								menu={menuDevice}
+								className={'rounded-3xl'}
+								onVisibleChange={(visible) => {
+									setIsDeviceMenuOpen(visible);
+									if (!visible) {
+										setExpandedDevice(null);
+									}
+								}}
+							>
+								<div
+									title={deviceSettingsTriggerLabel || undefined}
+									className={`h-9 w-9 sbm:h-11 sbm:w-11 lg:h-[56px] lg:min-w-[56px] lg:max-w-[min(200px,28vw)] lg:w-auto lg:px-3 relative rounded-full flex items-center justify-center cursor-pointer transition-colors duration-200 min-w-0 ${isDeviceMenuOpen ? 'dark:bg-neutral-400 bg-neutral-700' : 'dark:bg-bgSecondary dark:hover:bg-neutral-400 bg-neutral-500 hover:bg-bgSecondary'}`}
+								>
+									<Icons.CallSetting className="text-white dark:text-bgTertiary shrink-0" />
 								</div>
 							</Menu>
 							<div

@@ -504,14 +504,14 @@ interface IconProps {
 
 export const ThreadIcon: React.FC<IconProps> = ({
 	defaultSize = 'w-5 h-5',
-	defaultFill1 = 'rgba(172,172,172,1)',
-	defaultFill2 = 'rgba(133,133,137,1)',
-	defaultFill3 = 'rgba(156,156,159,1)',
-	defaultFill4 = 'rgba(255,255,255,1)',
+	defaultFill1 = 'currentColor',
+	defaultFill2 = 'currentColor',
+	defaultFill3 = 'currentColor',
+	defaultFill4 = 'currentColor',
 	...props
 }: IconProps) => {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="152" height="152" viewBox="0 0 152 152" className={defaultSize} {...props}>
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 152 152" className={defaultSize} {...props}>
 			<g>
 				<path
 					d="M1.56 149.714C.19 147.595 0 139.912 0 87.994c0-32.621.37-59.775.83-60.34s1.4-3.195 2.09-5.836C4.78 14.745 13.65 5.519 21.6 2.4 27.58.053 28.7-.001 76.1.01c52.18.011 53.31.12 62.41 5.912 4.7 2.999 8.65 8.138 11.51 14.983 1.8 4.315 1.94 7.455 1.95 45.921 0 0 .208 11.094-.006 16.635-.242 6.274.796 13.426-1.274 19.657-1.56 4.694-3.951 8.814-8.093 12.437-7.032 6.151-17.032 10.151-27.116 10.56-10.053.408-26.577.111-36.481.089-4.933-.011-9.868-.043-14.8.094-6.628.185-13.3.07-19.867.982-3.729.518-7.396 1.061-10.825 2.45-2.894 1.172-5.65 2.522-8.168 4.368-5.19 3.804-10.127 8.694-14.37 13.203-5.09 5.412-7.14 5.934-9.41 2.413m111.77-49.18c1.16.88 3.23 1.608 4.59 1.608 3.52 0 8.08-5.096 8.08-9.019 0-3.641-26.72-55.147-30.69-59.167-2.67-2.695-5.9-3.097-9.7-1.216-2.84 1.401-5.15 6.541-4.18 9.279 1.93 5.465 30.11 57.145 31.9 58.515M67 101.62c3.63 2.206 5.47 1.956 8.92-1.206 5.34-4.879 4.7-6.998-10.97-36.478-7.73-14.539-15.01-27.535-16.18-28.882-4.56-5.281-14.02-1.457-14.02 5.682 0 4.076 29.07 58.95 32.25 60.884M.47 88.016c0 23.558.06 37.227.15 37.227.04 0 .08-2.271.13-7.074.15-16.582.15-43.725 0-60.307-.05-4.804-.09-7.074-.13-7.074-.09 0-.15 13.67-.15 37.228M50.75.271c-4.02.054-5.93.098-5.93.141 0 .098 11.45.173 31.18.173S107.18.51 107.18.412c0-.043-1.91-.087-5.93-.141-13.89-.174-36.61-.174-50.5 0"
@@ -1125,6 +1125,17 @@ export const Smile: React.FC<IconProps> = ({ defaultFill1 = 'currentColor', defa
 	);
 };
 
+export const CallSetting: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', className = '', ...props }) => {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 143 144" className={className || defaultSize} {...props}>
+			<path
+				d="M76.03 142.5c-14.15-3.2-32.73-14.37-46.56-28-10.09-9.94-16.33-18.11-21.96-28.76C1.26 73.91-.32 67.64.2 56.61c.53-11.22 3.21-17.1 10.98-24.08C17.19 27.12 19.55 26 24.92 26c5.28 0 9.32 3.07 16.61 12.64 9.09 11.93 9.16 16.62.43 27.51-2.73 3.4-4.96 6.61-4.96 7.14s1.43 3.5 3.17 6.59c6.43 11.4 27.23 28.48 31.19 25.62.75-.55 3.71-2.9 6.55-5.22 9.74-7.92 14.87-7.7 26.49 1.17 9.5 7.25 12.6 11.34 12.6 16.63 0 5.65-1.44 8.48-7.56 14.9-9.06 9.5-19.87 12.58-33.41 9.52m20.32-64.19c-1.56-.31-2.34-1.43-2.84-4.1-1.42-7.59-3.15-8.62-8.74-5.21-4.41 2.68-5.14 2.57-9.72-1.58-5.28-4.76-5.67-6.48-2.61-11.32 1.39-2.21 2.27-4.69 1.95-5.53-.32-.83-2.66-2.1-5.2-2.81-3.87-1.1-4.78-1.83-5.53-4.46-.5-1.74-.61-5.17-.24-7.64.67-4.41.76-4.5 5.7-5.69 2.77-.66 5.3-1.91 5.63-2.76.33-.86-.41-3.3-1.63-5.42-2.72-4.72-2.24-6.55 2.93-11.21 4.58-4.15 5.31-4.26 9.72-1.58 5.18 3.16 6.98 2.67 8.26-2.25C95.47 1.24 97.24 0 103.62 0c6.19 0 7.93 1.36 8.87 6.94.88 5.18 3.19 5.92 8.34 2.67l3.94-2.49 3.91 2.88c2.15 1.58 4.55 4.05 5.32 5.49 1.26 2.37 1.17 3.04-.96 6.93-1.29 2.38-2.08 5.03-1.75 5.9.33.86 2.54 2.1 4.91 2.73 2.36.64 4.63 1.67 5.03 2.3.96 1.5.96 11.81-.01 13.32-.4.64-2.09 1.47-3.73 1.84-5.65 1.27-6.31 1.57-6.9 3.1-.32.85.56 3.5 1.97 5.9l2.55 4.36-3.72 4.12c-5.63 6.23-6.75 6.57-11.87 3.58-2.4-1.41-5.04-2.31-5.86-1.99-.82.31-2.02 2.74-2.65 5.39-1.01 4.2-1.54 4.89-4.21 5.42-3.22.64-6.88.61-10.45-.08m12.38-26.27c10.86-4.93 11-19.77.25-25.34-4.36-2.27-10.67-1.77-14.77 1.15-3.77 2.69-6.57 9.42-5.74 13.82 1.12 5.99 8.25 12.22 14.03 12.27 1.1.01 3.9-.85 6.23-1.9"
+				fill="rgba(249,249,249,1)"
+			/>
+		</svg>
+	);
+};
+
 export const ArrowDown: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', ...props }: IconProps) => {
 	return (
 		<svg viewBox="0 0 20 17" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -1465,7 +1476,7 @@ export const SpeakerLocked: React.FC<IconProps> = ({
 	);
 };
 
-export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(122,122,122,1)', ...props }) => {
+export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'currentColor', ...props }) => {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 151 150" className={defaultSize} {...props}>
 			<g>
@@ -1479,7 +1490,7 @@ export const HashtagLocked: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', de
 	);
 };
 
-export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'rgba(123,123,123,1)', ...props }: IconProps) {
+export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', ...props }: IconProps) {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 153" className={defaultSize} {...props}>
 			<g>
@@ -1493,7 +1504,7 @@ export function HashtagWarning({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'rgba(
 	);
 }
 
-export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(123,123,123,1)', ...props }: IconProps) => {
+export const Hashtag: React.FC<IconProps> = ({ defaultSize = 'w-5 h-5', defaultFill1 = 'currentColor', ...props }: IconProps) => {
 	return (
 		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 151 150" className={defaultSize} {...props}>
 			<g>
@@ -2517,15 +2528,15 @@ export function OwnerIcon({ defaultSize = 'w-5 h-5 ', defaultFill1 = '#F0B132', 
 
 export function ThreadIconLocker({
 	defaultSize = 'w-5 h-5 ',
-	defaultFill1 = 'rgba(172,172,172,1)',
-	defaultFill2 = 'rgba(133,133,137,1)',
-	defaultFill3 = 'rgba(156,156,159,1)',
-	defaultFill4 = 'rgba(255,255,255,1)',
-	defaultFill5 = 'rgba(82,82,88,1)',
+	defaultFill1 = 'currentColor',
+	defaultFill2 = 'currentColor',
+	defaultFill3 = 'currentColor',
+	defaultFill4 = 'currentColor',
+	defaultFill5 = 'currentColor',
 	...props
 }: IconProps) {
 	return (
-		<svg xmlns="http://www.w3.org/2000/svg" width="152" height="152" viewBox="0 0 152 152" className={defaultSize} {...props}>
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 152 152" className={defaultSize} {...props}>
 			<g>
 				<path
 					d="M1.56 149.714C.19 147.595 0 139.912 0 87.994c0-32.621.37-59.775.83-60.34s1.4-3.195 2.09-5.836C4.78 14.745 13.65 5.519 21.6 2.4 27.58.053 28.7-.001 76.1.01c52.18.011 53.31.12 62.41 5.912 4.7 2.999 8.65 8.138 11.51 14.983 1.8 4.315 1.94 7.455 1.95 45.921 0 0 .208 11.094-.006 16.635-.242 6.274.796 13.426-1.274 19.657-1.56 4.694-3.951 8.814-8.093 12.437-7.032 6.151-17.032 10.151-27.116 10.56-10.053.408-26.577.111-36.481.089-4.933-.011-9.868-.043-14.8.094-6.628.185-13.3.07-19.867.982-3.729.518-7.396 1.061-10.825 2.45-2.894 1.172-5.65 2.522-8.168 4.368-5.19 3.804-10.127 8.694-14.37 13.203-5.09 5.412-7.14 5.934-9.41 2.413m111.77-49.18c1.16.88 3.23 1.608 4.59 1.608 3.52 0 8.08-5.096 8.08-9.019 0-3.641-26.72-55.147-30.69-59.167-2.67-2.695-5.9-3.097-9.7-1.216-2.84 1.401-5.15 6.541-4.18 9.279 1.93 5.465 30.11 57.145 31.9 58.515M67 101.62c3.63 2.206 5.47 1.956 8.92-1.206 5.34-4.879 4.7-6.998-10.97-36.478-7.73-14.539-15.01-27.535-16.18-28.882-4.56-5.281-14.02-1.457-14.02 5.682 0 4.076 29.07 58.95 32.25 60.884M.47 88.016c0 23.558.06 37.227.15 37.227.04 0 .08-2.271.13-7.074.15-16.582.15-43.725 0-60.307-.05-4.804-.09-7.074-.13-7.074-.09 0-.15 13.67-.15 37.228M50.75.271c-4.02.054-5.93.098-5.93.141 0 .098 11.45.173 31.18.173S107.18.51 107.18.412c0-.043-1.91-.087-5.93-.141-13.89-.174-36.61-.174-50.5 0"
@@ -3888,12 +3899,7 @@ export function HatIcon({ defaultSize = 'w-5 h-5', defaultFill1 = 'rgba(45,41,15
 	);
 }
 
-export function FullScreen({
-	defaultSize = 'w-5 h-5 ',
-	defaultFill1 = 'rgba(98,98,98,1)',
-	defaultFill2 = 'rgba(254,254,254,1)',
-	...props
-}: IconProps) {
+export function FullScreen({ defaultSize = 'w-5 h-5 ', defaultFill1 = 'currentColor', defaultFill2 = 'currentColor', ...props }: IconProps) {
 	return (
 		<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 152 151" {...props}>
 			<g>

@@ -25,9 +25,9 @@ export const UserStatusIcon = ({ status }: { status?: EUserStatus }) => {
 		case EUserStatus.ONLINE:
 			return <StatusUser status="online" className="w-5 h-5 p-1" />;
 		case EUserStatus.IDLE:
-			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 w-[10px] h-[10px]  bg-theme-primary p-1 rounded-full" />;
+			return <Icons.DarkModeIcon className="text-[#F0B232] -rotate-90 bg-theme-primary p-1 rounded-full" />;
 		case EUserStatus.DO_NOT_DISTURB:
-			return <StatusUser status="dnd" className="w-[10px] h-[10px] p-1" />;
+			return <StatusUser status="dnd" className="w-[20px] h-[20px] p-1" />;
 		default:
 			return null;
 	}

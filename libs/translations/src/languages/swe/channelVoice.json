@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "Mikrofon",
 		"outputDevice": "Ljud",
-		"camera": "Kamera"
+		"camera": "Kamera",
+		"systemDefault": "Systemstandard"
 	},
 	"toast": {
 		"connectionConnected": "Ansluten framgångsrikt",
