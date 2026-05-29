@@ -379,7 +379,7 @@ const ItemInfor = ({
 									className="w-5 h-5 "
 									defaultFill1="var(--bg-icon-theme)"
 									defaultFill4="var(--bg-theme-secounnd)"
-									defaultFill5="var(--bg-icon-theme)"
+									defaultFill5="var(--bg-icon-theme-active)"
 								/>
 							) : (
 								<Icons.ThreadIcon

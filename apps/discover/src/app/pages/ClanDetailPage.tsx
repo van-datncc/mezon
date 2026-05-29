@@ -144,7 +144,7 @@ export default function ClanDetailPage() {
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-							<Icons.IconChat className="w-6 h-6 text-[#5865f2]" />
+							<Icons.Chat className="w-6 h-6 text-[#5865f2]" />
 							<div>
 								<div className="font-semibold text-sm">How chatty?</div>
 								<div className="text-xs text-gray-500">{chatty}</div>

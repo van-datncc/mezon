@@ -4,7 +4,6 @@ export const Mezon = createLazyIconWithFallback(() => import('./icons'), 'Mezon'
 export const OnlineStatus = createLazyIconWithFallback(() => import('./icons'), 'OnlineStatus');
 export const OfflineStatus = createLazyIconWithFallback(() => import('./icons'), 'OfflineStatus');
 export const IconFriends = createLazyIconWithFallback(() => import('./icons'), 'IconFriends');
-export const IconChat = createLazyIconWithFallback(() => import('./icons'), 'IconChat');
 export const IconEditThreeDot = createLazyIconWithFallback(() => import('./icons'), 'IconEditThreeDot');
 export const UploadImage = createLazyIconWithFallback(() => import('./icons'), 'UploadImage');
 export const AddIcon = createLazyIconWithFallback(() => import('./icons'), 'AddIcon');
@@ -205,7 +204,6 @@ export const GuideIcon = createLazyIconWithFallback(() => import('./icons'), 'Gu
 export const RuleIcon = createLazyIconWithFallback(() => import('./icons'), 'RuleIcon');
 export const CheckMarkFilter = createLazyIconWithFallback(() => import('./icons'), 'CheckMarkFilter');
 export const SendMoney = createLazyIconWithFallback(() => import('./icons'), 'SendMoney');
-export const HashIcon = createLazyIconWithFallback(() => import('./icons'), 'HashIcon');
 export const TargetIcon = createLazyIconWithFallback(() => import('./icons'), 'TargetIcon');
 export const LongArrowRight = createLazyIconWithFallback(() => import('./icons'), 'LongArrowRight');
 export const CirclePlusFill = createLazyIconWithFallback(() => import('./icons'), 'CirclePlusFill');

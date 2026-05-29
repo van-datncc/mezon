@@ -1,5 +1,5 @@
 import { useMessageValue } from '@mezon/core';
-import { selectComposeInputByChannelId, selectCurrentChannelId, threadsActions, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectComposeInputByChannelId, selectCurrentChannelId, selectIsPrivate, threadsActions, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId } from '@mezon/utils';
 import type { ApiChannelDescription } from 'mezon-js';
@@ -15,6 +15,8 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	const { t } = useTranslation('channelTopbar');
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
+	const isPrivate = useSelector(selectIsPrivate);
+	const isPrivateThread = threadCurrentChannel ? Boolean(threadCurrentChannel.channel_private) : isPrivate === 1;
 
 	const setNameValueThread = useCallback(
 		(nameValue: string) => {
@@ -61,11 +63,11 @@ const ThreadHeader = ({ threadCurrentChannel }: ThreadHeaderProps) => {
 	return (
 		<div className="flex flex-row items-center justify-between px-4 h-[48px] min-h-[50px] border-b-theme-primary  z-10 bg-theme-chat">
 			<div className="flex flex-row items-center gap-2 pointer-events-none">
-				{threadCurrentChannel?.channel_private ? (
+				{isPrivateThread ? (
 					<Icons.ThreadIconLocker
 						defaultFill1="var(--bg-icon-theme)"
 						defaultFill4="var(--bg-theme-secounnd)"
-						defaultFill5="var(--bg-icon-theme)"
+						defaultFill5="var(--bg-icon-theme-active)"
 					/>
 				) : (
 					<Icons.ThreadIcon

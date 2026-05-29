@@ -8,12 +8,7 @@ import { useSelector } from 'react-redux';
 import { RedDot } from '../ChannelTopbar';
 import { NotificationTooltipContent } from './NotificationTooltipContent';
 
-interface NotificationTooltipProps {
-	isGridView?: boolean;
-	isShowMember?: boolean;
-}
-
-export const NotificationTooltip = memo(({ isGridView, isShowMember }: NotificationTooltipProps) => {
+export const NotificationTooltip = memo(() => {
 	const { t } = useTranslation('notifications');
 	const currentClanId = useSelector(selectCurrentClanId);
 	const badgeCount = useSelector((state) => selectBadgeClanById(state, currentClanId || ''));
@@ -55,13 +50,15 @@ export const NotificationTooltip = memo(({ isGridView, isShowMember }: Notificat
 				offset: [0, 8]
 			}}
 		>
-		<button
-			title={t('inbox')}
-			className={`focus-visible:outline-none relative group text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${visible ? 'text-[var(--bg-icon-theme-active)]' : ''} ${visible ? '[--inbox-fill-1:var(--bg-icon-theme-active)] [--inbox-fill-2:var(--bg-theme-secounnd)]' : '[--inbox-fill-1:var(--bg-icon-theme)] [--inbox-fill-2:var(--bg-theme-secounnd)] hover:[--inbox-fill-1:var(--bg-icon-theme-active)]'}`}
-			onContextMenu={(e) => e.preventDefault()}
-			data-e2e={generateE2eId('chat.channel_message.header.button.inbox')}
-		>
-				<Icons.Inbox className="size-5" defaultFill1="var(--inbox-fill-1)" defaultFill2="var(--inbox-fill-2)" />
+			<button
+				title={t('inbox')}
+				className={`focus-visible:outline-none relative group text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${
+					visible ? 'text-[var(--bg-icon-theme-active)]' : ''
+				}`}
+				onContextMenu={(e) => e.preventDefault()}
+				data-e2e={generateE2eId('chat.channel_message.header.button.inbox')}
+			>
+				<Icons.Inbox className="size-5" />
 				{badgeCount > 0 && <RedDot />}
 			</button>
 		</Tooltip>
