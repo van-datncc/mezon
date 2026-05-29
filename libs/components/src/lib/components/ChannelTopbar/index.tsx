@@ -25,7 +25,6 @@ import {
 	searchMessagesActions,
 	selectAllAccount,
 	selectChannelById,
-	selectClanView,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelAgeRestricted,
@@ -1062,7 +1061,7 @@ function PinButton({ styleCss, mode, isDMView = false }: { styleCss: string; mod
 	const currentDM = useSelector(selectCurrentDM) ?? '';
 	const dmId = (currentDM as { id?: string } | null)?.id ?? '';
 	const activeChannelId = isDMView ? (directId ?? dmId) : currentChannelId;
-	const shouldShowPinMessage = useSelector((state) => selectIsPinModalOpenFor(state, activeChannelId, isDMView));
+	const shouldShowPinMessage = useAppSelector((state) => selectIsPinModalOpenFor(state, activeChannelId, isDMView));
 	const isShowPinBadge = useAppSelector(selectIsShowPinBadgeByChannelId(currentChannelId));
 	const isShowPinDMBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, (currentDM as { id?: string })?.id || ''));
 	const isShowPinBadgeFinal = isDMView ? isShowPinDMBadge : isShowPinBadge;
