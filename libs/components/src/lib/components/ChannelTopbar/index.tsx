@@ -402,7 +402,7 @@ const ChannelTopbarLabel = memo(
 			}
 			switch (type) {
 				case ChannelType.CHANNEL_TYPE_CHANNEL:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 				case ChannelType.CHANNEL_TYPE_THREAD:
 					return (
 						<Icons.ThreadIconLocker
@@ -418,7 +418,7 @@ const ChannelTopbarLabel = memo(
 				case ChannelType.CHANNEL_TYPE_APP:
 					return <AppChannelListIcon isEmphasized className="w-4 h-4" />;
 				default:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 			}
 		};
 
