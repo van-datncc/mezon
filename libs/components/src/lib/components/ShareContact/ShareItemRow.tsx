@@ -40,7 +40,7 @@ export const ShareItemRow = ({ item, isSelected, onToggle, searchText, t }: Shar
 						item.isPublic ? (
 							<Icons.Hashtag className="w-5 h-5 text-theme-secondary" />
 						) : (
-							<Icons.HashtagLocked className="w-5 h-5 text-theme-secondary" />
+							<Icons.HashtagLocked className="w-5 h-5" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 						)
 					) : item.isPublic ? (
 						<Icons.ThreadIcon
