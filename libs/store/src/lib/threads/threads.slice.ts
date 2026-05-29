@@ -307,7 +307,7 @@ export const writeActiveArchivedThread = createAsyncThunk(
 			const threadChannel = selectChannelById(state, channelId);
 			const parentId = threadChannel?.parent_id;
 
-			if (parentId) {
+			if (parentId && parentId !== '0') {
 				await thunkAPI.dispatch(threadsActions.fetchThreads({ channelId: parentId, clanId, noCache: true })).unwrap();
 			}
 			return { channelId, activeCode: ThreadStatus.joined };

@@ -146,6 +146,7 @@ import type {
 	BannedUserEvent,
 	BlockFriend,
 	CategoryEvent,
+	ChannelArchiveEvent,
 	ChannelCanvas,
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -1825,7 +1826,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!channelUpdated) return;
 			const store = await getStoreAsync();
 			const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-			const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
 			const channelExist = selectChannelByIdAndClanId(
 				store.getState() as unknown as RootState,
 				channelUpdated.clan_id as string,
@@ -1989,6 +1989,39 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch, userId, isMobile]
 	);
 
+	const onchannelarchive = useCallback(
+		(channelArchive: ChannelArchiveEvent) => {
+			const parentId = channelArchive.parent_id ?? '0';
+			if (parentId !== '0' || channelArchive.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+				return;
+			}
+
+			const clanId = channelArchive.clan_id || selectCurrentClanId(getStore().getState()) || '0';
+			const channelId = channelArchive.channel_id;
+			const isArchiveAction = Number(channelArchive.active) === ThreadStatus.archived;
+
+			if (isArchiveAction) {
+				dispatch(
+					channelsActions.update({
+						clanId,
+						update: { id: channelId, changes: { is_channel_archived: true } }
+					})
+				);
+				dispatch(channelsActions.removeFavorite({ clanId, channelId }));
+				return;
+			}
+
+			dispatch(
+				channelsActions.update({
+					clanId,
+					update: { id: channelId, changes: { is_channel_archived: false } }
+				})
+			);
+			dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
+		},
+		[dispatch]
+	);
+
 	const onpermissionset = useCallback(
 		(setPermission: PermissionSet) => {
 			if (userId !== setPermission.caller) {
@@ -2070,7 +2103,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, []);
 	const oneventcreated = useCallback(
 		async (eventCreatedEvent: ApiCreateEventRequest) => {
-			// eslint-disable-next-line no-console
 			// Check actions
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
@@ -2646,6 +2678,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onchanneldeleted = onchanneldeleted;
 
 			socket.onchannelupdated = onchannelupdated;
+			socket.onchannelarchive = onchannelarchive;
 
 			socket.onuserprofileupdate = onuserprofileupdate;
 
@@ -2948,6 +2981,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onbanneduser = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onreconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelarchive = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -2986,6 +3021,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		oncategoryevent,
 		onchanneldeleted,
 		onchannelupdated,
+		onchannelarchive,
 		onuserprofileupdate,
 		ondeleteaccount,
 		onpermissionset,

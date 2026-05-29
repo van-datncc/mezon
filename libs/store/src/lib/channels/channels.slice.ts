@@ -57,7 +57,11 @@ export const CHANNELS_FEATURE_KEY = 'channels';
 export interface ChannelsEntity extends IChannel {
 	id: string; // Primary ID
 	showPinBadge?: boolean;
+	is_channel_archived?: boolean;
 }
+
+export const isArchivedParentChannel = (channel?: ChannelsEntity | null) =>
+	Boolean(channel && !checkIsThread(channel) && channel.is_channel_archived);
 
 function extractChannelMeta(channel: ChannelsEntity): ChannelMetaEntity {
 	return {
@@ -491,18 +495,46 @@ export const archiveChannel = createAsyncThunk('channels/archiveChannel', async 
 		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId as string);
 		const response = await mezon.client.archiveChannel(mezon.session, body.clanId, body.channelId);
 		if (response) {
-			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
-			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
 			if (channelData && checkIsThread(channelData as any)) {
+				thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
+				thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
 				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId: body.channelId, activeCode: 0 }));
 				if (channelData.parent_id) {
 					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: channelData.parent_id, threadId: body.channelId }));
 				}
+			} else {
+				thunkAPI.dispatch(
+					channelsActions.update({
+						clanId: body.clanId,
+						update: { id: body.channelId, changes: { is_channel_archived: true } }
+					})
+				);
+				thunkAPI.dispatch(channelsActions.removeFavorite({ clanId: body.clanId, channelId: body.channelId }));
 			}
 		}
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'channels/archiveChannel');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const restoreChannel = createAsyncThunk('channels/restoreChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.activeArchivedThread(mezon.session, body.clanId, body.channelId);
+
+		thunkAPI.dispatch(
+			channelsActions.update({
+				clanId: body.clanId,
+				update: { id: body.channelId, changes: { is_channel_archived: false } }
+			})
+		);
+
+		await thunkAPI.dispatch(fetchChannels({ clanId: body.clanId, noCache: true })).unwrap();
+		return { clanId: body.clanId, channelId: body.channelId };
+	} catch (error) {
+		captureSentryError(error, 'channels/restoreChannel');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -1629,6 +1661,7 @@ export const channelsActions = {
 	createNewChannel,
 	deleteChannel,
 	archiveChannel,
+	restoreChannel,
 	updateChannel,
 	updateChannelPrivate,
 	fetchAppChannels,
