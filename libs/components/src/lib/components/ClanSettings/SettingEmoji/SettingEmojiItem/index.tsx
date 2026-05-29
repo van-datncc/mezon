@@ -13,6 +13,7 @@ import type { ClanEmoji, MezonUpdateClanEmojiByIdBody } from 'mezon-js';
 import type { ChangeEvent } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../../AvatarImage/AvatarImage';
 
 type SettingEmojiItemProp = {
 	emoji: ClanEmoji;
@@ -83,7 +84,6 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji: _onUpdateEmoji }: SettingEmoji
 		}
 	};
 	const avatarDefault = dataAuthor?.clan_nick || dataAuthor?.user?.display_name || dataAuthor?.user?.username || '';
-	const avatarLetter = avatarDefault?.trim().charAt(0).toUpperCase();
 	const avatarUrl = dataAuthor?.clan_avatar || dataAuthor?.user?.avatar_url;
 	const handleInputFocus = () => {
 		setIsInputFocused(true);
@@ -155,9 +155,7 @@ const SettingEmojiItem = ({ emoji, onUpdateEmoji: _onUpdateEmoji }: SettingEmoji
 								alt="User avatar"
 							/>
 						) : (
-							<div className="size-6 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight text-[16px]">
-								{avatarLetter}
-							</div>
+							<AvatarColor username={avatarDefault} className="size-6" />
 						)}
 					</div>
 					<p className={'text-sm h-auto leading-6'}>{dataAuthor?.clan_nick || dataAuthor?.user?.username}</p>

@@ -3,6 +3,7 @@ import type { IMessageWithUser, IPinMessage, LoadingStatus } from '@mezon/utils'
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type { ApiMessageAttachment, ApiPinMessage, ApiPinMessageRequest } from 'mezon-js';
+import { ChannelStreamMode } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions, selectCurrentChannelId } from '../channels/channels.slice';
@@ -13,6 +14,13 @@ import { ensureSession, ensureSocket, getMezonCtx } from '../helpers';
 import type { AppDispatch, RootState } from '../store';
 
 export const PIN_MESSAGE_FEATURE_KEY = 'pinmessages';
+
+export type PinModalTarget = {
+	channelId: string;
+	isDM: boolean;
+};
+
+export const isDMStreamMode = (mode: number) => mode === ChannelStreamMode.STREAM_MODE_DM || mode === ChannelStreamMode.STREAM_MODE_GROUP;
 
 /*
  * Update these interfaces according to your requirements.
@@ -33,6 +41,7 @@ export interface PinMessageState extends EntityState<PinMessageEntity, string> {
 	error?: string | null;
 	isPinModalVisible?: boolean;
 	pinModalChannelId?: string;
+	pinModalIsDM?: boolean;
 }
 
 export const pinMessageAdapter = createEntityAdapter<PinMessageEntity>();
@@ -238,7 +247,8 @@ export const initialPinMessageState: PinMessageState = pinMessageAdapter.getInit
 	error: null,
 	jumpPinMessageId: '',
 	isPinModalVisible: false,
-	pinModalChannelId: undefined
+	pinModalChannelId: undefined,
+	pinModalIsDM: undefined
 });
 
 export const pinMessageSlice = createSlice({
@@ -248,18 +258,28 @@ export const pinMessageSlice = createSlice({
 		add: pinMessageAdapter.addOne,
 		addMany: pinMessageAdapter.addMany,
 		remove: pinMessageAdapter.removeOne,
-		togglePinModal: (state: PinMessageState, action: PayloadAction<string | undefined>) => {
-			const newChannelId = action.payload;
-			if (state.isPinModalVisible && state.pinModalChannelId !== newChannelId) {
-				state.pinModalChannelId = newChannelId;
+		togglePinModal: (state: PinMessageState, action: PayloadAction<PinModalTarget>) => {
+			const { channelId, isDM } = action.payload;
+			const isSameTarget = state.pinModalChannelId === channelId && state.pinModalIsDM === isDM;
+
+			if (state.isPinModalVisible && !isSameTarget) {
+				state.pinModalChannelId = channelId;
+				state.pinModalIsDM = isDM;
 			} else {
 				state.isPinModalVisible = !state.isPinModalVisible;
-				state.pinModalChannelId = state.isPinModalVisible ? newChannelId : undefined;
+				if (state.isPinModalVisible) {
+					state.pinModalChannelId = channelId;
+					state.pinModalIsDM = isDM;
+				} else {
+					state.pinModalChannelId = undefined;
+					state.pinModalIsDM = undefined;
+				}
 			}
 		},
 		closePinModal: (state: PinMessageState) => {
 			state.isPinModalVisible = false;
 			state.pinModalChannelId = undefined;
+			state.pinModalIsDM = undefined;
 		},
 		clearChannelCache: (state: PinMessageState, action: PayloadAction<string>) => {
 			const channelId = action.payload;
@@ -413,3 +433,8 @@ export const selectPinMessageByChannelId = createSelector(
 export const selectIsPinModalVisible = createSelector(getPinMessageState, (state: PinMessageState) => state.isPinModalVisible);
 
 export const selectPinModalChannelId = createSelector(getPinMessageState, (state: PinMessageState) => state.pinModalChannelId);
+
+export const selectIsPinModalOpenFor = createSelector(
+	[getPinMessageState, (_state: RootState, channelId: string) => channelId, (_state: RootState, _channelId: string, isDM: boolean) => isDM],
+	(state, channelId, isDM) => !!state.isPinModalVisible && state.pinModalChannelId === channelId && state.pinModalIsDM === isDM
+);

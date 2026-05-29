@@ -391,7 +391,7 @@ const ItemInfor = ({
 						) : isAgeRestrictedChannel ? (
 							<Icons.HashtagWarning />
 						) : privateChannel ? (
-							<Icons.HashtagLocked />
+							<Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 						) : (
 							<Icons.Hashtag />
 						))}

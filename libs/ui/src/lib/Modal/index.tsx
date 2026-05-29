@@ -63,7 +63,13 @@ const Modal = (props: ModalProps) => {
 									{hasChannel && (
 										<div className="inline-flex gap-x-2">
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
-												hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && <Icons.HashtagLocked className="w-5 h-5 " />}
+												hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
+													<Icons.HashtagLocked
+														className="w-5 h-5"
+														defaultFill1="var(--bg-icon-theme)"
+														defaultFill2="var(--bg-icon-theme-active)"
+													/>
+												)}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
 												<Icons.Hashtag className="w-5 h-5" />
 											)}

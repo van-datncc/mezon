@@ -348,6 +348,9 @@ module.exports = {
 	plugins: [
 		plugin(function ({ addUtilities }) {
 			const newUtilities = {
+				'.hide-scrollbar': {
+					'scrollbar-width': 'none'
+				},
 				'.hide-scrollbar::-webkit-scrollbar': {
 					display: 'none'
 				},

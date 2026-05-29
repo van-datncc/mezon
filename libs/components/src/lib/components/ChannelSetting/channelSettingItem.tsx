@@ -80,7 +80,13 @@ const ChannelSettingItem = (props: ChannelSettingItemProps) => {
 				return <Icons.HashtagWarning className="w-5 h-5 -mt-1 min-w-5" />;
 			}
 			if (isPrivate) {
-				return <Icons.HashtagLocked className="w-5 h-5 -mt-1 min-w-5" />;
+				return (
+					<Icons.HashtagLocked
+						className="w-5 h-5 -mt-1 min-w-5 block dark:text-[#AEAEAE] text-colorTextLightMode"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill2="var(--bg-icon-theme-active)"
+					/>
+				);
 			}
 			return <Icons.Hashtag className="w-5 h-5 -mt-1 min-w-5" />;
 		}

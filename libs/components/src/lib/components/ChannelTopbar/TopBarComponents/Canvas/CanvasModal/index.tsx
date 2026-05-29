@@ -1,6 +1,7 @@
 import { useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import {
 	appActions,
+	canvasAPIActions,
 	selectCanvasIdsByChannelId,
 	selectCurrentChannelChannelId,
 	selectCurrentChannelCreatorId,
@@ -15,8 +16,10 @@ import { generateE2eId } from '@mezon/utils';
 import type { RefObject } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import ModalConfirm from '../../../../ModalConfirm';
 import EmptyCanvas from './EmptyCanvas';
 import GroupCanvas from './GroupCanvas';
 import SearchCanvas from './SearchCanvas';
@@ -28,6 +31,7 @@ type CanvasProps = {
 
 const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const { t } = useTranslation('channelTopbar');
+	const { t: tCommon } = useTranslation('common');
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const { canvasId: currentCanvasId } = useParams<{ canvasId: string }>();
@@ -38,6 +42,12 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 	const appearanceTheme = useSelector(selectTheme);
 	const [keywordSearch, setKeywordSearch] = useState('');
 	const [selectedCanvasId, setSelectedCanvasId] = useState<string | null>(currentCanvasId || null);
+	const [confirmModalProps, setConfirmModalProps] = useState<{
+		canvasId: string;
+		canvasTitle: string;
+		channelId: string;
+		clanId: string;
+	} | null>(null);
 	const canvases = useAppSelector((state) => selectCanvasIdsByChannelId(state, channelId || ''));
 	const filteredCanvases = useMemo(() => {
 		if (!keywordSearch) return canvases;
@@ -66,9 +76,59 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 		setSelectedCanvasId(canvasId);
 	};
 
+	const handleDeleteCanvas = async () => {
+		if (confirmModalProps && confirmModalProps.channelId && confirmModalProps.clanId) {
+			const body = {
+				id: confirmModalProps.canvasId,
+				channel_id: confirmModalProps.channelId,
+				clan_id: confirmModalProps.clanId
+			};
+			await dispatch(canvasAPIActions.deleteCanvas(body));
+			dispatch(canvasAPIActions.removeOneCanvas({ channelId: confirmModalProps.channelId, canvasId: confirmModalProps.canvasId }));
+			if (currentCanvasId === confirmModalProps.canvasId) {
+				dispatch(appActions.setIsShowCanvas(false));
+				const redirectPath = `/chat/clans/${confirmModalProps.clanId}/channels/${confirmModalProps.channelId}`;
+				navigate(redirectPath);
+			}
+		}
+		setConfirmModalProps(null);
+		closeModalConfirm();
+	};
+
+	const handleOpenConfirmDelete = (canvasId: string, canvasTitle: string) => {
+		if (channelId && currentClanId) {
+			setConfirmModalProps({ canvasId, canvasTitle, channelId, clanId: currentClanId });
+			openModalConfirm();
+		}
+	};
+
 	const modalRef = useRef<HTMLDivElement>(null);
+
+	const [openModalConfirm, closeModalConfirm] = useModal(() => {
+		return (
+			<ModalConfirm
+				handleCancel={() => {
+					setConfirmModalProps(null);
+					closeModalConfirm();
+					modalRef.current?.focus();
+				}}
+				handleConfirm={handleDeleteCanvas}
+				modalName={confirmModalProps?.canvasTitle}
+				title="Delete"
+				buttonName="Delete"
+				message={tCommon('canvas.deleteMessage')}
+			/>
+		);
+	}, [confirmModalProps]);
+
 	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useOnClickOutside(
+		modalRef,
+		() => {
+			if (!confirmModalProps) onClose();
+		},
+		rootRef
+	);
 
 	return (
 		<div
@@ -110,25 +170,13 @@ const CanvasModal = ({ onClose, rootRef }: CanvasProps) => {
 								creatorIdChannel={creatorChannelId}
 								selectedCanvasId={selectedCanvasId}
 								onSelectCanvas={handleSelectCanvas}
+								onDeleteCanvas={handleOpenConfirmDelete}
 							/>
 						);
 					})}
 
 					{!canvases?.length && <EmptyCanvas onClick={handleCreateCanvas} />}
 				</div>
-				{/* {totalPages > 1 && (
-					<div className="py-2">
-						<Pagination
-							theme={customTheme(totalPages <= 5)}
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={onPageChange}
-							previousLabel=""
-							nextLabel=""
-							showIcons={totalPages > 5}
-						/>
-					</div>
-				)} */}
 			</div>
 		</div>
 	);

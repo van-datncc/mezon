@@ -2496,31 +2496,26 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			badgeService.markAsReadCategory(markAsReadEvent.clan_id as string, markAsReadEvent.category_id, channelIds, channelUpdates);
 			return;
 		}
-		const relatedChannels = channels.filter((channel) => channel.parent_id === markAsReadEvent.channel_id);
+		const relatedChannels = channels.filter(
+			(channel) => channel.parent_id === markAsReadEvent.channel_id || channel.channel_id === markAsReadEvent.channel_id
+		);
+		const channelMeta = selectChannelMetaEntities(store.getState());
 		const channelIds = relatedChannels.map((channel) => channel.id);
 		const channelUpdates = channelIds.map((channelId) => ({
 			channelId,
 			messageId: selectLatestMessageId(store.getState(), channelId) || undefined
 		}));
+
 		badgeService.markAsReadChannel(
 			markAsReadEvent.clan_id as string,
 			markAsReadEvent.channel_id,
-			[markAsReadEvent.channel_id, ...channelIds],
+			[...channelIds],
 			channelUpdates,
 			relatedChannels.map((channel) => ({
 				channelId: channel.id,
-				count: (channel.count_mess_unread ?? 0) * -1
+				count: (channelMeta?.[channel.id]?.count_mess_unread ?? 0) * -1
 			}))
 		);
-
-		const threadIds = relatedChannels.flatMap((channel) => channel.threadIds || []);
-		if (threadIds.length) {
-			const threadUpdates = threadIds.map((channelId) => ({
-				channelId,
-				messageId: selectLatestMessageId(store.getState(), channelId) || undefined
-			}));
-			dispatch(channelMetaActions.setChannelsLastSeenTimestamp(threadUpdates));
-		}
 	}, []);
 
 	const onaddfriend = useCallback((user: AddFriend) => {

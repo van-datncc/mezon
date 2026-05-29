@@ -77,6 +77,11 @@ const SuggestItem = ({
 			? '[--thread-body-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
 			: '[--thread-body-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] group-hover:[--thread-body-fill-1:var(--bg-icon-theme-active)]';
 
+		const hashtagLockedFillClass =
+			isUnread || (count && count > 0)
+				? '[--hashtag-locked-fill-1:var(--bg-icon-theme-active)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)]'
+				: '[--hashtag-locked-fill-1:var(--bg-icon-theme)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)] hover:[--hashtag-locked-fill-1:var(--bg-icon-theme-active)]';
+
 		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
 			if (isAgeRestrictedChannel) {
 				return <Icons.HashtagWarning defaultSize="w-5 h-5" />;
@@ -85,7 +90,14 @@ const SuggestItem = ({
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}
 			if (channel_private === 1) {
-				return <Icons.HashtagLocked defaultSize="w-5 h-5" />;
+				return (
+					<Icons.HashtagLocked
+						defaultSize="w-5 h-5"
+						className={hashtagLockedFillClass}
+						defaultFill1="var(--hashtag-locked-fill-1)"
+						defaultFill2="var(--hashtag-locked-fill-2)"
+					/>
+				);
 			}
 		}
 

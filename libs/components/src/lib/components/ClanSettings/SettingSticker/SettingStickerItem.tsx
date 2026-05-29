@@ -5,6 +5,7 @@ import { EPermission, createImgproxyUrl } from '@mezon/utils';
 import type { ClanSticker } from 'mezon-js';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../AvatarImage/AvatarImage';
 
 type SettingEmojiListProps = {
 	updateSticker: (sticker: ClanSticker) => void;
@@ -29,7 +30,6 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 		}
 	};
 	const avatarDefault = dataAuthor?.clan_nick || dataAuthor?.user?.display_name || dataAuthor?.user?.username;
-	const avatarLetter = avatarDefault?.trim().charAt(0).toUpperCase();
 	const avatarUrl = dataAuthor?.clan_avatar || dataAuthor?.user?.avatar_url;
 	return (
 		<div
@@ -55,9 +55,7 @@ const SettingStickerItem = ({ sticker, updateSticker }: SettingEmojiListProps) =
 				{avatarUrl ? (
 					<img className="w-4 h-4 rounded-full select-none object-cover" src={createImgproxyUrl(avatarUrl)} alt="" />
 				) : (
-					<div className="size-4 bg-bgAvatarDark rounded-full flex justify-center items-center text-bgAvatarLight text-[12px]">
-						{avatarLetter}
-					</div>
+					<AvatarColor username={avatarDefault || ''} className={`size-4`} />
 				)}
 				<p className=" max-w-20 truncate">{dataAuthor?.clan_nick || dataAuthor?.user?.username}</p>
 			</div>
