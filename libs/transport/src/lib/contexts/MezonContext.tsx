@@ -190,6 +190,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 	const dongRef = React.useRef<DongClient | null>(null);
 	const mmnRef = React.useRef<MmnClient | null>(null);
 	const indexerRef = React.useRef<IndexerClient | null>(null);
+	const lastPersistedSidRef = React.useRef<string | null>(null);
 
 	React.useEffect(() => {
 		const unsubscribe = subscribeSessionUpdate(({ session, source }) => {
@@ -273,30 +274,28 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 		client.onrefreshsession = (sessionNew: ApiSession) => {
 			const prev = sessionRef.current;
 			const nextSid = sessionNew?.session_id;
-			console.log('[SessionFix] onrefreshsession fired');
-			if (!nextSid) {
-				console.warn('[SessionFix] onrefreshsession skipped: empty nextSid');
+			if (!prev || !nextSid) {
 				return;
 			}
-			if (prev && prev.session_id === nextSid) {
-				console.log('[SessionFix] onrefreshsession skipped: same session_id');
-				return;
-			}
-			const base = prev ?? sessionNew;
-			const updated: ApiSession = { ...base, session_id: nextSid };
-			sessionRef.current = updated;
 
-			try {
-				const raw = localStorage.getItem('persist:auth');
-				const outer = raw ? JSON.parse(raw) : {};
-				outer.session = JSON.stringify(updated);
-				localStorage.setItem('persist:auth', JSON.stringify(outer));
-				console.log('[SessionFix] onrefreshsession persisted to localStorage');
-			} catch (err) {
-				console.error('[SessionFix] onrefreshsession localStorage write failed');
+			const updated: ApiSession = { ...prev, session_id: nextSid };
+
+			if (lastPersistedSidRef.current !== nextSid) {
+				try {
+					const raw = localStorage.getItem('persist:auth');
+					const outer = raw ? JSON.parse(raw) : {};
+					outer.session = JSON.stringify(updated);
+					localStorage.setItem('persist:auth', JSON.stringify(outer));
+					lastPersistedSidRef.current = nextSid;
+				} catch (err) {
+					console.error('[SessionFix] onrefreshsession localStorage write failed', err);
+				}
 			}
 
-			publishSessionUpdate(updated, 'refresh');
+			if (prev.session_id !== nextSid) {
+				sessionRef.current = updated;
+				publishSessionUpdate(updated, 'refresh');
+			}
 		};
 
 		createZkClient();

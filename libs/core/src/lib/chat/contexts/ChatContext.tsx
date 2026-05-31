@@ -249,7 +249,6 @@ function reconnectJitterTicker$(): Observable<number> {
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'SKIP';
 
-const RECONNECT_TRIGGER_MERGE_MS = 1000;
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -268,6 +267,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
+	const reconnectRecoveryPendingRef = useRef(false);
 
 	const navigate = useCustomNavigate();
 	// update later
@@ -2557,6 +2557,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, []);
 
 	const runPostReconnectActions = useCallback(() => {
+		if (!reconnectRecoveryPendingRef.current) {
+			return;
+		}
+		reconnectRecoveryPendingRef.current = false;
 		resetReconnectWave();
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
@@ -2581,12 +2585,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		(socket: Client) => {
 			socket.onconnect = (_evt: Event) => {
 				socketState.status = 'connected';
-				runPostReconnectActions();
 			};
 
 			socket.onreconnect = (_evt: Event) => {
 				setCallbackEventFn(socket as Client);
-				runPostReconnectActions();
 				socketState.status = 'connected';
 			};
 
@@ -2815,7 +2817,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	useEffect(() => {
 		const subscription = reconnect$
 			.pipe(
-				auditTime(RECONNECT_TRIGGER_MERGE_MS),
 				exhaustMap((socketType) => {
 					beginReconnectWave();
 					return reconnectJitterTicker$().pipe(
@@ -2837,6 +2838,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 							}
 
 							if (!consumeReconnectAttempt()) {
+								reconnectRecoveryPendingRef.current = false;
 								socketState.status = 'disconnected';
 								resetRefreshState();
 								dispatch(authActions.setLogout());
@@ -2880,6 +2882,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const handleReconnect = useCallback(
 		(socketType: string) => {
+			reconnectRecoveryPendingRef.current = true;
 			reconnect$.next(socketType);
 		},
 		[reconnect$]
