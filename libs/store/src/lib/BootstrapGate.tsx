@@ -1,4 +1,4 @@
-import { useMezon } from '@mezon/transport';
+import { probeNetworkReachability, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
 import type { ApiSession } from 'mezon-js';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
@@ -77,6 +77,19 @@ export function BootstrapGate({ children, persistor, fallback }: Props) {
 					// Retry call connect socket if it fail with MAX_RETRIES time
 					for (let i = 0; i <= MAX_RETRIES; i++) {
 						setRetryCount(i);
+
+						if (i > 0) {
+							const reachable = await probeNetworkReachability({
+								timeoutMs: RECONNECT_NETWORK_PROBE_TIMEOUT_MS
+							});
+							if (!reachable) {
+								console.error(`Network probe failed before bootstrap retry ${i}`);
+								if (i === MAX_RETRIES) break;
+								const baseDelay = INITIAL_DELAY * Math.pow(2, i);
+								await delay(baseDelay + Math.random() * 500);
+								continue;
+							}
+						}
 
 						try {
 							await connectSocket();
