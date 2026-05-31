@@ -57,7 +57,8 @@ interface ParsedContentRange {
 }
 
 function isElectronMac(): boolean {
-	return isElectron() && navigator.platform?.toLowerCase().includes('mac');
+	return true;
+	// return isElectron() && navigator.platform?.toLowerCase().includes('mac');
 }
 
 function parseContentRangeHeader(contentRange: string | null): ParsedContentRange | null {
