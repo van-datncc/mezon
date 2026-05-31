@@ -452,14 +452,7 @@ const MezonContextProvider: React.FC<MezonContextProviderProps> = ({ children, m
 
 			socketState.status = 'connected';
 			return sessionRef.current;
-		})()
-			.catch((error) => {
-				console.log('[ReconnectFlow] connectSocket failed', {
-					error: error instanceof Error ? error.message : String(error)
-				});
-				throw error;
-			})
-			.finally(() => {
+		})().finally(() => {
 				connectInFlight = null;
 			});
 
