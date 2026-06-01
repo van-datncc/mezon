@@ -133,7 +133,7 @@ export const channelMetaSlice = createSlice({
 				}
 			}
 			if (action?.payload?.clanId === '0') {
-				// dmMetaAdapter.setMany(state.dmEntities, meta);
+				dmMetaAdapter.setMany(state.dmEntities, meta);
 				return;
 			}
 			channelMetaAdapter.setMany(state, meta);
@@ -228,16 +228,16 @@ export const channelMetaSlice = createSlice({
 					id: channelId,
 					changes: {
 						last_sent_message: updatedMessage,
-						lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1
+						lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
 					}
 				});
 			} else {
 				dmMetaAdapter.addOne(state.dmEntities, {
 					id: channelId,
-					clanId: message.clan_id || '0',
+					clanId: message.clan_id || '',
 					isMute: false,
 					senderId: message.sender_id,
-					lastSeenTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1000,
+					lastSeenTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1,
 					last_sent_message: updatedMessage,
 					lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
 				});
