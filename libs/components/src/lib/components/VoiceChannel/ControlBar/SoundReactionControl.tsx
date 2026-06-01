@@ -30,7 +30,7 @@ export const SoundReactionControl = memo(({ showSoundPanel, onVisibleChange, onS
 		<Tooltip
 			placement="topLeft"
 			trigger={['click']}
-			overlayClassName="w-auto"
+			overlayClassName="w-auto text-theme-primary"
 			visible={showSoundPanel}
 			onVisibleChange={onVisibleChange}
 			overlay={<SoundSquare mode={ChannelStreamMode.STREAM_MODE_CHANNEL} onClose={handleClose} onSoundSelect={handleSoundSelect} />}
