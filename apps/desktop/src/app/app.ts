@@ -635,11 +635,10 @@ export default class App {
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
-		// TODO revert PR 13095
-		// if (process.platform === 'linux') {
-		// 	app.commandLine.appendSwitch('ozone-platform', 'wayland');
-		// 	app.commandLine.appendSwitch('disable-features', 'Vulkan');
-		// }
+		if (process.platform === 'linux' && process.env.XDG_SESSION_TYPE === 'wayland') {
+			app.commandLine.appendSwitch('ozone-platform', 'wayland');
+			app.commandLine.appendSwitch('disable-features', 'Vulkan');
+		}
 
 		App.BrowserWindow = browserWindow;
 		App.application = app;
