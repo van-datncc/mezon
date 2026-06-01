@@ -133,7 +133,7 @@ export const channelMetaSlice = createSlice({
 				}
 			}
 			if (action?.payload?.clanId === '0') {
-				dmMetaAdapter.setMany(state.dmEntities, meta);
+				// dmMetaAdapter.setMany(state.dmEntities, meta);
 				return;
 			}
 			channelMetaAdapter.setMany(state, meta);
@@ -221,13 +221,27 @@ export const channelMetaSlice = createSlice({
 		updateDmLastSentMessage: (state, action: PayloadAction<{ channelId: string; message: ChannelMessage }>) => {
 			const { channelId, message } = action.payload;
 			const updatedMessage = mapMessageToConversation(message);
-			dmMetaAdapter.updateOne(state.dmEntities, {
-				id: channelId,
-				changes: {
+
+			const checkExist = state.dmEntities?.entities[channelId];
+			if (checkExist) {
+				dmMetaAdapter.updateOne(state.dmEntities, {
+					id: channelId,
+					changes: {
+						last_sent_message: updatedMessage,
+						lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1
+					}
+				});
+			} else {
+				dmMetaAdapter.addOne(state.dmEntities, {
+					id: channelId,
+					clanId: message.clan_id || '0',
+					isMute: false,
+					senderId: message.sender_id,
+					lastSeenTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1000,
 					last_sent_message: updatedMessage,
 					lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
-				}
-			});
+				});
+			}
 		},
 		dmMetaAdd: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
