@@ -29,9 +29,7 @@ export const ListGroupSearchModal: React.FC<Props> = ({ listRecent, listItemWith
 					const isDMMessage = item.type === ChannelType.CHANNEL_TYPE_DM;
 					const isGrMessage = item.type === ChannelType.CHANNEL_TYPE_GROUP;
 					const hasUnread = item.lastSentTimeStamp > item.lastSeenTimeStamp;
-					const hasUnreadChannel =
-						(isTextChannel && (hasUnread || !!item.count_messsage_unread)) ||
-						(isThreadChannel && (hasUnread || !!item.count_messsage_unread));
+					const hasUnreadChannel = (isTextChannel && (hasUnread || hasCountUnread)) || (isThreadChannel && (hasUnread || hasCountUnread));
 					const hasUnreadDmGr = (isDMMessage && (hasUnread || hasCountUnread)) || (isGrMessage && (hasUnread || hasCountUnread));
 					const isInListRecent = listRecent.some((recentItem) => recentItem.id === item.id);
 

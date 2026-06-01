@@ -24,7 +24,6 @@ import debounce from 'lodash.debounce';
 import { ChannelType } from 'mezon-js';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { ModalLayout } from '../../components';
 import { ListGroupSearchModal } from './ListGroupSeacrhModal';
 
@@ -43,7 +42,7 @@ const withChannelMetaUnread = (lastSent: number, lastSeen: number, countUnread: 
 	}
 	const listSaysUnread = (countUnread ?? 0) > 0 || lastSent > lastSeen;
 	const metaSaysUnread = (meta.count_mess_unread ?? 0) > 0 || (meta.lastSentTimestamp ?? 0) > (meta.lastSeenTimestamp ?? 0);
-	if (listSaysUnread || !metaSaysUnread) {
+	if (listSaysUnread && metaSaysUnread) {
 		return fromList;
 	}
 	return {
@@ -53,19 +52,24 @@ const withChannelMetaUnread = (lastSent: number, lastSeen: number, countUnread: 
 	};
 };
 
+const getMetaUnreadSignature = (entities: Record<string, ChannelMetaEntity | undefined>, channelIds: string[]) =>
+	channelIds
+		.map((id) => {
+			const meta = entities[id];
+			return meta ? `${meta.count_mess_unread ?? 0}:${meta.lastSentTimestamp ?? 0}:${meta.lastSeenTimestamp ?? 0}` : '';
+		})
+		.join('|');
+
 function SearchModal({ onClose }: SearchModalProps) {
 	const { t } = useTranslation('common');
 	const dispatch = useAppDispatch();
-	const allClanUsersEntitiesRef = useRef(useSelector(selectEntitesUserClans));
+	const allClanUsersEntities = useAppSelector(selectEntitesUserClans);
 	const dmGroupChatList = useAppSelector(selectAllDirectMessages);
 	const listChannels = useAppSelector(selectAllChannelsByUser);
 	const channelMetaEntities = useAppSelector(selectChannelMetaEntities);
 	const dmMetaEntities = useAppSelector(selectDmMetaEntities);
-	const allUsesInAllClansEntitiesRef = useRef(useSelector(selectAllUsesInAllClansEntities));
+	const allUsesInAllClansEntities = useAppSelector(selectAllUsesInAllClansEntities);
 	const previousChannels = useAppSelector(selectPreviousChannels);
-
-	const allClanUsersEntities = allClanUsersEntitiesRef.current;
-	const allUsesInAllClansEntities = allUsesInAllClansEntitiesRef.current;
 
 	const { userProfile } = useAuth();
 	const accountId = userProfile?.user?.id ?? '';
@@ -77,6 +81,15 @@ function SearchModal({ onClose }: SearchModalProps) {
 
 	const debouncedSetSearchText = useMemo(() => debounce((value) => setSearchText(value), 200), []);
 	const checkListDM = useRef(new Set<string>());
+	const dmChannelIds = useMemo(
+		() =>
+			dmGroupChatList
+				.filter((item) => item.active === 1)
+				.map((item) => item.channel_id ?? '')
+				.filter(Boolean),
+		[dmGroupChatList]
+	);
+	const dmMetaUnreadSignature = getMetaUnreadSignature(dmMetaEntities, dmChannelIds);
 	const listDirectSearch = useMemo(() => {
 		const listDmSearchMap: SearchItemProps[] = [];
 		if (dmGroupChatList.length) {
@@ -112,7 +125,9 @@ function SearchModal({ onClose }: SearchModalProps) {
 		}
 		const addPropsIntoSearchList = addAttributesSearchList(listDmSearchMap, Object.values(allUsesInAllClansEntities) as any);
 		return addPropsIntoSearchList;
-	}, [accountId, dmGroupChatList, allUsesInAllClansEntities, allClanUsersEntities, dmMetaEntities]);
+	}, [dmGroupChatList, allUsesInAllClansEntities, allClanUsersEntities, dmMetaUnreadSignature]);
+	const channelIdsForMeta = useMemo(() => listChannels.map((item) => item?.channel_id ?? '').filter(Boolean), [listChannels]);
+	const channelMetaUnreadSignature = getMetaUnreadSignature(channelMetaEntities, channelIdsForMeta);
 	const listChannelSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
 		listChannels.map((item) => {
@@ -144,7 +159,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 			}
 		});
 		return list;
-	}, [listChannels, channelMetaEntities]);
+	}, [listChannels, channelMetaUnreadSignature]);
 
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
