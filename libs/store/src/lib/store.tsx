@@ -206,14 +206,6 @@ const persistedEventMngtReducer = persistReducer(
 	eventManagementReducer
 );
 
-const persistedChannelCatSettingReducer = persistReducer(
-	{
-		key: 'notichannelcategorysetting',
-		storage
-	},
-	channelCategorySettingReducer
-);
-
 const persistedPinMsgReducer = persistReducer(
 	{
 		key: 'pinmessages',
@@ -351,7 +343,7 @@ const reducer = {
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: persistedDefaultNotiCatReducer,
-	notichannelcategorysetting: persistedChannelCatSettingReducer,
+	notichannelcategorysetting: channelCategorySettingReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
