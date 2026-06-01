@@ -256,6 +256,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isMobile = false }) => {
 	const { t } = useTranslation('token');
+	const { t: tChannelMenu } = useTranslation('channelMenu');
 	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
@@ -1998,6 +1999,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 			const clanId = channelArchive.clan_id || selectCurrentClanId(getStore().getState()) || '0';
 			const channelId = channelArchive.channel_id;
+			const currentChannelId = selectCurrentChannelId(getStore().getState() as unknown as RootState);
 			const isArchiveAction = Number(channelArchive.active) === ThreadStatus.archived;
 
 			if (isArchiveAction) {
@@ -2008,6 +2010,17 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					})
 				);
 				dispatch(channelsActions.removeFavorite({ clanId, channelId }));
+
+				if (userId && channelArchive.creator_id !== userId && currentChannelId === channelId) {
+					dispatch(
+						toastActions.addToast({
+							message: tChannelMenu('toastArchivedByAdministrator'),
+							type: 'success',
+							autoClose: 3000
+						})
+					);
+				}
+
 				return;
 			}
 
@@ -2019,7 +2032,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			);
 			dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
 		},
-		[dispatch]
+		[dispatch, userId, tChannelMenu]
 	);
 
 	const onpermissionset = useCallback(

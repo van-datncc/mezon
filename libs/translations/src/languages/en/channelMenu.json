@@ -114,5 +114,6 @@
 	"btnBadgeCount": "New",
 	"favoriteChannel": "FAVORITE CHANNEL",
 	"toastArchiveChannel": "Channel archived successfully.",
-	"toastArchiveThread": "Thread archived successfully."
+	"toastArchiveThread": "Thread archived successfully.",
+	"toastArchivedByAdministrator": "This channel has been archived by the administrator"
 }

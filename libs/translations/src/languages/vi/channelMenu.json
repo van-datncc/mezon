@@ -114,5 +114,6 @@
 	"btnBadgeCount": "Mới",
 	"favoriteChannel": "KÊNH YÊU THÍCH",
 	"toastArchiveChannel": "Lưu trữ kênh thành công.",
-	"toastArchiveThread": "Lưu trữ chủ đề thành công."
+	"toastArchiveThread": "Lưu trữ chủ đề thành công.",
+	"toastArchivedByAdministrator": "Kênh này đã được quản trị viên lưu trữ"
 }
