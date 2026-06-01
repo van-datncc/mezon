@@ -175,8 +175,8 @@ const ChannelLinkComponent = ({ clanId, channel, isPrivate, isUnReadChannel, num
 				: '[--hashtag-warning-fill-1:var(--bg-icon-theme)] group-hover:[--hashtag-warning-fill-1:var(--bg-icon-theme-active)]',
 			hashtagLocked: `w-4 h-4 ${
 				isIconActive
-					? '[--hashtag-locked-fill-1:var(--bg-icon-theme-active)]'
-					: '[--hashtag-locked-fill-1:var(--bg-icon-theme)] group-hover:[--hashtag-locked-fill-1:var(--bg-icon-theme-active)]'
+					? '[--hashtag-locked-fill-1:var(--bg-icon-theme-active)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)]'
+					: '[--hashtag-locked-fill-1:var(--bg-icon-theme)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)] group-hover:[--hashtag-locked-fill-1:var(--bg-icon-theme-active)]'
 			}`,
 			hashtag: isIconActive
 				? '[--hashtag-fill-1:var(--bg-icon-theme-active)]'
@@ -257,6 +257,7 @@ const ChannelLinkComponent = ({ clanId, channel, isPrivate, isUnReadChannel, num
 									<Icons.HashtagLocked
 										className={` ${iconFillClasses.hashtagLocked} w-4 h-4`}
 										defaultFill1="var(--hashtag-locked-fill-1)"
+										defaultFill2="var(--hashtag-locked-fill-2)"
 										data-e2e={generateE2eId('clan_page.channel_list.item.icon.hashtag_lock')}
 									/>
 								)}

@@ -214,7 +214,7 @@ export const AddMemRole: React.FC<AddMemRoleProps> = ({
 						<Icons.SpeakerLocked className="w-5 h-5" />
 					)}
 					{isPrivate === ChannelStatusEnum.isPrivate && channel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-						<Icons.HashtagLocked className="w-5 h-5 " />
+						<Icons.HashtagLocked className="w-5 h-5" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 					)}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE && <Icons.Speaker className="w-5 h-5" />}
 					{isPrivate === undefined && channel.type === ChannelType.CHANNEL_TYPE_STREAMING && <Icons.Stream className="w-5 h-5" />}

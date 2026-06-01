@@ -14,6 +14,7 @@ type ShareItem = {
 	clanId?: string;
 	clanName?: string;
 	isPublic?: boolean;
+	isAgeRestricted?: boolean;
 };
 
 type ShareItemRowProps = {
@@ -37,10 +38,12 @@ export const ShareItemRow = ({ item, isSelected, onToggle, searchText, t }: Shar
 			{isChannelOrThread ? (
 				<div className="flex items-center flex-1 mr-1 gap-2">
 					{item.type === 'channel' ? (
-						item.isPublic ? (
+						item.isAgeRestricted ? (
+							<Icons.HashtagWarning className="w-5 h-5 text-theme-secondary" />
+						) : item.isPublic ? (
 							<Icons.Hashtag className="w-5 h-5 text-theme-secondary" />
 						) : (
-							<Icons.HashtagLocked className="w-5 h-5 text-theme-secondary" />
+							<Icons.HashtagLocked className="w-5 h-5" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 						)
 					) : item.isPublic ? (
 						<Icons.ThreadIcon
@@ -54,7 +57,7 @@ export const ShareItemRow = ({ item, isSelected, onToggle, searchText, t }: Shar
 							className="w-5 h-5"
 							defaultFill1="var(--bg-icon-theme)"
 							defaultFill4="var(--bg-theme-secounnd)"
-							defaultFill5="var(--bg-icon-theme)"
+							defaultFill5="var(--bg-icon-theme-active)"
 						/>
 					)}
 					<span className="text-theme-primary text-sm flex-1">{item.displayName}</span>
