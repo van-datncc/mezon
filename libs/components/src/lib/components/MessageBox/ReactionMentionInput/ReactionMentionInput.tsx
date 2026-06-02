@@ -397,8 +397,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					await addMemberToThread(currentChannel!, usersNotExistingInThread);
 				}
 
-				await handleThreadActivation(currentChannel);
-
 				if (isReplyOnChannel) {
 					props.onSend(
 						filterEmptyArrays(payload),
@@ -466,7 +464,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					);
 					setMentionEveryone(false);
 				}
-
+				await handleThreadActivation(currentChannel);
 				updateDraft?.({
 					valueTextInput: '',
 					content: '',
@@ -573,8 +571,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				return;
 			}
 
-			await handleThreadActivation(currentChannel);
-
 			if (isReplyOnChannel) {
 				props.onSend(
 					filterEmptyArrays(payload),
@@ -671,6 +667,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				setEphemeralTargetUserId(null);
 				setEphemeralTargetUserDisplay(null);
 			}
+			await handleThreadActivation(currentChannel);
 
 			updateDraft?.({
 				valueTextInput: '',
