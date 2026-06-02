@@ -79,6 +79,7 @@ import {
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
 	selectLoadingStatus,
+	selectMessageByMessageId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -101,7 +102,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { probeNetworkReachability, publishSessionUpdate, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
+import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -193,7 +194,7 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Observable, Subject } from 'rxjs';
-import { auditTime, exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
+import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import {
@@ -248,7 +249,6 @@ function reconnectJitterTicker$(): Observable<number> {
 }
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'SKIP';
-
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -602,6 +602,31 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					}
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 					dispatch(threadsActions.updateLastSentInThread({ channelId: message.channel_id, lastSentTime: timestamp }));
+				}
+				if (message?.code === TypeMessage.CreatePin) {
+					const pinnedMessageId = message.references?.[0]?.message_ref_id;
+					if (pinnedMessageId && message.channel_id) {
+						const pinnedMessage = selectMessageByMessageId(store.getState() as RootState, message.channel_id, String(pinnedMessageId));
+						dispatch(
+							pinMessageActions.addPinMessage({
+								channelId: message.channel_id,
+								pinMessage: {
+									id: String(pinnedMessageId),
+									message_id: String(pinnedMessageId),
+									channel_id: message.channel_id,
+									content: pinnedMessage ? JSON.stringify(pinnedMessage.content) : '{}',
+									avatar: pinnedMessage?.avatar || pinnedMessage?.clan_avatar || '',
+									sender_id: pinnedMessage?.sender_id || message.sender_id || '',
+									username: pinnedMessage?.display_name || pinnedMessage?.username || '',
+									create_time_seconds:
+										pinnedMessage?.create_time_seconds || message.create_time_seconds || Math.floor(Date.now() / 1000),
+									attachment: pinnedMessage?.attachments?.length
+										? new TextEncoder().encode(JSON.stringify(pinnedMessage.attachments))
+										: new Uint8Array()
+								}
+							})
+						);
+					}
 				}
 				if (message?.code === TypeMessage.ChatRemove) {
 					const replyData = selectDataReferences(store.getState(), message.channel_id);

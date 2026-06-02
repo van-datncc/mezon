@@ -15,6 +15,7 @@ import {
 	selectCurrentClanId,
 	selectCurrentTopicId,
 	selectDmGroupCurrentId,
+	selectIsMessagePinned,
 	selectMessageByMessageId,
 	selectThreadCurrentChannel,
 	useAppDispatch
@@ -176,6 +177,14 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 		const currentChannelChannelId = selectCurrentChannelChannelId(appState);
 		const currentChannelPrivate = selectCurrentChannelPrivate(appState);
 		const mode = getActiveMode();
+		const isChannelOrThread = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
+		const channelIdForPinList = isChannelOrThread
+			? selectCurrentChannelId(appState) || message?.channel_id || ''
+			: currentDm?.id || message?.channel_id || '';
+
+		if (message?.id && selectIsMessagePinned(appState, [channelIdForPinList, message?.channel_id, currentChannelChannelId], message.id)) {
+			return;
+		}
 
 		dispatch(
 			pinMessageActions.setChannelPinMessage({
@@ -206,6 +215,25 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 		};
 
 		dispatch(pinMessageActions.joinPinMessage(pinBody));
+
+		if (channelIdForPinList && message?.id) {
+			dispatch(
+				pinMessageActions.addPinMessage({
+					channelId: channelIdForPinList,
+					pinMessage: {
+						id: message.id,
+						message_id: message.id,
+						channel_id: message.channel_id || channelIdForPinList,
+						content: JSON.stringify(message.content),
+						avatar: message.avatar || message.clan_avatar || '',
+						sender_id: message.sender_id,
+						username: message.display_name || message.username || message.user?.name || '',
+						create_time_seconds: message.create_time_seconds || Math.floor(Date.now() / 1000),
+						attachment: attachments.length ? new TextEncoder().encode(JSON.stringify(attachments)) : new Uint8Array()
+					}
+				})
+			);
+		}
 	}, []);
 
 	const { show } = useContextMenu({
