@@ -106,9 +106,11 @@ const ScreenListItems = memo(({ source, onClose, audio, onSelect, selectedId }: 
 
 	useEffect(() => {
 		return () => {
-			window.electron.clearScreenSourcesCache().catch((error) => {
-				console.error('Failed to clear window sources cache on unmount:', error);
-			});
+			if (typeof window?.electron?.clearScreenSourcesCache === 'function') {
+				window.electron.clearScreenSourcesCache().catch((error) => {
+					console.error('Failed to clear window sources cache on unmount:', error);
+				});
+			}
 		};
 	}, []);
 
