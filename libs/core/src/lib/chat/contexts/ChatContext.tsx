@@ -74,6 +74,7 @@ import {
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectDmMetaEntities,
+	selectFriendById,
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
@@ -2447,33 +2448,49 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const onblockfriend = useCallback(
 		(blockFriend: BlockFriend) => {
-			if (!blockFriend?.user_id) {
+			if (!blockFriend?.user_id || !userId) {
 				return;
 			}
-			dispatch(
-				friendsActions.applyFriendBlockState({
-					userId: blockFriend.user_id,
-					state: EStateFriend.BLOCK,
-					sourceId: userId as string
-				})
-			);
+			const myId = userId as string;
+			const targetUserId = blockFriend.user_id;
+
+			if (targetUserId === myId) {
+				return;
+			}
+
+			const existing = selectFriendById(getStore().getState() as RootState, targetUserId);
+			const iBlockedThem = existing?.state === EStateFriend.BLOCK && existing.source_id === myId;
+			if (!iBlockedThem) {
+				void dispatch(friendsActions.fetchListFriends({ noCache: true }));
+			}
 		},
 		[dispatch, userId]
 	);
 
 	const onunblockfriend = useCallback(
 		(unblockFriend: UnblockFriend) => {
-			if (!unblockFriend?.user_id) {
+			if (!unblockFriend?.user_id || !userId) {
 				return;
 			}
-			dispatch(
-				friendsActions.applyFriendBlockState({
-					userId: unblockFriend.user_id,
-					state: EStateFriend.FRIEND
-				})
-			);
+			const myId = userId as string;
+			const targetUserId = unblockFriend.user_id;
+
+			if (targetUserId === myId) {
+				return;
+			}
+
+			const existing = selectFriendById(getStore().getState() as RootState, targetUserId);
+			const iBlockedThem = existing?.state === EStateFriend.BLOCK && existing.source_id === myId;
+			if (iBlockedThem) {
+				dispatch(
+					friendsActions.applyFriendBlockState({
+						userId: targetUserId,
+						state: EStateFriend.FRIEND
+					})
+				);
+			}
 		},
-		[dispatch]
+		[dispatch, userId]
 	);
 
 	const onMarkAsRead = useCallback(async (markAsReadEvent: MarkAsRead) => {
