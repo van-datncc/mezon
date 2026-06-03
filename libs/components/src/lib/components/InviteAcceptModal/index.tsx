@@ -1,7 +1,7 @@
 import { useInvite } from '@mezon/core';
-import { channelsActions, clansActions, getStore, inviteActions, selectAllClans, selectInviteById, useAppDispatch } from '@mezon/store';
+import { channelsActions, clansActions, inviteActions, selectClanById, selectInviteById, useAppDispatch } from '@mezon/store';
 import { Modal } from '@mezon/ui';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -53,23 +53,18 @@ export default function InviteAcceptModal({ inviteId, onClose, showModal }: Invi
 	const handleJoinChannel = () => {
 		joinChannel();
 		dispatch(inviteActions.setIsClickInvite(false));
+		const clan = selectClanById(clanId);
+		if (userJoined || !!clan) {
+			toast.info(t('acceptModal.toast.alreadyMember'));
+			navigate(`/chat/clans/${clanId}/channels/${channelId}`);
+			onClose();
+		}
 	};
 
 	const handleClose = () => {
 		dispatch(inviteActions.setIsClickInvite(false));
 		onClose();
 	};
-
-	useEffect(() => {
-		const store = getStore();
-		const clans = selectAllClans(store.getState());
-		const isClanMember = clans.some((item) => item.id === clanId);
-		if (userJoined || isClanMember) {
-			toast.info(t('acceptModal.toast.alreadyMember'));
-			navigate(`/chat/clans/${clanId}/channels/${channelId}`);
-			onClose();
-		}
-	}, [userJoined, navigate, clanId, channelId, onClose, t]);
 
 	return (
 		<Modal showModal={showModal} onClose={handleClose} isInviteModal={true} title={t('acceptModal.title')}>

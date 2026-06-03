@@ -74,6 +74,7 @@ import {
 	selectDirectById,
 	selectDmGroupCurrentId,
 	selectDmMetaEntities,
+	selectFriendById,
 	selectIsInCall,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
@@ -101,7 +102,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { publishSessionUpdate, useMezon } from '@mezon/transport';
+import { probeNetworkReachability, publishSessionUpdate, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -194,10 +195,18 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Observable, Subject } from 'rxjs';
-import { exhaustMap, filter, takeWhile } from 'rxjs/operators';
+import { auditTime, exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
-import { consumeSocketReconnectBudget, refundSocketReconnectBudgetSlot, resetSocketReconnectBudget } from '../utils/socketReconnectBudget';
+import {
+	beginReconnectWave,
+	consumeReconnectAttempt,
+	markNetworkProbeCompleted,
+	refundReconnectAttempt,
+	resetReconnectWave,
+	shouldProbeNetworkBeforeConnect,
+	waitForNetworkProbeSlot
+} from '../utils/socketReconnectBudget';
 import { handleGroupCallSocketEvent } from './groupCallSocketHandler';
 
 const MobileEventEmitter = new EventEmitter();
@@ -240,7 +249,8 @@ function reconnectJitterTicker$(): Observable<number> {
 	});
 }
 
-type ReconnectWaveTickResult = boolean | 'BUDGET_EXHAUSTED';
+type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'SKIP';
+
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -260,6 +270,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
+	const reconnectRecoveryPendingRef = useRef(false);
 
 	const navigate = useCustomNavigate();
 	// update later
@@ -2480,33 +2491,49 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const onblockfriend = useCallback(
 		(blockFriend: BlockFriend) => {
-			if (!blockFriend?.user_id) {
+			if (!blockFriend?.user_id || !userId) {
 				return;
 			}
-			dispatch(
-				friendsActions.applyFriendBlockState({
-					userId: blockFriend.user_id,
-					state: EStateFriend.BLOCK,
-					sourceId: userId as string
-				})
-			);
+			const myId = userId as string;
+			const targetUserId = blockFriend.user_id;
+
+			if (targetUserId === myId) {
+				return;
+			}
+
+			const existing = selectFriendById(getStore().getState() as RootState, targetUserId);
+			const iBlockedThem = existing?.state === EStateFriend.BLOCK && existing.source_id === myId;
+			if (!iBlockedThem) {
+				void dispatch(friendsActions.fetchListFriends({ noCache: true }));
+			}
 		},
 		[dispatch, userId]
 	);
 
 	const onunblockfriend = useCallback(
 		(unblockFriend: UnblockFriend) => {
-			if (!unblockFriend?.user_id) {
+			if (!unblockFriend?.user_id || !userId) {
 				return;
 			}
-			dispatch(
-				friendsActions.applyFriendBlockState({
-					userId: unblockFriend.user_id,
-					state: EStateFriend.FRIEND
-				})
-			);
+			const myId = userId as string;
+			const targetUserId = unblockFriend.user_id;
+
+			if (targetUserId === myId) {
+				return;
+			}
+
+			const existing = selectFriendById(getStore().getState() as RootState, targetUserId);
+			const iBlockedThem = existing?.state === EStateFriend.BLOCK && existing.source_id === myId;
+			if (iBlockedThem) {
+				dispatch(
+					friendsActions.applyFriendBlockState({
+						userId: targetUserId,
+						state: EStateFriend.FRIEND
+					})
+				);
+			}
 		},
-		[dispatch]
+		[dispatch, userId]
 	);
 
 	const onMarkAsRead = useCallback(async (markAsReadEvent: MarkAsRead) => {
@@ -2590,7 +2617,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, []);
 
 	const runPostReconnectActions = useCallback(() => {
-		resetSocketReconnectBudget();
+		if (!reconnectRecoveryPendingRef.current) {
+			return;
+		}
+		reconnectRecoveryPendingRef.current = false;
+		resetReconnectWave();
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING'));
 		dispatch(toastActions.removeToast('SOCKET_RECONNECTING_ERROR'));
 		dispatch(toastActions.removeToast('SOCKET_CONNECTION_ERROR'));
@@ -2601,7 +2632,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const onServerDisconnectStreakLogout = useCallback(
 		(_evt: Event, streak: number) => {
-			console.error('[ReconnectFlow] Server disconnect streak logout', { streak });
 			captureSentryError(new Error(`serverDisconnectStreak=${String(streak)}`), 'SERVER_DISCONNECT_STREAK_LOGOUT');
 			resetRefreshState();
 			dispatch(authActions.setLogout());
@@ -2619,7 +2649,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 			socket.onreconnect = (_evt: Event) => {
 				setCallbackEventFn(socket as Client);
-				runPostReconnectActions();
 				socketState.status = 'connected';
 			};
 
@@ -2810,15 +2839,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				return false;
 			}
 
-			if (!consumeSocketReconnectBudget()) {
-				socketState.status = 'disconnected';
-				resetRefreshState();
-				dispatch(authActions.setLogout());
-				dispatch(walletActions.setLogout());
-				publishSessionUpdate(null, 'logout');
-				return 'BUDGET_EXHAUSTED';
-			}
-
 			socketState.status = 'connecting';
 
 			let watchdogId: number | undefined;
@@ -2826,7 +2846,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				watchdogId = window.setTimeout(() => {
 					if (socketState.status === 'connecting') {
 						socketState.status = 'disconnected';
-						console.warn('[ReconnectFlow] connect watchdog elapsed while still connecting');
 					}
 				}, RECONNECT_CONNECT_WATCHDOG_MS);
 			}
@@ -2835,8 +2854,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				const result = await reconnectSocket();
 
 				if (result.status === 'RECONNECTING') {
-					refundSocketReconnectBudgetSlot();
-					return false;
+					refundReconnectAttempt();
+					return 'RECONNECTING';
 				}
 				if (result.status === 'MISSING_SESSION') {
 					socketState.status = 'disconnected';
@@ -2859,13 +2878,36 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	useEffect(() => {
 		const subscription = reconnect$
 			.pipe(
-				exhaustMap((socketType) =>
-					reconnectJitterTicker$().pipe(
-						filter(() => isUiActive() && (typeof navigator === 'undefined' || navigator.onLine !== false)),
+				exhaustMap((socketType) => {
+					beginReconnectWave();
+					return reconnectJitterTicker$().pipe(
+						filter(() => isUiActive()),
 						exhaustMap(async (): Promise<ReconnectWaveTickResult> => {
-							if (!clientRef.current) {
-								return false;
+							if (shouldProbeNetworkBeforeConnect()) {
+								await waitForNetworkProbeSlot();
+								const reachable = await probeNetworkReachability({
+									timeoutMs: RECONNECT_NETWORK_PROBE_TIMEOUT_MS
+								});
+								markNetworkProbeCompleted();
+								if (!reachable) {
+									return 'NETWORK_DOWN';
+								}
 							}
+
+							if (!clientRef.current) {
+								return 'SKIP';
+							}
+
+							if (!consumeReconnectAttempt()) {
+								reconnectRecoveryPendingRef.current = false;
+								socketState.status = 'disconnected';
+								resetRefreshState();
+								dispatch(authActions.setLogout());
+								dispatch(walletActions.setLogout());
+								publishSessionUpdate(null, 'logout');
+								return 'ATTEMPTS_EXHAUSTED';
+							}
+
 							try {
 								return await executeReconnect(socketType, clientRef.current);
 							} catch (error) {
@@ -2873,29 +2915,35 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 								return false;
 							}
 						}),
-						takeWhile((result) => result !== true && result !== 'BUDGET_EXHAUSTED', true)
-					)
-				)
+						tap((result) => {
+							if (result === true) {
+								runPostReconnectActions();
+							}
+						}),
+						takeWhile((result) => result !== true && result !== 'ATTEMPTS_EXHAUSTED', true)
+					);
+				})
 			)
 			.subscribe();
 
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [reconnect$, executeReconnect, dispatch]);
+	}, [reconnect$, executeReconnect, clientRef, dispatch, runPostReconnectActions]);
 
 	useEffect(() => {
-		const onBudgetReset = () => {
+		const onWaveReset = () => {
 			dispatch(toastActions.removeToast('SOCKET_RECONNECT_BUDGET'));
 		};
-		window.addEventListener('mezon:socket-budget-reset', onBudgetReset);
+		window.addEventListener('mezon:reconnect-wave-reset', onWaveReset);
 		return () => {
-			window.removeEventListener('mezon:socket-budget-reset', onBudgetReset);
+			window.removeEventListener('mezon:reconnect-wave-reset', onWaveReset);
 		};
 	}, [dispatch]);
 
 	const handleReconnect = useCallback(
 		(socketType: string) => {
+			reconnectRecoveryPendingRef.current = true;
 			reconnect$.next(socketType);
 		},
 		[reconnect$]

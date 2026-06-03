@@ -1,4 +1,4 @@
-import { channelsActions, messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
+import { channelsActions, isDMStreamMode, messagesActions, pinMessageActions, threadsActions, useAppDispatch } from '@mezon/store';
 import type { IExtendedMessage, IMessageWithUser } from '@mezon/utils';
 import { ETokenMessage, TypeMessage, convertUnixSecondsToTimeString, generateE2eId, parseThreadInfo } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
@@ -115,14 +115,16 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 
 	const handelJumpToChannel = async () => {
 		if (threadId) {
-			await dispatch(
+			const result = await dispatch(
 				channelsActions.addThreadToChannels({
 					channelId: threadId,
 					clanId: message?.clan_id as string,
 					parentChannelId: message?.channel_id
 				})
-			);
-			navigate(`/chat/clans/${message?.clan_id}/channels/${threadId}`);
+			).unwrap();
+			if (result) {
+				navigate(`/chat/clans/${message?.clan_id}/channels/${threadId}`);
+			}
 		}
 	};
 
@@ -131,9 +133,10 @@ const RenderContentSystem = ({ message, data, mode, isSearchMessage, isJumMessag
 	};
 
 	const handleShowPinMessage = async () => {
-		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: message?.channel_id, clanId: message.clan_id || '0' }));
-		const prefix = mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? 'c:' : 'd:';
-		dispatch(pinMessageActions.togglePinModal(`${prefix}${message?.channel_id}`));
+		const channelId = message?.channel_id;
+		if (!channelId) return;
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId, clanId: message.clan_id || '0' }));
+		dispatch(pinMessageActions.togglePinModal({ channelId, isDM: isDMStreamMode(mode) }));
 	};
 
 	return (

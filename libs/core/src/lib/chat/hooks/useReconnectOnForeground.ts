@@ -2,7 +2,7 @@ import { isOnline$, socketState } from '@mezon/transport';
 import { isUiActive } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 
-import { resetSocketReconnectBudget } from '../utils/socketReconnectBudget';
+import { resetReconnectWave } from '../utils/socketReconnectBudget';
 
 export type UseReconnectOnForegroundOptions = {
 	scheduleReconnect: (reason: string) => void;
@@ -35,7 +35,7 @@ export function useReconnectOnForeground({ scheduleReconnect, debouncedScheduleM
 		};
 
 		const refreshAndReconnect = () => {
-			resetSocketReconnectBudget();
+			resetReconnectWave();
 			armReconnect();
 		};
 
