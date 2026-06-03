@@ -1,5 +1,8 @@
 {
 	"emptyDescription": "We searched far and wide. Unfortunately, no results were found",
+	"attachment": {
+		"sending": "Sending..."
+	},
 	"video": {
 		"error": {
 			"title": "Video unavailable",

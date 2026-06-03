@@ -20,6 +20,8 @@ import {
 	getMobileUploadedAttachments,
 	getPublicKeys,
 	getWebUploadedAttachments,
+	revokePreSendAttachmentUrls,
+	toPublicMessageAttachments,
 	isFacebookLink,
 	isTikTokLink,
 	isYouTubeLink
@@ -259,6 +261,9 @@ export const fetchMessagesCached = async (
 			mezon: ensuredMezon
 		}
 	);
+
+	console.log(response, 'response');
+	
 
 	markApiFirstCalled(apiKey);
 
@@ -1037,6 +1042,13 @@ export const sendMessageViaApi = createAsyncThunk('messages/sendMessageViaApi', 
 				} else {
 					uploadedFiles = await getWebUploadedAttachments({ attachments, client, session });
 				}
+				thunkAPI.dispatch(
+					messagesActions.updateSendingMessageAttachments({
+						channelId,
+						messageId: id,
+						attachments: toPublicMessageAttachments(uploadedFiles)
+					})
+				);
 			}
 
 			const messageResult = await doSend(uploadedFiles);
@@ -1182,6 +1194,13 @@ export const sendMessage = createAsyncThunk('messages/sendMessage', async (paylo
 					session
 				});
 			}
+			thunkAPI.dispatch(
+				messagesActions.updateSendingMessageAttachments({
+					channelId: channelId as string,
+					messageId: id,
+					attachments: toPublicMessageAttachments(uploadedFiles)
+				})
+			);
 		}
 
 		const state = thunkAPI.getState() as RootState;
@@ -1934,6 +1953,22 @@ export const messagesSlice = createSlice({
 				};
 			}
 		},
+		updateSendingMessageAttachments: (
+			state,
+			action: PayloadAction<{ channelId: string; messageId: string; attachments: ApiMessageAttachment[] }>
+		) => {
+			const { channelId, messageId, attachments } = action.payload;
+			const channelEntity = state.channelMessages[channelId];
+			const existingMessage = channelEntity?.entities[messageId];
+			if (!existingMessage) {
+				return;
+			}
+			existingMessage.attachments?.forEach(revokePreSendAttachmentUrls);
+			channelMessagesAdapter.updateOne(channelEntity, {
+				id: messageId,
+				changes: { attachments }
+			});
+		},
 		markAsError: (
 			state,
 			action: PayloadAction<{
@@ -2581,6 +2616,10 @@ const handleRemoveOneMessage = ({ state, channelId, messageId }: { state: Messag
 	if (Array.isArray(state.channelViewPortMessageIds[channelId])) {
 		state.channelViewPortMessageIds[channelId] = state.channelViewPortMessageIds[channelId].filter((item) => item !== messageId);
 	}
+
+	const removedMessage = channelEntity.entities[messageId];
+	removedMessage?.attachments?.forEach(revokePreSendAttachmentUrls);
+
 	return channelMessagesAdapter.removeOne(channelEntity, messageId);
 };
 
