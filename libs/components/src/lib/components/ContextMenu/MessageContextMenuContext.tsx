@@ -174,15 +174,20 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 		const currentClanId = selectCurrentClanId(appState);
 		const message = getMessage(appState, isTopic, messageIdRef.current);
 		const { currentDm } = getCurrentChannelAndDm(appState);
+		const currentChannelId = selectCurrentChannelId(appState);
 		const currentChannelChannelId = selectCurrentChannelChannelId(appState);
+		const currentDmId = selectDmGroupCurrentId(appState);
 		const currentChannelPrivate = selectCurrentChannelPrivate(appState);
 		const mode = getActiveMode();
 		const isChannelOrThread = mode === ChannelStreamMode.STREAM_MODE_CHANNEL || mode === ChannelStreamMode.STREAM_MODE_THREAD;
-		const channelIdForPinList = isChannelOrThread
-			? selectCurrentChannelId(appState) || message?.channel_id || ''
-			: currentDm?.id || message?.channel_id || '';
+		const pinStoreChannelId = isChannelOrThread
+			? (currentChannelChannelId ?? message?.channel_id ?? currentChannelId ?? '')
+			: currentDm?.id || message?.channel_id || currentDmId || '';
 
-		if (message?.id && selectIsMessagePinned(appState, [channelIdForPinList, message?.channel_id, currentChannelChannelId], message.id)) {
+		if (
+			message?.id &&
+			selectIsMessagePinned(appState, [currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId], message.id)
+		) {
 			return;
 		}
 
@@ -198,10 +203,7 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 		const createTime = message.create_time_seconds ? new Date(message.create_time_seconds * 1000).toISOString() : new Date().toISOString();
 		const pinBody: UpdatePinMessage = {
 			clanId: mode !== ChannelStreamMode.STREAM_MODE_CHANNEL && mode !== ChannelStreamMode.STREAM_MODE_THREAD ? '' : (currentClanId ?? ''),
-			channelId:
-				mode !== ChannelStreamMode.STREAM_MODE_CHANNEL && mode !== ChannelStreamMode.STREAM_MODE_THREAD
-					? currentDm?.id || ''
-					: (currentChannelChannelId ?? ''),
+			channelId: pinStoreChannelId,
 			messageId: message?.id,
 			isPublic:
 				mode !== ChannelStreamMode.STREAM_MODE_CHANNEL && mode !== ChannelStreamMode.STREAM_MODE_THREAD ? false : !currentChannelPrivate,
@@ -216,14 +218,14 @@ export const MessageContextMenuProvider = ({ children, channelId }: { children: 
 
 		dispatch(pinMessageActions.joinPinMessage(pinBody));
 
-		if (channelIdForPinList && message?.id) {
+		if (pinStoreChannelId && message?.id) {
 			dispatch(
 				pinMessageActions.addPinMessage({
-					channelId: channelIdForPinList,
+					channelId: pinStoreChannelId,
 					pinMessage: {
 						id: message.id,
 						message_id: message.id,
-						channel_id: message.channel_id || channelIdForPinList,
+						channel_id: message.channel_id || pinStoreChannelId,
 						content: JSON.stringify(message.content),
 						avatar: message.avatar || message.clan_avatar || '',
 						sender_id: message.sender_id,

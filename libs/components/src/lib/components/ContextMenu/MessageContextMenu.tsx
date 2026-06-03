@@ -211,9 +211,12 @@ function MessageContextMenu({
 		return message?.content?.t !== '';
 	}, [message?.content?.t]);
 
-	const isMessagePinned = useAppSelector((state) =>
-		selectIsMessagePinned(state, [currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId], messageId)
+	const pinCheckChannelIds = useMemo(
+		() => [currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId],
+		[currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId]
 	);
+
+	const isMessagePinned = useAppSelector((state) => selectIsMessagePinned(state, pinCheckChannelIds, messageId));
 
 	const [canManageThread, canDeleteMessage, canSendMessage] = usePermissionChecker(
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],

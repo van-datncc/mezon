@@ -79,7 +79,6 @@ import {
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
 	selectLoadingStatus,
-	selectMessageByMessageId,
 	selectStreamMembersByChannelId,
 	selectUserCallId,
 	selectVoiceInfo,
@@ -603,31 +602,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					dispatch(listChannelsByUserActions.updateLastSentTime({ channelId: message.channel_id }));
 					dispatch(threadsActions.updateLastSentInThread({ channelId: message.channel_id, lastSentTime: timestamp }));
 				}
-				if (message?.code === TypeMessage.CreatePin) {
-					const pinnedMessageId = message.references?.[0]?.message_ref_id;
-					if (pinnedMessageId && message.channel_id) {
-						const pinnedMessage = selectMessageByMessageId(store.getState() as RootState, message.channel_id, String(pinnedMessageId));
-						dispatch(
-							pinMessageActions.addPinMessage({
-								channelId: message.channel_id,
-								pinMessage: {
-									id: String(pinnedMessageId),
-									message_id: String(pinnedMessageId),
-									channel_id: message.channel_id,
-									content: pinnedMessage ? JSON.stringify(pinnedMessage.content) : '{}',
-									avatar: pinnedMessage?.avatar || pinnedMessage?.clan_avatar || '',
-									sender_id: pinnedMessage?.sender_id || message.sender_id || '',
-									username: pinnedMessage?.display_name || pinnedMessage?.username || '',
-									create_time_seconds:
-										pinnedMessage?.create_time_seconds || message.create_time_seconds || Math.floor(Date.now() / 1000),
-									attachment: pinnedMessage?.attachments?.length
-										? new TextEncoder().encode(JSON.stringify(pinnedMessage.attachments))
-										: new Uint8Array()
-								}
-							})
-						);
-					}
-				}
 				if (message?.code === TypeMessage.ChatRemove) {
 					const replyData = selectDataReferences(store.getState(), message.channel_id);
 					if (replyData && replyData.message_ref_id === message.id) {
@@ -836,18 +810,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[userId]
 	);
 
-	const onpinmessage = useCallback((pin: LastPinMessageEvent) => {
-		if (!pin?.channel_id) return;
+	const syncPinFromLastPinEvent = useCallback(
+		(pin: LastPinMessageEvent) => {
+			if (!pin?.channel_id || pin.operation !== 1) return;
 
-		const isDM = !pin.clan_id || pin.clan_id === '0';
+			const isDM = !pin.clan_id || pin.clan_id === '0';
 
-		if (isDM) {
-			dispatch(directActions.setShowPinBadgeOfDM({ dmId: pin.channel_id, isShow: true }));
-		} else {
-			dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: pin.clan_id, channelId: pin.channel_id, isShow: true }));
-		}
+			if (isDM) {
+				dispatch(directActions.setShowPinBadgeOfDM({ dmId: pin.channel_id, isShow: true }));
+			} else {
+				dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: pin.clan_id, channelId: pin.channel_id, isShow: true }));
+			}
 
-		if (pin.operation === 1) {
 			dispatch(
 				pinMessageActions.addPinMessage({
 					channelId: pin.channel_id,
@@ -864,8 +838,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					}
 				})
 			);
-		}
-	}, []);
+		},
+		[dispatch]
+	);
+
+	const onpinmessage = useCallback(
+		(pin: LastPinMessageEvent) => {
+			syncPinFromLastPinEvent(pin);
+		},
+		[syncPinFromLastPinEvent]
+	);
 
 	const onUnpinMessageEvent = useCallback((unpin_message_event: UnpinMessageEvent) => {
 		if (!unpin_message_event?.channel_id) return;
