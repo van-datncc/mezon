@@ -39,6 +39,8 @@ export function useDMInvite(channelID?: string) {
 			) {
 				listId.add(item.user_ids[0]);
 				return true;
+			} else if (item.type === ChannelType.CHANNEL_TYPE_GROUP) {
+				return true;
 			}
 			return false;
 		});
