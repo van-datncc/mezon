@@ -15,7 +15,7 @@ import {
 import { HighlightMatchBold, Icons } from '@mezon/ui';
 import type { ChannelMembersEntity } from '@mezon/utils';
 import { DEFAULT_ROLE_COLOR, EPermission, EVERYONE_ROLE_TITLE, createImgproxyUrl, generateE2eId, getDateLocale } from '@mezon/utils';
-import { formatDistance } from 'date-fns';
+import { format } from 'date-fns';
 import Tooltip from 'rc-tooltip';
 import type { MouseEvent } from 'react';
 import { useMemo, useRef, useState } from 'react';
@@ -181,6 +181,20 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 		openUserProfile();
 	};
 
+	const memberSinceLabel = useMemo(() => {
+		if (!clanJoinTime) return '';
+		const d = new Date(clanJoinTime);
+		if (Number.isNaN(d.getTime())) return '';
+		return format(d, 'MMM dd, yyyy', { locale: getDateLocale(i18n.language) });
+	}, [clanJoinTime, i18n.language]);
+
+	const joinedMezonLabel = useMemo(() => {
+		if (!mezonJoinTime) return '';
+		const d = new Date(mezonJoinTime);
+		if (Number.isNaN(d.getTime())) return '';
+		return format(d, 'MMM dd, yyyy', { locale: getDateLocale(i18n.language) });
+	}, [mezonJoinTime, i18n.language]);
+
 	return (
 		<div
 			className="flex flex-row justify-between items-center h-[48px]  bg-item-hover cursor-pointer  border-b-theme-primary no-divider-last "
@@ -215,15 +229,13 @@ const TableMemberItem = ({ userId, username, avatar, clanJoinTime, mezonJoinTime
 				</div>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs  font-medium uppercase" data-e2e={generateE2eId('clan_page.member_list.member_since')}>
-					{clanJoinTime
-						? formatDistance(clanJoinTime as string, new Date(), { addSuffix: true, locale: getDateLocale(i18n.language) })
-						: '-'}
+				<span className="text-xs font-medium" data-e2e={generateE2eId('clan_page.member_list.member_since')}>
+					{memberSinceLabel || '-'}
 				</span>
 			</div>
 			<div className="flex-1 p-1 text-center">
-				<span className="text-xs  font-medium uppercase" data-e2e={generateE2eId('clan_page.member_list.join_mezon')}>
-					{mezonJoinTime ? t('memberTable:timeAgo', { time: mezonJoinTime }) : '-'}
+				<span className="text-xs font-medium" data-e2e={generateE2eId('clan_page.member_list.join_mezon')}>
+					{joinedMezonLabel || '-'}
 				</span>
 			</div>
 			<div className="flex-2 p-1 text-center">
