@@ -1,5 +1,5 @@
 import { captureSentryError } from '@mezon/logger';
-import type { IClan, LoadingStatus } from '@mezon/utils';
+import type { ApiChannelMessageHeaderWithChannel, IClan, LoadingStatus } from '@mezon/utils';
 import { FOR_1_HOUR_SEC, LIMIT_CLAN_ITEM, ONE_MILISECONDS } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
@@ -18,6 +18,7 @@ import { accountActions } from '../account/account.slice';
 import { setUserAvatarOverride } from '../avatarOverride/avatarOverride';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import type { ChannelMetaEntity } from '../channels/channelmeta.slice';
 import { channelMetaActions } from '../channels/channelmeta.slice';
 import { channelsActions } from '../channels/channels.slice';
 import { fetchClanMembersWithStatus, usersClanActions } from '../clanMembers/clan.members';
@@ -173,8 +174,23 @@ export const listChannelBadgeCount = createAsyncThunk('clans/listChannelBadgeCou
 			'channel_badge_count'
 		);
 
-		if ((response as any)?.channeldesc && clanId && !state.clans.checkJoinList[clanId]) {
-			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata({ data: (response as any)?.channeldesc, clanId }));
+		if (response.channeldesc && clanId && !state.clans.checkJoinList[clanId]) {
+			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata({ data: response?.channeldesc as ChannelMetaEntity[], clanId }));
+
+			const listLastMessage = (response.channeldesc ?? []).reduce<ApiChannelMessageHeaderWithChannel[]>((acc, channel) => {
+				if (channel.channel_id) {
+					acc.push({
+						channel_id: channel.channel_id,
+						content: channel.last_sent_message?.content,
+						id: channel.last_sent_message?.id,
+						sender_id: channel.last_sent_message?.sender_id,
+						timestamp_seconds: channel.last_seen_message?.timestamp_seconds
+					});
+				}
+				return acc;
+			}, []);
+
+			thunkAPI.dispatch(messagesActions.setManyLastMessages(listLastMessage));
 		}
 		return { channeldesc: (response as any)?.channeldesc as ApiChannelDescription[], clanId };
 	} catch (error) {

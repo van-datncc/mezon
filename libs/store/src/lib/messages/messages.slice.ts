@@ -234,23 +234,6 @@ export const fetchMessagesCached = async (
 		};
 	}
 
-	// const response = await fetchDataWithSocketFallback(
-	// 	ensuredMezon,
-	// 	{
-	// 		api_name: 'ListChannelMessages',
-	// 		list_channel_message_req: {
-	// 			channel_id: channelId,
-	// 			message_id: messageId,
-	// 			direction,
-	// 			clan_id: clanId,
-	// 			topic_id: topicId,
-	// 			limit: LIMIT_MESSAGE
-	// 		}
-	// 	},
-	// 	() => ensuredMezon.client.listChannelMessages(ensuredMezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId),
-	// 	'channel_message_list'
-	// );
-
 	const response = await withRetry(
 		(session) =>
 			ensuredMezon.client.listChannelMessages(session, clanId, channelId, topicId ? undefined : messageId, direction, LIMIT_MESSAGE, topicId),
