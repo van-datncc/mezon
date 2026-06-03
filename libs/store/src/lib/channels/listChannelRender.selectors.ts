@@ -5,7 +5,7 @@ import { selectCategoryEntityStateByClanId } from '../categories/categories.slic
 import type { RootState } from '../store';
 import { buildListChannelRender, sortCategoriesByOrder } from './buildListChannelRender';
 import type { ChannelsEntity } from './channels.slice';
-import { isArchivedParentChannel, selectChannelEntityStateByClanId, selectFavoriteChannelsByClanId } from './channels.slice';
+import { selectChannelEntityStateByClanId, selectFavoriteChannelsByClanId } from './channels.slice';
 
 const createCachedSelector = createSelectorCreator({
 	memoize: weakMapMemoize,
@@ -50,13 +50,7 @@ export const selectListChannelRenderByClanId = createCachedSelector(
 		if (!hasChannels || !hasCategories) {
 			return undefined;
 		}
-		const channels = channelEntities.ids
-			.map((id) => channelEntities.entities[id])
-			.filter((channel): channel is ChannelsEntity => Boolean(channel) && !isArchivedParentChannel(channel));
-		const favoriteIdsActive = favoriteIds.filter((id) => {
-			const channel = channelEntities.entities[id];
-			return channel && !isArchivedParentChannel(channel);
-		});
+		const channels = channelEntities.ids.map((id) => channelEntities.entities[id]).filter(Boolean) as ChannelsEntity[];
 		const categoriesList = categoryEntities
 			? (categoryEntities.ids.map((id) => categoryEntities.entities[id]).filter(Boolean) as CategoriesEntity[])
 			: [];
@@ -71,7 +65,7 @@ export const selectListChannelRenderByClanId = createCachedSelector(
 			listChannel: channels as IChannel[],
 			listCategory: sortedCategories,
 			clanId,
-			listChannelFavor: favoriteIdsActive
+			listChannelFavor: favoriteIds
 		});
 	}
 );

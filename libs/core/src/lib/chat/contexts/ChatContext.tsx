@@ -1992,47 +1992,45 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 
 	const onchannelarchive = useCallback(
 		(channelArchive: ChannelArchiveEvent) => {
-			const parentId = channelArchive.parent_id ?? '0';
-			if (parentId !== '0' || channelArchive.channel_type === ChannelType.CHANNEL_TYPE_THREAD) {
+			const clanId = channelArchive.clan_id;
+			if (!clanId || clanId === '0') {
 				return;
 			}
 
-			const clanId = channelArchive.clan_id || selectCurrentClanId(getStore().getState()) || '0';
+			const parentId = channelArchive.parent_id ?? '0';
 			const channelId = channelArchive.channel_id;
+			const isThread = parentId !== '0';
 			const currentChannelId = selectCurrentChannelId(getStore().getState() as unknown as RootState);
 			const isArchiveAction = Number(channelArchive.active) === ThreadStatus.archived;
 
-			if (isArchiveAction) {
-				dispatch(
-					channelsActions.update({
-						clanId,
-						update: { id: channelId, changes: { is_channel_archived: true } }
-					})
-				);
-				dispatch(channelsActions.removeFavorite({ clanId, channelId }));
+			dispatch(
+				channelsActions.applyChannelArchiveState({
+					clanId,
+					channelId,
+					parentId,
+					isArchive: isArchiveAction
+				})
+			);
 
-				if (userId && channelArchive.creator_id !== userId && currentChannelId === channelId) {
+			if (isArchiveAction && currentChannelId === channelId) {
+				const redirectChannelId = isThread ? parentId : selectWelcomeChannelByClanId(getStore().getState() as unknown as RootState, clanId);
+
+				if (redirectChannelId) {
+					navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+				}
+
+				if (userId && channelArchive.creator_id !== userId) {
 					dispatch(
 						toastActions.addToast({
-							message: tChannelMenu('toastArchivedByAdministrator'),
+							message: tChannelMenu(isThread ? 'toastArchivedThreadByAdministrator' : 'toastArchivedByAdministrator'),
 							type: 'success',
 							autoClose: 3000
 						})
 					);
 				}
-
-				return;
 			}
-
-			dispatch(
-				channelsActions.update({
-					clanId,
-					update: { id: channelId, changes: { is_channel_archived: false } }
-				})
-			);
-			dispatch(channelsActions.fetchChannels({ clanId, noCache: true }));
 		},
-		[dispatch, userId, tChannelMenu]
+		[dispatch, userId, tChannelMenu, navigate]
 	);
 
 	const onpermissionset = useCallback(

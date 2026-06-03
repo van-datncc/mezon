@@ -6,7 +6,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
+import { applyChannelArchiveState, channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
@@ -302,14 +302,20 @@ export const writeActiveArchivedThread = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			await mezon.client.activeArchivedThread(mezon.session, clanId, channelId);
-			thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.joined }));
 			const state = thunkAPI.getState() as RootState;
 			const threadChannel = selectChannelById(state, channelId);
-			const parentId = threadChannel?.parent_id;
 
-			if (parentId && parentId !== '0') {
-				await thunkAPI.dispatch(threadsActions.fetchThreads({ channelId: parentId, clanId, noCache: true })).unwrap();
-			}
+			await thunkAPI
+				.dispatch(
+					applyChannelArchiveState({
+						clanId,
+						channelId,
+						parentId: threadChannel?.parent_id ?? '0',
+						isArchive: false
+					})
+				)
+				.unwrap();
+
 			return { channelId, activeCode: ThreadStatus.joined };
 		} catch (error) {
 			captureSentryError(error, 'threads/writeActiveArchivedThread');

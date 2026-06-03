@@ -115,5 +115,6 @@
 	"favoriteChannel": "FAVORITE CHANNEL",
 	"toastArchiveChannel": "Channel archived successfully.",
 	"toastArchiveThread": "Thread archived successfully.",
-	"toastArchivedByAdministrator": "This channel has been archived by the administrator"
+	"toastArchivedByAdministrator": "This channel has been archived by the administrator",
+	"toastArchivedThreadByAdministrator": "This thread has been archived by the administrator"
 }
