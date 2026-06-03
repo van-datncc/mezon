@@ -25,7 +25,7 @@ export enum EChannelSettingTab {
 	INVITES = 'Invites',
 	INTEGRATIONS = 'Integrations',
 	CATEGORY = 'Category',
-	QUICK_MENU = 'Quick Menu',
+	QUICK_MENU = 'Quick Actions',
 	STREAM_THUMBNAIL = 'Stream Thumbnail'
 }
 const SettingChannel = (props: ModalSettingProps) => {
