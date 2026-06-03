@@ -59,6 +59,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import ChannelMessages from '../../channel/ChannelMessages';
 import { ChannelTyping } from '../../channel/ChannelTyping';
 
@@ -159,6 +160,7 @@ const DirectMessage = () => {
 	const isUseProfileDM = useSelector(selectIsUseProfileDM);
 	const isSearchMessage = useAppSelector((state) => selectIsSearchMessage(state, resolvedDirectId));
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 	const { userId } = useAuth();
 	const directMessage = useAppSelector((state) => selectDirectById(state, resolvedDirectId));
 	const hasKeyE2ee = useSelector(selectHasKeyE2ee);
@@ -188,13 +190,28 @@ const DirectMessage = () => {
 			setDetailLoadFailed(false);
 			return;
 		}
+		if (loadingStatus !== 'loaded') {
+			return;
+		}
+		const isActiveDmSelection = Boolean(currentDirectId) && currentDirectId === resolvedDirectId;
+		if (!isActiveDmSelection) {
+			setDetailLoadFailed(true);
+			if (routeDirectId) {
+				navigate('/chat/direct/friends', { replace: true });
+			}
+			return;
+		}
 		setDetailLoadFailed(false);
-		return;
-	}, [resolvedDirectId, currentDmGroup, dispatch, routeDirectId, loadingStatus]);
-
-	useEffect(() => {
-		// state monitoring logs removed
-	}, [resolvedDirectId, routeDirectId, currentDirectId, loadingStatus, currentDmGroup, detailLoadFailed]);
+		let cancelled = false;
+		void dispatch(directActions.fetchDirectDetail({ directId: resolvedDirectId }))
+			.unwrap()
+			.catch(() => {
+				if (!cancelled) setDetailLoadFailed(true);
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [resolvedDirectId, currentDmGroup, currentDirectId, dispatch, loadingStatus, navigate, routeDirectId]);
 
 	const reactionTopState = useSelector(selectReactionTopState);
 	const { subPanelActive } = useGifsStickersEmoji();
@@ -263,6 +280,13 @@ const DirectMessage = () => {
 		return t === ChannelType.CHANNEL_TYPE_GROUP ? ChannelStreamMode.STREAM_MODE_GROUP : ChannelStreamMode.STREAM_MODE_DM;
 	}, [currentDmGroup?.type, resolvedChannelType]);
 
+	const dmUploadChannelId = useMemo(() => {
+		if (!currentDmGroup) {
+			return '';
+		}
+		return currentDmGroup.channel_id || currentDmGroup.id || '';
+	}, [currentDmGroup]);
+
 	useEffect(() => {
 		if (directMessage && directMessage?.e2ee && !hasKeyE2ee) {
 			dispatch(e2eeActions.setOpenModalE2ee(true));
@@ -287,7 +311,7 @@ const DirectMessage = () => {
 
 	return (
 		<>
-			{draggingState && <FileUploadByDnD currentId={currentDmGroup?.channel_id ?? resolvedDirectId} />}
+			{draggingState && dmUploadChannelId ? <FileUploadByDnD currentId={dmUploadChannelId} /> : null}
 			<div
 				className={` flex flex-col flex-1 shrink min-w-0 bg-transparent h-heightWithoutTopBar overflow-visible relative mt-[50px] bg-theme-chat text-theme-text`}
 				onDragEnter={handleDragEnter}
@@ -386,7 +410,11 @@ const DirectMessage = () => {
 								classBanner="h-[120px]"
 								showNote={true}
 								showPopupLeft={true}
-								avatar={currentDmGroup?.avatars?.at(-1)}
+								avatar={
+									(currentDmGroup?.type ?? resolvedChannelType) === ChannelType.CHANNEL_TYPE_GROUP
+										? currentDmGroup?.channel_avatar
+										: currentDmGroup?.avatars?.at(-1)
+								}
 								isDM={true}
 							/>
 						</div>
