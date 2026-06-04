@@ -169,7 +169,7 @@ function SoundSquare({ mode, onClose, isTopic = false, onSoundSelect }: ChannelM
 		<div
 			ref={modalRef}
 			tabIndex={-1}
-			className="outline-none flex h-[430px] w-full md:w-[500px] max-h-[430px] bg-theme-setting-primary overflow-hidden rounded-lg shadow-xl"
+			className="outline-none flex h-[430px] w-full md:w-[500px] max-h-[430px] bg-theme-setting-primary text-theme-primary overflow-hidden rounded-lg shadow-xl"
 		>
 			<div className="flex flex-col gap-y-4 bg-theme-setting-nav py-4 items-center w-11 flex-shrink-0 overflow-y-auto hide-scrollbar rounded-tl-lg rounded-tr-lg bg-item-theme ">
 				{categoryLogo.map((cat) => (
@@ -258,14 +258,14 @@ const CategorizedSounds: React.FC<ICategorizedSoundProps> = React.memo(
 						<img src={categoryLogo} alt={categoryName} className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
 					) : (
 						<div className="w-4 h-4 rounded-full bg-theme-primary/20 flex items-center justify-center flex-shrink-0">
-							<span className="text-[8px] font-bold text-theme-primary/60">{categoryName.charAt(0).toUpperCase()}</span>
+							<span className="text-[8px] font-bold text-theme-secondary">{categoryName.charAt(0).toUpperCase()}</span>
 						</div>
 					)}
-					<p className="uppercase font-bold text-xs tracking-wide text-theme-primary/60 group-hover:text-theme-primary transition-colors truncate overflow-hidden max-w-[300px]">
+					<p className="uppercase font-bold text-xs tracking-wide text-theme-secondary group-hover:text-theme-primary transition-colors truncate overflow-hidden max-w-[300px]">
 						{categoryName !== 'custom' ? categoryName : currentClanName}
 					</p>
 					<span
-						className={`transition-transform duration-200 text-theme-primary/60 group-hover:text-theme-primary ${isShowSoundList ? 'rotate-90' : ''}`}
+						className={`transition-transform duration-200 text-theme-secondary group-hover:text-theme-primary ${isShowSoundList ? 'rotate-90' : ''}`}
 					>
 						<Icons.ArrowRight defaultFill="currentColor" className="w-3 h-3" />
 					</span>
@@ -341,7 +341,7 @@ export const SoundPanel: React.FC<ISoundPanelProps> = React.memo(({ soundList, o
 				>
 					<button
 						onClick={(e) => handlePreview(e, sound)}
-						className={`flex-shrink-0 flex text-theme-primary items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 active:scale-95 ${playingPreview === sound.id ? 'text-green-500 bg-green-500/10' : 'text-theme-primary/60 hover:text-theme-primary hover:bg-theme-primary/10'}`}
+						className={`flex-shrink-0 flex text-theme-primary items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 active:scale-95 ${playingPreview === sound.id ? 'text-green-500 bg-green-500/10' : 'text-theme-secondary hover:text-theme-primary hover:bg-theme-primary/10'}`}
 						title="Preview sound"
 					>
 						{playingPreview === sound.id ? (

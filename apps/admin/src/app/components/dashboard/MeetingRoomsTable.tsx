@@ -164,7 +164,9 @@ const MeetingRoomsTable: React.FC<MeetingRoomsTableProps> = ({ onViewDetails }) 
 											key={`${room.id}-${room.createdAt}`}
 											className="border-b last:border-b-0 border-gray-100 dark:border-[#2e3035] hover:bg-gray-50 dark:hover:bg-[#25272b] transition-colors"
 										>
-											<td className="px-4 py-4 font-semibold text-gray-900 dark:text-white">{room.roomName}</td>
+											<td className="px-4 py-4 font-semibold text-gray-900 dark:text-white">
+												{room.channelName ?? room.roomName}
+											</td>
 											<td className="px-4 py-4">
 												<span
 													className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[room.status] ?? 'bg-gray-100 text-gray-600'}`}

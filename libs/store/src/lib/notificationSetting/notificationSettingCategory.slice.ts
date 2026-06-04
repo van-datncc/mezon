@@ -437,7 +437,10 @@ export const channelCategorySettingSlice = createSlice({
 					}
 
 					if (!fromCache) {
-						channelCategorySettingAdapter.setAll(state.byClans[clanId].list, notification_channel_category_settings_list);
+						state.byClans[clanId].list = channelCategorySettingAdapter.setAll(
+							state.byClans[clanId].list,
+							notification_channel_category_settings_list
+						);
 						state.byClans[clanId].cache = createCacheMetadata(CHANNEL_CATEGORY_SETTING_CACHE_TIME);
 					}
 

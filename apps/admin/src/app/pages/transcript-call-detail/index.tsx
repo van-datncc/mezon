@@ -149,7 +149,7 @@ const TranscriptCallDetail = () => {
 	}
 
 	const displayId = stats.room_id ?? roomId;
-	const roomName = stats.room_name ?? detail.summary?.room_name ?? '—';
+	const roomName = stats?.channel_name ?? detail.summary?.room_name ?? '—';
 
 	const tabLabels: Record<TabType, string> = {
 		overview: t('transcriptCalls.tabs.overview'),

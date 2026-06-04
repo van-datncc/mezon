@@ -5242,6 +5242,9 @@ export function Chat({ defaultSize = 'w-5 h-5', defaultFill1 = 'currentColor', d
 				<path
 					d="M 0.17 64.25 C0.49,45.57 0.74,43.03 2.67,38.82 C5.71,32.21 12.27,25.51 18.86,22.27 C23.73,19.88 25.66,19.51 33.00,19.56 C43.01,19.63 50.34,22.41 56.34,28.40 C65.24,37.31 68.41,51.63 64.04,63.20 C61.17,70.81 54.44,78.12 46.80,81.94 L 40.68 85.00 L 20.25 85.00 L -0.17 85.00 L 0.17 64.25 Z"
 					fill={defaultFill2}
+					stroke="black"
+					strokeWidth="3"
+					strokeLinejoin="round"
 					className="icon-Chat-fill-2"
 				/>
 			</g>
