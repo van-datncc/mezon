@@ -20,11 +20,11 @@ import {
 	getMobileUploadedAttachments,
 	getPublicKeys,
 	getWebUploadedAttachments,
-	revokePreSendAttachmentUrls,
-	toPublicMessageAttachments,
 	isFacebookLink,
 	isTikTokLink,
-	isYouTubeLink
+	isYouTubeLink,
+	revokePreSendAttachmentUrls,
+	toPublicMessageAttachments
 } from '@mezon/utils';
 import type { EntityState, GetThunkAPI, PayloadAction, Update } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSelectorCreator, createSlice, weakMapMemoize } from '@reduxjs/toolkit';
@@ -261,9 +261,6 @@ export const fetchMessagesCached = async (
 			mezon: ensuredMezon
 		}
 	);
-
-	console.log(response, 'response');
-	
 
 	markApiFirstCalled(apiKey);
 
@@ -1497,6 +1494,7 @@ export const sendEphemeralMessage = createAsyncThunk('messages/sendEphemeralMess
 				client,
 				session
 			});
+			attachments.forEach(revokePreSendAttachmentUrls);
 		}
 
 		let avatarToUse = avatar;

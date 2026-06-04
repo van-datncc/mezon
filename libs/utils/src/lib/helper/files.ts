@@ -1,7 +1,7 @@
 import { CONTENT_TYPES_WITH_PREVIEW } from '../types';
-import { capturePosterFromVideoElement, captureVideoPosterFromFile } from './videoPoster';
+import { capturePosterFromVideoElement } from './videoPoster';
 
-export { captureVideoPosterFromFile, capturePosterFromVideoElement } from './videoPoster';
+export { capturePosterFromVideoElement } from './videoPoster';
 
 // Polyfill for Safari: `File` is not available in web worker
 if (typeof File === 'undefined') {

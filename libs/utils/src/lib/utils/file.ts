@@ -13,7 +13,8 @@ import type {
 	RequestInput
 } from '../types';
 
-export const MEDIA_PROCESS_CONCURRENCY = 2;
+export const VIDEO_PROCESS_CONCURRENCY = 2;
+export const FILE_PROCESS_CONCURRENCY = 4;
 
 export const getImageExtension = (url?: string): string | undefined => {
 	if (!url) return undefined;
@@ -143,17 +144,32 @@ export async function processFilesForAttachment(files: File[]): Promise<ApiMessa
 	}
 
 	const results: ApiMessageAttachment[] = new Array(files.length);
-	let nextIndex = 0;
-	const workerCount = Math.min(MEDIA_PROCESS_CONCURRENCY, files.length);
+	const videoIndexes: number[] = [];
+	const lightweightIndexes: number[] = [];
 
-	const worker = async () => {
-		while (nextIndex < files.length) {
-			const index = nextIndex++;
-			results[index] = await processFile<ApiMessageAttachment>(files[index]);
+	files.forEach((file, index) => {
+		if (file.type.startsWith('video/')) {
+			videoIndexes.push(index);
+		} else {
+			lightweightIndexes.push(index);
 		}
+	});
+
+	const runPool = async (indexes: number[], concurrency: number) => {
+		let next = 0;
+		const worker = async () => {
+			while (next < indexes.length) {
+				const index = indexes[next++];
+				results[index] = await processFile<ApiMessageAttachment>(files[index]);
+			}
+		};
+		await Promise.all(Array.from({ length: Math.min(concurrency, indexes.length) }, () => worker()));
 	};
 
-	await Promise.all(Array.from({ length: workerCount }, () => worker()));
+	await Promise.all([
+		runPool(lightweightIndexes, FILE_PROCESS_CONCURRENCY),
+		runPool(videoIndexes, VIDEO_PROCESS_CONCURRENCY)
+	]);
 	return results;
 }
 

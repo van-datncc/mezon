@@ -493,13 +493,7 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
 			{showMedia && !activated && (
-				<VideoPoster
-					thumbnailUrl={thumbnailUrl}
-					style={mediaStyle}
-					onPlay={handlePlay}
-					disablePlay={isSending}
-					isSending={isSending}
-				/>
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isSending} isSending={isSending} />
 			)}
 
 			{activated && (probeStatus === 'idle' || probeStatus === 'probing') && <VideoSkeleton style={mediaStyle} />}
@@ -614,14 +608,6 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, isS
 		}
 	}, [showControl]);
 
-	if (isPreview) {
-		return (
-			<div ref={containerRef} className="relative overflow-hidden group rounded-lg max-w-full w-full h-full">
-				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={() => undefined} />
-			</div>
-		);
-	}
-
 	const showMedia = isSending || isIntersecting;
 
 	return (
@@ -629,13 +615,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, isS
 			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
 			{showMedia && !activated && (
-				<VideoPoster
-					thumbnailUrl={thumbnailUrl}
-					style={mediaStyle}
-					onPlay={handlePlay}
-					disablePlay={isSending}
-					isSending={isSending}
-				/>
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isSending} isSending={isSending} />
 			)}
 
 			{shouldRenderVideo && (
@@ -647,7 +627,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, isS
 						ref={videoRef}
 						onCanPlay={handleOnCanPlay}
 						className="object-contain"
-						preload="auto"
+						preload="metadata"
 						playsInline
 					>
 						<source src={attachmentData.url} />

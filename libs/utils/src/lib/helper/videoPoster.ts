@@ -1,8 +1,7 @@
-import { pause } from '../utils';
-
 export const MAX_VIDEO_POSTER_EDGE = 480;
 const JPEG_QUALITY = 0.82;
 const POSTER_CAPTURE_TIMEOUT_MS = 3000;
+const METADATA_LOAD_TIMEOUT_MS = 5000;
 
 export type VideoPosterCaptureResult = {
 	width: number;
@@ -56,11 +55,7 @@ export function capturePosterFromVideoElement(video: HTMLVideoElement): Promise<
 				return;
 			}
 			ctx.drawImage(video, 0, 0, width, height);
-			canvas.toBlob(
-				(blob) => resolve(blob ?? undefined),
-				'image/jpeg',
-				JPEG_QUALITY
-			);
+			canvas.toBlob((blob) => resolve(blob ?? undefined), 'image/jpeg', JPEG_QUALITY);
 		};
 
 		video.currentTime = seekTarget;
@@ -75,8 +70,25 @@ export async function captureVideoPosterFromUrl(objectUrl: string): Promise<Vide
 
 	try {
 		await new Promise<void>((resolve, reject) => {
-			video.onloadedmetadata = () => resolve();
-			video.onerror = () => reject(new Error('Failed to load video metadata'));
+			const timeout = window.setTimeout(() => {
+				cleanup();
+				reject(new Error('Timed out loading video metadata'));
+			}, METADATA_LOAD_TIMEOUT_MS);
+
+			const cleanup = () => {
+				window.clearTimeout(timeout);
+				video.onloadedmetadata = null;
+				video.onerror = null;
+			};
+
+			video.onloadedmetadata = () => {
+				cleanup();
+				resolve();
+			};
+			video.onerror = () => {
+				cleanup();
+				reject(new Error('Failed to load video metadata'));
+			};
 			video.src = objectUrl;
 		});
 
@@ -85,10 +97,7 @@ export async function captureVideoPosterFromUrl(objectUrl: string): Promise<Vide
 		let posterBlob: Blob | undefined;
 
 		try {
-			posterBlob = await Promise.race([
-				capturePosterFromVideoElement(video),
-				pause(POSTER_CAPTURE_TIMEOUT_MS) as Promise<undefined>
-			]);
+			posterBlob = await capturePosterFromVideoElement(video);
 		} catch {
 			posterBlob = undefined;
 		}
@@ -105,9 +114,4 @@ export async function captureVideoPosterFromUrl(objectUrl: string): Promise<Vide
 		video.removeAttribute('src');
 		video.load();
 	}
-}
-
-export async function captureVideoPosterFromFile(file: File): Promise<VideoPosterCaptureResult> {
-	const objectUrl = URL.createObjectURL(file);
-	return captureVideoPosterFromUrl(objectUrl);
 }

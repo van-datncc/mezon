@@ -248,7 +248,13 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 										height: 120,
 										resizeType: 'fill'
 									})
-								: undefined
+								: item.url
+									? createImgproxyUrl(item.url, {
+											width: 120,
+											height: 120,
+											resizeType: 'fill'
+										})
+									: undefined
 							: createImgproxyUrl(item.url || '', {
 									width: 120,
 									height: 120,
@@ -263,6 +269,8 @@ const TimelineAttachment = memo(({ message, maxThumbnails = 3, mode }: TimelineA
 							>
 								{thumbnailUrl ? (
 									<img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
+								) : isVideo && item.url ? (
+									<video src={item.url} className="w-full h-full object-cover" muted playsInline />
 								) : (
 									<div className="w-full h-full bg-bgLightSecondary dark:bg-bgSecondary" />
 								)}
