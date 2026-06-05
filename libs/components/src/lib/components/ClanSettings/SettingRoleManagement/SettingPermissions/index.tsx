@@ -60,6 +60,11 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 	};
 
 	useEffect(() => {
+		if (!hasPermissionEdit) {
+			dispatch(toggleIsShowFalse());
+			return;
+		}
+
 		const isSamePermissions =
 			selectedPermissions.length === permissionIds.length && selectedPermissions.every((id) => permissionIds.includes(id));
 
@@ -68,7 +73,7 @@ const SettingPermissions = ({ RolesClan, hasPermissionEdit }: { RolesClan: Roles
 		} else {
 			dispatch(toggleIsShowFalse());
 		}
-	}, [nameRole, colorRole, selectedPermissions, activeRole, permissionIds, dispatch]);
+	}, [nameRole, colorRole, selectedPermissions, activeRole, permissionIds, dispatch, hasPermissionEdit]);
 
 	const isClanOwner = useClanOwner();
 	const hiddenPermissionAdmin = (slug: string) => {

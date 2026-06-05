@@ -1,15 +1,15 @@
 import { useClanOwner } from '@mezon/core';
 import type { RolesClanEntity } from '@mezon/store';
-import { getSelectedRoleId, toggleIsShowFalse } from '@mezon/store';
+import { getSelectedRoleId, selectUserMaxPermissionLevel, toggleIsShowFalse } from '@mezon/store';
 import { generateE2eId } from '@mezon/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { checkHasPermissionEditRole } from '../../SettingMainRoles/listActiveRole';
 import SettingDisplayRole from '../SettingDisplayRole';
 import SettingManageMembers from '../SettingManageMembers';
 import SettingPermissions from '../SettingPermissions';
 import { TabsSelectRole } from './tabSelectRole';
-import { checkHasAdministrator } from '../../SettingMainRoles/listActiveRole';
 
 enum RoleTabs {
 	Display_Tab = 'Display',
@@ -24,8 +24,8 @@ const SettingValueDisplayRole = ({ RolesClan }: { RolesClan: RolesClanEntity[] }
 	const clickRole = useSelector(getSelectedRoleId);
 	const activeRole = useMemo(() => RolesClan.find((role) => role.id === clickRole), [RolesClan, clickRole]);
 	const isClanOwner = useClanOwner();
-	const hasPermissionAdmin = checkHasAdministrator(activeRole?.permission_list?.permissions);
-	const hasPermissionEdit = isClanOwner || !hasPermissionAdmin;
+	const userMaxPermissionLevel = useSelector(selectUserMaxPermissionLevel);
+	const hasPermissionEdit = checkHasPermissionEditRole(isClanOwner, userMaxPermissionLevel, activeRole);
 	const dispatch = useDispatch();
 
 	const handleButtonClick = (buttonName: string) => {
