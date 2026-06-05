@@ -1,14 +1,14 @@
 import {
-	badgeService,
-	fetchListNotification,
-	notificationActions,
-	selectCurrentClanId,
-	selectNotificationClan,
-	selectNotificationForYou,
-	selectNotificationMentions,
-	selectTopicsSort,
-	topicsActions,
-	useAppDispatch
+    badgeService,
+    fetchListNotification,
+    notificationActions,
+    selectCurrentClanId,
+    selectNotificationClan,
+    selectNotificationForYou,
+    selectNotificationMentions,
+    selectTopicsSort,
+    topicsActions,
+    useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { INotification } from '@mezon/utils';
@@ -30,8 +30,8 @@ const InboxType = {
 
 function InboxButton() {
 	return (
-		<div className="group">
-			<Icons.Inbox className="size-6" />
+		<div className="text-[var(--bg-icon-theme)]">
+			<Icons.Inbox className="size-5" />
 		</div>
 	);
 }

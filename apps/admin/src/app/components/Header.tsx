@@ -1,3 +1,4 @@
+import { AvatarColor } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
@@ -75,9 +76,7 @@ const Header = ({ toggleSideBar, isShowSideBar }: IHeaderProps) => {
 							alt=""
 						/>
 					) : (
-						<div className="w-[40px] h-[40px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px] cursor-pointer">
-							{(userProfile?.user?.username ?? '').charAt(0).toUpperCase()}
-						</div>
+						<AvatarColor username={userProfile?.user?.username || ''} className="size-10" />
 					)}
 				</div>
 				{showMenu && (

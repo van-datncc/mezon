@@ -158,7 +158,7 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 							avatar: profileInClan?.clan_avatar || userProfile?.user?.avatar_url,
 							code: 0,
 							topicId: isFocusTopicBox ? currenTopicId : undefined,
-							message_id: message.message_id,
+							message_id: message.id || messageId,
 							message_sender_id: message.sender_id
 						})
 					);

@@ -51,10 +51,16 @@ const SettingArchivedChannels = () => {
 							const isPrivate = ch.channel_private === 1;
 
 							if (isPrivate) {
-								return <Icons.HashtagLocked defaultSize="w-5 h-5 flex-shrink-0" />;
+								return (
+									<Icons.HashtagLocked
+										defaultSize="w-5 h-5 flex-shrink-0"
+										defaultFill1="var(--bg-icon-theme)"
+										defaultFill2="var(--bg-icon-theme-active)"
+									/>
+								);
 							}
 
-							return <Icons.Hashtag defaultSize="w-5 h-5 flex-shrink-0" />;
+							return <Icons.Hashtag defaultSize="w-5 h-5 flex-shrink-0" defaultFill1="var(--bg-icon-theme)" />;
 						};
 
 						return (

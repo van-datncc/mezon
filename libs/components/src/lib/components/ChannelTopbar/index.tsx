@@ -25,7 +25,6 @@ import {
 	searchMessagesActions,
 	selectAllAccount,
 	selectChannelById,
-	selectClanView,
 	selectCloseMenu,
 	selectCurrentChannel,
 	selectCurrentChannelAgeRestricted,
@@ -44,7 +43,7 @@ import {
 	selectFriendById,
 	selectGalleryAttachmentsByChannel,
 	selectIsInCall,
-	selectIsPinModalVisible,
+	selectIsPinModalOpenFor,
 	selectIsShowChatStream,
 	selectIsShowCreateThread,
 	selectIsShowCreateTopic,
@@ -58,7 +57,6 @@ import {
 	selectMemberByGroupId,
 	selectNotifiSettingsEntitiesById,
 	selectOpenVoiceCall,
-	selectPinModalChannelId,
 	selectSession,
 	selectStatusInVoice,
 	selectStatusMenu,
@@ -402,13 +400,13 @@ const ChannelTopbarLabel = memo(
 			}
 			switch (type) {
 				case ChannelType.CHANNEL_TYPE_CHANNEL:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 				case ChannelType.CHANNEL_TYPE_THREAD:
 					return (
 						<Icons.ThreadIconLocker
 							defaultFill1="var(--bg-icon-theme)"
 							defaultFill4="var(--bg-theme-secounnd)"
-							defaultFill5="var(--bg-icon-theme)"
+							defaultFill5="var(--bg-icon-theme-active)"
 						/>
 					);
 				case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
@@ -418,13 +416,13 @@ const ChannelTopbarLabel = memo(
 				case ChannelType.CHANNEL_TYPE_APP:
 					return <AppChannelListIcon isEmphasized className="w-4 h-4" />;
 				default:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 			}
 		};
 
 		return (
 			<div className="none-draggable-area flex items-center text-lg gap-3 min-w-0" onClick={onClick}>
-				<div className="flex w-4 flex-shrink-0 items-center justify-center text-theme-message">{renderIcon()}</div>
+				<div className="flex flex-shrink-0 items-center justify-center text-theme-message">{renderIcon()}</div>
 				<p className="flex-1 min-w-0 text-base font-semibold leading-5 truncate text-theme-message">{label}</p>
 			</div>
 		);
@@ -1059,20 +1057,16 @@ function PinButton({ styleCss, mode, isDMView = false }: { styleCss: string; mod
 	const { t } = useTranslation('channelTopbar');
 	const { directId } = useAppParams();
 	const dispatch = useAppDispatch();
-	const isShowPinMessage = useSelector(selectIsPinModalVisible);
-	const pinModalChannelId = useSelector(selectPinModalChannelId);
-	const isClanView = useSelector(selectClanView);
 	const currentChannelId = useSelector(selectCurrentChannelId) ?? '';
 	const currentDM = useSelector(selectCurrentDM) ?? '';
 	const dmId = (currentDM as { id?: string } | null)?.id ?? '';
-	const conversationKey = isClanView ? `c:${currentChannelId}` : `d:${directId ?? dmId}`;
+	const activeChannelId = isDMView ? (directId ?? dmId) : currentChannelId;
+	const shouldShowPinMessage = useAppSelector((state) => selectIsPinModalOpenFor(state, activeChannelId, isDMView));
 	const isShowPinBadge = useAppSelector(selectIsShowPinBadgeByChannelId(currentChannelId));
 	const isShowPinDMBadge = useAppSelector((state) => selectIsShowPinBadgeByDmId(state, (currentDM as { id?: string })?.id || ''));
 	const isShowPinBadgeFinal = isDMView ? isShowPinDMBadge : isShowPinBadge;
 
 	const pinRef = useRef<HTMLDivElement | null>(null);
-
-	const shouldShowPinMessage = isShowPinMessage && pinModalChannelId === conversationKey;
 
 	const handleClosePinMessage = useCallback(() => {
 		if (isShowPinBadge) dispatch(pinMessageActions.setIsShowPinBadge(false));
@@ -1089,8 +1083,9 @@ function PinButton({ styleCss, mode, isDMView = false }: { styleCss: string; mod
 		if (!currentDmGroup?.id && !currentChannelId) {
 			return;
 		}
-		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId: currentChannelId || currentDmGroup.id, clanId: currentClanId }));
-		dispatch(pinMessageActions.togglePinModal(conversationKey));
+		const channelId = currentChannelId || currentDmGroup.id;
+		await dispatch(pinMessageActions.fetchChannelPinMessages({ channelId, clanId: currentClanId }));
+		dispatch(pinMessageActions.togglePinModal({ channelId, isDM: isDMView }));
 
 		if (isDMView && currentDmGroup?.id && isShowPinDMBadge) {
 			dispatch(directActions.setShowPinBadgeOfDM({ dmId: currentDmGroup.id, isShow: false }));
@@ -1098,7 +1093,7 @@ function PinButton({ styleCss, mode, isDMView = false }: { styleCss: string; mod
 		if (!isDMView && currentChannelId && isShowPinBadge) {
 			dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: currentClanId, channelId: currentChannelId, isShow: false }));
 		}
-	}, [conversationKey, currentChannelId, dispatch, isDMView, isShowPinBadge, isShowPinDMBadge]);
+	}, [currentChannelId, dispatch, isDMView, isShowPinBadge, isShowPinDMBadge]);
 
 	return (
 		<div className="relative leading-5 h-5" ref={pinRef} data-e2e={generateE2eId('chat.channel_message.header.button.pin')}>

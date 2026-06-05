@@ -35,7 +35,7 @@
 			"description": "Cambia la configuración de privacidad y personaliza cómo los miembros pueden interactuar con este canal."
 		},
 		"quickAction": {
-			"title": "Acción Rápida"
+			"title": "Comando rápido"
 		},
 		"privateChannelInvite": {
 			"addMember": "Añadir Miembro"
@@ -176,7 +176,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Acciones Rápidas",
+		"title": "Comandos rápidos",
 		"description": "Gestionar mensajes flash y menús rápidos para este canal",
 		"keyTitle": "Clave (Ejemplo: hola)",
 		"valueTitle": "Contenido (Ejemplo: Buenos días, ¡Que tengas un buen día!)",
@@ -242,7 +242,7 @@
 		"invites": "Invitaciones",
 		"integrations": "Integraciones",
 		"category": "Categoría",
-		"quickMenu": "Menú Rápido"
+		"quickMenu": "Acciones rápidas"
 	},
 	"categoryManagement": {
 		"title": "Categoría",

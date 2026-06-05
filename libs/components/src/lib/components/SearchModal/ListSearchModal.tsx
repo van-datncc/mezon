@@ -31,7 +31,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 					ref={(element) => item?.id && itemRefs && (itemRefs[item.id] = element)}
 					onClick={() => onItemClick(item)}
 					onMouseEnter={() => onMouseEnter(item)}
-					className={`${focusItemId === item.id ? 'bg-item-theme ' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+					className={`group ${focusItemId === item.id ? 'bg-item-theme ' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 				>
 					{isChannel ? (
 						<SuggestItem
@@ -46,6 +46,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							channel={item}
 							count={item.count_messsage_unread}
 							isUnread={isUnread}
+							isRowFocused={focusItemId === item.id}
 						/>
 					) : (
 						<SuggestItem

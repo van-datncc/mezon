@@ -22,14 +22,26 @@ const ChannelSettingInforItem = ({ onClose, channelId }: ChannelSettingItemProps
 					<div className="h-7 w-7 overflow-hidden flex items-center justify-center ">
 						{channel?.type === ChannelType.CHANNEL_TYPE_CHANNEL ? (
 							channel?.channel_private === ChannelStatusEnum.isPrivate ? (
-								<Icons.HashtagLocked defaultSize="w-6 h-6 dark:text-black" />
+								<Icons.HashtagLocked
+									defaultSize="w-6 h-6 dark:text-black"
+									defaultFill1="var(--bg-icon-theme)"
+									defaultFill2="var(--bg-icon-theme-active)"
+								/>
 							) : (
 								<Icons.Hashtag defaultSize="w-6 h-6 dark:text-black" />
 							)
 						) : channel?.channel_private === ChannelStatusEnum.isPrivate ? (
-							<Icons.ThreadIconLocker defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />
+							<Icons.ThreadIconLocker
+								defaultFill1="var(--bg-icon-theme)"
+								defaultFill4="var(--bg-theme-secounnd)"
+								defaultFill5="var(--bg-icon-theme-active)"
+							/>
 						) : (
-							<Icons.ThreadIcon defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />
+							<Icons.ThreadIcon
+								defaultFill1="var(--bg-icon-theme)"
+								defaultFill4="var(--bg-theme-secounnd)"
+								defaultFill5="var(--bg-icon-theme)"
+							/>
 						)}
 					</div>
 				</div>

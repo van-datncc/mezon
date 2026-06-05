@@ -25,7 +25,7 @@ export enum EChannelSettingTab {
 	INVITES = 'Invites',
 	INTEGRATIONS = 'Integrations',
 	CATEGORY = 'Category',
-	QUICK_MENU = 'Quick Menu',
+	QUICK_MENU = 'Quick Actions',
 	STREAM_THUMBNAIL = 'Stream Thumbnail'
 }
 const SettingChannel = (props: ModalSettingProps) => {
@@ -64,16 +64,16 @@ const SettingChannel = (props: ModalSettingProps) => {
 		if (window.innerWidth < 480) {
 			setIsSidebarOpen(false);
 		}
+
+		if (settingName === EChannelSettingTab.PREMISSIONS) {
+			dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
+		}
 	};
 
 	const handleMenuBtn = () => {
 		setIsSidebarOpen((prev) => !prev);
 	};
 	const dispatch = useAppDispatch();
-
-	useEffect(() => {
-		dispatch(fetchUserChannels({ channelId: channel.channel_id as string }));
-	}, [channel?.channel_id]);
 
 	const closeMenu = useSelector(selectCloseMenu);
 
