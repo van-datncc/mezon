@@ -11,7 +11,20 @@ interface SideBarProps {
 
 export const SideBarMezon = memo((props: SideBarProps) => {
 	const { t } = useTranslation('homepage');
-	const isLogin = true;
+	const getIsLogin = () => {
+		try {
+			const raw = localStorage.getItem('persist:auth');
+			if (!raw) return false;
+
+			const parsed = JSON.parse(raw);
+			const state = typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
+
+			return state?.isLogin === true;
+		} catch {
+			return false;
+		}
+	};
+	const isLogin = getIsLogin();
 	const { sideBarIsOpen, scrollToSection } = props;
 
 	const [bodySideBarRef, setBodySideBarRef] = useState(0);
