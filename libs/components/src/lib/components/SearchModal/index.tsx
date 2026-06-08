@@ -11,6 +11,7 @@ import {
 	selectAllDirectMessages,
 	selectAllUsesInAllClansEntities,
 	selectChannelMetaEntities,
+	selectClansEntities,
 	selectDmMetaEntities,
 	selectEntitesUserClans,
 	selectPreviousChannels,
@@ -70,7 +71,8 @@ function SearchModal({ onClose }: SearchModalProps) {
 	const dmMetaEntities = useAppSelector(selectDmMetaEntities);
 	const allUsesInAllClansEntities = useAppSelector(selectAllUsesInAllClansEntities);
 	const previousChannels = useAppSelector(selectPreviousChannels);
-
+	const listClansRef = useRef(useAppSelector(selectClansEntities));
+	const listClans = listClansRef.current;
 	const { userProfile } = useAuth();
 	const accountId = userProfile?.user?.id ?? '';
 
@@ -142,7 +144,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 				list.push({
 					id: item?.channel_id ?? '',
 					name: item?.channel_label ?? '',
-					subText: item?.clan_name ?? '',
+					subText: item?.clan_id ? listClans?.[item.clan_id]?.clan_name || '' : item.clan_name || '',
 					icon: '#',
 					clanId: item?.clan_id ?? '',
 					channelId: item?.channel_id ?? '',
@@ -159,7 +161,7 @@ function SearchModal({ onClose }: SearchModalProps) {
 			}
 		});
 		return list;
-	}, [listChannels, channelMetaUnreadSignature]);
+	}, [listChannels, channelMetaUnreadSignature, listClans]);
 
 	const listMemberSearch = useMemo(() => {
 		const list: SearchItemProps[] = [];
