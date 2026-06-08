@@ -40,7 +40,7 @@ const HeaderMezon = memo((props: HeaderProps) => {
 			const parsed = JSON.parse(raw);
 			const state = typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
 
-			return state?.isLogin === true;
+			return state?.isLogin === true || state?.isLogin === 'true';
 		} catch {
 			return false;
 		}
@@ -119,14 +119,14 @@ const HeaderMezon = memo((props: HeaderProps) => {
 					</nav>
 					<div className="flex items-center justify-end gap-1.5 lg:gap-2 xl:gap-4 flex-shrink-0 min-w-fit lg:min-w-[220px] xl:min-w-[260px] ml-auto">
 						<Link
-							to={isLogin ? '/meet' : '/mezon'}
+							to={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 							className="hidden lg:flex items-center px-3 xl:px-[20px] py-[10px] bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white text-[14px] xl:text-[16px] font-bold whitespace-nowrap hover:bg-[#de82e6] hover:border-[#de82e6] hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm"
 						>
 							<span className="xl:inline">Mezon Meet</span>
 						</Link>
 
 						<Link
-							to="/mezon"
+							to={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 							className="hidden lg:flex items-center px-3 xl:px-[20px] py-[10px] bg-white rounded-xl text-[#6E4A9E] text-[14px] xl:text-[16px] font-bold whitespace-nowrap hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
 							onClick={() => trackHeaderLoginClick(isLogin ? 'Open Mezon' : 'Login')}
 							data-e2e={generateE2eId('homepage.header.button.login')}

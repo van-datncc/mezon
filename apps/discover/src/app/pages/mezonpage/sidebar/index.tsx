@@ -19,7 +19,7 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 			const parsed = JSON.parse(raw);
 			const state = typeof parsed === 'string' ? JSON.parse(parsed) : parsed;
 
-			return state?.isLogin === true;
+			return state?.isLogin === true || state?.isLogin === 'true';
 		} catch {
 			return false;
 		}
@@ -115,13 +115,13 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 
 				<Link
 					className="text-center px-[16px] py-[10px] rounded-[8px] bg-white text-[#6E4A9E] font-bold text-[16px] leading-[24px] hover:opacity-90 transition-opacity whitespace-nowrap"
-					to={isLogin ? '/meet' : '/mezon'}
+					to={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 				>
 					Mezon Meet
 				</Link>
 				<Link
 					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
-					to={'/mezon'}
+					to={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 				>
 					{isLogin ? t('header.openMezon') : t('header.login')}
 				</Link>
