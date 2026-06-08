@@ -102,7 +102,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { probeNetworkReachability, publishSessionUpdate, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
+import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -194,14 +194,14 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Observable, Subject } from 'rxjs';
-import { auditTime, exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
+import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import {
+	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	beginReconnectWave,
 	consumeReconnectAttempt,
 	markNetworkProbeCompleted,
-	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	noteReconnectWaveExhausted,
 	refundReconnectAttempt,
 	resetExhaustedWaveCount,
@@ -254,7 +254,6 @@ function reconnectJitterTicker$(): Observable<number> {
 }
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'WAVE_COOLDOWN' | 'SKIP';
-
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -1456,13 +1455,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			const currentUserId = selectCurrentUserId(state);
 			if (e.sender_id === currentUserId) return;
 
-			const channelId = e?.topic_id && e?.topic_id !== '0' ? e?.topic_id : e.channel_id;
+			const isTopicTyping = Boolean(e?.topic_id && e?.topic_id !== '0');
+			const channelId = isTopicTyping ? e.topic_id! : e.channel_id;
 			const currentClanId = selectCurrentClanId(state);
 			const isDM = !currentClanId || currentClanId === '0';
 
 			if (!isDM) {
 				const currentChannelId = selectCurrentChannelId(state as unknown as RootState);
-				if (channelId !== currentChannelId) return;
+				const currentTopicId = selectCurrentTopicId(state as unknown as RootState);
+				const isFocusTopicBox = selectClickedOnTopicStatus(state as unknown as RootState);
+
+				if (isTopicTyping) {
+					if (!isFocusTopicBox || !currentTopicId || channelId !== currentTopicId) return;
+					if (e.channel_id !== currentChannelId) return;
+				} else {
+					if (isFocusTopicBox && currentTopicId) return;
+					if (channelId !== currentChannelId) return;
+				}
 			}
 
 			typingUsersService.addTypingUser(channelId, e.sender_id, e.sender_display_name || e.sender_username);
