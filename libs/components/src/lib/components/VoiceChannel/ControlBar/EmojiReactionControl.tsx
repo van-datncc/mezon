@@ -14,44 +14,38 @@ interface EmojiReactionControlProps {
 	onEmojiSelect: (emojiId: string, emoji: string) => void;
 }
 
-export const EmojiReactionControl = memo(
-	({ isGridView, isShowMember, showEmojiPanel, onVisibleChange, onEmojiSelect }: EmojiReactionControlProps) => {
-		const handleEmojiSelect = useCallback(
-			(emojiId: string, emoji: string) => {
-				onEmojiSelect(emojiId, emoji);
-			},
-			[onEmojiSelect]
-		);
+export const EmojiReactionControl = memo(({ showEmojiPanel, onVisibleChange, onEmojiSelect }: EmojiReactionControlProps) => {
+	const handleEmojiSelect = useCallback(
+		(emojiId: string, emoji: string) => {
+			onEmojiSelect(emojiId, emoji);
+		},
+		[onEmojiSelect]
+	);
 
-		const iconClassName = `cursor-pointer ${
-			(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-				? 'text-theme-primary text-theme-primary-hover'
-				: 'text-gray-300 hover:text-white'
-		}`;
+	const iconClassName = 'cursor-pointer text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]';
 
-		return (
-			<Tooltip
-				placement="topLeft"
-				trigger={['click']}
-				overlayClassName="w-auto"
-				visible={showEmojiPanel}
-				onVisibleChange={onVisibleChange}
-				overlay={
-					<EmojiSuggestionProvider>
-						<GifStickerEmojiPopup
-							showTabs={{ emojis: true }}
-							mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
-							emojiAction={EmojiPlaces.EMOJI_REACTION}
-							onEmojiSelect={handleEmojiSelect}
-						/>
-					</EmojiSuggestionProvider>
-				}
-				destroyTooltipOnHide
-			>
-				<div>
-					<Icons.VoiceEmojiControlIcon className={iconClassName} />
-				</div>
-			</Tooltip>
-		);
-	}
-);
+	return (
+		<Tooltip
+			placement="topLeft"
+			trigger={['click']}
+			overlayClassName="w-auto"
+			visible={showEmojiPanel}
+			onVisibleChange={onVisibleChange}
+			overlay={
+				<EmojiSuggestionProvider>
+					<GifStickerEmojiPopup
+						showTabs={{ emojis: true }}
+						mode={ChannelStreamMode.STREAM_MODE_CHANNEL}
+						emojiAction={EmojiPlaces.EMOJI_REACTION}
+						onEmojiSelect={handleEmojiSelect}
+					/>
+				</EmojiSuggestionProvider>
+			}
+			destroyTooltipOnHide
+		>
+			<div>
+				<Icons.VoiceEmojiControlIcon className={iconClassName} />
+			</div>
+		</Tooltip>
+	);
+});

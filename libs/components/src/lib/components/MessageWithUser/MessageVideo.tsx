@@ -1,5 +1,5 @@
 import { Icons } from '@mezon/ui';
-import { calculateMediaDimensions, useIsIntersecting, useResizeObserver, type ObserveFn } from '@mezon/utils';
+import { calculateMediaDimensions, createImgproxyUrl, useIsIntersecting, useResizeObserver, type ObserveFn } from '@mezon/utils';
 import isElectron from 'is-electron';
 import type { ApiMessageAttachment } from 'mezon-js';
 import type { Movie, Track } from 'mp4box';
@@ -7,11 +7,12 @@ import { MP4BoxBuffer, createFile } from 'mp4box';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
-
+import { AttachmentSendingIndicator } from './AttachmentSendingIndicator';
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 	isMobile?: boolean;
 	isPreview?: boolean;
+	isSending?: boolean;
 	observeIntersection?: ObserveFn;
 };
 export const MIN_WIDTH_VIDEO_SHOW = 200;
@@ -35,6 +36,12 @@ interface VideoCodecInfo {
 	isMain10: boolean;
 	isDolbyVision: boolean;
 	isAppleDevice: boolean;
+}
+
+interface ProbeResult {
+	codec: VideoCodecInfo | null;
+	isFastStart: boolean | null;
+	reason: string;
 }
 
 interface VideoProbeRange {
@@ -116,7 +123,7 @@ function parseCodecFromMovie(info: Movie): VideoCodecInfo | null {
 	return { codec, isHEVC, isMain10, isDolbyVision, isAppleDevice };
 }
 
-async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<VideoCodecInfo | null> {
+async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<ProbeResult> {
 	return new Promise((resolve) => {
 		const mp4boxFile = createFile();
 		let resolved = false;
@@ -124,8 +131,9 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 		let lastProbeRange: VideoProbeRange | null = null;
 		let totalSize: number | null = null;
 		let nextBufferStart: number | undefined;
+		let moovBeforeMdat: boolean | null = null;
 
-		const timeout = setTimeout(() => finalize(null), MP4BOX_TIMEOUT_MS);
+		const timeout = setTimeout(() => finalize(null, 'timeout'), MP4BOX_TIMEOUT_MS);
 
 		function cleanup() {
 			clearTimeout(timeout);
@@ -134,17 +142,33 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 			mp4boxFile.flush();
 		}
 
-		function finalize(result: VideoCodecInfo | null) {
+		const detectFastStart = () => {
+			if (moovBeforeMdat !== null) return;
+			const boxes = (mp4boxFile as unknown as { boxes?: Array<{ type: string }> }).boxes;
+			if (!boxes) return;
+			for (const box of boxes) {
+				if (box.type === 'moov') {
+					moovBeforeMdat = true;
+					return;
+				}
+				if (box.type === 'mdat') {
+					moovBeforeMdat = false;
+					return;
+				}
+			}
+		};
+
+		function finalize(result: VideoCodecInfo | null, reason: string) {
 			if (resolved) return;
 			resolved = true;
 			cleanup();
-			resolve(result);
+			resolve({ codec: result, isFastStart: moovBeforeMdat, reason });
 		}
 
-		const flushAndFinalize = () => {
+		const flushAndFinalize = (reason: string) => {
 			mp4boxFile.flush();
 			if (!resolved) {
-				finalize(null);
+				finalize(null, reason);
 			}
 		};
 
@@ -153,6 +177,7 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 			totalSize = range.totalSize ?? totalSize;
 			bytesFetched += range.end - range.start + 1;
 			nextBufferStart = mp4boxFile.appendBuffer(range.buffer);
+			detectFastStart();
 		};
 
 		const getNextRequestedStart = () => {
@@ -166,13 +191,13 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 			return lastProbeRange ? lastProbeRange.end + 1 : 0;
 		};
 
-		mp4boxFile.onReady = (info: Movie) => finalize(parseCodecFromMovie(info));
-		mp4boxFile.onError = () => finalize(null);
+		mp4boxFile.onReady = (info: Movie) => finalize(parseCodecFromMovie(info), 'mp4box-ready');
+		mp4boxFile.onError = () => finalize(null, 'mp4box-error');
 
 		const runProbe = async () => {
 			const firstRange = await fetchVideoProbeRange(url, 0, INITIAL_PROBE_SIZE - 1, signal);
 			if (!firstRange) {
-				finalize(null);
+				finalize(null, 'first-range-failed');
 				return;
 			}
 
@@ -181,7 +206,7 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 			while (!resolved && bytesFetched < MAX_PROBE_BYTES) {
 				const requestedStart = getNextRequestedStart();
 				if (totalSize !== null && requestedStart > totalSize - 1) {
-					flushAndFinalize();
+					flushAndFinalize('reached-eof-no-moov');
 					return;
 				}
 
@@ -192,25 +217,22 @@ async function probeVideoCodec(url: string, signal?: AbortSignal): Promise<Video
 				const requestedEnd = totalSize === null ? requestedStart + chunkSize - 1 : Math.min(totalSize - 1, requestedStart + chunkSize - 1);
 				const probeRange = await fetchVideoProbeRange(url, requestedStart, requestedEnd, signal);
 				if (!probeRange) {
-					flushAndFinalize();
+					flushAndFinalize('chunk-range-failed');
 					return;
 				}
 
 				appendRange(probeRange);
 			}
 
-			flushAndFinalize();
+			flushAndFinalize('budget-exhausted');
 		};
 
-		runProbe().catch(() => finalize(null));
+		runProbe().catch(() => finalize(null, 'exception'));
 	});
 }
 
 function isUnsafeCodec(info: VideoCodecInfo): boolean {
-	if (info.isDolbyVision) return true;
-	if (info.isHEVC && info.isMain10) return true;
-	if (info.isAppleDevice) return true;
-	return false;
+	return info.isDolbyVision || (info.isHEVC && info.isMain10) || info.isAppleDevice;
 }
 
 function useVideoProbe(url: string | undefined, shouldProbe: boolean, filename?: string) {
@@ -241,22 +263,28 @@ function useVideoProbe(url: string | undefined, shouldProbe: boolean, filename?:
 		const unsupportedMessage = strictProbe ? t('video.error.codecNotSupportedElectron') : t('video.error.codecNotSupported');
 
 		const runProbe = async () => {
-			const info = await probeVideoCodec(url, abortController.signal);
+			const { codec: info, isFastStart } = await probeVideoCodec(url, abortController.signal);
 
 			if (cancelled) return;
 
 			if (info) {
 				setCodecInfo(info);
-				if (isUnsafeCodec(info)) {
-					setStatus('unsupported');
-					setErrorMessage(unsupportedMessage);
-					return;
-				}
-				setStatus('ready');
+			}
+
+			if (info && isUnsafeCodec(info)) {
+				setStatus('unsupported');
+				setErrorMessage(unsupportedMessage);
 				return;
 			}
 
-			if (strictProbe && isLikelyQuickTimeUrl(url, filename)) {
+			if (strictProbe && isFastStart === false) {
+				setStatus('unsupported');
+				setErrorMessage(unsupportedMessage);
+				return;
+			}
+
+			const quicktimeFallback = strictProbe && !info && isLikelyQuickTimeUrl(url, filename);
+			if (quicktimeFallback) {
 				setStatus('unsupported');
 				setErrorMessage(unsupportedMessage);
 				return;
@@ -366,17 +394,67 @@ function VideoSkeleton({ style }: { style: React.CSSProperties }) {
 	);
 }
 
-function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false, observeIntersection }: MessageImage) {
+function VideoPoster({
+	thumbnailUrl,
+	style,
+	onPlay,
+	disablePlay = false,
+	isSending = false
+}: {
+	thumbnailUrl?: string;
+	style: React.CSSProperties;
+	onPlay: () => void;
+	disablePlay?: boolean;
+	isSending?: boolean;
+}) {
+	return (
+		<div
+			className={`relative overflow-hidden rounded-lg bg-bgLightSecondary dark:bg-bgSecondary flex items-center justify-center ${
+				disablePlay ? 'cursor-default' : 'cursor-pointer'
+			}`}
+			style={style}
+			onClick={disablePlay ? undefined : onPlay}
+		>
+			{thumbnailUrl && <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />}
+			{isSending ? (
+				<AttachmentSendingIndicator />
+			) : (
+				<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group">
+					<div className="flex items-center justify-center w-12 h-12 rounded-full bg-black bg-opacity-50 transition-transform duration-150 group-hover:scale-110">
+						<Icons.PlayButton className="w-5 h-5 text-white" />
+					</div>
+				</div>
+			)}
+		</div>
+	);
+}
+
+function resolveVideoThumbnailUrl(attachmentData: ApiMessageAttachment, width: number, height: number): string | undefined {
+	const thumb = attachmentData.thumbnail;
+	if (!thumb) return undefined;
+	if (thumb.startsWith('blob:')) return thumb;
+	return createImgproxyUrl(thumb, { width: Math.round(width), height: Math.round(height), resizeType: 'fit' });
+}
+
+function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false, isSending = false, observeIntersection }: MessageImage) {
 	const { t } = useTranslation('media');
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isIntersecting = useIsIntersecting(containerRef, observeIntersection);
-	const { status: probeStatus, errorMessage, codecInfo } = useVideoProbe(attachmentData.url, isIntersecting, attachmentData.filename);
-	const { mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
+	const [activated, setActivated] = useState(false);
+	const { status: probeStatus, errorMessage, codecInfo } = useVideoProbe(attachmentData.url, isIntersecting && activated, attachmentData.filename);
+	const { width, height, mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
 	const handleDownloadVideo = useDownloadVideo(attachmentData.url, attachmentData.filename);
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [showControl, setShowControl] = useState(true);
-	const shouldRenderVideo = isIntersecting && probeStatus === 'ready';
+	const shouldRenderVideo = activated && probeStatus === 'ready' && !isSending;
+
+	const thumbnailUrl = resolveVideoThumbnailUrl(attachmentData, width, height);
+
+	const handlePlay = useCallback(() => {
+		if (isSending) return;
+		setActivated(true);
+	}, [isSending]);
 
 	useVideoCleanup(videoRef, shouldRenderVideo);
 
@@ -408,11 +486,19 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 		}
 	}, [showControl]);
 
+	const showMedia = isSending || isIntersecting;
+
 	return (
 		<div ref={containerRef} className="relative overflow-hidden group rounded-lg max-w-full">
-			{(probeStatus === 'idle' || probeStatus === 'probing') && <VideoSkeleton style={mediaStyle} />}
+			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
-			{isIntersecting && (probeStatus === 'error' || probeStatus === 'unsupported') && (
+			{showMedia && !activated && (
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isSending} isSending={isSending} />
+			)}
+
+			{activated && (probeStatus === 'idle' || probeStatus === 'probing') && <VideoSkeleton style={mediaStyle} />}
+
+			{activated && (probeStatus === 'error' || probeStatus === 'unsupported') && (
 				<div
 					className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg bg-bgLightSecondary dark:bg-bgSecondary"
 					style={mediaStyle}
@@ -438,12 +524,12 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 				<>
 					<video
 						controls={showControl}
-						autoPlay={false}
+						autoPlay
 						style={mediaStyle}
 						ref={videoRef}
 						onCanPlay={handleOnCanPlay}
 						className="object-contain"
-						preload="metadata"
+						preload="auto"
 						playsInline
 					>
 						<source src={attachmentData.url} />
@@ -474,17 +560,25 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 	);
 }
 
-function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, observeIntersection }: MessageImage) {
+function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, isSending = false, observeIntersection }: MessageImage) {
 	const { t } = useTranslation('media');
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isIntersecting = useIsIntersecting(containerRef, observeIntersection);
-	const { mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
+	const [activated, setActivated] = useState(false);
+	const { width, height, mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
 	const handleDownloadVideo = useDownloadVideo(attachmentData.url, attachmentData.filename);
+	const thumbnailUrl = resolveVideoThumbnailUrl(attachmentData, width, height);
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [showControl, setShowControl] = useState(true);
+	const shouldRenderVideo = activated && isIntersecting && !isSending;
 
-	useVideoCleanup(videoRef, isIntersecting);
+	useVideoCleanup(videoRef, shouldRenderVideo);
+
+	const handlePlay = useCallback(() => {
+		if (isSending) return;
+		setActivated(true);
+	}, [isSending]);
 
 	const handleOnCanPlay = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
 		if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
@@ -514,11 +608,17 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 		}
 	}, [showControl]);
 
+	const showMedia = isSending || isIntersecting;
+
 	return (
 		<div ref={containerRef} className="relative overflow-hidden group rounded-lg max-w-full">
-			{!isIntersecting && <VideoSkeleton style={mediaStyle} />}
+			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
-			{isIntersecting && (
+			{showMedia && !activated && (
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isSending} isSending={isSending} />
+			)}
+
+			{shouldRenderVideo && (
 				<>
 					<video
 						controls={showControl}

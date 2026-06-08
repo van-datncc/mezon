@@ -35,7 +35,7 @@
 			"description": "Ändra privat inställning och anpassa hur medlemmar kan interagera med denna kanal."
 		},
 		"quickAction": {
-			"title": "Snabbåtgärd"
+			"title": "Snabbkommando"
 		},
 		"privateChannelInvite": {
 			"addMember": "Lägg till medlem"
@@ -174,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Snabb meny",
+		"title": "Snabbkommando",
 		"description": "Hantera snabba meddelanden och snabbmeny för denna kanal",
 		"keyTitle": "Ange nyckelord (T.ex. hej): ",
 		"valueTitle": "Ange innehåll (T.ex. Godmorgon, önskar dig en bra dag!)",
@@ -240,7 +240,7 @@
 		"invites": "Inbjudan",
 		"integrations": "Integrationer",
 		"category": "Kategori",
-		"quickMenu": "Snabb meny"
+		"quickMenu": "Snabbåtgärder"
 	},
 	"categoryManagement": {
 		"title": "Kategori",

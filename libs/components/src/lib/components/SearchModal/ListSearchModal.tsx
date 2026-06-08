@@ -1,4 +1,5 @@
-import { SearchItemProps, TypeSearch } from '@mezon/utils';
+import type { SearchItemProps } from '@mezon/utils';
+import { TypeSearch } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useContext, useMemo } from 'react';
 import { SuggestItem } from '../../components';
@@ -24,14 +25,14 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 		listSearch.length > 0 &&
 		listSearch.map((item: SearchItemProps) => {
 			const isChannel = item.typeChat === TypeSearch.Channel_Type;
-			const isUnread = item.lastSeenTimeStamp < item.lastSentTimeStamp && !item.count_messsage_unread;
+			const isUnread = item.lastSeenTimeStamp < item.lastSentTimeStamp || !!item.count_messsage_unread;
 			return (
 				<div
 					key={item.id}
 					ref={(element) => item?.id && itemRefs && (itemRefs[item.id] = element)}
 					onClick={() => onItemClick(item)}
 					onMouseEnter={() => onMouseEnter(item)}
-					className={`${focusItemId === item.id ? 'bg-item-theme ' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
+					className={`group ${focusItemId === item.id ? 'bg-item-theme ' : ''}  w-full px-[10px] py-[4px] rounded-[6px] cursor-pointer`}
 				>
 					{isChannel ? (
 						<SuggestItem
@@ -46,6 +47,7 @@ const ListSearchModal = (props: ListSearchModalProps) => {
 							channel={item}
 							count={item.count_messsage_unread}
 							isUnread={isUnread}
+							isRowFocused={focusItemId === item.id}
 						/>
 					) : (
 						<SuggestItem

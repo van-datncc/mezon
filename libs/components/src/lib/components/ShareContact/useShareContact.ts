@@ -29,6 +29,7 @@ export type ShareItem = {
 	clanId?: string;
 	clanName?: string;
 	isPublic?: boolean;
+	isAgeRestricted?: boolean;
 };
 
 type UseShareContactProps = {
@@ -120,7 +121,8 @@ export const useShareContact = ({ contactUser, t }: UseShareContactProps) => {
 				channelId: ch.channel_id || ch.id,
 				clanId: ch.clan_id || '',
 				clanName: ch.clan_id ? clansEntities?.[ch.clan_id]?.clan_name || '' : '',
-				isPublic: !ch.channel_private
+				isPublic: !ch.channel_private,
+				isAgeRestricted: (ch as { age_restricted?: number }).age_restricted === 1
 			}));
 
 		return [...friendItems, ...dmGroupItems, ...channelItems];
