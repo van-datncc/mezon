@@ -607,7 +607,7 @@ export const jumpToMessage = createAsyncThunk(
 			const channelMessages = selectViewportIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
 			let found = true;
-			if (indexMessage < 10) {
+			if (indexMessage === -1) {
 				thunkAPI.dispatch(
 					channelsActions.setScrollDownVisibility({
 						channelId,
@@ -630,7 +630,11 @@ export const jumpToMessage = createAsyncThunk(
 					)
 					.unwrap();
 
-				found = response?.messages?.some((item) => item.id === messageId);
+				const chlId = topicId || channelId;
+				const stateAfterFetch = getMessagesState(getMessagesRootState(thunkAPI));
+				found =
+					response?.messages?.some((item) => item.id === messageId) || Boolean(stateAfterFetch.channelMessages[chlId]?.entities[messageId]);
+
 				if (!found) {
 					thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 				}
