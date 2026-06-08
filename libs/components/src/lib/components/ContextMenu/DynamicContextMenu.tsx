@@ -367,6 +367,11 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 					</Dropdown>
 				);
 			} else if (!labelQuickMenus) {
+				const isCreateThreadItem = item.id === 'createThread';
+				const threadIconHoverClass = isCreateThreadItem
+					? '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] hover:[--thread-fill-1:var(--bg-icon-theme-active)]'
+					: '';
+
 				elements.push(
 					<Item
 						key={item.label}
@@ -385,10 +390,16 @@ export default function DynamicContextMenu({ menuId, items, messageId, message, 
 					>
 						<div
 							data-e2e={generateE2eId('chat.message_action_modal.button.base')}
-							className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542]  ' : 'text-theme-primary text-theme-primary-hover'}`}
+							className={`flex justify-between items-center w-full font-['gg_sans','Noto_Sans',sans-serif] text-sm font-medium p-1 ${lableItemWarning ? ' text-[#E13542]  ' : 'text-theme-primary text-theme-primary-hover'} ${threadIconHoverClass}`}
 						>
 							<span>{item.label}</span>
-							<span> {item.icon}</span>
+							<span>
+								{isCreateThreadItem ? (
+									<Icons.ThreadIcon className="w-4 h-4" defaultFill1="var(--thread-fill-1)" defaultFill4="var(--thread-fill-4)" />
+								) : (
+									item.icon
+								)}
+							</span>
 						</div>
 					</Item>
 				);
