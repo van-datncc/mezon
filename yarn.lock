@@ -12081,9 +12081,9 @@ invariant@^2.0.0, invariant@^2.2.4:
     loose-envify "^1.0.0"
 
 ip-address@^10.0.1:
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.1.0.tgz#d8dcffb34d0e02eb241427444a6e23f5b0595aa4"
-  integrity sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-10.2.0.tgz#805fc178b20c518bd4c8548b24fe30892d7f3206"
+  integrity sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==
 
 ip-regex@^5.0.0:
   version "5.0.0"
@@ -14529,10 +14529,10 @@ mezon-js-protobuf@1.10.53, mezon-js-protobuf@^1.10.53:
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js@2.15.53:
-  version "2.15.53"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.53.tgz#f7133ea5e4fe0c0267c3df256ef47d320aeb3177"
-  integrity sha512-imL8SkTEf0OxaL56LrSQuB/C8/QQPwpYdDrfu4kzyXFcH8NRob5at85UT3L62KoumnwFCcwd6YuIHXHz2JXf+Q==
+mezon-js@2.15.54:
+  version "2.15.54"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.54.tgz#be37a821d9e88ee104da03fa7f6819d3408ca51d"
+  integrity sha512-I6dW87oQ5zVsQyjRzVeEQGk8R2bn0pra5wFYe9fanjzQdr1EGp6BjRthbfD1WlERiXVXMW1FmCkVnTW6LR6ZqA==
   dependencies:
     base64-arraybuffer "^1.0.2"
     js-base64 "^3.7.8"
@@ -19424,9 +19424,9 @@ tmp-promise@^3.0.2:
     tmp "^0.2.0"
 
 tmp@^0.2.0, tmp@~0.2.1:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.5.tgz#b06bcd23f0f3c8357b426891726d16015abfd8f8"
-  integrity sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.6.tgz#0dfac10fd09a9319288eb0e8f0ed524604e183b4"
+  integrity sha512-5sJPdPjfI5Kx+qbrDesxkglRBxW//g7hCsqspEjwkewGvBMGIKMOTKzLt1hFVJzyadba3lDUN20O9qhvbQUSTA==
 
 tmpl@1.0.5:
   version "1.0.5"
@@ -20296,9 +20296,9 @@ webpack-dev-middleware@^7.4.2:
     schema-utils "^4.0.0"
 
 webpack-dev-server@^5.2.1:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-5.2.3.tgz#7f36a78be7ac88833fd87757edee31469a9e47d3"
-  integrity sha512-9Gyu2F7+bg4Vv+pjbovuYDhHX+mqdqITykfzdM9UyKqKHlsE5aAjRhR+oOEfXW5vBeu8tarzlJFIZva4ZjAdrQ==
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-5.2.4.tgz#6e6306ce59848ed322c235e48b326632b1eed6d6"
+  integrity sha512-GqDPGZN9bRqKBTkp4aWkobDDHMsrXKoGSdOH56smIri8qR0JG8gfL8/v/f/OZR3/OKXjG8uwJbFVhKm/FNU/UA==
   dependencies:
     "@types/bonjour" "^3.5.13"
     "@types/connect-history-api-fallback" "^1.5.4"
