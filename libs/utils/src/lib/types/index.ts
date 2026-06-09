@@ -474,6 +474,7 @@ export interface IMessageSendPayload {
 	id?: number;
 	expire_at?: number;
 	type?: EPollType;
+	presign_finish?: string[];
 }
 
 export type IUser = {

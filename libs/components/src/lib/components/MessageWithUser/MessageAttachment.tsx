@@ -14,14 +14,19 @@ import {
 	ETypeLinkMedia,
 	calculateAlbumLayout,
 	createImgproxyUrl,
+	filterExpiredPresignAttachments,
 	generateAttachmentId,
 	getAttachmentDataForWindow,
+	getPresignFinishFingerprint,
+	hasActivePresignPendingAttachments,
 	isMediaTypeNotSupported,
+	isPresignAttachmentPending,
+	parsePresignFinishKeys,
 	useAppLayout
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import type { ApiMessageAttachment, ChannelStreamMode } from 'mezon-js';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import Album from './Album';
 import { MessageAudio } from './MessageAudio/MessageAudio';
 import MessageLinkFile from './MessageLinkFile';
@@ -47,6 +52,22 @@ const getMessageCreateTimeSeconds = (message: IMessageWithUser): number | undefi
 	}
 	return undefined;
 };
+
+function usePresignExpiryNow(hasPresignPending: boolean): number {
+	const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1000));
+
+	useEffect(() => {
+		if (!hasPresignPending) return;
+
+		const interval = setInterval(() => {
+			setNowSeconds(Math.floor(Date.now() / 1000));
+		}, 30_000);
+
+		return () => clearInterval(interval);
+	}, [hasPresignPending]);
+
+	return nowSeconds;
+}
 
 const classifyAttachments = (attachments: ApiMessageAttachment[], message: IMessageWithUser) => {
 	const videos: ApiMessageAttachment[] = [];
@@ -115,6 +136,11 @@ const Attachments: React.FC<{
 		const classified = useMemo(() => classifyAttachments(attachments, message), [attachments, message]);
 
 		const { videos, images, documents, audio } = classified;
+		const presignFinishKeys = useMemo(() => parsePresignFinishKeys(message.content), [message.content]);
+		const isPresignPendingForUrl = useCallback(
+			(url?: string) => isPresignAttachmentPending(url, presignFinishKeys),
+			[presignFinishKeys]
+		);
 
 		const { isMobile } = useAppLayout();
 		return (
@@ -127,6 +153,7 @@ const Attachments: React.FC<{
 									attachmentData={video}
 									isMobile={isMobile}
 									isSending={message.isSending}
+									isPresignPending={isPresignPendingForUrl(video.url)}
 									observeIntersection={observeIntersectionForLoading}
 								/>
 							</div>
@@ -144,6 +171,7 @@ const Attachments: React.FC<{
 						isInSearchMessage={isInSearchMessage}
 						defaultMaxWidth={defaultMaxWidth}
 						isMobile={isMobile}
+						isPresignPendingForUrl={isPresignPendingForUrl}
 					/>
 				)}
 
@@ -161,6 +189,7 @@ const Attachments: React.FC<{
 		prev.message.id === next.message.id &&
 		prev.message.isSending === next.message.isSending &&
 		prev.message.attachments === next.message.attachments &&
+		getPresignFinishFingerprint(prev.message.content) === getPresignFinishFingerprint(next.message.content) &&
 		prev.mode === next.mode
 );
 
@@ -169,10 +198,26 @@ Attachments.displayName = 'Attachments';
 // TODO: refactor component for message lines
 const MessageAttachment = memo(
 	({ message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage, defaultMaxWidth }: MessageAttachmentProps) => {
-		const validateAttachment = useMemo(
-			() => (message.attachments || [])?.filter((attachment) => Object.keys(attachment).length !== 0),
-			[message.attachments]
+		const hasPresignPending = useMemo(
+			() => hasActivePresignPendingAttachments(message.attachments, message.content),
+			[message.attachments, message.content]
 		);
+		const nowSeconds = usePresignExpiryNow(hasPresignPending);
+
+		const validateAttachment = useMemo(() => {
+			const rawAttachments = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
+			if (!rawAttachments.length) return null;
+
+			const messageCreateTimeSeconds = getMessageCreateTimeSeconds(message);
+			const visibleAttachments = filterExpiredPresignAttachments(
+				rawAttachments,
+				message.content,
+				messageCreateTimeSeconds,
+				nowSeconds
+			);
+
+			return visibleAttachments.length ? visibleAttachments : null;
+		}, [message.attachments, message.content, message.create_time_seconds, nowSeconds]);
 		if (!validateAttachment) return null;
 		return (
 			<Attachments
@@ -190,6 +235,7 @@ const MessageAttachment = memo(
 		prev.message.id === next.message.id &&
 		prev.message.attachments === next.message.attachments &&
 		prev.message.isSending === next.message.isSending &&
+		getPresignFinishFingerprint(prev.message.content) === getPresignFinishFingerprint(next.message.content) &&
 		prev.mode === next.mode
 );
 
@@ -204,7 +250,8 @@ const ImageAlbum = memo(
 		observeIntersectionForLoading,
 		isInSearchMessage,
 		defaultMaxWidth,
-		isMobile
+		isMobile,
+		isPresignPendingForUrl
 	}: {
 		images: ApiMessageAttachment[];
 		message: IMessageWithUser;
@@ -214,6 +261,7 @@ const ImageAlbum = memo(
 		isInSearchMessage?: boolean;
 		defaultMaxWidth?: number;
 		isMobile?: boolean;
+		isPresignPendingForUrl?: (url?: string) => boolean;
 	}) => {
 		const dispatch = useAppDispatch();
 
@@ -444,6 +492,7 @@ const ImageAlbum = memo(
 						onContextMenu={onContextMenu}
 						isInSearchMessage={isInSearchMessage}
 						isSending={message.isSending}
+						isPresignPendingForUrl={isPresignPendingForUrl}
 						isMobile={isMobile}
 						messageId={message.id}
 						images={images}
@@ -455,6 +504,7 @@ const ImageAlbum = memo(
 		if (images.length === 1 && photoProps) {
 			const firstImage = images[0];
 			const attachmentId = firstImage ? generateAttachmentId(firstImage, message.id) : message.id;
+			const isPresignPending = isPresignPendingForUrl?.(firstImage?.url);
 			return (
 				<div className="w-full py-1">
 					<Photo
@@ -467,6 +517,7 @@ const ImageAlbum = memo(
 						onContextMenu={onContextMenu}
 						isInSearchMessage={isInSearchMessage}
 						isSending={message.isSending}
+						isPresignPending={isPresignPending}
 						isMobile={isMobile}
 					/>
 				</div>
@@ -479,6 +530,7 @@ const ImageAlbum = memo(
 		prev.images === next.images &&
 		prev.message.id === next.message.id &&
 		prev.message.isSending === next.message.isSending &&
+		getPresignFinishFingerprint(prev.message.content) === getPresignFinishFingerprint(next.message.content) &&
 		prev.mode === next.mode &&
 		prev.isMobile === next.isMobile &&
 		prev.defaultMaxWidth === next.defaultMaxWidth
