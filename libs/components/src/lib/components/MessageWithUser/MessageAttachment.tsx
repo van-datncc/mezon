@@ -17,6 +17,8 @@ import {
 	filterExpiredPresignAttachments,
 	generateAttachmentId,
 	getAttachmentDataForWindow,
+	getMessageCreateTimeSeconds,
+	getPresignExpiryDelayMs,
 	getPresignFinishFingerprint,
 	hasActivePresignPendingAttachments,
 	isMediaTypeNotSupported,
@@ -43,28 +45,26 @@ type MessageAttachmentProps = {
 	defaultMaxWidth?: number;
 };
 
-const getMessageCreateTimeSeconds = (message: IMessageWithUser): number | undefined => {
-	if (message.create_time_seconds) return message.create_time_seconds;
-	const createTime = (message as any).create_time;
-	if (createTime) {
-		const parsed = new Date(createTime).getTime();
-		if (!isNaN(parsed)) return Math.floor(parsed / 1000);
-	}
-	return undefined;
-};
-
-function usePresignExpiryNow(hasPresignPending: boolean): number {
+function usePresignExpiryNow(hasPresignPending: boolean, messageCreateTimeSeconds?: number): number {
 	const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1000));
 
 	useEffect(() => {
 		if (!hasPresignPending) return;
 
-		const interval = setInterval(() => {
-			setNowSeconds(Math.floor(Date.now() / 1000));
-		}, 30_000);
+		const delay = getPresignExpiryDelayMs(messageCreateTimeSeconds);
+		if (delay === null) return;
 
-		return () => clearInterval(interval);
-	}, [hasPresignPending]);
+		if (delay === 0) {
+			setNowSeconds(Math.floor(Date.now() / 1000));
+			return;
+		}
+
+		const timeout = setTimeout(() => {
+			setNowSeconds(Math.floor(Date.now() / 1000));
+		}, delay);
+
+		return () => clearTimeout(timeout);
+	}, [hasPresignPending, messageCreateTimeSeconds]);
 
 	return nowSeconds;
 }
@@ -176,11 +176,16 @@ const Attachments: React.FC<{
 				)}
 
 				{documents.length > 0 &&
-					documents.map((document, index) => (
-						<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
-					))}
+					documents
+						.filter((document) => !isPresignPendingForUrl(document.url))
+						.map((document, index) => (
+							<MessageLinkFile key={`${index}_${document.url}`} attachmentData={document} mode={mode} message={message} />
+						))}
 
-				{audio.length > 0 && audio.map((audio, index) => <MessageAudio key={`${index}_${audio.url}`} audioUrl={audio.url || ''} />)}
+				{audio.length > 0 &&
+					audio
+						.filter((audioItem) => !isPresignPendingForUrl(audioItem.url))
+						.map((audioItem, index) => <MessageAudio key={`${index}_${audioItem.url}`} audioUrl={audioItem.url || ''} />)}
 			</>
 		);
 	},
@@ -198,17 +203,16 @@ Attachments.displayName = 'Attachments';
 // TODO: refactor component for message lines
 const MessageAttachment = memo(
 	({ message, onContextMenu, mode, observeIntersectionForLoading, isInSearchMessage, defaultMaxWidth }: MessageAttachmentProps) => {
+		const messageCreateTimeSeconds = useMemo(() => getMessageCreateTimeSeconds(message), [message]);
 		const hasPresignPending = useMemo(
 			() => hasActivePresignPendingAttachments(message.attachments, message.content),
 			[message.attachments, message.content]
 		);
-		const nowSeconds = usePresignExpiryNow(hasPresignPending);
+		const nowSeconds = usePresignExpiryNow(hasPresignPending, messageCreateTimeSeconds);
 
 		const validateAttachment = useMemo(() => {
 			const rawAttachments = (message.attachments || []).filter((attachment) => Object.keys(attachment).length !== 0);
 			if (!rawAttachments.length) return null;
-
-			const messageCreateTimeSeconds = getMessageCreateTimeSeconds(message);
 			const visibleAttachments = filterExpiredPresignAttachments(
 				rawAttachments,
 				message.content,
@@ -217,7 +221,7 @@ const MessageAttachment = memo(
 			);
 
 			return visibleAttachments.length ? visibleAttachments : null;
-		}, [message.attachments, message.content, message.create_time_seconds, nowSeconds]);
+		}, [message.attachments, message.content, messageCreateTimeSeconds, nowSeconds]);
 		if (!validateAttachment) return null;
 		return (
 			<Attachments

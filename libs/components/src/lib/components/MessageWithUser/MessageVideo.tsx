@@ -483,7 +483,7 @@ function MacElectronVideo({
 	const isUploading = isSending || isPresignPending;
 	const { status: probeStatus, errorMessage, codecInfo } = useVideoProbe(
 		attachmentData.url,
-		isIntersecting && !isPresignPending,
+		isIntersecting && activated && !isPresignPending,
 		attachmentData.filename
 	);
 	const { width, height, mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
@@ -646,11 +646,6 @@ function DefaultVideo({
 	const handlePlay = useCallback(() => {
 		if (isUploading) return;
 		requestPlay();
-		const video = videoRef.current;
-		if (video) {
-			video.preload = 'auto';
-			void video.play().catch(() => undefined);
-		}
 		setActivated(true);
 	}, [isUploading, requestPlay]);
 
@@ -696,26 +691,23 @@ function DefaultVideo({
 				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isUploading} isSending={isUploading} />
 			)}
 
-			{showMedia && (
+			{isVideoActive && (
 				<>
 					<video
-						controls={activated && showControl}
+						controls={showControl}
 						autoPlay={false}
-						style={{
-							...mediaStyle,
-							...(activated ? {} : { position: 'absolute', width: 0, height: 0, opacity: 0, pointerEvents: 'none' })
-						}}
+						style={mediaStyle}
 						ref={videoRef}
-						onCanPlay={activated ? handleOnCanPlay : undefined}
+						onCanPlay={handleOnCanPlay}
 						className="object-contain"
-						preload={activated ? 'auto' : 'none'}
+						preload="auto"
 						playsInline
 					>
 						<source src={attachmentData.url} />
 						{t('video.error.browserNotSupported')}
 					</video>
 
-					{activated && !showControl && (
+					{!showControl && (
 						<div
 							className="cursor-pointer absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-30 group"
 							onClick={handleShowFullVideo}
@@ -724,17 +716,15 @@ function DefaultVideo({
 						</div>
 					)}
 
-					{activated && (
-						<div
-							className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center z-30"
-							onClick={handleDownloadVideo}
-						>
-							<Icons.Download
-								defaultSize="!w-4 !h-4 "
-								defaultFill="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black"
-							/>
-						</div>
-					)}
+					<div
+						className="group-hover:flex hidden top-2 right-1 cursor-pointer absolute bg-bgSurface rounded-md w-6 h-6  items-center justify-center z-30"
+						onClick={handleDownloadVideo}
+					>
+						<Icons.Download
+							defaultSize="!w-4 !h-4 "
+							defaultFill="dark:text-[#AEAEAE] text-[#535353] dark:hover:text-white hover:text-black"
+						/>
+					</div>
 				</>
 			)}
 		</div>

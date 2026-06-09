@@ -78,3 +78,56 @@ export function hasActivePresignPendingAttachments(
 
 	return attachments.some((attachment) => isPresignAttachmentPending(attachment.url, presignFinishKeys));
 }
+
+export function getPresignExpiryDelayMs(messageCreateTimeSeconds?: number, nowMs = Date.now()): number | null {
+	if (!messageCreateTimeSeconds) return null;
+
+	const expiresAtMs = (messageCreateTimeSeconds + PRESIGN_PENDING_MAX_AGE_SEC) * 1000;
+	const delay = expiresAtMs - nowMs;
+	return delay <= 0 ? 0 : delay;
+}
+
+export function getMessageCreateTimeSeconds(message: {
+	create_time_seconds?: number | string;
+	create_time?: string;
+	update_time_seconds?: number | string;
+}): number | undefined {
+	if (message.create_time_seconds !== undefined && message.create_time_seconds !== null) {
+		const seconds = Number(message.create_time_seconds);
+		if (Number.isFinite(seconds) && seconds > 0) return seconds;
+	}
+
+	if (message.create_time) {
+		const parsed = new Date(message.create_time).getTime();
+		if (!isNaN(parsed)) return Math.floor(parsed / 1000);
+	}
+
+	if (message.update_time_seconds !== undefined && message.update_time_seconds !== null) {
+		const seconds = Number(message.update_time_seconds);
+		if (Number.isFinite(seconds) && seconds > 0) return seconds;
+	}
+
+	return undefined;
+}
+
+export function isAttachmentPresignPendingForMessage(
+	url: string | undefined,
+	message: { content?: unknown } | null | undefined
+): boolean {
+	if (!message) return false;
+	return isPresignAttachmentPending(url, parsePresignFinishKeys(message.content));
+}
+
+export function shouldHidePresignAttachment(
+	url: string | undefined,
+	message: {
+		content?: unknown;
+		create_time_seconds?: number | string;
+		create_time?: string;
+		update_time_seconds?: number | string;
+	} | null | undefined,
+	nowSeconds = Math.floor(Date.now() / 1000)
+): boolean {
+	if (!message) return false;
+	return isExpiredPresignAttachment(url, parsePresignFinishKeys(message.content), getMessageCreateTimeSeconds(message), nowSeconds);
+}
