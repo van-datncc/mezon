@@ -1,7 +1,6 @@
 import debounce from 'lodash.debounce';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 interface SideBarProps {
 	sideBarIsOpen: boolean;
@@ -113,18 +112,18 @@ export const SideBarMezon = memo((props: SideBarProps) => {
 					{t('header.blogs')}
 				</a>
 
-				<Link
+				<a
 					className="text-center px-[16px] py-[10px] rounded-[8px] bg-white text-[#6E4A9E] font-bold text-[16px] leading-[24px] hover:opacity-90 transition-opacity whitespace-nowrap"
-					to={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
+					href={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 				>
 					Mezon Meet
-				</Link>
-				<Link
+				</a>
+				<a
 					className="text-center px-[16px] py-[10px] rounded-[8px] bg-[#1024D4] text-[#F4F7F9] font-semibold text-[16px] leading-[24px] hover:bg-[#0C1AB2] focus:bg-[#281FB5] whitespace-nowrap"
-					to={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
+					href={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 				>
 					{isLogin ? t('header.openMezon') : t('header.login')}
-				</Link>
+				</a>
 			</div>
 		</div>
 	);

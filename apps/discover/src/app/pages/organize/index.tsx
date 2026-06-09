@@ -4,7 +4,6 @@ import mezonPackage from '@mezon/package-js';
 import { Icons } from '@mezon/ui';
 import { getPlatform, Platform } from '@mezon/utils';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../mezonpage/footer';
 import HeaderMezon from '../mezonpage/header';
 
@@ -182,12 +181,12 @@ const OrganizePage = () => {
 					<p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
 						Join Mezon today and take control of how your team communicates and collaborates.
 					</p>
-					<Link
-						to="/mezon"
+					<a
+						href="/mezon"
 						className="inline-block px-8 py-4 bg-purple-600 text-white rounded-lg font-semibold text-lg hover:bg-purple-700 transition-colors"
 					>
 						Get Started
-					</Link>
+					</a>
 				</div>
 			</section>
 
