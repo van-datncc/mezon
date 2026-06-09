@@ -102,7 +102,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { probeNetworkReachability, publishSessionUpdate, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
+import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -194,14 +194,14 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Observable, Subject } from 'rxjs';
-import { auditTime, exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
+import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import {
+	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	beginReconnectWave,
 	consumeReconnectAttempt,
 	markNetworkProbeCompleted,
-	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	noteReconnectWaveExhausted,
 	refundReconnectAttempt,
 	resetExhaustedWaveCount,
@@ -254,7 +254,6 @@ function reconnectJitterTicker$(): Observable<number> {
 }
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'WAVE_COOLDOWN' | 'SKIP';
-
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -838,7 +837,10 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						avatar: pin.message_sender_avatar,
 						channel_id: pin.channel_id,
 						content: pin.message_content,
-						create_time_seconds: pin.message_created_time ? new Date(pin.message_created_time).getTime() / 1000 : Date.now(),
+						create_time_seconds:
+							'timestamp_seconds' in pin && typeof pin.timestamp_seconds === 'number'
+								? pin.timestamp_seconds
+								: Math.floor(Date.now() / 1000),
 						message_id: pin.message_id,
 						username: pin.message_sender_username,
 						sender_id: pin.message_sender_id
