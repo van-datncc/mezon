@@ -118,21 +118,21 @@ const HeaderMezon = memo((props: HeaderProps) => {
 						))}
 					</nav>
 					<div className="flex items-center justify-end gap-1.5 lg:gap-2 xl:gap-4 flex-shrink-0 min-w-fit lg:min-w-[220px] xl:min-w-[260px] ml-auto">
-						<Link
-							to={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
+						<a
+							href={isLogin ? `${process.env.NX_CHAT_APP_REDIRECT_URI}/meet` : `${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 							className="hidden lg:flex items-center px-3 xl:px-[20px] py-[10px] bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl text-white text-[14px] xl:text-[16px] font-bold whitespace-nowrap hover:bg-[#de82e6] hover:border-[#de82e6] hover:scale-105 active:scale-95 transition-all duration-300 shadow-sm"
 						>
 							<span className="xl:inline">Mezon Meet</span>
-						</Link>
+						</a>
 
-						<Link
-							to={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
+						<a
+							href={`${process.env.NX_CHAT_APP_REDIRECT_URI}/mezon`}
 							className="hidden lg:flex items-center px-3 xl:px-[20px] py-[10px] bg-white rounded-xl text-[#6E4A9E] text-[14px] xl:text-[16px] font-bold whitespace-nowrap hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
 							onClick={() => trackHeaderLoginClick(isLogin ? 'Open Mezon' : 'Login')}
 							data-e2e={generateE2eId('homepage.header.button.login')}
 						>
 							{isLogin ? t('header.openMezon') : t('header.login')}
-						</Link>
+						</a>
 
 						<div className="lg:hidden flex w-[40px] h-[40px] items-center justify-center hover:bg-white/10 rounded-full transition-colors duration-200">
 							{sideBarIsOpen ? (
