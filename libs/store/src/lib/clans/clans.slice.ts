@@ -178,13 +178,10 @@ export const listChannelBadgeCount = createAsyncThunk('clans/listChannelBadgeCou
 			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata({ data: response?.channeldesc as ChannelMetaEntity[], clanId }));
 
 			const listLastMessage = (response.channeldesc ?? []).reduce<ApiChannelMessageHeaderWithChannel[]>((acc, channel) => {
-				if (channel.channel_id) {
+				if (channel.channel_id && channel.last_seen_message) {
 					acc.push({
-						channel_id: channel.channel_id,
-						content: channel.last_sent_message?.content,
-						id: channel.last_sent_message?.id,
-						sender_id: channel.last_sent_message?.sender_id,
-						timestamp_seconds: channel.last_seen_message?.timestamp_seconds
+						...channel.last_sent_message,
+						channel_id: channel.channel_id
 					});
 				}
 				return acc;
