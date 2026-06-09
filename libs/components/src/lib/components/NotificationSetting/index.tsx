@@ -12,6 +12,7 @@ import {
 	selectCurrentClanName,
 	selectDefaultNotificationClanByClanId,
 	selectNotifiSettingsEntitiesById,
+	selectOverrideChannelNotificationMuteSeconds,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -90,7 +91,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	const channelCategorySettings = useSelector(selectAllchannelCategorySetting);
 	const channelsEntities = useAppSelector((state) => selectChannelsEntitiesByClanId(state, currentClanId || ''));
 	const categoriesEntities = useAppSelector((state) => selectCategoryEntityStateByClanId(state, currentClanId || '')?.entities ?? {});
-	const channelNotificationByChannels = useAppSelector((state) => state.notificationsetting.byChannels);
+	const channelNotificationMuteSeconds = useAppSelector(selectOverrideChannelNotificationMuteSeconds);
 	const categoryNotificationSettings = useAppSelector(
 		(state) => (currentClanId ? state.defaultnotificationcategory.byClans[currentClanId]?.categoriesSettings : undefined) ?? {}
 	);
@@ -105,17 +106,18 @@ const ModalNotificationSetting = (props: ModalParam) => {
 	};
 	const getIsMuted = useCallback(
 		(setting: (typeof channelCategorySettings)[number]) => {
-			if (setting.channel_category_title === 'category') {
-				if (isMutedFromMuteTime(categoryNotificationSettings[setting.id]?.time_mute)) {
-					return true;
-				}
-			} else if (isMutedFromMuteTime(channelNotificationByChannels[setting.id]?.notificationSetting?.time_mute_seconds)) {
-				return true;
+			const muteTime =
+				setting.channel_category_title === 'category'
+					? categoryNotificationSettings[setting.id]?.time_mute
+					: channelNotificationMuteSeconds[setting.id];
+
+			if (muteTime !== undefined && muteTime !== null && muteTime !== EMuteState.UN_MUTE) {
+				return isMutedFromMuteTime(muteTime);
 			}
 
 			return (setting.action ?? 1) === 0;
 		},
-		[categoryNotificationSettings, channelNotificationByChannels]
+		[categoryNotificationSettings, channelNotificationMuteSeconds]
 	);
 	const getChannelCategoryLabel = useCallback(
 		(setting: (typeof channelCategorySettings)[number]) =>

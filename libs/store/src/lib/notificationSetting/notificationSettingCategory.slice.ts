@@ -9,19 +9,17 @@ import { selectCategoryEntityStateByClanId } from '../categories/categories.slic
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import type { RootState } from '../store';
-import { deleteNotiChannelSetting, setMuteChannel, setNotificationSetting } from './notificationSettingChannel.slice';
+import {
+	deleteNotiChannelSetting,
+	getMuteActionFromMuteTime,
+	getNotificationSettingState,
+	setMuteChannel,
+	setNotificationSetting
+} from './notificationSettingChannel.slice';
 
 export const DEFAULT_NOTIFICATION_CATEGORY_FEATURE_KEY = 'defaultnotificationcategory';
 
 const DEFAULT_NOTIFICATION_CATEGORY_CACHE_TIME = 1000 * 60 * 60;
-
-const getMuteActionFromMuteTime = (muteTime?: number | null): number => {
-	if (muteTime === undefined || muteTime === null || muteTime === EMuteState.UN_MUTE) {
-		return 1;
-	}
-
-	return 0;
-};
 
 export interface DefaultNotificationCategoryState {
 	byClans: Record<
@@ -702,5 +700,39 @@ export const selectAllchannelCategorySetting = createSelector(
 			return [];
 		}
 		return selectAll(state.byClans[clanId]?.list);
+	}
+);
+
+export const selectOverrideChannelNotificationMuteSeconds = createSelector(
+	[selectAllchannelCategorySetting, getNotificationSettingState],
+	(channelCategorySettings, notificationState) => {
+		const muteByChannelId: Record<string, number | null | undefined> = {};
+
+		for (const setting of channelCategorySettings) {
+			if (setting.channel_category_title === 'channel' && setting.id) {
+				muteByChannelId[setting.id] = notificationState.byChannels[setting.id]?.notificationSetting?.time_mute_seconds;
+			}
+		}
+
+		return muteByChannelId;
+	},
+	{
+		memoizeOptions: {
+			resultEqualityCheck: (a: Record<string, number | null | undefined>, b: Record<string, number | null | undefined>) => {
+				const keysA = Object.keys(a);
+
+				if (keysA.length !== Object.keys(b).length) {
+					return false;
+				}
+
+				for (const key of keysA) {
+					if (a[key] !== b[key]) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+		}
 	}
 );

@@ -26,6 +26,18 @@ const toStoredTimeMuteSeconds = (timeMuteSeconds?: number | null) => {
 	return Date.now() + timeMuteSeconds * 1000;
 };
 
+export const getMuteActionFromMuteTime = (muteTime?: number | null): number => {
+	if (muteTime === undefined || muteTime === null || muteTime === EMuteState.UN_MUTE) {
+		return 1;
+	}
+
+	if (muteTime === EMuteState.MUTED_INFINITY) {
+		return 0;
+	}
+
+	return muteTime > Date.now() ? 0 : 1;
+};
+
 export interface NotificationSettingState extends EntityState<INotificationUserChannel, string> {
 	byChannels: Record<
 		string,
@@ -249,12 +261,7 @@ export const setNotificationSetting = createAsyncThunk(
 
 			const rootState = thunkAPI.getState() as RootState;
 			const channelNoti = channel_id ? rootState.notificationsetting.byChannels[channel_id]?.notificationSetting : undefined;
-			const active =
-				channelNoti?.time_mute_seconds === undefined ||
-				channelNoti?.time_mute_seconds === null ||
-				channelNoti?.time_mute_seconds === EMuteState.UN_MUTE
-					? 1
-					: 0;
+			const active = getMuteActionFromMuteTime(channelNoti?.time_mute_seconds);
 
 			return { ...body, clan_id, label: resolvedLabel, title: resolvedTitle, active };
 		} catch (error) {
@@ -461,13 +468,12 @@ export const notificationSettingSlice = createSlice({
 				channel.cache = createCacheMetadata();
 				NotificationSettingsAdapter.upsertOne(state, notificationSetting);
 
-				const isMuted = mute_time === EMuteState.MUTED_INFINITY || mute_time > 0;
-				if (isMuted) {
+				if (getMuteActionFromMuteTime(mute_time) === 0) {
 					state.mutedChannels = {
 						...state.mutedChannels,
 						[channel_id]: true
 					};
-				} else if (mute_time === EMuteState.UN_MUTE) {
+				} else {
 					const { [channel_id]: _removed, ...rest } = state.mutedChannels;
 					state.mutedChannels = rest;
 				}
