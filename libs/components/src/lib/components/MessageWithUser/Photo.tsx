@@ -51,6 +51,7 @@ export type OwnProps<T> = {
 	isInSearchMessage?: boolean;
 	isSending?: boolean;
 	isPresignPending?: boolean;
+	loadWhenUnpending?: boolean;
 	isMobile?: boolean;
 };
 const Photo = <T,>({
@@ -80,6 +81,7 @@ const Photo = <T,>({
 	isInSearchMessage,
 	isSending,
 	isPresignPending = false,
+	loadWhenUnpending = false,
 	isMobile
 }: OwnProps<T>) => {
 	const ref = useRef<HTMLDivElement>(null);
@@ -88,7 +90,8 @@ const Photo = <T,>({
 
 	const isRecentlySent = !!(photo?.url && photo.url === lastSentUrl);
 	const isUploading = isSending || isPresignPending;
-	const shouldLoad = canAutoLoad && !isPresignPending && (isSending || isIntersecting || isRecentlySent);
+	const shouldLoad =
+		canAutoLoad && !isPresignPending && (isSending || isIntersecting || isRecentlySent || loadWhenUnpending);
 
 	if (isSending && photo?.url) {
 		lastSentUrl = photo.url;

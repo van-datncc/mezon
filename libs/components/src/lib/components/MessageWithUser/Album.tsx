@@ -78,6 +78,7 @@ const Album: FC<OwnProps> = ({
 					onContextMenu={onContextMenu}
 					isSending={isSending}
 					isPresignPending={isPresignPending}
+					loadWhenUnpending={!isPresignPending}
 					isInSearchMessage={isInSearchMessage}
 				/>
 			);

@@ -20,6 +20,7 @@ import {
 	getMobileUploadedAttachments,
 	getPublicKeys,
 	getWebUploadedAttachments,
+	mergePresignFinishContent,
 	isFacebookLink,
 	isTikTokLink,
 	isYouTubeLink,
@@ -1854,8 +1855,10 @@ export const messagesSlice = createSlice({
 				case TypeMessage.ChatUpdate:
 				case TypeMessage.UpdateEphemeralMsg: {
 					const updateTimeSeconds = action.payload.update_time_seconds;
+					const existingMessage = channelEntity?.entities?.[messageId];
+					const mergedContent = mergePresignFinishContent(existingMessage?.content, action.payload.content);
 					const changes: Partial<MessagesEntity> = {
-						content: action.payload.content,
+						content: mergedContent as MessagesEntity['content'],
 						mentions: action.payload.mentions,
 						hide_editted: action.payload.hide_editted,
 						update_time_seconds: updateTimeSeconds,
