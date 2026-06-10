@@ -102,7 +102,7 @@ import {
 	walletActions,
 	webhookActions
 } from '@mezon/store';
-import { probeNetworkReachability, publishSessionUpdate, RECONNECT_NETWORK_PROBE_TIMEOUT_MS, useMezon } from '@mezon/transport';
+import { RECONNECT_NETWORK_PROBE_TIMEOUT_MS, probeNetworkReachability, publishSessionUpdate, useMezon } from '@mezon/transport';
 import type { IMessageSendPayload, IUserProfileActivity, NotificationCategory } from '@mezon/utils';
 import {
 	ADD_ROLE_CHANNEL_STATUS,
@@ -194,7 +194,7 @@ import { ChannelStreamMode, ChannelType, Client, WebrtcSignalingType, safeJSONPa
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Observable, Subject } from 'rxjs';
-import { auditTime, exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
+import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import {
@@ -254,7 +254,6 @@ function reconnectJitterTicker$(): Observable<number> {
 }
 
 type ReconnectWaveTickResult = boolean | 'ATTEMPTS_EXHAUSTED' | 'RECONNECTING' | 'NETWORK_DOWN' | 'WAVE_COOLDOWN' | 'SKIP';
-
 
 type ChatContextProviderProps = {
 	children: React.ReactNode;
@@ -817,18 +816,18 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[userId]
 	);
 
-	const onpinmessage = useCallback((pin: LastPinMessageEvent) => {
-		if (!pin?.channel_id) return;
+	const syncPinFromLastPinEvent = useCallback(
+		(pin: LastPinMessageEvent) => {
+			if (!pin?.channel_id || pin.operation !== 1) return;
 
-		const isDM = !pin.clan_id || pin.clan_id === '0';
+			const isDM = !pin.clan_id || pin.clan_id === '0';
 
-		if (isDM) {
-			dispatch(directActions.setShowPinBadgeOfDM({ dmId: pin.channel_id, isShow: true }));
-		} else {
-			dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: pin.clan_id, channelId: pin.channel_id, isShow: true }));
-		}
+			if (isDM) {
+				dispatch(directActions.setShowPinBadgeOfDM({ dmId: pin.channel_id, isShow: true }));
+			} else {
+				dispatch(channelsActions.setShowPinBadgeOfChannel({ clanId: pin.clan_id, channelId: pin.channel_id, isShow: true }));
+			}
 
-		if (pin.operation === 1) {
 			dispatch(
 				pinMessageActions.addPinMessage({
 					channelId: pin.channel_id,
@@ -845,8 +844,16 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 					}
 				})
 			);
-		}
-	}, []);
+		},
+		[dispatch]
+	);
+
+	const onpinmessage = useCallback(
+		(pin: LastPinMessageEvent) => {
+			syncPinFromLastPinEvent(pin);
+		},
+		[syncPinFromLastPinEvent]
+	);
 
 	const onUnpinMessageEvent = useCallback((unpin_message_event: UnpinMessageEvent) => {
 		if (!unpin_message_event?.channel_id) return;
