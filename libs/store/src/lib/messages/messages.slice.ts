@@ -17,10 +17,12 @@ import {
 	LIMIT_MESSAGE,
 	MessageCrypt,
 	TypeMessage,
+	getMessageCreateTimeSeconds,
 	getMobileUploadedAttachments,
 	getPublicKeys,
 	getWebUploadedAttachments,
 	mergePresignFinishContent,
+	withCreateTimeSecondsInUpdateContent,
 	isFacebookLink,
 	isTikTokLink,
 	isYouTubeLink,
@@ -1095,9 +1097,21 @@ export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', 
 			...content,
 			t: content.t?.trim()
 		};
-		const stringifiedContent = JSON.stringify(trimContent);
+		const state = thunkAPI.getState() as RootState;
+		const existingMessage = selectMessageByMessageId(state, channelId, messageId);
+		const isAttachmentFieldUpdate = attachments !== undefined;
+		const hasExistingAttachments = (existingMessage?.attachments?.length ?? 0) > 0;
+		const messageCreateTimeSeconds = getMessageCreateTimeSeconds(existingMessage ?? {});
+
+		let contentForUpdate = trimContent;
+		if (hasExistingAttachments && !isAttachmentFieldUpdate) {
+			contentForUpdate = withCreateTimeSecondsInUpdateContent(trimContent, messageCreateTimeSeconds);
+		}
+
+		const stringifiedContent = JSON.stringify(contentForUpdate);
 		const finalTopicId = topicId || '0';
 		const updateChannelId = finalTopicId !== '0' ? finalTopicId : channelId || '0';
+		const updateAttachments = isAttachmentFieldUpdate ? attachments : undefined;
 
 		const res = await client.updateChannelMessage(
 			session,
@@ -1108,7 +1122,7 @@ export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', 
 			messageId || '0',
 			stringifiedContent,
 			mentions,
-			attachments,
+			updateAttachments,
 			hideEditted,
 			finalTopicId,
 			!!isTopic
@@ -1851,7 +1865,7 @@ export const messagesSlice = createSlice({
 						update_time_seconds: updateTimeSeconds,
 						update_time: action.payload.update_time || (updateTimeSeconds ? new Date(updateTimeSeconds * 1000).toISOString() : undefined)
 					};
-					if (action.payload.attachments?.length !== channelEntity?.entities?.[messageId]?.attachments?.length) {
+					if (action.payload.attachments?.length) {
 						changes.attachments = action.payload.attachments;
 					}
 					channelMessagesAdapter.updateOne(channelEntity, {

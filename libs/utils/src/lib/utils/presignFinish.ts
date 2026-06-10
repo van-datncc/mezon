@@ -1,6 +1,7 @@
 import type { ApiMessageAttachment } from 'mezon-js';
 import { safeJSONParse } from 'mezon-js';
 import { FOR_10_MINUTES_SEC } from '../constant';
+import type { IMessageSendPayload } from '../types';
 import { isMezonCdnUrl } from './urlSanitization';
 
 export const PRESIGN_PENDING_MAX_AGE_SEC = FOR_10_MINUTES_SEC;
@@ -138,6 +139,17 @@ export function getPresignExpiryDelayMs(messageCreateTimeSeconds?: number, nowMs
 	const expiresAtMs = (messageCreateTimeSeconds + PRESIGN_PENDING_MAX_AGE_SEC) * 1000;
 	const delay = expiresAtMs - nowMs;
 	return delay <= 0 ? 0 : delay;
+}
+
+export function withCreateTimeSecondsInUpdateContent(
+	content: IMessageSendPayload,
+	messageCreateTimeSeconds: number | undefined
+): IMessageSendPayload {
+	if (!messageCreateTimeSeconds) {
+		return content;
+	}
+
+	return { ...content, create_time_seconds: messageCreateTimeSeconds };
 }
 
 export function getMessageCreateTimeSeconds(message: {
