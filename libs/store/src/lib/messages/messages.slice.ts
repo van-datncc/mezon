@@ -237,23 +237,6 @@ export const fetchMessagesCached = async (
 		};
 	}
 
-	// const response = await fetchDataWithSocketFallback(
-	// 	ensuredMezon,
-	// 	{
-	// 		api_name: 'ListChannelMessages',
-	// 		list_channel_message_req: {
-	// 			channel_id: channelId,
-	// 			message_id: messageId,
-	// 			direction,
-	// 			clan_id: clanId,
-	// 			topic_id: topicId,
-	// 			limit: LIMIT_MESSAGE
-	// 		}
-	// 	},
-	// 	() => ensuredMezon.client.listChannelMessages(ensuredMezon.session, clanId, channelId, messageId, direction, LIMIT_MESSAGE, topicId),
-	// 	'channel_message_list'
-	// );
-
 	const response = await withRetry(
 		(session) =>
 			ensuredMezon.client.listChannelMessages(session, clanId, channelId, topicId ? undefined : messageId, direction, LIMIT_MESSAGE, topicId),
@@ -608,7 +591,7 @@ export const jumpToMessage = createAsyncThunk(
 			const channelMessages = selectViewportIdsByChannelId(getMessagesRootState(thunkAPI), channelId);
 			const indexMessage = channelMessages.indexOf(messageId);
 			let found = true;
-			if (indexMessage < 10) {
+			if (indexMessage === -1) {
 				thunkAPI.dispatch(
 					channelsActions.setScrollDownVisibility({
 						channelId,
@@ -631,7 +614,11 @@ export const jumpToMessage = createAsyncThunk(
 					)
 					.unwrap();
 
-				found = response?.messages?.some((item) => item.id === messageId);
+				const chlId = topicId || channelId;
+				const stateAfterFetch = getMessagesState(getMessagesRootState(thunkAPI));
+				found =
+					response?.messages?.some((item) => item.id === messageId) || Boolean(stateAfterFetch.channelMessages[chlId]?.entities[messageId]);
+
 				if (!found) {
 					thunkAPI.dispatch(messagesActions.setIdMessageToJump(null));
 				}

@@ -460,9 +460,22 @@ function useThreadMenuBuilder(message: IMessageWithUser, isShowIconThread: boole
 		setValueThread({ ...message, references: [] });
 	}, [dispatch, message, setIsShowCreateThread, setOpenThreadMessageState, setThread, thread, setValueThread]);
 
+	const threadFillClass = thread
+		? '[--thread-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
+		: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] hover:[--thread-fill-1:var(--bg-icon-theme-active)]';
+
 	return createMenuBuilderPlugin((builder) => {
 		builder.when(isShowIconThread && hasPermission && !isAppChannel && !isTopic, (builder) => {
-			builder.addMenuItem('thread', t('createThread'), handleItemClick, <Icons.ThreadIcon isWhite={thread} defaultFill1="var(--bg-icon-theme)" defaultFill4="var(--bg-theme-secounnd)" defaultFill5="var(--bg-icon-theme)" />);
+			builder.addMenuItem(
+				'thread',
+				t('createThread'),
+				handleItemClick,
+				<Icons.ThreadIcon className="w-5 h-5" defaultFill1="var(--thread-fill-1)" defaultFill4="var(--thread-fill-4)" />,
+				null,
+				false,
+				false,
+				threadFillClass
+			);
 		});
 	});
 }
