@@ -290,6 +290,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 					JSON.stringify(trimContent),
 					mentions,
 					updateAttachments,
+					existingMessage.create_time_seconds,
 					hide_editted,
 					finalTopicId,
 					!!isTopic
