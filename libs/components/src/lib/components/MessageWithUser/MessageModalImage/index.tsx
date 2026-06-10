@@ -1,4 +1,5 @@
 import { useAppParams, useAttachments } from '@mezon/core';
+import type { AttachmentEntity } from '@mezon/store';
 import {
 	attachmentActions,
 	getStore,
@@ -90,7 +91,7 @@ const MessageModalImage = () => {
 	const isMainPresignPending = isAttachmentPresignPendingForMessage(urlImg ?? currentAttachment?.url, sourceMessage);
 
 	const getSourceMessageForAttachment = useCallback(
-		(att: (typeof attachments)[number] | undefined) => {
+		(att: AttachmentEntity | undefined) => {
 			if (!att?.message_id || !channelIdForAttachments) return undefined;
 			return selectMessageByMessageId(getStore()?.getState(), channelIdForAttachments, att.message_id);
 		},
@@ -98,7 +99,7 @@ const MessageModalImage = () => {
 	);
 
 	const isAttPresignPending = useCallback(
-		(att: (typeof attachments)[number] | undefined) =>
+		(att: AttachmentEntity | undefined) =>
 			isAttachmentPresignPendingForMessage(att?.url, getSourceMessageForAttachment(att)),
 		[getSourceMessageForAttachment]
 	);

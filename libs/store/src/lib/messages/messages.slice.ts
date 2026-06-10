@@ -1123,6 +1123,7 @@ export const editMessageViaApi = createAsyncThunk('messages/editMessageViaApi', 
 			stringifiedContent,
 			mentions,
 			updateAttachments,
+			messageCreateTimeSeconds,
 			hideEditted,
 			finalTopicId,
 			!!isTopic
