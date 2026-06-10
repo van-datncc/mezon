@@ -117,6 +117,7 @@ const DeleteOgpButton = ({ messageId }: { messageId?: string }) => {
 				trimContent,
 				message.mentions,
 				undefined,
+				getMessageCreateTimeSeconds(message),
 				message.hide_editted,
 				message.topic_id || '0',
 				false
