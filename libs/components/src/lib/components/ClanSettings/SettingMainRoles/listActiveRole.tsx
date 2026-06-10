@@ -185,5 +185,5 @@ export function checkHasPermissionEditRole(
 	userMaxPermissionLevel: number,
 	role?: Pick<RolesClanEntity, 'max_level_permission'>
 ) {
-	return isClanOwner || Number(userMaxPermissionLevel) > Number(role?.max_level_permission);
+	return isClanOwner || Number(userMaxPermissionLevel ?? -1) > Number(role?.max_level_permission);
 }
