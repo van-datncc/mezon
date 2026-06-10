@@ -53,9 +53,10 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	);
 
 	const validCreateTime = useMemo(() => {
-		if (message?.create_time_seconds) return new Date(message.create_time_seconds * 1000).toISOString();
+		const createTimeSeconds = message?.create_time_seconds ?? pinMessage?.create_time_seconds;
+		if (createTimeSeconds) return new Date(createTimeSeconds * 1000).toISOString();
 		return '';
-	}, [message?.create_time_seconds]);
+	}, [message?.create_time_seconds, pinMessage?.create_time_seconds]);
 	const messageTime = validCreateTime ? convertTimeString(validCreateTime) : '';
 
 	const directChannel = useAppSelector((state) => selectDirectById(state, String(pinMessage?.channel_id || '')));

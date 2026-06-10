@@ -431,7 +431,7 @@ export const selectPinMessageByChannelId = createSelector(
 	[getPinMessageState, (state: RootState, channelId: string) => channelId],
 	(state, channelId) => {
 		if (!channelId) return [];
-		return sortPinMessagesByPinTime(state.byChannels[channelId]?.pinMessages || []);
+		return state.byChannels[channelId]?.pinMessages || [];
 	}
 );
 

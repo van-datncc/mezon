@@ -838,9 +838,11 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						channel_id: pin.channel_id,
 						content: pin.message_content,
 						create_time_seconds:
-							'timestamp_seconds' in pin && typeof pin.timestamp_seconds === 'number'
+							'timestamp_seconds' in pin && typeof pin.timestamp_seconds === 'number' && pin.timestamp_seconds > 0
 								? pin.timestamp_seconds
-								: Math.floor(Date.now() / 1000),
+								: pin.message_created_time
+									? Math.floor(new Date(pin.message_created_time).getTime() / 1000)
+									: Math.floor(Date.now() / 1000),
 						message_id: pin.message_id,
 						username: pin.message_sender_username,
 						sender_id: pin.message_sender_id
