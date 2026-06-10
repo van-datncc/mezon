@@ -199,10 +199,10 @@ import { exhaustMap, filter, takeWhile, tap } from 'rxjs/operators';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useCustomNavigate } from '../hooks/useCustomNavigate';
 import {
+	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	beginReconnectWave,
 	consumeReconnectAttempt,
 	markNetworkProbeCompleted,
-	MAX_RECONNECT_WAVES_BEFORE_LOGOUT,
 	noteReconnectWaveExhausted,
 	refundReconnectAttempt,
 	resetExhaustedWaveCount,
@@ -1465,13 +1465,23 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			const currentUserId = selectCurrentUserId(state);
 			if (e.sender_id === currentUserId) return;
 
-			const channelId = e?.topic_id && e?.topic_id !== '0' ? e?.topic_id : e.channel_id;
+			const isTopicTyping = Boolean(e?.topic_id && e?.topic_id !== '0');
+			const channelId = isTopicTyping ? e.topic_id! : e.channel_id;
 			const currentClanId = selectCurrentClanId(state);
 			const isDM = !currentClanId || currentClanId === '0';
 
 			if (!isDM) {
 				const currentChannelId = selectCurrentChannelId(state as unknown as RootState);
-				if (channelId !== currentChannelId) return;
+				const currentTopicId = selectCurrentTopicId(state as unknown as RootState);
+				const isFocusTopicBox = selectClickedOnTopicStatus(state as unknown as RootState);
+
+				if (isTopicTyping) {
+					if (!isFocusTopicBox || !currentTopicId || channelId !== currentTopicId) return;
+					if (e.channel_id !== currentChannelId) return;
+				} else {
+					if (isFocusTopicBox && currentTopicId) return;
+					if (channelId !== currentChannelId) return;
+				}
 			}
 
 			typingUsersService.addTypingUser(channelId, e.sender_id, e.sender_display_name || e.sender_username);
