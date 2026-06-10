@@ -147,6 +147,7 @@ import type {
 	BannedUserEvent,
 	BlockFriend,
 	CategoryEvent,
+	ChannelArchiveEvent,
 	ChannelCanvas,
 	ChannelCreatedEvent,
 	ChannelDeletedEvent,
@@ -269,6 +270,7 @@ const ChatContext = React.createContext<ChatContextValue>({} as ChatContextValue
 
 const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isMobile = false }) => {
 	const { t } = useTranslation('token');
+	const { t: tChannelMenu } = useTranslation('channelMenu');
 	const { clientRef, sessionRef, mmnRef, reconnectSocket } = useMezon();
 	const { userId } = useAuth();
 	const dispatch = useAppDispatch();
@@ -1848,7 +1850,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!channelUpdated) return;
 			const store = await getStoreAsync();
 			const currentChannelId = selectCurrentChannelId(store.getState() as unknown as RootState);
-			const currentChannel = selectCurrentChannel(store.getState() as unknown as RootState);
 			const channelExist = selectChannelByIdAndClanId(
 				store.getState() as unknown as RootState,
 				channelUpdated.clan_id as string,
@@ -2012,6 +2013,49 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		[dispatch, userId, isMobile]
 	);
 
+	const onchannelarchive = useCallback(
+		(channelArchive: ChannelArchiveEvent) => {
+			const clanId = channelArchive.clan_id;
+			if (!clanId || clanId === '0') {
+				return;
+			}
+
+			const parentId = channelArchive.parent_id ?? '0';
+			const channelId = channelArchive.channel_id;
+			const isThread = parentId !== '0';
+			const currentChannelId = selectCurrentChannelId(getStore().getState() as unknown as RootState);
+			const isArchiveAction = Number(channelArchive.active) === ThreadStatus.archived;
+
+			dispatch(
+				channelsActions.applyChannelArchiveState({
+					clanId,
+					channelId,
+					parentId,
+					isArchive: isArchiveAction
+				})
+			);
+
+			if (isArchiveAction && currentChannelId === channelId) {
+				const redirectChannelId = isThread ? parentId : selectWelcomeChannelByClanId(getStore().getState() as unknown as RootState, clanId);
+
+				if (redirectChannelId) {
+					navigate(`/chat/clans/${clanId}/channels/${redirectChannelId}`);
+				}
+
+				if (userId && channelArchive.creator_id !== userId) {
+					dispatch(
+						toastActions.addToast({
+							message: tChannelMenu(isThread ? 'toastArchivedThreadByAdministrator' : 'toastArchivedByAdministrator'),
+							type: 'success',
+							autoClose: 3000
+						})
+					);
+				}
+			}
+		},
+		[dispatch, userId, tChannelMenu, navigate]
+	);
+
 	const onpermissionset = useCallback(
 		(setPermission: PermissionSet) => {
 			if (userId !== setPermission.caller) {
@@ -2093,7 +2137,6 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 	}, []);
 	const oneventcreated = useCallback(
 		async (eventCreatedEvent: ApiCreateEventRequest) => {
-			// eslint-disable-next-line no-console
 			// Check actions
 			const isActionCreating = eventCreatedEvent.action === EEventAction.CREATED;
 			const isActionUpdating = eventCreatedEvent.action === EEventAction.UPDATE;
@@ -2688,6 +2731,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onchanneldeleted = onchanneldeleted;
 
 			socket.onchannelupdated = onchannelupdated;
+			socket.onchannelarchive = onchannelarchive;
 
 			socket.onuserprofileupdate = onuserprofileupdate;
 
@@ -3017,6 +3061,8 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			socket.onbanneduser = () => {};
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
 			socket.onreconnect = () => {};
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			socket.onchannelarchive = () => {};
 		};
 	}, [
 		onchannelmessage,
@@ -3055,6 +3101,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 		oncategoryevent,
 		onchanneldeleted,
 		onchannelupdated,
+		onchannelarchive,
 		onuserprofileupdate,
 		ondeleteaccount,
 		onpermissionset,
