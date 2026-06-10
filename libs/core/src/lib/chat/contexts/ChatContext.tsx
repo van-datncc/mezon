@@ -656,17 +656,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						event?.joins?.forEach((join) => {
 							userStatusMap.set(join.user_id, {
 								online: true,
-								is_mobile: join.is_mobile,
-								status: join.status,
-								user_status: join.user_status
+								is_mobile: join.is_mobile
 							});
 						});
 						event?.leaves?.forEach((leave) => {
 							userStatusMap.set(leave.user_id, {
 								online: false,
-								is_mobile: false,
-								status: leave.status,
-								user_status: leave.user_status
+								is_mobile: false
 							});
 						});
 					});
@@ -676,9 +672,7 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 						changes: {
 							online: status.online,
 							is_mobile: status.is_mobile,
-							id: userId,
-							user_status: status.user_status,
-							status: status.status
+							id: userId
 						}
 					}));
 
