@@ -489,6 +489,11 @@ export const DATA_E2E_IDENTIFIER = {
 					active_time: '',
 					restore_button: ''
 				}
+			},
+			category: {
+				input: {
+					category_name: ''
+				}
 			}
 		},
 		channel_list: {
@@ -1136,6 +1141,11 @@ export const DATA_E2E_IDENTIFIER = {
 				vote: '',
 				remove_vote: ''
 			}
+		}
+	},
+	invite_card: {
+		button: {
+			goto_clan: ''
 		}
 	}
 };
