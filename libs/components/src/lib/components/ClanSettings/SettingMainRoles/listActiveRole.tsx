@@ -103,7 +103,7 @@ const ListActiveRole = (props: ListActiveRoleProps) => {
 								: ''
 						}`}
 						onClick={() => handleOpenEditRole(role.id)}
-						draggable
+						draggable={hasPermissionEdit}
 						onDragStart={() => handleDragStart(index)}
 						onDragOver={handleDragOver}
 						onDragEnd={handleDragEnd}

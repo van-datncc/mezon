@@ -161,7 +161,7 @@ const SettingListRole = (props: closeEditRole) => {
 									: '!border-t-2 !border-t-green-500'
 								: ''
 						}`}
-							draggable
+							draggable={hasPermissionEdit}
 							onDragStart={() => handleDragStart(index)}
 							onDragOver={handleDragOver}
 							onDragEnd={handleDragEnd}

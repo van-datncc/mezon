@@ -117,7 +117,7 @@ const SettingPermissions = ({
 					{searchResults.map((permission) => (
 						<li
 							key={permission.id}
-							className={`flex items-start justify-between p-3 rounded-lg border border-color-theme ${hasPermissionEdit && permission.level && permission.level < userMaxPermissionLevel ? 'cursor-pointer bg-item-hover' : 'cursor-not-allowed bg-item-hover'}`}
+							className={`flex items-start justify-between p-3 rounded-lg border border-color-theme ${hasPermissionEdit && permission.level !== undefined && permission.level < userMaxPermissionLevel ? 'cursor-pointer bg-item-hover' : 'cursor-not-allowed bg-item-hover'}`}
 							data-e2e={generateE2eId('clan_page.settings.role.container.role_option.permissions.item')}
 						>
 							<div className="flex-1 pr-4">
@@ -155,7 +155,7 @@ const SettingPermissions = ({
 									disabled={
 										hiddenPermissionAdmin(permission.slug || '') ||
 										!hasPermissionEdit ||
-										(permission.level && permission.level >= userMaxPermissionLevel) ||
+										(permission.level !== undefined && permission.level >= userMaxPermissionLevel) ||
 										(activeRole?.slug?.startsWith('everyone-') && permission.slug === EOverriddenPermission.sendMessage)
 									}
 									data-e2e={generateE2eId('clan_page.settings.role.container.role_option.permissions.item.switch')}
