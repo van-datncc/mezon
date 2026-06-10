@@ -92,6 +92,10 @@ export const fcmSlice = createSlice({
 	reducers: {
 		setGotifyToken(state, action) {
 			state.token = action.payload;
+		},
+		clearGotifyToken(state) {
+			state.token = null;
+			state.deviceId = null;
 		}
 	},
 	extraReducers: (builder) => {

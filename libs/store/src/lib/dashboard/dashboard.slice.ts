@@ -339,6 +339,7 @@ export interface Room {
 	participants: RoomParticipant[];
 	finalizedAt: string;
 	completedAt: string;
+	channelName?: string;
 }
 
 interface ListRoomsApiResponse {
@@ -354,6 +355,7 @@ interface ListRoomsApiResponse {
 		participants: Array<{ participant_identity: string; timestamp: string }>;
 		finalized_at: string;
 		completed_at: string;
+		channel_name?: string;
 	}>;
 }
 
@@ -368,6 +370,7 @@ export interface RoomStatisticsPayload {
 	total_segments?: number | string;
 	created_at?: string;
 	finalized_at?: string;
+	channel_name?: string;
 }
 
 export interface ActionItemsEntry {
@@ -800,7 +803,8 @@ export const dashboardSlice = createSlice({
 						timestamp: p.timestamp ?? ''
 					})),
 					finalizedAt: r.finalized_at ?? '',
-					completedAt: r.completed_at ?? ''
+					completedAt: r.completed_at ?? '',
+					channelName: r.channel_name
 				}));
 			})
 			.addCase(fetchRooms.rejected, (state, action) => {

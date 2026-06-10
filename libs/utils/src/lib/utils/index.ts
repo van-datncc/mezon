@@ -1,4 +1,5 @@
 import { CustomFile, handleUploadFile, handleUploadFileMobile } from '@mezon/transport';
+import { getPreSendSourceFile, getPreSendThumbnailBlob, revokePreSendAttachmentUrls } from './file';
 import {
 	differenceInDays,
 	differenceInHours,
@@ -81,6 +82,7 @@ export * from './mediaDimensions';
 export * from './mergeRefs';
 export * from './sanitizeHtml';
 export * from './parseHtmlAsFormattedText';
+export * from './presignFinish';
 export * from './processEntitiesDirectly';
 export * from './resetScroll';
 export * from './schedulers';
@@ -746,16 +748,28 @@ export async function getWebUploadedAttachments(payload: {
 					throw new Error(`File URL is missing for file: ${attachment.filename}`);
 				}
 
-				const response = await fetch(attachment.url);
-				const arrayBuffer = await response.arrayBuffer();
-				const blob = new Blob([arrayBuffer], { type: attachment.filetype || 'application/octet-stream' });
-				const createdFile = new CustomFile([blob], attachment.filename ?? 'untitled', {
-					type: attachment.filetype || 'application/octet-stream'
-				});
-				createdFile.url = attachment.url;
-				createdFile.width = attachment.width || 0;
-				createdFile.height = attachment.height || 0;
-				createdFile.thumbnail = attachment.thumbnail;
+				const sourceFile = getPreSendSourceFile(attachment);
+				let createdFile: CustomFile;
+
+				if (sourceFile) {
+					createdFile = sourceFile as CustomFile;
+					createdFile.url = attachment.url;
+					createdFile.width = attachment.width || 0;
+					createdFile.height = attachment.height || 0;
+					createdFile.thumbnail = attachment.thumbnail;
+					createdFile.thumbnailBlob = getPreSendThumbnailBlob(attachment);
+				} else {
+					const response = await fetch(attachment.url);
+					const arrayBuffer = await response.arrayBuffer();
+					const blob = new Blob([arrayBuffer], { type: attachment.filetype || 'application/octet-stream' });
+					createdFile = new CustomFile([blob], attachment.filename ?? 'untitled', {
+						type: attachment.filetype || 'application/octet-stream'
+					});
+					createdFile.url = attachment.url;
+					createdFile.width = attachment.width || 0;
+					createdFile.height = attachment.height || 0;
+					createdFile.thumbnail = attachment.thumbnail;
+				}
 
 				const result = await handleUploadFile(client, session, createdFile.name, createdFile, index);
 

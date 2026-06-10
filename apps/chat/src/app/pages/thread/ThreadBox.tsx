@@ -43,7 +43,7 @@ import {
 	UploadLimitReason,
 	ValidateSpecialCharacters,
 	generateE2eId,
-	processFile
+	processFilesForAttachment
 } from '@mezon/utils';
 import isElectron from 'is-electron';
 import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js';
@@ -388,7 +388,7 @@ const ThreadBox = () => {
 				return;
 			}
 
-			const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+			const updatedFiles = await processFilesForAttachment(files);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentInputChannelId,
@@ -461,16 +461,20 @@ const ThreadBox = () => {
 					<div className="flex flex-col justify-end flex-grow">
 						{!threadCurrentChannel && (
 							<div className="relative flex text-theme-primary-active items-center justify-center mx-4 mt-4 w-16 h-16 bg-item-theme rounded-full pointer-events-none">
-								<Icons.ThreadIcon
-									className="w-7 h-7"
-									defaultFill1="var(--bg-icon-theme)"
-									defaultFill4="var(--bg-theme-secounnd)"
-									defaultFill5="var(--bg-icon-theme)"
-								/>
-								{isPrivate === 1 && (
-									<div className="absolute right-4 bottom-4">
-										<Icons.Locked />
-									</div>
+								{isPrivate === 1 ? (
+									<Icons.ThreadIconLocker
+										className="w-7 h-7"
+										defaultFill1="var(--bg-icon-theme)"
+										defaultFill4="var(--bg-theme-secounnd)"
+										defaultFill5="var(--bg-icon-theme-active)"
+									/>
+								) : (
+									<Icons.ThreadIcon
+										className="w-7 h-7"
+										defaultFill1="var(--bg-icon-theme)"
+										defaultFill4="var(--bg-theme-secounnd)"
+										defaultFill5="var(--bg-icon-theme)"
+									/>
 								)}
 							</div>
 						)}

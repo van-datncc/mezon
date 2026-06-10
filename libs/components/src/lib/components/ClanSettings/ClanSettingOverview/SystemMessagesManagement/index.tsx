@@ -42,7 +42,7 @@ const SystemMessagesManagement = ({
 			return <Icons.HashtagWarning className="w-4 h-4 dark:text-channelTextLabel" />;
 		}
 		if (channel?.channel_private) {
-			return <Icons.HashtagLocked className="w-4 h-4 dark:text-channelTextLabel" />;
+			return <Icons.HashtagLocked className="w-4 h-4" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 		}
 		return <Icons.Hashtag className="w-4 h-4 dark:text-channelTextLabel" />;
 	};

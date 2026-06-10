@@ -1,4 +1,4 @@
-import { channelSettingActions, selectArchivedChannels, selectCurrentClanId, threadsActions, toastActions, useAppDispatch } from '@mezon/store';
+import { channelSettingActions, channelsActions, selectArchivedChannels, selectCurrentClanId, toastActions, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId, getDateLocale } from '@mezon/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,7 +15,7 @@ const SettingArchivedChannels = () => {
 	const handleRestore = async (channelId: string) => {
 		if (!currentClanId) return;
 		try {
-			await dispatch(threadsActions.writeActiveArchivedThread({ clanId: currentClanId as string, channelId })).unwrap();
+			await dispatch(channelsActions.restoreChannel({ clanId: currentClanId as string, channelId })).unwrap();
 			dispatch(channelSettingActions.removeArchivedChannel(channelId));
 			dispatch(
 				toastActions.addToast({
@@ -51,10 +51,16 @@ const SettingArchivedChannels = () => {
 							const isPrivate = ch.channel_private === 1;
 
 							if (isPrivate) {
-								return <Icons.HashtagLocked defaultSize="w-5 h-5 flex-shrink-0" />;
+								return (
+									<Icons.HashtagLocked
+										defaultSize="w-5 h-5 flex-shrink-0"
+										defaultFill1="var(--bg-icon-theme)"
+										defaultFill2="var(--bg-icon-theme-active)"
+									/>
+								);
 							}
 
-							return <Icons.Hashtag defaultSize="w-5 h-5 flex-shrink-0" />;
+							return <Icons.Hashtag defaultSize="w-5 h-5 flex-shrink-0" defaultFill1="var(--bg-icon-theme)" />;
 						};
 
 						return (
