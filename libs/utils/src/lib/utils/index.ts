@@ -82,6 +82,7 @@ export * from './mediaDimensions';
 export * from './mergeRefs';
 export * from './sanitizeHtml';
 export * from './parseHtmlAsFormattedText';
+export * from './presignFinish';
 export * from './processEntitiesDirectly';
 export * from './resetScroll';
 export * from './schedulers';
