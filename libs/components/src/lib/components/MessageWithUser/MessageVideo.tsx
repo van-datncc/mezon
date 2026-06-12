@@ -5,13 +5,16 @@ import type { ApiMessageAttachment } from 'mezon-js';
 import type { Movie, Track } from 'mp4box';
 import { MP4BoxBuffer, createFile } from 'mp4box';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useDebouncedCallback } from 'use-debounce';
-
+import { AttachmentSendingIndicator } from './AttachmentSendingIndicator';
 export type MessageImage = {
 	readonly attachmentData: ApiMessageAttachment;
 	isMobile?: boolean;
 	isPreview?: boolean;
+	isSending?: boolean;
+	isPresignPending?: boolean;
 	observeIntersection?: ObserveFn;
 };
 export const MIN_WIDTH_VIDEO_SHOW = 200;
@@ -360,6 +363,36 @@ function useDownloadVideo(url?: string, filename?: string) {
 	}, [url, filename]);
 }
 
+function usePlayOnActivation(videoRef: React.RefObject<HTMLVideoElement | null>, shouldPlay: boolean) {
+	const pendingPlayRef = useRef(false);
+
+	const requestPlay = useCallback(() => {
+		pendingPlayRef.current = true;
+	}, []);
+
+	const tryPlay = useCallback(() => {
+		const video = videoRef.current;
+		if (!video || !pendingPlayRef.current || !shouldPlay) return;
+
+		void video
+			.play()
+			.then(() => {
+				pendingPlayRef.current = false;
+			})
+			.catch(() => {
+				pendingPlayRef.current = false;
+			});
+	}, [shouldPlay, videoRef]);
+
+	useEffect(() => {
+		if (shouldPlay) {
+			tryPlay();
+		}
+	}, [shouldPlay, tryPlay]);
+
+	return { requestPlay, tryPlay };
+}
+
 function useVideoCleanup(videoRef: React.RefObject<HTMLVideoElement | null>, isActive: boolean) {
 	const prevActiveRef = useRef(isActive);
 
@@ -393,49 +426,102 @@ function VideoSkeleton({ style }: { style: React.CSSProperties }) {
 	);
 }
 
-function VideoPoster({ thumbnailUrl, style, onPlay }: { thumbnailUrl?: string; style: React.CSSProperties; onPlay: () => void }) {
+function VideoPoster({
+	thumbnailUrl,
+	style,
+	onPlay,
+	disablePlay = false,
+	isSending = false
+}: {
+	thumbnailUrl?: string;
+	style: React.CSSProperties;
+	onPlay: () => void;
+	disablePlay?: boolean;
+	isSending?: boolean;
+}) {
 	return (
 		<div
-			className="relative cursor-pointer overflow-hidden rounded-lg bg-bgLightSecondary dark:bg-bgSecondary flex items-center justify-center"
+			className={`relative overflow-hidden rounded-lg bg-bgLightSecondary dark:bg-bgSecondary flex items-center justify-center ${
+				disablePlay ? 'cursor-default' : 'cursor-pointer'
+			}`}
 			style={style}
-			onClick={onPlay}
+			onClick={disablePlay ? undefined : onPlay}
 		>
 			{thumbnailUrl && <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" loading="lazy" />}
-			<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group">
-				<div className="flex items-center justify-center w-12 h-12 rounded-full bg-black bg-opacity-50 transition-transform duration-150 group-hover:scale-110">
-					<Icons.PlayButton className="w-5 h-5 text-white" />
+			{isSending ? (
+				<AttachmentSendingIndicator />
+			) : (
+				<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group">
+					<div className="flex items-center justify-center w-12 h-12 rounded-full bg-black bg-opacity-50 transition-transform duration-150 group-hover:scale-110">
+						<Icons.PlayButton className="w-5 h-5 text-white" />
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }
 
-function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false, observeIntersection }: MessageImage) {
+function resolveVideoThumbnailUrl(attachmentData: ApiMessageAttachment, width: number, height: number): string | undefined {
+	const thumb = attachmentData.thumbnail;
+	if (!thumb) return undefined;
+	if (thumb.startsWith('blob:')) return thumb;
+	return createImgproxyUrl(thumb, { width: Math.round(width), height: Math.round(height), resizeType: 'fit' });
+}
+
+function MacElectronVideo({
+	attachmentData,
+	isMobile = false,
+	isPreview = false,
+	isSending = false,
+	isPresignPending = false,
+	observeIntersection
+}: MessageImage) {
 	const { t } = useTranslation('media');
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isIntersecting = useIsIntersecting(containerRef, observeIntersection);
 	const [activated, setActivated] = useState(false);
-	const { status: probeStatus, errorMessage, codecInfo } = useVideoProbe(attachmentData.url, isIntersecting && activated, attachmentData.filename);
+	const isUploading = isSending || isPresignPending;
+	const { status: probeStatus, errorMessage, codecInfo } = useVideoProbe(
+		attachmentData.url,
+		isIntersecting && activated && !isPresignPending,
+		attachmentData.filename
+	);
 	const { width, height, mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
 	const handleDownloadVideo = useDownloadVideo(attachmentData.url, attachmentData.filename);
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [showControl, setShowControl] = useState(true);
-	const shouldRenderVideo = activated && probeStatus === 'ready';
+	const shouldRenderVideo = activated && probeStatus === 'ready' && !isUploading;
+	const { requestPlay, tryPlay } = usePlayOnActivation(videoRef, shouldRenderVideo);
 
-	const thumbnailUrl = attachmentData.thumbnail
-		? createImgproxyUrl(attachmentData.thumbnail, { width: Math.round(width), height: Math.round(height), resizeType: 'fit' })
-		: undefined;
+	const thumbnailUrl = isPresignPending ? undefined : resolveVideoThumbnailUrl(attachmentData, width, height);
 
-	const handlePlay = useCallback(() => setActivated(true), []);
+	const playFromUserGesture = useCallback(() => {
+		const video = videoRef.current;
+		if (!video) return;
+		void video.play().catch(() => undefined);
+	}, []);
+
+	const handlePlay = useCallback(() => {
+		if (isUploading) return;
+		requestPlay();
+		flushSync(() => {
+			setActivated(true);
+		});
+		playFromUserGesture();
+	}, [isUploading, requestPlay, playFromUserGesture]);
 
 	useVideoCleanup(videoRef, shouldRenderVideo);
 
-	const handleOnCanPlay = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-		if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
-			setShowControl(false);
-		}
-	}, []);
+	const handleOnCanPlay = useCallback(
+		(e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+			tryPlay();
+			if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
+				setShowControl(false);
+			}
+		},
+		[tryPlay]
+	);
 
 	const handleShowFullVideo = useCallback(() => {
 		if (videoRef.current) {
@@ -454,16 +540,20 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 	useResizeObserver(videoRef, handleResize);
 
 	useEffect(() => {
-		if (!showControl && videoRef.current && !videoRef.current.paused) {
+		if (!showControl && !activated && videoRef.current && !videoRef.current.paused) {
 			videoRef.current.pause();
 		}
-	}, [showControl]);
+	}, [showControl, activated]);
+
+	const showMedia = isUploading || isIntersecting;
 
 	return (
 		<div ref={containerRef} className="relative overflow-hidden group rounded-lg max-w-full">
-			{!isIntersecting && <VideoSkeleton style={mediaStyle} />}
+			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
-			{isIntersecting && !activated && <VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} />}
+			{showMedia && !activated && (
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isUploading} isSending={isUploading} />
+			)}
 
 			{activated && (probeStatus === 'idle' || probeStatus === 'probing') && <VideoSkeleton style={mediaStyle} />}
 
@@ -529,23 +619,45 @@ function MacElectronVideo({ attachmentData, isMobile = false, isPreview = false,
 	);
 }
 
-function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, observeIntersection }: MessageImage) {
+function DefaultVideo({
+	attachmentData,
+	isMobile = false,
+	isPreview = false,
+	isSending = false,
+	isPresignPending = false,
+	observeIntersection
+}: MessageImage) {
 	const { t } = useTranslation('media');
 	const containerRef = useRef<HTMLDivElement>(null);
 	const isIntersecting = useIsIntersecting(containerRef, observeIntersection);
-	const { mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
+	const [activated, setActivated] = useState(false);
+	const isUploading = isSending || isPresignPending;
+	const { width, height, mediaStyle } = useVideoMediaDimensions(attachmentData, isMobile, isPreview);
 	const handleDownloadVideo = useDownloadVideo(attachmentData.url, attachmentData.filename);
+	const thumbnailUrl = isPresignPending ? undefined : resolveVideoThumbnailUrl(attachmentData, width, height);
 
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [showControl, setShowControl] = useState(true);
+	const isVideoActive = activated && isIntersecting && !isUploading;
+	const { requestPlay, tryPlay } = usePlayOnActivation(videoRef, isVideoActive);
 
-	useVideoCleanup(videoRef, isIntersecting);
+	useVideoCleanup(videoRef, isVideoActive);
 
-	const handleOnCanPlay = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-		if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
-			setShowControl(false);
-		}
-	}, []);
+	const handlePlay = useCallback(() => {
+		if (isUploading) return;
+		requestPlay();
+		setActivated(true);
+	}, [isUploading, requestPlay]);
+
+	const handleOnCanPlay = useCallback(
+		(e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+			tryPlay();
+			if (e.currentTarget.offsetWidth < MIN_WIDTH_VIDEO_SHOW) {
+				setShowControl(false);
+			}
+		},
+		[tryPlay]
+	);
 
 	const handleShowFullVideo = useCallback(() => {
 		if (videoRef.current) {
@@ -564,16 +676,22 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 	useResizeObserver(videoRef, handleResize);
 
 	useEffect(() => {
-		if (!showControl && videoRef.current && !videoRef.current.paused) {
+		if (!showControl && !activated && videoRef.current && !videoRef.current.paused) {
 			videoRef.current.pause();
 		}
-	}, [showControl]);
+	}, [showControl, activated]);
+
+	const showMedia = isUploading || isIntersecting;
 
 	return (
 		<div ref={containerRef} className="relative overflow-hidden group rounded-lg max-w-full">
-			{!isIntersecting && <VideoSkeleton style={mediaStyle} />}
+			{!showMedia && <VideoSkeleton style={mediaStyle} />}
 
-			{isIntersecting && (
+			{showMedia && !activated && (
+				<VideoPoster thumbnailUrl={thumbnailUrl} style={mediaStyle} onPlay={handlePlay} disablePlay={isUploading} isSending={isUploading} />
+			)}
+
+			{isVideoActive && (
 				<>
 					<video
 						controls={showControl}
@@ -582,7 +700,7 @@ function DefaultVideo({ attachmentData, isMobile = false, isPreview = false, obs
 						ref={videoRef}
 						onCanPlay={handleOnCanPlay}
 						className="object-contain"
-						preload="metadata"
+						preload="auto"
 						playsInline
 					>
 						<source src={attachmentData.url} />

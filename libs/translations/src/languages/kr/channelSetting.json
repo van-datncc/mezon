@@ -35,7 +35,7 @@
 			"description": "비밀권 설정을 변경하고 멤버가 이 채널과 상호 작용하는 방법을 사용자 정의합니다."
 		},
 		"quickAction": {
-			"title": "작업"
+			"title": "빠른 명령"
 		},
 		"privateChannelInvite": {
 			"addMember": "멤버 추가"
@@ -174,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "빠른 메뉴",
+		"title": "빠른 명령",
 		"description": "이 채널을 위한 빠른 메시지 관리 및 빠른 메뉴 관리",
 		"keyTitle": "키워드 입력 (예: xinchao): ",
 		"valueTitle": "내용 입력 (예: 좋은 아침, 좋은 하루 되세요!)",
@@ -240,7 +240,7 @@
 		"invites": "초대",
 		"integrations": "통합",
 		"category": "카테고리",
-		"quickMenu": "빠른 메뉴"
+		"quickMenu": "빠른 작업"
 	},
 	"categoryManagement": {
 		"title": "카테고리",

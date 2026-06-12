@@ -262,7 +262,7 @@ const FriendsListItem = ({ friend }: FriendProps) => {
 					{friend?.state === EStateFriend.FRIEND && (
 						<div className="flex gap-3 items-center">
 							<button onClick={handleNavigateDM} className=" bg-button-secondary rounded-full p-2 text-theme-primary-hover">
-								<Icons.IconChat />
+								<Icons.Chat />
 							</button>
 							<button
 								title={t('friendMenu.more')}

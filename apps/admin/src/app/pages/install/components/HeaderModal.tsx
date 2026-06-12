@@ -7,19 +7,23 @@ type HeaderModalProps = {
 
 const HeaderModal = memo(({ name, username }: HeaderModalProps) => {
 	return (
-		<div className="p-4 pb-0 bg-[#f9fafb] text-[#111827] dark:bg-[#1e1f22] dark:text-[#d1d5db]">
-			<p className="text-sm font-medium">An external application</p>
+		<div className="p-0 bg-transparent text-slate-800 dark:text-slate-200 flex flex-col w-full">
+			<p className="text-[10px] font-extrabold uppercase tracking-widest dark:text-slate-400 text-slate-500">An external application</p>
 
-			<h3 className="font-bold text-2xl text-[#facc15] mt-1 truncate max-w-full">{name}</h3>
+			<h3 className="font-extrabold text-2xl dark:text-amber-400 text-amber-500 mt-1.5 tracking-tight truncate max-w-full">{name}</h3>
 
-			<p className="text-sm mt-2">wants to access your Mezon account</p>
-			<p className="text-xs mt-2">
-				Signed in as <span className="font-bold text-[#16a34a]">{username}</span>
-				<a href="#" className="text-[#2563eb] hover:underline ml-1">
+			<p className="text-sm font-medium dark:text-slate-300 text-slate-600 mt-1 leading-relaxed">wants to access your Mezon account</p>
+
+			<div className="mt-4 p-3 rounded-xl dark:bg-[#161826]/60 bg-slate-50/80 border dark:border-white/[0.04] border-slate-100 flex items-center justify-between text-xs font-medium shadow-inner">
+				<span className="dark:text-slate-400 text-slate-500 truncate max-w-[75%]">
+					Signed in as <span className="font-bold dark:text-emerald-400 text-emerald-600">{username}</span>
+				</span>
+				<a href="#" className="text-violet-600 dark:text-violet-400 font-bold hover:underline shrink-0 ml-2 transition">
 					Not you?
 				</a>
-			</p>
-			<hr className="my-4 border-[#d1d5db] dark:border-[#374151]" />
+			</div>
+
+			<div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-[#22263a]/80 to-transparent my-5" />
 		</div>
 	);
 });

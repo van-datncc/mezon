@@ -9,6 +9,7 @@ import type { ApiLinkAccountConfirmRequest, ApiSession } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { clearApiCallTracker } from '../cache-metadata';
 import { listChannelsByUserActions } from '../channels/channelUser.slice';
+import { fcmActions } from '../fcm/fcm.slice';
 import { ensureClientAsync, ensureSession, getMezonCtx, restoreLocalStorage } from '../helpers';
 import { videoStreamActions } from '../stream/videoStream.slice';
 import { voiceActions } from '../voice/voice.slice';
@@ -239,6 +240,7 @@ export const logOut = createAsyncThunk('auth/logOut', async ({ device_id, platfo
 	thunkAPI.dispatch(listChannelsByUserActions.removeAll());
 	thunkAPI.dispatch(voiceActions.resetVoiceControl());
 	thunkAPI.dispatch(videoStreamActions.setIsJoin(false));
+	thunkAPI.dispatch(fcmActions.clearGotifyToken());
 	clearApiCallTracker();
 	const restoreKey = ['persist:apps', 'current-theme', 'hideNotificationContent', 'i18nextLng'];
 	if (sessionState) {

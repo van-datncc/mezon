@@ -35,7 +35,7 @@
 			"description": "Thay đổi cài đặt quyền riêng tư và tùy chỉnh cách thành viên có thể tương tác với kênh này."
 		},
 		"quickAction": {
-			"title": "Tác vụ"
+			"title": "Lệnh nhanh"
 		},
 		"privateChannelInvite": {
 			"addMember": "Thêm thành viên"
@@ -174,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Menu nhanh",
+		"title": "Lệnh nhanh",
 		"description": "Quản lý tin nhắn nhanh và menu nhanh cho kênh này",
 		"keyTitle": "Nhập từ khóa (VD: xinchao): ",
 		"valueTitle": "Nhập nội dung (VD: Chào buổi sáng, chúc bạn có một ngày mới tốt lành !)",
@@ -240,7 +240,7 @@
 		"invites": "Lời mời",
 		"integrations": "Tích hợp",
 		"category": "Danh mục",
-		"quickMenu": "Menu nhanh"
+		"quickMenu": "Hành động nhanh"
 	},
 	"categoryManagement": {
 		"title": "Danh mục",

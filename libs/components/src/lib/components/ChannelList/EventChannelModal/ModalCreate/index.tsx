@@ -93,16 +93,18 @@ const ModalCreate = (props: ModalCreateProps) => {
 	const isExistPrivateEvent = currentEvent?.is_private;
 
 	useEffect(() => {
-		if (currentEvent && eventChannel) {
-			if (isExistChannelVoice) {
-				setOption(OptionEvent.OPTION_SPEAKER);
-			} else if (isExistAddress) {
-				setOption(OptionEvent.OPTION_LOCATION);
-			} else if (isExistPrivateEvent) {
-				setOption(OptionEvent.PRIVATE_EVENT);
-			}
+		if (!currentEvent || option) {
+			return;
 		}
-	}, [currentEvent, eventChannel]);
+
+		if (isExistChannelVoice) {
+			setOption(OptionEvent.OPTION_SPEAKER);
+		} else if (isExistAddress) {
+			setOption(OptionEvent.OPTION_LOCATION);
+		} else if (isExistPrivateEvent) {
+			setOption(OptionEvent.PRIVATE_EVENT);
+		}
+	}, [currentEvent, option, isExistChannelVoice, isExistAddress, isExistPrivateEvent]);
 
 	const choiceSpeaker = useMemo(() => {
 		return option === OptionEvent.OPTION_SPEAKER || (!option && isExistChannelVoice && !isExistAddress && !isExistPrivateEvent);

@@ -400,13 +400,13 @@ const ChannelTopbarLabel = memo(
 			}
 			switch (type) {
 				case ChannelType.CHANNEL_TYPE_CHANNEL:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 				case ChannelType.CHANNEL_TYPE_THREAD:
 					return (
 						<Icons.ThreadIconLocker
 							defaultFill1="var(--bg-icon-theme)"
 							defaultFill4="var(--bg-theme-secounnd)"
-							defaultFill5="var(--bg-icon-theme)"
+							defaultFill5="var(--bg-icon-theme-active)"
 						/>
 					);
 				case ChannelType.CHANNEL_TYPE_MEZON_VOICE:
@@ -416,13 +416,13 @@ const ChannelTopbarLabel = memo(
 				case ChannelType.CHANNEL_TYPE_APP:
 					return <AppChannelListIcon isEmphasized className="w-4 h-4" />;
 				default:
-					return <Icons.HashtagLocked />;
+					return <Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
 			}
 		};
 
 		return (
 			<div className="none-draggable-area flex items-center text-lg gap-3 min-w-0" onClick={onClick}>
-				<div className="flex w-4 flex-shrink-0 items-center justify-center text-theme-message">{renderIcon()}</div>
+				<div className="flex flex-shrink-0 items-center justify-center text-theme-message">{renderIcon()}</div>
 				<p className="flex-1 min-w-0 text-base font-semibold leading-5 truncate text-theme-message">{label}</p>
 			</div>
 		);

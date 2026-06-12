@@ -485,24 +485,81 @@ export const deleteChannel = createAsyncThunk('channels/deleteChannel', async (b
 	}
 });
 
+export const applyChannelArchiveState = createAsyncThunk(
+	'channels/applyChannelArchiveState',
+	async ({ clanId, channelId, parentId, isArchive }: { clanId: string; channelId: string; parentId: string; isArchive: boolean }, thunkAPI) => {
+		const parentChannelId = parentId || '0';
+		const isThread = parentChannelId !== '0';
+
+		if (isArchive) {
+			thunkAPI.dispatch(channelsActions.remove({ channelId, clanId }));
+			thunkAPI.dispatch(listChannelsByUserActions.remove(channelId));
+
+			if (isThread) {
+				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.archived }));
+				thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: parentChannelId, threadId: channelId }));
+			} else {
+				thunkAPI.dispatch(channelsActions.removeFavorite({ clanId, channelId }));
+			}
+
+			return { channelId, parentChannelId, isArchive };
+		}
+
+		if (isThread) {
+			thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.joined }));
+			await thunkAPI.dispatch(threadsActions.fetchThreads({ channelId: parentChannelId, clanId, noCache: true })).unwrap();
+		} else {
+			await thunkAPI.dispatch(fetchChannels({ clanId, noCache: true })).unwrap();
+		}
+
+		return { channelId, parentChannelId, isArchive };
+	}
+);
+
 export const archiveChannel = createAsyncThunk('channels/archiveChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId as string);
 		const response = await mezon.client.archiveChannel(mezon.session, body.clanId, body.channelId);
 		if (response) {
-			thunkAPI.dispatch(channelsActions.remove({ channelId: body.channelId, clanId: body.clanId }));
-			thunkAPI.dispatch(listChannelsByUserActions.remove(body.channelId));
-			if (channelData && checkIsThread(channelData as any)) {
-				thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId: body.channelId, activeCode: 0 }));
-				if (channelData.parent_id) {
-					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId: channelData.parent_id, threadId: body.channelId }));
-				}
-			}
+			await thunkAPI
+				.dispatch(
+					applyChannelArchiveState({
+						clanId: body.clanId,
+						channelId: body.channelId,
+						parentId: channelData?.parent_id ?? '0',
+						isArchive: true
+					})
+				)
+				.unwrap();
 		}
 		return response;
 	} catch (error) {
 		captureSentryError(error, 'channels/archiveChannel');
+		return thunkAPI.rejectWithValue(error);
+	}
+});
+
+export const restoreChannel = createAsyncThunk('channels/restoreChannel', async (body: { clanId: string; channelId: string }, thunkAPI) => {
+	try {
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		await mezon.client.activeArchivedThread(mezon.session, body.clanId, body.channelId);
+
+		const channelData = selectChannelById(getChannelsRootState(thunkAPI), body.channelId);
+		await thunkAPI
+			.dispatch(
+				applyChannelArchiveState({
+					clanId: body.clanId,
+					channelId: body.channelId,
+					parentId: channelData?.parent_id ?? '0',
+					isArchive: false
+				})
+			)
+			.unwrap();
+
+		return { clanId: body.clanId, channelId: body.channelId };
+	} catch (error) {
+		captureSentryError(error, 'channels/restoreChannel');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -696,33 +753,39 @@ export const addThreadToChannels = createAsyncThunk(
 			const channelIdToFetch = parentChannelId || currentChannelId;
 
 			if (!channelIdToFetch || channelIdToFetch === channelId) {
-				return;
+				return true;
 			}
 
-			const data = await thunkAPI
-				.dispatch(
-					threadsActions.fetchThread({
-						channelId: channelIdToFetch,
-						clanId,
-						threadId: channelId
-					})
-				)
-				.unwrap();
+			try {
+				const data = await thunkAPI
+					.dispatch(
+						threadsActions.fetchThread({
+							channelId: channelIdToFetch,
+							clanId,
+							threadId: channelId
+						})
+					)
+					.unwrap();
 
-			const matchedThread = data?.threads?.find((thread) => thread.id === channelId || thread.channel_id === channelId);
+				const matchedThread = data?.threads?.find((thread) => thread.id === channelId || thread.channel_id === channelId);
 
-			if (matchedThread) {
-				thunkAPI.dispatch(
-					channelsActions.upsertOne({
-						clanId,
-						channel: {
-							...matchedThread,
-							active: matchedThread.active ? ThreadStatus.joined : ThreadStatus.activePublic
-						} as ChannelsEntity
-					})
-				);
+				if (matchedThread) {
+					thunkAPI.dispatch(
+						channelsActions.upsertOne({
+							clanId,
+							channel: {
+								...matchedThread,
+								active: matchedThread.active
+							} as ChannelsEntity
+						})
+					);
+				}
+				return true;
+			} catch (error) {
+				return false;
 			}
 		}
+		return true;
 	}
 );
 
@@ -803,7 +866,10 @@ export const fetchChannels = createAsyncThunk(
 							)
 							.unwrap();
 						if (data?.threads?.length > 0) {
-							response.channeldesc.push({ ...data.threads[0], active: 1 } as ChannelsEntity);
+							response.channeldesc.push({
+								...data.threads[0],
+								active: data.threads[0].active ? data.threads[0].active : ThreadStatus.activePublic
+							} as ChannelsEntity);
 						}
 					}
 				} catch (error) {
@@ -1628,7 +1694,9 @@ export const channelsActions = {
 	joinChat,
 	createNewChannel,
 	deleteChannel,
+	applyChannelArchiveState,
 	archiveChannel,
+	restoreChannel,
 	updateChannel,
 	updateChannelPrivate,
 	fetchAppChannels,

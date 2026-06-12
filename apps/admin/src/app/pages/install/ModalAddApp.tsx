@@ -42,6 +42,7 @@ const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) 
 	const [categoryError, setCategoryError] = useState<string>();
 	const activeSince = new Date(appDetail?.create_time_seconds || 0 * 1000);
 	const activeSincecv = activeSince ? new Date(activeSince).toLocaleDateString() : '';
+
 	useEffect(() => {
 		if (clanValue) {
 			dispatch(categoriesActions.fetchCategories({ clanId: clanValue }));
@@ -59,6 +60,7 @@ const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) 
 		dispatch(fetchClans({}));
 	}, [dispatch]);
 	const categories = useAppSelector((state) => selectAllCategories(state, clanValue));
+
 	const clanConfig: SelectFieldConfig<any> = {
 		label: 'Add to clan',
 		value: clanValue,
@@ -87,6 +89,7 @@ const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) 
 			value: mapCategoryToOption.id
 		}))
 	};
+
 	const handleAdd = useCallback(async () => {
 		let hasError = false;
 		if (!clanValue) {
@@ -147,25 +150,48 @@ const ModalAddApp = memo(({ applicationId, handleOpenModal }: ModalAddAppProps) 
 	}
 
 	return (
-		<div className="rounded overflow-hidden dark:bg-bgProfileBody bg-bgLightMode max-w-[440px] w-full flex flex-col text-center">
+		<div className="rounded-3xl dark:bg-[#121421]/90 bg-white border dark:border-white/[0.06] border-slate-200/80 max-w-[440px] w-full p-6 md:p-7 flex flex-col items-center text-center backdrop-blur-xl transition-all duration-300 shadow-[0_24px_48px_-12px_rgba(15,23,42,0.06)] dark:shadow-[0_24px_50px_-12px_rgba(3,4,9,0.7)] relative overflow-hidden">
 			{appDetail && (
-				<div className="flex flex-col items-center mt-4 mb-2">
-					{appDetail.applogo ? (
-						<img src={appDetail.applogo} alt={appDetail.appname} className="w-16 h-16 rounded-full object-cover mb-2" />
-					) : (
-						<span className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold mb-2 truncate overflow-hidden max-w-[300px]">
-							{appDetail.appname?.[0]}
-						</span>
-					)}
-					<p className="text-xl font-semibold truncate overflow-hidden max-w-[300px]">{appDetail.appname}</p>
+				<div className="flex flex-col items-center mt-2 mb-3 w-full">
+					<div className="relative group mb-3">
+						<div className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-violet-600 via-indigo-500 to-sky-400 opacity-25 blur-sm transition duration-500" />
+						<div className="rounded-full size-16 min-w-[64px] uppercase flex justify-center items-center text-2xl font-extrabold border-2 dark:border-[#1a1d2e] border-white dark:bg-[#0d0f19] bg-slate-50 dark:text-white text-slate-900 relative z-10 overflow-hidden shadow-md">
+							{appDetail.applogo ? (
+								<img src={appDetail.applogo} alt={appDetail.appname} className="w-full h-full object-cover" />
+							) : (
+								<span className="bg-gradient-to-tr from-violet-500 to-sky-400 bg-clip-text text-transparent truncate overflow-hidden max-w-[300px]">
+									{appDetail.appname?.[0]}
+								</span>
+							)}
+						</div>
+					</div>
+					<p className="text-xl font-extrabold tracking-tight dark:text-white text-slate-900 truncate max-w-[300px]">{appDetail.appname}</p>
 				</div>
 			)}
-			<HeaderModal name={appDetail?.appname || ''} username={account?.user?.username} />
-			<SelectField uppercase={true} {...clanConfig} />
-			{clanValue && <SelectField {...categoryConfig} />}
-			<TextField label="Channel Name" value={labelValue} onChange={(v) => setLabelValue(v)} placeholder={appDetail?.appname || ''} />
-			<FooterModal activeSince={activeSincecv} name={appDetail?.appname || ''} />
-			<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
+
+			<div className="w-full flex flex-col gap-4 text-left">
+				<HeaderModal name={appDetail?.appname || ''} username={account?.user?.username} />
+
+				<div className="w-full">
+					<SelectField uppercase={true} {...clanConfig} />
+				</div>
+
+				{clanValue && (
+					<div className="w-full">
+						<SelectField {...categoryConfig} />
+					</div>
+				)}
+
+				<div className="w-full">
+					<TextField label="Channel Name" value={labelValue} onChange={(v) => setLabelValue(v)} placeholder={appDetail?.appname || ''} />
+				</div>
+
+				<FooterModal activeSince={activeSincecv} name={appDetail?.appname || ''} />
+
+				<div className="mt-2 w-full">
+					<ModalAsk handelBack={handleOpenModal} handleAddBotOrApp={handleAdd} />
+				</div>
+			</div>
 		</div>
 	);
 });

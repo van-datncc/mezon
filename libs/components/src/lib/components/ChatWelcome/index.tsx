@@ -153,9 +153,9 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 				{isChatStream ? (
 					<Icons.Chat className="w-10 h-10 " />
 				) : channelPrivate ? (
-					<Icons.HashtagLocked className="w-10 h-10" />
+					<Icons.HashtagLocked className="w-10 h-10" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 				) : (
-					<Icons.Hashtag className="w-10 h-10" />
+					<Icons.Hashtag className="w-10 h-10" defaultFill1="var(--bg-icon-theme)" />
 				)}
 			</div>
 			<div>
@@ -193,7 +193,7 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 						className="w-10 h-10"
 						defaultFill1="var(--bg-icon-theme)"
 						defaultFill4="var(--bg-theme-secounnd)"
-						defaultFill5="var(--bg-icon-theme)"
+						defaultFill5="var(--bg-icon-theme-active)"
 					/>
 				) : (
 					<Icons.ThreadIcon

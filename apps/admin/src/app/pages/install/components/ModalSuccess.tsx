@@ -21,45 +21,52 @@ const ModalSuccess = ({ name, clan }: ModalSuccessProps) => {
 	};
 
 	return (
-		<div className="max-w-[440px] w-full rounded-lg overflow-hidden border-0 bg-white text-black dark:bg-gradient-to-br dark:from-[#2b2d31] dark:to-[#313338] dark:text-white shadow-2xl transition-all duration-500 hover:shadow-[0_0_25px_rgba(88,101,242,0.3)]">
-			<div className="p-8 flex flex-col items-center text-center space-y-6 relative overflow-hidden">
-				<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+')]"></div>
+		<div className="rounded-3xl dark:bg-[#121421]/90 bg-white border dark:border-white/[0.06] border-slate-200/80 max-w-[440px] w-full p-8 md:p-9 flex flex-col items-center text-center backdrop-blur-xl transition-all duration-500 shadow-[0_24px_48px_-12px_rgba(15,23,42,0.06)] dark:shadow-[0_24px_50px_-12px_rgba(3,4,9,0.7)] relative overflow-hidden">
+			<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgzMCkiPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+')] opacity-60 pointer-events-none select-none" />
 
-				<div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#23a55a] to-[#2dc771] flex items-center justify-center shadow-[0_0_20px_rgba(35,165,90,0.5)] animate-bounce-slow relative z-10">
-					<Check className="h-10 w-10 text-white animate-pulse" />
+			<div className="absolute top-[-20%] w-[200px] h-[200px] rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-[50px] pointer-events-none select-none" />
+
+			<div className="relative size-24 flex items-center justify-center mt-2 select-none z-10 group">
+				<div className="absolute inset-0 rounded-full bg-emerald-500/10 dark:bg-emerald-400/5 animate-pulse" />
+
+				<div className="absolute inset-2 rounded-full border border-dashed border-emerald-500/20 dark:border-emerald-400/25 animate-[spin_40s_linear_infinite]" />
+
+				<div className="absolute inset-3.5 rounded-full border border-emerald-500/30 dark:border-emerald-400/20 bg-gradient-to-tr from-emerald-500/[0.03] to-teal-500/[0.03]" />
+
+				<div className="size-12 rounded-full bg-emerald-500 dark:bg-emerald-500/90 flex items-center justify-center shadow-lg shadow-emerald-500/30 dark:shadow-emerald-500/20 transition-transform duration-300 group-hover:scale-105">
+					<Check className="h-6 w-6 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.15)]" />
 				</div>
-
-				<div className="absolute top-0 left-0 p-1 flex items-center space-x-2 animate-fadeIn z-10">
-					<div className="w-3 h-3 rounded-full bg-[#eb459e] shadow-[0_0_6px_rgba(235,69,158,0.7)]"></div>
-					<span className="text-xs font-bold text-[#5865f2] tracking-wider">mezon</span>
-				</div>
-
-				<h2 className="text-2xl font-bold animate-fadeIn z-10">Success!</h2>
-
-				<p className="animate-fadeIn z-10">
-					<span className="font-semibold">{name}</span> has been authorised and added
-					{clan?.clanName ? (
-						<>
-							{' '}
-							to <span className="font-semibold">{clan.clanName}</span>
-						</>
-					) : (
-						'.'
-					)}
-				</p>
-
-				<button
-					onClick={handleNavigate}
-					className="bg-[#5865f2] hover:bg-[#4752c4] text-white w-full mt-4 animate-fadeIn relative z-10 transition-all hover:scale-105 hover:shadow-lg group overflow-hidden px-3 py-2"
-				>
-					<span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#5865f2] to-[#4752c4] group-hover:animate-shimmer"></span>
-					<span className="relative font-bold">Go to {clan?.clanName}</span>
-				</button>
-
-				<p className="text-xs animate-fadeIn z-10">You may now close this window or tab.</p>
-
-				<div className="absolute -bottom-10 left-0 w-full h-2 bg-gradient-to-r from-[#5865f2] via-[#23a55a] to-[#5865f2] animate-gradient-x"></div>
 			</div>
+
+			<div className="absolute top-5 left-5 flex items-center gap-1.5 z-10 opacity-85 select-none">
+				<div className="w-2 h-2 rounded-full bg-[#eb459e] shadow-[0_0_8px_rgba(235,69,158,0.6)]"></div>
+				<span className="text-[10px] font-extrabold text-violet-500 dark:text-violet-400 uppercase tracking-widest font-mono">mezon</span>
+			</div>
+
+			<h2 className="text-2xl font-extrabold tracking-tight dark:text-white text-slate-900 mt-6 relative z-10">Success!</h2>
+
+			<p className="text-sm dark:text-slate-300 text-slate-600 mt-3 leading-relaxed font-medium relative z-10 px-2">
+				<span className="font-bold dark:text-white text-slate-900">{name}</span> has been authorised and added
+				{clan?.clanName ? (
+					<>
+						{' '}
+						to <span className="font-bold dark:text-white text-slate-900">{clan.clanName}</span>
+					</>
+				) : (
+					'.'
+				)}
+			</p>
+
+			<button
+				onClick={handleNavigate}
+				className="w-full mt-7 py-3.5 px-5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-xl hover:opacity-95 transition-all duration-300 shadow-lg shadow-violet-500/15 active:scale-95 cursor-pointer relative z-10 flex justify-center items-center gap-2"
+			>
+				<span className="font-bold text-sm">Go to {clan?.clanName}</span>
+			</button>
+
+			<p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-4 relative z-10">You may now close this window or tab.</p>
+
+			<div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-violet-500 via-emerald-500 to-indigo-500"></div>
 		</div>
 	);
 };

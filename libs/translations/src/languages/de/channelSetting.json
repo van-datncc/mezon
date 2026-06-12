@@ -35,7 +35,7 @@
 			"description": "Ändere die Privatsphäre-Einstellungen und passe an, wie Mitglieder mit diesem Kanal interagieren können."
 		},
 		"quickAction": {
-			"title": "Aktion"
+			"title": "Schnellbefehl"
 		},
 		"privateChannelInvite": {
 			"addMember": "Mitglied hinzufügen"
@@ -174,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Schnellmenü",
+		"title": "Schnellbefehl",
 		"description": "Schnellnachrichten und Schnellmenüs für diesen Kanal verwalten",
 		"keyTitle": "Schlüsselwort eingeben (z. B. hallo): ",
 		"valueTitle": "Inhalt eingeben (z. B. Guten Morgen, ich wünsche dir einen schönen Tag!)",
@@ -240,7 +240,7 @@
 		"invites": "Einladungen",
 		"integrations": "Integrationen",
 		"category": "Kategorie",
-		"quickMenu": "Schnellmenü"
+		"quickMenu": "Schnellaktionen"
 	},
 	"categoryManagement": {
 		"title": "Kategorien",

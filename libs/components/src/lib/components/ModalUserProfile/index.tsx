@@ -303,7 +303,11 @@ const ModalUserProfile = ({
 									className={`w-full border-theme-primary text-theme-primary color-text-secondary rounded-[5px] bg-theme-contexify p-[5px] `}
 									placeholder={t('placeholders.messageUser', {
 										username: isFooterProfile
-											? userById?.user?.display_name || userProfile?.user?.display_name || userById?.user?.username
+											? userById?.user?.display_name ||
+												userProfile?.user?.display_name ||
+												userById?.user?.username ||
+												userProfile?.user?.username ||
+												usernameShow
 											: !isDM
 												? userById?.clan_nick || userById?.user?.display_name || userById?.user?.username || usernameShow
 												: userById?.user?.display_name || userById?.user?.username || usernameShow

@@ -91,6 +91,8 @@ export type IPermissionUser = ApiPermission & {
 export type IUsersClan = ClanUserListClanUser & {
 	prioritizeName?: string;
 	id: string;
+	join_time_seconds?: number;
+	create_time_seconds?: number;
 };
 
 export type IRolesClan = ApiRole & {
@@ -472,6 +474,8 @@ export interface IMessageSendPayload {
 	id?: number;
 	expire_at?: number;
 	type?: EPollType;
+	presign_finish?: string[];
+	create_time_seconds?: number;
 }
 
 export type IUser = {
@@ -1118,6 +1122,13 @@ export enum ENotificationTypes {
 	MENTION_MESSAGE = NotificationType.MENTION_MESSAGE,
 	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE
 }
+
+export type PreSendMediaAttachmentFields = {
+	_sourceFile?: File;
+	_thumbnailBlob?: Blob;
+};
+
+export type PreSendMediaAttachment = ApiMessageAttachment & PreSendMediaAttachmentFields;
 
 export type PreSendAttachment = {
 	channelId?: string;
