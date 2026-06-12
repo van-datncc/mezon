@@ -8,8 +8,6 @@ import AppLayout from '../layouts/AppLayout';
 import RootLayout from '../layouts/RootLayout';
 //loader
 import type { CustomLoaderFunction } from '../loader/appLoader';
-import { appLoader, shouldRevalidateApp } from '../loader/appLoader';
-import { authLoader, shouldRevalidateAuth } from '../loader/authLoader';
 // Pages
 import { applicationLoader, shouldRevalidateApplication } from '../loader/applicationLoader';
 import InitialRoutes from './InititalRoutes';
@@ -53,14 +51,10 @@ export const Routes = () => {
 				},
 				{
 					path: '/developers',
-					loader: loaderWithStore(appLoader),
-					shouldRevalidate: shouldRevalidateApp,
 					element: <AppLayout />,
 					children: [
 						{
 							path: '',
-							loader: loaderWithStore(authLoader),
-							shouldRevalidate: shouldRevalidateAuth,
 							element: <RootLayout />,
 							children: [
 								{
@@ -131,7 +125,6 @@ export const Routes = () => {
 						},
 						{
 							path: ':modalType/install/:applicationId',
-							loader: loaderWithStore(authLoader),
 							element: <Install />
 						}
 					]
