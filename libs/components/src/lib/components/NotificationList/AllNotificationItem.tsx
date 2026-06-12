@@ -3,14 +3,16 @@ import { selectChannelById, selectClanById, selectMemberDMByUserId, useAppSelect
 import type { IEmbedProps, IExtendedMessage, IMentionOnMessage, IMessageWithUser, INotification } from '@mezon/utils';
 import {
 	DEFAULT_MESSAGE_CREATOR_NAME_DISPLAY_COLOR,
-	EBacktickType,
 	NotificationCategory,
 	TOPBARS_MAX_WIDTH,
+	adjustMentionsForStrippedMarkers,
 	convertTimeString,
 	createImgproxyUrl,
 	generateE2eId,
 	getShareContactInfo,
-	processText
+	patchLinkTokens,
+	processText,
+	stripNotificationMarkers
 } from '@mezon/utils';
 import type { ApiDirectFcmProto } from 'mezon-js';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
@@ -28,18 +30,6 @@ export type NotifyMentionProps = {
 	onCloseTooltip?: () => void;
 };
 
-const NOTIFICATION_MARKER_REGEX = /\[(?:lk|pre|b|c|s|t|vk|lk_yt|lk_fb|lk_tt)\]\s?/g;
-
-function patchLinkTokens(content: IExtendedMessage): IExtendedMessage {
-	if ((!content.mk || content.mk.length === 0) && Array.isArray(content.lk) && content.lk.length > 0) {
-		return {
-			...content,
-			mk: content.lk.map((lkItem) => ({ ...lkItem, type: EBacktickType.LINK }))
-		};
-	}
-	return content;
-}
-
 function buildNotificationMessageContent(contentRaw: string | undefined, mentions: IMentionOnMessage[]): IExtendedMessage {
 	if (!contentRaw) {
 		return { t: '', mentions };
@@ -56,12 +46,13 @@ function buildNotificationMessageContent(contentRaw: string | undefined, mention
 		}
 	}
 
-	const text = contentRaw.replace(NOTIFICATION_MARKER_REGEX, '');
+	const text = stripNotificationMarkers(contentRaw);
+	const adjustedMentions = adjustMentionsForStrippedMarkers(contentRaw, mentions);
 	const { links, voiceRooms, markdowns } = processText(text);
 
 	return patchLinkTokens({
 		t: text,
-		mentions,
+		mentions: adjustedMentions,
 		...(links.length > 0 ? { lk: links } : {}),
 		...(voiceRooms.length > 0 ? { vk: voiceRooms } : {}),
 		...(markdowns.length > 0 ? { mk: markdowns } : {})
@@ -84,7 +75,7 @@ function getNotificationCopyText(contentRaw: string | undefined): string {
 		}
 	}
 
-	return contentRaw.replace(NOTIFICATION_MARKER_REGEX, '');
+	return stripNotificationMarkers(contentRaw);
 }
 
 function AllNotificationItem({ notify, onCloseTooltip }: NotifyMentionProps) {
