@@ -1,4 +1,4 @@
-import type { Middleware, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
@@ -25,7 +25,7 @@ import { notificationReducer } from './notification/notify.slice';
 import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice';
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
-import type { MezonAdminContextValue, MezonContextValue } from '@mezon/transport';
+import type { MezonContextValue } from '@mezon/transport';
 import { publishSessionUpdate } from '@mezon/transport';
 import { safeJSONParse } from 'mezon-js';
 import { ACTIVITIES_API_FEATURE_KEY, activitiesAPIReducer } from './activities/activitiesAPI.slice';
@@ -410,24 +410,6 @@ export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
 
-const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
-	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
-	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
-		const { channelIdLastFetch, channelMessages } = action.payload || {};
-
-		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
-			// Limit the channelMessages to only include messages for the last fetched channelId
-			action.payload = {
-				...action.payload,
-				channelMessages: {
-					[channelIdLastFetch]: channelMessages[channelIdLastFetch]
-				}
-			};
-		}
-	}
-	// Pass the action to the next middleware or reducer
-	return next(action);
-};
 const isDev = process.env.NX_ENV === 'development';
 
 const thunkNameLogger = () => (next: any) => (action: any) => {
@@ -522,80 +504,6 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 		_friendSyncCleanup = initFriendRelationCrossTabSync(store.dispatch);
 	}
 
-	return { store, persistor };
-};
-
-export const initAdminStore = (mezon: MezonAdminContextValue, preloadedState?: PreloadedRootState) => {
-	const store = configureStore({
-		reducer,
-		devTools: false,
-		preloadedState,
-		middleware: (getDefaultMiddleware) => {
-			const base = getDefaultMiddleware({
-				thunk: {
-					extraArgument: { mezon }
-				},
-				immutableCheck: false,
-				serializableCheck: false
-			});
-
-			const withListeners = base.prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware);
-
-			if (isDev) {
-				return withListeners.prepend(thunkNameLogger);
-			}
-
-			return withListeners;
-		}
-	});
-	storeInstance = store;
-	storeCreated = true;
-	_resolveStoreReady?.(store);
-
-	const persistor = persistStore(store);
-
-	if (typeof window !== 'undefined') {
-		let lastStorageValue: string | null = null;
-		const handleStorageChange = async (e: StorageEvent) => {
-			if (e.key !== 'persist:auth') return;
-			if (e.newValue === lastStorageValue) return;
-			lastStorageValue = e.newValue;
-
-			try {
-				const currentState = store.getState();
-				const currentSession = currentState.auth?.session;
-
-				if (!e.newValue) {
-					if (currentSession) {
-						publishSessionUpdate(null, 'cross-tab');
-					}
-					return;
-				}
-
-				const newAuthState = safeJSONParse(e.newValue);
-				const sessionData = newAuthState?.session ? safeJSONParse(newAuthState.session) : null;
-				const newSession = sessionData ?? null;
-
-				const hasSessionChanged =
-					newSession?.token !== currentSession?.token ||
-					newSession?.refresh_token !== currentSession?.refresh_token ||
-					newSession?.session_id !== currentSession?.session_id;
-
-				if (!hasSessionChanged) return;
-
-				publishSessionUpdate(newSession, 'cross-tab');
-			} catch (err) {
-				console.error('[Storage Sync] Failed to sync auth state:', err);
-			}
-		};
-
-		if (!_storageListenerActive) {
-			window.addEventListener('storage', handleStorageChange);
-			_storageListenerActive = true;
-		}
-	}
-
-	setupSessionSyncListener(store);
 	return { store, persistor };
 };
 
