@@ -399,6 +399,11 @@ export const authSlice = createSlice({
 					state.session = value;
 				}
 			}
+		},
+		setSessionToken(state, action: PayloadAction<{ token?: string; refresh_token?: string }>) {
+			if (state.session) {
+				state.session = { ...state.session, ...action.payload };
+			}
 		}
 	},
 	extraReducers: (builder) => {

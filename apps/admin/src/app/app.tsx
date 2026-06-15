@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
 import { PersistGate } from 'redux-persist/integration/react';
 import './app.module.scss';
+import AdminGate from './context/AdminGate';
 import { Routes } from './routes';
 
 const mezon: CreateMezonClientOptions = {
@@ -30,7 +31,9 @@ export function App() {
 		<I18nextProvider i18n={i18n}>
 			<Provider store={store}>
 				<PersistGate persistor={persistor}>
-					<Routes />
+					<AdminGate>
+						<Routes />
+					</AdminGate>
 				</PersistGate>
 			</Provider>
 		</I18nextProvider>
