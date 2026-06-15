@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { accountReducer } from './account/account.slice';
+import { ACCOUNT_FEATURE_KEY, accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
 import { authReducer, setupSessionSyncListener } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
@@ -308,10 +308,18 @@ const persistedFcmReducer = persistReducer(
 	fcmReducer
 );
 
+const persistedAccountReducer = persistReducer(
+	{
+		key: ACCOUNT_FEATURE_KEY,
+		storage
+	},
+	accountReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	dashboard: dashboardReducer,
-	account: accountReducer,
+	account: persistedAccountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	gallery: galleryReducer,

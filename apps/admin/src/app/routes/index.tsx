@@ -10,6 +10,7 @@ import RootLayout from '../layouts/RootLayout';
 import type { CustomLoaderFunction } from '../loader/appLoader';
 // Pages
 import { applicationLoader, shouldRevalidateApplication } from '../loader/applicationLoader';
+import { authLoader, shouldRevalidateAuth } from '../loader/authLoader';
 import InitialRoutes from './InititalRoutes';
 
 const DashboardPage = lazy(() => import('../pages/dashboard'));
@@ -55,6 +56,8 @@ export const Routes = () => {
 					children: [
 						{
 							path: '',
+							loader: loaderWithStore(authLoader),
+							shouldRevalidate: shouldRevalidateAuth,
 							element: <RootLayout />,
 							children: [
 								{
@@ -125,6 +128,7 @@ export const Routes = () => {
 						},
 						{
 							path: ':modalType/install/:applicationId',
+							loader: loaderWithStore(authLoader),
 							element: <Install />
 						}
 					]
