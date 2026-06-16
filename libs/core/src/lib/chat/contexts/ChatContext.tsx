@@ -76,6 +76,7 @@ import {
 	selectDmMetaEntities,
 	selectFriendById,
 	selectIsInCall,
+	selectIsShowCreateTopic,
 	selectLastMessageByChannelId,
 	selectLastSentMessageStateByChannelId,
 	selectLatestMessageId,
@@ -1472,13 +1473,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!isDM) {
 				const currentChannelId = selectCurrentChannelId(state as unknown as RootState);
 				const currentTopicId = selectCurrentTopicId(state as unknown as RootState);
-				const isFocusTopicBox = selectClickedOnTopicStatus(state as unknown as RootState);
+				const isShowCreateTopic = selectIsShowCreateTopic(state as unknown as RootState);
 
 				if (isTopicTyping) {
-					if (!isFocusTopicBox || !currentTopicId || channelId !== currentTopicId) return;
+					if (!isShowCreateTopic || !currentTopicId || channelId !== currentTopicId) return;
 					if (e.channel_id !== currentChannelId) return;
 				} else {
-					if (isFocusTopicBox && currentTopicId) return;
+					if (isShowCreateTopic && currentTopicId) return;
 					if (channelId !== currentChannelId) return;
 				}
 			}
