@@ -74,7 +74,7 @@
     "date-fns": "^3.3.1",
     "deepfilternet3-noise-filter": "1.2.1",
     "device-uuid": "^1.0.4",
-    "dompurify": "^3.2.4",
+    "dompurify": "^3.4.9",
     "electron-log": "^5.2.0",
     "electron-store": "8.2.0",
     "electron-updater": "^6.6.2",
