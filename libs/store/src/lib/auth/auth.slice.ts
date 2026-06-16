@@ -400,9 +400,14 @@ export const authSlice = createSlice({
 				}
 			}
 		},
-		setSessionToken(state, action: PayloadAction<{ token?: string; refresh_token?: string }>) {
+		setSessionToken(
+			state,
+			action: PayloadAction<{ token: string; refresh_token: string; api_url: string; created: boolean; created_at: number }>
+		) {
 			if (state.session) {
 				state.session = { ...state.session, ...action.payload };
+			} else {
+				state.session = { ...action.payload };
 			}
 		}
 	},

@@ -68,8 +68,11 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 						const session = Session.decode(new Uint8Array(buffer)) as ApiSession;
 						dispatch(
 							authActions.setSessionToken({
-								token: session.token,
-								refresh_token: session.refresh_token
+								token: session.token || '',
+								refresh_token: session.refresh_token || '',
+								api_url: session.api_url || '',
+								created: !!session.created,
+								created_at: Date.now()
 							})
 						);
 						setAuthorized(true);
@@ -97,7 +100,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 	}
 
 	if (!authorized) {
-		window.location.replace(process.env.NX_CHAT_APP_REDIRECT_URI || '/login');
+		window.location.replace(`${process.env.NX_CHAT_APP_REDIRECT_URI}/login`);
 		return null;
 	}
 

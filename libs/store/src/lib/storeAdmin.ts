@@ -62,6 +62,9 @@ const reducer = {
 let storeInstance = configureStore({
 	reducer
 });
+
+export type StoreAdmin = typeof storeInstance;
+
 let _resolveStoreReady: ((store: typeof storeInstance) => void) | null = null;
 const _storeReadyPromise: Promise<typeof storeInstance> = new Promise((resolve) => {
 	_resolveStoreReady = resolve;
@@ -155,4 +158,19 @@ export const initAdminStore = (mezon: MezonAdminContextValue) => {
 
 	setupSessionSyncListener(store);
 	return { store, persistor };
+};
+
+export const getStoreAdminAsync = async (timeoutMs = 5000): Promise<StoreAdmin> => {
+	if (storeCreated) {
+		return storeInstance;
+	}
+	return new Promise<StoreAdmin>((resolve, reject) => {
+		const deadline = setTimeout(() => {
+			reject(new Error('[getStoreAsync] Store initialization timed out'));
+		}, timeoutMs);
+		_storeReadyPromise.then((store) => {
+			clearTimeout(deadline);
+			resolve(store as StoreAdmin);
+		});
+	});
 };
