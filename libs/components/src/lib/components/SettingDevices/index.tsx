@@ -39,16 +39,15 @@ type DeviceItemProps = {
 	onRemove?: (deviceId: string) => void;
 };
 
-const formatDeviceDate = (date: string | Date | undefined, t: (key: string) => string): string => {
-	if (!date) return '';
-	const dateStr = date instanceof Date ? date.toISOString() : String(date);
-	return convertTimeString(dateStr, t);
+const formatDeviceDate = (timestampSeconds: number | undefined, t: (key: string) => string): string => {
+	if (!timestampSeconds) return '';
+	return convertTimeString(new Date(timestampSeconds * 1000).toISOString(), t);
 };
 
 const DeviceItem = ({ device, isCurrent, t, onRemove }: DeviceItemProps) => {
-	const { platform, device_name, location, last_active } = device;
+	const { platform, device_name, location, last_active_seconds } = device;
 
-	const formattedLastActive = formatDeviceDate(last_active, t);
+	const formattedLastActive = formatDeviceDate(last_active_seconds, t);
 	const platformLabel = getPlatformLabel(platform);
 
 	return (
