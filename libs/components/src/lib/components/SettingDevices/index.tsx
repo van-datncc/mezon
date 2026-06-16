@@ -39,9 +39,11 @@ type DeviceItemProps = {
 	onRemove?: (deviceId: string) => void;
 };
 
-const formatDeviceDate = (timestampSeconds: number | undefined, t: (key: string) => string): string => {
+const formatDeviceDate = (timestampSeconds: number | string | undefined, t: (key: string) => string): string => {
 	if (!timestampSeconds) return '';
-	return convertTimeString(new Date(timestampSeconds * 1000).toISOString(), t);
+	const seconds = typeof timestampSeconds === 'string' ? Number(timestampSeconds) : timestampSeconds;
+	if (!seconds) return '';
+	return convertTimeString(new Date(seconds * 1000).toISOString(), t);
 };
 
 const DeviceItem = ({ device, isCurrent, t, onRemove }: DeviceItemProps) => {
@@ -72,7 +74,7 @@ const DeviceItem = ({ device, isCurrent, t, onRemove }: DeviceItemProps) => {
 			</div>
 			{!isCurrent && onRemove && (
 				<button
-					onClick={() => onRemove(device.device_id)}
+					onClick={() => device.device_id && onRemove(device.device_id)}
 					className="w-8 h-8 flex items-center hover:text-red-500 justify-center rounded-full hover:bg-theme-setting-nav text-theme-primary hover:text-theme-primary-active transition-colors"
 					title={t('deviceSettings.removeDevice')}
 				>
