@@ -14522,28 +14522,21 @@ mezon-active-windows@0.1.38:
   dependencies:
     node-addon-api "^1.7.2"
 
-mezon-js-protobuf@1.10.55:
-  version "1.10.55"
-  resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.55.tgz#09f5de4d3e8ecfa1ec5bf2e6274f094a6317ed37"
-  integrity sha512-X2pRXwi7VsY4O5pr0P93rhuQu4nzAQ4rfiCGXunksi9QYMwZS1rKtj9nna4XTh52pfCMGvMMSGKz+ydt0Wh0Vw==
-  dependencies:
-    protobufjs "^7.2.4"
-
-mezon-js-protobuf@^1.10.55:
+mezon-js-protobuf@1.10.59, mezon-js-protobuf@^1.10.59:
   version "1.10.59"
   resolved "https://registry.yarnpkg.com/mezon-js-protobuf/-/mezon-js-protobuf-1.10.59.tgz#e43b8ee1d988bf3171e66c03737173309dcfc143"
   integrity sha512-6+4/BJF86EXPSAPSbBKg0LyaGPipKVDZpCBhuOWsvYTWt7QPi6kwUJAcL6MP6iplK0+5nn19/p+8H1c7AFmBFg==
   dependencies:
     protobufjs "^7.2.4"
 
-mezon-js@2.15.57:
-  version "2.15.57"
-  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.57.tgz#72954e808cb0b6d92f7c63771a11798ea3c26ee7"
-  integrity sha512-IX5cUTC3UbDNHkz376cn1gjGa4ytxJmDA3QvNuHiNDet0U2lB/35RdL0VrrmDgkDmCoA7o+nQzv80+3UpGCNEQ==
+mezon-js@2.15.61:
+  version "2.15.61"
+  resolved "https://registry.yarnpkg.com/mezon-js/-/mezon-js-2.15.61.tgz#ae172bb4e1042fdbe897dbe15b4b03505feb86ba"
+  integrity sha512-AKVwmVc5Ycj0HbSbrM+hYYiKfQwbh3A7Ve44SaS6DpLCy6P1IC2JiZxo93LOEIg/Rongm10uEjSYeDKikr7QNw==
   dependencies:
     base64-arraybuffer "^1.0.2"
     js-base64 "^3.7.8"
-    mezon-js-protobuf "^1.10.55"
+    mezon-js-protobuf "^1.10.59"
     whatwg-fetch "^3.6.2"
 
 micromatch@^4.0.0, micromatch@^4.0.2, micromatch@^4.0.4, micromatch@^4.0.5, micromatch@^4.0.8:
@@ -19431,9 +19424,9 @@ tmp-promise@^3.0.2:
     tmp "^0.2.0"
 
 tmp@^0.2.0, tmp@~0.2.1:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.6.tgz#0dfac10fd09a9319288eb0e8f0ed524604e183b4"
-  integrity sha512-5sJPdPjfI5Kx+qbrDesxkglRBxW//g7hCsqspEjwkewGvBMGIKMOTKzLt1hFVJzyadba3lDUN20O9qhvbQUSTA==
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.7.tgz#26f4db11d1601ce8012dcb8a798ece1c06a99059"
+  integrity sha512-e0votIpp4Uo2AJYSzVHV6xCcawuiez3DzqDAbrTc3YxBkplN6e+dM13ZeIcZnDg/QpSuU2zfZ3rzwY8ukEnaXw==
 
 tmpl@1.0.5:
   version "1.0.5"
