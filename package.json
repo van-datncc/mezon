@@ -14,7 +14,7 @@
     "format": "nx format:check",
     "format:fix": "nx format:write",
     "build:chat": "cross-env GENERATE_SOURCEMAP=false nx build chat --prod --baseHref=/",
-    "build:admin": "cross-env GENERATE_SOURCEMAP=false nx build admin --prod --baseHref=/",
+    "build:admin": "cross-env GENERATE_SOURCEMAP=false nx build admin --prod --baseHref=/developers/",
     "build:discover": "cross-env GENERATE_SOURCEMAP=false nx build discover --prod --baseHref=/",
     "build-stats:chat": "nx run statchat:build --statsJson",
     "bundle-analyzer:chat": "webpack-bundle-analyzer ./dist/apps/chat/stats.json",
