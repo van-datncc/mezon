@@ -12,6 +12,7 @@ import type { RootState } from '../store';
 import {
 	deleteNotiChannelSetting,
 	getMuteActionFromMuteTime,
+	getNotificationSetting,
 	getNotificationSettingState,
 	setMuteChannel,
 	setNotificationSetting
@@ -423,11 +424,26 @@ export const fetchChannelCategorySetting = createAsyncThunk(
 				};
 			}
 
+			const mappedList = response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
+
+			await Promise.all(
+				mappedList.map((item) => {
+					if (!item.id) {
+						return Promise.resolve();
+					}
+
+					if (item.channel_category_title === 'category') {
+						return thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: item.id, clanId, noCache: true }));
+					}
+
+					return thunkAPI.dispatch(getNotificationSetting({ channelId: item.id, noCache: true }));
+				})
+			);
+
 			return {
 				fromCache: response.fromCache,
 				clanId,
-				notification_channel_category_settings_list:
-					response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity)
+				notification_channel_category_settings_list: mappedList
 			};
 		} catch (error) {
 			captureSentryError(error, 'channelCategorySetting/fetchChannelCategorySetting');
