@@ -120,6 +120,8 @@ const ClanLayout = () => {
 		if (isShowCreateTopic && currentTopicId) {
 			dispatch(topicsActions.setFocusTopicBox(true));
 			dispatch(threadsActions.setFocusThreadBox(false));
+		} else {
+			dispatch(topicsActions.setFocusTopicBox(false));
 		}
 	}, [isShowCreateTopic, currentTopicId, dispatch]);
 

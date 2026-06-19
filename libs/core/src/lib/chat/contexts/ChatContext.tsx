@@ -1474,12 +1474,13 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 				const currentChannelId = selectCurrentChannelId(state as unknown as RootState);
 				const currentTopicId = selectCurrentTopicId(state as unknown as RootState);
 				const isShowCreateTopic = selectIsShowCreateTopic(state as unknown as RootState);
+				const isFocusTopicBox = selectClickedOnTopicStatus(state as unknown as RootState);
 
 				if (isTopicTyping) {
 					if (!isShowCreateTopic || !currentTopicId || channelId !== currentTopicId) return;
 					if (e.channel_id !== currentChannelId) return;
 				} else {
-					if (isShowCreateTopic && currentTopicId) return;
+					if (isFocusTopicBox && currentTopicId) return;
 					if (channelId !== currentChannelId) return;
 				}
 			}
@@ -1497,9 +1498,9 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			}
 			const reactionEntity = mapReactionToEntity(e);
 			const store = await getStoreAsync();
-			const isFocusTopicBox = selectClickedOnTopicStatus(store.getState());
+			const isShowCreateTopic = selectIsShowCreateTopic(store.getState());
 			const currenTopicId = selectCurrentTopicId(store.getState());
-			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isFocusTopicBox && currenTopicId) {
+			if (reactionEntity.topic_id && reactionEntity.topic_id !== '0' && isShowCreateTopic && currenTopicId) {
 				reactionEntity.channel_id = reactionEntity.topic_id ?? '';
 			}
 
