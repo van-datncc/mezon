@@ -1,12 +1,22 @@
 import type { LoadingStatus } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { LogedDevice, LogedDeviceList } from 'mezon-js-protobuf';
 import { ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 
 export const DEVICES_FEATURE_KEY = 'devices';
 
-export type IDevice = LogedDevice;
+export interface IDevice {
+	device_id?: string;
+	is_current?: boolean;
+	platform?: string;
+	device_name?: string;
+	location?: string;
+	last_active_seconds?: number | string;
+}
+
+interface LogedDeviceList {
+	devices?: IDevice[];
+}
 
 export interface DevicesState extends EntityState<IDevice, string> {
 	loadingStatus: LoadingStatus;
