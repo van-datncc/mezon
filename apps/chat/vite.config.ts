@@ -9,13 +9,13 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'));
 const APP_VERSION = packageJson.version;
-const CHAT_BASE_HREF = '/chat/';
+const CHAT_BASE_HREF = './chat/';
 
 function chatAssetPathsPlugin(): PluginOption {
 	return {
 		name: 'chat-asset-paths',
 		transform(code) {
-			if (!code.includes('/assets/')) {
+			if (!code.includes('/chat/assets/')) {
 				return;
 			}
 
