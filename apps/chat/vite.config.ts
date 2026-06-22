@@ -9,9 +9,8 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'));
 const APP_VERSION = packageJson.version;
-const CHAT_BASE_HREF = './chat/';
 
-function chatAssetPathsPlugin(): PluginOption {
+function chatAssetPathsPlugin(path: string): PluginOption {
 	return {
 		name: 'chat-asset-paths',
 		transform(code) {
@@ -19,7 +18,7 @@ function chatAssetPathsPlugin(): PluginOption {
 				return;
 			}
 
-			const rewritten = code.replace(/(?<!\/chat)\/assets\//g, `${CHAT_BASE_HREF}assets/`);
+			const rewritten = code.replace(/(?<!\/chat)\/assets\//g, `${path}assets/`);
 			if (rewritten === code) {
 				return;
 			}
@@ -37,7 +36,7 @@ export default defineConfig(({ mode }) => {
 		root: path.join(appRoot, 'src'),
 		publicDir: mode === 'production' ? false : path.join(appRoot, 'src/assets'),
 		cacheDir: path.join(workspaceRoot, 'node_modules/.vite/apps/chat'),
-		base: CHAT_BASE_HREF,
+		base: mode === 'production' ? '/chat' : './chat',
 
 		server: {
 			port: 4200,
@@ -75,7 +74,7 @@ export default defineConfig(({ mode }) => {
 		},
 
 		plugins: [
-			chatAssetPathsPlugin(),
+			chatAssetPathsPlugin(mode === 'production' ? '/chat' : './chat'),
 			react({
 				babel: {
 					plugins: [
