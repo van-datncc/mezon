@@ -5,7 +5,7 @@ import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
-import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import { createApiKey, createCacheMetadata, dedupeInFlight, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { applyChannelArchiveState, channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
@@ -304,6 +304,7 @@ export const writeActiveArchivedThread = createAsyncThunk(
 			await mezon.client.activeArchivedThread(mezon.session, clanId, channelId);
 			const state = thunkAPI.getState() as RootState;
 			const threadChannel = selectChannelById(state, channelId);
+			thunkAPI.dispatch(channelsActions.update({ clanId, update: { id: channelId, changes: { active: ThreadStatus.joined } } }));
 
 			await thunkAPI
 				.dispatch(
