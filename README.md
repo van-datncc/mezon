@@ -227,8 +227,6 @@ mezon/
 ├── apps/              # Applications
 │   ├── chat/          # Main web chat application
 │   ├── admin/         # Admin dashboard
-│   ├── desktop/       # Electron desktop app
-│   ├── mobile/        # React Native mobile app
 │   └── discover/      # Community discovery app
 ├── libs/              # Shared libraries
 │   ├── components/    # Reusable UI components
