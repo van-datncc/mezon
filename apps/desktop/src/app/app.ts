@@ -5,6 +5,7 @@ import { autoUpdater } from 'electron-updater';
 import activeWindows from 'mezon-active-windows';
 import { join } from 'path';
 import ua from 'universal-analytics';
+import { pathToFileURL } from 'url';
 import tray from '../Tray';
 import { EActivityCoding, EActivityGaming, EActivityMusic } from './activities';
 import setupAutoUpdates from './autoUpdates';
@@ -137,6 +138,8 @@ export default class App {
 		if (App.isShowingConnectingPage) return;
 
 		App.isShowingConnectingPage = true;
+		const reconnectUrl = App.application.isPackaged ? 'https://mezon.ai/' : `http://localhost:${rendererAppPort}`;
+		const connectingAssetsBaseUrl = `${pathToFileURL(join(__dirname, 'assets')).href}/`;
 
 		const connectingHTML = `
 			<!DOCTYPE html>
@@ -155,19 +158,11 @@ export default class App {
 						-webkit-app-region: drag;
 					}
 					.logo-img {
-						width: 52px;
-						height: 52px;
-						border-radius: 50%;
-						object-fit: cover;
+						width: min(280px, 72vw);
+						height: auto;
+						object-fit: contain;
 						margin-bottom: 24px;
-					}
-					.app-name {
-						font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-						font-size: 22px;
-						font-weight: 700;
-						color: #ffffff;
-						letter-spacing: -0.3px;
-						margin-bottom: 8px;
+						display: block;
 					}
 					.dots {
 						display: flex;
@@ -202,23 +197,117 @@ export default class App {
 						80% { width: 85%; }
 						100%{ width: 95%; }
 					}
+					.connection-status {
+						font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+						font-size: 12px;
+						font-weight: 600;
+						color: #D1D5DB;
+						margin-top: 10px;
+						margin-bottom: 12px;
+						-webkit-app-region: no-drag;
+					}
+					.retry-button {
+						background-color: #5864f2;
+						color: #ffffff;
+						border: none;
+						padding: 8px 18px;
+						border-radius: 6px;
+						font-size: 13px;
+						font-weight: 600;
+						cursor: pointer;
+						-webkit-app-region: no-drag;
+						/* Visually hidden but still accessible for programmatic click */
+						opacity: 0;
+						pointer-events: none;
+						position: absolute;
+					}
+					.retry-button:hover {
+						background-color: #4752c4;
+					}
+					.retry-button:disabled {
+						background-color: #3b3d5c;
+						cursor: not-allowed;
+					}
 				</style>
 			</head>
 			<body>
 				<div class="top-bar"></div>
-				<svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="69.96 139.03 468.28 466.17">
-					<path fill="#CC1FC9" d="M83.98,377.69c1.1-125.83,100.99-226.95,227.46-226.72c125.68,0.22,226.91,99.47,226.8,227.02c-0.11,129.55-102.46,227.5-227.15,227.21C182.57,604.89,85.03,503.08,83.98,377.69z M312.48,187.09c-106.14-1.2-191.04,85.07-191.39,189.54c-0.36,105.8,86.56,190.6,190.4,190.77c101.54,0.16,192.19-83.84,190.1-194.44C499.7,272.54,416.77,186.76,312.48,187.09z"/>
-					<path fill="#E399C3" d="M347.42,147.98c-82.52-11.58-154.52,9.75-210.71,72.12c-56.15,62.33-70.24,136.08-49.81,217c-26.16-56.54-24.97-141.21,24.48-209.03C162.47,158.02,254.29,120.74,347.42,147.98z"/>
-				</svg>
-				<div class="app-name">Mezon</div>
+				<img class="logo-img" src="logoflashsceenmezon.webp" alt="Mezon" />
 				<div class="dots">
 					<span></span><span></span><span></span>
 				</div>
+				<div class="connection-status" id="connectionStatusText">Checking your internet connection...</div>
+				<button class="retry-button" id="retryBtn" onclick="retryConnection()">Retry</button>
+				<script>
+					var retryTargetUrl = ${JSON.stringify(reconnectUrl)};
+					var connectionStatusText = document.getElementById('connectionStatusText');
+
+					function retryConnection() {
+						var btn = document.getElementById('retryBtn');
+						if (!btn) return;
+
+						btn.disabled = true;
+						btn.textContent = 'Connecting...';
+						connectionStatusText.textContent = 'Checking connection...';
+
+						// Always check against mezon.ai for reliable connectivity test
+						var checkUrl = 'https://mezon.ai/assets/favicon.ico?t=' + Date.now();
+						var img = new Image();
+						var completed = false;
+
+						// Timeout for connection check (5 seconds)
+						var timeoutId = setTimeout(function() {
+							if (completed) return;
+							completed = true;
+							btn.disabled = false;
+							btn.textContent = 'Retry';
+							connectionStatusText.textContent = 'Connection timed out. Retrying...';
+						}, 5000);
+
+						img.onload = function() {
+							if (completed) return;
+							completed = true;
+							clearTimeout(timeoutId);
+							window.location.href = retryTargetUrl;
+						};
+						img.onerror = function() {
+							if (completed) return;
+							completed = true;
+							clearTimeout(timeoutId);
+							btn.disabled = false;
+							btn.textContent = 'Retry';
+							connectionStatusText.textContent = 'Connection still unavailable. Retrying...';
+						};
+						img.src = checkUrl;
+					}
+
+					// Auto-click retry button every 5 seconds
+					setInterval(function() {
+						var btn = document.getElementById('retryBtn');
+						if (btn && !btn.disabled) {
+							btn.click();
+						}
+					}, 5000);
+
+					window.addEventListener('online', function() {
+						if (connectionStatusText) {
+							connectionStatusText.textContent = 'Connection restored. Reconnecting...';
+						}
+					});
+
+					window.addEventListener('offline', function() {
+						if (connectionStatusText) {
+							connectionStatusText.textContent = 'Internet connection lost. Reconnecting...';
+						}
+					});
+				</script>
 			</body>
 			</html>
 		`;
 
-		App.mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(connectingHTML)}`);
+		App.mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(connectingHTML)}`, {
+			baseURLForDataURL: connectingAssetsBaseUrl
+		});
 		if (!App.mainWindow.isVisible()) App.mainWindow.show();
 
 		App.networkRetryInterval = setInterval(() => {
@@ -231,11 +320,6 @@ export default class App {
 					// Still offline, keep retrying
 				});
 		}, 3000);
-
-		App.networkRetryTimeout = setTimeout(() => {
-			App.clearNetworkRetry();
-			App.showOfflinePage(errorDescription);
-		}, 30000);
 	}
 
 	private static showOfflinePage(errorDescription?: string) {
@@ -393,35 +477,6 @@ export default class App {
 			App.mainWindow.webContents.send('window-focused', true);
 		});
 
-		const gotTheLock = App.application.requestSingleInstanceLock();
-		if (gotTheLock) {
-			App.application.on('second-instance', (e, argv) => {
-				if (process.platform === 'win32' || process.platform === 'linux') {
-					const url = argv.pop().slice(1);
-
-					if (url) {
-						const index = url.indexOf('data=');
-						if (index > 0) {
-							const dataString = url.substring(index + 5);
-
-							if (dataString) {
-								App.loadMainWindow({ deepLinkUrl: dataString });
-							}
-						}
-					}
-				}
-
-				if (App.mainWindow) {
-					if (App.mainWindow.isMinimized()) App.mainWindow.restore();
-					App.mainWindow.show();
-					App.mainWindow.focus();
-				}
-			});
-		} else {
-			App.application.quit();
-			return;
-		}
-
 		if (!App.application.isDefaultProtocolClient('mezonapp')) {
 			App.application.setAsDefaultProtocolClient('mezonapp');
 		}
@@ -454,14 +509,42 @@ export default class App {
 			if (App.isDevelopmentMode()) {
 				return { action: 'allow' };
 			}
-			shell.openExternal(url);
+			try {
+				const parsed = new URL(url);
+				if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') {
+					shell.openExternal(url);
+				} else {
+					log.warn(`Blocked window.open for non-http(s) URL: ${url}`);
+				}
+			} catch {
+				log.warn(`Blocked invalid window.open URL: ${url}`);
+			}
 			return { action: 'deny' };
 		});
 
-		App.mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+		App.mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+			if (!isMainFrame) {
+				return;
+			}
+
 			log.error(`Failed to load: ${validatedURL}, Error code: ${errorCode}, Description: ${errorDescription}`);
-			const isCSPError = errorDescription?.toUpperCase().includes('CSP') || errorDescription?.toUpperCase().includes('CONTENT-SECURITY-POLICY');
-			if (errorCode !== -3 && errorCode !== -21 && !isCSPError) {
+
+			const description = (errorDescription || '').toUpperCase();
+			const isCSPError =
+				description.includes('CSP') ||
+				description.includes('CONTENT-SECURITY-POLICY') ||
+				description.includes('BLOCKED_BY_RESPONSE') ||
+				description.includes('BLOCKED_BY_CLIENT') ||
+				description.includes('FRAME-ANCESTORS') ||
+				description.includes('REFUSED TO FRAME') ||
+				description.includes('REFUSED TO CONNECT');
+
+			if (isCSPError) {
+				log.warn(`Skip connecting page for CSP/policy error: ${errorDescription}`);
+				return;
+			}
+
+			if (errorCode !== -3 && errorCode !== -21) {
 				App.showConnectingPage(errorDescription);
 			}
 		});
@@ -543,17 +626,52 @@ export default class App {
 
 	private static loadMainWindow(params?: Record<string, string>) {
 		if (!App.application.isPackaged) {
-			const baseUrl = `http://localhost:${rendererAppPort}`;
+			const baseUrl = `http://localhost:${rendererAppPort}/chat`;
 			const fullUrl = this.generateFullUrl(baseUrl, params);
 			App.mainWindow.loadURL(fullUrl);
 		} else {
-			App.mainWindow.loadURL('https://mezon.ai/');
+			App.mainWindow.loadURL('https://mezon.ai/chat');
 		}
 	}
 
 	static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
+		if (process.platform === 'linux' && process.env.XDG_SESSION_TYPE === 'wayland') {
+			app.commandLine.appendSwitch('ozone-platform', 'wayland');
+			app.commandLine.appendSwitch('disable-features', 'Vulkan');
+		}
+
 		App.BrowserWindow = browserWindow;
 		App.application = app;
+
+		const gotTheLock = App.application.requestSingleInstanceLock();
+
+		if (!gotTheLock) {
+			App.application.quit();
+			return;
+		}
+
+		App.application.on('second-instance', (e, argv) => {
+			if (process.platform === 'win32' || process.platform === 'linux') {
+				const url = argv.pop().slice(1);
+
+				if (url) {
+					const index = url.indexOf('data=');
+					if (index > 0) {
+						const dataString = url.substring(index + 5);
+
+						if (dataString) {
+							App.loadMainWindow({ deepLinkUrl: dataString });
+						}
+					}
+				}
+			}
+
+			if (App.mainWindow) {
+				if (App.mainWindow.isMinimized()) App.mainWindow.restore();
+				App.mainWindow.show();
+				App.mainWindow.focus();
+			}
+		});
 
 		App.application.on('window-all-closed', App.onWindowAllClosed);
 		App.application.on('ready', App.onReady);

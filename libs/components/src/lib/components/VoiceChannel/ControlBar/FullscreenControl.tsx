@@ -8,12 +8,8 @@ interface FullscreenControlProps {
 	onToggle: () => void;
 }
 
-export const FullscreenControl = memo(({ isGridView, isShowMember, isFullScreen, onToggle }: FullscreenControlProps) => {
-	const iconClassName = `cursor-pointer ${
-		(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-			? 'text-theme-primary text-theme-primary-hover'
-			: 'text-gray-300 hover:text-white'
-	}`;
+export const FullscreenControl = memo(({ isFullScreen, onToggle }: FullscreenControlProps) => {
+	const iconClassName = 'cursor-pointer text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]';
 
 	return (
 		<div onClick={onToggle}>

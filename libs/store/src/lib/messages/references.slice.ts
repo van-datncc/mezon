@@ -1,8 +1,8 @@
 import type { IMessage, PreSendAttachment } from '@mezon/utils';
-import { AttachmentTypeUpload, MAX_FILE_ATTACHMENTS } from '@mezon/utils';
+import { AttachmentTypeUpload, MAX_FILE_ATTACHMENTS, revokePreSendAttachmentUrls } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ApiMessageRef } from 'mezon-js/api';
+import { safeJSONParse, type ApiMessageRef } from 'mezon-js';
 
 export const REFERENCES_FEATURE_KEY = 'references';
 
@@ -46,6 +46,10 @@ export interface OgpEntity {
 	description?: string;
 	channel_id: string;
 	type?: string;
+	clan_id?: string;
+	member_count?: number;
+	banner?: string;
+	is_community?: boolean;
 }
 
 export const referencesAdapter = createEntityAdapter<ReferencesEntity>();
@@ -85,7 +89,20 @@ export const referencesSlice = createSlice({
 				if (state.dataReferences[channelId]) {
 					delete state.dataReferences[channelId];
 				}
-				state.dataReferences[channelId] = dataReferences;
+
+				const data = dataReferences;
+				if (dataReferences.content) {
+					try {
+						const contentParse: { t: string } = safeJSONParse(dataReferences.content);
+						if (contentParse?.t && contentParse.t.length > 200) {
+							const content = contentParse.t.slice(0, 200);
+							data.content = JSON.stringify({ ...contentParse, t: content });
+						}
+					} catch (error) {
+						console.error(error);
+					}
+				}
+				state.dataReferences[channelId] = data;
 			}
 		},
 
@@ -148,7 +165,7 @@ export const referencesSlice = createSlice({
 
 			if (attachment) {
 				if (index >= 0 && index < attachment.files.length) {
-					// Remove the file at the specified index
+					revokePreSendAttachmentUrls(attachment.files[index]);
 					attachment.files.splice(index, 1);
 
 					// If no files are left, remove the attachment entry
@@ -173,6 +190,7 @@ export const referencesSlice = createSlice({
 				const fileIndex = attachment.files.findIndex((file) => file?.filename === fileName);
 
 				if (fileIndex >= 0) {
+					revokePreSendAttachmentUrls(attachment.files[fileIndex]);
 					attachment.files.splice(fileIndex, 1);
 
 					// If no files are left, remove the attachment entry
@@ -253,6 +271,10 @@ export const referencesSlice = createSlice({
 				description?: string;
 				channel_id: string;
 				type?: string;
+				clan_id?: string;
+				member_count?: number;
+				banner?: string;
+				is_community?: boolean;
 			} | null>
 		) {
 			state.ogpData = action.payload;

@@ -213,5 +213,57 @@
 	},
 
 	"small": "Small",
-	"large": "Large"
+	"large": "Large",
+	"transcriptCalls": {
+		"title": "Transcript Calls",
+		"subtitle": "View and manage your call transcripts.",
+		"loading": "Loading…",
+		"results": "rooms",
+		"page": "Page",
+		"prev": "Previous",
+		"next": "Next",
+		"columns": {
+			"callId": "Call ID",
+			"roomName": "Room Name",
+			"status": "Status",
+			"totalTracks": "Total Tracks",
+			"completedTracks": "Completed",
+			"duration": "Duration",
+			"createdAt": "Created At",
+			"completedAt": "Completed At"
+		},
+		"status": {
+			"pending": "Pending",
+			"processing": "Processing",
+			"completed": "Completed",
+			"failed": "Failed"
+		},
+		"tabs": {
+			"overview": "Overview",
+			"fullTranscript": "Full Transcript",
+			"summary": "Summary",
+			"participants": "Participant"
+		},
+		"detail": {
+			"title": "Call Transcript Detail",
+			"back": "Back",
+			"refresh": "Refresh",
+			"loadError": "Could not load this room.",
+			"summaryEmpty": "No summary available.",
+			"transcriptEmpty": "No transcript text available.",
+			"actionItems": "Action items",
+			"participants": "Participants",
+			"participantsEmpty": "No participants listed for this room.",
+			"metrics": {
+				"totalTracks": "Total Tracks",
+				"completed": "Completed",
+				"duration": "Duration",
+				"segments": "Segments"
+			},
+			"notFound": "Call transcript not found",
+			"unknown": "unknown",
+			"username": "Username",
+			"displayName": "Display Name"
+		}
+	}
 }

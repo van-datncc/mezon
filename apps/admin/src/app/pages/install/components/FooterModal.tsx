@@ -8,16 +8,16 @@ type FooterModalProps = {
 
 const FooterModal = memo(({ name, activeSince }: FooterModalProps) => {
 	return (
-		<div className="text-xs space-y-3 p-4 bg-[#f9fafb] dark:bg-[#1e1f22]">
-			<hr className="my-3 border-[#d1d5db] dark:border-[#4b5563]" />
-			<div className="flex gap-x-2 items-start">
-				<LockIcon className="h-4 w-4 text-[#4b5563] dark:text-[#9ca3af]" />
+		<div className="text-xs space-y-3.5 p-0 bg-transparent w-full flex flex-col">
+			<div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-[#22263a]/80 to-transparent my-2" />
 
-				<p className="text-[#4b5563] dark:text-[#9ca3af]">
+			<div className="flex gap-x-2.5 items-start text-left">
+				<LockIcon className="h-4 w-4 text-slate-400 dark:text-slate-500 mt-0.5 shrink-0" />
+
+				<p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
 					The Privacy Policy and Terms of Service of{' '}
 					<span
-						className="inline-block align-bottom truncate overflow-hidden max-w-[100px]
-                 text-[#111827] dark:text-[#d1d5db] font-semibold"
+						className="inline-block align-bottom truncate overflow-hidden max-w-[120px] text-slate-900 dark:text-slate-200 font-bold"
 						title={name}
 					>
 						{name}
@@ -26,10 +26,10 @@ const FooterModal = memo(({ name, activeSince }: FooterModalProps) => {
 				</p>
 			</div>
 
-			<div className="flex gap-x-2 items-start">
-				<ClockIcon className="h-4 w-4 text-[#4b5563] dark:text-[#9ca3af]" />
-				<p className="text-[#4b5563] dark:text-[#9ca3af]">
-					Active since: <span className="font-semibold">{activeSince}</span>
+			<div className="flex gap-x-2.5 items-center text-left">
+				<ClockIcon className="h-4 w-4 text-slate-400 dark:text-slate-500 shrink-0" />
+				<p className="text-slate-500 dark:text-slate-400 font-medium">
+					Active since: <span className="font-bold text-slate-800 dark:text-slate-300">{activeSince}</span>
 				</p>
 			</div>
 		</div>

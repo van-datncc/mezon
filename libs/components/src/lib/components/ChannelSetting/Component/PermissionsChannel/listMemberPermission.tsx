@@ -4,6 +4,7 @@ import { channelUsersActions, selectCurrentClanId, selectMemberClanByUserId, sel
 import { Icons } from '@mezon/ui';
 import type { IChannel } from '@mezon/utils';
 import { createImgproxyUrl, generateE2eId, getAvatarForPrioritize, getNameForPrioritize } from '@mezon/utils';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../../AvatarImage/AvatarImage';
@@ -19,11 +20,24 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 
 	const dispatch = useAppDispatch();
 	const idUsers = useSelector((state) => selectUserChannelIds(state, channel.id));
+	const displayUserIds = useMemo(() => {
+		const sourceIds = channel.channel_private === 1 ? idUsers : props.selectedUserIds;
+		return Array.from(new Set(sourceIds.filter(Boolean)));
+	}, [channel.channel_private, idUsers, props.selectedUserIds]);
 	const currentClanId = useSelector(selectCurrentClanId);
 	const navigate = useCustomNavigate();
 	const userProfile = useAuth();
 	const { toMembersPage } = useAppNavigation();
+
 	const deleteMember = async (userId: string) => {
+		if (channel.channel_private !== 1) {
+			props.setSelectedUserIds?.(props.selectedUserIds.filter((selectedId) => selectedId !== userId));
+			return;
+		}
+
+		if (!idUsers.includes(userId)) {
+			return;
+		}
 		const body: removeChannelUsersPayload = {
 			channelId: channel.id,
 			userId,
@@ -36,15 +50,8 @@ const ListMemberPermission = (props: ListMemberPermissionProps) => {
 		}
 	};
 
-	return idUsers.map((id) => (
-		<ItemMemberPermission
-			key={id}
-			id={id}
-			onDelete={() => deleteMember(id as string)}
-			channelOwner={channel.creator_id === id}
-			selectedUserIds={props.selectedUserIds}
-			setSelectedUserIds={props.setSelectedUserIds}
-		/>
+	return displayUserIds.map((id) => (
+		<ItemMemberPermission key={id} id={id} onDelete={() => deleteMember(id as string)} channelOwner={channel.creator_id === id} />
 	));
 };
 
@@ -59,21 +66,15 @@ type ItemMemberPermissionProps = {
 	clanAvatar?: string;
 	onDelete: () => void;
 	channelOwner?: boolean;
-	selectedUserIds?: string[];
-	setSelectedUserIds?: (userIds: string[]) => void;
 };
 
 const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
-	const { id = '', onDelete, channelOwner, selectedUserIds = [], setSelectedUserIds } = props;
+	const { id = '', onDelete, channelOwner } = props;
 	const user = useSelector((state) => selectMemberClanByUserId(state, id));
 	const namePrioritize = getNameForPrioritize(user?.clan_nick, user?.user?.display_name, user?.user?.username);
 	const avatarPrioritize = getAvatarForPrioritize(user?.clan_avatar, user?.user?.avatar_url);
 
 	const handleDelete = () => {
-		if (setSelectedUserIds && selectedUserIds) {
-			const newSelectedUserIds = selectedUserIds.filter((userId) => userId !== id);
-			setSelectedUserIds(newSelectedUserIds);
-		}
 		if (!channelOwner) {
 			onDelete();
 		}
@@ -100,7 +101,7 @@ const ItemMemberPermission = (props: ItemMemberPermissionProps) => {
 			<div className="flex items-center gap-x-2">
 				<p className="text-xs ">{channelOwner && t('channelPermission.ChannelCreator')}</p>
 				<div onClick={handleDelete} role="button" className={`${channelOwner ? 'cursor-not-allowed' : 'cursor-pointer hover:text-red-500'}`}>
-					<Icons.EscIcon defaultSize={` size-[15px]`} defaultFill={channelOwner ? 'text-theme-primary-active' : ''} />
+					<Icons.EscIcon className={` size-[15px]`} defaultFill={channelOwner ? 'text-theme-primary-active' : ''} />
 				</div>
 			</div>
 		</div>

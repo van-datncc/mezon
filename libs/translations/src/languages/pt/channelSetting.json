@@ -4,6 +4,7 @@
 			"title": "Nome do canal",
 			"placeholder": "Digite o nome do canal",
 			"errorMessage": "Por favor, insira o nome do canal (máximo de 64 caracteres, apenas letras, números, _ ou -).",
+			"emptyError": "Por favor, insira o nome do canal (máximo de 64 caracteres, apenas letras, números, _ ou -).",
 			"duplicateError": "Este nome de canal já existe na categoria. Por favor, insira outro nome."
 		},
 		"threadName": {
@@ -34,7 +35,7 @@
 			"description": "Altere as configurações de privacidade e personalize como os membros podem interagir com este canal."
 		},
 		"quickAction": {
-			"title": "Ações rápidas"
+			"title": "Comando rápido"
 		},
 		"privateChannelInvite": {
 			"addMember": "Adicionar membro"
@@ -173,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "Menu rápido",
+		"title": "Comando rápido",
 		"description": "Gerencie mensagens rápidas e o menu rápido para este canal",
 		"keyTitle": "Digite a palavra-chave (Ex: olá): ",
 		"valueTitle": "Digite o conteúdo (Ex: Bom dia, tenha um ótimo dia!)",
@@ -239,7 +240,7 @@
 		"invites": "Convites",
 		"integrations": "Integrações",
 		"category": "Categoria",
-		"quickMenu": "Menu rápido"
+		"quickMenu": "Ações rápidas"
 	},
 	"categoryManagement": {
 		"title": "Categoria",

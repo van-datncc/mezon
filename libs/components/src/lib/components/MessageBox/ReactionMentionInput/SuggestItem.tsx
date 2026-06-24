@@ -8,6 +8,7 @@ import { ChannelType } from 'mezon-js';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AvatarImage } from '../../AvatarImage/AvatarImage';
+import { AppChannelListIcon } from '../../ChannelList/AppChannelListIcon';
 
 type SuggestItemProps = {
 	avatarUrl?: string;
@@ -25,6 +26,7 @@ type SuggestItemProps = {
 	channel?: SearchItemProps;
 	count?: number;
 	isUnread?: boolean;
+	isRowFocused?: boolean;
 	color?: string;
 };
 
@@ -43,6 +45,7 @@ const SuggestItem = ({
 	channel,
 	count,
 	isUnread,
+	isRowFocused = false,
 	color
 }: SuggestItemProps) => {
 	const allChannels = useSelector(selectAllChannelsByUser);
@@ -62,22 +65,62 @@ const SuggestItem = ({
 		if (!specificChannel) return null;
 
 		const { channel_private, type } = specificChannel;
+		const isAgeRestrictedChannel = (specificChannel as { age_restricted?: number }).age_restricted === 1;
+
+		const isThreadEmphasized = isUnread || Boolean(count && count > 0) || isRowFocused;
+		const threadFillClass = isThreadEmphasized
+			? '[--thread-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
+			: '[--thread-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] group-hover:[--thread-fill-1:var(--bg-icon-theme-active)]';
+
+		const isThreadLockerBodyEmphasized = isRowFocused;
+		const threadLockerFillClass = isThreadLockerBodyEmphasized
+			? '[--thread-body-fill-1:var(--bg-icon-theme-active)] [--thread-fill-4:var(--bg-theme-secounnd)]'
+			: '[--thread-body-fill-1:var(--bg-icon-theme)] [--thread-fill-4:var(--bg-theme-secounnd)] group-hover:[--thread-body-fill-1:var(--bg-icon-theme-active)]';
+
+		const hashtagLockedFillClass =
+			isUnread || (count && count > 0)
+				? '[--hashtag-locked-fill-1:var(--bg-icon-theme-active)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)]'
+				: '[--hashtag-locked-fill-1:var(--bg-icon-theme)] [--hashtag-locked-fill-2:var(--bg-icon-theme-active)] hover:[--hashtag-locked-fill-1:var(--bg-icon-theme-active)]';
 
 		if (type === ChannelType.CHANNEL_TYPE_CHANNEL) {
+			if (isAgeRestrictedChannel) {
+				return <Icons.HashtagWarning defaultSize="w-5 h-5" />;
+			}
 			if (!channel_private || channel_private === 0) {
 				return <Icons.Hashtag defaultSize="w-5 h-5" />;
 			}
 			if (channel_private === 1) {
-				return <Icons.HashtagLocked defaultSize="w-5 h-5" />;
+				return (
+					<Icons.HashtagLocked
+						defaultSize="w-5 h-5"
+						className={hashtagLockedFillClass}
+						defaultFill1="var(--hashtag-locked-fill-1)"
+						defaultFill2="var(--hashtag-locked-fill-2)"
+					/>
+				);
 			}
 		}
 
 		if (type === ChannelType.CHANNEL_TYPE_THREAD) {
 			if (!channel_private || channel_private === 0) {
-				return <Icons.ThreadIcon defaultSize="w-5 h-5 text-theme-primary " />;
+				return (
+					<Icons.ThreadIcon
+						defaultSize="w-5 h-5"
+						defaultFill1="var(--thread-fill-1)"
+						defaultFill4="var(--thread-fill-4)"
+						className={threadFillClass}
+					/>
+				);
 			}
 			if (channel_private === 1) {
-				return <Icons.ThreadIconLocker className="w-5 h-5 text-theme-primary " />;
+				return (
+					<Icons.ThreadIconLocker
+						className={`w-5 h-5 ${threadLockerFillClass}`}
+						defaultFill1="var(--thread-body-fill-1)"
+						defaultFill4="var(--thread-fill-4)"
+						defaultFill5="var(--bg-icon-theme-active)"
+					/>
+				);
 			}
 		}
 
@@ -93,11 +136,11 @@ const SuggestItem = ({
 		}
 
 		if (type === ChannelType.CHANNEL_TYPE_APP) {
-			return <Icons.AppChannelIcon className={'w-5 h-5'} />;
+			return <AppChannelListIcon isEmphasized={isUnread || Boolean(count && count > 0)} className="w-5 h-5" />;
 		}
 
 		return null;
-	}, [specificChannel]);
+	}, [specificChannel, isUnread, count, isRowFocused]);
 
 	useEffect(() => {
 		if (channel) {
@@ -113,7 +156,7 @@ const SuggestItem = ({
 
 	return (
 		<div
-			className={`flex flex-row items-center h-[24px] w-full ${wrapSuggestItemStyle ?? 'justify-between'}`}
+			className={`group relative flex flex-row items-center h-[24px] w-full ${wrapSuggestItemStyle ?? 'justify-between'}`}
 			data-e2e={generateE2eId('suggest_item')}
 		>
 			<div className="flex flex-row items-center gap-2 py-[3px] text-theme-primary text-theme-primary-hover">

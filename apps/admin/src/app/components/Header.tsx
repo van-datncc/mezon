@@ -1,3 +1,4 @@
+import { AvatarColor } from '@mezon/components';
 import { useAuth } from '@mezon/core';
 import { authActions, useAppDispatch } from '@mezon/store';
 import { Icons, Image } from '@mezon/ui';
@@ -62,7 +63,7 @@ const Header = ({ toggleSideBar, isShowSideBar }: IHeaderProps) => {
 			<div className="flex flex-row items-center justify-center relative">
 				<button onClick={toggleDarkMode} className="mr-4 max-lg:hidden">
 					<img
-						src={isDarkMode ? 'developers/assets/icons/IconDarkMode.png' : 'developers/assets/icons/IconLightMode.png'}
+						src={isDarkMode ? 'assets/icons/IconDarkMode.png' : 'assets/icons/IconLightMode.png'}
 						alt="Toggle Dark Mode"
 						className="w-6 h-6 bg-white"
 					/>
@@ -75,9 +76,7 @@ const Header = ({ toggleSideBar, isShowSideBar }: IHeaderProps) => {
 							alt=""
 						/>
 					) : (
-						<div className="w-[40px] h-[40px] bg-bgDisable rounded-full flex justify-center items-center text-contentSecondary text-[16px] cursor-pointer">
-							{(userProfile?.user?.username ?? '').charAt(0).toUpperCase()}
-						</div>
+						<AvatarColor username={userProfile?.user?.username || ''} className="size-10" />
 					)}
 				</div>
 				{showMenu && (
@@ -95,7 +94,7 @@ const Header = ({ toggleSideBar, isShowSideBar }: IHeaderProps) => {
 							className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden"
 						>
 							<img
-								src={isDarkMode ? 'developers/assets/icons/IconDarkMode.png' : 'developers/assets/icons/IconLightMode.png'}
+								src={isDarkMode ? 'assets/icons/IconDarkMode.png' : 'assets/icons/IconLightMode.png'}
 								alt="Toggle Dark Mode"
 								className="w-5 h-5 bg-white rounded"
 							/>

@@ -26,6 +26,7 @@ import {
 	selectClanView,
 	selectClickedOnThreadBoxStatus,
 	selectClickedOnTopicStatus,
+	selectCurrentChannelChannelId,
 	selectCurrentChannelId,
 	selectCurrentChannelParentId,
 	selectCurrentChannelPrivate,
@@ -38,11 +39,11 @@ import {
 	selectDmCreatorIdById,
 	selectDmGroupCurrentId,
 	selectInitTopicMessageId,
+	selectIsMessagePinned,
 	selectMessageByMessageId,
 	selectMessageEntitiesByChannelId,
 	selectMessageIdsByChannelId,
 	selectModeResponsive,
-	selectPinMessageByChannelId,
 	selectQuickMenuByChannelId,
 	selectTheme,
 	selectThreadCurrentChannel,
@@ -77,8 +78,8 @@ import {
 	isPublicChannel,
 	showSimpleToast
 } from '@mezon/utils';
+import type { ApiChannelDescription, ApiQuickMenuAccessRequest } from 'mezon-js';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import type { ApiChannelDescription, ApiQuickMenuAccessRequest } from 'mezon-js/api';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -138,7 +139,7 @@ function MessageContextMenu({
 	const currentChannelParentId = useSelector(selectCurrentChannelParentId);
 	const currentChannelType = useSelector(selectCurrentChannelType);
 	const currentClanId = useSelector(selectCurrentClanId);
-	const listPinMessages = useAppSelector((state) => selectPinMessageByChannelId(state, currentChannelId as string));
+	const currentChannelChannelId = useSelector(selectCurrentChannelChannelId);
 	const currentDmId = useSelector(selectDmGroupCurrentId);
 	const isClanView = useSelector(selectClanView);
 	const currentTopicId = useSelector(selectCurrentTopicId);
@@ -210,9 +211,12 @@ function MessageContextMenu({
 		return message?.content?.t !== '';
 	}, [message?.content?.t]);
 
-	const checkMessageInPinnedList = useMemo(() => {
-		return listPinMessages?.some((pinMessage) => pinMessage?.message_id === messageId);
-	}, [listPinMessages, messageId]);
+	const pinCheckChannelIds = useMemo(
+		() => [currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId],
+		[currentChannelId, currentChannelChannelId, message?.channel_id, currentDmId]
+	);
+
+	const isMessagePinned = useAppSelector((state) => selectIsMessagePinned(state, pinCheckChannelIds, messageId));
 
 	const [canManageThread, canDeleteMessage, canSendMessage] = usePermissionChecker(
 		[EOverriddenPermission.manageThread, EOverriddenPermission.deleteMessage, EOverriddenPermission.sendMessage],
@@ -411,6 +415,7 @@ function MessageContextMenu({
 		(isShowCreateThread: boolean, channelId?: string) => {
 			dispatch(threadsActions.setIsShowCreateThread({ channelId: channelId ? channelId : (currentChannelId as string), isShowCreateThread }));
 			dispatch(topicsActions.setIsShowCreateTopic(false));
+			dispatch(topicsActions.setFocusTopicBox(false));
 		},
 		[currentChannelId, dispatch]
 	);
@@ -477,8 +482,9 @@ function MessageContextMenu({
 			dispatch(
 				channelMetaActions.setChannelLastSeenTimestamp({
 					channelId: message?.channel_id as string,
-					timestamp: message.create_time_seconds || Date.now(),
-					messageId: message?.id
+					timestamp: message.create_time_seconds || Date.now() / 1000,
+					messageId: message?.id,
+					clanId: message.clan_id || ''
 				})
 			);
 		} catch (error) {
@@ -580,8 +586,8 @@ function MessageContextMenu({
 
 	const pinMessageStatus = useMemo(() => {
 		if (!checkPos) return undefined;
-		return !checkMessageInPinnedList;
-	}, [checkMessageInPinnedList, checkPos]);
+		return !isMessagePinned;
+	}, [isMessagePinned, checkPos]);
 
 	const enableSpeakMessageItem = useMemo(() => {
 		if (!checkPos) return false;
@@ -833,7 +839,12 @@ function MessageContextMenu({
 			);
 		});
 		builder.when(enableCreateThreadItem && !isPollMessage, (builder) => {
-			builder.addMenuItem('createThread', t('createThread'), () => handleCreateThread(), <Icons.ThreadIconRightClick defaultSize="w-4 h-4" />);
+			builder.addMenuItem(
+				'createThread',
+				t('createThread'),
+				() => handleCreateThread(),
+				<Icons.ThreadIcon className="w-4 h-4" defaultFill1="var(--thread-fill-1)" defaultFill4="var(--thread-fill-4)" />
+			);
 		});
 		builder.when(checkPos && !isPollMessage, (builder) => {
 			builder.addMenuItem(

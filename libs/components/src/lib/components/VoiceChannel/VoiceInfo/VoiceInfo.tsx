@@ -144,7 +144,7 @@ const VoiceInfo = React.memo(() => {
 			<div className="flex justify-between items-center">
 				<div className="flex flex-col max-w-[200px]">
 					<div className="flex items-center gap-1">
-						<Icons.NetworkStatus defaultSize="w-4 h-4 dark:text-green-600" />
+						<Icons.NetworkStatus className="w-4 h-4 dark:text-green-600" />
 						<span className="text-green-600 font-medium text-base">{t(showCamera ? 'videoConnected' : 'voiceConnected')}</span>
 					</div>
 					<button className="w-fit" onClick={redirectToVoice}>
@@ -158,7 +158,7 @@ const VoiceInfo = React.memo(() => {
 					<ButtonCopy copyText={linkVoice} key={linkVoice} />
 				</div>
 			</div>
-			<div className="flex items-centerg gap-4 justify-between">
+			<div className="flex items-center gap-4 justify-between">
 				{hasMicrophoneAccess && (
 					<ButtonControlVoice
 						overlay={
@@ -169,7 +169,7 @@ const VoiceInfo = React.memo(() => {
 							) : null
 						}
 						onClick={handleToggleOpenMicro}
-						icon={showMicrophone ? <Icons.VoiceMicIcon className="w-4 h-4" /> : <Icons.VoiceMicDisabledIcon className="w-4 h-4" />}
+						icon={showMicrophone ? <Icons.VoiceMicIcon className="w-5 h-5" /> : <Icons.VoiceMicDisabledIcon className="w-5 h-5" />}
 					/>
 				)}
 
@@ -181,7 +181,7 @@ const VoiceInfo = React.memo(() => {
 							) : null
 						}
 						onClick={handleToggleShareCamera}
-						icon={showCamera ? <Icons.VoiceCameraIcon className="w-4 h-4" /> : <Icons.VoiceCameraDisabledIcon className="w-4 h-4" />}
+						icon={showCamera ? <Icons.VoiceCameraIcon className="w-6 h-6" /> : <Icons.VoiceCameraDisabledIcon className="w-6 h-6" />}
 					/>
 				)}
 
@@ -190,7 +190,7 @@ const VoiceInfo = React.memo(() => {
 						<span className="bg-[#2B2B2B] p-[6px] text-[14px] rounded">{t(showScreen ? 'stopScreenShare' : 'shareYourScreen')}</span>
 					}
 					onClick={handleToggleShareScreen}
-					icon={showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5" /> : <Icons.VoiceScreenShareIcon className="w-5 h-5" />}
+					icon={showScreen ? <Icons.VoiceScreenShareStopIcon className="w-5 h-5 " /> : <Icons.VoiceScreenShareIcon className="w-5 h-5 " />}
 				/>
 				<ButtonControlVoice
 					danger={true}
@@ -213,22 +213,24 @@ const TOOLTIP_OVERLAY_STYLE = { background: 'none', boxShadow: 'none' };
 
 const ButtonControlVoice = memo(({ onClick, overlay, danger = false, icon }: ButtonControlVoiceProps) => {
 	return (
-		<Tooltip
-			showArrow={{ className: '!bottom-1' }}
-			placement="top"
-			overlay={overlay}
-			overlayInnerStyle={TOOLTIP_OVERLAY_STYLE}
-			overlayClassName="whitespace-nowrap z-50 !p-0 !pt-5"
-			destroyTooltipOnHide
-		>
-			<button
-				className={`flex h-8 flex-1 justify-center items-center ${danger ? 'bg-[#da373c] hover:bg-[#a12829]' : 'bg-buttonSecondary hover:bg-buttonSecondaryHover'} p-[6px] rounded-md`}
-				onClick={onClick}
-				data-e2e={generateE2eId('modal.voice_management.button.control_item')}
+		<div className="flex-1">
+			<Tooltip
+				showArrow={{ className: '!bottom-1' }}
+				placement="top"
+				overlay={overlay}
+				overlayInnerStyle={TOOLTIP_OVERLAY_STYLE}
+				overlayClassName="whitespace-nowrap z-50 !p-0 !pt-5"
+				destroyTooltipOnHide
 			>
-				{icon}
-			</button>
-		</Tooltip>
+				<button
+					className={`flex h-9 w-full justify-center items-center ${danger ? 'bg-[#da373c] hover:bg-[#a12829]' : 'bg-buttonSecondary hover:bg-buttonSecondaryHover'} p-[6px] rounded-md`}
+					onClick={onClick}
+					data-e2e={generateE2eId('modal.voice_management.button.control_item')}
+				>
+					{icon}
+				</button>
+			</Tooltip>
+		</div>
 	);
 });
 
@@ -253,9 +255,7 @@ const ButtonNoiseControl = memo(() => {
 				onClick={toggleNoiseSuppression}
 				className="flex items-center rounded-sm bg-item-theme-hover text-red-500 gap-2 p-[2px] text-sm bg-transparent bg-item-theme-hover"
 			>
-				<Icons.NoiseSupressionIcon className={`w-5 h-5`}>
-					<path d="M3 21 L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-				</Icons.NoiseSupressionIcon>
+				<Icons.NoiseSupressionIcon className={`w-5 h-5`} disabled />
 			</button>
 		);
 	}

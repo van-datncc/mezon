@@ -4,3 +4,5 @@ export const APP_TYPES = {
 } as const;
 
 export type AppType = (typeof APP_TYPES)[keyof typeof APP_TYPES];
+
+export * from './dashboard';

@@ -1,5 +1,3 @@
-import type { ChannelDescription, ChannelMessage, ChannelStreamMode, ChannelType, HashtagDm, WebrtcSignalingFwd } from 'mezon-js';
-import { NotificationType } from 'mezon-js';
 import type {
 	ApiAccount,
 	ApiAllUsersAddChannelResponse,
@@ -28,9 +26,16 @@ import type {
 	ApiSearchMessageDocument,
 	ApiSystemMessage,
 	ApiUser,
+	ChannelDescription,
+	ChannelMessage,
+	ChannelStreamMode,
+	ChannelType,
 	ClanUserListClanUser,
-	RoleUserListRoleUser
-} from 'mezon-js/api';
+	HashtagDm,
+	RoleUserListRoleUser,
+	WebrtcSignalingFwd
+} from 'mezon-js';
+import { NotificationType } from 'mezon-js';
 import type { HTMLInputTypeAttribute } from 'react';
 import type { ILongPressType } from '../hooks';
 import type { CanvasDataResponse } from './htmlCanvas';
@@ -86,6 +91,8 @@ export type IPermissionUser = ApiPermission & {
 export type IUsersClan = ClanUserListClanUser & {
 	prioritizeName?: string;
 	id: string;
+	join_time_seconds?: number;
+	create_time_seconds?: number;
 };
 
 export type IRolesClan = ApiRole & {
@@ -195,6 +202,7 @@ export type IThread = {
 	create_time_seconds?: number | string | undefined;
 	update_time_seconds?: number | string | undefined;
 	last_sent_message?: ApiChannelMessageHeader;
+	last_seen_message?: ApiChannelMessageHeader;
 	channel_private?: number;
 };
 
@@ -428,7 +436,7 @@ export interface IPollAnswer {
 
 export enum EPollType {
 	SINGLE = 0,
-	MULTIPLE = 1,
+	MULTIPLE = 1
 }
 
 export interface IMessageSendPayload {
@@ -463,9 +471,11 @@ export interface IMessageSendPayload {
 	total_votes?: number;
 	allow_multiple_answers?: boolean;
 	user_votes?: number[];
-	id?: number,
-	expire_at?: number,
-	type?: EPollType,
+	id?: number;
+	expire_at?: number;
+	type?: EPollType;
+	presign_finish?: string[];
+	create_time_seconds?: number;
 }
 
 export type IUser = {
@@ -1014,6 +1024,7 @@ export type SearchItemProps = {
 	icon?: string;
 	channelId?: string;
 	channel_private?: number;
+	age_restricted?: number;
 	parent_id?: string;
 	clanId?: string;
 	searchName?: string;
@@ -1112,6 +1123,13 @@ export enum ENotificationTypes {
 	NOTHING_MESSAGE = NotificationType.NOTHING_MESSAGE
 }
 
+export type PreSendMediaAttachmentFields = {
+	_sourceFile?: File;
+	_thumbnailBlob?: Blob;
+};
+
+export type PreSendMediaAttachment = ApiMessageAttachment & PreSendMediaAttachmentFields;
+
 export type PreSendAttachment = {
 	channelId?: string;
 	mode?: string;
@@ -1152,6 +1170,7 @@ export enum TypeCheck {
 }
 
 export enum ThreadStatus {
+	archived = 0,
 	activePublic = 2,
 	joined = 1,
 	activePrivate = 3

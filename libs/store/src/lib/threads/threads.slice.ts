@@ -3,11 +3,10 @@ import type { IMessageWithUser, IThread, LoadingStatus } from '@mezon/utils';
 import { LIMIT, ThreadStatus, TypeCheck, getParentChannelIdIfHas } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ApiChannelDescription } from 'mezon-js/api';
+import type { ApiChannelDescription } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
-import { channelsActions, selectCurrentChannel } from '../channels/channels.slice';
-import { listChannelRenderAction } from '../channels/listChannelRender.slice';
+import { applyChannelArchiveState, channelsActions, selectChannelById, selectCurrentChannel } from '../channels/channels.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, ensureSocket, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
@@ -90,13 +89,20 @@ export const fetchThreadsCached = async (
 	const threadsState = currentState[THREADS_FEATURE_KEY];
 	const channelData = threadsState.byChannels?.[channelId] || getInitialChannelState();
 
-	const apiKey = createApiKey('fetchThreads', channelId, clanId, mezon.session.username || '', threadId || '', page || 1);
+	const apiKey = createApiKey(
+		'fetchThreads',
+		channelId,
+		clanId,
+		mezon.session?.token || currentState.auth?.session?.token || '',
+		threadId || '',
+		page || 1
+	);
 
 	const shouldForceCall = shouldForceApiCall(apiKey, channelData.cache, noCache);
 
-	if (!shouldForceCall && channelData) {
+	if (!shouldForceCall && channelData?.ids?.length > 0) {
 		return {
-			channeldesc: channelData || [],
+			channeldesc: threadsAdapter.getSelectors().selectAll(channelData),
 			fromCache: true,
 			time: channelData.cache?.lastFetched || Date.now()
 		};
@@ -133,7 +139,11 @@ const updateCacheOnThreadCreation = createAsyncThunk(
 	}
 );
 
-const mapToThreadEntity = (threads: ApiChannelDescription[]) => {
+const mapToThreadEntity = (threads: ApiChannelDescription[] | ThreadsEntity[] | undefined | null) => {
+	if (!Array.isArray(threads)) {
+		return [];
+	}
+
 	return threads.map((thread) => ({
 		...thread,
 		id: thread.channel_id as string
@@ -205,7 +215,6 @@ export const fetchThread = createAsyncThunk('threads/fetchThread', async ({ chan
 			undefined,
 			Boolean(noCache)
 		);
-
 		if (!response.channeldesc) {
 			return {
 				channelId,
@@ -227,9 +236,7 @@ export const fetchThread = createAsyncThunk('threads/fetchThread', async ({ chan
 });
 
 const getInitialChannelState = () => {
-	return {
-		threads: threadsAdapter.getInitialState()
-	};
+	return threadsAdapter.getInitialState();
 };
 
 export const initialThreadsState: ThreadsState = threadsAdapter.getInitialState({
@@ -253,9 +260,13 @@ export const checkDuplicateThread = createAsyncThunk(
 	async ({ thread_name, channel_id, clan_id }: { thread_name: string; channel_id: string; clan_id: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(thread_name, channel_id, TypeCheck.TYPETHREAD, clan_id);
-			if (isDuplicateName?.type === TypeCheck.TYPETHREAD) {
-				return isDuplicateName.exist;
+			const isDuplicateName = await mezon.clientRef.current?.checkDuplicateName(mezon.session, {
+				name: thread_name,
+				condition_id: channel_id,
+				type: TypeCheck.TYPETHREAD
+			});
+			if (isDuplicateName?.is_duplicate) {
+				return isDuplicateName?.is_duplicate;
 			}
 		} catch (error) {
 			captureSentryError(error, 'threads/duplicateNameCthread');
@@ -276,7 +287,6 @@ export const leaveThread = createAsyncThunk(
 					thunkAPI.dispatch(threadsActions.remove(threadId));
 					thunkAPI.dispatch(threadsActions.removeThreadFromCache({ channelId, threadId }));
 				}
-				thunkAPI.dispatch(listChannelRenderAction.leaveChannelListRender({ channelId: threadId, clanId }));
 				return threadId;
 			}
 		} catch (error) {
@@ -292,7 +302,21 @@ export const writeActiveArchivedThread = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			await mezon.client.activeArchivedThread(mezon.session, clanId, channelId);
-			thunkAPI.dispatch(threadsActions.updateActiveCodeThread({ channelId, activeCode: ThreadStatus.joined }));
+			const state = thunkAPI.getState() as RootState;
+			const threadChannel = selectChannelById(state, channelId);
+			thunkAPI.dispatch(channelsActions.update({ clanId, update: { id: channelId, changes: { active: ThreadStatus.joined } } }));
+
+			await thunkAPI
+				.dispatch(
+					applyChannelArchiveState({
+						clanId,
+						channelId,
+						parentId: threadChannel?.parent_id ?? '0',
+						isArchive: false
+					})
+				)
+				.unwrap();
+
 			return { channelId, activeCode: ThreadStatus.joined };
 		} catch (error) {
 			captureSentryError(error, 'threads/writeActiveArchivedThread');
@@ -413,6 +437,13 @@ export const threadsSlice = createSlice({
 			}
 
 			threadsAdapter.upsertOne(state.byChannels[channelId], thread);
+		},
+		updateThreadFromSocket: (state, action: PayloadAction<{ threadId: string; parentId: string; changes: Partial<ThreadsEntity> }>) => {
+			const { threadId, parentId, changes } = action.payload;
+			const channelData = state.byChannels?.[parentId];
+			if (channelData) {
+				threadsAdapter.updateOne(channelData, { id: threadId, changes });
+			}
 		},
 		resetThreadSearchedResult: (state: ThreadsState, action: PayloadAction<string>) => {
 			const channelId = action.payload;

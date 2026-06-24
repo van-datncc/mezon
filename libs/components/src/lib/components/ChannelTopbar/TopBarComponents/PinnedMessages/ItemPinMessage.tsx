@@ -4,6 +4,7 @@ import {
 	appActions,
 	messagesActions,
 	selectCurrentClanId,
+	selectDirectById,
 	selectIsShowCanvas,
 	selectMessageByMessageId,
 	useAppDispatch,
@@ -11,6 +12,7 @@ import {
 } from '@mezon/store';
 import type { IMessageWithUser } from '@mezon/utils';
 import {
+	NX_CHAT_APP_ANNONYMOUS_USER_ID,
 	TypeMessage,
 	convertTimeString,
 	convertTimestampToTimeRemainingI18n,
@@ -19,8 +21,8 @@ import {
 	isImageFileType,
 	isVideoFileType
 } from '@mezon/utils';
+import type { ApiMessageAttachment } from 'mezon-js';
 import { ChannelStreamMode, decodeAttachments, safeJSONParse } from 'mezon-js';
-import type { ApiMessageAttachment } from 'mezon-js/api';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -30,9 +32,6 @@ import MessageAttachment from '../../../MessageWithUser/MessageAttachment';
 import { MessageLine } from '../../../MessageWithUser/MessageLine';
 import { PollMessage } from '../../../MessageWithUser/PollMessage';
 import ShareContactCard from '../../../ShareContact/ShareContactCard';
-
-const NX_CHAT_APP_ANNONYMOUS_USER_ID = process.env.NX_CHAT_APP_ANNONYMOUS_USER_ID || 'anonymous';
-
 type ItemPinMessageProps = {
 	pinMessage: PinMessageEntity;
 	contentString: string | undefined;
@@ -45,20 +44,44 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const { t } = useTranslation('channelTopbar');
 	const { pinMessage, contentString, handleUnPinMessage, onClose, mode } = props;
 
-	const getValidCreateTime = () => {
-		if (pinMessage?.create_time_seconds) return new Date(pinMessage.create_time_seconds * 1000).toISOString();
-		return new Date().toISOString();
-	};
 	const isShowCanvas = useSelector(selectIsShowCanvas);
-
-	const validCreateTime = getValidCreateTime();
-	const messageTime = convertTimeString(validCreateTime);
 	const { priorityAvatar, namePriority } = useGetPriorityNameFromUserClan(String(pinMessage.sender_id || ''));
 	const currentClanId = useSelector(selectCurrentClanId);
 	const dispatch = useAppDispatch();
 	const message = useAppSelector((state) =>
 		selectMessageByMessageId(state, String(pinMessage?.channel_id || '0'), String(pinMessage?.message_id || '0'))
 	);
+
+	const validCreateTime = useMemo(() => {
+		const createTimeSeconds = message?.create_time_seconds ?? pinMessage?.create_time_seconds;
+		if (createTimeSeconds) return new Date(createTimeSeconds * 1000).toISOString();
+		return '';
+	}, [message?.create_time_seconds, pinMessage?.create_time_seconds]);
+	const messageTime = validCreateTime ? convertTimeString(validCreateTime) : '';
+
+	const directChannel = useAppSelector((state) => selectDirectById(state, String(pinMessage?.channel_id || '')));
+
+	let directAvatar = '';
+	let directName = '';
+
+	if (mode === ChannelStreamMode.STREAM_MODE_DM) {
+		if (directChannel?.user_ids) {
+			const userIndex = directChannel.user_ids.indexOf(String(pinMessage?.sender_id || ''));
+			if (userIndex !== -1) {
+				directAvatar = directChannel.avatars?.[userIndex] || '';
+				directName = directChannel.display_names?.[userIndex] || directChannel.usernames?.[userIndex] || '';
+			}
+		}
+	} else if (mode === ChannelStreamMode.STREAM_MODE_GROUP) {
+		if (directChannel?.user_ids) {
+			const userIndex = directChannel.user_ids.indexOf(String(pinMessage?.sender_id || ''));
+			if (userIndex !== -1) {
+				directAvatar = directChannel.avatars?.[userIndex] || '';
+				directName = directChannel.display_names?.[userIndex] || directChannel.usernames?.[userIndex] || '';
+			}
+		}
+	}
+
 	const pinMessageAttachments = message?.attachments || pinMessage?.attachment;
 
 	const messageContentObject = useMemo(() => {
@@ -117,11 +140,14 @@ const ItemPinMessage = (props: ItemPinMessageProps) => {
 	const checkAnonymous = pinMessage?.sender_id === NX_CHAT_APP_ANNONYMOUS_USER_ID;
 
 	const avatarToShow =
-		(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? priorityAvatar : pinMessage.avatar) || '';
+		(mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+			? priorityAvatar
+			: pinMessage.avatar || priorityAvatar || directAvatar || message?.avatar) || '';
 	const nameToShow = checkAnonymous
 		? 'Anonymous'
-		: (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL ? namePriority : pinMessage.username) ||
-			'';
+		: (mode === ChannelStreamMode.STREAM_MODE_THREAD || mode === ChannelStreamMode.STREAM_MODE_CHANNEL
+				? namePriority
+				: pinMessage.username || namePriority || directName || message?.display_name || message?.username) || '';
 	return (
 		<div
 			key={pinMessage.id}

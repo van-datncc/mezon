@@ -55,7 +55,7 @@ export function TimelineView({ events, loadingStatus, onNavigateToEvents, onNavi
 		return (
 			<div className="flex flex-col items-center justify-center h-full gap-4 px-8">
 				<div className="w-32 h-32 rounded-full bg-theme-primary flex items-center justify-center">
-					<Icons.ImageThumbnail defaultSize="w-16 h-16" />
+					<Icons.ImageThumbnail />
 				</div>
 				<h3 className="text-lg font-semibold text-theme-primary">{t('fields.mediaHighlights.emptyTitle')}</h3>
 				<p className="text-sm text-theme-secondary text-center">{t('fields.mediaHighlights.emptyDescription')}</p>
@@ -86,6 +86,7 @@ export function TimelineView({ events, loadingStatus, onNavigateToEvents, onNavi
 					onClick={onNavigateToEvents}
 					className="p-2 rounded-lg text-theme-primary text-theme-primary-hover transition-colors"
 					title={t('fields.eventDetail.calendar')}
+					data-e2e={generateE2eId('timeline.buttons.calendar')}
 				>
 					<Icons.BulletListIcon className="w-5 h-5" />
 				</button>

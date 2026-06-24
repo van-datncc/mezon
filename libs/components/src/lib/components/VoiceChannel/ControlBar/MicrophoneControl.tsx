@@ -47,11 +47,11 @@ export const MicrophoneControl = memo(
 		);
 
 		return (
-			<div className="relative rounded-full bg-gray-300 dark:bg-black">
+			<div className="relative rounded-full">
 				<TrackToggle
 					id="btn-meet-micro"
-					className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${
-						isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'
+					className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none ${
+						isShowMember ? 'bg-zinc-700 dark:bg-zinc-900' : 'bg-zinc-900'
 					}`}
 					source={Track.Source.Microphone}
 					onChange={handleChange}

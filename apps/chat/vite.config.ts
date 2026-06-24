@@ -3,12 +3,31 @@ import react from '@vitejs/plugin-react';
 import * as fs from 'fs';
 import * as path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type PluginOption } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf-8'));
 const APP_VERSION = packageJson.version;
+const CHAT_BASE_HREF = '/chat/';
+
+function chatAssetPathsPlugin(): PluginOption {
+	return {
+		name: 'chat-asset-paths',
+		transform(code) {
+			if (!code.includes('/assets/')) {
+				return;
+			}
+
+			const rewritten = code.replace(/(?<!\/chat)\/assets\//g, `${CHAT_BASE_HREF}assets/`);
+			if (rewritten === code) {
+				return;
+			}
+
+			return { code: rewritten, map: null };
+		}
+	};
+}
 
 export default defineConfig(({ mode }) => {
 	const workspaceRoot = path.resolve(__dirname, '../..');
@@ -18,24 +37,45 @@ export default defineConfig(({ mode }) => {
 		root: path.join(appRoot, 'src'),
 		publicDir: mode === 'production' ? false : path.join(appRoot, 'src/assets'),
 		cacheDir: path.join(workspaceRoot, 'node_modules/.vite/apps/chat'),
-		base: mode === 'production' ? '/' : './',
+		base: CHAT_BASE_HREF,
 
 		server: {
 			port: 4200,
 			host: '127.0.0.1',
-			open: false,
+			open: '/chat/',
 			proxy: JSON.parse(fs.readFileSync(path.resolve(__dirname, 'proxy.conf.json'), 'utf-8')),
 			fs: {
 				allow: [workspaceRoot, path.join(workspaceRoot, 'libs/assets/src/assets')]
+			},
+			headers: {
+				'Content-Security-Policy': [
+					"default-src 'self'",
+					"script-src 'self' 'wasm-unsafe-eval' 'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk=' blob: *.mezon.ai *.googletagmanager.com *.google-analytics.com *.googlesyndication.com *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net",
+					"style-src 'self' 'unsafe-inline' *.mezon.ai *.googleapis.com *.gstatic.com https://cdn.jsdelivr.net",
+					"font-src 'self' data: *.mezon.ai *.gstatic.com *.googleapis.com https://cdn.jsdelivr.net",
+					"object-src 'none'",
+					"worker-src 'self' 'wasm-unsafe-eval' blob:",
+					"manifest-src 'self'",
+					"img-src 'self' data: blob: https: *.mezon.ai media.tenor.com *.googleusercontent.com",
+					"connect-src 'self' ws: wss: https: blob: *.mezon.ai media.tenor.com *.googletagmanager.com *.google-analytics.com *.googleapis.com *.gstatic.com https://cdn.jsdelivr.net",
+					"media-src 'self' blob: https: *.mezon.ai media.tenor.com",
+					"child-src 'self' https://www.youtube.com https://www.tiktok.com https://www.facebook.com https://player.vimeo.com",
+					"frame-src 'self' https://www.youtube.com https://www.tiktok.com https://www.facebook.com https://player.vimeo.com",
+					"base-uri 'self'",
+					"form-action 'self' *.mezon.ai",
+					"frame-ancestors 'self'"
+				].join('; ')
 			}
 		},
 
 		preview: {
 			port: 4300,
-			host: 'localhost'
+			host: '127.0.0.1',
+			open: '/chat/'
 		},
 
 		plugins: [
+			chatAssetPathsPlugin(),
 			react({
 				babel: {
 					plugins: [
@@ -95,7 +135,7 @@ export default defineConfig(({ mode }) => {
 						})
 					]
 				: [])
-		],
+		] as PluginOption[],
 
 		define: {
 			global: 'globalThis',
@@ -147,9 +187,7 @@ export default defineConfig(({ mode }) => {
 
 		css: {
 			preprocessorOptions: {
-				scss: {
-					api: 'modern-compiler'
-				}
+				scss: { api: 'modern-compiler' } as Record<string, unknown>
 			}
 		},
 
@@ -214,6 +252,9 @@ export default defineConfig(({ mode }) => {
 						}
 						if (normalizedId.includes('libs/translations/src/languages/tt')) {
 							return 'i18n-tt';
+						}
+						if (normalizedId.includes('libs/translations/src/languages/de')) {
+							return 'i18n-de';
 						}
 						if (normalizedId.includes('libs/translations/src/languages/pt')) {
 							return 'i18n-pt';

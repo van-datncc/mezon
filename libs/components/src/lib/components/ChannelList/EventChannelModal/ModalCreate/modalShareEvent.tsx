@@ -1,7 +1,8 @@
+import { ButtonCopy } from '@mezon/components';
 import { useOnClickOutside } from '@mezon/core';
 import { ChannelsEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { ButtonCopy } from '@mezon/components';
+import { generateE2eId } from '@mezon/utils';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -51,7 +52,7 @@ const ModalShareEvent = (props: ModalShareEventProps) => {
 				<div className="dark:text-white text-black w-[440px] p-4">
 					<div className="flex justify-between pb-4 font-bold text-base">
 						<h3>{t('eventDetail.inviteFriends')}</h3>
-						<button title="Close" onClick={closeModal} className="dark:hover:text-white hover:text-colorTextLightMode transition">
+						<button title="Close" onClick={closeModal} className="dark:hover:text-white hover:text-colorTextLightMode transition" data-e2e={generateE2eId('clan_page.modal.create_event.event_management.item.button.close_modal_copy_link')}>
 							✕
 						</button>
 					</div>

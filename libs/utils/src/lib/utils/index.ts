@@ -12,9 +12,17 @@ import {
 	subDays
 } from 'date-fns';
 import isElectron from 'is-electron';
-import type { Client, Session } from 'mezon-js';
+import type {
+	ApiMessageAttachment,
+	ApiMessageMention,
+	ApiMessageRef,
+	ApiRole,
+	ApiSession,
+	ClanUserListClanUser,
+	Client,
+	RoleUserListRoleUser
+} from 'mezon-js';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiRole, ClanUserListClanUser, RoleUserListRoleUser } from 'mezon-js/api';
 import type React from 'react';
 import Resizer from 'react-image-file-resizer';
 import { electronBridge } from '../bridge';
@@ -51,6 +59,8 @@ import type {
 } from '../types';
 import { EBacktickType, EMimeTypes, ETokenMessage, EUserStatus } from '../types';
 import { getDateLocale } from './dateI18n';
+import { getLinkType } from './embed-social';
+import { getPreSendSourceFile, getPreSendThumbnailBlob } from './file';
 import { Foreman } from './foreman';
 import { isMezonCdnUrl, isTenorUrl } from './urlSanitization';
 import { getPlatform } from './windowEnvironment';
@@ -72,8 +82,10 @@ export * from './heavyAnimation';
 export * from './mediaDimensions';
 export * from './mergeRefs';
 export * from './parseHtmlAsFormattedText';
+export * from './presignFinish';
 export * from './processEntitiesDirectly';
 export * from './resetScroll';
+export * from './sanitizeHtml';
 export * from './schedulers';
 export * from './select';
 export * from './signals';
@@ -212,6 +224,7 @@ export {
 	isFromAllowedDomain,
 	isMezonCdnUrl,
 	isSecureAttachmentUrl,
+	sanitizeHref,
 	sanitizeUrl as sanitizeUrlSecure,
 	type SecureURLOptions
 } from './urlSanitization';
@@ -614,6 +627,63 @@ export function addMention(obj: IMessageSendPayload | string, mentionValue: IMen
 	return updatedObj;
 }
 
+export const NOTIFICATION_MARKER_REGEX = /\[(?:lk|pre|b|c|s|t|vk|lk_yt|lk_fb|lk_tt|lk_ogp)\]\s?/g;
+
+function getNotificationMarkerShiftBeforeIndex(content: string, index: number): number {
+	let shift = 0;
+	const regex = new RegExp(NOTIFICATION_MARKER_REGEX.source, 'g');
+
+	for (const match of content.matchAll(regex)) {
+		if (match.index !== undefined && match.index < index) {
+			shift += match[0].length;
+		} else {
+			break;
+		}
+	}
+
+	return shift;
+}
+
+export function stripNotificationMarkers(content: string): string {
+	return content.replace(NOTIFICATION_MARKER_REGEX, '');
+}
+
+export function adjustMentionsForStrippedMarkers(contentWithMarkers: string, mentions: IMentionOnMessage[]): IMentionOnMessage[] {
+	return mentions.map((mention) => {
+		if (mention.s === undefined || mention.e === undefined) {
+			return mention;
+		}
+
+		return {
+			...mention,
+			s: mention.s - getNotificationMarkerShiftBeforeIndex(contentWithMarkers, mention.s),
+			e: mention.e - getNotificationMarkerShiftBeforeIndex(contentWithMarkers, mention.e)
+		};
+	});
+}
+
+export function patchLinkTokens(content: IExtendedMessage): IExtendedMessage;
+export function patchLinkTokens(content: IExtendedMessage | undefined): IExtendedMessage | undefined;
+export function patchLinkTokens(content: IExtendedMessage | undefined): IExtendedMessage | undefined {
+	if (!content) {
+		return content;
+	}
+
+	if ((!content.mk || content.mk.length === 0) && Array.isArray(content.lk) && content.lk.length > 0) {
+		const text = typeof content.t === 'string' ? content.t : '';
+
+		return {
+			...content,
+			mk: content.lk.map((lkItem) => {
+				const url = lkItem.s !== undefined && lkItem.e !== undefined ? text.substring(lkItem.s, lkItem.e) : '';
+				return { ...lkItem, type: getLinkType(url) };
+			})
+		};
+	}
+
+	return content;
+}
+
 export function isValidEmojiData(data: IExtendedMessage): boolean | undefined {
 	if (data?.mentions && data.mentions.length !== 0) {
 		return false;
@@ -718,7 +788,7 @@ const fileUploadForeman = new Foreman(MAX_WORKERS);
 export async function getWebUploadedAttachments(payload: {
 	attachments: ApiMessageAttachment[];
 	client: Client;
-	session: Session;
+	session: ApiSession;
 }): Promise<ApiMessageAttachment[]> {
 	const { attachments, client, session } = payload;
 	if (!attachments || attachments?.length === 0) {
@@ -736,16 +806,28 @@ export async function getWebUploadedAttachments(payload: {
 					throw new Error(`File URL is missing for file: ${attachment.filename}`);
 				}
 
-				const response = await fetch(attachment.url);
-				const arrayBuffer = await response.arrayBuffer();
-				const blob = new Blob([arrayBuffer], { type: attachment.filetype || 'application/octet-stream' });
-				const createdFile = new CustomFile([blob], attachment.filename ?? 'untitled', {
-					type: attachment.filetype || 'application/octet-stream'
-				});
-				createdFile.url = attachment.url;
-				createdFile.width = attachment.width || 0;
-				createdFile.height = attachment.height || 0;
-				createdFile.thumbnail = attachment.thumbnail;
+				const sourceFile = getPreSendSourceFile(attachment);
+				let createdFile: CustomFile;
+
+				if (sourceFile) {
+					createdFile = sourceFile as CustomFile;
+					createdFile.url = attachment.url;
+					createdFile.width = attachment.width || 0;
+					createdFile.height = attachment.height || 0;
+					createdFile.thumbnail = attachment.thumbnail;
+					createdFile.thumbnailBlob = getPreSendThumbnailBlob(attachment);
+				} else {
+					const response = await fetch(attachment.url);
+					const arrayBuffer = await response.arrayBuffer();
+					const blob = new Blob([arrayBuffer], { type: attachment.filetype || 'application/octet-stream' });
+					createdFile = new CustomFile([blob], attachment.filename ?? 'untitled', {
+						type: attachment.filetype || 'application/octet-stream'
+					});
+					createdFile.url = attachment.url;
+					createdFile.width = attachment.width || 0;
+					createdFile.height = attachment.height || 0;
+					createdFile.thumbnail = attachment.thumbnail;
+				}
 
 				const result = await handleUploadFile(client, session, createdFile.name, createdFile, index);
 
@@ -779,7 +861,7 @@ export async function getWebUploadedAttachments(payload: {
 export async function getMobileUploadedAttachments(payload: {
 	attachments: ApiMessageAttachment[];
 	client: Client;
-	session: Session;
+	session: ApiSession;
 }): Promise<ApiMessageAttachment[]> {
 	const { attachments, client, session } = payload;
 	if (!attachments || attachments?.length === 0) {
@@ -1185,8 +1267,9 @@ export const parseThreadInfo = (messageContent: string) => {
 };
 
 export const openVoiceChannel = (url: string) => {
-	const urlVoice = `https://meet.google.com/${url}`;
-	window.open(urlVoice, '_blank', 'noreferrer');
+	const sanitized = encodeURIComponent(url).replace(/%2F/gi, '/');
+	const urlVoice = `https://meet.google.com/${sanitized}`;
+	window.open(urlVoice, '_blank', 'noopener,noreferrer');
 };
 
 export const getChannelMode = (chatType: number) => {

@@ -1,4 +1,4 @@
-import { auditLogFilterActions, auditLogList, selectTheme, useAppDispatch } from '@mezon/store';
+import { auditLogFilterActions, auditLogList, selectActionAuditLog, selectTheme, selectUserAuditLog, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { IUserAuditLog } from '@mezon/utils';
 import { ActionLog } from '@mezon/utils';
@@ -87,6 +87,7 @@ const SearchActionAuditLogModal = ({
 	const { t } = useTranslation('auditLogSearch');
 	const dispatch = useAppDispatch();
 	const appearanceTheme = useSelector(selectTheme);
+	const userFilterFromStore = useSelector(selectUserAuditLog);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [selectedAction, setSelectedAction] = useState<string>(actionFilter || ActionLog.ALL_ACTION_AUDIT);
 
@@ -158,9 +159,10 @@ const SearchActionAuditLogModal = ({
 		if (currentClanId) {
 			const body = {
 				actionLog: action?.originalKey === ActionLog.ALL_ACTION_AUDIT ? '' : action?.originalKey,
-				userId: userFilter?.userId ?? '',
+				userId: userFilterFromStore?.userId ?? userFilter?.userId ?? '',
 				clanId: currentClanId ?? '',
-				date_log: selectedDate
+				date_log: selectedDate,
+				noCache: true
 			};
 			dispatch(auditLogList(body));
 		}
@@ -172,8 +174,8 @@ const SearchActionAuditLogModal = ({
 	const filteredActions = actions.filter((action) => action.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	return (
-		<div className="absolute border sm:left-0 max-sm:right-0 max-sm:left-[unset] top-8 pb-3 rounded border-solid border-theme-primary bg-theme-setting-nav z-[9999] shadow w-72">
-			<div className="bg-theme-setting-primary rounded-lg w-full max-w-xs">
+		<div className="absolute border sm:left-0 max-sm:right-0 max-sm:left-[unset] top-8 rounded border-solid border-theme-primary bg-theme-setting-nav z-[9999] shadow w-72 overflow-visible">
+			<div className="bg-theme-setting-primary rounded-lg w-full max-w-xs pb-2">
 				<div className="relative m-2">
 					<input
 						type="text"
@@ -183,11 +185,13 @@ const SearchActionAuditLogModal = ({
 						onChange={(e) => setSearchTerm(e.target.value)}
 					/>
 					<span className="absolute right-3 top-3 text-gray-400 cursor-pointer" onClick={searchTerm ? handleClearSearch : undefined}>
-						{searchTerm ? <Icons.Close defaultSize="size-4" /> : <Icons.Search className="w-4 h-4 text-theme-primary" />}
+						{searchTerm ? <Icons.Close className="w-4 h-4" /> : <Icons.Search className="w-4 h-4 text-theme-primary" />}
 					</span>
 				</div>
 
-				<div className={`h-64 ml-2 pr-1 overflow-y-scroll ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}>
+				<div
+					className={`max-h-64 ml-2 mr-2 pr-1 pb-2 overflow-y-auto ${appearanceTheme === 'light' ? 'customSmallScrollLightMode' : 'thread-scroll'}`}
+				>
 					{filteredActions.length > 0 ? (
 						filteredActions.map((action, index) => (
 							<div
@@ -201,7 +205,7 @@ const SearchActionAuditLogModal = ({
 								<span className="ml-3 ">{action.name}</span>
 								{selectedAction === action.originalKey && (
 									<span className="ml-auto">
-										<Icons.CheckMarkFilter defaultSize="w-5 h-5" defaultFill="text-white" />
+										<Icons.CheckMarkFilter className="w-5 h-5" defaultFill="text-white" />
 									</span>
 								)}
 							</div>

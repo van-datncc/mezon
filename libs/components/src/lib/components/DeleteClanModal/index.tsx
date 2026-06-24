@@ -42,12 +42,7 @@ const DeleteClanModal: React.FC<DeleteClanModalProps> = ({ onClose, title, butto
 			<div className="fixed inset-0 bg-black opacity-80"></div>
 			<form className="relative z-10 bg-theme-setting-primary rounded-[5px] w-[90%] md:w-[500px] mx-auto md:mx-0" onSubmit={handleSubmit}>
 				<div className="top-block p-[16px]  flex flex-col gap-[15px] max-w-[500px]">
-					<div
-						className="text-xl font-semibold text-theme-primary-active truncate overflow-auto max-w-[400px]"
-						data-e2e="permission-denied"
-					>
-						{title}
-					</div>
+					<div className="text-xl font-semibold text-theme-primary-active truncate overflow-auto max-w-[400px]">{title}</div>
 					<div className="bg-[#f0b132] text-theme-message rounded-sm p-[10px] text-[#30232d]">{t('confirmMessage')}</div>
 					<div className="mb-[15px]">
 						<div className=" text-base">{t('enterClanName')}</div>

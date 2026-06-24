@@ -1,8 +1,9 @@
 import { isEqualTrackRef } from '@livekit/components-core';
 import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
 import { isTrackReference, LayoutContextProvider, usePinnedTracks, useTracks, type useCreateLayoutContext } from '@livekit/components-react';
-import { selectOpenExternalChatBox, useAppDispatch, voiceActions } from '@mezon/store';
+import { selectOpenExternalChatBox, selectVoiceFullScreen, useAppDispatch, voiceActions } from '@mezon/store';
 import { Icons } from '@mezon/ui';
+import { generateE2eId } from '@mezon/utils';
 import type { Room } from 'livekit-client';
 import { RoomEvent, Track } from 'livekit-client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -75,7 +76,11 @@ export const VideoConferenceLayout = memo(
 	}: VideoConferenceLayoutProps) => {
 		const dispatch = useAppDispatch();
 		const openChatBox = useSelector(selectOpenExternalChatBox);
+		const isVoiceFullScreen = useSelector(selectVoiceFullScreen);
 		const [isShowMember, setIsShowMember] = useState<boolean>(true);
+		const voiceOverlayClass = isVoiceFullScreen
+			? 'transition-opacity duration-300 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
+			: 'transition-opacity duration-300 opacity-100 pointer-events-auto';
 		const lastAutoFocusedScreenShareTrack = useRef<TrackReferenceOrPlaceholder | null>(null);
 
 		const tracksFromHook = useTracks(
@@ -119,6 +124,8 @@ export const VideoConferenceLayout = memo(
 		const handleShowMember = useCallback(() => {
 			setIsShowMember((prevState) => !prevState);
 		}, []);
+
+		const isChatOpen = isExternalCalling ? openChatBox : isShowChatVoice;
 
 		const toggleViewMode = useCallback(() => {
 			if (focusTrack) {
@@ -167,8 +174,7 @@ export const VideoConferenceLayout = memo(
 							</FocusLayoutContainer>
 							<div
 								className={`absolute bg-[#2B2B2B] left-1/2 ${isShowMember ? 'bottom-[178px]' : 'bottom-[140px]'}
-                        transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px]
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto`}
+                        transform -translate-x-1/2 flex flex-row items-center gap-[2px] p-[2px] rounded-[20px] ${voiceOverlayClass}`}
 								onClick={handleShowMember}
 							>
 								{isShowMember ? <Icons.VoiceArowDownIcon /> : <Icons.VoiceArowUpIcon />}
@@ -181,58 +187,54 @@ export const VideoConferenceLayout = memo(
 							</div>
 						</div>
 					)}
-					<div className="absolute top-0 left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
+					<div className={`absolute top-0 left-0 w-full ${voiceOverlayClass}`}>
 						<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5">
 							<div className="flex justify-start gap-2">
 								<span>
 									{!isExternalCalling ? (
-										<Icons.Speaker defaultSize="w-6 h-6" defaultFill={isShowMember ? 'text-theme-primary' : 'text-gray-300'} />
+										<Icons.Speaker
+											defaultSize="w-6 h-6"
+											className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]"
+											defaultFill1="currentColor"
+											defaultFill2="currentColor"
+											defaultFill3="currentColor"
+										/>
 									) : (
 										<Icons.SpeakerLocked
 											defaultSize="w-6 h-6"
-											defaultFill={isShowMember ? 'text-theme-primary' : 'text-gray-300'}
+											className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]"
 										/>
 									)}
 								</span>
-								<p
-									className={`text-base font-semibold cursor-default one-line ${isShowMember ? 'text-theme-primary' : 'text-gray-300'}`}
-								>
+								<p className="text-base font-semibold cursor-default one-line text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]">
 									{channelLabel}
 								</p>
 							</div>
 							<div className="flex justify-start gap-4">
-								{!isExternalCalling && !propTracks && <NotificationTooltip isGridView={!focusTrack} isShowMember={isShowMember} />}
+								{!isExternalCalling && !propTracks && <NotificationTooltip />}
 								<span onClick={toggleViewMode} className="cursor-pointer">
 									{focusTrack ? (
-										<Icons.VoiceGridIcon
-											className={
-												isShowMember ? 'text-theme-primary text-theme-primary-hover' : 'text-gray-300 hover:text-white'
-											}
-										/>
+										<Icons.VoiceGridIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									) : (
-										<Icons.VoiceFocusIcon
-											className={
-												isShowMember ? 'text-theme-primary text-theme-primary-hover' : 'text-gray-300 hover:text-white'
-											}
-										/>
+										<Icons.VoiceFocusIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									)}
 								</span>
 								<button
-									className={`relative focus-visible:outline-none ${
-										(isExternalCalling ? openChatBox : isShowChatVoice)
-											? 'text-theme-primary-active text-theme-primary-hover'
-											: 'text-theme-primary text-theme-primary-hover'
+									className={`relative focus-visible:outline-none text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)] ${
+										isChatOpen ? 'text-[var(--bg-icon-theme-active)]' : ''
 									}`}
 									title="Chat"
 									onClick={onToggleChatBox}
+									data-e2e={generateE2eId('chat.channel_message.header.button.chat')}
 								>
-									<Icons.Chat defaultSize="w-5 h-5" />
+									<Icons.Chat className="w-5 h-5" />
 								</button>
 							</div>
 						</div>
 					</div>
 					<div
-						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto`}
+						className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full ${voiceOverlayClass}`}
+						data-e2e={generateE2eId('clan_page.screen.voice_room.control_bar')}
 					>
 						<ControlBar
 							isExternalCalling={isExternalCalling}

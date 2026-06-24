@@ -74,7 +74,14 @@ function MyApp() {
 	const dispatch = useAppDispatch();
 	const currentClanId = useSelector(selectCurrentClanId);
 	const [openCreateClanModal, closeCreateClanModal] = useModal(() => <ModalCreateClan open={true} onClose={closeCreateClanModal} />);
-	const [openSearchModal, closeSearchModal] = useModal(() => <SearchModal onClose={closeSearchModal} />);
+	const isSearchModalOpenRef = useRef(false);
+	const closeSearchModalRef = useRef<() => void>(() => undefined);
+	const [openSearchModal, closeSearchModalBase] = useModal(() => <SearchModal onClose={() => closeSearchModalRef.current()} />);
+	const closeSearchModal = useCallback(() => {
+		isSearchModalOpenRef.current = false;
+		closeSearchModalBase();
+	}, [closeSearchModalBase]);
+	closeSearchModalRef.current = closeSearchModal;
 	const openModalAttachment = useSelector(selectOpenModalAttachment);
 	const closeMenu = useSelector(selectCloseMenu);
 	const statusMenu = useSelector(selectStatusMenu);
@@ -88,12 +95,21 @@ function MyApp() {
 	const { currentURL, directId } = useAppParams();
 	const memberPath = `/chat/clans/${currentClanId}/member-safety`;
 
+	const handleOpenSearchModal = useCallback(() => {
+		if (isSearchModalOpenRef.current) {
+			closeSearchModal();
+		} else {
+			isSearchModalOpenRef.current = true;
+			openSearchModal();
+		}
+	}, [openSearchModal, closeSearchModal]);
+
 	const handleKeyDown = useCallback(
 		(event: KeyboardEvent) => {
 			const prefixKey = PLATFORM_ENV === Platform.MACOS ? 'metaKey' : 'ctrlKey';
 			if (event[prefixKey] && (event.key === 'k' || event.key === 'K')) {
 				event.preventDefault();
-				openSearchModal();
+				handleOpenSearchModal();
 			}
 			if (event[prefixKey] && event.shiftKey && event.key === 'Enter' && !directId) {
 				const store = getStore();
@@ -118,15 +134,17 @@ function MyApp() {
 				window.electron.setRatioWindow(true);
 			}
 		},
-		[openSearchModal, currentURL]
+		[handleOpenSearchModal, currentURL]
 	);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyDown);
+		window.addEventListener('open-search-modal', handleOpenSearchModal as EventListener);
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
+			window.removeEventListener('open-search-modal', handleOpenSearchModal as EventListener);
 		};
-	}, [handleKeyDown]);
+	}, [handleKeyDown, handleOpenSearchModal]);
 
 	const openPopupForward = useSelector(getIsShowPopupForward);
 
@@ -167,13 +185,13 @@ function MyApp() {
 
 	const previewMode = useSelector(selectOnboardingMode);
 
-	const { streamVideoRef, handleChannelClick, disconnect, isStream } = useWebRTCStream();
+	const { streamVideoRef, handleChannelClick, disconnect, isStream, isPlaybackBlocked, retryPlayback } = useWebRTCStream();
 
 	const handleClose = () => {
 		dispatch(e2eeActions.setOpenModalE2ee(false));
 	};
 	const openDiscoverPage = () => {
-		window.open('https://mezon.ai/clans', '_blank');
+		window.open('https://mezon.ai/clans', '_blank', 'noopener,noreferrer');
 	};
 
 	return (
@@ -209,6 +227,8 @@ function MyApp() {
 							streamVideoRef={streamVideoRef}
 							disconnect={disconnect}
 							isStream={isStream}
+							isPlaybackBlocked={isPlaybackBlocked}
+							retryPlayback={retryPlayback}
 						/>
 					) : null}
 				</div>
@@ -271,7 +291,7 @@ const DirectUnreadList = memo(() => {
 
 	if (!listDmRender?.length) return null;
 
-	return <div>{renderItems}</div>;
+	return <div className="max-h-64 overflow-y-scroll hide-scrollbar p-[2px]">{renderItems}</div>;
 });
 
 const SidebarMenu = memo(

@@ -4,6 +4,7 @@
 			"title": "チャンネル名",
 			"placeholder": "チャンネル名を入力",
 			"errorMessage": "有効なチャンネル名を入力してください（最大64文字、文字、数字、_または-のみ）。",
+			"emptyError": "チャンネル名を入力してください（最大64文字、文字、数字、_または-のみ）。",
 			"duplicateError": "このカテゴリに同じチャンネル名があります。別の名前を入力してください。"
 		},
 		"threadName": {
@@ -34,7 +35,7 @@
 			"description": "プライバシー権限設定を変更し、メンバーがこのチャンネルとどのように相互作用できるかをカスタマイズします。"
 		},
 		"quickAction": {
-			"title": "クイックアクション"
+			"title": "クイックコマンド"
 		},
 		"privateChannelInvite": {
 			"addMember": "メンバーを追加"
@@ -173,7 +174,7 @@
 		}
 	},
 	"quickAction": {
-		"title": "クイックメニュー",
+		"title": "クイックコマンド",
 		"description": "このチャンネルのクイックメッセージとクイックメニューを管理",
 		"keyTitle": "キーワードを入力（例：こんにちは）:",
 		"valueTitle": "内容を入力（例：おはようございます、良い一日をお過ごしください!）",
@@ -239,7 +240,7 @@
 		"invites": "招待",
 		"integrations": "統合",
 		"category": "カテゴリ",
-		"quickMenu": "クイックメニュー"
+		"quickMenu": "クイックアクション"
 	},
 	"categoryManagement": {
 		"title": "カテゴリ",

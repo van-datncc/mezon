@@ -1,5 +1,6 @@
 import { useEscapeKeyClose, usePermissionChecker } from '@mezon/core';
 import {
+	channelSettingActions,
 	deleteClan,
 	fetchClanWebhooks,
 	fetchWebhooks,
@@ -24,6 +25,7 @@ import Integrations from './Integrations';
 import type { ItemObjProps } from './ItemObj';
 import { ItemSetting, createTranslatedListItemSetting } from './ItemObj';
 import CategoryOrderSetting from './OrderCategorySetting';
+import SettingArchivedChannels from './SettingArchivedChannels';
 import SettingEmoji from './SettingEmoji';
 import ServerSettingMainRoles from './SettingMainRoles';
 import SettingOnBoarding from './SettingOnBoarding';
@@ -47,6 +49,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 			{ id: ItemSetting.OVERVIEW, name: t('sidebar.items.overview') },
 			{ id: ItemSetting.ROLES, name: t('sidebar.items.roles') },
 			{ id: ItemSetting.CATEGORY_ORDER, name: t('sidebar.items.categoryOrder') },
+			{ id: ItemSetting.ARCHIVED_CHANNELS, name: t('sidebar.items.archivedChannels') },
 			{ id: ItemSetting.EMOJI, name: t('sidebar.items.emoji') },
 			{ id: ItemSetting.IMAGE_STICKERS, name: t('sidebar.items.imageStickers') },
 			{ id: ItemSetting.VOIDE_STICKERS, name: t('sidebar.items.voiceStickers') },
@@ -77,6 +80,9 @@ const ClanSetting = (props: ModalSettingProps) => {
 			} else if (canManagerChannel) {
 				dispatch(fetchWebhooks({ channelId: '0', clanId: currentClanId }));
 			}
+		}
+		if (settingItem.id === ItemSetting.ARCHIVED_CHANNELS) {
+			dispatch(channelSettingActions.fetchArchivedChannelsInClan(currentClanId));
 		}
 	};
 
@@ -117,13 +123,15 @@ const ClanSetting = (props: ModalSettingProps) => {
 			case ItemSetting.EMOJI:
 				return <SettingEmoji parentRef={modalRef} />;
 			// case ItemSetting.NOTIFICATION_SOUND:
-			// 	return <NotificationSoundSetting />;
+			//  return <NotificationSoundSetting />;
 			case ItemSetting.IMAGE_STICKERS:
 				return <SettingSticker parentRef={modalRef} />;
 			case ItemSetting.VOIDE_STICKERS:
 				return <SettingSoundEffect />;
 			case ItemSetting.CATEGORY_ORDER:
 				return <CategoryOrderSetting />;
+			case ItemSetting.ARCHIVED_CHANNELS:
+				return <SettingArchivedChannels />;
 			case ItemSetting.AUDIT_LOG:
 				return <AuditLog currentClanId={currentClanId} />;
 			case ItemSetting.ON_BOARDING:
@@ -178,7 +186,7 @@ const ClanSetting = (props: ModalSettingProps) => {
 							!isSidebarOpen ? 'hidden sbm:flex' : 'flex fixed sbm:relative left-0 top-0 h-full z-50 sbm:z-auto'
 						} w-1/6 xl:w-1/4 min-w-56 relative bg-theme-setting-nav text-theme-primary ${closeMenu && !menu && window.innerWidth >= 768 ? 'hidden' : ''}`}
 					>
-						<div className="overflow-y-auto sbm:h-auto sbm:flex-1 h-full">
+						<div className="overflow-y-auto sbm:h-auto sbm:flex-1 h-full thread-scroll">
 							<SettingSidebar
 								onClickItem={handleSettingItemClick}
 								handleMenu={(value: boolean) => setMenu(value)}

@@ -1,19 +1,19 @@
 import {
-	badgeService,
-	fetchListNotification,
-	notificationActions,
-	selectCurrentClanId,
-	selectNotificationClan,
-	selectNotificationForYou,
-	selectNotificationMentions,
-	selectTopicsSort,
-	topicsActions,
-	useAppDispatch
+    badgeService,
+    fetchListNotification,
+    notificationActions,
+    selectCurrentClanId,
+    selectNotificationClan,
+    selectNotificationForYou,
+    selectNotificationMentions,
+    selectTopicsSort,
+    topicsActions,
+    useAppDispatch
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { INotification } from '@mezon/utils';
 import { NotificationCategory, generateE2eId, sortNotificationsByDate } from '@mezon/utils';
-import type { ApiSdTopic } from 'mezon-js/api';
+import type { ApiSdTopic } from 'mezon-js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -30,8 +30,8 @@ const InboxType = {
 
 function InboxButton() {
 	return (
-		<div>
-			<Icons.Inbox />
+		<div className="text-[var(--bg-icon-theme)]">
+			<Icons.Inbox className="size-5" />
 		</div>
 	);
 }
@@ -136,7 +136,7 @@ export function NotificationTooltipContent({ onCloseTooltip }: NotificationToolt
 		<div className="flex flex-col bg-theme-setting-primary text-[14px] text-theme-primary rounded-lg w-[480px] max-w-[600px] max-h-[80vh] z-50 overflow-hidden">
 			<div className="py-2 px-3 ">
 				<div className="flex flex-row items-center justify-between gap-2 font-bold text-[16px]">
-					<div className="flex flex-row items-center gap-4 justify-start">
+					<div className="flex flex-row items-center gap-2 justify-start">
 						<InboxButton />
 						<div>{t('inbox')}</div>
 					</div>

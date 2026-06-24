@@ -11,7 +11,7 @@ import {
 import { Icons } from '@mezon/ui';
 import type { IMessageWithUser } from '@mezon/utils';
 import { TypeMessage, generateE2eId } from '@mezon/utils';
-import type { ApiMessageAttachment } from 'mezon-js/api';
+import type { ApiMessageAttachment } from 'mezon-js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -82,7 +82,12 @@ const ModalDeleteMess = (props: ModalDeleteMessProps) => {
 		if (isRemoveAttachmentNoContent) {
 			const remainingAttachments =
 				attachmentData && mess?.attachments && mess?.attachments.filter((attachment) => attachment.url !== attachmentData.url);
-			await editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, '');
+			const topicIdForUpdate =
+				(mess.topic_id && mess.topic_id !== '0' && mess.topic_id) ||
+				(mess?.content?.tp && mess.content.tp !== '0' && mess.content.tp) ||
+				(isTopic && currentTopicId && currentTopicId !== '0' && currentTopicId) ||
+				'0';
+			await editSendMessage(mess.content, mess.id, mess.mentions ?? [], remainingAttachments, true, topicIdForUpdate, !!isTopic);
 		} else {
 			setIsLoading(true);
 			await handleDeleteMessage();

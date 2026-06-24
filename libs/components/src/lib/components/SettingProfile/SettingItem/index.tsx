@@ -1,3 +1,4 @@
+import { useAppNavigation } from '@mezon/core';
 import mezonPackage from '@mezon/package-js';
 import { appActions, authActions, selectAllAccount, useAppDispatch } from '@mezon/store';
 import { LogoutModal } from '@mezon/ui';
@@ -18,6 +19,9 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 	const handleOpenModal = () => {
 		setOpenModal(true);
 	};
+
+	const { navigate } = useAppNavigation();
+
 	const handleLogOut = async () => {
 		if (!isElectron()) {
 			window.location.href = `${process.env.NX_CHAT_APP_OAUTH2_LOG_OUT}`;
@@ -26,6 +30,7 @@ const SettingItem = ({ onItemClick, initSetting }: { onItemClick?: (settingName:
 			await dispatch(authActions.logOut({ device_id: userProfile?.user?.username || '', platform: 'desktop' }));
 			dispatch(appActions.setIsShowSettingFooterStatus(false));
 			dispatch(appActions.clearHistory());
+			navigate('/login');
 		}
 	};
 	const handleCloseModal = () => {

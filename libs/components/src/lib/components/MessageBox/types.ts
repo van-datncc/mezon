@@ -5,6 +5,8 @@ export type PreviewData = {
 	banner?: string;
 	is_community?: boolean;
 	type?: string;
+	clan_id?: string;
+	member_count?: number;
 };
 
 export type InviteBannerData = {

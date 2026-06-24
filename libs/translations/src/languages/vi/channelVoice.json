@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "Microphone",
 		"outputDevice": "Audio",
-		"camera": "Camera"
+		"camera": "Camera",
+		"systemDefault": "Mặc định hệ thống"
 	},
 	"toast": {
 		"connectionConnected": "Kết nối thành công",

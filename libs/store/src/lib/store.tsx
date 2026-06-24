@@ -1,9 +1,9 @@
-import type { Middleware, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit';
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { accountReducer } from './account/account.slice';
+import { ACCOUNT_FEATURE_KEY, accountReducer } from './account/account.slice';
 import { appReducer } from './app/app.slice';
 import { authReducer, setupSessionSyncListener } from './auth/auth.slice';
 import { categoriesReducer } from './categories/categories.slice';
@@ -26,6 +26,7 @@ import { POLICIES_FEATURE_KEY, policiesReducer } from './policies/policies.slice
 import { reactionReducer } from './reactionMessage/reactionMessage.slice';
 
 import type { MezonContextValue } from '@mezon/transport';
+import { publishSessionUpdate } from '@mezon/transport';
 import { safeJSONParse } from 'mezon-js';
 import { ACTIVITIES_API_FEATURE_KEY, activitiesAPIReducer } from './activities/activitiesAPI.slice';
 import { adminApplicationReducer } from './application/applications.slice';
@@ -38,7 +39,6 @@ import { channelMediaReducer } from './channels/channelMedia.slice';
 import { listchannelsByUserReducer } from './channels/channelUser.slice';
 import { CHANNEL_APP, channelAppReducer } from './channels/channelapp.slice';
 import { channelMetaReducer } from './channels/channelmeta.slice';
-import { CHANNEL_LIST_RENDER, listChannelRenderReducer } from './channels/listChannelRender.slice';
 import { listUsersByUserReducer } from './channels/listUsers.slice';
 import { integrationClanWebhookReducer } from './clanWebhook/clanWebhook.slide';
 import { settingChannelReducer } from './clans/clanSettingChannel.slice';
@@ -206,14 +206,6 @@ const persistedEventMngtReducer = persistReducer(
 	eventManagementReducer
 );
 
-const persistedChannelCatSettingReducer = persistReducer(
-	{
-		key: 'notichannelcategorysetting',
-		storage
-	},
-	channelCategorySettingReducer
-);
-
 const persistedPinMsgReducer = persistReducer(
 	{
 		key: 'pinmessages',
@@ -303,7 +295,7 @@ const persistedChannelMetaReducer = persistReducer(
 	{
 		key: 'channelmeta',
 		storage,
-		blacklist: ['entities']
+		blacklist: ['entities', 'ids']
 	},
 	channelMetaReducer
 );
@@ -316,10 +308,18 @@ const persistedFcmReducer = persistReducer(
 	fcmReducer
 );
 
+const persistedAccountReducer = persistReducer(
+	{
+		key: ACCOUNT_FEATURE_KEY,
+		storage
+	},
+	accountReducer
+);
+
 const reducer = {
 	app: persistedAppReducer,
 	dashboard: dashboardReducer,
-	account: accountReducer,
+	account: persistedAccountReducer,
 	auth: persistedReducer,
 	attachments: attachmentReducer,
 	gallery: galleryReducer,
@@ -351,7 +351,7 @@ const reducer = {
 	pinmessages: persistedPinMsgReducer,
 	defaultnotificationclan: defaultNotificationClanReducer,
 	defaultnotificationcategory: persistedDefaultNotiCatReducer,
-	notichannelcategorysetting: persistedChannelCatSettingReducer,
+	notichannelcategorysetting: channelCategorySettingReducer,
 	invite: inviteReducer,
 	isshow: IsShowReducer,
 	forwardmessage: popupForwardReducer,
@@ -386,7 +386,6 @@ const reducer = {
 	dmcall: DMCallReducer,
 	[E2EE_FEATURE_KEY]: e2eeReducer,
 	[EMBED_MESSAGE]: embedReducer,
-	[CHANNEL_LIST_RENDER]: listChannelRenderReducer,
 	[COMPOSE_FEATURE_KEY]: persistedCompose,
 	groupCall: groupCallReducer,
 	[QUICK_MENU_FEATURE_KEY]: quickMenuReducer,
@@ -405,26 +404,31 @@ let storeInstance = configureStore({
 
 let storeCreated = false;
 
+// Event-based "store ready" promise replaces 100ms polling in getStoreAsync — single shared awaiter, no background timers.
+let _resolveStoreReady: ((store: typeof storeInstance) => void) | null = null;
+const _storeReadyPromise: Promise<typeof storeInstance> = new Promise((resolve) => {
+	_resolveStoreReady = resolve;
+});
+
+// Singleton guards — prevent duplicate listener registration on HMR / repeated initStore calls.
+let _storageListenerActive = false;
+let _friendSyncCleanup: (() => void) | null = null;
+
 export type RootState = ReturnType<typeof storeInstance.getState>;
 
 export type PreloadedRootState = RootState | undefined;
 
-const limitDataMiddleware: Middleware = () => (next) => (action: any) => {
-	// Check if the action is of type 'persist/REHYDRATE' and the key is 'messages'
-	if (action.type === 'persist/REHYDRATE' && action.key === 'messages') {
-		const { channelIdLastFetch, channelMessages } = action.payload || {};
+const isDev = process.env.NX_ENV === 'development';
 
-		if (channelIdLastFetch && channelMessages?.[channelIdLastFetch]) {
-			// Limit the channelMessages to only include messages for the last fetched channelId
-			action.payload = {
-				...action.payload,
-				channelMessages: {
-					[channelIdLastFetch]: channelMessages[channelIdLastFetch]
-				}
-			};
+const thunkNameLogger = () => (next: any) => (action: any) => {
+	const isThunk = typeof action.type === 'string' && action.type.includes('/');
+	if (isThunk) {
+		const [slice, actionName, status] = action.type.split('/');
+		if (status === 'pending') {
+			console.warn(`🚀 : ${slice}/${actionName}`);
 		}
 	}
-	// Pass the action to the next middleware or reducer
+
 	return next(action);
 };
 
@@ -433,19 +437,27 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 		reducer,
 		devTools: false,
 		preloadedState,
-		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware({
+		middleware: (getDefaultMiddleware) => {
+			const base = getDefaultMiddleware({
 				thunk: {
-					extraArgument: {
-						mezon
-					}
+					extraArgument: { mezon }
 				},
 				immutableCheck: false,
 				serializableCheck: false
-			}).prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware)
+			});
+
+			const withListeners = base.prepend(errorListenerMiddleware.middleware, toastListenerMiddleware.middleware);
+
+			if (isDev) {
+				return withListeners.prepend(thunkNameLogger);
+			}
+
+			return withListeners;
+		}
 	});
 	storeInstance = store;
 	storeCreated = true;
+	_resolveStoreReady?.(store);
 
 	import('./badge/badgeService').then(({ badgeService }) => {
 		badgeService.init(store.dispatch, store.getState);
@@ -456,46 +468,49 @@ export const initStore = (mezon: MezonContextValue, preloadedState?: PreloadedRo
 	if (typeof window !== 'undefined') {
 		let lastStorageValue: string | null = null;
 		const handleStorageChange = async (e: StorageEvent) => {
-			if (e.key === 'persist:auth' && e.newValue) {
-				try {
-					if (e.newValue === lastStorageValue) {
-						return;
+			if (e.key !== 'persist:auth') return;
+			if (e.newValue === lastStorageValue) return;
+			lastStorageValue = e.newValue;
+
+			try {
+				const currentState = store.getState();
+				const currentSession = currentState.auth?.session;
+
+				if (!e.newValue) {
+					if (currentSession) {
+						publishSessionUpdate(null, 'cross-tab');
 					}
-					lastStorageValue = e.newValue;
-
-					const newAuthState = safeJSONParse(e.newValue);
-					const sessionData = newAuthState.session ? safeJSONParse(newAuthState.session) : null;
-					const activeAccount = newAuthState.activeAccount ? safeJSONParse(newAuthState.activeAccount) : null;
-
-					const currentState = store.getState();
-					const currentActiveAccount = currentState.auth?.activeAccount;
-					const currentSession = currentState.auth?.session?.[currentActiveAccount || ''];
-
-					const newSession = sessionData && activeAccount ? sessionData[activeAccount] : null;
-					const hasSessionChanged =
-						newSession?.token !== currentSession?.token || newSession?.refresh_token !== currentSession?.refresh_token;
-
-					if (hasSessionChanged) {
-						if (newSession) {
-							window.dispatchEvent(
-								new CustomEvent('mezon:session-refreshed', {
-									detail: { session: newSession }
-								})
-							);
-						}
-					}
-				} catch (err) {
-					console.error('[Storage Sync] Failed to sync auth state:', err);
+					return;
 				}
+
+				const newAuthState = safeJSONParse(e.newValue);
+				const sessionData = newAuthState?.session ? safeJSONParse(newAuthState.session) : null;
+				const newSession = sessionData ?? null;
+
+				const hasSessionChanged =
+					newSession?.token !== currentSession?.token ||
+					newSession?.refresh_token !== currentSession?.refresh_token ||
+					newSession?.session_id !== currentSession?.session_id;
+
+				if (!hasSessionChanged) return;
+
+				publishSessionUpdate(newSession, 'cross-tab');
+			} catch (err) {
+				console.error('[Storage Sync] Failed to sync auth state:', err);
 			}
 		};
 
-		window.addEventListener('storage', handleStorageChange);
+		if (!_storageListenerActive) {
+			window.addEventListener('storage', handleStorageChange);
+			_storageListenerActive = true;
+		}
 	}
 
 	setupSessionSyncListener(store);
 
-	initFriendRelationCrossTabSync(store.dispatch);
+	if (!_friendSyncCleanup) {
+		_friendSyncCleanup = initFriendRelationCrossTabSync(store.dispatch);
+	}
 
 	return { store, persistor };
 };
@@ -510,18 +525,19 @@ export const getStore = () => {
 	return storeInstance;
 };
 
-export const getStoreAsync = async () => {
-	if (!storeCreated) {
-		return new Promise<Store>((resolve) => {
-			const interval = setInterval(() => {
-				if (storeCreated) {
-					clearInterval(interval);
-					resolve(storeInstance);
-				}
-			}, 100);
-		});
+export const getStoreAsync = async (timeoutMs = 5000): Promise<Store> => {
+	if (storeCreated) {
+		return storeInstance;
 	}
-	return storeInstance;
+	return new Promise<Store>((resolve, reject) => {
+		const deadline = setTimeout(() => {
+			reject(new Error('[getStoreAsync] Store initialization timed out'));
+		}, timeoutMs);
+		_storeReadyPromise.then((store) => {
+			clearTimeout(deadline);
+			resolve(store as Store);
+		});
+	});
 };
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();

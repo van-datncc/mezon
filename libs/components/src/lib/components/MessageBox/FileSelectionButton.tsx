@@ -9,9 +9,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
-import { IMAGE_MAX_FILE_SIZE, MAX_FILE_ATTACHMENTS, MAX_FILE_SIZE, UploadLimitReason, generateE2eId, processFile } from '@mezon/utils';
+import { IMAGE_MAX_FILE_SIZE, MAX_FILE_ATTACHMENTS, MAX_FILE_SIZE, UploadLimitReason, generateE2eId, processFilesForAttachment } from '@mezon/utils';
+import type { ApiMessageAttachment } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiMessageAttachment } from 'mezon-js/api';
 import { useRef, useState } from 'react';
 import { useModal } from 'react-modal-hook';
 import CreatePollModal, { type PollData } from './CreatePollModal';
@@ -53,7 +53,7 @@ function FileSelectionButton({ currentChannelId }: FileSelectionButtonProps) {
 				setOverUploadingState(true, UploadLimitReason.SIZE, limit);
 				return;
 			}
-			const updatedFiles = await Promise.all(fileArr.map(processFile<ApiMessageAttachment>));
+			const updatedFiles = await processFilesForAttachment(fileArr);
 			dispatch(
 				referencesActions.setAtachmentAfterUpload({
 					channelId: currentChannelId,
@@ -126,6 +126,7 @@ function FileSelectionButton({ currentChannelId }: FileSelectionButtonProps) {
 				ref={buttonRef}
 				onClick={handleOpenModal}
 				className="flex flex-row h-6 w-6 items-center justify-center cursor-pointer text-theme-primary text-theme-primary-hover"
+				data-e2e={generateE2eId('poll.button.open_modal')}
 			>
 				<Icons.AddCircle className="" />
 			</div>
