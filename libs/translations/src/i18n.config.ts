@@ -6,7 +6,7 @@ import enTranslations from './languages/en/index';
 import esTranslations from './languages/es/index';
 import itTranslations from './languages/it/index';
 import jpnTranslations from './languages/jpn/index';
-import nlTranslations from './languages/nl/index';
+import plTranslations from './languages/pl/index';
 import ptTranslations from './languages/pt/index';
 import ruTranslations from './languages/ru/index';
 import ttTranslations from './languages/tt/index';
@@ -33,7 +33,7 @@ const timezoneDetector = {
 				storedLang === 'tt' ||
 				storedLang === 'pt' ||
 				storedLang === 'jpn' ||
-				storedLang === 'nl' ||
+				storedLang === 'pl' ||
 				storedLang === 'it')
 		) {
 			return undefined;
@@ -68,8 +68,8 @@ const timezoneDetector = {
 			if (languageCode.startsWith('jpn')) {
 				return 'jpn';
 			}
-			if (languageCode.startsWith('nl')) {
-				return 'nl';
+			if (languageCode.startsWith('pl')) {
+				return 'pl';
 			}
 		}
 
@@ -86,6 +86,7 @@ const timezoneDetector = {
 				lng === 'pt' ||
 				lng === 'it' ||
 				lng === 'jpn' ||
+				lng === 'pl' ||
 				lng === 'fr' ||
 				lng === 'ukr' ||
 				lng === 'de' ||
@@ -155,7 +156,7 @@ i18n.use(languageDetector)
 		defaultNS,
 		ns: defaultNamespaces,
 		fallbackLng: 'en',
-		supportedLngs: ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'nl'],
+		supportedLngs: ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'pl'],
 		resources: {
 			en: enTranslations,
 			vi: viTranslations,
@@ -165,7 +166,7 @@ i18n.use(languageDetector)
 			pt: ptTranslations,
 			it: itTranslations,
 			jpn: jpnTranslations,
-			nl: nlTranslations
+			pl: plTranslations
 		},
 		detection: {
 			order: ['timezone', 'localStorage', 'navigator', 'htmlTag'],

@@ -70,11 +70,12 @@ export const SettingLanguage = ({ menuIsOpen }: ISettingLanguageProps) => {
 			{
 				title: `${t('setting:language.japanese')}`,
 				value: 'jpn',
-				contributedBy: 'robits'
+				contributedBy: 'robits',
+				flag: <JapanFlag />
 			},
 			{
-				title: `${t('setting:language.dutch')}`,
-				value: 'nl',
+				title: `${t('setting:language.polish')}`,
+				value: 'pl',
 				contributedBy: 'robits'
 			}
 		];
