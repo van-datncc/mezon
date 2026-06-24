@@ -425,20 +425,27 @@ export const fetchChannelCategorySetting = createAsyncThunk(
 			}
 
 			const mappedList = response.notification_channel_category_settings_list.map(mapChannelCategorySettingToEntity);
+			const childNoCache = Boolean(noCache);
 
-			await Promise.all(
+			const childFetchResults = await Promise.allSettled(
 				mappedList.map((item) => {
 					if (!item.id) {
 						return Promise.resolve();
 					}
 
 					if (item.channel_category_title === 'category') {
-						return thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: item.id, clanId, noCache: true }));
+						return thunkAPI.dispatch(getDefaultNotificationCategory({ categoryId: item.id, clanId, noCache: childNoCache }));
 					}
 
-					return thunkAPI.dispatch(getNotificationSetting({ channelId: item.id, noCache: true }));
+					return thunkAPI.dispatch(getNotificationSetting({ channelId: item.id, noCache: childNoCache }));
 				})
 			);
+
+			for (const result of childFetchResults) {
+				if (result.status === 'rejected') {
+					captureSentryError(result.reason, 'channelCategorySetting/fetchChannelCategorySetting child fetch');
+				}
+			}
 
 			return {
 				fromCache: response.fromCache,

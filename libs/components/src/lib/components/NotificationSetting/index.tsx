@@ -119,7 +119,7 @@ const ModalNotificationSetting = (props: ModalParam) => {
 				return isMutedFromMuteTime(muteTime);
 			}
 
-			return false;
+			return (setting.action ?? 1) === 0;
 		},
 		[categoryNotificationSettings, channelNotificationMuteSeconds]
 	);
