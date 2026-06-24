@@ -6,7 +6,7 @@ import { initReactI18next } from 'react-i18next';
 export const defaultNS = 'common';
 const defaultNamespaces = ['common', 'friends'];
 
-const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe'] as const;
+const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'ukr', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe'] as const;
 type SupportedLng = (typeof SUPPORTED_LNGS)[number];
 const isSupportedLng = (value: string): value is SupportedLng => (SUPPORTED_LNGS as readonly string[]).includes(value);
 
@@ -20,7 +20,6 @@ const timezoneDetector = {
 
 		const browserLanguage = navigator.language || (navigator as Navigator & { userLanguage?: string }).userLanguage;
 		if (!browserLanguage) return undefined;
-
 		const prefix = browserLanguage.toLowerCase().slice(0, 3);
 		const match = SUPPORTED_LNGS.find((lng) => prefix.startsWith(lng));
 		return match;
@@ -50,6 +49,8 @@ const loadLanguageBundle = (language: string): Promise<LanguageBundle> => {
 				return (await import('./languages/vi/index')).default as LanguageBundle;
 			case 'ru':
 				return (await import('./languages/ru/index')).default as LanguageBundle;
+			case 'ukr':
+				return (await import('./languages/ukr/index')).default as LanguageBundle;
 			case 'es':
 				return (await import('./languages/es/index')).default as LanguageBundle;
 			case 'tt':
