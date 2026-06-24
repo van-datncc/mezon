@@ -2528,23 +2528,28 @@ const ChatContextProvider: React.FC<ChatContextProviderProps> = ({ children, isM
 			if (!unblockFriend?.user_id || !userId) {
 				return;
 			}
-			const myId = userId as string;
-			const targetUserId = unblockFriend.user_id;
+			const myId = String(userId);
+			const eventUserId = String(unblockFriend.user_id);
 
-			if (targetUserId === myId) {
+			if (!eventUserId) {
 				return;
 			}
 
-			const existing = selectFriendById(getStore().getState() as RootState, targetUserId);
-			const iBlockedThem = existing?.state === EStateFriend.BLOCK && existing.source_id === myId;
-			if (iBlockedThem) {
-				dispatch(
-					friendsActions.applyFriendBlockState({
-						userId: targetUserId,
-						state: EStateFriend.FRIEND
-					})
-				);
+			if (eventUserId === myId) {
+				void dispatch(friendsActions.fetchListFriends({ noCache: true }));
+				return;
 			}
+
+			dispatch(
+				friendsActions.restoreFriendAfterUnblock({
+					myId,
+					friendUserId: eventUserId,
+					username: unblockFriend.username,
+					avatar: unblockFriend.avatar,
+					display_name: unblockFriend.display_name,
+					user_status: unblockFriend.user_status
+				})
+			);
 		},
 		[dispatch, userId]
 	);
