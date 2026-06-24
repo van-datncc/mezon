@@ -265,8 +265,8 @@ export default defineConfig(({ mode }) => {
 						if (normalizedId.includes('libs/translations/src/languages/jpn')) {
 							return 'i18n-jpn';
 						}
-						if (normalizedId.includes('libs/translations/src/languages/fr')) {
-							return 'i18n-fr';
+						if (normalizedId.includes('libs/translations/src/languages/nl')) {
+							return 'i18n-nl';
 						}
 					}
 				}
