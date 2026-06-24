@@ -1,11 +1,9 @@
-import { checkDuplicateChannelInCategory, selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectTheme, useAppDispatch, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { ValidateSpecialCharacters, generateE2eId } from '@mezon/utils';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { ChannelType } from 'mezon-js';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDebouncedCallback } from 'use-debounce';
 import { ChannelLableModal } from '../ChannelLabel';
 
 interface ChannelNameModalProps {
@@ -13,7 +11,6 @@ interface ChannelNameModalProps {
 	channelNameProps: string;
 	onChange: (value: string) => void;
 	onCheckValidate?: (check: boolean) => void;
-	onHandleChangeValue?: () => void;
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	error?: string;
 	placeholder: string;
@@ -27,10 +24,10 @@ export type ChannelNameModalRef = {
 };
 
 export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameModalProps>((props, ref) => {
-	const { channelNameProps, type, onChange, onCheckValidate, onHandleChangeValue, onKeyDown, error, placeholder, shouldValidate, categoryId, clanId } = props;
+	const { channelNameProps, type, onChange, onCheckValidate, onKeyDown, error, placeholder, shouldValidate, categoryId, clanId } = props;
 	const { t } = useTranslation('createChannel');
-	const [checkValidate, setCheckValidate] = useState(true);
-	const [checkNameChannel, setCheckNameChannel] = useState(true);
+	const [checkValidate, setCheckValidate] = useState(false);
+	const [checkNameChannel, setCheckNameChannel] = useState(false);
 	const theme = useAppSelector(selectTheme);
 	const dispatch = useAppDispatch();
 	const messages = {
@@ -40,56 +37,37 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 	const [validateMessage, setValidateMesage] = useState(messages.INVALID_NAME);
 
 	const handleInputChange = useCallback(
-		async (e: React.ChangeEvent<HTMLInputElement>) => {
+		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = e.target.value;
 			onChange(value);
 
 			if (value === '') {
 				setCheckNameChannel(true);
+				setCheckValidate(true);
+				setValidateMesage(messages.INVALID_NAME);
+				if (onCheckValidate) {
+					onCheckValidate(false);
+				}
 			} else {
 				setCheckNameChannel(false);
-			}
-
-			debouncedSetChannelName(value);
-		},
-		[onChange, setCheckValidate, onCheckValidate, setValidateMesage]
-	);
-
-	const debouncedSetChannelName = useDebouncedCallback(async (value: string) => {
-		const regex = ValidateSpecialCharacters();
-		if (regex.test(value)) {
-			await dispatch(
-				checkDuplicateChannelInCategory({
-					channelName: value.trim(),
-					categoryId: categoryId ?? '',
-					clanId
-				})
-			)
-				.then(unwrapResult)
-				.then((result) => {
-					if (result) {
-						setCheckValidate(true);
-						setValidateMesage(messages.DUPLICATE_NAME);
-						if (onCheckValidate) {
-							onCheckValidate(false);
-						}
-						return;
-					}
+				const regex = ValidateSpecialCharacters();
+				if (regex.test(value)) {
 					setCheckValidate(false);
 					setValidateMesage('');
 					if (onCheckValidate) {
 						onCheckValidate(true);
 					}
-				});
-			return;
-		} else {
-			setCheckValidate(true);
-			if (onCheckValidate) {
-				onCheckValidate(false);
-				setValidateMesage(messages.INVALID_NAME);
+				} else {
+					setCheckValidate(true);
+					setValidateMesage(messages.INVALID_NAME);
+					if (onCheckValidate) {
+						onCheckValidate(false);
+					}
+				}
 			}
-		}
-	}, 300);
+		},
+		[onChange, setCheckValidate, onCheckValidate, setValidateMesage]
+	);
 
 	const iconMap: Partial<Record<ChannelType, JSX.Element>> = {
 		[ChannelType.CHANNEL_TYPE_CHANNEL]: <Icons.Hashtag defaultSize="w-6 h-6" />,
@@ -107,18 +85,12 @@ export const ChannelNameTextField = forwardRef<ChannelNameModalRef, ChannelNameM
 		checkInput: () => checkValidate || checkNameChannel
 	}));
 
-	useEffect(() => {
-		if (onHandleChangeValue) {
-			onHandleChangeValue();
-		}
-	}, [checkValidate, checkNameChannel, onHandleChangeValue]);
-
 	return (
 		<div className="Frame408 self-stretch h-[84px] flex-col justify-start items-start gap-2 flex mt-1">
 			<ChannelLableModal labelProp={channelNameProps} />
 			<div className="ContentContainer self-stretch h-11 flex-col items-start flex">
 				<div
-					className={`InputContainer self-stretch h-11 px-4 py-3 bg-item-theme rounded shadow border w-full ${error ? 'border border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
+					className={`InputContainer self-stretch h-11 px-4 py-3 bg-item-theme rounded shadow border w-full ${error || (shouldValidate && checkValidate && !checkNameChannel) ? 'border-red-500' : 'border-blue-600'}  justify-start items-center gap-2 inline-flex`}
 				>
 					{iconMap[type]}
 					<div className="InputValue grow shrink basis-0 self-stretch justify-start items-center flex">

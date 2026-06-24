@@ -3,8 +3,8 @@ import { referencesActions, selectCloseMenu, selectDataReferences, selectStatusM
 import { useMezon } from '@mezon/transport';
 import { Icons } from '@mezon/ui';
 import type { ILongPressType, IMessageSendPayload, MentionDataProps, ThreadValue } from '@mezon/utils';
-import { EOverriddenPermission, MAX_FILE_ATTACHMENTS, UploadLimitReason, processFile, useLongPress } from '@mezon/utils';
-import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js/api';
+import { EOverriddenPermission, MAX_FILE_ATTACHMENTS, UploadLimitReason, processFilesForAttachment, useLongPress } from '@mezon/utils';
+import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef } from 'mezon-js';
 import type { ReactElement } from 'react';
 import { Fragment, memo, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -96,7 +96,7 @@ const MessageBox = (props: MessageBoxProps): ReactElement => {
 						setOverUploadingState(true, UploadLimitReason.COUNT);
 						return;
 					}
-					const updatedFiles = await Promise.all(files.map(processFile<ApiMessageAttachment>));
+					const updatedFiles = await processFilesForAttachment(files);
 					dispatch(
 						referencesActions.setAtachmentAfterUpload({
 							channelId: currentChannelId,

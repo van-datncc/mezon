@@ -9,10 +9,10 @@ import {
 } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { generateE2eId, titleMission } from '@mezon/utils';
-import type { ApiOnboardingItem } from 'mezon-js/api';
+import type { ApiOnboardingItem } from 'mezon-js';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useModal } from 'react-modal-hook';
 import { useSelector } from 'react-redux';
 import GuideItemLayout from '../GuideItemLayout';
@@ -68,7 +68,13 @@ function ClanGuideSetting({ setOpenModalSaveChanges }: ClanGuideSettingProps = {
 				<div className="w-full h-[1px] my-8 text-theme-primary"></div>
 				<SectionDescription
 					title={t('clanGuideSetting.newMemberToDos.title')}
-					description={<div dangerouslySetInnerHTML={{ __html: t('clanGuideSetting.newMemberToDos.description') }} />}
+					description={
+						<Trans
+							i18nKey="clanGuideSetting.newMemberToDos.description"
+							ns="onBoardingClan"
+							components={{ strong: <strong className="font-semibold" /> }}
+						/>
+					}
 				/>
 
 				<div className="flex flex-col gap-2 pb-8 md:pb-8">
@@ -209,7 +215,7 @@ const MissionItem = ({ mission, temp, setOpenModalSaveChanges }: MissionItemProp
 		<GuideItemLayout
 			key={mission.title}
 			hightLightIcon={true}
-			icon={<Icons.HashIcon className="w-4 text-theme-primary flex-shrink-0" />}
+			icon={<Icons.Hashtag className="w-4 text-theme-primary flex-shrink-0" />}
 			gap={16}
 			className="px-3 md:px-3"
 			title={mission.title}

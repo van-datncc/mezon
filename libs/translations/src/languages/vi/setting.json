@@ -89,10 +89,16 @@
 		"russian": "Русский",
 		"spanish": "Español",
 		"tatar": "Tatarça",
+		"german": "Deutsch",
 		"portuguese": "Português",
 		"italian": "Italiano",
 		"japanese": "日本語",
-		"french": "Français"
+		"french": "Français",
+		"german": "Deutsch",
+		"polish": "Polski",
+		"korean": "한국어",
+		"swedish": "Svenska",
+		"belarusian": "Беларуская"
 	},
 	"voice": {
 		"title": "Giọng nói",

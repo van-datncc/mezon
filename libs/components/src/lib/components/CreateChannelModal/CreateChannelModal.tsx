@@ -1,9 +1,9 @@
 import { useAppNavigation, useEscapeKeyClose } from '@mezon/core';
 import {
 	channelsActions,
+	checkDuplicateChannelInCategoryApi,
 	createNewChannel,
 	fetchApplications,
-	listChannelRenderAction,
 	selectChannelById,
 	selectCurrentCategory,
 	selectCurrentClanId,
@@ -12,8 +12,9 @@ import {
 	useAppSelector
 } from '@mezon/store';
 import { AlertTitleTextWarning, Icons } from '@mezon/ui';
+import { unwrapResult } from '@reduxjs/toolkit';
+import type { ApiApp, ApiCreateChannelDescRequest } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiApp, ApiCreateChannelDescRequest } from 'mezon-js/api';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,7 +35,7 @@ export const CreateNewChannelModal = () => {
 	const currentClanId = useSelector(selectCurrentClanId);
 	const welcomeChannelId = useAppSelector(selectCurrentClanWelcomeChannelId);
 	const currentCategory = useAppSelector((state) => selectCurrentCategory(state));
-	const [validate, setValidate] = useState(true);
+	const [validate, setValidate] = useState(false);
 	const [channelName, setChannelName] = useState<string>('');
 	const [selectedApp, setSelectedApp] = useState<ApiApp | null>(null);
 	const [isErrorType, setIsErrorType] = useState<string>('');
@@ -82,6 +83,26 @@ export const CreateNewChannelModal = () => {
 			return;
 		}
 
+		try {
+			const categoryIdParams = currentCategory?.category_id || channelWelcome?.category_id;
+			if (channelType !== ChannelType.CHANNEL_TYPE_APP && categoryIdParams) {
+				const isDuplicateRes = await dispatch(
+					checkDuplicateChannelInCategoryApi({
+						channelName: channelName.trim(),
+						categoryId: categoryIdParams
+					})
+				).then(unwrapResult);
+
+				if (isDuplicateRes) {
+					setIsErrorName(t('validation.duplicateName'));
+					return;
+				}
+			}
+		} catch (error) {
+			console.error('Check duplicate channel name Failed', error);
+			return;
+		}
+
 		const body: ApiCreateChannelDescRequest = {
 			clan_id: currentClanId as string,
 			type: channelType,
@@ -97,15 +118,6 @@ export const CreateNewChannelModal = () => {
 		const payload = newChannelCreatedId.payload as ApiCreateChannelDescRequest;
 		const channelID = payload.channel_id;
 		const typeChannel = payload.type;
-		if (currentCategory?.category_id) {
-			dispatch(
-				listChannelRenderAction.updateCategoryChannels({
-					clanId: currentClanId as string,
-					categoryId: currentCategory?.category_id,
-					channelId: channelID ?? ''
-				})
-			);
-		}
 
 		if (newChannelCreatedId && typeChannel !== ChannelType.CHANNEL_TYPE_MEZON_VOICE && typeChannel !== ChannelType.CHANNEL_TYPE_STREAMING) {
 			const channelPath = toChannelPage(channelID ?? '', currentClanId ?? '');
@@ -129,6 +141,7 @@ export const CreateNewChannelModal = () => {
 
 	const checkValidate = (check: boolean) => {
 		setValidate(check);
+		setIsInputError(!check);
 	};
 
 	const onChangeChannelType = (value: number) => {
@@ -139,17 +152,6 @@ export const CreateNewChannelModal = () => {
 	const onChangeToggle = (value: number) => {
 		setIsPrivate(value);
 	};
-
-	const handleChangeValue = useCallback(() => {
-		const isValid = InputRef.current?.checkInput() ?? false;
-
-		if (channelType === ChannelType.CHANNEL_TYPE_APP) {
-			const isInputError = isValid;
-			setIsInputError(isInputError);
-		} else {
-			setIsInputError(isValid);
-		}
-	}, [channelType]);
 
 	const modalRef = useRef<HTMLDivElement>(null);
 	const handleClose = useCallback(() => {
@@ -228,7 +230,6 @@ export const CreateNewChannelModal = () => {
 									type={channelType}
 									channelNameProps={t('labels.channelName')}
 									error={isErrorName}
-									onHandleChangeValue={handleChangeValue}
 									placeholder={t('labels.placeholder')}
 									shouldValidate={true}
 									categoryId={currentCategory?.category_id || channelWelcome?.category_id}

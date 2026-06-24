@@ -2,14 +2,12 @@ import i18n from '@mezon/translations';
 import { EUserStatus, type IUserProfileActivity, type LoadingStatus } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { AddFriend } from 'mezon-js';
-import type { ApiFriend } from 'mezon-js/api';
+import type { AddFriend, ApiFriend } from 'mezon-js';
 import { toast } from 'react-toastify';
 import { selectAllAccount, selectCurrentUserId } from '../account/account.slice';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import type { StatusUserArgs } from '../channelmembers/channel.members';
-import { statusActions } from '../direct/status.slice';
 import type { MezonValueContext } from '../helpers';
 import { ensureSession, fetchDataWithSocketFallback, getMezonCtx } from '../helpers';
 import type { RootState } from '../store';
@@ -84,7 +82,7 @@ export const fetchListFriendsCached = async (
 	const currentState = getState();
 	const friendsState = currentState[FRIEND_FEATURE_KEY];
 
-	const apiKey = createApiKey('fetchFriends', state, limit, cursor, ensuredMezon.session.username || '');
+	const apiKey = createApiKey('fetchFriends', state, limit, cursor, ensuredMezon.session?.token || '');
 
 	const shouldForceCall = shouldForceApiCall(apiKey, friendsState?.cache, noCache);
 
@@ -128,7 +126,6 @@ export const fetchListFriends = createAsyncThunk('friends/fetchListFriends', asy
 	const state = thunkAPI.getState() as RootState;
 	const currentUserId = selectAllAccount(state)?.user?.id || '';
 	const listFriends = response.friends.map((friend) => mapFriendToEntity(friend, currentUserId));
-	thunkAPI.dispatch(statusActions.updateBulkStatus(mapFriendToStatus(response.friends)));
 	return { friends: listFriends, fromCache: response.fromCache };
 });
 
@@ -332,6 +329,56 @@ export const friendsSlice = createSlice({
 					friend.source_id = sourceId;
 				}
 			}
+		},
+		restoreFriendAfterUnblock: (
+			state,
+			action: PayloadAction<{
+				myId: string;
+				friendUserId: string;
+				username?: string;
+				avatar?: string;
+				display_name?: string;
+				user_status?: string;
+			}>
+		) => {
+			const { myId, friendUserId, username, avatar, display_name, user_status } = action.payload;
+			const myIdStr = String(myId);
+			const friendId = String(friendUserId);
+
+			if (!friendId || friendId === myIdStr) {
+				return;
+			}
+
+			const directEntity = state.entities[friendId];
+			const existing = directEntity ?? Object.values(state.entities).find((entity) => entity && String(entity.user?.id ?? '') === friendId);
+
+			if (existing) {
+				existing.state = EStateFriend.FRIEND;
+				if (username || avatar || display_name || user_status) {
+					existing.user = {
+						...existing.user,
+						id: friendId,
+						...(username !== undefined ? { username } : {}),
+						...(avatar !== undefined ? { avatar_url: avatar } : {}),
+						...(display_name !== undefined ? { display_name } : {}),
+						...(user_status !== undefined ? { user_status } : {})
+					};
+				}
+				return;
+			}
+
+			friendsAdapter.upsertOne(state, {
+				id: friendId,
+				source_id: myIdStr,
+				state: EStateFriend.FRIEND,
+				user: {
+					id: friendId,
+					username,
+					avatar_url: avatar,
+					display_name,
+					user_status
+				}
+			});
 		},
 		upsertFriend: (state, action: PayloadAction<FriendsEntity>) => {
 			const friendEntity = mapFriendToEntity(action.payload, action.payload.source_id || '');

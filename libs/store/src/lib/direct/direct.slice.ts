@@ -3,9 +3,16 @@ import type { BuzzArgs, IChannel, IMessage, IUserChannel, IUserProfileActivity, 
 import { ActiveDm } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ChannelMessage, ChannelUpdatedEvent, UserProfile } from 'mezon-js';
+import type {
+	ApiChannelDescription,
+	ApiChannelMessageHeader,
+	ApiCreateChannelDescRequest,
+	ApiDeleteChannelDescRequest,
+	ChannelMessage,
+	ChannelUpdatedEvent,
+	UserProfile
+} from 'mezon-js';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import type { ApiChannelDescription, ApiChannelMessageHeader, ApiCreateChannelDescRequest, ApiDeleteChannelDescRequest } from 'mezon-js/api';
 import { toast } from 'react-toastify';
 import { selectAllAccount } from '../account/account.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
@@ -18,7 +25,6 @@ import { ensureSession, getMezonCtx, withRetry } from '../helpers';
 import type { MessagesEntity } from '../messages/messages.slice';
 import { messagesActions } from '../messages/messages.slice';
 import type { RootState } from '../store';
-import { statusActions } from './status.slice';
 
 export const DIRECT_FEATURE_KEY = 'direct';
 
@@ -102,6 +108,7 @@ export const createNewDirectMessage = createAsyncThunk(
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.createChannelDesc(mezon.session, body);
+
 			if (response) {
 				thunkAPI.dispatch(
 					directActions.upsertOne({
@@ -109,10 +116,12 @@ export const createNewDirectMessage = createAsyncThunk(
 						...response,
 						usernames: Array.isArray(username) ? username : username ? [username] : [],
 						display_names: Array.isArray(display_names) ? display_names : display_names ? [display_names] : [],
-						channel_label:
-							response.channel_label ||
-							(Array.isArray(display_names) ? display_names.join(',') : Array.isArray(username) ? username.join(',') : ''),
-						channel_avatar: response.channel_avatar || '/assets/images/avatar-group.png',
+						channel_label: Array.isArray(display_names)
+							? display_names.join(',')
+							: Array.isArray(username)
+								? username.join(',')
+								: display_names || username,
+						channel_avatar: Array.isArray(avatar) ? avatar[0] : avatar || '/assets/images/avatar-group.png',
 						avatars: Array.isArray(avatar) ? avatar : avatar ? [avatar] : [],
 						user_ids: body.user_ids,
 						active: 1,
@@ -194,22 +203,20 @@ type fetchDmGroupArgs = {
 
 const processDmChannels = (channelDescs: ApiChannelDescription[], existingEntities: DirectEntity[], userProfile: any, thunkAPI: any) => {
 	const listDM: IUserChannel[] = [];
-	const sorted = channelDescs.sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
-		if (
-			a === undefined ||
-			b === undefined ||
-			a.last_sent_message === undefined ||
-			a.last_seen_message?.id === undefined ||
-			b.last_sent_message === undefined ||
-			b.last_seen_message?.id === undefined
-		) {
-			return 0;
+	const toBigIntSafe = (id: string | undefined): bigint => {
+		if (!id) return 0n;
+		try {
+			return BigInt(id);
+		} catch {
+			return 0n;
 		}
-		if (a.last_sent_message.id && b.last_sent_message.id && a.last_sent_message.id < b.last_sent_message.id) {
-			return 1;
-		}
-
-		return -1;
+	};
+	const sorted = [...channelDescs].sort((a: ApiChannelDescription, b: ApiChannelDescription) => {
+		const aId = a?.last_sent_message?.id;
+		const bId = b?.last_sent_message?.id;
+		if (!aId || !bId) return 0;
+		const diff = toBigIntSafe(bId) - toBigIntSafe(aId);
+		return diff > 0n ? 1 : diff < 0n ? -1 : 0;
 	});
 
 	channelDescs.map((channel: ApiChannelDescription) => {
@@ -233,8 +240,6 @@ const processDmChannels = (channelDescs: ApiChannelDescription[], existingEntiti
 	});
 
 	thunkAPI.dispatch(userChannelsActions.upsertMany(listDM));
-	const users = mapChannelsToUsers(sorted);
-	thunkAPI.dispatch(statusActions.updateBulkStatus(users));
 
 	return channels;
 };
@@ -244,7 +249,7 @@ export const fetchDirectMessage = createAsyncThunk(
 	async ({ channelType = ChannelType.CHANNEL_TYPE_GROUP, isMobile = false }: fetchDmGroupArgs, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const response = await mezon.client.listChannelDescs(mezon.session, DM_PAGE_SIZE, 1, 1, '0', channelType, isMobile);
+			const response = await mezon.client.listChannelDescs(mezon.session, DM_PAGE_SIZE, 1, 1, '0', channelType, false);
 			if (!response.channeldesc || response.channeldesc.length === 0) {
 				return { channels: [], hasMore: false, page: 1 };
 			}
@@ -589,14 +594,33 @@ export const directSlice = createSlice({
 	name: DIRECT_FEATURE_KEY,
 	initialState: initialDirectState,
 	reducers: {
-		remove: directAdapter.removeOne,
+		remove: (state, action: PayloadAction<string>) => {
+			const channelId = action.payload;
+			directAdapter.removeOne(state, channelId);
+			if (state.currentDirectMessageId === channelId) {
+				state.currentDirectMessageId = null;
+			}
+		},
 		upsertOne: (state, action: PayloadAction<DirectEntity>) => {
 			const { entities } = state;
-			const existLabel = entities[action.payload.id]?.channel_label?.split(',');
-			const existingShowPinBadge = entities[action.payload.id]?.showPinBadge;
+			const existingEntity = entities[action.payload.id];
+			const existingShowPinBadge = existingEntity?.showPinBadge;
 			const dataUpdate = action.payload;
-			if (existLabel && existLabel?.length <= 1) {
-				dataUpdate.channel_label = entities[action.payload.id]?.channel_label;
+
+			if (dataUpdate.channel_label === undefined && existingEntity?.channel_label?.trim()) {
+				dataUpdate.channel_label = existingEntity.channel_label;
+			}
+			if (dataUpdate.avatars === undefined && existingEntity?.avatars?.length) {
+				dataUpdate.avatars = existingEntity.avatars;
+			}
+			if (dataUpdate.display_names === undefined && existingEntity?.display_names?.length) {
+				dataUpdate.display_names = existingEntity.display_names;
+			}
+			if (dataUpdate.usernames === undefined && existingEntity?.usernames?.length) {
+				dataUpdate.usernames = existingEntity.usernames;
+			}
+			if (dataUpdate.user_ids === undefined && existingEntity?.user_ids?.length) {
+				dataUpdate.user_ids = existingEntity.user_ids;
 			}
 
 			if (existingShowPinBadge !== undefined) {
@@ -944,6 +968,10 @@ export const directSlice = createSlice({
 				toast.error(action.error.message || 'Failed to update group');
 			})
 			.addCase(fetchDirectDetail.fulfilled, (state: DirectState, action) => {
+				const { directId } = action.meta.arg;
+				if (state.currentDirectMessageId !== directId) {
+					return;
+				}
 				directAdapter.upsertOne(state, action.payload);
 			});
 	}

@@ -9,7 +9,7 @@ import {
 	useRoomContext,
 	useTracks
 } from '@livekit/components-react';
-import { selectCurrentGroupId, selectMemberByGroupId, useAppSelector } from '@mezon/store';
+import { selectCurrentGroupId, selectMemberByGroupId, selectVoiceFullScreen, useAppSelector } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { LocalParticipant, LocalTrackPublication, RemoteParticipant, RemoteTrackPublication } from 'livekit-client';
 import { DisconnectReason, RoomEvent, Track } from 'livekit-client';
@@ -67,6 +67,10 @@ export const GroupVideoConference = memo(
 		const focusTrack = usePinnedTracks(layoutContext)?.[0];
 
 		const [isShowMember, setIsShowMember] = useState<boolean>(true);
+		const isVoiceFullScreen = useAppSelector(selectVoiceFullScreen);
+		const voiceOverlayClass = isVoiceFullScreen
+			? 'transition-opacity duration-300 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto'
+			: 'transition-opacity duration-300 opacity-100 pointer-events-auto';
 
 		useEffect(() => {
 			if (screenShareTracks.some((track) => track.publication.isSubscribed) && lastAutoFocusedScreenShareTrack.current === null) {
@@ -185,39 +189,29 @@ export const GroupVideoConference = memo(
 								</FocusLayoutContainer>
 							</div>
 						)}
-						<div className="absolute top-0 left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
+						<div className={`absolute top-0 left-0 w-full ${voiceOverlayClass}`}>
 							<div className="w-full h-[68px] flex justify-between items-center p-2 !pr-5">
 								<div className="flex justify-start gap-2">
 									<span>
-										<Icons.Speaker defaultSize="w-6 h-6" defaultFill={isShowMember ? 'text-theme-primary' : 'text-gray-300'} />
+										<Icons.Speaker className="w-6 h-6 text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 									</span>
-									<p
-										className={`text-base font-semibold cursor-default one-line ${isShowMember ? 'text-theme-primary' : 'text-gray-300'}`}
-									>
+									<p className="text-base font-semibold cursor-default one-line text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]">
 										{channelLabel}
 									</p>
 								</div>
 								<div className="flex justify-start gap-4">
 									<span onClick={toggleViewMode} className="cursor-pointer">
 										{focusTrack ? (
-											<Icons.VoiceGridIcon
-												className={
-													isShowMember ? 'text-theme-primary text-theme-primary-hover' : 'text-gray-300 hover:text-white'
-												}
-											/>
+											<Icons.VoiceGridIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 										) : (
-											<Icons.VoiceFocusIcon
-												className={
-													isShowMember ? 'text-theme-primary text-theme-primary-hover' : 'text-gray-300 hover:text-white'
-												}
-											/>
+											<Icons.VoiceFocusIcon className="text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]" />
 										)}
 									</span>
 								</div>
 							</div>
 						</div>
 						<div
-							className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto`}
+							className={`absolute ${isShowMember ? 'bottom-0' : focusTrack ? 'bottom-8' : 'bottom-0'} left-0 w-full ${voiceOverlayClass}`}
 						>
 							<ControlBar
 								onLeaveRoom={() => onLeaveRoom(userTracks.length)}

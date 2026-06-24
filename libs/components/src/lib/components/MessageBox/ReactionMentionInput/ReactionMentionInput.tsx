@@ -11,6 +11,7 @@ import {
 	selectAllRolesClan,
 	selectAnonymousMode,
 	selectAttachmentByChannelId,
+	selectChannelMetaById,
 	selectCloseMenu,
 	selectCurrentTopicId,
 	selectDataMentions,
@@ -45,6 +46,7 @@ import {
 	ID_MENTION_HERE,
 	IS_SAFARI,
 	MIN_THRESHOLD_CHARS,
+	PREFIX_MESSAGE_LENGTH,
 	QUICK_MENU_TYPE,
 	RECENT_EMOJI_CATEGORY,
 	SubPanelName,
@@ -58,8 +60,8 @@ import {
 	processEntitiesDirectly,
 	searchMentionsHashtag
 } from '@mezon/utils';
+import type { ApiMessageMention, ApiMessageRef } from 'mezon-js';
 import { ChannelStreamMode, ChannelType } from 'mezon-js';
-import type { ApiMessageMention, ApiMessageRef } from 'mezon-js/api';
 import type { ReactElement, RefObject } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +71,7 @@ import MentionsInput, { type FormattedText, type MentionsInputHandle } from './M
 import SuggestItem from './SuggestItem';
 import { ChatBoxToolbarWrapper } from './components';
 import { useClickUpToEditMessage, useEmojiPicker, useFocusEditor, useFocusManager, useKeyboardHandler } from './hooks';
-import parseHtmlAsFormattedText, { ApiMessageEntityTypes } from './parseHtmlAsFormattedText';
+import parseHtmlAsFormattedToText, { ApiMessageEntityTypes } from './parseHtmlAsFormattedText';
 import { getCanvasTitles } from './utils/canvas';
 
 interface SlashCommand extends MentionData {
@@ -252,22 +254,24 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				return;
 			}
 
-			const currentTime = Math.floor(Date.now() / 1000);
-			const lastMessageTimestamp = channel.last_sent_message?.timestamp_seconds;
-
-			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
-
 			const store = getStore();
 			const userIds = selectMemberIdsByChannelId(store.getState(), channel.id as string);
+			const threadMeta = selectChannelMetaById(store.getState(), channel.id);
 			const needsJoin = !userProfile?.user?.id ? false : !userIds?.includes(userProfile?.user?.id);
-
-			if (isArchived || channel.active === 0) {
-				await dispatch(
-					threadsActions.writeActiveArchivedThread({
-						clanId: channel.clan_id ?? '',
-						channelId: channel.channel_id ?? ''
-					})
-				);
+			const currentTime = Math.floor(Date.now() / 1000);
+			const lastMessageTimestamp = threadMeta?.lastSentTimestamp;
+			const isArchived = lastMessageTimestamp && currentTime - Number(lastMessageTimestamp) > THREAD_ARCHIVE_DURATION_SECONDS;
+			try {
+				if (isArchived || !channel.active) {
+					await dispatch(
+						threadsActions.writeActiveArchivedThread({
+							clanId: channel.clan_id ?? '',
+							channelId: channel.channel_id ?? ''
+						})
+					).unwrap();
+				}
+			} catch (e) {
+				// Unarchive failed, but message send will continue
 			}
 			if (needsJoin && joinningToThread) {
 				dispatch(threadsActions.updateActiveCodeThread({ channelId: channel.id, activeCode: ThreadStatus.joined }));
@@ -293,7 +297,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					mentionRaw: [],
 					entities: []
 				});
-
 				return;
 			}
 
@@ -301,10 +304,8 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				const hasContent = checkedRequest.content?.trim() || checkedRequest.valueTextInput?.trim();
 				// Khi openThreadMessageState: valueThread luôn có content (message gốc) nên KHÔNG tính vào check
 				// → bắt buộc user phải tự nhập vào field starter message
-				const hasValueThreadMedia = !isSendMessageOnThreadBox && (
-					(valueThread?.attachments?.length ?? 0) > 0 ||
-					(valueThread?.content?.t ?? '').trim().length > 0
-				);
+				const hasValueThreadMedia =
+					!isSendMessageOnThreadBox && ((valueThread?.attachments?.length ?? 0) > 0 || (valueThread?.content?.t ?? '').trim().length > 0);
 				if (!hasContent && !checkAttachment && !hasValueThreadMedia) {
 					dispatch(threadsActions.setMessageThreadError(t('channelTopbar:createThread.validation.starterMessageRequired')));
 					return;
@@ -372,7 +373,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					payload.cvtt = canvasTitles;
 				}
 
-				const removeEmptyOnPayload = filterEmptyArrays([]);
+				const removeEmptyOnPayload = filterEmptyArrays(payload);
 
 				const encoder = new TextEncoder();
 				const payloadJson = JSON.stringify(removeEmptyOnPayload);
@@ -395,8 +396,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				if (checkIsThread(currentChannel as ChannelsEntity) && usersNotExistingInThread.length > 0 && addMemberToThread) {
 					await addMemberToThread(currentChannel!, usersNotExistingInThread);
 				}
-
-				handleThreadActivation(currentChannel);
 
 				if (isReplyOnChannel) {
 					props.onSend(
@@ -465,7 +464,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 					);
 					setMentionEveryone(false);
 				}
-
 				updateDraft?.({
 					valueTextInput: '',
 					content: '',
@@ -494,6 +492,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				setIsPasteMulti(false);
 				setSubPanelActive(SubPanelName.NONE);
 
+				await handleThreadActivation(currentChannel);
 				if (ephemeralTargetUserId) {
 					setEphemeralTargetUserId(null);
 					setEphemeralTargetUserDisplay(null);
@@ -522,7 +521,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				payload.cvtt = canvasTitles;
 			}
 
-			const removeEmptyOnPayload = filterEmptyArrays([]);
+			const removeEmptyOnPayload = filterEmptyArrays(payload);
 			const encoder = new TextEncoder();
 			const payloadJson = JSON.stringify(removeEmptyOnPayload);
 			const utf8Bytes = encoder.encode(payloadJson);
@@ -571,8 +570,6 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				dispatch(threadsActions.setNameThreadError(t('channelTopbar:createThread.validation.threadNameRequired')));
 				return;
 			}
-
-			handleThreadActivation(currentChannel);
 
 			if (isReplyOnChannel) {
 				props.onSend(
@@ -695,6 +692,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 			setDisplayPlaintext('');
 			setIsPasteMulti(false);
 			setSubPanelActive(SubPanelName.NONE);
+			await handleThreadActivation(currentChannel);
 		},
 		[
 			mentionData,
@@ -777,7 +775,7 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 	const cachedLinkOgp = useRef<string>('');
 
 	const onChangeMentionInput = (html: string) => {
-		const { text: newPlainTextValue, entities, linkPreview } = parseHtmlAsFormattedText(html);
+		const { text: newPlainTextValue, entities, linkPreview } = parseHtmlAsFormattedToText(html);
 
 		if (cachedLinkOgp.current !== linkPreview.url) {
 			dispatch(referencesActions.setOgpPreview(linkPreview.url ? { ...linkPreview, channel_id: props.currentChannelId || '' } : null));
@@ -1218,8 +1216,10 @@ export const MentionReactBase = memo((props: MentionReactBaseProps): ReactElemen
 				isThreadbox={props.isThreadbox || false}
 				onEmojiSelect={insertEmojiDirectly}
 			/>
-			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS && (
-				<div className="w-16 text-red-300 bottom-0 right-0 absolute">{MIN_THRESHOLD_CHARS - draftRequest.content.length}</div>
+			{draftRequest?.content && draftRequest.content.length > MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH && (
+				<div className="w-16 text-red-300 bottom-0 right-0 absolute">
+					{MIN_THRESHOLD_CHARS - PREFIX_MESSAGE_LENGTH - draftRequest.content.length}
+				</div>
 			)}
 		</div>
 	);

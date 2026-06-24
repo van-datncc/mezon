@@ -1,3 +1,4 @@
+import type { MessagesEntity } from '@mezon/store';
 import {
 	getStore,
 	messagesActions,
@@ -6,6 +7,7 @@ import {
 	selectCurrentTopicId,
 	selectInitTopicMessageId,
 	selectMemberClanByUserId,
+	selectMessageByMessageId,
 	selectSearchChannelById,
 	selectTopicAnonymousMode,
 	topicsActions,
@@ -14,8 +16,9 @@ import {
 } from '@mezon/store';
 import { useMezon } from '@mezon/transport';
 import type { IMessageSendPayload } from '@mezon/utils';
+import { TypeMessage, getMessageCreateTimeSeconds, withCreateTimeSecondsInUpdateContent } from '@mezon/utils';
+import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js';
 import { ChannelStreamMode } from 'mezon-js';
-import type { ApiChannelDescription, ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiSdTopic, ApiSdTopicRequest } from 'mezon-js/api';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -55,7 +58,7 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 	const anonymousMode = useSelector((state) => selectAnonymousMode(state, getClanId as string));
 	const topicAnonymousMode = useSelector(selectTopicAnonymousMode);
 	const initTopicMessageId = useSelector(selectInitTopicMessageId);
-	const { clientRef, sessionRef, socketRef } = useMezon();
+	const { clientRef, sessionRef } = useMezon();
 	const isCreatingTopicRef = useRef(false);
 
 	const createTopic = useCallback(async () => {
@@ -258,34 +261,63 @@ export function useChatSending({ mode, channelOrDirect, fromTopic = false }: Use
 		) => {
 			const session = sessionRef.current;
 			const client = clientRef.current;
-			const socket = socketRef.current;
-			if (!client || !session || !socket || !channelOrDirect) {
+			if (!client || !session || !channelOrDirect) {
 				throw new Error('Client is not initialized');
 			}
-			const trimContent: IMessageSendPayload = {
+			const finalTopicId = topic_id || (isTopic ? currentTopicId || '0' : '0');
+			const messageLookupChannelId = finalTopicId !== '0' ? finalTopicId : (channelIdOrDirectId ?? '');
+			const existingMessage = selectMessageByMessageId(getStore().getState(), messageLookupChannelId, messageId);
+			const isAttachmentFieldUpdate = attachments !== undefined;
+			const hasExistingAttachments = (existingMessage?.attachments?.length ?? 0) > 0;
+			const messageCreateTimeSeconds = getMessageCreateTimeSeconds(existingMessage ?? {});
+
+			let trimContent: IMessageSendPayload = {
 				...content,
 				t: content.t?.trim()
 			};
+			if (hasExistingAttachments && !isAttachmentFieldUpdate) {
+				trimContent = withCreateTimeSecondsInUpdateContent(trimContent, messageCreateTimeSeconds);
+			}
+			const updateChannelId = finalTopicId !== '0' ? finalTopicId : (channelIdOrDirectId ?? '0');
+			const updateAttachments = isAttachmentFieldUpdate ? attachments : undefined;
 			try {
 				await client.updateChannelMessage(
 					session,
 					getClanId || '0',
-					channelIdOrDirectId ?? '0',
+					updateChannelId,
 					mode,
 					isPublic,
 					messageId || '0',
 					JSON.stringify(trimContent),
 					mentions,
-					attachments,
+					updateAttachments,
+					messageCreateTimeSeconds,
 					hide_editted,
-					topic_id || '0',
+					finalTopicId,
 					!!isTopic
 				);
+
+				if (existingMessage) {
+					const updateTimeSeconds = Math.floor(Date.now() / 1000);
+					dispatch(
+						messagesActions.newMessage({
+							...existingMessage,
+							code: TypeMessage.ChatUpdate,
+							content: trimContent,
+							mentions,
+							channel_id: messageLookupChannelId,
+							topic_id: finalTopicId !== '0' ? finalTopicId : existingMessage.topic_id,
+							hide_editted: hide_editted ?? false,
+							update_time_seconds: updateTimeSeconds,
+							update_time: new Date(updateTimeSeconds * 1000).toISOString()
+						} as MessagesEntity)
+					);
+				}
 			} catch (e) {
 				console.error(e);
 			}
 		},
-		[sessionRef, clientRef, socketRef, channelOrDirect, getClanId, channelIdOrDirectId, mode, isPublic]
+		[sessionRef, clientRef, channelOrDirect, dispatch, getClanId, channelIdOrDirectId, mode, isPublic, currentTopicId]
 	);
 
 	return useMemo(

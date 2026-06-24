@@ -3,7 +3,7 @@ import type { ICategory, LoadingStatus, SortChannel } from '@mezon/utils';
 import { TypeCheck } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js/api';
+import type { ApiCategoryDesc, ApiCreateCategoryDescRequest, ApiUpdateCategoryDescRequest, ApiUpdateCategoryOrderRequest } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { clearApiCallTracker, createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import { channelsActions } from '../channels/channels.slice';
@@ -151,10 +151,14 @@ export const checkDuplicateCategoryInClan = createAsyncThunk(
 	async ({ categoryName, clanId }: { categoryName: string; clanId: string }, thunkAPI) => {
 		try {
 			const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-			const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(categoryName, clanId, TypeCheck.TYPECATEGORY, clanId);
+			const isDuplicateName = await mezon.clientRef.current?.checkDuplicateName(mezon.session, {
+				name: categoryName,
+				condition_id: clanId,
+				type: TypeCheck.TYPECATEGORY
+			});
 
-			if (isDuplicateName?.type === TypeCheck.TYPECATEGORY) {
-				return isDuplicateName.exist;
+			if (isDuplicateName?.is_duplicate) {
+				return isDuplicateName?.is_duplicate;
 			}
 			return;
 		} catch (error) {
@@ -187,14 +191,8 @@ export const updateCategoriesOrder = createAsyncThunk(
 	async ({ clan_id, categories }: ApiUpdateCategoryOrderRequest, thunkAPI) => {
 		try {
 			if (!categories?.length || !clan_id) return;
-			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			await mezon.client.updateCategoryOrder(mezon.session, {
-				clan_id,
-				categories
-			});
-
-			const state = thunkAPI.getState() as RootState;
-			const currentCategories = selectCachedCategoriesByClan(state, clan_id as string);
+			const stateBefore = thunkAPI.getState() as RootState;
+			const currentCategories = selectCachedCategoriesByClan(stateBefore, clan_id as string);
 
 			const updatedCategories = currentCategories.map((cat) => {
 				const updatedOrder = categories.find((c) => c.category_id === cat.id);
@@ -212,6 +210,12 @@ export const updateCategoriesOrder = createAsyncThunk(
 					categories: sortedCategories
 				})
 			);
+
+			const mezon = await ensureSession(getMezonCtx(thunkAPI));
+			await mezon.client.updateCategoryOrder(mezon.session, {
+				clan_id,
+				categories
+			});
 		} catch (error) {
 			captureSentryError(error, 'categories/updateCategoriesOrder');
 			return thunkAPI.rejectWithValue(error);
@@ -412,6 +416,34 @@ export const categoriesSlice = createSlice({
 				state.loadingStatus = 'error';
 				state.error = action.error.message;
 			});
+
+		builder.addMatcher(
+			(action) => action.type === 'channels/syncClanChannelSidebarSources/fulfilled',
+			(state: CategoriesState, action) => {
+				const { clanId, categories, categoriesFromCache } = (action as any).payload ?? {};
+				if (categoriesFromCache || !categories || !clanId) return;
+				if (!state.byClans[clanId]) {
+					state.byClans[clanId] = getInitialClanState();
+				}
+				const newEntities = categories.reduce(
+					(acc: Record<string, CategoriesEntity>, category: CategoriesEntity) => {
+						acc[category.id] = category;
+						return acc;
+					},
+					{} as Record<string, CategoriesEntity>
+				);
+				state.byClans[clanId].entities = {
+					ids: categories.map((c: CategoriesEntity) => c.id),
+					entities: newEntities
+				};
+				state.byClans[clanId].cache = createCacheMetadata();
+				categories.forEach((category: CategoriesEntity) => {
+					if (state.byClans[clanId].categoryExpandState[category.id] === undefined) {
+						state.byClans[clanId].categoryExpandState[category.id] = true;
+					}
+				});
+			}
+		);
 	}
 });
 
@@ -486,6 +518,8 @@ export const selectCategoryExpandStateByCategoryId = createSelector(
 	[getCategoriesState, (state: RootState) => state.clans.currentClanId as string, (_, categoryId: string) => categoryId],
 	(state, clanId, categoryId) => state.byClans[clanId]?.categoryExpandState[categoryId] ?? true
 );
+
+export const selectCategoryEntityStateByClanId = (state: RootState, clanId: string) => state[CATEGORIES_FEATURE_KEY].byClans[clanId]?.entities;
 
 export const selectAllCategories = createSelector(
 	[

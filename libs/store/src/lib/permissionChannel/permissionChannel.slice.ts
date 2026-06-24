@@ -4,7 +4,6 @@ import { ChannelType } from 'mezon-js';
 import { selectCurrentUserId } from '../account/account.slice';
 import { userChannelsActions } from '../channelmembers/AllUsersChannelByAddChannel.slice';
 import { selectChannelByChannelId } from '../channels/channels.slice';
-import { listChannelRenderAction } from '../channels/listChannelRender.slice';
 import { ensureSession, getMezonCtx } from '../helpers';
 import { rolesClanActions } from '../roleclan/roleclan.slice';
 import type { RootState } from '../store';
@@ -17,7 +16,7 @@ type addChannelUsersPayload = {
 };
 export const addChannelUsers = createAsyncThunk(
 	'channelUsers/addChannelUsers',
-	async ({ channelId, channelType, userIds, clanId }: addChannelUsersPayload, thunkAPI) => {
+	async ({ channelId, channelType, userIds, clanId: _clanId }: addChannelUsersPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const response = await mezon.client.addChannelUsers(mezon.session, channelId, userIds);
@@ -37,15 +36,6 @@ export const addChannelUsers = createAsyncThunk(
 			const thread = selectChannelByChannelId(state, channelId);
 			if (!thread) return response;
 
-			thunkAPI.dispatch(
-				listChannelRenderAction.addThreadToListRender({
-					clanId: thread.clan_id ?? '',
-					channel: {
-						...thread,
-						active: 1
-					}
-				})
-			);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'channelUsers/addChannelUsers');
@@ -69,13 +59,16 @@ export type banChannelUsersPayload = {
 
 export const removeChannelUsers = createAsyncThunk(
 	'channelUsers/removeChannelUsers',
-	async ({ channelId, userId }: removeChannelUsersPayload, thunkAPI) => {
+	async ({ channelId, userId, channelType: _channelType }: removeChannelUsersPayload, thunkAPI) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
 			const userIds = [userId];
 			const response = await mezon.client.removeChannelUsers(mezon.session, channelId, userIds);
 			if (!response) {
 				return thunkAPI.rejectWithValue([]);
+			}
+			if (channelId) {
+				thunkAPI.dispatch(userChannelsActions.removeUserChannel({ channelId, userRemoves: userIds }));
 			}
 
 			return response;

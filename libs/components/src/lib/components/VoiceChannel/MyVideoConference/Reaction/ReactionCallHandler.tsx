@@ -4,6 +4,7 @@ import { getSrcEmoji } from '@mezon/utils';
 import type { VoiceReactionSend } from 'mezon-js';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { AvatarColor } from '../../../AvatarImage/AvatarImage';
 import { soundReactionsService } from './soundReactionsService';
 import type { DisplayedEmoji, DisplayedHand } from './types';
 
@@ -15,7 +16,7 @@ export const ReactionCallHandler = memo(() => {
 	const [raisingList, setRaisingList] = useState<DisplayedHand[]>([]);
 	const timeoutsRef = useRef<Map<string, number>>(new Map());
 
-	const { socketRef } = useMezon();
+	const { clientRef } = useMezon();
 	const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
 	const emojiQueueRef = useRef<DisplayedEmoji[]>([]);
 	const lastEmojiTimestampRef = useRef<number>(0);
@@ -85,9 +86,9 @@ export const ReactionCallHandler = memo(() => {
 	}, []);
 
 	useEffect(() => {
-		if (!socketRef.current || !channelId) return;
+		if (!clientRef.current || !channelId) return;
 
-		const currentSocket = socketRef.current;
+		const currentSocket = clientRef.current;
 		const audioMap = audioRefs.current;
 
 		currentSocket.onvoicereactionmessage = (message: VoiceReactionSend) => {
@@ -129,7 +130,9 @@ export const ReactionCallHandler = memo(() => {
 
 							timeoutsRef.current.set(senderId, timeoutId);
 							if (audioRef.current) {
-								audioRef.current.play();
+								audioRef.current.play().catch((error) => {
+									console.error(error);
+								});
 							}
 
 							return;
@@ -189,7 +192,7 @@ export const ReactionCallHandler = memo(() => {
 			soundReactionsService.clearAllSound();
 			audioMap.clear();
 		};
-	}, [socketRef, channelId, generatePosition, playSound]);
+	}, [clientRef, channelId, generatePosition, playSound]);
 
 	const shouldRender = displayedEmojis.length !== 0 || raisingList.length !== 0;
 	return (
@@ -234,9 +237,7 @@ export const ReactionCallHandler = memo(() => {
 										{item.avatar ? (
 											<img src={item.avatar} className="w-8 h-8 rounded-full" />
 										) : (
-											<div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-semibold">
-												{item.name.charAt(0).toUpperCase()}
-											</div>
+											<AvatarColor username={item.name} className="size-8" />
 										)}
 										<div className="text-sm text-black flex-1 truncate font-semibold">{item.name}</div>
 										<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5.0 -10.0 110.0 135.0" className="h-8" fill="#efbc39">

@@ -1,3 +1,4 @@
+import { sanitizeMessageHtml } from '@mezon/utils';
 import { ApiMessageEntityTypes, ENTITY_CLASS_BY_NODE_NAME } from '../parseHtmlAsFormattedText';
 import cleanDocsHtml from './cleanDocsHtml';
 
@@ -10,7 +11,7 @@ export function preparePastedHtml(html: string) {
 	} catch (err) {
 		console.error(err);
 	}
-	fragment.innerHTML = html.replace(/\u00a0/g, ' ').replace(STYLE_TAG_REGEX, '');
+	fragment.innerHTML = sanitizeMessageHtml(html.replace(/\u00a0/g, ' ').replace(STYLE_TAG_REGEX, ''));
 	const textContents = fragment.querySelectorAll<HTMLDivElement>('.text-content');
 	if (textContents.length) {
 		fragment = textContents[textContents.length - 1];
@@ -22,7 +23,7 @@ export function preparePastedHtml(html: string) {
 			return;
 		}
 		node.removeAttribute('style');
-		if (node.tagName === 'BR') node.replaceWith('\n');
+		if (node.tagName === 'BR') node.replaceWith(document.createElement('br'));
 		if (node.tagName === 'P') node.appendChild(document.createTextNode('\n'));
 		if (node.tagName === 'IMG' && !node.dataset.entityType) node.replaceWith(node.getAttribute('alt') || '');
 		if (node.dataset.ignoreOnPaste) node.remove();

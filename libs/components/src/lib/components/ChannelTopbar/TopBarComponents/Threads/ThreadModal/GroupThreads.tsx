@@ -1,5 +1,5 @@
-import { ThreadsEntity } from '@mezon/store';
-import { MutableRefObject } from 'react';
+import type { ThreadsEntity } from '@mezon/store';
+import type { MutableRefObject } from 'react';
 import ThreadItem from './ThreadItem';
 
 interface GroupThreadsProps {
@@ -22,7 +22,7 @@ const GroupThreads = ({ title, threads, measureRef, preventClosePannel }: GroupT
 					const isLast = index === threads.length - 1;
 					return (
 						<li key={thread.id} ref={isLast ? measureRef : undefined}>
-							<ThreadItem preventClosePannel={preventClosePannel} isPublicThread={true} thread={thread} setIsShowThread={() => {}} />
+							<ThreadItem preventClosePannel={preventClosePannel} isPublicThread={true} thread={thread} />
 						</li>
 					);
 				})}

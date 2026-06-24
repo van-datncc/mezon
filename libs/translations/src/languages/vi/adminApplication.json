@@ -211,5 +211,57 @@
 		"title": "Trình gỡ lỗi Embed"
 	},
 	"small": "Nhỏ",
-	"large": "Lớn"
+	"large": "Lớn",
+	"transcriptCalls": {
+		"title": "Bản ghi cuộc gọi",
+		"subtitle": "Xem và quản lý bản ghi cuộc gọi của bạn.",
+		"loading": "Đang tải…",
+		"results": "phòng",
+		"page": "Trang",
+		"prev": "Trước",
+		"next": "Sau",
+		"columns": {
+			"callId": "ID Cuộc gọi",
+			"roomName": "Tên Phòng",
+			"status": "Trạng thái",
+			"totalTracks": "Tổng Tracks",
+			"completedTracks": "Đã hoàn thành",
+			"duration": "Thời lượng",
+			"createdAt": "Ngày tạo",
+			"completedAt": "Ngày hoàn thành"
+		},
+		"status": {
+			"pending": "Đang chờ",
+			"processing": "Đang xử lý",
+			"completed": "Đã hoàn thành",
+			"failed": "Thất bại"
+		},
+		"tabs": {
+			"overview": "Tổng quan",
+			"fullTranscript": "Bản ghi đầy đủ",
+			"summary": "Tóm tắt",
+			"participants": "Người tham gia"
+		},
+		"detail": {
+			"title": "Chi tiết Bản ghi Cuộc gọi",
+			"back": "Quay lại",
+			"refresh": "Làm mới",
+			"loadError": "Không thể tải phòng này.",
+			"summaryEmpty": "Chưa có tóm tắt.",
+			"transcriptEmpty": "Chưa có nội dung bản ghi.",
+			"actionItems": "Việc cần làm",
+			"participants": "Người tham gia",
+			"participantsEmpty": "Không có người tham gia cho cuộc gọi này.",
+			"metrics": {
+				"totalTracks": "Tổng Tracks",
+				"completed": "Đã hoàn thành",
+				"duration": "Thời lượng",
+				"segments": "Phân đoạn"
+			},
+			"notFound": "Không tìm thấy bản ghi cuộc gọi",
+			"unknown": "không xác định",
+			"username": "Tên tài khoản",
+			"displayName": "Tên hiển thị"
+		}
+	}
 }

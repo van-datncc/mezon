@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "Input device",
 		"outputDevice": "Output device",
-		"camera": "Camera"
+		"camera": "Camera",
+		"systemDefault": "System default"
 	},
 	"toast": {
 		"connectionConnected": "Connection connected",

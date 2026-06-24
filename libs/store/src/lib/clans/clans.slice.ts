@@ -1,20 +1,28 @@
 import { captureSentryError } from '@mezon/logger';
-import type { IClan, LoadingStatus } from '@mezon/utils';
-import { LIMIT_CLAN_ITEM, TypeCheck } from '@mezon/utils';
+import type { ApiChannelMessageHeaderWithChannel, IClan, LoadingStatus } from '@mezon/utils';
+import { FOR_1_HOUR_SEC, LIMIT_CLAN_ITEM, ONE_MILISECONDS } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ClanUpdatedEvent } from 'mezon-js';
+import type {
+	ApiChannelDescription,
+	ApiCheckDuplicateNameRequest,
+	ApiCheckDuplicateNameResponse,
+	ApiClanDesc,
+	ApiUpdateAccountRequest,
+	ClanUpdatedEvent,
+	MezonUpdateClanDescBody
+} from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiChannelDescription, ApiClanDesc, ApiUpdateAccountRequest, MezonUpdateClanDescBody } from 'mezon-js/api';
 import { batch } from 'react-redux';
 import { accountActions } from '../account/account.slice';
 import { setUserAvatarOverride } from '../avatarOverride/avatarOverride';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
+import type { ChannelMetaEntity } from '../channels/channelmeta.slice';
 import { channelMetaActions } from '../channels/channelmeta.slice';
 import { channelsActions } from '../channels/channels.slice';
-import { listOnlineUserClan, usersClanActions } from '../clanMembers/clan.members';
-import { statusActions } from '../direct/status.slice';
+import { fetchClanMembersWithStatus, usersClanActions } from '../clanMembers/clan.members';
+
 import { emojiSuggestionSlice } from '../emojiSuggestion/emojiSuggestion.slice';
 import { eventManagementActions } from '../eventManagement/eventManagement.slice';
 import type { MezonValueContext } from '../helpers';
@@ -166,8 +174,20 @@ export const listChannelBadgeCount = createAsyncThunk('clans/listChannelBadgeCou
 			'channel_badge_count'
 		);
 
-		if ((response as any)?.channeldesc && clanId && !state.clans.checkJoinList[clanId]) {
-			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata({ data: (response as any)?.channeldesc, clanId }));
+		if (response.channeldesc && clanId && !state.clans.checkJoinList[clanId]) {
+			thunkAPI.dispatch(channelMetaActions.updateBulkChannelMetadata({ data: response?.channeldesc as ChannelMetaEntity[], clanId }));
+
+			const listLastMessage = (response.channeldesc ?? []).reduce<ApiChannelMessageHeaderWithChannel[]>((acc, channel) => {
+				if (channel.channel_id && channel.last_seen_message) {
+					acc.push({
+						...channel.last_sent_message,
+						channel_id: channel.channel_id
+					});
+				}
+				return acc;
+			}, []);
+
+			thunkAPI.dispatch(messagesActions.setManyLastMessages(listLastMessage));
 		}
 		return { channeldesc: (response as any)?.channeldesc as ApiChannelDescription[], clanId };
 	} catch (error) {
@@ -230,19 +250,6 @@ export const updateUsername = createAsyncThunk('clans/updateUsername', async ({ 
 		const response = await mezon.client.updateUsername(mezon.session, { username });
 		if (!response) {
 			return thunkAPI.rejectWithValue([]);
-		}
-		const sessionState = mezon?.session;
-		if (response?.refresh_token && response?.token) {
-			return await mezon?.refreshSession(
-				{
-					...sessionState,
-					is_remember: sessionState.is_remember ?? false,
-					username,
-					refresh_token: response.refresh_token,
-					token: response.token
-				},
-				true
-			);
 		}
 		return false;
 	} catch (error) {
@@ -312,17 +319,13 @@ export const createClan = createAsyncThunk('clans/createClans', async ({ clan_na
 	}
 });
 
-export const checkDuplicateNameClan = createAsyncThunk('clans/duplicateNameClan', async (clan_name: string, thunkAPI) => {
+export const checkDuplicateNameApi = createAsyncThunk('clans/duplicateNameApi', async (request: ApiCheckDuplicateNameRequest, thunkAPI) => {
 	try {
-		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		const isDuplicateName = await mezon.socketRef.current?.checkDuplicateName(clan_name, '0', TypeCheck.TYPECLAN, '0');
-
-		if (isDuplicateName?.type === TypeCheck.TYPECLAN) {
-			return isDuplicateName.exist;
-		}
-		return;
+		const mezon = await ensureSession(getMezonCtx(thunkAPI));
+		const response = await mezon.client.checkDuplicateName(mezon.session, request);
+		return response as ApiCheckDuplicateNameResponse;
 	} catch (error) {
-		captureSentryError(error, 'clans/duplicateNameClan');
+		captureSentryError(error, 'clans/duplicateNameApi');
 		return thunkAPI.rejectWithValue(error);
 	}
 });
@@ -459,7 +462,6 @@ export const updateUser = createAsyncThunk(
 				return thunkAPI.rejectWithValue([]);
 			}
 			if (response) {
-				thunkAPI.dispatch(accountActions.getUserProfile());
 				thunkAPI.dispatch(
 					accountActions.setUpdateAccount({
 						logo,
@@ -480,8 +482,6 @@ export const updateUser = createAsyncThunk(
 					setUserAvatarOverride(currentUser.user.id, avatar_url);
 					thunkAPI.dispatch(accountActions.incrementAvatarVersion());
 				}
-
-				thunkAPI.dispatch(messagesActions.invalidateAllCache());
 			}
 			return response as true;
 		} catch (error) {
@@ -498,12 +498,11 @@ interface JoinClanPayload {
 export const joinClan = createAsyncThunk<void, JoinClanPayload>('direct/joinClan', async ({ clanId }, thunkAPI) => {
 	try {
 		const mezon = await ensureSocket(getMezonCtx(thunkAPI));
-		await mezon.socketRef.current?.joinClanChat(clanId);
+		await mezon.clientRef.current?.joinClanChat(mezon.session, clanId);
 		const state = thunkAPI.getState() as RootState;
 		if (!state.clans?.checkJoinList?.[clanId] && clanId !== '0') {
 			thunkAPI.dispatch(listChannelBadgeCount({ clanId }));
-			thunkAPI.dispatch(listOnlineUserClan({ clanId }));
-			thunkAPI.dispatch(statusActions.fetchListStatusClanUser({ clanId }));
+			await thunkAPI.dispatch(fetchClanMembersWithStatus({ clanId }));
 		}
 	} catch (error) {
 		captureSentryError(error, 'clans/joinClan');
@@ -515,16 +514,23 @@ export const listClanBadgeCount = createAsyncThunk('clans/listClanBadgeCount', a
 	try {
 		const mezon = await ensureSession(getMezonCtx(thunkAPI));
 
-		const response = await fetchDataWithSocketFallback(
-			mezon,
-			{
-				api_name: 'ListClanBadgeCount'
-			},
-			() => Promise.resolve({ list_badge: [] }),
-			'clan_badge_count'
-		);
+		const apiKey = createApiKey('listClanBadgeCount', mezon.session.session_id || '');
 
-		return response?.list_badge || [];
+		const shouldForceCall = shouldForceApiCall(apiKey, { expiresAt: Date.now() + FOR_1_HOUR_SEC * ONE_MILISECONDS, lastFetched: Date.now() });
+		if (shouldForceCall) {
+			const response = await fetchDataWithSocketFallback(
+				mezon,
+				{
+					api_name: 'ListClanBadgeCount'
+				},
+				(session) => mezon.client.listClanBadgeCount(session),
+				'clan_badge_count'
+			);
+
+			markApiFirstCalled(apiKey);
+			return response?.list_badge || [];
+		}
+		return null;
 	} catch (error) {
 		captureSentryError(error, 'clans/listClanBadgeCount');
 		return thunkAPI.rejectWithValue(error);
@@ -942,14 +948,16 @@ export const clansSlice = createSlice({
 				state.loadingStatus = 'loaded';
 			}
 		);
-		builder.addCase(listClanBadgeCount.fulfilled, (state: ClansState, action: PayloadAction<ClanUnreadState[]>) => {
-			const normalizedPayload: ClanUnreadState[] = action.payload.map((item) => ({
-				...item,
-				badge: item.badge <= 0 ? 0 : item.badge
-			}));
+		builder.addCase(listClanBadgeCount.fulfilled, (state: ClansState, action: PayloadAction<ClanUnreadState[] | null>) => {
+			if (action.payload) {
+				const normalizedPayload: ClanUnreadState[] = action.payload.map((item) => ({
+					...item,
+					badge: item.badge <= 0 ? 0 : item.badge
+				}));
 
-			clanUnreadAdapter.setAll(state.clanUnreadStates, normalizedPayload);
-			state.loadingStatus = 'loaded';
+				clanUnreadAdapter.setAll(state.clanUnreadStates, normalizedPayload);
+				state.loadingStatus = 'loaded';
+			}
 		});
 	}
 });
@@ -1048,9 +1056,9 @@ export const selectOrderedClans = createSelector([selectAllClans, (state: RootSt
 	return [...orderedClans, ...remainingClans];
 });
 
-export const selectBadgeCountAllClan = createSelector(getClansState, (state) =>
-	selectAllBadgeClan(state.clanUnreadStates).reduce((total, count) => total + (count.badge ?? 0), 0)
-);
+export const selectBadgeCountAllClan = createSelector(getClansState, (state) => {
+	return selectAllBadgeClan(state.clanUnreadStates).reduce((total, count) => total + (count.clan_id !== '0' ? (count.badge ?? 0) : 0), 0);
+});
 
 export const selectInvitePeopleStatus = createSelector(getClansState, (state) => state.invitePeople);
 export const selectInviteChannelId = createSelector(getClansState, (state) => state.inviteChannelId);
