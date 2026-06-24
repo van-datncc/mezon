@@ -32,6 +32,12 @@ export const SettingLanguage = ({ menuIsOpen }: ISettingLanguageProps) => {
 				flag: <RussiaFlag />
 			},
 			{
+				title: `${t('setting:language.ukrainian')}`,
+				value: 'ukr',
+				contributedBy: 'robits',
+				flag: <UkraineFlag />
+			},
+			{
 				title: `${t('setting:language.spanish')}`,
 				value: 'es',
 				contributedBy: 'robits',
@@ -243,6 +249,24 @@ const JapanFlag = () => (
 			opacity=".15"
 		></path>
 		<circle cx="16" cy="16" r="6" fill="#ae232f"></circle>
+	</svg>
+);
+
+const UkraineFlag = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+		<defs>
+			<clipPath id="ukr-clip">
+				<rect x="1" y="4" width="30" height="24" rx="4" ry="4" />
+			</clipPath>
+		</defs>
+		<g clipPath="url(#ukr-clip)">
+			<rect x="1" y="4" width="30" height="12" fill="#005BBB" />
+			<rect x="1" y="16" width="30" height="12" fill="#FFD500" />
+		</g>
+		<path
+			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
+			opacity=".15"
+		></path>
 	</svg>
 );
 
