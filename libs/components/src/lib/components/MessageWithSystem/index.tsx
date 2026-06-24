@@ -3,6 +3,7 @@ import type { RootState } from '@mezon/store';
 import { getStore, selectBanMeInChannel, type MessagesEntity } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import { TypeMessage, addMention, convertDateStringI18n, generateE2eId } from '@mezon/utils';
+import { ChannelStreamMode } from 'mezon-js';
 import type { ReactNode } from 'react';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,7 @@ export type MessageWithSystemProps = {
 	isSearchMessage?: boolean;
 	showDivider?: boolean;
 	isTopic: boolean;
+	mode?: number;
 };
 
 function MessageWithSystem({
@@ -31,7 +33,8 @@ function MessageWithSystem({
 	popup: _popup,
 	isSearchMessage,
 	showDivider,
-	isTopic
+	isTopic,
+	mode = ChannelStreamMode.STREAM_MODE_CHANNEL
 }: Readonly<MessageWithSystemProps>) {
 	const contentUpdatedMention = addMention(message.content, message?.mentions as any);
 	const isCustom = message.code === TypeMessage.CreateThread || message.code === TypeMessage.CreatePin;
@@ -54,11 +57,19 @@ function MessageWithSystem({
 					>
 						{message?.code === TypeMessage.Welcome && <Icons.WelcomeIcon defaultSize="size-8 flex-shrink-0" />}
 						{message?.code === TypeMessage.UpcomingEvent && <Icons.UpcomingEventIcon defaultSize="size-8 flex-shrink-0" />}
-						{message?.code === TypeMessage.CreateThread && <Icons.ThreadIcon defaultSize="size-6 flex-shrink-0" />}
+						{message?.code === TypeMessage.CreateThread && (
+							<Icons.ThreadIcon
+								defaultSize="size-6 flex-shrink-0"
+								defaultFill1="var(--bg-icon-theme)"
+								defaultFill4="var(--bg-theme-secounnd)"
+								defaultFill5="var(--bg-icon-theme)"
+							/>
+						)}
 						{message?.code === TypeMessage.CreatePin && <Icons.PinRight defaultSize="size-6 flex-shrink-0" />}
 						{message?.code === TypeMessage.AuditLog && <Icons.AuditLogIcon defaultSize="size-8 flex-shrink-0" />}
 						<MessageLineSystem
 							message={message}
+							mode={mode}
 							isTokenClickAble={true}
 							isSearchMessage={isSearchMessage}
 							isJumMessageEnabled={false}

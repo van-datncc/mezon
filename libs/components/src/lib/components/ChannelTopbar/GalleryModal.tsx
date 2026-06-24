@@ -23,6 +23,7 @@ import {
 	selectCurrentDM,
 	selectGalleryAttachmentsByChannel,
 	selectGalleryPaginationByChannel,
+	selectMessageByMessageId,
 	useAppDispatch,
 	useAppSelector,
 	type MediaFilterType
@@ -36,7 +37,9 @@ import {
 	convertDateStringI18n,
 	createImgproxyUrl,
 	generateE2eId,
-	getAttachmentDataForWindow
+	getAttachmentDataForWindow,
+	isAttachmentPresignPendingForMessage,
+	shouldHidePresignAttachment
 } from '@mezon/utils';
 import { endOfDay, format, getUnixTime, isSameDay, startOfDay } from 'date-fns';
 import isElectron from 'is-electron';
@@ -473,6 +476,15 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 			const attachmentData = attachment;
 
 			if (!attachmentData) return;
+
+			const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
+			const sourceMessage =
+				attachmentData.message_id && channelId
+					? selectMessageByMessageId(state, channelId, attachmentData.message_id)
+					: undefined;
+			if (isAttachmentPresignPendingForMessage(attachmentData.url, sourceMessage)) return;
+			if (shouldHidePresignAttachment(attachmentData.url, sourceMessage)) return;
+
 			const enhancedAttachmentData = {
 				...attachmentData,
 				create_time: attachmentData.create_time || new Date().toISOString()
@@ -485,7 +497,6 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 
 			if (isElectron()) {
 				const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
-				const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 
 				const messageTimestamp = enhancedAttachmentData.create_time
 					? Math.floor(new Date(enhancedAttachmentData.create_time).getTime() / 1000)
@@ -619,7 +630,6 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 
 			if ((currentClanId && currentChannelId) || currentDmGroupId) {
 				const clanId = currentClanId === '0' ? '0' : (currentClanId as string);
-				const channelId = currentClanId !== '0' ? (currentChannelId as string) : (currentDmGroupId as string);
 				const messageTimestamp = enhancedAttachmentData.create_time
 					? Math.floor(new Date(enhancedAttachmentData.create_time).getTime() / 1000)
 					: undefined;
@@ -650,11 +660,11 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 				<div className="bg-theme-setting-nav flex flex-col p-[16px]">
 					<div className="flex flex-row items-center justify-between mb-3">
 						<div className="flex flex-row items-center gap-4">
-							<Icons.ImageThumbnail defaultSize="w-4 h-4" />
+							<Icons.ImageThumbnail />
 							<span className="text-base font-semibold cursor-default">{t('gallery.title')}</span>
 						</div>
 						<button onClick={onClose} className="text-theme-primary-hover">
-							<Icons.Close defaultSize="w-4 h-4" />
+							<Icons.Close className="w-4 h-4" />
 						</button>
 					</div>
 					<div className="flex flex-row items-center justify-between gap-4">
@@ -663,7 +673,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 								onClick={() => handleMediaFilterChange('all')}
 								className={`px-3 py-1.5 text-sm rounded transition-colors ${
 									mediaFilter === 'all'
-										? 'bg-theme-primary text-white'
+										? 'bg-buttonPrimary text-white'
 										: 'bg-theme-surface text-theme-primary hover:bg-theme-surface-hover'
 								}`}
 								data-e2e={generateE2eId('clan_page.modal.gallery.tab.all')}
@@ -674,7 +684,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 								onClick={() => handleMediaFilterChange('image')}
 								className={`px-3 py-1.5 text-sm rounded transition-colors ${
 									mediaFilter === 'image'
-										? 'bg-theme-primary text-white'
+										? 'bg-buttonPrimary text-white'
 										: 'bg-theme-surface text-theme-primary hover:bg-theme-surface-hover'
 								}`}
 								data-e2e={generateE2eId('clan_page.modal.gallery.tab.image')}
@@ -685,7 +695,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 								onClick={() => handleMediaFilterChange('video')}
 								className={`px-3 py-1.5 text-sm rounded transition-colors ${
 									mediaFilter === 'video'
-										? 'bg-theme-primary text-white'
+										? 'bg-buttonPrimary text-white'
 										: 'bg-theme-surface text-theme-primary hover:bg-theme-surface-hover'
 								}`}
 								data-e2e={generateE2eId('clan_page.modal.gallery.tab.video')}
@@ -787,7 +797,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 				<div className="flex flex-col gap-4 py-4 px-[16px] min-h-full flex-1 overflow-hidden">
 					{virtualData.length === 0 ? (
 						<div className="flex flex-col items-center justify-center h-64 text-center">
-							<Icons.ImageThumbnail defaultSize="w-12 h-12" className="text-theme-secondary opacity-50 mb-4" />
+							<Icons.ImageThumbnail className="w-12 h-12 text-theme-secondary opacity-50 mb-4" />
 							<p className="text-theme-secondary text-sm">
 								{mediaFilter === 'image'
 									? t('gallery.emptyState.noImages')
@@ -809,6 +819,7 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 					) : (
 						<GalleryContent
 							virtualData={virtualData}
+							channelId={currentChannelId}
 							handleImageClick={handleImageClick}
 							formatDate={formatDate}
 							onLoadMore={handleLoadMoreAttachments}
@@ -824,8 +835,54 @@ export function GalleryModal({ onClose, rootRef }: GalleryModalProps) {
 	);
 }
 
+interface GalleryAttachmentTileProps {
+	attachment: AttachmentEntity;
+	channelId: string;
+	dateKey: string;
+	attachmentIndex: number;
+	onClick: (attachment: AttachmentEntity) => void;
+	t: (key: string, options?: any) => string;
+}
+
+const GalleryAttachmentTile = React.memo(({ attachment, channelId, dateKey, attachmentIndex, onClick, t }: GalleryAttachmentTileProps) => {
+	const sourceMessage = useAppSelector((state) =>
+		attachment.message_id && channelId ? selectMessageByMessageId(state, channelId, attachment.message_id) : undefined
+	);
+	const isPresignPending = isAttachmentPresignPendingForMessage(attachment.url, sourceMessage);
+	const isHidden = shouldHidePresignAttachment(attachment.url, sourceMessage);
+
+	if (isHidden) return null;
+
+	const cacheKey = attachment.id || attachment.message_id || `${dateKey}-${attachment.url}-${attachmentIndex}`;
+	const isVideo = attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX);
+
+	if (isPresignPending) {
+		return <div key={cacheKey} className="aspect-square rounded-lg bg-bgLightSecondary dark:bg-bgSecondary" />;
+	}
+
+	return (
+		<ImageWithLoading
+			key={cacheKey}
+			cacheKey={cacheKey}
+			src={
+				isVideo
+					? attachment.url || ''
+					: createImgproxyUrl(attachment.url || '', { width: 120, height: 120, resizeType: 'fill' })
+			}
+			alt={attachment.filename || 'Media'}
+			onClick={() => onClick(attachment)}
+			isVideo={isVideo}
+			filetype={attachment.filetype}
+			t={t}
+		/>
+	);
+});
+
+GalleryAttachmentTile.displayName = 'GalleryAttachmentTile';
+
 interface GalleryContentProps {
 	virtualData: VirtualDataItem[];
+	channelId: string;
 	handleImageClick: (attachment: AttachmentEntity) => void;
 	formatDate: (date: Date) => string;
 	onLoadMore?: (direction: 'before' | 'after') => void;
@@ -990,6 +1047,7 @@ ImageWithLoading.displayName = 'ImageWithLoading';
 
 const GalleryContent = ({
 	virtualData,
+	channelId,
 	handleImageClick,
 	formatDate,
 	onLoadMore,
@@ -1050,26 +1108,17 @@ const GalleryContent = ({
 					if (item.type === 'imagesGrid') {
 						return (
 							<div key={`${item.dateKey}-grid`} className="gallery-item grid grid-cols-3 gap-3">
-								{item.attachments.map((attachment: AttachmentEntity, attachmentIndex: number) => {
-									const cacheKey = attachment.id || attachment.message_id || `${item.dateKey}-${attachment.url}-${attachmentIndex}`;
-									const isVideo = attachment.filetype?.startsWith(ETypeLinkMedia.VIDEO_PREFIX);
-									return (
-										<ImageWithLoading
-											key={cacheKey}
-											cacheKey={cacheKey}
-											src={
-												isVideo
-													? attachment.url || ''
-													: createImgproxyUrl(attachment.url || '', { width: 120, height: 120, resizeType: 'fill' })
-											}
-											alt={attachment.filename || 'Media'}
-											onClick={() => handleImageClick(attachment)}
-											isVideo={isVideo}
-											filetype={attachment.filetype}
-											t={t}
-										/>
-									);
-								})}
+								{item.attachments.map((attachment: AttachmentEntity, attachmentIndex: number) => (
+									<GalleryAttachmentTile
+										key={attachment.id || attachment.message_id || `${item.dateKey}-${attachment.url}-${attachmentIndex}`}
+										attachment={attachment}
+										channelId={channelId}
+										dateKey={item.dateKey}
+										attachmentIndex={attachmentIndex}
+										onClick={handleImageClick}
+										t={t}
+									/>
+								))}
 							</div>
 						);
 					}

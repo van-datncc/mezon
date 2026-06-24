@@ -33,16 +33,16 @@ const SelectField = <T,>({ label, options, value, onChange, errorMessage, classN
 	const menu = useMemo(
 		() => (
 			<div
-				className={`border-none py-[6px] px-[8px] max-h-[200px] overflow-y-scroll thread-scroll z-20 bg-white dark:bg-[#2b2d31]  rounded-lg shadow-lg`}
+				className={`border dark:border-white/[0.08] border-slate-200/80 py-1.5 px-2 max-h-[200px] overflow-y-auto thread-scroll z-30 bg-white/95 dark:bg-[#151726]/95 backdrop-blur-xl rounded-xl shadow-xl min-w-[180px]`}
 			>
 				{options?.map((option, index) => (
 					<Menu.Item
 						key={index}
 						onClick={() => handleOptionClick(option.value)}
-						className={`truncate px-3 py-2 rounded-md hover:bg-[#f3f4f6] dark:hover:bg-[#3f4147] cursor-pointer transition-colors duration-150  ${uppercaseClass} ${
+						className={`truncate px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.04] cursor-pointer transition-all duration-200 text-xs font-semibold ${uppercaseClass} ${
 							value === option.value
-								? 'bg-[#e5e7eb] dark:bg-[#313338] text-[#1f2937] dark:text-white font-medium'
-								: 'text-[#374151] dark:text-[#d1d5db]'
+								? 'bg-violet-500/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 font-bold'
+								: 'text-slate-700 dark:text-slate-300'
 						}`}
 					>
 						{option.label}
@@ -50,12 +50,14 @@ const SelectField = <T,>({ label, options, value, onChange, errorMessage, classN
 				))}
 			</div>
 		),
-		[options, value, handleOptionClick, className]
+		[options, value, handleOptionClick, className, uppercaseClass]
 	);
 
 	return (
-		<div className="flex flex-col gap-2 p-4 bg-[#f9fafb] dark:bg-[#1e1f22]">
-			<label className="block text-left text-sm font-medium mb-1 text-[#111827] dark:text-[#d1d5db]">{label}</label>
+		<div className="flex flex-col gap-1.5 p-0 bg-transparent w-full">
+			<label className="block text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+				{label}
+			</label>
 
 			<Menu
 				trigger="click"
@@ -63,15 +65,21 @@ const SelectField = <T,>({ label, options, value, onChange, errorMessage, classN
 				placement="bottomLeft"
 				visible={visible}
 				onVisibleChange={handleVisibleChange}
-				className="border-none py-[6px] px-[8px]   z-20 bg-white dark:bg-[#2b2d31]  rounded-lg shadow-lg"
+				className="border-none p-0 z-20 rounded-xl"
 			>
-				<div className="w-full h-[40px] rounded-md flex flex-row px-3 justify-between items-center cursor-pointer bg-white text-[#111827] border border-[#4b5563] dark:bg-[#2d2f33] dark:text-[#d1d5db]">
-					<p className={`truncate ${uppercaseClass}`}>{selectedOption}</p>
-					<Icons.ArrowDownFill />
+				<div className="w-full h-11 rounded-xl flex flex-row px-4 justify-between items-center cursor-pointer bg-slate-50 dark:bg-[#171a2a] text-slate-900 dark:text-slate-100 border dark:border-white/[0.04] border-slate-200 transition-all duration-300 hover:border-violet-500/40 dark:hover:border-violet-500/30 focus-within:ring-2 focus-within:ring-violet-500/20 shadow-sm">
+					<p className={`text-xs font-semibold truncate ${uppercaseClass}`}>{selectedOption}</p>
+					<div className="text-slate-400 dark:text-slate-500 shrink-0 ml-2">
+						<Icons.ArrowDownFill className={`size-4 transform transition-transform duration-200 ${visible ? 'rotate-180' : ''}`} />
+					</div>
 				</div>
 			</Menu>
 
-			{errorMessage && <span className="text-red-500 text-sm">{errorMessage}</span>}
+			{errorMessage && (
+				<span className="text-red-500 text-[11px] font-medium text-left mt-0.5 pl-1 flex items-center gap-1 animate-fade-in">
+					{errorMessage}
+				</span>
+			)}
 		</div>
 	);
 };

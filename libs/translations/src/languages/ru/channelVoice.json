@@ -46,7 +46,8 @@
 	"device": {
 		"inputDevice": "Устройство ввода",
 		"outputDevice": "Устройство вывода",
-		"camera": "Камера"
+		"camera": "Камера",
+		"systemDefault": "Системное устройство по умолчанию"
 	},
 	"toast": {
 		"connectionConnected": "Соединение установлено",

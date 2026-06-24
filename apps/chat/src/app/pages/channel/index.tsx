@@ -15,6 +15,7 @@ import {
 	selectChannelAppChannelId,
 	selectChannelAppClanId,
 	selectChannelById,
+	selectClanById,
 	selectCloseMenu,
 	selectCurrentChannelId,
 	selectCurrentClanId,
@@ -52,6 +53,8 @@ import {
 	ONE_MILISECONDS,
 	ONE_MINUTE_MS,
 	SubPanelName,
+	ThreadStatus,
+	buildChannelAppLaunchUrl,
 	generateE2eId,
 	isBackgroundModeActive,
 	isLinuxDesktop,
@@ -60,8 +63,8 @@ import {
 	useBackgroundMode
 } from '@mezon/utils';
 import isElectron from 'is-electron';
+import type { ApiOnboardingItem } from 'mezon-js';
 import { ChannelStreamMode, ChannelType, safeJSONParse } from 'mezon-js';
-import type { ApiOnboardingItem } from 'mezon-js/api';
 import type { DragEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,8 +112,8 @@ function useChannelSeen(channelId: string) {
 
 	const updateChannelSeenState = useCallback(
 		(_channelId: string) => {
-			if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD) {
-				const channelWithActive = { ...currentChannel, active: 1 };
+			if (currentChannel.type === ChannelType.CHANNEL_TYPE_THREAD && currentChannel.active === ThreadStatus.archived) {
+				const channelWithActive = { ...currentChannel, active: ThreadStatus.activePublic };
 				dispatch(
 					channelsActions.upsertOne({
 						clanId: currentChannel?.clan_id || '0',
@@ -175,6 +178,8 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 	const isSpecialViewMode = isTimelineViewMode || isMediaChannelViewMode;
 
 	const currentClanId = useSelector(selectCurrentClanId);
+	const launchClan = useAppSelector(selectClanById(currentChannel?.clan_id ?? ''));
+	const launchClanName = launchClan?.clan_name ?? '';
 	const currentClanIsOnboarding = useSelector(selectCurrentClanIsOnboarding);
 	const missionDone = useSelector((state) => selectMissionDone(state, currentClanId as string));
 	const missionSum = useSelector((state) => selectMissionSum(state, currentClanId as string));
@@ -252,13 +257,16 @@ const ChannelMainContentText = ({ channelId, canSendMessage }: ChannelMainConten
 					})
 				).unwrap();
 				if (hashData.web_app_data) {
-					const encodedHash = encodeURIComponent(hashData.web_app_data);
-					const urlWithHash = `${appChannel.app_url}?data=${encodedHash}`;
+					const urlWithHash = buildChannelAppLaunchUrl(appChannel.app_url, {
+						webAppData: hashData.web_app_data,
+						clanId: currentChannel?.clan_id ?? '',
+						clanName: launchClanName
+					});
 					if (isElectron()) {
 						window.electron.launchAppWindow(urlWithHash);
 						return;
 					}
-					window.open(urlWithHash, currentChannel?.channel_label, 'width=900,height=700');
+					window.open(urlWithHash, currentChannel?.channel_label, 'width=900,height=700,noopener,noreferrer');
 				}
 			}
 		}
@@ -398,7 +406,7 @@ const ChannelMainContent = ({ channelId }: ChannelMainContentProps) => {
 									<ChannelMedia currentChannel={currentChannel} />
 								</div>
 								<div className="flex-shrink-0">
-									<ChannelMainContentText canSendMessage={canSendMessage} channelId={currentChannel?.channel_id as string} />
+									<ChannelMainContentText canSendMessage={canSendMessage} channelId={channelId} />
 								</div>
 							</div>
 						)}
@@ -522,8 +530,8 @@ const OnboardingGuide = ({
 					onClick={handleDoNextMission}
 				>
 					<Icons.Hashtag className="text-theme-primary" />
-					<div className=" flex flex-col">
-						<div className="text-base font-semibold text-theme-primary">{currentMission.title} </div>
+					<div className=" flex flex-col w-full overflow-hidden">
+						<div className="text-base font-semibold text-theme-primary w-full truncate">{currentMission.title} </div>
 						<div className="text-[10px] font-normal text-theme-primary">
 							{' '}
 							{titleMission[currentMission.task_type ? currentMission.task_type - 1 : 0]}{' '}

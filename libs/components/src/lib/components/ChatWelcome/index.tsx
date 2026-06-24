@@ -78,6 +78,12 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 	const isDmGroup = mode === ChannelStreamMode.STREAM_MODE_GROUP;
 	const isChatStream = currentChannelType === ChannelType.CHANNEL_TYPE_STREAMING;
 
+	const showAsGroupWelcome = isDmGroup && directChannel?.type === ChannelType.CHANNEL_TYPE_GROUP;
+	const groupWelcomeTitle = useMemo(() => {
+		const creator = selectedChannel?.creator_name;
+		return name || directChannel?.channel_label || (creator ? `${creator}'s Groups` : 'Group');
+	}, [name, directChannel?.channel_label, selectedChannel?.creator_name]);
+
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="space-y-2 px-4 mb-0  flex-1 flex flex-col justify-end" data-e2e={generateE2eId('chat_welcome')}>
@@ -104,12 +110,12 @@ function ChatWelCome({ name, username, avatarDM, mode, isPrivate }: ChatWelComeP
 						)}
 						{(isDm || isDmGroup) && (
 							<WelComeDm
-								name={isDmGroup ? name || `${selectedChannel?.creator_name}'s Groups` : name || username}
+								name={showAsGroupWelcome ? groupWelcomeTitle : name || username}
 								username={username || name}
-								avatar={isDmGroup ? directChannel?.channel_avatar || '/assets/images/avatar-group.png' : avatarDM}
+								avatar={showAsGroupWelcome ? directChannel?.channel_avatar || '/assets/images/avatar-group.png' : avatarDM}
 								classNameSubtext={classNameSubtext}
-								isDmGroup={isDmGroup}
-								onEditGroup={isDmGroup ? handleOpenEditModal : undefined}
+								isDmGroup={showAsGroupWelcome}
+								onEditGroup={showAsGroupWelcome ? handleOpenEditModal : undefined}
 								t={t}
 							/>
 						)}
@@ -151,11 +157,11 @@ const WelComeChannel = (props: WelComeChannelProps) => {
 				className={`h-[75px] w-[75px] rounded-full text-theme-primary-active  flex items-center justify-center ${!isChatStream ? 'bg-theme-primary' : ''}`}
 			>
 				{isChatStream ? (
-					<Icons.Chat defaultSize="w-10 h-10 " />
+					<Icons.Chat className="w-10 h-10 " />
 				) : channelPrivate ? (
-					<Icons.HashtagLocked defaultSize="w-10 h-10" />
+					<Icons.HashtagLocked className="w-10 h-10" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 				) : (
-					<Icons.Hashtag defaultSize="w-10 h-10" />
+					<Icons.Hashtag className="w-10 h-10" defaultFill1="var(--bg-icon-theme)" />
 				)}
 			</div>
 			<div>
@@ -189,9 +195,19 @@ const WelcomeChannelThread = (props: WelcomeChannelThreadProps) => {
 		<>
 			<div className="h-[75px] w-[75px] rounded-full bg-item-theme text-theme-primary flex items-center justify-center ">
 				{isPrivate === ChannelStatusEnum.isPrivate ? (
-					<Icons.ThreadIconLocker className="w-10 h-10" />
+					<Icons.ThreadIconLocker
+						className="w-10 h-10"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme-active)"
+					/>
 				) : (
-					<Icons.ThreadIcon defaultSize="w-10 h-10" />
+					<Icons.ThreadIcon
+						className="w-10 h-10"
+						defaultFill1="var(--bg-icon-theme)"
+						defaultFill4="var(--bg-theme-secounnd)"
+						defaultFill5="var(--bg-icon-theme)"
+					/>
 				)}
 			</div>
 			<div>

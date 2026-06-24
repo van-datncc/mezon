@@ -50,7 +50,7 @@ export const NoiseSuppressionControl = memo(({ isShowMember }: NoiseSuppressionC
 		>
 			<button
 				onClick={toggleNoiseSuppression}
-				className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
+				className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
 					isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'
 				} hover:bg-green-600 dark:hover:bg-green-700`}
 			>
@@ -60,11 +60,11 @@ export const NoiseSuppressionControl = memo(({ isShowMember }: NoiseSuppressionC
 	) : (
 		<button
 			onClick={toggleNoiseSuppression}
-			className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
+			className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
 				isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'
 			} hover:bg-zinc-600 dark:hover:bg-zinc-800`}
 		>
-			<Icons.NoiseSupressionIcon className={`w-5 h-5 text-gray-400`} />
+			<Icons.NoiseSupressionIcon className={`w-5 h-5 text-gray-400`} disabled />
 		</button>
 	);
 });

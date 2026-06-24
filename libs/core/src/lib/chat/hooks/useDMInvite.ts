@@ -8,8 +8,8 @@ import {
 	selectFriendsEntities,
 	useAppDispatch
 } from '@mezon/store';
+import type { ApiLinkInviteUser } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiLinkInviteUser } from 'mezon-js/api';
 import React, { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -38,6 +38,8 @@ export function useDMInvite(channelID?: string) {
 				(item.user_ids && item.user_ids.length === 1 && !userIdInClanArray.includes(item.user_ids[0]))
 			) {
 				listId.add(item.user_ids[0]);
+				return true;
+			} else if (item.type === ChannelType.CHANNEL_TYPE_GROUP) {
 				return true;
 			}
 			return false;

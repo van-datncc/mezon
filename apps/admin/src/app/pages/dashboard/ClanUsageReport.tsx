@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import ReportControls from '../../components/ReportControls/ReportControls';
 import ChartSection from '../../components/dashboard/ChartSection';
 import ClansTable from '../../components/dashboard/ClansTable';
+import MeetingRoomsTable from '../../components/dashboard/MeetingRoomsTable';
 import { LoadingState, NoDataState } from '../../components/dashboard/StateComponents';
 import { handleCSVExport } from '../../utils/dashboard/csvExport';
 import { usePagination, useTableSkeleton } from '../../utils/dashboard/reportHooks';
@@ -226,6 +227,8 @@ function ClanUsageReport({ onClanClick }: ClanUsageReportProps) {
 					/>
 				</>
 			)}
+
+			<MeetingRoomsTable />
 		</div>
 	);
 }

@@ -8,12 +8,8 @@ interface PopoutControlProps {
 	onToggle: () => void;
 }
 
-export const PopoutControl = memo(({ isGridView, isShowMember, isOpenPopOut, onToggle }: PopoutControlProps) => {
-	const iconClassName = `cursor-pointer ${
-		(isGridView && !isShowMember) || (isGridView && isShowMember) || (isShowMember && !isGridView)
-			? 'text-theme-primary text-theme-primary-hover'
-			: 'text-gray-300 hover:text-white'
-	}`;
+export const PopoutControl = memo(({ isOpenPopOut, onToggle }: PopoutControlProps) => {
+	const iconClassName = 'cursor-pointer text-[var(--bg-icon-theme)] hover:text-[var(--bg-icon-theme-active)]';
 
 	return (
 		<div onClick={onToggle}>

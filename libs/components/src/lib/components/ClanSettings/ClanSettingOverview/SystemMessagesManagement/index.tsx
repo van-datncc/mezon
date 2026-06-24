@@ -1,10 +1,10 @@
-import { fetchChannels, selectAllChannels, selectCurrentClanId, useAppDispatch, useAppSelector } from '@mezon/store';
+import { selectAllChannels, selectCurrentClanId, useAppSelector } from '@mezon/store';
 import { Icons, Menu } from '@mezon/ui';
 import { ChannelStatusEnum, generateE2eId } from '@mezon/utils';
+import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiSystemMessage, ApiSystemMessageRequest } from 'mezon-js/api';
 import type { ReactElement } from 'react';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 enum ETypeUpdateSystemMessage {
@@ -30,23 +30,22 @@ const SystemMessagesManagement = ({
 	setClanRequest
 }: SystemMessagesManagementProps) => {
 	const { t } = useTranslation('clanSettings');
-	const dispatch = useAppDispatch();
 	const channelsList = useAppSelector(selectAllChannels);
 	const currentClanId = useAppSelector(selectCurrentClanId);
 
-	useEffect(() => {
-		if (currentClanId && channelsList.length === 0) {
-			dispatch(
-				fetchChannels({
-					clanId: currentClanId,
-					channelType: ChannelType.CHANNEL_TYPE_CHANNEL
-				})
-			);
-		}
-	}, [currentClanId, dispatch, channelsList.length]);
 	const selectedChannel = useMemo(() => {
 		return channelsList.find((channel) => channel.id === channelSelectedId);
 	}, [channelsList, channelSelectedId]);
+
+	const renderChannelIcon = (channel?: { age_restricted?: number; channel_private?: number }) => {
+		if (channel?.age_restricted === 1) {
+			return <Icons.HashtagWarning className="w-4 h-4 dark:text-channelTextLabel" />;
+		}
+		if (channel?.channel_private) {
+			return <Icons.HashtagLocked className="w-4 h-4" defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />;
+		}
+		return <Icons.Hashtag className="w-4 h-4 dark:text-channelTextLabel" />;
+	};
 
 	const handleToggleSetting = (checked: boolean, type: ETypeUpdateSystemMessage, channelId?: string) => {
 		if (channelId && channelId !== channelSelectedId && type === ETypeUpdateSystemMessage.CHANNEL) {
@@ -85,11 +84,7 @@ const SystemMessagesManagement = ({
 							className="flex flex-row items-center rounded-sm text-sm w-full py-2 px-4 text-left cursor-pointer"
 							onClick={() => handleToggleSetting(true, ETypeUpdateSystemMessage.CHANNEL, channel.id)}
 						>
-							{channel?.channel_private ? (
-								<Icons.HashtagLocked defaultSize="w-4 h-4 dark:text-channelTextLabel" />
-							) : (
-								<Icons.Hashtag defaultSize="w-4 h-4 dark:text-channelTextLabel" />
-							)}
+							{renderChannelIcon(channel)}
 							<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.item.channel_name')}>
 								{channel.channel_label ?? ''}
 							</p>
@@ -114,7 +109,7 @@ const SystemMessagesManagement = ({
 					data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel')}
 				>
 					<div className={' flex flex-row items-center'}>
-						<Icons.Hashtag defaultSize="w-4 h-4 " />
+						{renderChannelIcon(selectedChannel)}
 						<p data-e2e={generateE2eId('clan_page.settings.overview.system_messages_channel.selection.selected.channel_name')}>
 							{selectedChannel?.channel_label}
 						</p>

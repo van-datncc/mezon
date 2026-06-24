@@ -6,7 +6,6 @@ import {
 	channelsActions,
 	clansActions,
 	hasGrandchildModal,
-	listChannelRenderAction,
 	notificationSettingActions,
 	selectAllChannelsFavorite,
 	selectCategoryById,
@@ -20,6 +19,7 @@ import {
 	selectWelcomeChannelByClanId,
 	stickerSettingActions,
 	threadsActions,
+	toastActions,
 	useAppDispatch,
 	useAppSelector
 } from '@mezon/store';
@@ -129,7 +129,8 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const currentChannel = useAppSelector((state) => selectChannelById(state, selectedChannel ?? '')) || {};
 
-	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, channel?.id || ''));
+	const channelId = channel?.id || channel?.channel_id || '';
+	const getNotificationChannelSelected = useAppSelector((state) => selectNotifiSettingsEntitiesById(state, channelId));
 	const dispatch = useAppDispatch();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentClanId = useSelector(selectCurrentClanId);
@@ -162,13 +163,11 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const maskFavoriteChannel = () => {
 		dispatch(channelsActions.addFavoriteChannel({ channel_id: channel.id, clan_id: currentClanId as string }));
-		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClanId as string, mark: true }));
 		setIsShowPanelChannel(false);
 	};
 
 	const removeFavoriteChannel = () => {
 		dispatch(channelsActions.removeFavoriteChannel({ channelId: channel.id, clanId: currentClanId || '' }));
-		dispatch(listChannelRenderAction.handleMarkFavor({ channelId: channel.id, clanId: currentClanId as string, mark: false }));
 		setIsShowPanelChannel(false);
 	};
 
@@ -219,11 +218,59 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 		handClosePannel();
 	};
 
+	const handleArchiveChannel = async () => {
+		try {
+			await dispatch(channelsActions.archiveChannel({ channelId: channel.id, clanId: currentClanId as string })).unwrap();
+			dispatch(
+				toastActions.addToast({
+					message: isThread ? t('toastArchiveThread') : t('toastArchiveChannel'),
+					type: 'success',
+					autoClose: 3000
+				})
+			);
+			if (channel.id === currentChannelId || channel.id === selectedChannel) {
+				if (isThread) {
+					navigate(`/chat/clans/${currentClanId}/channels/${channel.parent_id}`);
+				} else {
+					navigate(`/chat/clans/${currentClanId}/channels/${welcomeChannelId}`);
+				}
+			}
+		} catch (error) {
+			// Ignored intentionally or handled globally
+		} finally {
+			handleCloseArchiveConfirm();
+		}
+	};
+
+	const [openArchiveConfirm, closeArchiveConfirm] = useModal(() => {
+		const keyPrefix = isThread ? 'modalConfirmArchiveThread' : 'modalConfirmArchiveChannel';
+		return (
+			<ModalConfirm
+				handleCancel={handleCloseArchiveConfirm}
+				handleConfirm={handleArchiveChannel}
+				title={t(`${keyPrefix}.title`)}
+				buttonName={t(`${keyPrefix}.button`)}
+				message={t(`${keyPrefix}.textConfirm`)}
+			/>
+		);
+	});
+
+	const handleOpenArchiveConfirm = () => {
+		dispatch(stickerSettingActions.openModalInChild());
+		openArchiveConfirm();
+	};
+
+	const handleCloseArchiveConfirm = () => {
+		dispatch(stickerSettingActions.closeModalInChild());
+		closeArchiveConfirm();
+		handClosePannel();
+	};
+
 	const handleScheduleMute = (duration: number) => {
 		menuOpenMute.current = false;
 
 		const body: MuteChannelPayload = {
-			channel_id: channel.channel_id || '0',
+			channel_id: channelId || '0',
 			mute_time: duration !== Infinity ? duration : EMuteState.MUTED_INFINITY,
 			clan_id: currentClanId || ''
 		};
@@ -232,7 +279,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 
 	const muteOrUnMuteChannel = (active: number) => {
 		const body: MuteChannelPayload = {
-			channel_id: channel.channel_id || '0',
+			channel_id: channelId || '0',
 			clan_id: currentClanId || '',
 			mute_time: active
 		};
@@ -243,18 +290,18 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 		menuOpenNoti.current = false;
 		if (notificationType) {
 			const body = {
-				channel_id: channel.channel_id || '0',
+				channel_id: channelId || '0',
 				notification_type: notificationType || 0,
 				clan_id: currentClanId || '',
-				is_current_channel: channel.channel_id === currentChannelId
+				is_current_channel: channelId === currentChannelId
 			};
 			dispatch(notificationSettingActions.setNotificationSetting(body));
 		} else {
 			dispatch(
 				notificationSettingActions.deleteNotiChannelSetting({
-					channel_id: channel.channel_id || '0',
+					channel_id: channelId || '0',
 					clan_id: currentClanId || '',
-					is_current_channel: channel.channel_id === currentChannelId
+					is_current_channel: channelId === currentChannelId
 				})
 			);
 		}
@@ -386,7 +433,7 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 		);
 
 		return <>{menuItems}</>;
-	}, [notificationTypesListTranslated, t]);
+	}, [notificationTypesListTranslated, t, getNotificationChannelSelected, defaultNotifiName]);
 
 	const handleOpenMenuMute = useCallback((visible: boolean) => {
 		menuOpenMute.current = visible;
@@ -401,6 +448,12 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 	}, []);
 
 	const isFavoriteCategory = channel?.category_id === FAVORITE_CATEGORY_ID;
+
+	const isHideArchive =
+		channel.type === ChannelType.CHANNEL_TYPE_MEZON_VOICE ||
+		channel.type === ChannelType.CHANNEL_TYPE_STREAMING ||
+		channel.type === ChannelType.CHANNEL_TYPE_APP ||
+		channel.id === welcomeChannelId;
 
 	return (
 		<div
@@ -431,6 +484,12 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			{channel.parent_id === '0' || !channel.parent_id ? (
 				<>
 					<GroupPanels>
+						{!isHideArchive && canManageChannel && (
+							<ItemPanel
+								children={isThread ? t('menu.notification.archiveThread') : t('menu.notification.archiveChannel')}
+								onClick={handleOpenArchiveConfirm}
+							/>
+						)}
 						{!getNotificationChannelSelected?.time_mute_seconds ? (
 							<Menu
 								trigger="hover"
@@ -498,6 +557,12 @@ const PanelChannel = ({ coords, channel, openSetting, setIsShowPanelChannel, onD
 			) : (
 				<>
 					<GroupPanels>
+						{!isHideArchive && hasManageThreadPermission && (
+							<ItemPanel
+								children={isThread ? t('menu.notification.archiveThread') : t('menu.notification.archiveChannel')}
+								onClick={handleOpenArchiveConfirm}
+							/>
+						)}
 						{!getNotificationChannelSelected?.time_mute_seconds ? (
 							<Menu
 								trigger="hover"

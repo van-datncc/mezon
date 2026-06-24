@@ -38,6 +38,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			[ItemSetting.IMAGE_STICKERS]: t('sidebar.items.imageStickers'),
 			[ItemSetting.VOIDE_STICKERS]: t('sidebar.items.voiceStickers'),
 			[ItemSetting.CATEGORY_ORDER]: t('sidebar.items.categoryOrder'),
+			[ItemSetting.ARCHIVED_CHANNELS]: t('sidebar.items.archivedChannels'),
 			[ItemSetting.INTEGRATIONS]: t('sidebar.items.integrations'),
 			[ItemSetting.AUDIT_LOG]: t('sidebar.items.auditLog'),
 			[ItemSetting.ON_BOARDING]: t('sidebar.items.onboarding'),
@@ -60,7 +61,7 @@ const SettingSidebar = ({ onClickItem, handleMenu, currentSetting, setIsShowDele
 			if (item.id === ItemSetting.INTEGRATIONS) {
 				return hasClanPermission || hasChannelPermission;
 			}
-			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.AUDIT_LOG].includes(item.id)) {
+			if ([ItemSetting.OVERVIEW, ItemSetting.ROLES, ItemSetting.AUDIT_LOG, ItemSetting.ARCHIVED_CHANNELS].includes(item.id)) {
 				return hasClanPermission;
 			}
 			if (item.id === ItemSetting.ON_BOARDING || item.id === ItemSetting.ON_COMUNITY) {

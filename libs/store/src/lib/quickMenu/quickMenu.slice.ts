@@ -4,7 +4,7 @@ import { QUICK_MENU_TYPE } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Snowflake } from '@theinternetfolks/snowflake';
-import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiQuickMenuAccess, ApiQuickMenuAccessRequest } from 'mezon-js/api';
+import type { ApiMessageAttachment, ApiMessageMention, ApiMessageRef, ApiQuickMenuAccess, ApiQuickMenuAccessRequest } from 'mezon-js';
 import { ensureSession, getMezonCtx, withRetry } from '../helpers';
 import type { RootState } from '../store';
 
@@ -41,7 +41,9 @@ export const writeQuickMenuEvent = createAsyncThunk(
 			mentionEveryone,
 			avatar,
 			code,
-			topicId
+			topicId,
+			message_id,
+			message_sender_id
 		}: {
 			channelId: string;
 			clanId: string;
@@ -57,18 +59,21 @@ export const writeQuickMenuEvent = createAsyncThunk(
 			avatar?: string;
 			code?: number;
 			topicId?: string;
+			message_id?: string;
+			message_sender_id?: string;
 		},
 		thunkAPI
 	) => {
 		try {
 			const mezon = await ensureSession(getMezonCtx(thunkAPI));
-			const socket = mezon.socketRef?.current;
+			const client = mezon.clientRef?.current;
 
-			if (!socket || !socket.isOpen()) {
-				throw new Error('Socket is not connected');
+			if (!client) {
+				throw new Error('Client is not created');
 			}
 
-			await socket.writeQuickMenuEvent(
+			await client.writeQuickMenuEvent(
+				mezon.session,
 				menuName,
 				clanId,
 				channelId,
@@ -82,7 +87,9 @@ export const writeQuickMenuEvent = createAsyncThunk(
 				mentionEveryone || false,
 				avatar,
 				code || 0,
-				topicId
+				topicId,
+				message_id,
+				message_sender_id
 			);
 
 			return {

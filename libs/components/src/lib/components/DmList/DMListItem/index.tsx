@@ -2,7 +2,6 @@ import { useMemberStatus } from '@mezon/core';
 import type { DirectEntity } from '@mezon/store';
 import {
 	directActions,
-	getStore,
 	selectBuzzStateByDirectId,
 	selectDirectById,
 	selectIsUnreadDMById,
@@ -66,12 +65,11 @@ function DMListItem({ id, currentDmGroupId, joinToChatAndNavigate, navigateToFri
 
 	const handleLeave = async (e: React.MouseEvent, directId: string, currentDmGroupId: string) => {
 		e.stopPropagation();
-		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
-		const store = getStore();
 		if (directId === currentDmGroupId) {
-			dispatch(directActions.setDmGroupCurrentId(''));
+			dispatch(directActions.setDmGroupCurrentId(null));
 			navigateToFriends();
 		}
+		await dispatch(directActions.closeDirectMessage({ channel_id: directId }));
 	};
 
 	const ref = useRef<HTMLDivElement>(null);
@@ -164,12 +162,9 @@ const DmItemProfile = ({
 
 			{isTypeDMGroup ? (
 				<div className="flex flex-col justify-center ">
-					<span className="one-line text-start" data-e2e={generateE2eId(`chat.direct_message.chat_item.username`)}>
+					<span className="one-line text-start" data-e2e={generateE2eId(`chat.direct_message.chat_item.group_name`)}>
 						{name}
 					</span>
-					<p className="opacity-60 text-theme-primary text-xs text-start">
-						{number} {number === 1 ? t('member') : t('members')}
-					</p>
 				</div>
 			) : (
 				<DmInvoiceProfile name={name} directId={direct?.id} userId={direct?.user_ids?.[0] || ''} status={userStatus.status} />

@@ -120,9 +120,9 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 								xmlns="http://www.w3.org/2000/svg"
 								aria-labelledby="qrIconTitle"
 								stroke="#000000"
-								stroke-width="1"
-								stroke-linecap="square"
-								stroke-linejoin="miter"
+								strokeWidth="1"
+								strokeLinecap="square"
+								strokeLinejoin="miter"
 								color="#000000"
 							>
 								<title id="qrIconTitle">QR Code</title> <rect x="10" y="3" width="7" height="7" transform="rotate(90 10 3)" />{' '}
@@ -161,13 +161,6 @@ const SettingAccount = ({ onSettingProfile, menuIsOpen }: SettingAccountProps) =
 						<div>
 							<h4 className="uppercase font-bold text-xs  mb-1">{t('username')}</h4>
 							<p>{userProfile?.user?.username}</p>
-						</div>
-						<div
-							className=" h-fit rounded-lg px-6 py-1 cursor-pointer border-theme-primary bg-theme-input text-theme-primary-hover bg-secondary-button-hover	"
-							onClick={handleClick}
-							data-e2e={generateE2eId(`user_setting.account.edit_username`)}
-						>
-							{t('edit')}
 						</div>
 					</div>
 				</div>

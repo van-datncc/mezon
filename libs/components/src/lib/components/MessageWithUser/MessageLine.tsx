@@ -1,16 +1,14 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { clansActions, getStore, inviteActions, selectCanvasIdsByChannelId, selectClanById, selectInviteById, useAppDispatch } from '@mezon/store';
+import { clansActions, getStore, inviteActions, selectCanvasIdsByChannelId, selectClanById, useAppDispatch } from '@mezon/store';
 import { Icons } from '@mezon/ui';
 import type { IExtendedMessage } from '@mezon/utils';
-import { EBacktickType, ETokenMessage, INVITE_URL_REGEX, TypeMessage, convertMarkdown } from '@mezon/utils';
+import { EBacktickType, ETokenMessage, INVITE_URL_REGEX, TypeMessage, convertMarkdown, generateE2eId } from '@mezon/utils';
 import { ChannelStreamMode } from 'mezon-js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { CanvasHashtag, ChannelHashtag, EmojiMarkup, MarkdownContent, MentionUser, PlainText } from '../../components';
-import { useFetchClanBanner } from '../../hooks';
-import type { InviteBannerData } from '../MessageBox/types';
 import OgpEmbed from './OgpEmbed';
 
 interface RenderContentProps {
@@ -52,7 +50,12 @@ export interface ElementToken {
 	title?: string;
 	image?: string;
 	description?: string;
+	banner?: string;
 	index?: number;
+	language?: string;
+	member_count?: number;
+	is_community?: boolean;
+	url?: string;
 }
 
 export function extractIdsFromUrl(url: string) {
@@ -173,54 +176,20 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 	const navigate = useNavigate();
 	const [joining, setJoining] = useState(false);
 	const [error, setError] = useState('');
-	const [banner, setBanner] = useState('');
 	const inviteId = url.match(INVITE_URL_REGEX)?.[1] || '';
-	const inviteInfo = useSelector(selectInviteById(inviteId || ''));
-	const joinedClan = useSelector(selectClanById(inviteInfo?.clan_id || ''));
-	const { fetchClanBannerById } = useFetchClanBanner();
+	const joinedClan = useSelector(selectClanById(element?.clanId || ''));
 
-	const resolveInviteBanner = (invite: InviteBannerData | Record<string, unknown> | null | undefined): string => {
-		const b = invite && typeof invite === 'object' ? (invite as InviteBannerData) : null;
-		return b?.banner || b?.clan_banner || '';
-	};
-
-	useEffect(() => {
-		if (!inviteId || inviteInfo) return;
-		dispatch(inviteActions.getLinkInvite({ inviteId }));
-	}, [dispatch, inviteId, inviteInfo]);
-
-	useEffect(() => {
-		let mounted = true;
-		(async () => {
-			const resolved = resolveInviteBanner(inviteInfo as InviteBannerData | Record<string, unknown> | null | undefined);
-			if (resolved) {
-				if (mounted) setBanner(resolved);
-				return;
-			}
-			if (inviteInfo?.clan_id) {
-				const fallbackBanner = await fetchClanBannerById(inviteInfo.clan_id);
-				if (mounted && fallbackBanner) setBanner(fallbackBanner);
-			}
-		})();
-		return () => {
-			mounted = false;
-		};
-	}, [inviteInfo?.clan_id, inviteInfo, fetchClanBannerById]);
-
-	const clanTitle = inviteInfo?.clan_name || element.title || t('unknownClan');
-	const memberCount = Number(inviteInfo?.member_count || 0);
-	const memberLabel = t('memberCount', { count: memberCount });
-	const isJoined = Boolean(inviteInfo?.user_joined || joinedClan);
+	const clanTitle = element.title || t('unknownClan');
+	const isJoined = Boolean(joinedClan);
 	const isInvalidInvite = element.title === 'Invite Error';
-	const clanImage = inviteInfo?.clan_logo || element.image || '';
+	const clanImage = element.image || '';
 	const clanInitial = (clanTitle || 'M').trim().charAt(0).toUpperCase();
-	const isCommunityEnabled = Boolean((inviteInfo as { is_community?: boolean })?.is_community);
+	const isCommunityEnabled = !!element?.is_community;
 
 	const handleJoinOrGoTo = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.stopPropagation();
-		if (!inviteId) return;
-		if (isJoined && inviteInfo?.clan_id) {
-			navigate(`/chat/clans/${inviteInfo.clan_id}/channels/${inviteInfo.channel_id || '0'}`);
+		if (isJoined && element?.clanId) {
+			navigate(`/chat/clans/${element?.clanId}/member-safety`);
 			return;
 		}
 		try {
@@ -259,7 +228,7 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 		<div className="flex flex-col gap-0.5 max-w-[350px]">
 			<div className="relative rounded-2xl overflow-hidden border border-theme-primary bg-item-theme">
 				<div className="h-[76px] relative overflow-hidden bg-theme-setting-nav bg-theme-chat">
-					{banner ? <img src={banner} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
+					{element.banner ? <img src={element.banner} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
 				</div>
 				<div className="absolute top-[40px] left-4 w-[72px] h-[72px] rounded-[22px] overflow-hidden border-4 border-theme-primary bg-theme-setting-primary shadow-lg">
 					<div className="w-full h-full">
@@ -286,7 +255,7 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 					<div className="mt-2 flex items-center gap-2 text-theme-primary text-sm">
 						<span className="inline-flex items-center gap-1">
 							<span className="w-2 h-2 rounded-full text-theme-primary-active bg-[#22c55e]" />
-							{memberLabel}
+							{t('memberCount', { count: element.member_count || 0 })}
 						</span>
 					</div>
 					{error ? <p className="mt-2 text-xs text-red-300">{error}</p> : null}
@@ -294,6 +263,7 @@ const InvitePreviewCard = ({ element, url }: InvitePreviewCardProps) => {
 						className="mt-4 w-full h-10 rounded-lg bg-[#0a9f59] text-white font-semibold text-base hover:bg-[#0b8a4f] disabled:opacity-60"
 						onClick={handleJoinOrGoTo}
 						disabled={joining}
+						data-e2e={generateE2eId('invite_card.button.goto_clan')}
 					>
 						{joining ? t('joining') : isJoined ? t('goToClan') : t('join')}
 					</button>
@@ -575,16 +545,7 @@ export const MessageLine = ({
 					);
 				} else if (element.type === EBacktickType.OGP_PREVIEW) {
 					if (!isSending) {
-						const url =
-							element.index !== undefined && t
-								? t.substring(
-										element.index,
-										Math.min(
-											t.indexOf(' ', element.index) === -1 ? t.length : t.indexOf(' ', element.index),
-											t.indexOf('\n', element.index) === -1 ? t.length : t.indexOf('\n', element.index)
-										)
-									)
-								: '';
+						const url = element.url || '';
 
 						if (INVITE_URL_REGEX.test(url || '')) {
 							formattedContent.push(<InvitePreviewCard key={`invite-${s}-${messageId}`} element={element} url={url} />);
@@ -625,6 +586,7 @@ export const MessageLine = ({
 							content={content}
 							isInPinMsg={isInPinMsg}
 							typeOfBacktick={element.type}
+							language={element.language}
 							messageId={messageId}
 							onContextMenu={onContextMenu}
 						/>

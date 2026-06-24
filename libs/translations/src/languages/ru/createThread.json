@@ -15,7 +15,7 @@
 	"joinedThread": "вступившая в ветку",
 	"otherActiveThreads": "другие активные ветки",
 	"otherActiveThread": "другая активная ветка",
-	"olderThreads": "старые ветки",
+	"archivedThreads": "старые ветки",
 	"olderThread": "старая ветка",
 	"searchThreads": "искать ветки",
 	"searchThread": "искать ветку",
@@ -24,4 +24,3 @@
 		"content": "Ветка не найдена или у вас нет прав на обновление"
 	}
 }
-

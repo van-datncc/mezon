@@ -126,15 +126,23 @@ const LocationModal = (props: LocationModalProps) => {
 
 				const icon = isTextChannel ? (
 					isPrivateChannel ? (
-						<Icons.HashtagLocked />
+						<Icons.HashtagLocked defaultFill1="var(--bg-icon-theme)" defaultFill2="var(--bg-icon-theme-active)" />
 					) : (
-						<Icons.Hashtag />
+						<Icons.Hashtag defaultFill1="var(--bg-icon-theme)" />
 					)
 				) : isThread ? (
 					isPrivateChannel ? (
-						<Icons.ThreadIconLocker />
+						<Icons.ThreadIconLocker
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme-active)"
+						/>
 					) : (
-						<Icons.ThreadIcon />
+						<Icons.ThreadIcon
+							defaultFill1="var(--bg-icon-theme)"
+							defaultFill4="var(--bg-theme-secounnd)"
+							defaultFill5="var(--bg-icon-theme)"
+						/>
 					)
 				) : null;
 

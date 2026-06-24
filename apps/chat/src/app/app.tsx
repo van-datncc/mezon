@@ -16,7 +16,7 @@ import {
 	setIsElectronUpdateAvailable
 } from '@mezon/store';
 import i18n from '@mezon/translations';
-import { clearSessionFromStorage, getMezonConfig, MezonContextProvider, useMezon } from '@mezon/transport';
+import { getMezonConfig, MezonContextProvider, useMezon } from '@mezon/transport';
 
 import { PopupManagerProvider } from '@mezon/components';
 import { getCurrentChatData, PermissionProvider, useActivities, useSettingFooter } from '@mezon/core';
@@ -46,9 +46,10 @@ import { preloadedState } from './mock/state';
 import { Routes } from './routes';
 
 import { ThemeManager } from '@mezon/themes';
-import { LogLevel, setLogLevel } from 'livekit-client';
 
-setLogLevel(LogLevel.silent);
+void import('livekit-client').then(({ LogLevel, setLogLevel }) => {
+	setLogLevel(LogLevel.silent);
+});
 
 ThemeManager.initializeTheme();
 
@@ -105,23 +106,6 @@ const AppInitializer = () => {
 	const dispatch = useDispatch();
 	const { setIsShowSettingFooterStatus } = useSettingFooter();
 	const { setUserActivity, setUserAFK } = useActivities();
-
-	const { clientRef } = useMezon();
-	if (clientRef?.current?.setBasePath) {
-		if (!isLogin) {
-			clearSessionFromStorage();
-			clientRef.current.setBasePath(
-				process.env.NX_CHAT_APP_API_GW_HOST as string,
-				process.env.NX_CHAT_APP_API_GW_PORT as string,
-				process.env.NX_CHAT_APP_API_SECURE === 'true'
-			);
-		} else {
-			const config = getMezonConfig();
-			if (config) {
-				clientRef.current.setBasePath(config.host, config.port, config.ssl);
-			}
-		}
-	}
 
 	useEffect(() => {
 		if (!isElectron()) {
@@ -239,16 +223,23 @@ const AppInitializer = () => {
 	useEffect(() => {
 		if (isElectron() && isLogin) {
 			const handleNotificationClick = (_: any, data: any) => {
-				if (data?.link) {
+				if (!data?.link || typeof data.link !== 'string') return;
+				let path: string;
+				try {
 					const notificationUrl = new URL(data.link);
-					const path = notificationUrl.pathname;
-					const fromTopic = data.msg?.extras?.topicId && data.msg?.extras?.topicId !== '0';
-					window.dispatchEvent(
-						new CustomEvent('mezon:navigate', {
-							detail: { url: path, msg: fromTopic ? data.msg : null }
-						})
-					);
+					if (notificationUrl.protocol !== 'http:' && notificationUrl.protocol !== 'https:') {
+						return;
+					}
+					path = notificationUrl.pathname + notificationUrl.search + notificationUrl.hash;
+				} catch {
+					return;
 				}
+				const fromTopic = data.msg?.extras?.topicId && data.msg?.extras?.topicId !== '0';
+				window.dispatchEvent(
+					new CustomEvent('mezon:navigate', {
+						detail: { url: path, msg: fromTopic ? data.msg : null }
+					})
+				);
 			};
 			window.electron.on('APP::NOTIFICATION_CLICKED', handleNotificationClick);
 			return () => {
@@ -257,41 +248,45 @@ const AppInitializer = () => {
 		}
 	}, [isLogin]);
 
-	if (isElectron()) {
-		if (isLogin) {
-			electronBridge?.initListeners({
-				[TRIGGER_SHORTCUT]: () => {
-					setIsShowSettingFooterStatus(true);
-				},
-				[ACTIVE_WINDOW]: (activitiesInfo) => {
-					setUserActivity(activitiesInfo);
-				},
-				[UPDATE_AVAILABLE]: () => {
-					dispatch(setIsElectronDownloading(false));
-					dispatch(setIsElectronUpdateAvailable(true));
-				},
-				[DOWNLOAD_PROGRESS]: (progressObj) => {
-					let status = true;
-					if (progressObj?.transferred) {
-						status = progressObj?.transferred < progressObj?.total;
-					}
-					dispatch(setIsElectronDownloading(status));
-				},
-				[UPDATE_ERROR]: (error) => {
-					console.error(error);
-					captureSentryError(error, 'electron/update');
-				},
-				[LOCK_SCREEN]: () => {
-					setUserAFK(1);
-				},
-				[UNLOCK_SCREEN]: () => {
-					setUserAFK(0);
-				}
-			});
-		} else {
-			electronBridge?.removeAllListeners();
+	useEffect(() => {
+		if (!isElectron() || !electronBridge) return;
+		if (!isLogin) {
+			electronBridge.removeAllListeners();
+			return;
 		}
-	}
+		electronBridge.initListeners({
+			[TRIGGER_SHORTCUT]: () => {
+				setIsShowSettingFooterStatus(true);
+			},
+			[ACTIVE_WINDOW]: (activitiesInfo) => {
+				setUserActivity(activitiesInfo);
+			},
+			[UPDATE_AVAILABLE]: () => {
+				dispatch(setIsElectronDownloading(false));
+				dispatch(setIsElectronUpdateAvailable(true));
+			},
+			[DOWNLOAD_PROGRESS]: (progressObj) => {
+				let status = true;
+				if (progressObj?.transferred) {
+					status = progressObj?.transferred < progressObj?.total;
+				}
+				dispatch(setIsElectronDownloading(status));
+			},
+			[UPDATE_ERROR]: (error) => {
+				console.error(error);
+				captureSentryError(error, 'electron/update');
+			},
+			[LOCK_SCREEN]: () => {
+				setUserAFK(1);
+			},
+			[UNLOCK_SCREEN]: () => {
+				setUserAFK(0);
+			}
+		});
+		return () => {
+			electronBridge.removeAllListeners();
+		};
+	}, [isLogin, dispatch, setIsShowSettingFooterStatus, setUserActivity, setUserAFK]);
 
 	useEffect(() => {
 		isElectron() && isLogin && electronBridge.invoke('APP::CHECK_UPDATE');
@@ -324,6 +319,8 @@ export function App() {
 		return initStore(mezon, preloadedState);
 	}, [mezon]);
 
+	const loadingContextValue = useMemo(() => ({ isLoading, setIsLoading, suspenseLoading, setSuspenseLoading }), [isLoading, suspenseLoading]);
+
 	if (!store) {
 		return <LoadingFallbackWrapper />;
 	}
@@ -331,14 +328,7 @@ export function App() {
 	const showLoading = isLoading || suspenseLoading;
 
 	return (
-		<LoadingContext.Provider
-			value={{
-				isLoading,
-				setIsLoading,
-				suspenseLoading,
-				setSuspenseLoading
-			}}
-		>
+		<LoadingContext.Provider value={loadingContextValue}>
 			{showLoading && <LoadingFallbackWrapper />}
 			<MezonStoreProvider store={store} loading={null} persistor={persistor}>
 				<LanguageSyncProvider />

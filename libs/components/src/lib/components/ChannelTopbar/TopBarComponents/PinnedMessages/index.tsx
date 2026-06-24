@@ -1,7 +1,8 @@
 import { ColorRoleProvider, useAppParams, useEscapeKeyClose, useOnClickOutside } from '@mezon/core';
 import type { PinMessageEntity } from '@mezon/store';
 import { pinMessageActions, selectCurrentChannelClanId, selectCurrentChannelId, useAppDispatch } from '@mezon/store';
-import type { ApiMessageAttachment } from 'mezon-js/api';
+import { Icons } from '@mezon/ui';
+import type { ApiMessageAttachment } from 'mezon-js';
 import type { RefObject } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +31,7 @@ const PinnedMessages = ({ onClose, rootRef, mode }: PinnedMessagesProps) => {
 	const { directId } = useAppParams();
 	const currentChannelId = useSelector(selectCurrentChannelId);
 	const currentChannelClanId = useSelector(selectCurrentChannelClanId);
+	const [unpinMess, setUnpinMess] = useState<UnpinMessageObject | null>(null);
 
 	const handleUnPinMessage = (messageId: string) => {
 		const channelId = directId || currentChannelId || '';
@@ -42,16 +44,28 @@ const PinnedMessages = ({ onClose, rootRef, mode }: PinnedMessagesProps) => {
 			})
 		);
 	};
-	const [unpinMess, setUnpinMess] = useState<UnpinMessageObject | null>(null);
+
+	const handleClosePinnedModal = () => {
+		if (unpinMess) return;
+		onClose();
+	};
+
+	const handleCloseDeleteModal = () => {
+		setUnpinMess(null);
+		closeDeletePinMessage();
+	};
+
 	const modalDeleteRef = useRef(null);
 	const [openDeletePinMessage, closeDeletePinMessage] = useModal(() => {
+		if (!unpinMess?.pinMessage) return null;
+
 		return (
 			<ColorRoleProvider>
 				<ModalDeletePinMess
 					pinMessage={unpinMess?.pinMessage as PinMessageEntity}
 					contentString={unpinMess?.contentString}
 					handlePinMessage={() => handleUnPinMessage(unpinMess?.pinMessage.message_id || '0')}
-					closeModal={closeDeletePinMessage}
+					closeModal={handleCloseDeleteModal}
 					attachments={unpinMess?.attachments as ApiMessageAttachment[]}
 					modalref={modalDeleteRef}
 				/>
@@ -68,14 +82,15 @@ const PinnedMessages = ({ onClose, rootRef, mode }: PinnedMessagesProps) => {
 		openDeletePinMessage();
 	};
 
-	useEscapeKeyClose(modalRef, onClose);
-	useOnClickOutside(modalRef, onClose, rootRef);
+	useEscapeKeyClose(modalRef, handleClosePinnedModal);
+	useOnClickOutside(modalRef, handleClosePinnedModal, rootRef);
 
 	return (
 		<div ref={modalRef} tabIndex={-1} className="absolute top-8 right-0 shadow z-50 origin-top-right text-theme-primary">
 			<div className="flex flex-col rounded-md w-[420px] max-h-[80vh] overflow-hidden shadow-shadowBorder bg-theme-setting-primary">
 				<div className=" flex flex-row items-center justify-between p-[16px] h-12 border-b-theme-primary bg-theme-setting-nav">
 					<div className="flex flex-row items-center pr-[16px] gap-4 bg-theme-primary-nav">
+						<Icons.PinRight />
 						<span className="text-base font-medium cursor-default ">{t('modals.pinnedMessages.title')}</span>
 					</div>
 				</div>

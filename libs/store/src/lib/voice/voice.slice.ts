@@ -1,10 +1,8 @@
 import { captureSentryError } from '@mezon/logger';
-import { generateBasePath } from '@mezon/transport';
 import { INITIAL_NOISE_SUPPRESSION_PERCENTAGE, LENGHT_USER_ID, type IvoiceInfo, type LoadingStatus } from '@mezon/utils';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
-import type { ChannelType, VoiceLeavedEvent } from 'mezon-js';
-import type { ApiGenerateMeetTokenResponse, ApiVoiceChannelUser } from 'mezon-js/api';
+import type { ApiGenerateMeetTokenResponse, ApiVoiceChannelUser, ChannelType, VoiceLeavedEvent } from 'mezon-js';
 import type { CacheMetadata } from '../cache-metadata';
 import { createApiKey, createCacheMetadata, markApiFirstCalled, shouldForceApiCall } from '../cache-metadata';
 import type { MezonValueContext } from '../helpers';
@@ -169,7 +167,7 @@ export const generateMeetTokenExternal = createAsyncThunk(
 	async ({ token, username, metadata, isGuest }: { token: string; username?: string; metadata?: string; isGuest?: boolean }, thunkAPI) => {
 		try {
 			const mezon = await ensureClientAsync(getMezonCtx(thunkAPI));
-			const response = await mezon.client.generateMeetTokenExternal(generateBasePath(), token, username, metadata, isGuest);
+			const response = await mezon.client.generateMeetTokenExternal(token, username, metadata, isGuest);
 			return response;
 		} catch (error) {
 			captureSentryError(error, 'meet/generateMeetTokenExternal');
@@ -388,7 +386,7 @@ export const voiceSlice = createSlice({
 			state.showMicrophone = false;
 			state.showCamera = false;
 			state.showScreen = false;
-			state.noiseSuppressionEnabled = true;
+			state.noiseSuppressionEnabled = false;
 			state.noiseSuppressionLevel = INITIAL_NOISE_SUPPRESSION_PERCENTAGE;
 			state.voiceConnectionState = false;
 			state.voiceInfo = null;

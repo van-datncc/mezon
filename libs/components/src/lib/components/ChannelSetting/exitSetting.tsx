@@ -19,7 +19,7 @@ const ExitSetting = (props: ModalExitProps) => {
 						className="rounded-full p-[10px] border-2 border-theme-primary text-theme-primary cursor-pointer text-theme-primary-hover"
 						data-e2e={generateE2eId('clan_page.settings.button.exit')}
 					>
-						<Icons.CloseButton className="w-4 " />
+						<Icons.CloseButton />
 					</div>
 					<div className="font-semibold text-[13px] text-theme-primary">ESC</div>
 				</div>

@@ -1,4 +1,12 @@
-import { ChatContext, ChatContextProvider, ColorRoleProvider, useDragAndDrop, useFriends, useIdleRender } from '@mezon/core';
+import {
+	ChatContext,
+	ChatContextProvider,
+	ColorRoleProvider,
+	useDragAndDrop,
+	useFriends,
+	useIdleRender,
+	useReconnectOnForeground
+} from '@mezon/core';
 import {
 	appActions,
 	e2eeActions,
@@ -12,7 +20,7 @@ import { IS_SAFARI, MessageCrypt, UploadLimitReason, throttle } from '@mezon/uti
 
 import { TooManyUpload, WebRTCStreamProvider, useClanLimitModalErrorHandler } from '@mezon/components';
 import { selectTotalUnreadDM, useAppSelector } from '@mezon/store';
-import { MezonSuspense, isOnline$, socketState } from '@mezon/transport';
+import { MezonSuspense } from '@mezon/transport';
 import { SubPanelName, electronBridge, isLinuxDesktop, isWindowsDesktop } from '@mezon/utils';
 import isElectron from 'is-electron';
 import { memo, useContext, useEffect, useMemo } from 'react';
@@ -35,6 +43,12 @@ const GlobalEventListener = () => {
 
 	const hasUnreadChannel = useAppSelector((state) => selectAnyUnreadChannel(state));
 
+
+	useReconnectOnForeground({
+		scheduleReconnect: handleReconnect,
+		debouncedScheduleMs: 3000
+	});
+
 	const handleReconnectSuccess = useMemo(
 		() =>
 			throttle(() => {
@@ -55,39 +69,8 @@ const GlobalEventListener = () => {
 	}, []);
 
 	useEffect(() => {
-		let timeoutId: NodeJS.Timeout | null = null;
-		const reconnectSocket = () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-
-			timeoutId = setTimeout(() => {
-				if (document.visibilityState === 'visible' && !document.hidden && !socketState.isConnected) {
-					handleReconnect('Window focus/online event, attempting to reconnect...');
-				}
-			}, 3000);
-		};
-
-		const sub = isOnline$().subscribe((online) => {
-			if (online) {
-				reconnectSocket();
-			}
-		});
-		window.addEventListener('focus', reconnectSocket);
-		document.addEventListener('visibilitychange', reconnectSocket);
-
-		return () => {
-			if (timeoutId) {
-				clearTimeout(timeoutId);
-			}
-			sub.unsubscribe();
-			window.removeEventListener('focus', reconnectSocket);
-			document.removeEventListener('visibilitychange', reconnectSocket);
-		};
-	}, []);
-
-	useEffect(() => {
 		if (typeof window === 'undefined') return;
+
 		window.addEventListener('mezon:socket-reconnect', handleReconnectSuccess);
 		return () => {
 			window.removeEventListener('mezon:socket-reconnect', handleReconnectSuccess);
@@ -112,31 +95,43 @@ const GlobalEventListener = () => {
 	}, [allNotificationReplyMentionAllClan, totalUnreadMessages, quantityPendingRequest, hasUnreadChannel]);
 
 	useEffect(() => {
-		if (user?.encrypt_private_key) {
-			MessageCrypt.checkExistingKeys(user?.user?.id as string)
-				.then((found) => {
-					if (found) {
-						dispatch(e2eeActions.setHasKey(true));
-					}
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		}
+		const userId = user?.user?.id;
+		if (!user?.encrypt_private_key || !userId) return;
+		let cancelled = false;
+		MessageCrypt.checkExistingKeys(userId as string)
+			.then((found) => {
+				if (cancelled) return;
+				if (found) {
+					dispatch(e2eeActions.setHasKey(true));
+				}
+			})
+			.catch((error) => {
+				if (cancelled) return;
+				console.error(error);
+			});
+		return () => {
+			cancelled = true;
+		};
 	}, [dispatch, user?.encrypt_private_key, user?.user?.id]);
 
 	useEffect(() => {
-		if (!user?.encrypt_private_key) {
-			MessageCrypt.checkExistingKeys(user?.user?.id as string)
-				.then((found) => {
-					if (found) {
-						MessageCrypt.clearKeys(user?.user?.id as string);
-					}
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-		}
+		const userId = user?.user?.id;
+		if (user?.encrypt_private_key || !userId) return;
+		let cancelled = false;
+		MessageCrypt.checkExistingKeys(userId as string)
+			.then((found) => {
+				if (cancelled) return;
+				if (found) {
+					MessageCrypt.clearKeys(userId as string);
+				}
+			})
+			.catch((error) => {
+				if (cancelled) return;
+				console.error(error);
+			});
+		return () => {
+			cancelled = true;
+		};
 	}, []);
 
 	return null;

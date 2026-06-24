@@ -68,13 +68,13 @@ function DirectMessageList() {
 					</>
 				)}
 
-				<div className="text-xs font-semibold tracking-wide left-sp text-theme-primary mt-6 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default text-theme-primary-hover">
+				<div className="text-xs font-semibold tracking-wide left-sp text-theme-primary mt-2 flex flex-row items-center w-full justify-between px-2 pb-0 h-5 cursor-default text-theme-primary-hover">
 					<p>{t('directMessages')}</p>
 					<CreateMessageGroupModal />
 				</div>
 			</div>
 			<div className={`flex-1 font-medium  px-2`}>
-				<div className="flex flex-col gap-1 text-center relative" data-e2e={generateE2eId(`chat.direct_message.chat_list`)}>
+				<div className="flex flex-col gap-1 text-center relative" data-e2e={generateE2eId('chat.direct_message.chat_list_container')}>
 					<ListDMChannel listDM={unpinnedDMs} pinnedCount={pinnedDMs.length} />
 				</div>
 			</div>

@@ -60,7 +60,7 @@ Mezon is a Live, Work, and Play platform. It’s perfect for gaming and chilling
 
 1. **Web App**: Visit [mezon.ai](https://mezon.ai) - no installation required
 2. **Desktop**: Download from [releases](https://github.com/mezonai/mezon/releases) for Windows, macOS, or Linux
-3. **Mobile**: Get the app from [App Store](https://mezon.ai) or [Google Play](https://mezon.ai)
+3. **Mobile**: Get the app from [App Store](https://apps.apple.com/vn/app/mezon/id6502750046) or [Google Play](https://play.google.com/store/apps/details?id=com.mezon.mobile&pli=1)
 
 ### For Developers
 
@@ -127,13 +127,22 @@ The application will be available at http://localhost:4200/
 | **Mobile**      | iOS 13.0+, Android 8.0+ (API level 26+)                        |
 | **Development** | Node.js 18+, Yarn 1.22.4+, 4GB RAM minimum                     |
 
+### Source code
+
+| Platform    | Git Repo                                                 | Status    |
+| ----------- | -------------------------------------------------------- | --------- |
+| **Desktop** | [Desktop repo](https://github.com/mezonai/mezon-desktop) | ✅ Stable |
+| **iOS**     | [IOS repo](https://github.com/mezonai/mezon-ios)         | ✅ Stable |
+| **Android** | [Android repo](https://github.com/mezonai/mezon-android) | ✅ Stable |
+| **Web**     | [Web repo](https://github.com/mezonai/mezon)             | ✅ Stable |
+
 ### Download Options
 
 | Platform    | Download Link                                                                 | Status    |
 | ----------- | ----------------------------------------------------------------------------- | --------- |
 | **Windows** | [Download](https://apps.microsoft.com/detail/9pf25lf1fj17)                    | ✅ Stable |
 | **macOS**   | [Download](https://apps.apple.com/vn/app/mezon-desktop/id6756601798)          | ✅ Stable |
-| **Linux**   | [Download](https://cdn.mezon.ai/release/mezon-1.4.61-linux-amd64.deb)         | ✅ Stable |
+| **Linux**   | [Download](https://cdn.mezon.ai/release/mezon-1.4.72-linux-amd64.deb)         | ✅ Stable |
 | **iOS**     | [App Store](https://apps.apple.com/vn/app/mezon/id6502750046)                 | ✅ Stable |
 | **Android** | [Google Play](https://play.google.com/store/apps/details?id=com.mezon.mobile) | ✅ Stable |
 | **Web**     | [mezon.ai](https://mezon.ai)                                                  | ✅ Stable |
@@ -373,8 +382,8 @@ We welcome contributions from the community! Here's how you can help:
 ## 📄 License & Legal
 
 -   **License**: [MIT License](LICENSE) - Free for personal and commercial use
--   **Privacy Policy**: [mezon.ai/privacy](https://mezon.ai/privacy)
--   **Terms of Service**: [mezon.ai/terms](https://mezon.ai/terms)
+-   **Privacy Policy**: [mezon.ai/privacy](https://mezon.ai/privacy-policy)
+-   **Terms of Service**: [mezon.ai/terms](https://mezon.ai/terms-of-service)
 -   **Security Policy**: [SECURITY.md](SECURITY.md)
 
 ---

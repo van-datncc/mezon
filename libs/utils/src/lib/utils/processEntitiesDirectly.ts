@@ -1,13 +1,6 @@
 import type { IEmojiOnMessage, IHashtagOnMessage, IMarkdownOnMessage, IMentionOnMessage } from '../types';
 import { EBacktickType } from '../types';
-import { isFacebookLink, isTikTokLink, isYouTubeLink } from './embed-social';
-
-const getLinkType = (url: string): EBacktickType => {
-	if (isYouTubeLink(url)) return EBacktickType.LINKYOUTUBE;
-	if (isFacebookLink(url)) return EBacktickType.LINKFACEBOOK;
-	if (isTikTokLink(url)) return EBacktickType.LINKTIKTOK;
-	return EBacktickType.LINK;
-};
+import { getLinkType } from './embed-social';
 
 export const processEntitiesDirectly = (entities: any[], content: string, rolesClan: any[]) => {
 	const mentions: IMentionOnMessage[] = [];
@@ -21,7 +14,33 @@ export const processEntitiesDirectly = (entities: any[], content: string, rolesC
 		const s = offset;
 		const e = offset + length;
 		const display = content.substring(offset, offset + length);
-
+		const lines = display.split('\n');
+		const firstLine = lines[0]?.trim();
+		const languages = new Set([
+			'c',
+			'c++',
+			'c#',
+			'js',
+			'ts',
+			'py',
+			'java',
+			'javascript',
+			'typescript',
+			'python',
+			'go',
+			'rust',
+			'kotlin',
+			'sql',
+			'html',
+			'json',
+			'css',
+			'swift',
+			'yaml',
+			'json',
+			'php',
+			'jsx'
+		]);
+		let language = undefined;
 		switch (type) {
 			case 'MessageEntityMentionName':
 				if (userId) {
@@ -78,7 +97,10 @@ export const processEntitiesDirectly = (entities: any[], content: string, rolesC
 				break;
 
 			case 'MessageEntityPre':
-				markdown.push({ s, e, type: EBacktickType.PRE });
+				if (languages.has(firstLine.toLowerCase())) {
+					language = firstLine;
+				}
+				markdown.push({ s, e, type: EBacktickType.PRE, language });
 				break;
 
 			case 'MessageEntityTextUrl':

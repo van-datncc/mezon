@@ -3,7 +3,6 @@ import type { IChannel } from '@mezon/utils';
 import { ChannelStatusEnum } from '@mezon/utils';
 import { ChannelType } from 'mezon-js';
 import { useRef } from 'react';
-import Button from '../Button';
 import { Icons } from '../Icons';
 
 export type ModalProps = {
@@ -65,22 +64,27 @@ const Modal = (props: ModalProps) => {
 										<div className="inline-flex gap-x-2">
 											{hasChannel.channel_private === ChannelStatusEnum.isPrivate &&
 												hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-													<Icons.HashtagLocked defaultSize="w-5 h-5 " />
+													<Icons.HashtagLocked
+														className="w-5 h-5"
+														defaultFill1="var(--bg-icon-theme)"
+														defaultFill2="var(--bg-icon-theme-active)"
+													/>
 												)}
 											{hasChannel.channel_private === undefined && hasChannel.type === ChannelType.CHANNEL_TYPE_CHANNEL && (
-												<Icons.Hashtag defaultSize="w-5 h-5" />
+												<Icons.Hashtag className="w-5 h-5" />
 											)}
 											<p>{hasChannel.channel_label}</p>
 										</div>
 									)}
 									<p className={`${classSubTitleBox}`}>{subTitleBox}</p>
 								</div>
-								<Button
-									className="flex items-center rounded-full aspect-square h-6 text-5xl leading-3 justify-center opacity-50 text-theme-primary-hover "
+								<button
+									type="button"
 									onClick={onClose}
+									className="p-2 rounded-md border border-transparent text-theme-primary hover:text-theme-primary-active hover:border-theme-primary bg-item-theme-hover transition-colors"
 								>
-									×
-								</Button>
+									<Icons.Close className="w-5 h-5" />
+								</button>
 							</div>
 
 							{/*body*/}

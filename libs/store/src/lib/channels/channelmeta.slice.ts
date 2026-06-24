@@ -1,8 +1,8 @@
 import type { LoadingStatus } from '@mezon/utils';
 import type { EntityState, PayloadAction } from '@reduxjs/toolkit';
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import type { ApiChannelDescription, ApiChannelMessageHeader, ChannelMessage } from 'mezon-js';
 import { ChannelType } from 'mezon-js';
-import type { ApiChannelDescription, ApiChannelMessageHeader, ChannelMessage } from 'mezon-js/api';
 import { selectAllAccount } from '../account/account.slice';
 export const CHANNELMETA_FEATURE_KEY = 'channelmeta';
 
@@ -20,9 +20,9 @@ export interface ChannelMetaEntity {
 	last_sent_message?: ApiChannelMessageHeader;
 }
 
-function extractChannelMeta(channel: ApiChannelDescription, clanId: string): ChannelMetaEntity {
+function extractChannelMeta(channel: ApiChannelDescription & { id?: string }, clanId: string): ChannelMetaEntity {
 	return {
-		id: channel.channel_id || '0',
+		id: channel.id || channel.channel_id || '0',
 		lastSeenTimestamp:
 			Number.isNaN(channel.last_seen_message?.timestamp_seconds) || !channel.last_seen_message?.timestamp_seconds
 				? 0
@@ -71,6 +71,7 @@ export const channelMetaSlice = createSlice({
 	initialState: initialChannelMetaState,
 	reducers: {
 		add: channelMetaAdapter.addOne,
+		upsertOne: channelMetaAdapter.upsertOne,
 		setChannelLastSentTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number; senderId: string; clanId: string }>) => {
 			if (action.payload.clanId === '0') {
 				dmMetaAdapter.updateOne(state.dmEntities, {
@@ -88,8 +89,8 @@ export const channelMetaSlice = createSlice({
 				}
 			});
 		},
-		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number; messageId?: string }>) => {
-			const { channelId, timestamp, messageId } = action.payload;
+		setChannelLastSeenTimestamp: (state, action: PayloadAction<{ channelId: string; timestamp: number; messageId?: string; clanId: string }>) => {
+			const { channelId, timestamp, messageId, clanId } = action.payload;
 			const channel = state?.entities[channelId];
 			if (channel) {
 				channelMetaAdapter.updateOne(state, {
@@ -98,6 +99,16 @@ export const channelMetaSlice = createSlice({
 						lastSeenTimestamp: Math.floor(timestamp),
 						...(messageId && { lastSeenMessageId: messageId })
 					}
+				});
+			} else {
+				channelMetaAdapter.upsertOne(state, {
+					id: channelId,
+					clanId,
+					isMute: false,
+					lastSeenMessageId: messageId,
+					senderId: '0',
+					lastSentTimestamp: 0,
+					lastSeenTimestamp: Math.floor(timestamp)
 				});
 			}
 		},
@@ -142,7 +153,7 @@ export const channelMetaSlice = createSlice({
 					clanId,
 					isMute: false,
 					lastSeenTimestamp: 0,
-					lastSentTimestamp: Date.now(),
+					lastSentTimestamp: Date.now() / 1000,
 					senderId: '0',
 					count_mess_unread: initialCount
 				});
@@ -210,12 +221,27 @@ export const channelMetaSlice = createSlice({
 		updateDmLastSentMessage: (state, action: PayloadAction<{ channelId: string; message: ChannelMessage }>) => {
 			const { channelId, message } = action.payload;
 			const updatedMessage = mapMessageToConversation(message);
-			dmMetaAdapter.updateOne(state.dmEntities, {
-				id: channelId,
-				changes: {
-					last_sent_message: updatedMessage
-				}
-			});
+
+			const checkExist = state.dmEntities?.entities[channelId];
+			if (checkExist) {
+				dmMetaAdapter.updateOne(state.dmEntities, {
+					id: channelId,
+					changes: {
+						last_sent_message: updatedMessage,
+						lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
+					}
+				});
+			} else {
+				dmMetaAdapter.addOne(state.dmEntities, {
+					id: channelId,
+					clanId: message.clan_id || '',
+					isMute: false,
+					senderId: message.sender_id,
+					lastSeenTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000 - 1,
+					last_sent_message: updatedMessage,
+					lastSentTimestamp: updatedMessage?.timestamp_seconds || Date.now() / 1000
+				});
+			}
 		},
 		dmMetaAdd: (state, action: PayloadAction<{ channelId: string; clanId: string }>) => {
 			const { channelId, clanId } = action.payload;
@@ -224,10 +250,14 @@ export const channelMetaSlice = createSlice({
 				id: channelId,
 				isMute: false,
 				senderId: '0',
-				lastSentTimestamp: Date.now(),
+				lastSentTimestamp: Date.now() / 1000,
 				lastSeenTimestamp: 0,
 				count_mess_unread: 0
 			});
+		},
+		deleteChannelMeta: (state, action: PayloadAction<{ channelId: string }>) => {
+			const { channelId } = action.payload;
+			channelMetaAdapter.removeOne(state, channelId);
 		}
 	}
 });
@@ -303,7 +333,7 @@ export const selectChannelMetaById = createSelector([selectChannelMetaEntities, 
 });
 
 export const selectIsUnreadChannelById = createSelector([selectChannelMetaById], (channel) => {
-	return channel?.lastSeenTimestamp < channel?.lastSentTimestamp || !!channel?.count_mess_unread;
+	return !isNaN(channel?.lastSeenTimestamp) ? channel?.lastSeenTimestamp < channel?.lastSentTimestamp || !!channel?.count_mess_unread : false;
 });
 
 export const selectLastSeenMessageId = createSelector([selectChannelMetaEntities, (state, channelId) => channelId], (settings, channelId) => {

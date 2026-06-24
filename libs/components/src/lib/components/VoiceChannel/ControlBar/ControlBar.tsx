@@ -302,9 +302,9 @@ const ControlBar = ({
 						>
 							<button
 								onClick={toggleNoiseSuppression}
-								className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark	border-none transition-colors ${
+								className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
 									isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'
-								} 'hover:bg-green-600 dark:hover:bg-green-700`}
+								} hover:bg-green-600 dark:hover:bg-green-700`}
 							>
 								<Icons.NoiseSupressionIcon className="w-5 h-5 text-green-400" />
 							</button>
@@ -312,13 +312,11 @@ const ControlBar = ({
 					) : (
 						<button
 							onClick={toggleNoiseSuppression}
-							className={`w-14 aspect-square max-md:w-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
+							className={`w-14 h-14 max-md:w-10 max-md:h-10 max-md:p-2 !rounded-full flex justify-center items-center border-none dark:border-none transition-colors ${
 								isShowMember ? 'bg-zinc-500 dark:bg-zinc-900' : 'bg-zinc-700'
 							} hover:bg-zinc-600 dark:hover:bg-zinc-800`}
 						>
-							<Icons.NoiseSupressionIcon className="w-5 h-5 text-gray-400">
-								<path d="M3 21 L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-							</Icons.NoiseSupressionIcon>
+							<Icons.NoiseSupressionIcon className="w-5 h-5 text-gray-400" disabled />
 						</button>
 					))}
 				{visibleControls.camera && (
@@ -342,8 +340,8 @@ const ControlBar = ({
 					/>
 				)}
 
-				<AgentControl isExternalCalling={!!isExternalCalling} />
-				{!isExternalCalling && <RaisingHandControls />}
+				<AgentControl isExternalCalling={!!isExternalCalling} isShowMember={isShowMember} />
+				{!isExternalCalling && <RaisingHandControls isShowMember={isShowMember} />}
 				{visibleControls.leave && <LeaveButton onLeaveRoom={handleLeaveRoom} />}
 			</div>
 

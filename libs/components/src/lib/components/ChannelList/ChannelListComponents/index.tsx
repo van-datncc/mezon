@@ -11,6 +11,7 @@ import {
 	selectCurrentChannelId,
 	selectCurrentClanId,
 	selectCurrentClanIsOnboarding,
+	selectCurrentClanName,
 	selectEventLoading,
 	selectMissionDone,
 	selectMissionSum,
@@ -24,9 +25,9 @@ import {
 } from '@mezon/store';
 
 import { Icons } from '@mezon/ui';
-import { DONE_ONBOARDING_STATUS, EPermission, generateE2eId } from '@mezon/utils';
+import { DONE_ONBOARDING_STATUS, EPermission, buildChannelAppLaunchUrl, generateE2eId } from '@mezon/utils';
 import isElectron from 'is-electron';
-import type { ApiChannelAppResponse } from 'mezon-js/api';
+import type { ApiChannelAppResponse } from 'mezon-js';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useModal } from 'react-modal-hook';
@@ -119,12 +120,18 @@ export const Events = memo(() => {
 				<Link
 					to={serverGuidePath}
 					onClick={handleClose}
-					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${isGuidePath ? 'bg-button-secondary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded h-[34px] ${
+						isGuidePath ? 'bg-button-secondary text-theme-primary-active' : ''
+					} bg-item-hover text-theme-primary text-theme-primary-hover ${
+						isGuidePath
+							? '[--guide-fill-1:var(--bg-icon-theme-active)] [--guide-fill-2:var(--bg-theme-secounnd)]'
+							: '[--guide-fill-1:var(--bg-icon-theme)] [--guide-fill-2:var(--bg-theme-secounnd)]'
+					} hover:[--guide-fill-1:var(--bg-icon-theme-active)] hover:[--guide-fill-2:var(--bg-theme-secounnd)]`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex" data-e2e={generateE2eId('clan_page.side_bar.button.clan_guide')}>
 						<div className="w-5 h-5 relative flex flex-row items-center">
-							<div className="w-5 h-5 left-[1.67px] top-[1.67px] absolute">
-								<Icons.GuideIcon defaultSize="w-5 h-5 " defaultFill="" />
+							<div className="w-5 h-5">
+								<Icons.GuideIcon className="w-5 h-5 " defaultFill1="var(--guide-fill-1)" defaultFill2="var(--guide-fill-2)" />
 							</div>
 						</div>
 						<div className="w-[99px] text-base font-medium">{t('navigation.clanGuide')}</div>
@@ -133,14 +140,14 @@ export const Events = memo(() => {
 			)}
 
 			<div
-				className="self-stretch  items-center inline-flex cursor-pointer px-2 rounded-lg h-[34px] bg-item-hover  text-theme-primary text-theme-primary-hover"
+				className="self-stretch items-center inline-flex cursor-pointer px-2 rounded-lg h-[34px] bg-item-hover text-theme-primary text-theme-primary-hover [--events-fill-1:var(--bg-icon-theme)] [--events-fill-2:var(--bg-theme-secounnd)] hover:[--events-fill-1:var(--bg-icon-theme-active)] hover:[--events-fill-2:var(--bg-theme-secounnd)]"
 				onClick={openModal}
 				data-e2e={generateE2eId('clan_page.side_bar.button.events')}
 			>
 				<div className="grow w-5 flex-row items-center gap-2 flex">
 					<div className="h-5 relative flex justify-center gap-2  items-center">
 						<div className="w-5 h-5">
-							<Icons.IconEvents />
+							<Icons.IconEvents className="w-5 h-5" defaultFill1="var(--events-fill-1)" defaultFill2="var(--events-fill-2)" />
 						</div>
 						<div className="w-[99px] text-base font-medium">
 							{numberEventManagement === 0
@@ -166,7 +173,7 @@ export const Events = memo(() => {
 				<div className="grow w-5 flex-row items-center gap-2 flex" data-e2e={generateE2eId('clan_page.side_bar.button.members')}>
 					<div className="w-5 h-5 relative flex flex-row items-center">
 						<div className="w-5 h-5 ">
-							<Icons.MemberList defaultSize="w-5 h-5" />
+							<Icons.MemberList className="w-5 h-5" />
 						</div>
 					</div>
 					<div className="text-base font-medium">{t('navigation.members')}</div>
@@ -176,12 +183,18 @@ export const Events = memo(() => {
 				<Link
 					to={channelSettingPath}
 					onClick={handleClose}
-					className={`self-stretch  inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''} bg-item-hover text-theme-primary text-theme-primary-hover`}
+					className={`self-stretch inline-flex cursor-pointer px-2 rounded-lg h-[34px] ${
+						isSettingPath ? 'bg-button-secondary border-theme-primary text-theme-primary-active' : ''
+					} bg-item-hover text-theme-primary text-theme-primary-hover ${
+						isSettingPath
+							? '[--channel-browser-fill-1:var(--bg-icon-theme-active)] [--channel-browser-fill-2:var(--bg-theme-secounnd)]'
+							: '[--channel-browser-fill-1:var(--bg-icon-theme)] [--channel-browser-fill-2:var(--bg-theme-secounnd)]'
+					} hover:[--channel-browser-fill-1:var(--bg-icon-theme-active)] hover:[--channel-browser-fill-2:var(--bg-theme-secounnd)]`}
 				>
 					<div className="grow w-5 flex-row items-center gap-2 flex">
 						<div className="w-5 h-5 relative flex flex-row items-center">
 							<div className="w-5 h-5">
-								<Icons.ChannelBrowser />
+								<Icons.ChannelBrowser defaultFill1="var(--channel-browser-fill-1)" defaultFill2="var(--channel-browser-fill-2)" />
 							</div>
 						</div>
 						<div className="w-full text-base font-medium" data-e2e={generateE2eId('clan_page.side_bar.button.channels')}>
@@ -243,7 +256,7 @@ const OnboardingGetStart = ({ link, clanId }: { link: string; clanId: string }) 
 					<p className="text-xs font-bold ">{missionDone}</p>
 					<p className="text-xs">{t('onboarding.of')}</p>
 					<p className="text-xs font-bold">{missionSum}</p>
-					<Icons.ArrowRight defaultSize="w-3 h-3" />
+					<Icons.ArrowRight className="w-3 h-3" />
 				</div>
 			</div>
 			<div className="flex bg-slate-700 relative rounded-2xl w-full h-1 overflow-hidden">
@@ -264,6 +277,7 @@ const NUMBER_APPS_SHOW_OFF = 4;
 const ChannelAppList = memo(() => {
 	const allChannelApp = useSelector(selectAppChannelsList);
 	const currentClanId = useSelector(selectCurrentClanId);
+	const currentClanName = useSelector(selectCurrentClanName) ?? '';
 	const expandRef = useRef<HTMLDivElement>(null);
 	const dispatch = useAppDispatch();
 	const showList = allChannelApp.length > NUMBER_APPS_SHOW_OFF + 1 ? allChannelApp.slice(0, NUMBER_APPS_SHOW_OFF) : allChannelApp;
@@ -287,13 +301,16 @@ const ChannelAppList = memo(() => {
 			if (hashData.web_app_data) {
 				const store = getStore();
 				const channel = selectChannelById(store.getState(), appChannel.channel_id);
-				const encodedHash = encodeURIComponent(hashData.web_app_data);
-				const urlWithHash = `${appChannel.app_url}?data=${encodedHash}`;
+				const urlWithHash = buildChannelAppLaunchUrl(appChannel.app_url, {
+					webAppData: hashData.web_app_data,
+					clanId: currentClanId ?? '',
+					clanName: currentClanName
+				});
 				if (isElectron()) {
 					window.electron.launchAppWindow(urlWithHash);
 					return;
 				}
-				window.open(urlWithHash, channel?.channel_label, 'width=900,height=700');
+				window.open(urlWithHash, channel?.channel_label, 'width=900,height=700,noopener,noreferrer');
 			}
 		}
 	};
@@ -365,7 +382,7 @@ const ChannelAppList = memo(() => {
 						className="text-theme-primary text-theme-primary-hover rounded-md aspect-square h-10 p-2 flex items-center justify-center cursor-pointer bg-item-hover"
 						onClick={handleOpenListApp}
 					>
-						<Icons.RightIcon defaultSize="w-6 h-6" />
+						<Icons.RightIcon className="w-6 h-6" />
 					</div>
 				)}
 			</div>
@@ -385,7 +402,7 @@ const ListChannelApp = ({
 	useOnClickOutside(panelRef, onClose);
 
 	const handleFindChannelApp = () => {
-		window.open('https://top.mezon.ai/search?q=&tags=&type=app', '_blank');
+		window.open('https://top.mezon.ai/search?q=&tags=&type=app', '_blank', 'noopener,noreferrer');
 	};
 
 	return (
@@ -438,7 +455,7 @@ const ListChannelApp = ({
 						<p className="text-sm font-medium">Find Channel App</p>
 						<p className="text-xs opacity-60">Discover more apps</p>
 					</div>
-					<Icons.ArrowRight defaultSize="w-5 h-5" />
+					<Icons.ArrowRight className="w-5 h-5" />
 				</button>
 			</div>
 		</div>
