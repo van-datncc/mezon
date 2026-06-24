@@ -15,7 +15,7 @@ import viTranslations from './languages/vi/index';
 export const defaultNS = 'common';
 const defaultNamespaces = ['common', 'friends'];
 
-const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe', 'blr'] as const;
+const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'ukr', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe', 'blr'] as const;
 type SupportedLng = (typeof SUPPORTED_LNGS)[number];
 const isSupportedLng = (value: string): value is SupportedLng => (SUPPORTED_LNGS as readonly string[]).includes(value);
 
@@ -86,7 +86,13 @@ const timezoneDetector = {
 				lng === 'pt' ||
 				lng === 'it' ||
 				lng === 'jpn' ||
-				lng === 'fr')
+				lng === 'fr' ||
+				lng === 'ukr' ||
+				lng === 'de' ||
+				lng === 'fr' ||
+				lng === 'kr' ||
+				lng === 'swe' ||
+				lng === 'blr')
 		) {
 			localStorage.setItem('i18nextLng', lng);
 		}
@@ -111,6 +117,8 @@ const loadLanguageBundle = (language: string): Promise<LanguageBundle> => {
 				return (await import('./languages/vi/index')).default as LanguageBundle;
 			case 'ru':
 				return (await import('./languages/ru/index')).default as LanguageBundle;
+			case 'ukr':
+				return (await import('./languages/ukr/index')).default as LanguageBundle;
 			case 'es':
 				return (await import('./languages/es/index')).default as LanguageBundle;
 			case 'tt':
