@@ -2,7 +2,6 @@ import { appActions, selectCurrentLanguage, useAppDispatch } from '@mezon/store'
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-
 interface ISettingLanguageProps {
 	menuIsOpen: boolean;
 }
@@ -79,6 +78,12 @@ export const SettingLanguage = ({ menuIsOpen }: ISettingLanguageProps) => {
 				value: 'swe',
 				contributedBy: 'robits',
 				flag: <SwedenFlag />
+			},
+			{
+				title: `${t('setting:language.belarusian')}`,
+				value: 'blr',
+				contributedBy: 'community',
+				flag: <BelarusFlag />
 			}
 		];
 	}, [t]);
@@ -402,6 +407,25 @@ const SwedenFlag = () => (
 			<rect x="1" y="4" width="30" height="24" fill="#006aa7" />
 			<rect x="8" y="4" width="4" height="24" fill="#fecc00" />
 			<rect x="1" y="14" width="30" height="4" fill="#fecc00" />
+		</g>
+		<path
+			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
+			opacity=".15"
+		></path>
+	</svg>
+);
+
+const BelarusFlag = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32">
+		<defs>
+			<clipPath id="blr-clip">
+				<rect x="1" y="4" width="30" height="24" rx="4" ry="4" />
+			</clipPath>
+		</defs>
+		<g clipPath="url(#blr-clip)">
+			<rect x="1" y="4" width="30" height="8" fill="#fff" />
+			<rect x="1" y="12" width="30" height="8" fill="#c8313e" />
+			<rect x="1" y="20" width="30" height="8" fill="#fff" />
 		</g>
 		<path
 			d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z"
