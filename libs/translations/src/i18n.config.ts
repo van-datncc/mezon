@@ -2,6 +2,15 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { initReactI18next } from 'react-i18next';
+import enTranslations from './languages/en/index';
+import esTranslations from './languages/es/index';
+import frTranslations from './languages/fr/index';
+import itTranslations from './languages/it/index';
+import jpnTranslations from './languages/jpn/index';
+import ptTranslations from './languages/pt/index';
+import ruTranslations from './languages/ru/index';
+import ttTranslations from './languages/tt/index';
+import viTranslations from './languages/vi/index';
 
 export const defaultNS = 'common';
 const defaultNamespaces = ['common', 'friends'];
@@ -14,18 +23,77 @@ const timezoneDetector = {
 	name: 'timezone',
 	lookup() {
 		const storedLang = localStorage.getItem('i18nextLng');
-		if (storedLang && isSupportedLng(storedLang)) {
+
+		if (
+			storedLang &&
+			(storedLang === 'vi' ||
+				storedLang === 'en' ||
+				storedLang === 'ru' ||
+				storedLang === 'es' ||
+				storedLang === 'tt' ||
+				storedLang === 'pt' ||
+				storedLang === 'jpn' ||
+				storedLang === 'fr' ||
+				storedLang === 'it')
+		) {
 			return undefined;
 		}
 
 		const browserLanguage = navigator.language || (navigator as Navigator & { userLanguage?: string }).userLanguage;
 		if (!browserLanguage) return undefined;
-		const prefix = browserLanguage.toLowerCase().slice(0, 3);
-		const match = SUPPORTED_LNGS.find((lng) => prefix.startsWith(lng));
-		return match;
+
+		if (browserLanguage) {
+			const languageCode = browserLanguage.toLowerCase();
+			if (languageCode.startsWith('vi')) {
+				return 'vi';
+			}
+			if (languageCode.startsWith('en')) {
+				return 'en';
+			}
+			if (languageCode.startsWith('ru')) {
+				return 'ru';
+			}
+			if (languageCode.startsWith('es')) {
+				return 'es';
+			}
+			if (languageCode.startsWith('tt')) {
+				return 'tt';
+			}
+			if (languageCode.startsWith('pt')) {
+				return 'pt';
+			}
+			if (languageCode.startsWith('it')) {
+				return 'it';
+			}
+			if (languageCode.startsWith('jpn')) {
+				return 'jpn';
+			}
+			if (languageCode.startsWith('fr')) {
+				return 'fr';
+			}
+		}
+
+		return undefined;
 	},
 	cacheUserLanguage(lng: string) {
-		if (isSupportedLng(lng)) {
+		if (
+			lng &&
+			(lng === 'vi' ||
+				lng === 'en' ||
+				lng === 'ru' ||
+				lng === 'es' ||
+				lng === 'tt' ||
+				lng === 'pt' ||
+				lng === 'it' ||
+				lng === 'jpn' ||
+				lng === 'fr' ||
+				lng === 'ukr' ||
+				lng === 'de' ||
+				lng === 'fr' ||
+				lng === 'kr' ||
+				lng === 'swe' ||
+				lng === 'blr')
+		) {
 			localStorage.setItem('i18nextLng', lng);
 		}
 	}
@@ -87,7 +155,18 @@ i18n.use(languageDetector)
 		defaultNS,
 		ns: defaultNamespaces,
 		fallbackLng: 'en',
-		supportedLngs: SUPPORTED_LNGS as unknown as string[],
+		supportedLngs: ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'fr'],
+		resources: {
+			en: enTranslations,
+			vi: viTranslations,
+			ru: ruTranslations,
+			es: esTranslations,
+			tt: ttTranslations,
+			pt: ptTranslations,
+			it: itTranslations,
+			jpn: jpnTranslations,
+			fr: frTranslations
+		},
 		detection: {
 			order: ['timezone', 'localStorage', 'navigator', 'htmlTag'],
 			lookupLocalStorage: 'i18nextLng',
