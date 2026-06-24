@@ -6,7 +6,7 @@ import { initReactI18next } from 'react-i18next';
 export const defaultNS = 'common';
 const defaultNamespaces = ['common', 'friends'];
 
-const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe'] as const;
+const SUPPORTED_LNGS = ['en', 'vi', 'ru', 'es', 'tt', 'pt', 'it', 'jpn', 'kr', 'swe', 'blr'] as const;
 type SupportedLng = (typeof SUPPORTED_LNGS)[number];
 const isSupportedLng = (value: string): value is SupportedLng => (SUPPORTED_LNGS as readonly string[]).includes(value);
 
@@ -64,6 +64,8 @@ const loadLanguageBundle = (language: string): Promise<LanguageBundle> => {
 				return (await import('./languages/kr/index')).default as LanguageBundle;
 			case 'swe':
 				return (await import('./languages/swe/index')).default as LanguageBundle;
+			case 'blr':
+				return (await import('./languages/blr/index')).default as LanguageBundle;
 			default:
 				return {} as LanguageBundle;
 		}
